@@ -352,26 +352,41 @@ export async function listMonitors(
   const monitors: MonitorInfo[] = [];
 
   // Try kscreen-doctor (KDE/Wayland native)
+  // Output format (multi-line):
+  //   Output: N NAME uuid
+  //     Geometry: X,Y WxH
   try {
     const r = await execFile("kscreen-doctor", ["-o"], {
       timeout: 5000,
       env: sessionEnv(),
     });
+    // Strip ANSI escape codes before parsing
+    // eslint-disable-next-line no-control-regex
+    const clean = r.stdout.replace(/\x1b\[[0-9;]*m/g, "");
+    const lines = clean.split("\n");
+    let pendingName: string | null = null;
     let idx = 0;
-    for (const line of r.stdout.split("\n")) {
-      // Match "Output: N NAME ... geometry X,Y WxH"
-      const geoMatch = /geometry\s+(\d+),(\d+)\s+(\d+)x(\d+)/i.exec(line);
-      const nameMatch = /Output:\s+\d+\s+(\S+)/i.exec(line);
-      if (geoMatch && nameMatch) {
-        monitors.push({
-          name: nameMatch[1],
-          x: parseInt(geoMatch[1], 10),
-          y: parseInt(geoMatch[2], 10),
-          width: parseInt(geoMatch[3], 10),
-          height: parseInt(geoMatch[4], 10),
-          index: idx++,
-          primary: idx === 1,
-        });
+    for (const line of lines) {
+      const nameMatch = /^\s*Output:\s+\d+\s+(\S+)/.exec(line);
+      if (nameMatch) {
+        pendingName = nameMatch[1];
+        continue;
+      }
+      if (pendingName) {
+        const geoMatch = /^\s*Geometry:\s+(\d+),(\d+)\s+(\d+)x(\d+)/.exec(line);
+        if (geoMatch) {
+          monitors.push({
+            name: pendingName,
+            x: parseInt(geoMatch[1], 10),
+            y: parseInt(geoMatch[2], 10),
+            width: parseInt(geoMatch[3], 10),
+            height: parseInt(geoMatch[4], 10),
+            index: idx,
+            primary: idx === 0,
+          });
+          idx++;
+          pendingName = null;
+        }
       }
     }
   } catch {
@@ -467,14 +482,22 @@ async function getAtSpiBusAddress(): Promise<string | undefined> {
   }
 
   const uid = process.getuid?.() ?? 1000;
-  const sockPath = `/run/user/${uid}/at-spi/bus`;
-  if (existsSync(sockPath)) {
-    const addr = `unix:path=${sockPath}`;
-    atSpiBusAddressCache = { addr, ts: now };
-    return addr;
+  const atSpiDir = `/run/user/${uid}/at-spi`;
+  // Socket may be named bus, bus_0, bus_1, etc. — pick the first match.
+  try {
+    const { readdirSync } = await import("node:fs");
+    const entries = readdirSync(atSpiDir).filter((e) => e.startsWith("bus"));
+    if (entries.length > 0) {
+      const sockPath = `${atSpiDir}/${entries[0]}`;
+      const addr = `unix:path=${sockPath}`;
+      atSpiBusAddressCache = { addr, ts: now };
+      return addr;
+    }
+  } catch {
+    // directory missing or unreadable
   }
 
-  atSpiBusAddressCache = { addr: null, ts: now };
+  // Don't cache null — retry on next call so transient failures self-heal.
   return undefined;
 }
 
@@ -574,29 +597,47 @@ export class DesktopScreenshotRepository {
     const outputPath =
       data.outputPath ?? `/tmp/desktop-screenshot-${executionId}.png`;
 
-    // Resolve monitor name and geometry from name
+    // Resolve monitor name and geometry.
+    // If neither monitorName nor screen is specified, default to the primary monitor.
     let resolvedMonitorName: string | undefined;
     let monitorGeometry:
       | { x: number; y: number; width: number; height: number }
       | undefined;
 
-    if (data.monitorName) {
+    {
       const monitors = await listMonitors(logger);
-      const match = monitors.find(
-        (m) => m.name.toLowerCase() === data.monitorName!.toLowerCase(),
-      );
-      if (match) {
-        resolvedMonitorName = match.name;
-        monitorGeometry = {
-          x: match.x,
-          y: match.y,
-          width: match.width,
-          height: match.height,
-        };
-      } else {
-        logger.warn(
-          `[Desktop] Monitor "${data.monitorName}" not found, capturing all`,
+      let targetName = data.monitorName;
+
+      if (!targetName && data.screen === undefined) {
+        // Default: primary monitor
+        const primary = monitors.find((m) => m.primary) ?? monitors[0];
+        if (primary) {
+          targetName = primary.name;
+        }
+      } else if (!targetName && data.screen !== undefined) {
+        const byIdx = monitors[data.screen];
+        if (byIdx) {
+          targetName = byIdx.name;
+        }
+      }
+
+      if (targetName) {
+        const match = monitors.find(
+          (m) => m.name.toLowerCase() === targetName!.toLowerCase(),
         );
+        if (match) {
+          resolvedMonitorName = match.name;
+          monitorGeometry = {
+            x: match.x,
+            y: match.y,
+            width: match.width,
+            height: match.height,
+          };
+        } else {
+          logger.warn(
+            `[Desktop] Monitor "${targetName}" not found, capturing all`,
+          );
+        }
       }
     }
 
@@ -923,24 +964,16 @@ export class DesktopAccessibilityRepository {
       });
     }
 
-    const args = [scriptPath];
-    if (data.appName) {
-      args.push(data.appName);
-    }
-    if (data.maxDepth !== undefined) {
-      args.push(String(data.maxDepth));
-    }
+    // Always pass both positional args so maxDepth isn't misread as appName.
+    // Empty string = no filter (Python: `if app_name and ...` skips empty).
+    const args = [scriptPath, data.appName ?? "", String(data.maxDepth ?? 5)];
 
     const atSpiBusAddr = await getAtSpiBusAddress();
     const atSpiEnv: NodeJS.ProcessEnv = {
       ...sessionEnv(),
-      ...(atSpiBusAddr
-        ? {
-            AT_SPI_BUS_ADDRESS: atSpiBusAddr,
-            DBUS_SESSION_BUS_ADDRESS:
-              process.env.DBUS_SESSION_BUS_ADDRESS ?? atSpiBusAddr,
-          }
-        : {}),
+      // Only override AT_SPI_BUS_ADDRESS; keep DBUS_SESSION_BUS_ADDRESS as the
+      // main session bus so qdbus6 and other tools inside pyatspi still work.
+      ...(atSpiBusAddr ? { AT_SPI_BUS_ADDRESS: atSpiBusAddr } : {}),
     };
 
     let stdout = "";
@@ -994,15 +1027,20 @@ export class DesktopAccessibilityRepository {
       stdout = stdout.replace(/NODE_COUNT:\d+\n?/, "");
     }
 
-    const tree = timedOut
+    let tree = timedOut
       ? `${stdout.trim()}\n\n[WARNING: Query timed out - output may be incomplete]`
       : stdout.trim();
+
+    // If a specific app was requested but the tree is empty, add a helpful hint
+    if (data.appName && (!nodeCount || nodeCount === 0) && !timedOut) {
+      tree = `[No accessibility data found for "${data.appName}"]\n\nThe app may not have AT-SPI accessibility enabled.\n- Firefox: go to about:config → set accessibility.force_disabled = -1 → restart\n- Electron apps: launch with --enable-accessibility flag\n- Other apps: check if they expose AT-SPI (some require a11y settings enabled)`;
+    }
 
     return success({
       success: true,
       tree,
       appName: data.appName,
-      nodeCount,
+      nodeCount: nodeCount ?? 0,
       truncated: timedOut,
       executionId,
     });
@@ -1415,11 +1453,20 @@ export interface WindowInfo {
   width: number;
   height: number;
   title: string;
+  monitor?: string;
 }
 
 export interface ListWindowsResult {
   success: boolean;
   windows?: WindowInfo[];
+  error?: string;
+  executionId: string;
+}
+
+export interface MoveWindowToMonitorResult {
+  success: boolean;
+  movedTo?: string;
+  windowTitle?: string;
   error?: string;
   executionId: string;
 }
@@ -1592,6 +1639,7 @@ print("KWIN_LIST_START_${executionId}");
 var wins = workspace.windowList();
 for (var i = 0; i < wins.length; i++) {
   var w = wins[i];
+  if (w.skipTaskbar || !w.caption) continue;
   print(JSON.stringify({
     uuid: String(w.internalId),
     title: w.caption,
@@ -1601,8 +1649,7 @@ for (var i = 0; i < wins.length; i++) {
     width: Math.round(w.width),
     height: Math.round(w.height),
     desktop: w.desktops && w.desktops[0] ? String(w.desktops[0]) : "0",
-    minimized: w.minimized,
-    skipTaskbar: w.skipTaskbar
+    minimized: w.minimized
   }));
 }
 print("KWIN_LIST_END_${executionId}");
@@ -1710,6 +1757,23 @@ print("KWIN_LIST_END_${executionId}");
             /* skip non-JSON lines */
           }
         }
+      }
+    }
+
+    // Annotate each window with the monitor it primarily lives on.
+    // Window coords from KWin are in logical kscreen space; monitor coords
+    // from listMonitors (xrandr) are also logical — they match directly.
+    if (windows.length > 0) {
+      const monitors = await listMonitors(logger);
+      for (const win of windows) {
+        const cx = win.x + win.width / 2;
+        const cy = win.y + win.height / 2;
+        // Find monitor whose rect contains the window center
+        const hit = monitors.find(
+          (m) =>
+            cx >= m.x && cx < m.x + m.width && cy >= m.y && cy < m.y + m.height,
+        );
+        win.monitor = hit?.name;
       }
     }
 
@@ -1830,5 +1894,173 @@ for (var i = 0; i < wins.length; i++) {
     );
 
     return success({ success: true, executionId });
+  }
+
+  static async moveWindowToMonitor(
+    data: {
+      windowId?: string;
+      pid?: number;
+      title?: string;
+      monitorName?: string;
+      monitorIndex?: number;
+    },
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<MoveWindowToMonitorResult>> {
+    const platformErr = checkLinux(t);
+    if (platformErr) {
+      return platformErr as ResponseType<MoveWindowToMonitorResult>;
+    }
+
+    const executionId = makeExecutionId();
+
+    if (!data.windowId && data.pid === undefined && !data.title) {
+      return fail({
+        message: t("repository.focusWindowRequiresIdentifier"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+    if (data.monitorName === undefined && data.monitorIndex === undefined) {
+      return fail({
+        message: t("repository.commandFailed", {
+          error: "Provide monitorName or monitorIndex",
+        }),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+
+    const monitors = await listMonitors(logger);
+    let targetMonitor: MonitorInfo | undefined;
+    if (data.monitorName) {
+      targetMonitor = monitors.find(
+        (m) => m.name.toLowerCase() === data.monitorName!.toLowerCase(),
+      );
+    } else if (data.monitorIndex !== undefined) {
+      targetMonitor = monitors[data.monitorIndex];
+    }
+
+    if (!targetMonitor) {
+      return fail({
+        message: t("repository.commandFailed", {
+          error: `Monitor not found: ${data.monitorName ?? data.monitorIndex}`,
+        }),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    let targetId = data.windowId;
+    let windowTitle: string | undefined;
+
+    if (!targetId) {
+      const listResult = await DesktopWindowRepository.listWindows(t, logger);
+      if (!listResult.success || !listResult.data.windows) {
+        return fail({
+          message: t("repository.commandFailed", {
+            error: "Could not list windows",
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+      const match = listResult.data.windows.find((w: WindowInfo) =>
+        data.pid !== undefined
+          ? w.pid === data.pid
+          : w.title.toLowerCase().includes((data.title ?? "").toLowerCase()),
+      );
+      if (!match) {
+        return fail({
+          message: t("repository.commandFailed", {
+            error: data.pid
+              ? `No window with PID ${data.pid}`
+              : `No window with title containing "${data.title}"`,
+          }),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      targetId = match.windowId;
+      windowTitle = match.title;
+    }
+
+    const resolvedId: string = targetId;
+    const {
+      x: mx,
+      y: my,
+      width: mw,
+      height: mh,
+      name: monName,
+    } = targetMonitor;
+    const targetX = mx + Math.round(mw / 4);
+    const targetY = my + Math.round(mh / 4);
+
+    const safeId = resolvedId.replace(/[^a-zA-Z0-9{}-]/g, "");
+    const script = `
+var wins = workspace.windowList();
+for (var i = 0; i < wins.length; i++) {
+  var w = wins[i];
+  if (String(w.internalId) === "${safeId}") {
+    w.frameGeometry = Qt.rect(${targetX}, ${targetY}, w.width, w.height);
+    workspace.activeWindow = w;
+    break;
+  }
+}
+`.trim();
+
+    const scriptPath = `/tmp/kwin-move-${executionId}.js`;
+    const { writeFileSync, unlinkSync } = await import("node:fs");
+    writeFileSync(scriptPath, script, "utf-8");
+
+    const loadResult = await runCommand(
+      "qdbus6",
+      [
+        "org.kde.KWin",
+        "/Scripting",
+        "org.kde.kwin.Scripting.loadScript",
+        scriptPath,
+      ],
+      t,
+      logger,
+    );
+
+    if (isCommandError(loadResult)) {
+      try {
+        unlinkSync(scriptPath);
+      } catch {
+        /* non-fatal */
+      }
+      return loadResult as ResponseType<MoveWindowToMonitorResult>;
+    }
+
+    const scriptId = loadResult.stdout.trim();
+    await runCommand(
+      "qdbus6",
+      [
+        "org.kde.KWin",
+        `/Scripting/Script${scriptId}`,
+        "org.kde.kwin.Script.run",
+      ],
+      t,
+      logger,
+    );
+    try {
+      unlinkSync(scriptPath);
+    } catch {
+      /* non-fatal */
+    }
+    await runCommand(
+      "qdbus6",
+      [
+        "org.kde.KWin",
+        `/Scripting/Script${scriptId}`,
+        "org.kde.kwin.Script.stop",
+      ],
+      t,
+      logger,
+    );
+
+    return success({
+      success: true,
+      movedTo: monName,
+      windowTitle,
+      executionId,
+    });
   }
 }

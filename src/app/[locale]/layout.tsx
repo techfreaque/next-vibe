@@ -112,8 +112,8 @@ export async function tanstackLoader({
       ],
     },
   };
-  const themeCookie = (await cookies()).get("theme")?.value;
-  const theme: "light" | "dark" = themeCookie === "dark" ? "dark" : "light";
+  const themeCookie = (await cookies()).get("theme_v2")?.value;
+  const theme: "light" | "dark" = themeCookie === "light" ? "light" : "dark";
 
   return { locale, structuredData, theme };
 }
@@ -133,7 +133,7 @@ export function TanstackPage({
         <Script
           id="theme-sync"
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)theme=(light|dark)/);if(m)localStorage.setItem('theme',m[1]);}catch(e){}})();`,
+            __html: `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)theme_v2=(light|dark)/);if(m)localStorage.setItem('theme_v2',m[1]);}catch(e){}})();`,
           }}
         />
       </Head>

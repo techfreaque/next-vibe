@@ -284,9 +284,35 @@ const { GET } = createEndpoint({
     },
 
     // ── files-uploaded ───────────────────────────────────────────────────────
+    // The framework's id-based array merger would keep optimistic attachments
+    // alongside the permanent ones (different IDs). We bypass it entirely and
+    // patch the message metadata directly so the attachments array is replaced.
     "files-uploaded": {
       fields: { messages: ["id", "metadata"] as const },
       operation: "merge" as const,
+      onEvent: async (ctx) => {
+        const msg = ctx.partial.messages?.[0];
+        const msgId = msg?.id;
+        if (!msgId) {
+          return;
+        }
+        const threadId = ctx.urlPathParams["threadId"] ?? "";
+        const rawFolderId = ctx.requestData["rootFolderId"];
+        if (typeof rawFolderId !== "string") {
+          return;
+        }
+        const { isDefaultFolderId } =
+          await import("@/app/api/[locale]/agent/chat/config");
+        if (!isDefaultFolderId(rawFolderId)) {
+          return;
+        }
+        const { writeMessagesMetadataPatch } =
+          await import("./hooks/update-messages");
+        writeMessagesMetadataPatch(threadId, rawFolderId, ctx.logger, msgId, {
+          isUploadingAttachments: false,
+          attachments: msg.metadata?.attachments,
+        });
+      },
     },
 
     // ── tokens-updated ───────────────────────────────────────────────────────

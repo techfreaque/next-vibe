@@ -5,10 +5,10 @@ export interface HeadProps {
   children: ReactNode;
 }
 
-// Mirrors next-themes' inline script (attribute="class", storageKey="theme",
+// Mirrors next-themes' inline script (attribute="class", storageKey="theme_v2",
 // defaultTheme="dark", enableSystem=false). Must run before any stylesheet
 // so the correct dark/light class is on <html> before first paint.
-const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t="dark";}var d=document.documentElement;d.classList.remove("light","dark");d.classList.add(t);d.style.colorScheme=t;}catch(e){}})()`;
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem("theme_v2");if(t!=="light"&&t!=="dark"){t="dark";}var d=document.documentElement;d.classList.remove("light","dark");d.classList.add(t);d.style.colorScheme=t;}catch(e){}})()`;
 
 /**
  * Platform-agnostic Head wrapper component (Web implementation)

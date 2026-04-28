@@ -680,6 +680,15 @@ export class ResumeStreamRepository {
                   createdAt: new Date(),
                   updatedAt: new Date(),
                   isAI: true,
+                  authorId:
+                    resolvedExisting?.authorId ?? existing?.authorId ?? null,
+                  authorName: null,
+                  errorType: null,
+                  errorCode: null,
+                  errorMessage: null,
+                  upvotes: 0,
+                  downvotes: 0,
+                  searchVector: null,
                 },
               ],
             });

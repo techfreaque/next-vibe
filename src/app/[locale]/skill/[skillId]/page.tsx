@@ -44,16 +44,44 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const logger = createEndpointLogger(false, Date.now(), locale);
+
+  const userResponse = await UserRepository.getUserByAuth(
+    {
+      detailLevel: UserDetailLevel.MINIMAL,
+      roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+    },
+    locale,
+    logger,
+  );
+  const user = userResponse.success ? userResponse.data : null;
+
+  let name = "";
+  let tagline = "";
+  let modelCount = 0;
+  if (user) {
+    const skillResult = await SkillsRepository.getSkillById(
+      { id: skillId },
+      user,
+      logger,
+      locale,
+    );
+    if (skillResult.success) {
+      name = skillResult.data.name ?? "";
+      tagline = skillResult.data.tagline ?? "";
+      modelCount = skillResult.data.variants?.length ?? 0;
+    }
+  }
 
   return metadataGenerator(locale, {
     path: `skill/${skillId}`,
-    title: t("meta.title", { appName }),
+    title: t("meta.title", { appName, name }),
     category: t("meta.category"),
-    description: t("meta.description", { appName }),
+    description: t("meta.description", { appName, name, tagline, modelCount }),
     image:
       "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?q=80&w=2070",
-    imageAlt: t("meta.imageAlt", { appName }),
-    keywords: [t("meta.keywords", { appName })],
+    imageAlt: t("meta.imageAlt", { appName, name }),
+    keywords: [t("meta.keywords", { appName, name })],
   });
 }
 

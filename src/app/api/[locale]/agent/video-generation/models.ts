@@ -6,7 +6,7 @@ import {
   IntelligenceLevel,
   ModelSelectionType,
 } from "../chat/skills/enum";
-import { ModelUtility } from "../models/enum";
+import { ModelUtility, type Modality } from "../models/enum";
 import {
   ApiProvider,
   buildModelOptionsIndex,
@@ -107,7 +107,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"],
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -152,7 +152,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"],
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -355,7 +355,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"],
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -480,7 +480,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"],
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -607,7 +607,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"],
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -685,7 +685,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"],
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -726,7 +726,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"],
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -986,7 +986,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"],
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -1175,4 +1175,14 @@ export function getBestVideoGenModel(
   providerOverride?: ApiProvider,
 ): VideoGenModelOption | null {
   return filterVideoGenModels(selection, user, providerOverride)[0] ?? null;
+}
+
+/**
+ * Returns all video gen model options that accept the given input modality.
+ * E.g. getVideoGenModelsByInputModality("image") → all I2V models.
+ */
+export function getVideoGenModelsByInputModality(
+  modality: Modality,
+): VideoGenModelOption[] {
+  return videoGenModelOptions.filter((m) => m.inputs.includes(modality));
 }

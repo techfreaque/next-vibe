@@ -20,6 +20,7 @@ import { TASK_TIMEOUTS } from "@/app/api/[locale]/system/unified-interface/tasks
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { AI_RUN_ALIAS } from "@/app/api/[locale]/agent/ai-stream/run/constants";
 
 import type { ChatSettings } from "../db";
 import {
@@ -147,7 +148,7 @@ export async function ensureDreamTask(
     .values({
       id,
       shortId: id,
-      routeId: "agent.ai-stream.run",
+      routeId: AI_RUN_ALIAS,
       displayName: "Dreaming",
       description:
         "AI reorganizes your cortex while you sleep - consolidates memories, cleans up documents, surfaces what matters.",
@@ -163,6 +164,7 @@ export async function ensureDreamTask(
     .onConflictDoUpdate({
       target: cronTasks.id,
       set: {
+        routeId: AI_RUN_ALIAS,
         enabled,
         schedule,
         taskInput,
@@ -216,7 +218,7 @@ export async function ensureAutopilotTask(
     .values({
       id,
       shortId: id,
-      routeId: "agent.ai-stream.run",
+      routeId: AI_RUN_ALIAS,
       displayName: "Autopilot",
       description:
         "AI works your queue while you're away - advances projects, handles next steps, picks up where you left off.",
@@ -232,6 +234,7 @@ export async function ensureAutopilotTask(
     .onConflictDoUpdate({
       target: cronTasks.id,
       set: {
+        routeId: AI_RUN_ALIAS,
         enabled,
         schedule,
         taskInput,
@@ -285,7 +288,7 @@ export async function ensureMamaTask(
     .values({
       id: MAMA_TASK_ID,
       shortId: MAMA_TASK_ID,
-      routeId: "agent.ai-stream.run",
+      routeId: AI_RUN_ALIAS,
       displayName: "Mama Heartbeat",
       description:
         "Thea monitors the production instance - checks health, advances features, handles marketing, sends news.",
@@ -301,6 +304,7 @@ export async function ensureMamaTask(
     .onConflictDoUpdate({
       target: cronTasks.id,
       set: {
+        routeId: AI_RUN_ALIAS,
         enabled,
         schedule,
         taskInput,

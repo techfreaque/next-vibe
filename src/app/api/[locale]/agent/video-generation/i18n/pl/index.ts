@@ -38,6 +38,11 @@ export const translations = {
       label: "Rozdzielczość",
       description: "Rozdzielczość wyjściowego wideo",
     },
+    inputMediaUrl: {
+      label: "URL obrazu wejściowego",
+      description: "Obraz do animowania. Model wygeneruje ruch z tej klatki.",
+      placeholder: "https://przyklad.pl/obraz.jpg",
+    },
     download: "Pobierz",
     generatingNote: "Generowanie wideo może zająć 1–3 minuty",
     backButton: {
@@ -108,6 +113,8 @@ export const translations = {
       providerError: "Błąd dostawcy: {{error}}",
       noVideoUrl: "Dostawca nie zwrócił URL wideo",
       creditsFailed: "Nie udało się odjąć kredytów za generowanie wideo",
+      inputMediaRequired:
+        "Ten model wymaga URL obrazu wejściowego. Wklej link do obrazu, który chcesz animować.",
     },
     success: {
       title: "Wideo wygenerowane",

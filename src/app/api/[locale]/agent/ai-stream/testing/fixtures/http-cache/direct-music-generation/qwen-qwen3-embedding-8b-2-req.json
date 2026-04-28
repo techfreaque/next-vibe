@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:fcf8dbb1 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Apr 28, 20:05]\n\nAssistant: RETRY_RESPONSE STEP_OK\n\nSystem: [Context: ID:c334fb93 | Posted:Apr 28, 20:05]\n\nUser: [T4a music-gen] Call execute-tool with toolName='generate_music', instanceId='hermes', input={'prompt':'upbeat piano melody'}. Check that the result has a non-empty audioUrl, a positive creditCost, and durationSeconds between 8 and 120. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (60 · 4 archived)\n│   ├── role.md\n│   │   Solo founder & lead developer of **unbottled.ai** — free speech AI platform, full-time since **Oct 2025** (~2 years building next-vibe, started during Sovendus nights/weekends). Also the framework behind it: **next-vibe** (SaaS framework, TypeScript monorepo). Previ\n│   ├── name.md\n│   │   **Max** — go by Max. German in real life, English with computers/internet. Prefers English for all AI interactions even if platfo\n\nSystem: [Context: ID:c2029b5e | Model:kimi-k2.6 | Skill:quality-tester | Posted:Apr 28, 20:05]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_music\",\"input\":{\"prompt\":\"upbeat piano melody\"},\"instanceId\":\"hermes\",\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"audioUrl\":\"https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/55211b21-7ab6-48e9-9554-f1dd52fbe6b0.mp3\",\"creditCost\":10.4,\"durationSeconds\":8}}",
+    "encoding_format": "float"
+  }
+}

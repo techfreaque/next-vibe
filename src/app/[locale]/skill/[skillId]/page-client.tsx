@@ -69,13 +69,7 @@ export function SkillLandingPage({
   skillData,
 }: SkillLandingPageProps): JSX.Element {
   return (
-    <Div
-      style={{
-        minHeight: "100vh",
-        background: "#0f0520",
-        color: "#fff",
-      }}
-    >
+    <Div className="dark min-h-screen bg-[#0f0520] text-white">
       <EndpointsPage
         endpoint={skillDefs}
         endpointOptions={{

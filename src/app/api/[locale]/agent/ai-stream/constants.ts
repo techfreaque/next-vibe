@@ -40,7 +40,7 @@ export const DEFAULT_CHAT_MODEL_SELECTION: ChatModelSelection = {
  */
 export const DEFAULT_IMAGE_VISION_MODEL_SELECTION: ImageVisionModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: ImageVisionModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
+  manualModelId: ImageVisionModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,

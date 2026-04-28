@@ -37,6 +37,12 @@ export const translations = {
       label: "Resolution",
       description: "Output video resolution",
     },
+    inputMediaUrl: {
+      label: "Input Image URL",
+      description:
+        "Image to animate. The model will generate motion from this frame.",
+      placeholder: "https://example.com/image.jpg",
+    },
     download: "Download",
     generatingNote: "Video generation can take 1–3 minutes",
     backButton: {
@@ -107,6 +113,8 @@ export const translations = {
       providerError: "Video provider error: {{error}}",
       noVideoUrl: "No video URL returned from provider",
       creditsFailed: "Failed to deduct credits for video generation",
+      inputMediaRequired:
+        "This model requires an input image URL. Paste an image link to animate it.",
     },
     success: {
       title: "Video Generated",

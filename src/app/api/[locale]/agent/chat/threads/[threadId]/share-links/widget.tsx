@@ -58,8 +58,7 @@ export function ThreadShareDialog({
 
   const isInSharedFolder = currentRootFolderId === DefaultFolderId.SHARED;
   const [overridePublic, setOverridePublic] = useState<boolean | null>(null);
-  const isPublic =
-    overridePublic !== null ? overridePublic : isInSharedFolder;
+  const isPublic = overridePublic !== null ? overridePublic : isInSharedFolder;
 
   const [isToggling, setIsToggling] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -84,7 +83,9 @@ export function ThreadShareDialog({
 
   const handleSendEmail = useCallback((): void => {
     const emails = emailInput.trim();
-    if (!emails) {return;}
+    if (!emails) {
+      return;
+    }
     /* eslint-disable i18next/no-literal-string */
     const subject = encodeURIComponent(threadTitle);
     const body = encodeURIComponent(threadUrl);
@@ -102,14 +103,15 @@ export function ThreadShareDialog({
     setIsToggling(true);
     try {
       // Optimistic: update threads sidebar cache
-      const threadsDefModule = await import(
-        "@/app/api/[locale]/agent/chat/threads/definition"
-      );
+      const threadsDefModule =
+        await import("@/app/api/[locale]/agent/chat/threads/definition");
       apiClient.updateEndpointData(
         threadsDefModule.default.GET,
         logger,
         (old) => {
-          if (!old?.success) {return old;}
+          if (!old?.success) {
+            return old;
+          }
           return success({
             ...old.data,
             threads: old.data.threads.map((row) =>
@@ -119,18 +121,21 @@ export function ThreadShareDialog({
             ),
           });
         },
-        { requestData: { rootFolderId: currentRootFolderId, subFolderId: null } },
+        {
+          requestData: { rootFolderId: currentRootFolderId, subFolderId: null },
+        },
       );
 
       // Optimistic: remove from current folder-contents cache
-      const folderContentsDefModule = await import(
-        "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition"
-      );
+      const folderContentsDefModule =
+        await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition");
       apiClient.updateEndpointData(
         folderContentsDefModule.default.GET,
         logger,
         (old) => {
-          if (!old?.success) {return old;}
+          if (!old?.success) {
+            return old;
+          }
           return success({
             ...old.data,
             items: old.data.items.filter((i) => i.id !== threadId),
@@ -143,9 +148,8 @@ export function ThreadShareDialog({
       );
 
       // Persist
-      const threadDef = await import(
-        "@/app/api/[locale]/agent/chat/threads/[threadId]/definition"
-      );
+      const threadDef =
+        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
       await apiClient.mutate(
         threadDef.default.PATCH,
         logger,
@@ -160,7 +164,15 @@ export function ThreadShareDialog({
     } finally {
       setIsToggling(false);
     }
-  }, [isPublic, threadId, currentRootFolderId, logger, user, locale, onThreadMoved]);
+  }, [
+    isPublic,
+    threadId,
+    currentRootFolderId,
+    logger,
+    user,
+    locale,
+    onThreadMoved,
+  ]);
 
   const handleClose = useCallback(() => onOpenChange(false), [onOpenChange]);
 
@@ -180,7 +192,6 @@ export function ThreadShareDialog({
         </DialogHeader>
 
         <Div className="px-5 pb-5 flex flex-col gap-4">
-
           {/* Public / private toggle */}
           <Div
             className={cn(
@@ -189,17 +200,23 @@ export function ThreadShareDialog({
                 ? "border-primary/40 bg-primary/5"
                 : "border-border bg-muted/30",
             )}
-            onClick={(): void => { void handleTogglePublic(); }}
+            onClick={(): void => {
+              void handleTogglePublic();
+            }}
           >
             <Div
               className={cn(
                 "shrink-0 w-9 h-9 rounded-full flex items-center justify-center",
-                isPublic ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground",
+                isPublic
+                  ? "bg-primary/15 text-primary"
+                  : "bg-muted text-muted-foreground",
               )}
             >
-              {isPublic
-                ? <Globe className="h-4 w-4" />
-                : <Lock className="h-4 w-4" />}
+              {isPublic ? (
+                <Globe className="h-4 w-4" />
+              ) : (
+                <Lock className="h-4 w-4" />
+              )}
             </Div>
             <Div className="flex-1 flex flex-col gap-0.5">
               <Div className="text-sm font-medium">
@@ -217,7 +234,10 @@ export function ThreadShareDialog({
               variant={isPublic ? "outline" : "default"}
               size="sm"
               disabled={isToggling}
-              onClick={(e) => { e.stopPropagation(); void handleTogglePublic(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                void handleTogglePublic();
+              }}
               className="shrink-0"
             >
               {isToggling
@@ -244,13 +264,16 @@ export function ThreadShareDialog({
                   onClick={handleCopy}
                   className={cn(
                     "shrink-0 transition-colors",
-                    copied && "bg-green-600 border-green-600 hover:bg-green-700",
+                    copied &&
+                      "bg-green-600 border-green-600 hover:bg-green-700",
                   )}
                   title={t("widget.shareDialog.copyLink")}
                 >
-                  {copied
-                    ? <Check className="h-4 w-4" />
-                    : <Copy className="h-4 w-4" />}
+                  {copied ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </Button>
               </Div>
 
@@ -262,7 +285,11 @@ export function ThreadShareDialog({
                     type="email"
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") {handleSendEmail();} }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSendEmail();
+                      }
+                    }}
                     placeholder={t("widget.emailShare.placeholder")}
                     className="pl-8 text-sm"
                   />
@@ -279,7 +306,6 @@ export function ThreadShareDialog({
               </Div>
             </>
           )}
-
         </Div>
 
         <Separator />

@@ -63,6 +63,31 @@ export function upsertMessage(
   });
 }
 
+/**
+ * Patch specific keys inside a message's metadata object without replacing
+ * the entire metadata. Used by the files-uploaded event to replace attachments
+ * without triggering the id-based array merger that would duplicate images.
+ */
+export function writeMessagesMetadataPatch(
+  threadId: string,
+  rootFolderId: DefaultFolderId,
+  logger: EndpointLogger,
+  messageId: string,
+  metadataPatch: Partial<NonNullable<ChatMessage["metadata"]>>,
+): void {
+  writeMessages(threadId, rootFolderId, logger, (msgs) =>
+    msgs.map((m) =>
+      m.id === messageId
+        ? {
+            ...m,
+            metadata: { ...(m.metadata ?? {}), ...metadataPatch },
+            updatedAt: new Date(),
+          }
+        : m,
+    ),
+  );
+}
+
 export function patchMessage(
   threadId: string,
   rootFolderId: DefaultFolderId,

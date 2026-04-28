@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Appearance, useColorScheme, View } from "react-native";
 
 /** Mirrors the web constant - no cookie in React Native but exported for interface parity */
-export const THEME_COOKIE_NAME = "theme";
+export const THEME_COOKIE_NAME = "theme_v2";
 
 import type {
   ThemeProviderProps,
@@ -21,7 +21,7 @@ export function ThemeProvider({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
   defaultTheme = "system", // Intentionally extracted - not used in React Native, uses system color scheme
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
-  storageKey = "theme", // Intentionally extracted - not used in React Native, uses system color scheme
+  storageKey = "theme_v2", // Intentionally extracted - not used in React Native, uses system color scheme
   className,
   style,
 }: ThemeProviderProps): React.JSX.Element {

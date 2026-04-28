@@ -5,7 +5,7 @@ export type {
   UseThemeToggleReturn,
 } from "../../web/ui/theme-provider";
 
-export const THEME_COOKIE_NAME = "theme";
+export const THEME_COOKIE_NAME = "theme_v2";
 
 import type {
   ThemeProviderProps,

@@ -8,6 +8,7 @@ import { translations as getAccessibilityTreeTranslations } from "../../get-acce
 import { translations as getFocusedWindowTranslations } from "../../get-focused-window/i18n/en";
 import { translations as listMonitorsTranslations } from "../../list-monitors/i18n/en";
 import { translations as listWindowsTranslations } from "../../list-windows/i18n/en";
+import { translations as moveWindowToMonitorTranslations } from "../../move-window-to-monitor/i18n/en";
 import { translations as moveMouseTranslations } from "../../move-mouse/i18n/en";
 import { translations as pressKeyTranslations } from "../../press-key/i18n/en";
 import { translations as scrollTranslations } from "../../scroll/i18n/en";
@@ -26,6 +27,7 @@ export const translations = {
   "get-focused-window": getFocusedWindowTranslations,
   "list-windows": listWindowsTranslations,
   "focus-window": focusWindowTranslations,
+  "move-window-to-monitor": moveWindowToMonitorTranslations,
 
   title: "Desktop Automation Tools",
   description: "Control the desktop: screenshots, mouse, keyboard, windows",
@@ -52,6 +54,7 @@ export const translations = {
     getFocusedWindow: "Get Focused Window",
     listWindows: "List Windows",
     focusWindow: "Focus Window",
+    moveWindowToMonitor: "Move Window to Monitor",
   },
 
   repository: {

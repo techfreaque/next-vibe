@@ -4,6 +4,7 @@ import { translations as getAccessibilityTreeTranslations } from "../../get-acce
 import { translations as getFocusedWindowTranslations } from "../../get-focused-window/i18n/de";
 import { translations as listMonitorsTranslations } from "../../list-monitors/i18n/de";
 import { translations as listWindowsTranslations } from "../../list-windows/i18n/de";
+import { translations as moveWindowToMonitorTranslations } from "../../move-window-to-monitor/i18n/de";
 import { translations as moveMouseTranslations } from "../../move-mouse/i18n/de";
 import { translations as pressKeyTranslations } from "../../press-key/i18n/de";
 import { translations as scrollTranslations } from "../../scroll/i18n/de";
@@ -27,6 +28,7 @@ export const translations: typeof enTranslations = {
   "get-focused-window": getFocusedWindowTranslations,
   "list-windows": listWindowsTranslations,
   "focus-window": focusWindowTranslations,
+  "move-window-to-monitor": moveWindowToMonitorTranslations,
 
   title: "Desktop-Automatisierungstools",
   description: "Desktop steuern: Screenshots, Maus, Tastatur, Fenster",
@@ -53,6 +55,7 @@ export const translations: typeof enTranslations = {
     listMonitors: "Monitore auflisten",
     listWindows: "Fenster auflisten",
     focusWindow: "Fenster fokussieren",
+    moveWindowToMonitor: "Fenster auf Monitor verschieben",
   },
 
   repository: {

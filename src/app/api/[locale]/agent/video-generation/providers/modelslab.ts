@@ -38,6 +38,7 @@ export async function generateVideoWithModelsLab(params: {
   isUltra?: boolean;
   aspectRatio?: string;
   resolution?: string;
+  inputImageUrl?: string;
 }): Promise<ResponseType<{ videoUrl: string }>> {
   const {
     providerModel,
@@ -49,6 +50,7 @@ export async function generateVideoWithModelsLab(params: {
     isUltra,
     aspectRatio,
     resolution,
+    inputImageUrl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
@@ -66,9 +68,11 @@ export async function generateVideoWithModelsLab(params: {
   // Determine which endpoint to use
   const isUltraModel =
     isUltra ?? (providerModel === "wan2.1" || providerModel === "wan2.2");
-  const endpoint = isUltraModel
-    ? "https://modelslab.com/api/v6/video/text2video_ultra"
-    : "https://modelslab.com/api/v6/video/text2video";
+  const endpoint = inputImageUrl
+    ? "https://modelslab.com/api/v6/video/img2video"
+    : isUltraModel
+      ? "https://modelslab.com/api/v6/video/text2video_ultra"
+      : "https://modelslab.com/api/v6/video/text2video";
 
   logger.debug("[ModelsLab Video] Submitting generation request", {
     providerModel,
@@ -88,6 +92,7 @@ export async function generateVideoWithModelsLab(params: {
         // eslint-disable-next-line i18next/no-literal-string
         output_type: "mp4",
         num_frames: Math.min(Math.round(durationSeconds * 8), 25),
+        ...(inputImageUrl ? { init_image: inputImageUrl } : {}),
         ...(aspectRatio ? { aspect_ratio: aspectRatio } : {}),
         ...(resolution ? { resolution } : {}),
       }),

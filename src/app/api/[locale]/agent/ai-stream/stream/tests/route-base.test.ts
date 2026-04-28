@@ -941,6 +941,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     let mainFavoriteId: string;
     /** Native image gen favorite: GPT-5 Image Mini as chat model (outputs: ["text","image"]) */
     let nativeImageFavoriteId: string;
+    /** Nano Banana Pro favorite: Gemini 3 Pro Image Preview as chat model (can see + generates images, uses video tool) */
+    let nanoBananaFavoriteId: string;
     beforeAll(async () => {
       const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
       expect(
@@ -1026,6 +1028,42 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         })
         .onConflictDoNothing();
       nativeImageFavoriteId = NATIVE_IMAGE_FAVORITE_ID;
+
+      // ── Resolve Nano Banana Pro favorite (Gemini 3 Pro Image Preview) ──
+      // T11c/T11d tests: model can see images (inputs: ["text","image"]) and
+      // generates images natively, but video goes through the generate_video tool.
+      // Uses existing admin favorite if present so UI overrides are respected.
+      const NANO_BANANA_FAVORITE_ID = "00000000-0000-4001-a000-000000000003";
+      const [existingNanoBanana] = await db
+        .select({ id: chatFavorites.id })
+        .from(chatFavorites)
+        .where(
+          and(
+            eq(chatFavorites.userId, testUser.id),
+            eq(chatFavorites.slug, "test-nano-banana"),
+          ),
+        )
+        .limit(1);
+      if (existingNanoBanana) {
+        nanoBananaFavoriteId = existingNanoBanana.id;
+      } else {
+        await db
+          .insert(chatFavorites)
+          .values({
+            id: NANO_BANANA_FAVORITE_ID,
+            userId: testUser.id,
+            slug: "test-nano-banana",
+            skillId: "quality-tester",
+            variantId: "kimi",
+            modelSelection: {
+              selectionType: ModelSelectionType.MANUAL,
+              manualModelId: ChatModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
+            },
+            position: 10000,
+          })
+          .onConflictDoNothing();
+        nanoBananaFavoriteId = NANO_BANANA_FAVORITE_ID;
+      }
 
       // Per-mode setup (remote connections, credential patching, etc.)
       if (cfg.setup) {
@@ -4945,6 +4983,170 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const after = await getBalance(testUser, creditLogger, creditT);
           assertDeducted(before, after, 0, 20);
+        },
+        effectiveTestTimeout,
+      );
+
+      // ── T11c: I2V via Nano Banana Pro (sees image, calls generate_video tool with inputMediaUrl) ──
+      // Gemini 3 Pro Image Preview inputs: ["text","image"] - it can see the image directly.
+      // outputs: ["text","image"] only - video goes through the generate_video tool.
+      // The AI receives the image, understands it, then calls generate_video with inputMediaUrl set.
+      fit(
+        "T11c: image-to-video via Nano Banana Pro - model sees image, calls generate_video with inputMediaUrl",
+        async () => {
+          setFetchCacheContext(`${cfg.cachePrefix}image-to-video-nano-banana`);
+          // I2V models (wan-2-6-i2v etc.) cost ~10 cr/sec × 5 sec × 1.3 markup = ~65 cr
+          await pinBalance(testUser.id, 200, creditLogger, creditT);
+          const before = await getBalance(testUser, creditLogger, creditT);
+          const prevCount = (await fetchThreadMessages(threadId)).length;
+
+          // Max's photo hosted at a stable URL for the fixture.
+          // The model sees the image directly (inputs includes "image"), describes it,
+          // then calls generate_video with inputMediaUrl to animate it.
+          const INPUT_IMAGE_URL =
+            "https://unbottled.ai/test-assets/max-resume-photo.jpg";
+
+          const { result, messages } = await runStream({
+            user: testUser,
+            prompt: `[T11c i2v-nano-banana] Here is my photo: ${INPUT_IMAGE_URL} — make a nice foto out of it for my resume and tinder profile. ${toolInstrWithArgs(cfg, "generate_video", `prompt='professional portrait, smooth camera pull-back' inputMediaUrl='${INPUT_IMAGE_URL}'`)}. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
+            threadId,
+            favoriteId: nanoBananaFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+          });
+
+          expect(result.success).toBe(true);
+          if (!result.success) {
+            return;
+          }
+
+          const added = newMessages(messages, prevCount);
+
+          // Tool message: AI called generate_video (possibly via execute-tool in direct mode)
+          const videoToolMsg = findToolMsg(added, "generate_video", cfg);
+          expect(videoToolMsg).toBeDefined();
+          if (videoToolMsg) {
+            assertToolMessageComplete(videoToolMsg, "generate_video", "T11c", cfg);
+          }
+
+          // Args: inputMediaUrl must be the image URL passed in
+          const videoArgs = toolResultRecord(videoToolMsg!.toolCall?.args);
+          const resolvedArgs =
+            (videoArgs?.["input"] as Record<string, unknown> | undefined) ??
+            videoArgs;
+          expect(
+            resolvedArgs?.["inputMediaUrl"],
+            "[T11c] generate_video args.inputMediaUrl must be the input image URL",
+          ).toBe(INPUT_IMAGE_URL);
+
+          // Result: videoUrl, positive creditCost, positive durationSeconds
+          const videoRes = resolveToolResult(videoToolMsg);
+          expect(videoRes).not.toBeNull();
+          expect(typeof videoRes!["videoUrl"]).toBe("string");
+          expect(videoRes!["videoUrl"]).toBeTruthy();
+          expect((videoRes!["creditCost"] as number) > 0).toBe(true);
+          expect((videoRes!["durationSeconds"] as number) > 0).toBe(true);
+          expect((videoRes!["durationSeconds"] as number) <= 60).toBe(true);
+
+
+          const lastAi = messages.find(
+            (m) => m.id === result.data.lastAiMessageId,
+          );
+          expect(lastAi?.finishReason).toBe("stop");
+          assertStepOk(lastAi!.content, "T11c");
+          lastMainAiMsgId = result.data.lastAiMessageId!;
+
+          assertNoOrphans(
+            messages,
+            new Set([t2BranchParentId].filter(Boolean)),
+            {
+              expectedLeafId: lastMainAiMsgId,
+              knownDeadEndLeaves: deadEndLeaves,
+            },
+          );
+          await assertThreadIdle(threadId);
+          await assertNoPendingTasks(threadId);
+
+          const after = await getBalance(testUser, creditLogger, creditT);
+          assertDeducted(before, after, 30, 150);
+        },
+        effectiveTestTimeout,
+      );
+
+      // ── T11d: I2V via Kimi (text-only, can't see image, passes URL to generate_video tool) ──
+      // Kimi K2.6 inputs: ["text"] only - it cannot see the image directly.
+      // The user pastes the image URL as text; Kimi reads it and calls generate_video with inputMediaUrl.
+      // This tests the tool-based I2V path where the LLM bridges image→video via URL passing.
+      fit(
+        "T11d: image-to-video via Kimi - text-only model passes image URL to generate_video tool",
+        async () => {
+          setFetchCacheContext(`${cfg.cachePrefix}image-to-video-kimi`);
+          await pinBalance(testUser.id, 200, creditLogger, creditT);
+          const before = await getBalance(testUser, creditLogger, creditT);
+          const prevCount = (await fetchThreadMessages(threadId)).length;
+
+          const INPUT_IMAGE_URL =
+            "https://unbottled.ai/test-assets/max-resume-photo.jpg";
+
+          const { result, messages } = await runStream({
+            user: testUser,
+            prompt: `[T11d i2v-kimi] Here is a photo URL: ${INPUT_IMAGE_URL} — make a nice foto out of it for my resume and tinder profile. ${toolInstrWithArgs(cfg, "generate_video", `prompt='professional portrait, smooth camera pull-back' inputMediaUrl='${INPUT_IMAGE_URL}'`)}. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+          });
+
+          expect(result.success).toBe(true);
+          if (!result.success) {
+            return;
+          }
+
+          const added = newMessages(messages, prevCount);
+
+          // Tool message: Kimi called generate_video with the URL passed as text
+          const videoToolMsg = findToolMsg(added, "generate_video", cfg);
+          expect(videoToolMsg).toBeDefined();
+          if (videoToolMsg) {
+            assertToolMessageComplete(videoToolMsg, "generate_video", "T11d", cfg);
+          }
+
+          // Args: inputMediaUrl must be the image URL passed in the prompt as text
+          const videoArgs = toolResultRecord(videoToolMsg!.toolCall?.args);
+          const resolvedArgs =
+            (videoArgs?.["input"] as Record<string, unknown> | undefined) ??
+            videoArgs;
+          expect(
+            resolvedArgs?.["inputMediaUrl"],
+            "[T11d] generate_video args.inputMediaUrl must be the image URL from the text prompt",
+          ).toBe(INPUT_IMAGE_URL);
+
+          const videoRes = resolveToolResult(videoToolMsg);
+          expect(videoRes).not.toBeNull();
+          expect(typeof videoRes!["videoUrl"]).toBe("string");
+          expect(videoRes!["videoUrl"]).toBeTruthy();
+          expect((videoRes!["creditCost"] as number) > 0).toBe(true);
+          expect((videoRes!["durationSeconds"] as number) > 0).toBe(true);
+          expect((videoRes!["durationSeconds"] as number) <= 60).toBe(true);
+
+          const lastAi = messages.find(
+            (m) => m.id === result.data.lastAiMessageId,
+          );
+          expect(lastAi?.finishReason).toBe("stop");
+          assertStepOk(lastAi!.content, "T11d");
+          lastMainAiMsgId = result.data.lastAiMessageId!;
+
+          assertNoOrphans(
+            messages,
+            new Set([t2BranchParentId].filter(Boolean)),
+            {
+              expectedLeafId: lastMainAiMsgId,
+              knownDeadEndLeaves: deadEndLeaves,
+            },
+          );
+          await assertThreadIdle(threadId);
+          await assertNoPendingTasks(threadId);
+
+          const after = await getBalance(testUser, creditLogger, creditT);
+          assertDeducted(before, after, 30, 150);
         },
         effectiveTestTimeout,
       );

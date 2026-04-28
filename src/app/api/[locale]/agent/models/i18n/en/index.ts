@@ -42,6 +42,7 @@ export const translations = {
     platformDefault: "Default",
     searchPlaceholder: "Search models…",
     noSearchResults: 'No models found for "{{query}}"',
+    searchExtrasGroup: "Outside current filters",
   },
   tiers: {
     intelligence: {

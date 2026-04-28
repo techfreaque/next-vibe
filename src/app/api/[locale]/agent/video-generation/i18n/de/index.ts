@@ -38,6 +38,12 @@ export const translations = {
       label: "Auflösung",
       description: "Auflösung des Ausgabevideos",
     },
+    inputMediaUrl: {
+      label: "Bild-URL",
+      description:
+        "Bild, das animiert werden soll. Das Modell erzeugt Bewegung aus diesem Frame.",
+      placeholder: "https://beispiel.de/bild.jpg",
+    },
     download: "Herunterladen",
     generatingNote: "Videogenerierung kann 1–3 Minuten dauern",
     backButton: {
@@ -110,6 +116,8 @@ export const translations = {
       noVideoUrl: "Kein Video-URL vom Anbieter zurückgegeben",
       creditsFailed:
         "Credits für Videogenerierung konnten nicht abgezogen werden",
+      inputMediaRequired:
+        "Dieses Modell benötigt eine Bild-URL. Füge einen Bildlink ein, der animiert werden soll.",
     },
     success: {
       title: "Video generiert",

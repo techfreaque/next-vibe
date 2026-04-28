@@ -1476,6 +1476,32 @@ export function ModelSelector({
     );
   }, [searchQuery, modelsToShow]);
 
+  // Models that match the search but were excluded by the active filters
+  const searchExtraModels = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      return [];
+    }
+    // Exclude models already shown in the main list (after search filtering)
+    const shownIds = new Set(searchFilteredModels.map((m) => m.id));
+    const typeFilter = (m: AnyModelOptionWithVision): boolean =>
+      modelOptionToTypes(m).includes(modelTypeTab) &&
+      (modelTypeTab !== "text" ||
+        (!modelMatchesRoleLocal(m, "image-gen") &&
+          !modelMatchesRoleLocal(m, "video-gen") &&
+          !modelMatchesRoleLocal(m, "audio-gen") &&
+          !modelMatchesRoleLocal(m, "tts") &&
+          !modelMatchesRoleLocal(m, "stt")));
+    return getAllModelOptions().filter(
+      (m) =>
+        !shownIds.has(m.id) &&
+        typeFilter(m) &&
+        (isAdmin || isProviderAvailable(m)) &&
+        (m.name.toLowerCase().includes(q) ||
+          modelProviders[m.provider]?.name.toLowerCase().includes(q)),
+    );
+  }, [searchQuery, searchFilteredModels, modelTypeTab, isAdmin]);
+
   // Sort and group models
   const sortedAndGroupedModels = useMemo(() => {
     if (!sortBy) {
@@ -1741,32 +1767,29 @@ export function ModelSelector({
           <Div className="flex flex-col gap-1.5">
             {/* Row 1: search input + filter button + sort button */}
             <Div className="flex items-center gap-1.5">
-              {/* Search input - hidden in Skill Default mode */}
-              {mode !== ModelSelectionType.CHARACTER_BASED &&
-                allModels.length > 3 && (
-                  <Div className="relative flex-1 min-w-0">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-                    <Input
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder={t("selector.searchPlaceholder")}
-                      className="pl-8 pr-7 h-8 text-xs"
-                      disabled={readOnly}
-                    />
-                    {searchQuery && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted rounded-sm"
-                        onClick={() => setSearchQuery("")}
-                        disabled={readOnly}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    )}
-                  </Div>
+              {/* Search input - always visible */}
+              <Div className="relative flex-1 min-w-0">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t("selector.searchPlaceholder")}
+                  className="pl-8 pr-7 h-8 text-xs"
+                  disabled={readOnly}
+                />
+                {searchQuery && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted rounded-sm"
+                    onClick={() => setSearchQuery("")}
+                    disabled={readOnly}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
                 )}
+              </Div>
 
               {/* Filters popover */}
               <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
@@ -2089,6 +2112,44 @@ export function ModelSelector({
                   );
                 },
               )}
+            </Div>
+          )}
+
+          {/* Search extras: models matching search but outside active filters */}
+          {searchExtraModels.length > 0 && (
+            <Div className="flex flex-col gap-2 mt-2">
+              <Div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg bg-muted/20 border border-dashed border-border/50">
+                <Span className="text-xs font-semibold text-muted-foreground">
+                  {t("selector.searchExtrasGroup")}
+                </Span>
+              </Div>
+              <Div className="flex flex-col gap-2">
+                {searchExtraModels.map((model) => {
+                  const setupRequired = getSetupRequiredMessage(model, locale);
+                  return (
+                    <ModelCard
+                      key={model.id}
+                      model={model}
+                      isBest={false}
+                      selected={
+                        mode === ModelSelectionType.MANUAL &&
+                        manualModelId === model.id
+                      }
+                      onClick={() => handleModelSelect(model.id)}
+                      dimmed={true}
+                      disabled={readOnly}
+                      setupRequired={setupRequired}
+                      providerSuffix={
+                        duplicateModelNames.has(model.name)
+                          ? apiProviderDisplayNames[model.apiProvider]
+                          : null
+                      }
+                      t={t}
+                      locale={locale}
+                    />
+                  );
+                })}
+              </Div>
             </Div>
           )}
         </Div>

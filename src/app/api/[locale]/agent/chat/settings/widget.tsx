@@ -9,7 +9,7 @@
 
 "use client";
 
-import cronBulkEndpoints from "@/app/api/[locale]/system/unified-interface/tasks/cron/bulk/definition";
+import taskExecuteEndpoints from "@/app/api/[locale]/system/unified-interface/tasks/execute/definition";
 import favoritesEndpoint from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/chat/favorites/favorite-select-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
@@ -56,6 +56,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
@@ -776,6 +777,7 @@ function PulseSectionDreaming({
   const { t } = scopedTranslation.scopedT(locale);
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
 
   const folderUrl = subFolderId
@@ -786,17 +788,20 @@ function PulseSectionDreaming({
     setIsRunning(true);
     try {
       await apiClient.mutate(
-        cronBulkEndpoints.POST,
+        taskExecuteEndpoints.POST,
         logger,
         user,
-        { ids: [taskId], action: "run" },
+        { taskId },
         undefined,
         locale,
       );
+      if (folderUrl) {
+        router.push(folderUrl);
+      }
     } finally {
       setIsRunning(false);
     }
-  }, [taskId, logger, user, locale]);
+  }, [taskId, logger, user, locale, folderUrl, router]);
 
   return (
     <SettingsSection
@@ -890,6 +895,7 @@ function PulseSectionAutopilot({
   const { t } = scopedTranslation.scopedT(locale);
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
 
   const folderUrl = subFolderId
@@ -900,17 +906,20 @@ function PulseSectionAutopilot({
     setIsRunning(true);
     try {
       await apiClient.mutate(
-        cronBulkEndpoints.POST,
+        taskExecuteEndpoints.POST,
         logger,
         user,
-        { ids: [taskId], action: "run" },
+        { taskId },
         undefined,
         locale,
       );
+      if (folderUrl) {
+        router.push(folderUrl);
+      }
     } finally {
       setIsRunning(false);
     }
-  }, [taskId, logger, user, locale]);
+  }, [taskId, logger, user, locale, folderUrl, router]);
 
   return (
     <SettingsSection
@@ -1018,10 +1027,10 @@ function PulseSectionMama({
     setIsRunning(true);
     try {
       await apiClient.mutate(
-        cronBulkEndpoints.POST,
+        taskExecuteEndpoints.POST,
         logger,
         user,
-        { ids: [MAMA_TASK_ID], action: "run" },
+        { taskId: MAMA_TASK_ID },
         undefined,
         locale,
       );

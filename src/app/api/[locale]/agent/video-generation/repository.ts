@@ -64,6 +64,18 @@ export class VideoGenerationRepository {
       });
     }
 
+    // If this model requires image input, validate it's provided
+    if (
+      videoModel.inputs.includes("image") &&
+      !videoModel.inputs.includes("text") &&
+      !data.inputMediaUrl
+    ) {
+      return fail({
+        message: t("post.errors.inputMediaRequired"),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
     // duration is now raw seconds from the widget
     const rawDuration = data.duration ?? videoModel.defaultDurationSeconds;
 
@@ -165,6 +177,7 @@ export class VideoGenerationRepository {
           durationSeconds,
           aspectRatio: data.aspectRatio,
           resolution: data.resolution,
+          inputImageUrl: data.inputMediaUrl,
           logger,
           locale,
         });

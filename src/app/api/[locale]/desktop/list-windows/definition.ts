@@ -66,6 +66,12 @@ const { POST } = createEndpoint({
               width: z.number().describe("Window width in pixels"),
               height: z.number().describe("Window height in pixels"),
               title: z.string().describe("Window title"),
+              monitor: z
+                .string()
+                .optional()
+                .describe(
+                  "Monitor name the window is primarily on (e.g. DP-1)",
+                ),
             }),
           )
           .optional()

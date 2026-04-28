@@ -118,6 +118,15 @@ const { POST } = createEndpoint({
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.string().optional(),
       }),
+      inputMediaUrl: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.inputMediaUrl.label",
+        description: "post.inputMediaUrl.description",
+        columns: 12,
+        placeholder: "post.inputMediaUrl.placeholder",
+        schema: z.string().url().optional(),
+      }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,
         icon: "arrow-left",

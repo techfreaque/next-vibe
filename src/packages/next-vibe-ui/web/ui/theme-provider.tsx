@@ -6,7 +6,7 @@ import React, { type JSX, useEffect, useState } from "react";
 
 import type { StyleType } from "../utils/style-type";
 
-export const THEME_COOKIE_NAME = "theme";
+export const THEME_COOKIE_NAME = "theme_v2";
 
 /** Mirrors the resolved theme to a non-expiring cookie so SSR can read it.
  *  Cookie is the single source of truth; localStorage is kept in sync. */
@@ -14,7 +14,7 @@ function ThemeCookieSync(): null {
   const { resolvedTheme, setTheme } = useTheme();
   useEffect(() => {
     // Sanitize legacy "system" value in localStorage
-    const stored = localStorage.getItem("theme");
+    const stored = localStorage.getItem("theme_v2");
     if (stored !== null && stored !== "light" && stored !== "dark") {
       setTheme("dark");
       return;
@@ -24,7 +24,7 @@ function ThemeCookieSync(): null {
     }
     // Keep cookie and localStorage in sync - cookie wins on SSR, localStorage is just next-themes' internal state
     document.cookie = `${THEME_COOKIE_NAME}=${resolvedTheme};path=/;max-age=2147483647;SameSite=Lax`;
-    localStorage.setItem("theme", resolvedTheme);
+    localStorage.setItem("theme_v2", resolvedTheme);
   }, [resolvedTheme, setTheme]);
   return null;
 }
@@ -38,7 +38,7 @@ export type ThemeProviderProps = {
 export function ThemeProvider({
   children,
   defaultTheme = "dark",
-  storageKey = "theme",
+  storageKey = "theme_v2",
   attribute = "class",
   ...props
 }: ThemeProviderProps &

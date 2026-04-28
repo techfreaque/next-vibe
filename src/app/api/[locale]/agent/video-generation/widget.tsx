@@ -3,6 +3,7 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Input } from "next-vibe-ui/ui/input";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
@@ -123,6 +124,7 @@ export function VideoGenerationContainer({
   const currentDuration = form?.watch("duration") ?? 5;
   const currentAspectRatio = form?.watch("aspectRatio");
   const currentResolution = form?.watch("resolution");
+  const currentInputMediaUrl = form?.watch("inputMediaUrl") ?? "";
 
   const modelSelection = useMemo((): VideoGenModelSelection | undefined => {
     if (!currentModelId) {
@@ -159,6 +161,7 @@ export function VideoGenerationContainer({
     ? getVideoGenModelById(resolvedModelId)
     : undefined;
   const resolvedVideoBased = resolvedModel;
+  const isI2VModel = resolvedModel?.inputs.includes("image") ?? false;
 
   // Build dynamic duration presets from model capabilities
   const durationPresets = useMemo(
@@ -266,6 +269,27 @@ export function VideoGenerationContainer({
 
       <Div className="flex flex-col gap-4 px-4 pb-4">
         <FormAlertWidget field={{}} />
+
+        {/* Input image URL - only for I2V models */}
+        {isI2VModel && (
+          <Div className="flex flex-col gap-1.5">
+            <Span className="text-xs font-medium text-muted-foreground">
+              {t("post.inputMediaUrl.label")}
+            </Span>
+            <Input
+              type="url"
+              placeholder={t("post.inputMediaUrl.placeholder")}
+              value={currentInputMediaUrl}
+              disabled={isDisabled}
+              onChange={(e) =>
+                form?.setValue("inputMediaUrl", e.target.value || undefined)
+              }
+            />
+            <Span className="text-[10px] text-muted-foreground/70">
+              {t("post.inputMediaUrl.description")}
+            </Span>
+          </Div>
+        )}
 
         {/* Prompt */}
         <Div className="flex flex-col gap-1.5">
@@ -375,9 +399,16 @@ export function VideoGenerationContainer({
         {/* Model selector */}
         <Div className="flex flex-col gap-1.5">
           <Div className="flex items-center justify-between">
-            <Span className="text-xs font-medium text-muted-foreground">
-              {t("post.model.label")}
-            </Span>
+            <Div className="flex items-center gap-1.5">
+              <Span className="text-xs font-medium text-muted-foreground">
+                {t("post.model.label")}
+              </Span>
+              {isI2VModel && (
+                <Badge variant="secondary" className="text-[10px] h-4 px-1.5">
+                  Image-to-Video
+                </Badge>
+              )}
+            </Div>
             {resolvedModelId && (
               <ModelCreditDisplay
                 modelId={resolvedModelId}
