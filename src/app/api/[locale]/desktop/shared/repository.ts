@@ -1153,10 +1153,20 @@ const KEY_MAP: Record<string, number> = {
   ArrowRight: 106,
 };
 
+function resolveKeyCode(part: string): number {
+  return (
+    KEY_MAP[part] ??
+    KEY_MAP[part.toLowerCase()] ??
+    KEY_MAP[part.toUpperCase()] ??
+    KEY_MAP[part.charAt(0).toUpperCase() + part.slice(1)] ??
+    0
+  );
+}
+
 function resolveKeyArgs(keyExpr: string): string[] {
   const parts = keyExpr.split("+").map((p) => p.trim());
   const codes: number[] = parts
-    .map((p) => KEY_MAP[p] ?? KEY_MAP[p.toLowerCase()] ?? 0)
+    .map((p) => resolveKeyCode(p))
     .filter((c) => c > 0);
   if (codes.length === 0) {
     return [];
