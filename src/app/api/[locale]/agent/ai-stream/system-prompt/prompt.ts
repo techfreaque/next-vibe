@@ -34,6 +34,10 @@ export interface PromptContextData {
   isAdmin: boolean;
   /** Computed from DB counts: no memories + no tasks = fresh user */
   isFreshUser: boolean;
+  /** Whether dreamer (scheduled cortex reorganization) is enabled */
+  dreamerEnabled: boolean;
+  /** Whether autopilot (scheduled background agent work) is enabled */
+  autopilotEnabled: boolean;
   /** Resolved media generation capabilities (image-gen, music-gen, video-gen) */
   mediaCapabilities: MediaCapabilitiesParams | null;
   /**
@@ -575,3 +579,45 @@ export const mediaCapabilitiesFragment: SystemPromptFragment<PromptContextData> 
       return `## Media capabilities\n${lines.join("\n")}`;
     },
   };
+
+export const autonomyStatusFragment: SystemPromptFragment<PromptContextData> = {
+  id: "autonomy-status",
+  placement: "leading",
+  priority: 720,
+  condition: (data) => !data.headless && !data.isPublicUser,
+  build: (data) => {
+    const { dreamerEnabled, autopilotEnabled } = data;
+
+    if (dreamerEnabled && autopilotEnabled) {
+      return `## Background Agents
+
+**Dreamer:** active - Thea reorganizes your cortex on a schedule, consolidating memories and keeping everything tidy.
+**Autopilot:** active - Hermes picks up stalled projects and advances your tasks while you're away.
+
+Both run in the background folder. Check their threads for session logs.`;
+    }
+
+    if (dreamerEnabled) {
+      return `## Background Agents
+
+**Dreamer:** active - Thea reorganizes your cortex on a schedule.
+**Autopilot:** not enabled - the AI could pick up your stalled projects and advance tasks automatically while you're away. Enable it in chat settings.`;
+    }
+
+    if (autopilotEnabled) {
+      return `## Background Agents
+
+**Dreamer:** not enabled - Thea could reorganize your cortex nightly, consolidating scattered memories and keeping context fresh. Enable it in chat settings.
+**Autopilot:** active - Hermes works your queue while you're away.`;
+    }
+
+    return `## Background Agents
+
+Neither **Dreamer** nor **Autopilot** is enabled.
+
+- **Dreamer** runs on a schedule (e.g. nightly) to reorganize the cortex - consolidate scattered memories, update life areas, and spot gaps. Think of it as your AI keeping the filing system clean while you sleep.
+- **Autopilot** runs on a schedule (e.g. weekday mornings) to advance stalled projects, clear your task queue, and execute real output on your goals.
+
+Both can be enabled in **chat settings** (the gear icon). They run in the background folder and create session logs so you can review what they did.`;
+  },
+};

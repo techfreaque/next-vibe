@@ -92,6 +92,7 @@ export const translations: typeof enTranslations = {
       cancel: "Abbrechen",
       delete: "Löschen",
       noChatsFound: "Keine Threads gefunden",
+      noResults: "Keine passenden Threads",
       searchPlaceholder: "Suchen...",
       privateChats: "Private Threads",
       sharedChats: "Geteilte Threads",

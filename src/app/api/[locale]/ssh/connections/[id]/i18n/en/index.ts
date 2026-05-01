@@ -12,7 +12,7 @@ export const translations = {
 
   errors: {
     connectionNotFound: "Connection not found",
-    encryptionFailed: "Encryption failed - SSH_SECRET_KEY may be invalid",
+    encryptionFailed: "Encryption failed - JWT_SECRET_KEY may be invalid",
   },
 
   get: {

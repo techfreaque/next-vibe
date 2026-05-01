@@ -34,8 +34,8 @@ export const translations = {
     directoryNotFound: "Directory not found",
     permissionDenied: "Permission denied",
     sshSecretKeyNotSet:
-      "SSH_SECRET_KEY env var not set. Add a 32-byte hex value to enable SSH mode.",
-    encryptionFailed: "Encryption failed - SSH_SECRET_KEY may be invalid",
+      "JWT_SECRET_KEY env var not set. Add a 32-byte hex value to enable SSH mode.",
+    encryptionFailed: "Encryption failed - JWT_SECRET_KEY may be invalid",
     noRowReturned: "No row returned from insert",
     notImplemented: {
       test: "SSH backend not yet implemented. Cannot test remote connections yet.",

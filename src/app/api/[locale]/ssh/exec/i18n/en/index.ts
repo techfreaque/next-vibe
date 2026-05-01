@@ -6,7 +6,7 @@ export const translations = {
       "Invalid working directory: must be absolute path without '..' segments",
     commandTimedOut: "Command timed out",
     connectionNotFound: "Connection not found",
-    encryptionFailed: "Encryption failed - SSH_SECRET_KEY may be invalid",
+    encryptionFailed: "Encryption failed - JWT_SECRET_KEY may be invalid",
     connectTimeout: "Connection timed out",
     sshAuthFailed: "SSH authentication failed",
     sshConnectionFailed: "SSH connection failed",

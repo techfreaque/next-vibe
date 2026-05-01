@@ -90,6 +90,7 @@ export const translations = {
       cancel: "Cancel",
       delete: "Delete",
       noChatsFound: "No threads found",
+      noResults: "No matching threads",
       searchPlaceholder: "Search...",
       privateChats: "Private Threads",
       sharedChats: "Shared Threads",

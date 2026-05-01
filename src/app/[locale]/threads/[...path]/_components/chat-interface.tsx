@@ -121,7 +121,6 @@ export function ChatInterface({
                 />
               ) : (
                 <EndpointsPage
-                  key={activeThreadId}
                   endpoint={aiStreamDefinition}
                   locale={locale}
                   user={user}

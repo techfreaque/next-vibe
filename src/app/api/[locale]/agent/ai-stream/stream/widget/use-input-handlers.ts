@@ -4,7 +4,7 @@
  */
 
 import type { TextareaKeyboardEvent } from "next-vibe-ui/ui/textarea";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
@@ -20,8 +20,6 @@ const isSubmitKeyPress = (e: TextareaKeyboardEvent): boolean =>
   e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey;
 
 interface UseInputHandlersProps {
-  input: string;
-  attachments: File[];
   sendMessage: (
     params: {
       content: string;
@@ -66,32 +64,40 @@ interface UseInputHandlersReturn {
 }
 
 export function useInputHandlers({
-  input,
-  attachments,
   sendMessage,
   setInput,
   locale,
   logger,
   draftKey,
 }: UseInputHandlersProps): UseInputHandlersReturn {
-  const imageSize = useChatInputStore((s) => s.imageSize);
-  const imageQuality = useChatInputStore((s) => s.imageQuality);
-  const musicDuration = useChatInputStore((s) => s.musicDuration);
-
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
   const navActiveThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const navRootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
   const navSubFolderId = useChatNavigationStore((s) => s.currentSubFolderId);
 
+  // Keep a ref to sendMessage to avoid stale closures when React batches
+  // state updates during navigation. The ref always points to the latest
+  // sendMessage callback (which captures up-to-date settings, model, etc.).
+  const sendMessageRef = useRef(sendMessage);
+  sendMessageRef.current = sendMessage;
+
   const submitMessage = useCallback(async () => {
+    // Read current input from store at invocation time (not closure time)
+    // to prevent stale values during navigation transitions.
+    const currentInput = useChatInputStore.getState().input;
+    const currentAttachments = useChatInputStore.getState().attachments;
+    const currentImageSize = useChatInputStore.getState().imageSize;
+    const currentImageQuality = useChatInputStore.getState().imageQuality;
+    const currentMusicDuration = useChatInputStore.getState().musicDuration;
+
     logger.debug("Chat", "submitMessage called", {
-      hasInput: Boolean(input),
-      isValidInput: isValidInput(input),
-      attachmentsCount: attachments?.length || 0,
+      hasInput: Boolean(currentInput),
+      isValidInput: isValidInput(currentInput),
+      attachmentsCount: currentAttachments?.length || 0,
     });
 
-    if (isValidInput(input)) {
+    if (isValidInput(currentInput)) {
       logger.debug("Chat", "submitMessage calling sendMessage");
 
       // Snapshot navigation state before sending - needed to revert on failure
@@ -102,8 +108,15 @@ export function useInputHandlers({
         currentSubFolderId: navSubFolderId,
       };
 
-      const result = await sendMessage(
-        { content: input, attachments, imageSize, imageQuality, musicDuration },
+      // Use ref to get latest sendMessage (avoids stale closure during navigation)
+      const result = await sendMessageRef.current(
+        {
+          content: currentInput,
+          attachments: currentAttachments,
+          imageSize: currentImageSize,
+          imageQuality: currentImageQuality,
+          musicDuration: currentMusicDuration,
+        },
         (threadId, rootFolderId, subFolderId) => {
           // Navigate to the newly created thread
           logger.debug("Chat", "Navigating to newly created thread", {
@@ -152,9 +165,6 @@ export function useInputHandlers({
       logger.debug("Chat", "submitMessage blocked");
     }
   }, [
-    input,
-    attachments,
-    sendMessage,
     logger,
     locale,
     draftKey,
@@ -163,9 +173,6 @@ export function useInputHandlers({
     navActiveThreadId,
     navRootFolderId,
     navSubFolderId,
-    imageSize,
-    imageQuality,
-    musicDuration,
   ]);
 
   /**
@@ -174,9 +181,14 @@ export function useInputHandlers({
    */
   const submitWithContent = useCallback(
     async (content: string) => {
+      const currentAttachments = useChatInputStore.getState().attachments;
+      const currentImageSize = useChatInputStore.getState().imageSize;
+      const currentImageQuality = useChatInputStore.getState().imageQuality;
+      const currentMusicDuration = useChatInputStore.getState().musicDuration;
+
       logger.debug("Chat", "submitWithContent called", {
         contentLength: content.length,
-        attachmentsCount: attachments?.length || 0,
+        attachmentsCount: currentAttachments?.length || 0,
       });
 
       if (isValidInput(content)) {
@@ -190,8 +202,14 @@ export function useInputHandlers({
           currentSubFolderId: navSubFolderId,
         };
 
-        const result = await sendMessage(
-          { content, attachments, imageSize, imageQuality, musicDuration },
+        const result = await sendMessageRef.current(
+          {
+            content,
+            attachments: currentAttachments,
+            imageSize: currentImageSize,
+            imageQuality: currentImageQuality,
+            musicDuration: currentMusicDuration,
+          },
           (threadId, rootFolderId, subFolderId) => {
             logger.debug("Chat", "Navigating to newly created thread", {
               threadId,
@@ -229,8 +247,6 @@ export function useInputHandlers({
       }
     },
     [
-      attachments,
-      sendMessage,
       setInput,
       logger,
       locale,
@@ -240,9 +256,6 @@ export function useInputHandlers({
       navActiveThreadId,
       navRootFolderId,
       navSubFolderId,
-      imageSize,
-      imageQuality,
-      musicDuration,
     ],
   );
 
@@ -252,6 +265,8 @@ export function useInputHandlers({
    */
   const submitWithAudio = useCallback(
     async (audioFile: File) => {
+      const currentAttachments = useChatInputStore.getState().attachments;
+
       logger.debug("Chat", "submitWithAudio called", {
         fileSize: audioFile.size,
         fileType: audioFile.type,
@@ -265,11 +280,11 @@ export function useInputHandlers({
         currentSubFolderId: navSubFolderId,
       };
 
-      const result = await sendMessage(
+      const result = await sendMessageRef.current(
         {
           content: "", // Server will use transcribed audio as content
           audioInput: { file: audioFile },
-          attachments,
+          attachments: currentAttachments,
         },
         (threadId, rootFolderId, subFolderId) => {
           logger.debug("Chat", "Navigating to newly created thread", {
@@ -303,8 +318,6 @@ export function useInputHandlers({
       }
     },
     [
-      attachments,
-      sendMessage,
       logger,
       locale,
       draftKey,

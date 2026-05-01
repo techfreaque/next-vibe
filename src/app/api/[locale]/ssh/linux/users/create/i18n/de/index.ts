@@ -21,7 +21,7 @@ export const translations = {
     userAlreadyExists: "Ein Benutzer mit diesem Namen existiert bereits",
     connectionNotFound: "SSH-Verbindung nicht gefunden",
     encryptionFailed:
-      "Verschlüsselung fehlgeschlagen - SSH_SECRET_KEY möglicherweise ungültig",
+      "Verschlüsselung fehlgeschlagen - JWT_SECRET_KEY möglicherweise ungültig",
     connectTimeout: "Verbindung hat Zeitlimit überschritten",
     sshAuthFailed: "SSH-Authentifizierung fehlgeschlagen",
     sshConnectionFailed: "SSH-Verbindung fehlgeschlagen",

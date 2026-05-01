@@ -20,7 +20,7 @@ export const translations = {
       "Invalid username: must start with a letter, then lowercase letters, digits, or hyphens (max 32 chars)",
     userAlreadyExists: "A user with that username already exists",
     connectionNotFound: "SSH connection not found",
-    encryptionFailed: "Encryption failed - SSH_SECRET_KEY may be invalid",
+    encryptionFailed: "Encryption failed - JWT_SECRET_KEY may be invalid",
     connectTimeout: "Connection timed out",
     sshAuthFailed: "SSH authentication failed",
     sshConnectionFailed: "SSH connection failed",

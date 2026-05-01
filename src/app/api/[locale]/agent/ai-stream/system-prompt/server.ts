@@ -14,6 +14,7 @@ import {
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
 import { db } from "@/app/api/[locale]/system/db";
+import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import { cronTasks as cronTasksTable } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { users as usersTable } from "@/app/api/[locale]/user/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -80,33 +81,44 @@ export async function loadPromptContextData(
   let privateName = "";
   let publicName = "";
   let isFreshUser = true;
+  let dreamerEnabled = false;
+  let autopilotEnabled = false;
 
   if (userId && !isIncognito) {
     try {
-      const [userRow, memoriesCount, tasksCount] = await Promise.all([
-        db
-          .select({
-            privateName: usersTable.privateName,
-            publicName: usersTable.publicName,
-          })
-          .from(usersTable)
-          .where(eq(usersTable.id, userId))
-          .limit(1),
-        db
-          .select({ count: count() })
-          .from(cortexNodes)
-          .where(
-            and(
-              eq(cortexNodes.userId, userId),
-              eq(cortexNodes.nodeType, CortexNodeType.FILE),
-              like(cortexNodes.path, `${MEMORIES_PREFIX}/%`),
+      const [userRow, memoriesCount, tasksCount, settingsRow] =
+        await Promise.all([
+          db
+            .select({
+              privateName: usersTable.privateName,
+              publicName: usersTable.publicName,
+            })
+            .from(usersTable)
+            .where(eq(usersTable.id, userId))
+            .limit(1),
+          db
+            .select({ count: count() })
+            .from(cortexNodes)
+            .where(
+              and(
+                eq(cortexNodes.userId, userId),
+                eq(cortexNodes.nodeType, CortexNodeType.FILE),
+                like(cortexNodes.path, `${MEMORIES_PREFIX}/%`),
+              ),
             ),
-          ),
-        db
-          .select({ count: count() })
-          .from(cronTasksTable)
-          .where(eq(cronTasksTable.userId, userId)),
-      ]);
+          db
+            .select({ count: count() })
+            .from(cronTasksTable)
+            .where(eq(cronTasksTable.userId, userId)),
+          db
+            .select({
+              dreamerEnabled: chatSettings.dreamerEnabled,
+              autopilotEnabled: chatSettings.autopilotEnabled,
+            })
+            .from(chatSettings)
+            .where(eq(chatSettings.userId, userId))
+            .limit(1),
+        ]);
 
       const row = userRow[0];
       privateName = row?.privateName ?? "";
@@ -114,6 +126,8 @@ export async function loadPromptContextData(
       isFreshUser =
         (memoriesCount[0]?.count ?? 0) === 0 &&
         (tasksCount[0]?.count ?? 0) === 0;
+      dreamerEnabled = settingsRow[0]?.dreamerEnabled ?? false;
+      autopilotEnabled = settingsRow[0]?.autopilotEnabled ?? false;
     } catch {
       // fallback: assume fresh user if DB fails
     }
@@ -142,6 +156,8 @@ export async function loadPromptContextData(
     isPublicUser,
     isAdmin,
     isFreshUser,
+    dreamerEnabled,
+    autopilotEnabled,
     mediaCapabilities: mediaCapabilities ?? null,
     subAgentDepth,
   };

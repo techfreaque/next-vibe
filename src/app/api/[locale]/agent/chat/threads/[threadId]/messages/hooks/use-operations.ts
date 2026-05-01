@@ -6,7 +6,7 @@
 
 import { toast } from "next-vibe-ui/hooks/use-toast";
 import { parseError } from "next-vibe/shared/utils";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { answerAsAI as answerAsAIOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/answer-as-ai";
@@ -111,16 +111,7 @@ export interface MessageOperationsDeps {
 export function useMessageOperations(
   deps: MessageOperationsDeps,
 ): MessageOperations {
-  const {
-    startStream,
-    cancelStream,
-    activeThreadId,
-    currentRootFolderId,
-    currentSubFolderId,
-    leafMessageId,
-    settings,
-    favoriteConfig,
-  } = deps;
+  const { cancelStream, activeThreadId, currentRootFolderId } = deps;
 
   const user = useWidgetUser();
   const logger = useWidgetLogger();
@@ -136,6 +127,11 @@ export function useMessageOperations(
     logger,
     user,
   );
+
+  // Keep a ref to deps so async callbacks always use the latest values.
+  // Prevents stale closures when React batches state updates during navigation.
+  const depsRef = useRef(deps);
+  depsRef.current = deps;
 
   const sendMessage = useCallback(
     async (
@@ -160,7 +156,9 @@ export function useMessageOperations(
         subFolderId: string | null,
       ) => void,
     ): Promise<{ success: boolean; createdThreadId: string | null }> => {
-      if (!settings.selectedModel) {
+      // Read latest deps from ref to avoid stale closure values
+      const d = depsRef.current;
+      if (!d.settings.selectedModel) {
         toast({
           title: "No model selected",
           description:
@@ -173,31 +171,23 @@ export function useMessageOperations(
         params,
         {
           logger,
-          startStream,
-          activeThreadId,
-          currentRootFolderId,
-          currentSubFolderId,
-          leafMessageId,
+          startStream: d.startStream,
+          activeThreadId: d.activeThreadId,
+          currentRootFolderId: d.currentRootFolderId,
+          currentSubFolderId: d.currentSubFolderId,
+          leafMessageId: d.leafMessageId,
           user,
-          settings: { ...settings, selectedModel: settings.selectedModel },
-          favoriteConfig,
+          settings: {
+            ...d.settings,
+            selectedModel: d.settings.selectedModel,
+          },
+          favoriteConfig: d.favoriteConfig,
           locale,
         },
         onThreadCreated,
       );
     },
-    [
-      logger,
-      startStream,
-      activeThreadId,
-      currentRootFolderId,
-      currentSubFolderId,
-      leafMessageId,
-      user,
-      settings,
-      favoriteConfig,
-      locale,
-    ],
+    [logger, user, locale],
   );
 
   const retryMessage = useCallback(
@@ -205,7 +195,8 @@ export function useMessageOperations(
       messageId: string,
       attachments: File[] | undefined,
     ): Promise<void> => {
-      if (!settings.selectedModel) {
+      const d = depsRef.current;
+      if (!d.settings.selectedModel) {
         toast({
           title: "No model selected",
           description:
@@ -216,29 +207,21 @@ export function useMessageOperations(
       }
       await retryMessageOp(messageId, attachments, {
         logger,
-        startStream,
-        currentRootFolderId,
-        currentSubFolderId,
-        activeThreadId,
+        startStream: d.startStream,
+        currentRootFolderId: d.currentRootFolderId,
+        currentSubFolderId: d.currentSubFolderId,
+        activeThreadId: d.activeThreadId,
         user,
-        settings: { ...settings, selectedModel: settings.selectedModel },
-        favoriteConfig,
+        settings: {
+          ...d.settings,
+          selectedModel: d.settings.selectedModel,
+        },
+        favoriteConfig: d.favoriteConfig,
         setLeafMessageId,
         locale,
       });
     },
-    [
-      logger,
-      startStream,
-      currentRootFolderId,
-      currentSubFolderId,
-      activeThreadId,
-      user,
-      settings,
-      favoriteConfig,
-      setLeafMessageId,
-      locale,
-    ],
+    [logger, user, setLeafMessageId, locale],
   );
 
   const branchMessage = useCallback(
@@ -248,7 +231,8 @@ export function useMessageOperations(
       audioInput: { file: File } | undefined,
       attachments: File[] | undefined,
     ): Promise<void> => {
-      if (!settings.selectedModel) {
+      const d = depsRef.current;
+      if (!d.settings.selectedModel) {
         toast({
           title: "No model selected",
           description:
@@ -259,29 +243,21 @@ export function useMessageOperations(
       }
       await branchMessageOp(messageId, newContent, audioInput, attachments, {
         logger,
-        startStream,
-        currentRootFolderId,
-        currentSubFolderId,
-        activeThreadId,
+        startStream: d.startStream,
+        currentRootFolderId: d.currentRootFolderId,
+        currentSubFolderId: d.currentSubFolderId,
+        activeThreadId: d.activeThreadId,
         user,
-        settings: { ...settings, selectedModel: settings.selectedModel },
-        favoriteConfig,
+        settings: {
+          ...d.settings,
+          selectedModel: d.settings.selectedModel,
+        },
+        favoriteConfig: d.favoriteConfig,
         setLeafMessageId,
         locale,
       });
     },
-    [
-      logger,
-      startStream,
-      currentRootFolderId,
-      currentSubFolderId,
-      activeThreadId,
-      user,
-      settings,
-      favoriteConfig,
-      setLeafMessageId,
-      locale,
-    ],
+    [logger, user, setLeafMessageId, locale],
   );
 
   const answerAsAI = useCallback(
@@ -290,7 +266,8 @@ export function useMessageOperations(
       content: string,
       attachments: File[] | undefined,
     ): Promise<void> => {
-      if (!settings.selectedModel) {
+      const d = depsRef.current;
+      if (!d.settings.selectedModel) {
         toast({
           title: "No model selected",
           description:
@@ -301,23 +278,18 @@ export function useMessageOperations(
       }
       await answerAsAIOp(messageId, content, attachments, {
         logger,
-        startStream,
-        currentRootFolderId,
-        currentSubFolderId,
-        activeThreadId,
-        settings: { ...settings, selectedModel: settings.selectedModel },
-        favoriteConfig,
+        startStream: d.startStream,
+        currentRootFolderId: d.currentRootFolderId,
+        currentSubFolderId: d.currentSubFolderId,
+        activeThreadId: d.activeThreadId,
+        settings: {
+          ...d.settings,
+          selectedModel: d.settings.selectedModel,
+        },
+        favoriteConfig: d.favoriteConfig,
       });
     },
-    [
-      logger,
-      startStream,
-      currentRootFolderId,
-      currentSubFolderId,
-      activeThreadId,
-      settings,
-      favoriteConfig,
-    ],
+    [logger],
   );
 
   const deleteMessage = useCallback(

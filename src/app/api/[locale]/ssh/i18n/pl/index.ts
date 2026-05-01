@@ -34,7 +34,7 @@ export const translations = {
     fileNotFound: "Plik nie znaleziony",
     directoryNotFound: "Katalog nie znaleziony",
     permissionDenied: "Odmowa dostępu",
-    sshSecretKeyNotSet: "Zmienna SSH_SECRET_KEY nie jest ustawiona.",
+    sshSecretKeyNotSet: "Zmienna JWT_SECRET_KEY nie jest ustawiona.",
     encryptionFailed: "Szyfrowanie nieudane",
     noRowReturned: "Brak wiersza zwróconego z wstawiania",
     notImplemented: {

@@ -15,8 +15,10 @@ import {
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { FolderPlus } from "next-vibe-ui/ui/icons/FolderPlus";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
 import { Search } from "next-vibe-ui/ui/icons/Search";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Input, type InputRefObject } from "next-vibe-ui/ui/input";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
@@ -27,19 +29,25 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { cn } from "next-vibe/shared/utils";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   getFolderTourAttr,
   TOUR_DATA_ATTRS,
 } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
 import {
+  chatColors,
+  chatTransitions,
+} from "@/app/[locale]/chat/lib/design-tokens";
+import {
   DEFAULT_FOLDER_CONFIGS,
   DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+import cortexSearchDefinitions from "@/app/api/[locale]/agent/cortex/search/definition";
 import folderContentsDefinition from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetContext,
@@ -217,12 +225,127 @@ function RootFolderBar({
 }
 
 // ---------------------------------------------------------------------------
+// UUID regex to extract thread IDs from cortex paths
+// ---------------------------------------------------------------------------
+
+const UUID_REGEX =
+  /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i;
+
+/**
+ * Extract a readable title from a cortex thread path slug.
+ * e.g. "/threads/private/my-chat-topic-<uuid>.md" → "my chat topic"
+ */
+function titleFromPath(path: string): string {
+  const lastSegment = path.split("/").pop() ?? "";
+  // Remove .md extension, then strip the UUID suffix
+  const withoutExt = lastSegment.replace(/\.md$/, "");
+  const withoutUuid = withoutExt.replace(
+    /-?[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    "",
+  );
+  // Convert dashes to spaces and clean up
+  return withoutUuid.replace(/-/g, " ").trim() || "Untitled";
+}
+
+// ---------------------------------------------------------------------------
+// SearchResultsList - renders cortex search results matching ThreadRow layout
+// ---------------------------------------------------------------------------
+
+function SearchResultsList({
+  results,
+  isLoading,
+  activeRootFolderId,
+  locale,
+  noResultsLabel,
+}: {
+  results: Array<{
+    resultPath: string;
+    excerpt: string;
+    score: number;
+    updatedAt: string;
+  }>;
+  isLoading: boolean;
+  activeRootFolderId: DefaultFolderId;
+  locale: string;
+  noResultsLabel: string;
+}): React.JSX.Element {
+  const setNavigation = useChatNavigationStore((s) => s.setNavigation);
+  const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
+
+  const handleResultClick = useCallback(
+    (threadId: string) => {
+      setNavigation({
+        activeThreadId: threadId,
+        currentRootFolderId: activeRootFolderId,
+        currentSubFolderId: null,
+      });
+      window.history.pushState(
+        null,
+        "",
+        `/${locale}/threads/${activeRootFolderId}/${threadId}`,
+      );
+    },
+    [setNavigation, activeRootFolderId, locale],
+  );
+
+  if (isLoading) {
+    return (
+      <Div className="flex items-center justify-center py-8">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </Div>
+    );
+  }
+
+  if (results.length === 0) {
+    return (
+      <Div className="flex items-center justify-center py-8">
+        <Span className="text-sm text-muted-foreground">{noResultsLabel}</Span>
+      </Div>
+    );
+  }
+
+  return (
+    <Div className="px-1 py-1">
+      <Div className="flex flex-col gap-0.5 pl-2">
+        {results.map((result) => {
+          const uuidMatch = result.resultPath.match(UUID_REGEX);
+          if (!uuidMatch?.[1]) {
+            return null;
+          }
+          const threadId = uuidMatch[1];
+          const title = titleFromPath(result.resultPath);
+          const isActive = activeThreadId === threadId;
+
+          return (
+            <Div
+              key={threadId}
+              onClick={() => handleResultClick(threadId)}
+              className={cn(
+                "relative flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer",
+                chatTransitions.colors,
+                isActive
+                  ? cn(chatColors.sidebar.active, "shadow-sm")
+                  : chatColors.sidebar.hover,
+              )}
+            >
+              <Div className="flex-1 min-w-0">
+                <Div className="text-sm font-medium truncate">{title}</Div>
+              </Div>
+            </Div>
+          );
+        })}
+      </Div>
+    </Div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // FoldersListContainer - shell widget
 // ---------------------------------------------------------------------------
 
 export function FoldersListContainer(): React.JSX.Element {
   const field = useWidgetValue<typeof definition.GET>();
-  const { user, locale } = useWidgetContext();
+  const { user, locale, logger } = useWidgetContext();
   const { initialFolderContentsData, initialRootFolderId } =
     useChatBootContext();
   const { t } = scopedTranslation.scopedT(locale);
@@ -257,9 +380,13 @@ export function FoldersListContainer(): React.JSX.Element {
     }
   };
 
-  const [searchQuery, setSearchQuery] = useState("");
+  // Search query persisted in Zustand store (survives sidebar unmount/remount)
+  const searchQuery = useChatNavigationStore((s) => s.sidebarSearchQuery);
+  const setSearchQuery = useChatNavigationStore((s) => s.setSidebarSearchQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery.trim());
   const [newFolderDialogOpen, setNewFolderDialogOpen] = useState(false);
   const searchInputRef = useRef<InputRefObject>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const rootFolderPermissions = field?.rootFolderPermissions;
 
@@ -284,6 +411,97 @@ export function FoldersListContainer(): React.JSX.Element {
   const activeFolderId = useChatNavigationStore((s) => s.currentSubFolderId);
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
+
+  // --- Cortex vector search for threads ---
+  const searchEndpoint = useEndpoint(
+    cortexSearchDefinitions,
+    useMemo(
+      () => ({
+        read: {
+          queryOptions: {
+            enabled: false,
+            refetchOnWindowFocus: false,
+            staleTime: 60 * 1000,
+          },
+          formOptions: {
+            autoSubmit: false,
+            persistForm: false,
+          },
+        },
+      }),
+      [],
+    ),
+    logger,
+    user,
+  );
+
+  // Debounce search query (300ms)
+  useEffect(() => {
+    if (debounceTimerRef.current !== null) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    if (searchQuery.trim().length === 0) {
+      setDebouncedQuery("");
+      return;
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedQuery(searchQuery.trim());
+    }, 300);
+    return (): void => {
+      if (debounceTimerRef.current !== null) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [searchQuery, setDebouncedQuery]);
+
+  // Clear search when switching root folders (but not on initial mount)
+  const prevRootFolderRef = useRef(activeRootFolderId);
+  useEffect(() => {
+    if (prevRootFolderRef.current !== activeRootFolderId) {
+      prevRootFolderRef.current = activeRootFolderId;
+      setSearchQuery("");
+      setDebouncedQuery("");
+    }
+  }, [activeRootFolderId, setSearchQuery]);
+
+  // Trigger cortex search when debounced query changes or on mount with persisted query
+  const searchSubmittedRef = useRef("");
+  useEffect(() => {
+    if (!debouncedQuery || !searchEndpoint?.read) {
+      searchSubmittedRef.current = "";
+      return;
+    }
+    const searchKey = `${debouncedQuery}::${activeRootFolderId}`;
+    if (searchSubmittedRef.current === searchKey) {
+      return;
+    }
+    searchSubmittedRef.current = searchKey;
+    const form = searchEndpoint.read.form;
+    form.setValue("query", debouncedQuery);
+    form.setValue("path", `/threads/${activeRootFolderId}`);
+    form.setValue("maxResults", 20);
+    searchEndpoint.read.submitForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, activeRootFolderId, searchEndpoint?.read]);
+
+  const searchResults = searchEndpoint?.read?.response?.success
+    ? (searchEndpoint.read.response.data?.results ?? [])
+    : [];
+  // Show loading while debouncing OR while API is fetching
+  const isSearchActive = searchQuery.trim().length > 0;
+  const isDebouncePending =
+    isSearchActive && searchQuery.trim() !== debouncedQuery;
+  const isSearching =
+    isSearchActive &&
+    (isDebouncePending || (searchEndpoint?.read?.isLoading ?? false));
+  // Only show "no results" after debounce fires AND API responds
+  const hasSearchResults = debouncedQuery.length > 0 && !isDebouncePending;
+
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery("");
+    setDebouncedQuery("");
+    searchInputRef.current?.focus();
+  }, [setSearchQuery]);
 
   const rootFolderColor = getRootFolderColorName(activeRootFolderId);
   const buttonColorClass = ROOT_FOLDER_COLOR_MAP[rootFolderColor]?.button ?? "";
@@ -393,35 +611,56 @@ export function FoldersListContainer(): React.JSX.Element {
             placeholder={t("widget.common.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8 h-10 sm:h-8 text-sm border-none bg-primary/10 focus-visible:ring-primary"
+            className={cn(
+              "pl-8 h-10 sm:h-8 text-sm border-none bg-primary/10 focus-visible:ring-primary",
+              isSearchActive && "pr-8",
+            )}
           />
+          {isSearchActive && (
+            <Div
+              onClick={handleClearSearch}
+              className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-sm p-0.5 hover:bg-primary/10"
+            >
+              <X className="h-3.5 w-3.5 text-muted-foreground" />
+            </Div>
+          )}
         </Div>
       </Div>
 
       <Div className="flex-1 overflow-hidden px-0">
         <ScrollArea className="h-full">
-          <Div className="px-1 py-1">
-            <EndpointsPage
-              endpoint={folderContentsDefinition}
+          {isSearchActive ? (
+            <SearchResultsList
+              results={hasSearchResults ? searchResults : []}
+              isLoading={isSearching}
+              activeRootFolderId={activeRootFolderId}
               locale={locale}
-              user={user}
-              endpointOptions={{
-                read: {
-                  urlPathParams: { rootFolderId: activeRootFolderId },
-                  initialState: { subFolderId: null },
-                  initialData:
-                    activeRootFolderId === initialRootFolderId
-                      ? (initialFolderContentsData ?? undefined)
-                      : undefined,
-                  queryOptions: {
-                    refetchOnWindowFocus: false,
-                    staleTime: 30 * 1000,
-                  },
-                },
-                subscribeToEvents: true,
-              }}
+              noResultsLabel={t("widget.common.noResults")}
             />
-          </Div>
+          ) : (
+            <Div className="px-1 py-1">
+              <EndpointsPage
+                endpoint={folderContentsDefinition}
+                locale={locale}
+                user={user}
+                endpointOptions={{
+                  read: {
+                    urlPathParams: { rootFolderId: activeRootFolderId },
+                    initialState: { subFolderId: null },
+                    initialData:
+                      activeRootFolderId === initialRootFolderId
+                        ? (initialFolderContentsData ?? undefined)
+                        : undefined,
+                    queryOptions: {
+                      refetchOnWindowFocus: false,
+                      staleTime: 30 * 1000,
+                    },
+                  },
+                  subscribeToEvents: true,
+                }}
+              />
+            </Div>
+          )}
         </ScrollArea>
       </Div>
 

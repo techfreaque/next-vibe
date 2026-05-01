@@ -92,6 +92,7 @@ export const translations: typeof enTranslations = {
       cancel: "Anuluj",
       delete: "Usuń",
       noChatsFound: "Nie znaleziono wątków",
+      noResults: "Brak pasujących wątków",
       searchPlaceholder: "Szukaj...",
       privateChats: "Prywatne czaty",
       sharedChats: "Udostępnione czaty",

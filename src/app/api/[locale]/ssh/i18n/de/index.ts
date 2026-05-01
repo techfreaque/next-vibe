@@ -33,7 +33,7 @@ export const translations = {
     fileNotFound: "Datei nicht gefunden",
     directoryNotFound: "Verzeichnis nicht gefunden",
     permissionDenied: "Berechtigung verweigert",
-    sshSecretKeyNotSet: "SSH_SECRET_KEY Umgebungsvariable nicht gesetzt.",
+    sshSecretKeyNotSet: "JWT_SECRET_KEY Umgebungsvariable nicht gesetzt.",
     encryptionFailed: "Verschlüsselung fehlgeschlagen",
     noRowReturned: "Kein Datensatz vom Insert zurückgegeben",
     notImplemented: {

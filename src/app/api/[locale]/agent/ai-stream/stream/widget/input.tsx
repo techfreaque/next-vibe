@@ -298,8 +298,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   // Input handlers
   const inputHandlers = useInputHandlers({
-    input,
-    attachments,
     sendMessage: sendMessageWithStreamNotify,
     setInput,
     locale,

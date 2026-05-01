@@ -20,8 +20,9 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { SshAuthType } from "../../enum";
+import { env } from "@/config/env";
 import { sshConnections } from "../../db";
+import { SshAuthType } from "../../enum";
 import type {
   ConnectionCreateRequestOutput,
   ConnectionCreateResponseOutput,
@@ -30,7 +31,7 @@ import type { ConnectionsCreateT } from "./i18n";
 
 export class ConnectionCreateRepository {
   private static getSecretKey(): Buffer | null {
-    const raw = process.env["SSH_SECRET_KEY"];
+    const raw = env.JWT_SECRET_KEY;
     if (!raw || raw.length < 64) {
       return null;
     }

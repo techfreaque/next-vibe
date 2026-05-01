@@ -11,8 +11,8 @@ export const translations = {
 
   errors: {
     sshSecretKeyNotSet:
-      "SSH_SECRET_KEY env var not set. Add a 32-byte hex value to enable SSH mode.",
-    encryptionFailed: "Encryption failed - SSH_SECRET_KEY may be invalid",
+      "JWT_SECRET_KEY env var not set. Add a 32-byte hex value to enable SSH mode.",
+    encryptionFailed: "Encryption failed - JWT_SECRET_KEY may be invalid",
     noRowReturned: "No row returned from insert",
   },
 

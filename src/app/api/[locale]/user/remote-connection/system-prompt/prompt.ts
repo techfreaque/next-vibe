@@ -132,8 +132,8 @@ export const systemContextFragment: SystemPromptFragment<RemoteInstancesData> =
 export const remoteInstancesFragment: SystemPromptFragment<RemoteInstancesData> =
   {
     id: "remote-instances",
-    placement: "trailing",
-    priority: 400,
+    placement: "leading",
+    priority: 850,
     condition: (data) => (data.remoteConnections?.length ?? 0) > 0,
     build: (data) => {
       const { remoteConnections } = data;

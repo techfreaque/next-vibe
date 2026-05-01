@@ -7,7 +7,7 @@ export const translations = {
       "Parent directory not found. Set createDirs=true to create it.",
     permissionDenied: "Permission denied",
     connectionNotFound: "Connection not found",
-    encryptionFailed: "Encryption failed - SSH_SECRET_KEY may be invalid",
+    encryptionFailed: "Encryption failed - JWT_SECRET_KEY may be invalid",
     connectTimeout: "Connection timed out",
     sshAuthFailed: "SSH authentication failed",
     sshConnectionFailed: "SSH connection failed",

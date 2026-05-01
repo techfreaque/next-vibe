@@ -221,7 +221,7 @@ export enum ExecBackend {
 | createdAt       | ts      |                                                |
 | updatedAt       | ts      |                                                |
 
-Secrets encrypted with `AES-256-GCM` using `SSH_SECRET_KEY` env var. Never returned by any API.
+Secrets encrypted with `AES-256-GCM` using `JWT_SECRET_KEY` env var. Never returned by any API.
 
 ### In-memory SSH session pool (NOT persisted)
 
@@ -571,7 +571,7 @@ SSH keep-alive: every 30s. On connection drop: entry marked `ERROR`, next call r
 ### SSH secret storage
 
 - Passwords/keys encrypted with `AES-256-GCM` before DB insert.
-- Key: `SSH_SECRET_KEY` env (32-byte hex, required for SSH mode).
+- Key: `JWT_SECRET_KEY` env (32-byte hex, required for SSH mode).
 - Decrypted only at the moment of `ssh2.Client.connect()`. Never logged or returned.
 
 ### Local exec sandboxing
@@ -603,7 +603,7 @@ LOCAL_MAX_OUTPUT_BYTES=32768        # per-stream cap (default: 32 KB)
 LOCAL_DEFAULT_TIMEOUT_MS=30000      # exec timeout (default: 30 s)
 
 # SSH
-SSH_SECRET_KEY=<32-byte hex>        # required for SSH mode
+JWT_SECRET_KEY=<32-byte hex>        # required for SSH mode
 SSH_IDLE_TIMEOUT_MS=300000          # session idle TTL (default: 5 min)
 SSH_MAX_OUTPUT_BYTES=32768          # per-stream cap (default: 32 KB)
 SSH_DEFAULT_TIMEOUT_MS=30000        # exec timeout (default: 30 s)

@@ -7,7 +7,7 @@ export const translations = {
     directoryNotFound: "Katalog nie znaleziony",
     connectionNotFound: "Połączenie nie znalezione",
     encryptionFailed:
-      "Szyfrowanie nieudane - SSH_SECRET_KEY może być nieprawidłowy",
+      "Szyfrowanie nieudane - JWT_SECRET_KEY może być nieprawidłowy",
     connectTimeout: "Przekroczono limit czasu połączenia",
     sshAuthFailed: "Uwierzytelnianie SSH nieudane",
     sshConnectionFailed: "Połączenie SSH nieudane",

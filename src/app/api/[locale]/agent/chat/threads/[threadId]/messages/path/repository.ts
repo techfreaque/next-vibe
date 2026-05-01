@@ -78,7 +78,8 @@ export class pathRepository {
           id,
           parent_id AS "parentId",
           COALESCE((metadata->>'isCompacting')::boolean, false) AS "isCompacting",
-          0 AS depth
+          0 AS depth,
+          ARRAY[id] AS visited
         FROM chat_messages
         WHERE id = ${startId}
           AND thread_id = ${threadId}
@@ -89,10 +90,13 @@ export class pathRepository {
           m.id,
           m.parent_id AS "parentId",
           COALESCE((m.metadata->>'isCompacting')::boolean, false) AS "isCompacting",
-          ac.depth + 1
+          ac.depth + 1,
+          ac.visited || m.id
         FROM chat_messages m
         INNER JOIN ancestor_chain ac ON m.id = ac."parentId"
         WHERE NOT ac."isCompacting"
+          AND m.id != ALL(ac.visited)
+          AND ac.depth < 10000
       )
       SELECT id, "parentId", "isCompacting"
       FROM ancestor_chain
@@ -134,7 +138,8 @@ export class pathRepository {
       await db.execute<QueryResultRow & { id: string }>(sql`
       WITH RECURSIVE descendants AS (
         -- Seed: include chunk roots unconditionally (even if compacting boundary).
-        SELECT id, parent_id, COALESCE((metadata->>'isCompacting')::boolean, false) AS is_compacting
+        SELECT id, parent_id, COALESCE((metadata->>'isCompacting')::boolean, false) AS is_compacting,
+          0 AS depth, ARRAY[id] AS visited
         FROM chat_messages
         WHERE id = ANY(ARRAY[${rootIdsArray}]::uuid[])
           AND thread_id = ${threadId}
@@ -143,11 +148,14 @@ export class pathRepository {
 
         -- Recursive step: expand children that are NOT themselves a next compaction boundary.
         -- Stop when the CHILD is compacting (that's the start of the next chunk, not this one).
-        SELECT m.id, m.parent_id, COALESCE((m.metadata->>'isCompacting')::boolean, false)
+        SELECT m.id, m.parent_id, COALESCE((m.metadata->>'isCompacting')::boolean, false),
+          d.depth + 1, d.visited || m.id
         FROM chat_messages m
         INNER JOIN descendants d ON m.parent_id = d.id
         WHERE m.thread_id = ${threadId}
           AND NOT COALESCE((m.metadata->>'isCompacting')::boolean, false)
+          AND m.id != ALL(d.visited)
+          AND d.depth < 10000
       )
       -- Exclude compacting rows from the result; caller adds the chunk-header explicitly.
       SELECT id FROM descendants
@@ -315,19 +323,21 @@ export class pathRepository {
           id: string;
         }>(sql`
           WITH RECURSIVE latest_leaf AS (
-            SELECT id, parent_id, created_at, 0 AS depth
+            SELECT id, parent_id, created_at, 0 AS depth, ARRAY[id] AS visited
             FROM chat_messages
             WHERE id = ${data.leafMessageId}
               AND thread_id = ${urlPathParams.threadId}
 
             UNION ALL
 
-            SELECT m.id, m.parent_id, m.created_at, lf.depth + 1
+            SELECT m.id, m.parent_id, m.created_at, lf.depth + 1, lf.visited || m.id
             FROM chat_messages m
             INNER JOIN latest_leaf lf ON m.parent_id = lf.id
             WHERE m.thread_id = ${urlPathParams.threadId}
               -- Stop before crossing into the next chunk (compacting = next chunk header)
               AND NOT COALESCE((m.metadata->>'isCompacting')::boolean, false)
+              AND m.id != ALL(lf.visited)
+              AND lf.depth < 10000
           )
           SELECT id FROM latest_leaf
           ORDER BY depth DESC, created_at DESC

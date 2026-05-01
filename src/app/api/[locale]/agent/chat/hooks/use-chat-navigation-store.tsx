@@ -37,6 +37,8 @@ export interface ChatNavigationState {
   leafMessageId: string | null;
   /** Whether this store is for an embedded/nested context (e.g. AI run) */
   isEmbedded: boolean;
+  /** Sidebar search query - persisted across sidebar mount/unmount cycles */
+  sidebarSearchQuery: string;
   // --- Actions ---
   /** Set active thread ID */
   setActiveThreadId: (threadId: string | null) => void;
@@ -46,6 +48,8 @@ export interface ChatNavigationState {
   setCurrentSubFolderId: (subFolderId: string | null) => void;
   /** Set leaf message ID - updates store and pushes ?message= to URL */
   setLeafMessageId: (leafMessageId: string | null) => void;
+  /** Set sidebar search query */
+  setSidebarSearchQuery: (query: string) => void;
   /** Batch update all navigation state at once (avoids multiple re-renders) */
   setNavigation: (state: {
     activeThreadId?: string | null;
@@ -79,12 +83,14 @@ function createChatNavigationStore(opts?: {
     currentSubFolderId: opts?.currentSubFolderId ?? null,
     leafMessageId: opts?.leafMessageId ?? null,
     isEmbedded: opts?.isEmbedded ?? false,
+    sidebarSearchQuery: "",
 
     setActiveThreadId: (threadId): void => set({ activeThreadId: threadId }),
     setCurrentRootFolderId: (rootFolderId): void =>
       set({ currentRootFolderId: rootFolderId }),
     setCurrentSubFolderId: (subFolderId): void =>
       set({ currentSubFolderId: subFolderId }),
+    setSidebarSearchQuery: (query): void => set({ sidebarSearchQuery: query }),
     setLeafMessageId: (leafMessageId): void => {
       set({ leafMessageId });
       // Sync to URL without triggering server re-render
