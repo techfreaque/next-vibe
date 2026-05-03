@@ -64,13 +64,28 @@ export class FolderContentsRepository {
 
     const { rootFolderId } = urlPathParams;
     const subFolderId = data.subFolderId ?? null;
+    const threadIds = data.threadIds ?? null;
 
     try {
       logger.debug("Fetching folder contents", {
         userIdentifier,
         rootFolderId,
         subFolderId,
+        threadIds: threadIds?.length ?? 0,
       });
+
+      // --- When threadIds is provided, skip folders and fetch only those threads ---
+      if (threadIds && threadIds.length > 0) {
+        return FolderContentsRepository.getThreadsByIds(
+          threadIds,
+          rootFolderId,
+          user,
+          userIdentifier,
+          t,
+          logger,
+          locale,
+        );
+      }
 
       // --- Fetch folders at this level ---
       let folderWhere;
@@ -231,7 +246,7 @@ export class FolderContentsRepository {
         { activeShareCount: number; lastSharedAt: Date | null }
       >();
       if (rootFolderId === DefaultFolderId.SHARED && dbThreads.length > 0) {
-        const threadIds = dbThreads.map((thread) => thread.id);
+        const shareThreadIds = dbThreads.map((thread) => thread.id);
         const shareCounts = await db
           .select({
             threadId: threadShareLinks.threadId,
@@ -241,7 +256,7 @@ export class FolderContentsRepository {
           .from(threadShareLinks)
           .where(
             and(
-              inArray(threadShareLinks.threadId, threadIds),
+              inArray(threadShareLinks.threadId, shareThreadIds),
               eq(threadShareLinks.active, true),
             ),
           )
@@ -418,6 +433,221 @@ export class FolderContentsRepository {
       logger.error("Failed to fetch folder contents", parseError(error));
       return fail({
         message: t("get.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Fetch specific threads by IDs for search results.
+   * Returns only threads (no folders), with full permissions.
+   */
+  static async getThreadsByIds(
+    threadIds: string[],
+    rootFolderId: DefaultFolderId,
+    user: JwtPayloadType,
+    userIdentifier: string,
+    translate: FolderContentsT,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<FolderContentsResponseOutput>> {
+    try {
+      const threadConditions = [inArray(chatThreads.id, threadIds)];
+
+      // Scope to rootFolderId
+      threadConditions.push(eq(chatThreads.rootFolderId, rootFolderId));
+
+      // Scope to user for non-public folders
+      if (rootFolderId !== DefaultFolderId.PUBLIC) {
+        if (user.isPublic) {
+          threadConditions.push(eq(chatThreads.leadId, userIdentifier));
+        } else {
+          threadConditions.push(eq(chatThreads.userId, userIdentifier));
+        }
+      }
+
+      const dbThreads = await db
+        .select()
+        .from(chatThreads)
+        .where(and(...threadConditions))
+        .orderBy(desc(chatThreads.updatedAt));
+
+      // Batch-fetch share counts for SHARED folder
+      const shareCountMap = new Map<
+        string,
+        { activeShareCount: number; lastSharedAt: Date | null }
+      >();
+      if (rootFolderId === DefaultFolderId.SHARED && dbThreads.length > 0) {
+        const ids = dbThreads.map((thread) => thread.id);
+        const shareCounts = await db
+          .select({
+            threadId: threadShareLinks.threadId,
+            activeShareCount: count(threadShareLinks.id),
+            lastSharedAt: max(threadShareLinks.createdAt),
+          })
+          .from(threadShareLinks)
+          .where(
+            and(
+              inArray(threadShareLinks.threadId, ids),
+              eq(threadShareLinks.active, true),
+            ),
+          )
+          .groupBy(threadShareLinks.threadId);
+        for (const row of shareCounts) {
+          shareCountMap.set(row.threadId, {
+            activeShareCount: row.activeShareCount,
+            lastSharedAt: row.lastSharedAt ?? null,
+          });
+        }
+      }
+
+      // Build folder map for permission checks
+      const folderIds = [
+        ...new Set(
+          dbThreads
+            .map((thread) => thread.folderId)
+            .filter((id): id is string => id !== null),
+        ),
+      ];
+      const threadFolderMap: Record<string, ChatFolder> = {};
+      if (folderIds.length > 0) {
+        const folders = await db
+          .select()
+          .from(chatFolders)
+          .where(inArray(chatFolders.id, folderIds));
+        for (const f of folders) {
+          threadFolderMap[f.id] = f;
+        }
+      }
+
+      const threadItems: FolderContentsItem[] = [];
+      for (const thread of dbThreads) {
+        const folder = thread.folderId
+          ? (threadFolderMap[thread.folderId] ?? null)
+          : null;
+
+        if (
+          !(await canViewThread(
+            user,
+            thread,
+            folder,
+            logger,
+            locale,
+            threadFolderMap,
+          ))
+        ) {
+          continue;
+        }
+
+        const [canEdit, canPost, canModerate, canDelete, canManagePerms] =
+          await Promise.all([
+            canEditThread(
+              user,
+              thread,
+              folder,
+              logger,
+              locale,
+              threadFolderMap,
+            ),
+            canPostInThread(
+              user,
+              thread,
+              folder,
+              logger,
+              locale,
+              threadFolderMap,
+            ),
+            canHideThread(
+              user,
+              thread,
+              logger,
+              locale,
+              folder,
+              threadFolderMap,
+            ),
+            canDeleteThread(user, thread, logger, locale),
+            canManageThreadPermissions(
+              user,
+              thread,
+              folder,
+              logger,
+              locale,
+              threadFolderMap,
+            ),
+          ]);
+
+        threadItems.push({
+          type: "thread" as const,
+          sortOrder: thread.sortOrder,
+          id: thread.id,
+          userId: thread.userId,
+          rootFolderId: thread.rootFolderId,
+          createdAt: thread.createdAt,
+          updatedAt: thread.updatedAt,
+          title: thread.title,
+          folderId: thread.folderId,
+          status: thread.status,
+          preview: thread.preview,
+          pinned: thread.pinned,
+          archived: thread.archived,
+          canEdit,
+          canPost,
+          canModerate,
+          canDelete,
+          canManagePermissions: canManagePerms,
+          streamingState: thread.streamingState,
+          rolesView: thread.rolesView ?? null,
+          rolesEdit: thread.rolesEdit ?? null,
+          rolesPost: thread.rolesPost ?? null,
+          rolesModerate: thread.rolesModerate ?? null,
+          rolesAdmin: thread.rolesAdmin ?? null,
+          name: null,
+          icon: null,
+          color: null,
+          parentId: null,
+          expanded: null,
+          canManage: null,
+          canCreateThread: null,
+          rolesManage: null,
+          rolesCreateThread: null,
+          activeShareCount:
+            shareCountMap.get(thread.id)?.activeShareCount ?? null,
+          lastSharedAt: shareCountMap.get(thread.id)?.lastSharedAt ?? null,
+        });
+      }
+
+      // Preserve the order from the input threadIds (search relevance order)
+      const idOrder = new Map(threadIds.map((id, idx) => [id, idx]));
+      const sortedItems = threadItems.toSorted(
+        (a, b) => (idOrder.get(a.id) ?? 999) - (idOrder.get(b.id) ?? 999),
+      );
+
+      // Compute root folder permissions
+      let rootFolderPermissions = {
+        canCreateThread: false,
+        canCreateFolder: false,
+      };
+      const { RootFolderPermissionsRepository } =
+        await import("../../folders/[rootFolderId]/root-permissions/repository");
+      const permissionsResult =
+        await RootFolderPermissionsRepository.getRootFolderPermissions(
+          { rootFolderId },
+          user,
+          locale,
+          logger,
+        );
+      if (permissionsResult.success) {
+        rootFolderPermissions = permissionsResult.data;
+      }
+
+      return success({
+        rootFolderPermissions,
+        items: sortedItems,
+      });
+    } catch (error) {
+      logger.error("Failed to fetch threads by IDs", parseError(error));
+      return fail({
+        message: translate("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

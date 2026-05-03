@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Ausfüllen",
   description:
     "Text in ein Eingabefeld, Textbereich eingeben oder Option aus einem Select-Element auswählen",
+  dynamicTitle: "Füllen: {{uid}}",
 
   form: {
     label: "Element ausfüllen",

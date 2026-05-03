@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Datei hochladen",
+  dynamicTitle: "Upload: {{file}}",
   description: "Datei über ein bereitgestelltes Element hochladen",
   form: {
     label: "Datei hochladen",

@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Zrób zrzut ekranu pulpitu",
+  dynamicTitle: "Zrzut: {{target}}",
   description: "Przechwyć zrzut ekranu pulpitu lub obszaru ekranu",
   form: {
     label: "Zrób zrzut ekranu pulpitu",

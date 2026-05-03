@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Desktop-Screenshot aufnehmen",
+  dynamicTitle: "Screenshot: {{target}}",
   description:
     "Einen Screenshot des Desktops oder eines Bildschirmbereichs aufnehmen",
   form: {

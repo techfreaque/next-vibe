@@ -7,6 +7,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Element klicken",
   description: "Klickt auf das angegebene Element",
+  dynamicTitle: "Klick: {{uid}}",
 
   form: {
     label: "Element klicken",

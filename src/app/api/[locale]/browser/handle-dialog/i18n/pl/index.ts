@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Obsłuż dialog",
   description: "Obsłuż dialog przeglądarki (alert, potwierdzenie, prompt)",
+  dynamicTitle: "Dialog: {{action}}",
 
   form: {
     label: "Obsłuż dialog przeglądarki",

@@ -28,6 +28,15 @@ const { POST } = createEndpoint({
   path: ["browser", "click"],
   title: "click.title",
   description: "click.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.uid) {
+      return {
+        message: "click.dynamicTitle" as const,
+        messageParams: { uid: request.uid },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserInteraction",
   icon: "mouse-pointer",

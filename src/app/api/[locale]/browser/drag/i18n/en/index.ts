@@ -5,6 +5,7 @@
 export const translations = {
   title: "Drag Element",
   description: "Drag an element onto another element",
+  dynamicTitle: "Drag: {{from}} \u2192 {{to}}",
 
   form: {
     label: "Drag Element",

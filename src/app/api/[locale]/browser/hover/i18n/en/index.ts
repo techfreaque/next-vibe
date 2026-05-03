@@ -5,6 +5,7 @@
 export const translations = {
   title: "Hover",
   description: "Hover over the provided element",
+  dynamicTitle: "Hover: {{uid}}",
 
   form: {
     label: "Hover Element",

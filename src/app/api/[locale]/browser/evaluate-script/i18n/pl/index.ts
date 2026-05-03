@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Oceniaj skrypt",
   description: "Oceń funkcję JavaScript wewnątrz aktualnie wybranej strony",
+  dynamicTitle: "Skrypt: {{snippet}}",
   form: {
     label: "Oceniaj skrypt",
     description: "Wykonaj JavaScript na stronie przeglądarki",

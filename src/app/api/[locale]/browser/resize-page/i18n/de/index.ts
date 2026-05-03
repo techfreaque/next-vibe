@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Seite skalieren",
+  dynamicTitle: "Groesse: {{width}}x{{height}}",
   description: "Das Fenster der ausgewählten Seite skalieren",
   form: {
     label: "Seite skalieren",

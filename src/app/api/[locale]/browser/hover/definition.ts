@@ -28,6 +28,15 @@ const { POST } = createEndpoint({
   path: ["browser", "hover"],
   title: "hover.title",
   description: "hover.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.uid) {
+      return {
+        message: "hover.dynamicTitle" as const,
+        messageParams: { uid: request.uid },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserInteraction",
   icon: "mouse-pointer",

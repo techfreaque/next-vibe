@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Przewiń",
+  dynamicTitle: "Przewiń: {{direction}}",
   description: "Przewiń w bieżącej lub podanej pozycji kursora",
   form: {
     label: "Przewiń",

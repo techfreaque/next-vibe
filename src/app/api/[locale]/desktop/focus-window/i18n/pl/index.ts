@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Aktywuj okno",
+  dynamicTitle: "Fokus: {{target}}",
   description: "Przesuń okno na pierwszy plan i nadaj mu fokus",
   form: {
     label: "Aktywuj okno",

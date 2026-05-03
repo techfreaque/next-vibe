@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Taste drücken",
+  dynamicTitle: "Taste: {{key}}",
   description: "Taste oder Tastenkombination drücken",
   form: {
     label: "Taste drücken",

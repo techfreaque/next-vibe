@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Text eingeben",
+  dynamicTitle: "Tippen: {{text}}",
   description:
     "Text in das fokussierte Fenster über Tastatureingabe-Simulation eingeben",
   form: {

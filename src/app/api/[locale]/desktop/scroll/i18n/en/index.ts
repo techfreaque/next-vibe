@@ -1,5 +1,6 @@
 export const translations = {
   title: "Scroll",
+  dynamicTitle: "Scroll: {{direction}}",
   description: "Scroll at the current mouse position or specified coordinates",
   form: {
     label: "Scroll",

@@ -28,6 +28,20 @@ const { POST } = createEndpoint({
   path: ["browser", "navigate-page"],
   title: "navigate-page.title",
   description: "navigate-page.description",
+  dynamicTitle: ({ request }) => {
+    const target = request?.url || request?.type;
+    if (target) {
+      const short =
+        typeof target === "string" && target.length > 60
+          ? `${target.slice(0, 60)}…`
+          : target;
+      return {
+        message: "navigate-page.dynamicTitle" as const,
+        messageParams: { target: String(short) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserPages",
   icon: "navigation",

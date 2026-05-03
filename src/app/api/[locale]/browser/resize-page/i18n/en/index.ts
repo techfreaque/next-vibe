@@ -1,5 +1,6 @@
 export const translations = {
   title: "Resize Page",
+  dynamicTitle: "Resize: {{width}}x{{height}}",
   description: "Resize the selected page's window",
   form: {
     label: "Resize Page",

@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Najedź",
   description: "Najedź na podany element",
+  dynamicTitle: "Hover: {{uid}}",
 
   form: {
     label: "Najedź na element",

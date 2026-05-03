@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Wypełnij",
   description:
     "Wpisz tekst do pola wejściowego, obszaru tekstowego lub wybierz opcję z elementu select",
+  dynamicTitle: "Wypełnij: {{uid}}",
 
   form: {
     label: "Wypełnij element",

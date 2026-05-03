@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Warten auf",
+  dynamicTitle: "Warten: {{text}}",
   description:
     "Warten, bis der angegebene Text auf der ausgewählten Seite erscheint",
 

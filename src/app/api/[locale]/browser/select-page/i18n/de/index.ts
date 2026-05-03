@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Seite auswählen",
+  dynamicTitle: "Auswaehlen: {{page}}",
   description: "Eine Seite als Kontext für zukünftige Tool-Aufrufe auswählen",
   form: {
     label: "Seite auswählen",

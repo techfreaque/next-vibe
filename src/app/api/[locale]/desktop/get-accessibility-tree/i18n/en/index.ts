@@ -1,5 +1,6 @@
 export const translations = {
   title: "Get Accessibility Tree",
+  dynamicTitle: "A11y: {{app}}",
   description:
     "Get the accessibility tree of the focused window or a specific application",
   form: {

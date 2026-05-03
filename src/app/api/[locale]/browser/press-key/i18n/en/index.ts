@@ -1,5 +1,6 @@
 export const translations = {
   title: "Press Key",
+  dynamicTitle: "Key: {{key}}",
   description: "Press a key or key combination",
   form: {
     label: "Press Key",

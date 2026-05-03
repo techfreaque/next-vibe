@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Wpisz tekst",
+  dynamicTitle: "Wpisz: {{text}}",
   description: "Wpisz tekst do aktywnego okna za pomocą symulacji klawiatury",
   form: {
     label: "Wpisz tekst",

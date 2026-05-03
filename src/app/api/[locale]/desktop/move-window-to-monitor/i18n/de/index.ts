@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Fenster auf Monitor verschieben",
+  dynamicTitle: "Verschieben: {{target}}",
   description: "Ein Fenster auf einen bestimmten Monitor verschieben",
   form: {
     label: "Fenster auf Monitor verschieben",

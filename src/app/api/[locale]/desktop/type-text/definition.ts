@@ -32,6 +32,17 @@ const { POST } = createEndpoint({
   path: ["desktop", "type-text"],
   title: "type-text.title",
   description: "type-text.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.text) {
+      const text = String(request.text);
+      const short = text.length > 30 ? `${text.slice(0, 30)}…` : text;
+      return {
+        message: "type-text.dynamicTitle" as const,
+        messageParams: { text: short },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.desktop",
   subCategory: "endpointCategories.desktopInteraction",
   icon: "keyboard",

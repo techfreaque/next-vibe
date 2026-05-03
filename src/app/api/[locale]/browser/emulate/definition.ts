@@ -28,6 +28,25 @@ const { POST } = createEndpoint({
   path: ["browser", "emulate"],
   title: "emulate.title",
   description: "emulate.description",
+  dynamicTitle: ({ request }) => {
+    const parts: string[] = [];
+    if (request?.networkConditions) {
+      parts.push(String(request.networkConditions));
+    }
+    if (request?.cpuThrottlingRate) {
+      parts.push(`CPU:${String(request.cpuThrottlingRate)}x`);
+    }
+    if (request?.colorScheme) {
+      parts.push(String(request.colorScheme));
+    }
+    if (parts.length > 0) {
+      return {
+        message: "emulate.dynamicTitle" as const,
+        messageParams: { config: parts.join(", ") },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserPages",
   icon: "settings",

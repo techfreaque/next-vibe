@@ -1,5 +1,6 @@
 export const translations = {
   title: "Type Text",
+  dynamicTitle: "Type: {{text}}",
   description: "Type text into the focused window using keyboard simulation",
   form: {
     label: "Type Text",

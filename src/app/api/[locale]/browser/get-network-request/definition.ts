@@ -28,6 +28,15 @@ const { POST } = createEndpoint({
   path: ["browser", "get-network-request"],
   title: "get-network-request.title",
   description: "get-network-request.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.reqid !== undefined) {
+      return {
+        message: "get-network-request.dynamicTitle" as const,
+        messageParams: { id: String(request.reqid) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserDevTools",
   icon: "network",

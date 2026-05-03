@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Pobierz drzewo dostępności",
+  dynamicTitle: "A11y: {{app}}",
   description:
     "Pobierz drzewo dostępności aktywnego okna lub określonej aplikacji",
   form: {

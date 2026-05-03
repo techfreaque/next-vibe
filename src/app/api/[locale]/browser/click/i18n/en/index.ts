@@ -5,6 +5,7 @@
 export const translations = {
   title: "Click Element",
   description: "Clicks on the provided element",
+  dynamicTitle: "Click: {{uid}}",
 
   form: {
     label: "Click Element",

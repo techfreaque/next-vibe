@@ -6,6 +6,7 @@ export const translations = {
   title: "Fill",
   description:
     "Type text into an input, text area or select an option from a select element",
+  dynamicTitle: "Fill: {{uid}}",
 
   form: {
     label: "Fill Element",

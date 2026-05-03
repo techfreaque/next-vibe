@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Fenster fokussieren",
+  dynamicTitle: "Fokus: {{target}}",
   description: "Ein Fenster in den Vordergrund bringen und ihm den Fokus geben",
   form: {
     label: "Fenster fokussieren",

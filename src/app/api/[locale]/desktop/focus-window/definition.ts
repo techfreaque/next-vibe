@@ -32,6 +32,16 @@ const { POST } = createEndpoint({
   path: ["desktop", "focus-window"],
   title: "focus-window.title",
   description: "focus-window.description",
+  dynamicTitle: ({ request }) => {
+    const target = request?.title || request?.windowId || request?.pid;
+    if (target) {
+      return {
+        message: "focus-window.dynamicTitle" as const,
+        messageParams: { target: String(target) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.desktop",
   subCategory: "endpointCategories.desktopWindows",
   icon: "maximize",

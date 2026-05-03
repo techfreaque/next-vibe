@@ -2,6 +2,7 @@ export const translations = {
   title: "Evaluate Script",
   description:
     "Evaluate a JavaScript function inside the currently selected page",
+  dynamicTitle: "Script: {{snippet}}",
   form: {
     label: "Evaluate Script",
     description: "Execute JavaScript in the browser page",

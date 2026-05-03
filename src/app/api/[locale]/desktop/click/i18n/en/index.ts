@@ -1,5 +1,6 @@
 export const translations = {
   title: "Click",
+  dynamicTitle: "Click: {{x}},{{y}}",
   description:
     "Move the mouse to absolute coordinates and perform a mouse click",
   form: {

@@ -1,5 +1,6 @@
 export const translations = {
   title: "New Page",
+  dynamicTitle: "New page: {{url}}",
   description: "Create a new page",
   form: {
     label: "New Page",

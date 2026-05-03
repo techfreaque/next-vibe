@@ -28,6 +28,15 @@ const { POST } = createEndpoint({
   path: ["browser", "press-key"],
   title: "press-key.title",
   description: "press-key.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.key) {
+      return {
+        message: "press-key.dynamicTitle" as const,
+        messageParams: { key: String(request.key) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserInteraction",
   icon: "keyboard",

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Skript auswerten",
   description:
     "Eine JavaScript-Funktion in der aktuell ausgewählten Seite auswerten",
+  dynamicTitle: "Skript: {{snippet}}",
   form: {
     label: "Skript auswerten",
     description: "JavaScript in der Browser-Seite ausführen",

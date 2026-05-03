@@ -4,6 +4,7 @@
 
 export const translations = {
   title: "Wait For",
+  dynamicTitle: "Wait: {{text}}",
   description: "Wait for the specified text to appear on the selected page",
 
   form: {

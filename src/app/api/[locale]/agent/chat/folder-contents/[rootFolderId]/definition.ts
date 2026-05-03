@@ -124,6 +124,15 @@ const { GET } = createEndpoint({
         schema: z.string().uuid().nullish(),
         includeInCacheKey: true,
       }),
+      threadIds: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.threadIds.label" as const,
+        description: "get.threadIds.description" as const,
+        columns: 12,
+        schema: z.array(z.string().uuid()).nullish(),
+        includeInCacheKey: true,
+      }),
 
       // === RESPONSE ===
       // Root folder permissions
@@ -440,6 +449,7 @@ const { GET } = createEndpoint({
     requests: {
       default: {
         subFolderId: null,
+        threadIds: null,
       },
     },
     responses: {

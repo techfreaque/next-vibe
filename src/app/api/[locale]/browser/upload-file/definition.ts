@@ -28,6 +28,19 @@ const { POST } = createEndpoint({
   path: ["browser", "upload-file"],
   title: "upload-file.title",
   description: "upload-file.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.filePath) {
+      const filePath = String(request.filePath);
+      const fileName = filePath.split("/").pop() || filePath;
+      const short =
+        fileName.length > 40 ? `${fileName.slice(0, 40)}…` : fileName;
+      return {
+        message: "upload-file.dynamicTitle" as const,
+        messageParams: { file: short },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserInteraction",
   icon: "upload",

@@ -32,6 +32,20 @@ const { POST } = createEndpoint({
   path: ["desktop", "move-window-to-monitor"],
   title: "move-window-to-monitor.title",
   description: "move-window-to-monitor.description",
+  dynamicTitle: ({ request }) => {
+    const target =
+      request?.monitorName ||
+      (request?.monitorIndex !== undefined
+        ? `Monitor ${request.monitorIndex}`
+        : undefined);
+    if (target) {
+      return {
+        message: "move-window-to-monitor.dynamicTitle" as const,
+        messageParams: { target: String(target) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.desktop",
   subCategory: "endpointCategories.desktopWindows",
   icon: "monitor",

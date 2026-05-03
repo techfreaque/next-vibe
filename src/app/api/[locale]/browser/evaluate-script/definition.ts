@@ -29,6 +29,17 @@ const { POST } = createEndpoint({
   path: ["browser", "evaluate-script"],
   title: "evaluate-script.title",
   description: "evaluate-script.description",
+  dynamicTitle: ({ request }) => {
+    const fn = request?.function;
+    if (typeof fn === "string" && fn.trim()) {
+      const snippet = fn.length > 50 ? `${fn.slice(0, 50)}\u2026` : fn;
+      return {
+        message: "evaluate-script.dynamicTitle" as const,
+        messageParams: { snippet },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserDevTools",
   icon: "code",

@@ -24,6 +24,10 @@ export const translations = {
       label: "Unterordner",
       description: "Die Unterordner-ID (null für Stammebene)",
     },
+    threadIds: {
+      label: "Thread-IDs",
+      description: "Nach bestimmten Thread-IDs filtern (für Suchergebnisse)",
+    },
     response: {
       items: {
         item: {

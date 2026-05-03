@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Naciśnij klawisz",
+  dynamicTitle: "Klawisz: {{key}}",
   description: "Naciśnij klawisz lub kombinację klawiszy za pomocą xdotool",
   form: {
     label: "Naciśnij klawisz",

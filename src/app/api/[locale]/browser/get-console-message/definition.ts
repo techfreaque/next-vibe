@@ -28,6 +28,15 @@ const { POST } = createEndpoint({
   path: ["browser", "get-console-message"],
   title: "get-console-message.title",
   description: "get-console-message.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.msgid !== undefined) {
+      return {
+        message: "get-console-message.dynamicTitle" as const,
+        messageParams: { id: String(request.msgid) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserDevTools",
   icon: "terminal",

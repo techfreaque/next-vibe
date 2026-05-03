@@ -1,5 +1,6 @@
 export const translations = {
   title: "Upload File",
+  dynamicTitle: "Upload: {{file}}",
   description: "Upload a file through a provided element",
   form: {
     label: "Upload File",

@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Scrollen",
+  dynamicTitle: "Scrollen: {{direction}}",
   description: "An der aktuellen oder angegebenen Mauszeigerposition scrollen",
   form: {
     label: "Scrollen",

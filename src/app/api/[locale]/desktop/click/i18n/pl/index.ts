@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Kliknij",
+  dynamicTitle: "Klik: {{x}},{{y}}",
   description:
     "Przesuń mysz do bezwzględnych współrzędnych i wykonaj kliknięcie",
   form: {

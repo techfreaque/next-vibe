@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Prześlij plik",
+  dynamicTitle: "Upload: {{file}}",
   description: "Prześlij plik przez podany element",
   form: {
     label: "Prześlij plik",

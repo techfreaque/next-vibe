@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Seite navigieren",
+  dynamicTitle: "Navigation: {{target}}",
   description: "Die aktuell ausgewählte Seite navigieren",
   form: {
     label: "Seite navigieren",

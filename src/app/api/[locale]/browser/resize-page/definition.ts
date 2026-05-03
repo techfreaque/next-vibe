@@ -28,6 +28,18 @@ const { POST } = createEndpoint({
   path: ["browser", "resize-page"],
   title: "resize-page.title",
   description: "resize-page.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.width !== undefined && request?.height !== undefined) {
+      return {
+        message: "resize-page.dynamicTitle" as const,
+        messageParams: {
+          width: String(request.width),
+          height: String(request.height),
+        },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserPages",
   icon: "maximize",

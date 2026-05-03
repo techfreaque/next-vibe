@@ -28,6 +28,15 @@ const { POST } = createEndpoint({
   path: ["browser", "drag"],
   title: "drag.title",
   description: "drag.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.from_uid) {
+      return {
+        message: "drag.dynamicTitle" as const,
+        messageParams: { from: request.from_uid, to: request.to_uid ?? "?" },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserInteraction",
   icon: "move",

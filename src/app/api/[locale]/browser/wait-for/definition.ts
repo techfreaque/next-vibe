@@ -28,6 +28,18 @@ const { POST } = createEndpoint({
   path: ["browser", "wait-for"],
   title: "wait-for.title",
   description: "wait-for.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.text) {
+      const texts = Array.isArray(request.text) ? request.text : [request.text];
+      const joined = texts.join(", ");
+      const short = joined.length > 40 ? `${joined.slice(0, 40)}…` : joined;
+      return {
+        message: "wait-for.dynamicTitle" as const,
+        messageParams: { text: short },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserInspection",
   icon: "clock",

@@ -1,6 +1,7 @@
 export const translations = {
   title: "Get Console Message",
   description: "Get a console message by its ID",
+  dynamicTitle: "Console #{{id}}",
   form: {
     label: "Get Console Message",
     description: "Retrieve a specific console message",

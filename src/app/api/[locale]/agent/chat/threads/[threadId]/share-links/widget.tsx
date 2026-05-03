@@ -143,7 +143,7 @@ export function ThreadShareDialog({
         },
         {
           urlPathParams: { rootFolderId: currentRootFolderId },
-          requestData: { subFolderId: null },
+          requestData: { subFolderId: null, threadIds: null },
         },
       );
 

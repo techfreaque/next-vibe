@@ -28,6 +28,17 @@ const { POST } = createEndpoint({
   path: ["browser", "new-page"],
   title: "new-page.title",
   description: "new-page.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.url) {
+      const url = String(request.url);
+      const short = url.length > 60 ? `${url.slice(0, 60)}…` : url;
+      return {
+        message: "new-page.dynamicTitle" as const,
+        messageParams: { url: short },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserPages",
   icon: "file-plus",

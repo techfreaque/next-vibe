@@ -7,6 +7,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Element ziehen",
   description: "Ein Element auf ein anderes Element ziehen",
+  dynamicTitle: "Ziehen: {{from}} \u2192 {{to}}",
 
   form: {
     label: "Element ziehen",

@@ -1,5 +1,6 @@
 export const translations = {
   title: "Select Page",
+  dynamicTitle: "Select: {{page}}",
   description: "Select a page as a context for future tool calls",
   form: {
     label: "Select Page",

@@ -1,5 +1,6 @@
 export const translations = {
   title: "Move Window to Monitor",
+  dynamicTitle: "Move: {{target}}",
   description: "Move a window to a specific monitor",
   form: {
     label: "Move Window to Monitor",

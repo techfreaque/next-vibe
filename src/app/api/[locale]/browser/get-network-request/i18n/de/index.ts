@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Netzwerk-Anfrage abrufen",
   description:
     "Ruft eine Netzwerk-Anfrage über eine optionale reqid ab, bei Weglassen wird die aktuell ausgewählte Anfrage im DevTools Network-Panel zurückgegeben",
+  dynamicTitle: "Netzwerk #{{id}}",
   form: {
     label: "Netzwerk-Anfrage abrufen",
     description:

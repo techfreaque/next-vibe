@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Zmień rozmiar strony",
+  dynamicTitle: "Rozmiar: {{width}}x{{height}}",
   description: "Zmień rozmiar okna wybranej strony",
   form: {
     label: "Zmień rozmiar strony",

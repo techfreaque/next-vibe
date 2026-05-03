@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Przesuń mysz",
+  dynamicTitle: "Ruch: {{x}},{{y}}",
   description: "Przesuń kursor myszy do bezwzględnych współrzędnych ekranu",
   form: {
     label: "Przesuń mysz",

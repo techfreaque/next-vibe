@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Klicken",
+  dynamicTitle: "Klick: {{x}},{{y}}",
   description:
     "Maus zu absoluten Koordinaten bewegen und einen Mausklick ausführen",
   form: {

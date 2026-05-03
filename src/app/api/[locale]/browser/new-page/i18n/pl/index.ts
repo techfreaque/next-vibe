@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Nowa strona",
+  dynamicTitle: "Nowa strona: {{url}}",
   description: "Utwórz nową stronę",
   form: {
     label: "Nowa strona",

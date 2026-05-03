@@ -1,5 +1,6 @@
 export const translations = {
   title: "Navigate Page",
+  dynamicTitle: "Navigate: {{target}}",
   description: "Navigate the currently selected page",
   form: {
     label: "Navigate Page",

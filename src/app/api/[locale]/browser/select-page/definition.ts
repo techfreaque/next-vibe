@@ -28,6 +28,15 @@ const { POST } = createEndpoint({
   path: ["browser", "select-page"],
   title: "select-page.title",
   description: "select-page.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.pageId !== undefined) {
+      return {
+        message: "select-page.dynamicTitle" as const,
+        messageParams: { page: String(request.pageId) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserPages",
   icon: "square-check",

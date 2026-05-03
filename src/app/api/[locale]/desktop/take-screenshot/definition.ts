@@ -32,6 +32,18 @@ const { POST } = createEndpoint({
   path: ["desktop", "take-screenshot"],
   title: "take-screenshot.title",
   description: "take-screenshot.description",
+  dynamicTitle: ({ request }) => {
+    const target =
+      request?.monitorName ||
+      (request?.screen !== undefined ? `Screen ${request.screen}` : undefined);
+    if (target) {
+      return {
+        message: "take-screenshot.dynamicTitle" as const,
+        messageParams: { target: String(target) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.desktop",
   subCategory: "endpointCategories.desktopCapture",
   icon: "monitor",

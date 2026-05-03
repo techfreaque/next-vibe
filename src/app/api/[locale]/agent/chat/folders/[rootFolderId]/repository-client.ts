@@ -177,7 +177,7 @@ export class ChatFoldersRepositoryClient {
         urlPathParams: {
           rootFolderId: newItem.rootFolderId as DefaultFolderId,
         },
-        requestData: { subFolderId: newItem.parentId },
+        requestData: { subFolderId: newItem.parentId, threadIds: null },
       },
     );
   }
@@ -208,7 +208,7 @@ export class ChatFoldersRepositoryClient {
       },
       {
         urlPathParams: { rootFolderId },
-        requestData: { subFolderId: parentId },
+        requestData: { subFolderId: parentId, threadIds: null },
       },
     );
   }

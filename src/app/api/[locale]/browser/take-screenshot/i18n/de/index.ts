@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Screenshot aufnehmen",
+  dynamicTitle: "Screenshot: {{target}}",
   description:
     "Nimmt einen Screenshot der Seite oder eines bestimmten Elements auf",
   form: {

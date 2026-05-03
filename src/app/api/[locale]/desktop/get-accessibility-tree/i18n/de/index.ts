@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Barrierefreiheitsbaum abrufen",
+  dynamicTitle: "A11y: {{app}}",
   description:
     "Barrierefreiheitsbaum des fokussierten Fensters oder einer bestimmten Anwendung abrufen",
   form: {

@@ -24,6 +24,10 @@ export const translations = {
       label: "Sub Folder",
       description: "The sub folder ID (null for root level)",
     },
+    threadIds: {
+      label: "Thread IDs",
+      description: "Filter by specific thread IDs (for search results)",
+    },
     response: {
       items: {
         item: {

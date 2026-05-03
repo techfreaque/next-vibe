@@ -28,6 +28,17 @@ const { POST } = createEndpoint({
   path: ["browser", "take-screenshot"],
   title: "take-screenshot.title",
   description: "take-screenshot.description",
+  dynamicTitle: ({ request }) => {
+    const target = request?.uid
+      ? String(request.uid)
+      : request?.fullPage
+        ? "full page"
+        : "viewport";
+    return {
+      message: "take-screenshot.dynamicTitle" as const,
+      messageParams: { target },
+    };
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserInspection",
   icon: "camera",

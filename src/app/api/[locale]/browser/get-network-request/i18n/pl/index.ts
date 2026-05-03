@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Pobierz żądanie sieciowe",
   description:
     "Pobiera żądanie sieciowe według opcjonalnego reqid, jeśli pominięto zwraca aktualnie wybrane żądanie w panelu DevTools Network",
+  dynamicTitle: "Sieć #{{id}}",
   form: {
     label: "Pobierz żądanie sieciowe",
     description: "Pobierz określone żądanie sieciowe lub aktualnie wybrane",

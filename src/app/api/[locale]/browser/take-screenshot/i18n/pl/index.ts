@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Zrób zrzut ekranu",
+  dynamicTitle: "Zrzut: {{target}}",
   description: "Zrób zrzut ekranu strony lub określonego elementu",
   form: {
     label: "Zrób zrzut ekranu",

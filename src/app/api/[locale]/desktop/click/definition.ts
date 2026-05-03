@@ -32,6 +32,15 @@ const { POST } = createEndpoint({
   path: ["desktop", "click"],
   title: "click.title",
   description: "click.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.x !== undefined && request?.y !== undefined) {
+      return {
+        message: "click.dynamicTitle" as const,
+        messageParams: { x: String(request.x), y: String(request.y) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.desktop",
   subCategory: "endpointCategories.desktopInteraction",
   icon: "mouse-pointer",

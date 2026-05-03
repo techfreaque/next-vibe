@@ -28,6 +28,15 @@ const { POST } = createEndpoint({
   path: ["browser", "handle-dialog"],
   title: "handle-dialog.title",
   description: "handle-dialog.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.action) {
+      return {
+        message: "handle-dialog.dynamicTitle" as const,
+        messageParams: { action: request.action },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.browser",
   subCategory: "endpointCategories.browserInteraction",
   icon: "message-square",

@@ -32,6 +32,15 @@ const { POST } = createEndpoint({
   path: ["desktop", "scroll"],
   title: "scroll.title",
   description: "scroll.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.direction) {
+      return {
+        message: "scroll.dynamicTitle" as const,
+        messageParams: { direction: String(request.direction) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.desktop",
   subCategory: "endpointCategories.desktopInteraction",
   icon: "chevron-down",

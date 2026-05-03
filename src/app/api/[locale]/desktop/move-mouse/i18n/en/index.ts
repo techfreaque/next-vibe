@@ -1,5 +1,6 @@
 export const translations = {
   title: "Move Mouse",
+  dynamicTitle: "Move: {{x}},{{y}}",
   description: "Move the mouse cursor to absolute screen coordinates",
   form: {
     label: "Move Mouse",

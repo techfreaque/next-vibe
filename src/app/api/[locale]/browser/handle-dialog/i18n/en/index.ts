@@ -5,6 +5,7 @@
 export const translations = {
   title: "Handle Dialog",
   description: "Handle a browser dialog (alert, confirm, prompt)",
+  dynamicTitle: "Dialog: {{action}}",
 
   form: {
     label: "Handle Browser Dialog",

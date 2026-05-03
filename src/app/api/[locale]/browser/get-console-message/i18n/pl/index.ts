@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Pobierz wiadomość konsoli",
   description: "Pobierz wiadomość konsoli według jej ID",
+  dynamicTitle: "Konsola #{{id}}",
   form: {
     label: "Pobierz wiadomość konsoli",
     description: "Pobierz określoną wiadomość konsoli",

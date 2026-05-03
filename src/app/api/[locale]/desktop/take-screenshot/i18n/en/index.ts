@@ -1,5 +1,6 @@
 export const translations = {
   title: "Take Desktop Screenshot",
+  dynamicTitle: "Screenshot: {{target}}",
   description: "Capture a screenshot of the desktop or a screen region",
   form: {
     label: "Take Desktop Screenshot",

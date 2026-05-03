@@ -32,6 +32,15 @@ const { POST } = createEndpoint({
   path: ["desktop", "get-accessibility-tree"],
   title: "get-accessibility-tree.title",
   description: "get-accessibility-tree.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.appName) {
+      return {
+        message: "get-accessibility-tree.dynamicTitle" as const,
+        messageParams: { app: String(request.appName) },
+      };
+    }
+    return undefined;
+  },
   category: "endpointCategories.desktop",
   subCategory: "endpointCategories.desktopInspection",
   icon: "layers",

@@ -2,6 +2,7 @@ export const translations = {
   title: "Get Network Request",
   description:
     "Gets a network request by an optional reqid, if omitted returns the currently selected request in the DevTools Network panel",
+  dynamicTitle: "Network #{{id}}",
   form: {
     label: "Get Network Request",
     description: "Get a specific network request or the currently selected one",

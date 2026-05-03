@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Hover",
   description: "Über das bereitgestellte Element schweben",
+  dynamicTitle: "Hover: {{uid}}",
 
   form: {
     label: "Element überschweben",

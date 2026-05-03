@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Przenieś okno na monitor",
+  dynamicTitle: "Przenieś: {{target}}",
   description: "Przenieś okno na wybrany monitor",
   form: {
     label: "Przenieś okno na monitor",

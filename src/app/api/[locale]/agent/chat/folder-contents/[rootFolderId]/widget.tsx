@@ -248,7 +248,7 @@ function ThreadRow({
         },
         {
           urlPathParams: { rootFolderId: item.rootFolderId },
-          requestData: { subFolderId: item.folderId ?? null },
+          requestData: { subFolderId: item.folderId ?? null, threadIds: null },
         },
       );
       // Add to target folder's cache
@@ -272,7 +272,10 @@ function ThreadRow({
         },
         {
           urlPathParams: { rootFolderId: item.rootFolderId },
-          requestData: { subFolderId: updates.folderId ?? null },
+          requestData: {
+            subFolderId: updates.folderId ?? null,
+            threadIds: null,
+          },
         },
       );
     } else {
@@ -292,7 +295,7 @@ function ThreadRow({
         },
         {
           urlPathParams: { rootFolderId: item.rootFolderId },
-          requestData: { subFolderId: item.folderId ?? null },
+          requestData: { subFolderId: item.folderId ?? null, threadIds: null },
         },
       );
     }
@@ -341,7 +344,7 @@ function ThreadRow({
         },
         {
           urlPathParams: { rootFolderId: item.rootFolderId },
-          requestData: { subFolderId: item.folderId ?? null },
+          requestData: { subFolderId: item.folderId ?? null, threadIds: null },
         },
       );
       if (isActive) {
@@ -530,6 +533,7 @@ function ThreadRow({
                                 },
                                 requestData: {
                                   subFolderId: item.folderId ?? null,
+                                  threadIds: null,
                                 },
                               },
                             );
@@ -751,7 +755,7 @@ function ThreadRowShared({
         },
         {
           urlPathParams: { rootFolderId: item.rootFolderId },
-          requestData: { subFolderId: item.folderId ?? null },
+          requestData: { subFolderId: item.folderId ?? null, threadIds: null },
         },
       );
     } else {
@@ -771,7 +775,7 @@ function ThreadRowShared({
         },
         {
           urlPathParams: { rootFolderId: item.rootFolderId },
-          requestData: { subFolderId: item.folderId ?? null },
+          requestData: { subFolderId: item.folderId ?? null, threadIds: null },
         },
       );
     }
@@ -809,7 +813,7 @@ function ThreadRowShared({
         },
         {
           urlPathParams: { rootFolderId: item.rootFolderId },
-          requestData: { subFolderId: item.folderId ?? null },
+          requestData: { subFolderId: item.folderId ?? null, threadIds: null },
         },
       );
       if (isActive) {
@@ -1230,7 +1234,7 @@ function FolderRow({
         },
         {
           urlPathParams: { rootFolderId: activeRootFolderId },
-          requestData: { subFolderId: item.parentId ?? null },
+          requestData: { subFolderId: item.parentId ?? null, threadIds: null },
         },
       );
       // Add to new parent's folder-contents cache
@@ -1253,7 +1257,10 @@ function FolderRow({
         },
         {
           urlPathParams: { rootFolderId: activeRootFolderId },
-          requestData: { subFolderId: updates.parentId ?? null },
+          requestData: {
+            subFolderId: updates.parentId ?? null,
+            threadIds: null,
+          },
         },
       );
     } else {
@@ -1274,7 +1281,7 @@ function FolderRow({
         },
         {
           urlPathParams: { rootFolderId: activeRootFolderId },
-          requestData: { subFolderId: item.parentId ?? null },
+          requestData: { subFolderId: item.parentId ?? null, threadIds: null },
         },
       );
     }
@@ -1336,7 +1343,7 @@ function FolderRow({
         },
         {
           urlPathParams: { rootFolderId: activeRootFolderId },
-          requestData: { subFolderId: item.parentId ?? null },
+          requestData: { subFolderId: item.parentId ?? null, threadIds: null },
         },
       );
       if (isIncognito) {
@@ -1567,7 +1574,7 @@ function FolderRow({
             endpointOptions={{
               read: {
                 urlPathParams: { rootFolderId: activeRootFolderId },
-                initialState: { subFolderId: item.id },
+                initialState: { subFolderId: item.id, threadIds: null },
                 initialData:
                   initialSubFolderId === item.id
                     ? (initialSubFolderContentsData ?? undefined)

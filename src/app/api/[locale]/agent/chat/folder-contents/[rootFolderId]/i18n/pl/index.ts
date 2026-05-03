@@ -24,6 +24,11 @@ export const translations = {
       label: "Podfolder",
       description: "ID podfolderu (null dla poziomu głównego)",
     },
+    threadIds: {
+      label: "ID wątków",
+      description:
+        "Filtruj według konkretnych ID wątków (dla wyników wyszukiwania)",
+    },
     response: {
       items: {
         item: {

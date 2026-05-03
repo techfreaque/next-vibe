@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Emulieren",
   description: "Verschiedene Funktionen auf der ausgewählten Seite emulieren",
+  dynamicTitle: "Emulieren: {{config}}",
   form: {
     label: "Gerät emulieren",
     description: "Netzwerkbedingungen und CPU-Drosselung emulieren",

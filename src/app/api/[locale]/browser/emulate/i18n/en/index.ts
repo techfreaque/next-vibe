@@ -1,6 +1,7 @@
 export const translations = {
   title: "Emulate",
   description: "Emulate various features on the selected page",
+  dynamicTitle: "Emulate: {{config}}",
   form: {
     label: "Emulate Device",
     description: "Emulate network conditions and CPU throttling",

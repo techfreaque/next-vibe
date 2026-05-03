@@ -1,5 +1,6 @@
 export const translations = {
   title: "Focus Window",
+  dynamicTitle: "Focus: {{target}}",
   description: "Bring a window to the foreground and give it focus",
   form: {
     label: "Focus Window",
