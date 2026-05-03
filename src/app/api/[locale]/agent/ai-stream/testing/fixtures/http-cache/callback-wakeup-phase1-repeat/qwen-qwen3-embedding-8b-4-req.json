@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T6c wakeUp-repeat] Call the generate_image tool with prompt='wakeup-repeat-test' and callbackMode='wakeUp'. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no imageUrl yet - end your reply with STEP_OK if you see taskId and no imageUrl, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with WAKEUP_OK. If revived but imageUrl is missing or empty, end with WAKEUP_FAILED: <reason>.\n\nAssistant: <think>The user wants me to call generate_image with callbackMode='wakeUp' and prompt='wakeup-repeat-test'. I need to check that the initial response has a taskId and no imageUrl, then end with STEP_OK. Later when the result is injected, I need to confirm imageUrl is present and end with WAKEUP_OK.\n\nLet me call the tool with wakeUp mode. </think>\n\nAssistant: <think>The initial response shows taskId=\"local-wu-1777846323249-0f45ti\" and no imageUrl. I need to end this phase with STEP_OK. Then I'll be revived when the image is ready. </think> STEP_OK\n\nUser:",
+    "encoding_format": "float"
+  }
+}

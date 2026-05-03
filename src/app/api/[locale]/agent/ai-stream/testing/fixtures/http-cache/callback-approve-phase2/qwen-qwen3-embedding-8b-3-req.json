@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: Previous conversation summary:\n\n - The tool-help endpoint was tested in several ways. A general listing returned 403 tools across 17 pages with a non-empty tools array where every entry included a name and description. A detailed query for toolName='generate_image' returned its name, description, and full JSON parameters schema. An endLoop test confirmed the call returned a non-empty tools array and the loop stopped after a single execution. A direct execute-tool call with toolName='tool-help' and input={} also returned a valid tools array.\n- The generate_video tool was called with prompt='spinning cube' and returned videoUrl='http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/6cbbd149-72a0-4402-9304-b42d40be741b/4cce86a8-41b2-425b-941b-e4b033ca8374.mp4', creditCost=124.8, and du\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (60 · 4 archived)\n│   ├── role.md\n│   │   Solo founder & lead developer of **unbottled.ai** — free speech AI platform, full-time since **Oct 2025** (~2 years building next-vibe, started during Sovendus nights/weekends). Also the framework behind it: **next-vibe** (SaaS framework, TypeScript monorepo). Previ\n│   ├── name.md\n│   │   **Max** — go by Max. German in real life, English with computers/internet. Prefers English for all AI interactions even if platfo\n\nSystem: [Context: ID:98a75c0e | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:25]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"prompt\":\"endloop-test\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/6cbbd149-72a0-4402-9304-b42d40be741b/e493d94a-ac42-480a-a338-11e41239112a.png\",\"creditCost\":2.2}}",
+    "encoding_format": "float"
+  }
+}

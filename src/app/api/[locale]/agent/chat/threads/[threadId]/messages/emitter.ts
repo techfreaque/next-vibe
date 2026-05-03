@@ -75,6 +75,65 @@ export function emitThreadTitleUpdated(
 }
 
 /**
+ * Emit thread-created to sidebar channels with all required fields.
+ * Used for new threads so other tabs/clients can render the thread in the
+ * sidebar without a full refetch (the optimistic update only lives in the
+ * creating client's cache).
+ */
+export function emitThreadCreated(
+  threadId: string,
+  title: string,
+  rootFolderId: DefaultFolderId,
+  folderId: string | null,
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): void {
+  const now = new Date();
+  const threadsChannel = buildWsChannel(threadsDefinitions.GET.path, {});
+  const sidebarChannels = [
+    threadsChannel,
+    buildWsChannel(folderContentsDefinitions.GET.path, {
+      rootFolderId,
+    }),
+  ];
+  publishWsEventToChannels(
+    sidebarChannels,
+    {
+      event: "thread-created",
+      data: {
+        threads: [
+          {
+            id: threadId,
+            title,
+            rootFolderId,
+            folderId,
+            status: "active",
+            streamingState: "streaming",
+            createdAt: now,
+            updatedAt: now,
+          },
+        ],
+        items: [
+          {
+            id: threadId,
+            type: "thread",
+            title,
+            rootFolderId,
+            folderId,
+            status: "active",
+            streamingState: "streaming",
+            createdAt: now,
+            updatedAt: now,
+          },
+        ],
+      },
+    },
+    logger,
+    user,
+  );
+}
+
+/**
  * Build an emitter for the messages channel of a thread.
  *
  * Returns the typed emit function + a flush() to drain the batching queue at

@@ -4,9 +4,6 @@
  * Handles ONLY Next.js-specific concerns: NextRequest parsing, NextResponse wrapping, streaming
  */
 
-// Side-effect: registers global error sink so all logger.error() calls persist to error_logs
-import "../shared/logger/error-persist";
-
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import { NextResponse } from "next-vibe-ui/lib/request";
 import { parseError } from "next-vibe/shared/utils/parse-error";

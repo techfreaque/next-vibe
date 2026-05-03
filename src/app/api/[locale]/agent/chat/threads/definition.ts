@@ -462,6 +462,24 @@ const { GET } = createEndpoint({
         arrayField: "threads",
       }),
     },
+    // Thread created - emitted when a new thread is created during streaming.
+    // Ensures the sidebar shows the thread even if the optimistic client-side
+    // update missed the cache (e.g. cache was empty, or another tab/client).
+    "thread-created": {
+      fields: {
+        threads: [
+          "id",
+          "title",
+          "rootFolderId",
+          "folderId",
+          "status",
+          "streamingState",
+          "createdAt",
+          "updatedAt",
+        ] as const,
+      },
+      operation: "merge" as const,
+    },
   },
 
   examples: {

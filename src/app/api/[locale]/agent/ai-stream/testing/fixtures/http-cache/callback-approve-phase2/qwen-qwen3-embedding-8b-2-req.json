@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T7a approve-phase1] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='approve-test'. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.\n\nSystem: [Context: ID:faf23504 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]\n\nAssistant: [tool:tool-help] {} [tool:execute-tool] {\"input\":{\"prompt\":\"approve-test\"},\"toolName\":\"generate_image\",\"callbackMode\":\"approve\"}\n\nTool: [result:tool-help] {\"hint\":\"403 tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName=\\\"<name>\\\" for detail on one tool. To call any tool: execute-tool toolName=\\\"<name>\\\". Page 1/17 - pass page=2 to continue.\",\"tools\":[{\"name\":\"ai-run\",\"title\":\"Run AI Agent\",\"alias\n\nTool: [result:execute-tool] {\"_hint\":\"This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.\",\"result\":{\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/6cbbd149-72a0-4402-9304-b42d40be741b/9711bd8d-59f5-4a03-9fa4-6abe618ddc38.png\",\"cre\n\nSystem: Respond to the previous AI message naturally, as if you were a user engaging with it. Provide your thoughts, feedback, or follow-up based on what was said. Do not ask questions or try to drive the conversation - simply respond to what the AI said.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (60 · 4 archived)\n│   ├── role.md\n│   │   Solo founder & lead developer of **unbottled.ai** — free speech AI platform, full-time since **Oct 2025** (~2 years building next-vibe, started during Sovendus nights/weekends). Also the framework behind it: **next-vibe** (SaaS framework, TypeScript monorepo). Previ\n│   ├── name.md\n│   │   **Max** — go by Max. German in real life, English with computers/internet. Prefers English for all AI interactions even if platfo\n\nSystem: [Context: ID:98a75c0e | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:23]",
+    "encoding_format": "float"
+  }
+}

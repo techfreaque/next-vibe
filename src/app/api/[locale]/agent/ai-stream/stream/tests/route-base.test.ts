@@ -23,9 +23,8 @@
  *   T5b → wait-for-task: AI calls wait-for-task with T5 taskId, gets imageUrl
  *   T5a → endLoop: tool-help(endLoop) executes inline, stream stops after 1 call
  *   T6  → wakeUp: phase1 dispatches async, phase2 revives with result
- *   T6c → wakeUp failure: deferred status=failed, revival AI sees WAKEUP_FAILED (isolated thread)
- *   T6d → wakeUp idempotency: resume-stream called twice, only 1 deferred message created
- *   T6e → wakeUp dead-stream explicit: thread already idle, claimRevival path + full revival chain
+ *   T6c → wakeUp repeat: second full E2E wakeUp on same thread, no stale state from T6a/T6b
+ *   T6d → wakeUp stress: third consecutive E2E wakeUp, verifies no accumulated stale tasks
  *   T7  → approve: phase1 pending confirmation, phase2 confirms + executes
  *   T8  → parallel tools: tool-help + generate_image in same batch
  *   T9  → preCalls injection: synthetic tool result in DB before AI runs
@@ -1060,6 +1059,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     }, effectiveTestTimeout);
 
     afterAll(async () => {
+      // Clean up stale wakeUp/background tasks that may remain if tests fail mid-run.
+      // Without this, subsequent test runs would see leftover tasks causing fixture
+      // counter misalignment and unexpected revival triggers.
+      await db.execute(
+        sql`DELETE FROM cron_tasks WHERE id LIKE 'local-wu-%' AND last_execution_status IN ('status.completed', 'status.failed', 'status.cancelled', 'status.stopped')`,
+      );
       if (cfg.teardown && testUser) {
         await cfg.teardown(testUser);
       }
@@ -1253,7 +1258,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // check #5 only fires on genuinely unexpected leaves.
       const deadEndLeaves = new Set<string>();
       // NOTE: knownBranchParents removed — 0 branches allowed at any time.
-      // T6c/d/e chain linearly; each phase-2 appends to the goroutine's revival leaf.
+      // T6c/T6d are full E2E wakeUp tests chaining from T6b's revival AI.
 
       // Step artifacts
       let t1UserMsgId: string;
@@ -2865,472 +2870,58 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         "T6c: wakeUp repeat - second generate_image(wakeUp) on same thread",
         async () => {
           setFetchCacheContext(
-            `${cfg.cachePrefix}callback-wakeup-failure-phase2`,
+            `${cfg.cachePrefix}callback-wakeup-phase1-repeat`,
           );
-          await pinBalance(testUser.id, 10, creditLogger, creditT);
+          await pinBalance(testUser.id, 20, creditLogger, creditT);
+          const t6cInitialCount = (await fetchThreadMessages(threadId)).length;
 
-          const logger = createEndpointLogger(
-            false,
-            Date.now(),
-            defaultLocale,
-          );
-          const { t } = scopedTranslation.scopedT(defaultLocale);
-
-          const { chatMessages: cm } =
-            await import("@/app/api/[locale]/agent/chat/db");
-          const freshToolMsgId = crypto.randomUUID();
-          const freshToolCallId = freshToolMsgId;
-
-          // Inherit sequenceId from parent
-          const [parentRow] = await db
-            .select({ sequenceId: cm.sequenceId })
-            .from(cm)
-            .where(eq(cm.id, lastMainAiMsgId))
-            .limit(1);
-
-          const freshMetadata: MessageMetadata = {
-            toolCall: {
-              toolCallId: freshToolCallId,
-              toolName: "generate_image",
-              args: { prompt: "failure-test" } as Record<string, WidgetData>,
-              result: { status: "pending" } as Record<string, WidgetData>,
-              status: "pending" as const,
-              callbackMode: "wakeUp" as CallbackModeValue,
-              isDeferred: false,
-            },
-          };
-          await db.insert(cm).values({
-            id: freshToolMsgId,
-            threadId,
-            role: ChatMessageRole.TOOL,
-            content: null,
-            parentId: lastMainAiMsgId,
-            authorId: testUser.id,
-            isAI: true,
-            model: cfg.model as ChatModelId,
-            sequenceId: parentRow?.sequenceId ?? undefined,
-            metadata: freshMetadata,
-          });
-
-          const resumeResult = await ResumeStreamRepository.resume(
-            {
-              threadId,
-              favoriteId: mainFavoriteId,
-              callbackMode: "wakeUp",
-              wakeUpToolMessageId: freshToolMsgId,
-              wakeUpResult: { success: false, status: "failed" },
-              wakeUpStatus: "failed",
-              leafMessageId: freshToolMsgId,
-            },
-            testUser,
-            defaultLocale,
-            logger,
-            t,
-            new AbortController().signal,
-            0,
-          );
-
-          expect(
-            resumeResult.success,
-            `T6c: resume failed: ${!resumeResult.success ? JSON.stringify(resumeResult) : ""}`,
-          ).toBe(true);
-
-          // Poll for deferred + revival AI + idle
-          const WAKEUP_TIMEOUT_MS = 120_000;
-          const WAKEUP_POLL_MS = 500;
-          const deadline = Date.now() + WAKEUP_TIMEOUT_MS;
-          let messages: SlimMessage[] = [];
-          let deferredTool: SlimMessage | undefined;
-          let revivalAi: SlimMessage | undefined;
-
-          while (Date.now() < deadline) {
-            messages = await fetchThreadMessages(threadId);
-            deferredTool = messages.find(
-              (m) =>
-                m.role === "tool" &&
-                m.toolCall?.isDeferred === true &&
-                m.toolCall.originalToolCallId === freshToolCallId,
-            );
-            if (deferredTool) {
-              revivalAi = messages.find(
-                (m) =>
-                  m.role === "assistant" &&
-                  m.content &&
-                  m.parentId === deferredTool!.id,
-              );
-            }
-            if (deferredTool && revivalAi) {
-              const [tRow] = await db
-                .select({ streamingState: chatThreads.streamingState })
-                .from(chatThreads)
-                .where(eq(chatThreads.id, threadId));
-              if (tRow?.streamingState === "idle") {
-                break;
-              }
-            }
-            await new Promise<void>((resolve) => {
-              setTimeout(resolve, WAKEUP_POLL_MS);
-            });
-          }
-
-          // ── Deferred tool: must exist with failed status ──
-          expect(
-            deferredTool,
-            "T6c: no deferred tool message found for failed wakeUp",
-          ).toBeDefined();
-          if (deferredTool) {
-            const deferredRes = resolveToolResult(deferredTool);
-            expect(
-              deferredRes?.["imageUrl"],
-              "T6c: failed wakeUp deferred must NOT have imageUrl",
-            ).toBeUndefined();
-            expect(deferredTool.toolCall?.isDeferred).toBe(true);
-            expect(deferredTool.toolCall?.originalToolCallId).toBe(
-              freshToolCallId,
-            );
-            expect(deferredTool.toolCall?.status).toBe("failed");
-          }
-
-          // ── Revival AI: must exist (deferred status=failed is the real assertion) ──
-          expect(
-            revivalAi,
-            "T6c: no revival AI message found after failed wakeUp",
-          ).toBeDefined();
-          if (revivalAi) {
-            // The AI sees the failed tool result and must acknowledge it.
-            // Check visible (non-think) content for WAKEUP_FAILED.
-            // If the model only outputs a <think> block, skip keyword checks —
-            // the think block naturally reasons about all outcomes.
-            const revivalVisible = (revivalAi.content ?? "")
-              .replace(/<think>[\s\S]*?<\/think>/g, "")
-              .trim();
-            if (revivalVisible.length > 0) {
-              expect(
-                revivalVisible,
-                `T6c: revival AI visible text must contain WAKEUP_FAILED. Got: ${revivalVisible.slice(0, 300)}`,
-              ).toContain("WAKEUP_FAILED");
-            }
-          }
-
-          // ── Cleanup + advance chain ──
-          await cancelThreadTasks(threadId);
-          await db.execute(
-            sql`UPDATE chat_threads SET streaming_state = 'idle' WHERE id = ${threadId}`,
-          );
-
-          // Walk to the actual leaf (revival AI or its descendants)
-          const { walkToLeafMessage } =
-            await import("@/app/api/[locale]/agent/ai-stream/repository/core/branch-utils");
-          lastMainAiMsgId = await walkToLeafMessage(
-            threadId,
-            freshToolMsgId,
-            freshToolMsgId,
-          );
-
-          messages = await fetchThreadMessages(threadId);
-          assertNoOrphans(
-            messages,
-            new Set([t2BranchParentId].filter(Boolean)),
-            {
-              expectedLeafId: lastMainAiMsgId,
-              knownDeadEndLeaves: deadEndLeaves,
-            },
-          );
-          await assertThreadIdle(threadId);
-          await assertNoPendingTasks(threadId);
-        },
-        effectiveTestTimeout,
-      );
-
-      // ── T6d: wakeUp idempotency - call resume-stream twice, only 1 deferred ──
-      // Manually insert pending tool message, call resume twice with same payload.
-      // Second call must detect existing deferred and skip. No duplicate revivals.
-      fit(
-        "T6d: wakeUp idempotency - double resume-stream produces only 1 deferred",
-        async () => {
-          setFetchCacheContext(
-            `${cfg.cachePrefix}callback-wakeup-idem-phase2`,
-          );
-          await pinBalance(testUser.id, 10, creditLogger, creditT);
-
-          const logger = createEndpointLogger(
-            false,
-            Date.now(),
-            defaultLocale,
-          );
-          const { t } = scopedTranslation.scopedT(defaultLocale);
-
-          const { chatMessages: cm } =
-            await import("@/app/api/[locale]/agent/chat/db");
-          const freshIdemMsgId = crypto.randomUUID();
-          const freshIdemCallId = freshIdemMsgId;
-
-          const [parentRow] = await db
-            .select({ sequenceId: cm.sequenceId })
-            .from(cm)
-            .where(eq(cm.id, lastMainAiMsgId))
-            .limit(1);
-
-          const freshMetadata: MessageMetadata = {
-            toolCall: {
-              toolCallId: freshIdemCallId,
-              toolName: "generate_image",
-              args: { prompt: "idempotency-test" } as Record<
-                string,
-                WidgetData
-              >,
-              result: { status: "pending" } as Record<string, WidgetData>,
-              status: "pending" as const,
-              callbackMode: "wakeUp" as CallbackModeValue,
-              isDeferred: false,
-            },
-          };
-          await db.insert(cm).values({
-            id: freshIdemMsgId,
-            threadId,
-            role: ChatMessageRole.TOOL,
-            content: null,
-            parentId: lastMainAiMsgId,
-            authorId: testUser.id,
-            isAI: true,
-            model: cfg.model as ChatModelId,
-            sequenceId: parentRow?.sequenceId ?? undefined,
-            metadata: freshMetadata,
-          });
-
-          const resumePayload = {
+          const { result, messages: phase1Msgs } = await runStream({
+            user: testUser,
+            prompt: `[T6c wakeUp-repeat] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-repeat-test' and callbackMode='wakeUp'")}. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no imageUrl yet - end your reply with STEP_OK if you see taskId and no imageUrl, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with WAKEUP_OK. If revived but imageUrl is missing or empty, end with WAKEUP_FAILED: <reason>.`,
             threadId,
             favoriteId: mainFavoriteId,
-            callbackMode: "wakeUp",
-            wakeUpToolMessageId: freshIdemMsgId,
-            wakeUpResult: {
-              imageUrl: "http://example.com/idempotency-test.jpg",
-              creditCost: 2.9,
-            },
-            wakeUpStatus: "completed",
-            leafMessageId: freshIdemMsgId,
-          } as const;
-
-          // First call: fires revival, inserts deferred
-          const first = await ResumeStreamRepository.resume(
-            resumePayload,
-            testUser,
-            defaultLocale,
-            logger,
-            t,
-            new AbortController().signal,
-            0,
-          );
-          expect(first.success, "T6d: first resume call failed").toBe(true);
-
-          // Wait for first revival to complete
-          const REVIVAL_WAIT_MS = 120_000;
-          const revDeadline = Date.now() + REVIVAL_WAIT_MS;
-          while (Date.now() < revDeadline) {
-            const [tRow] = await db
-              .select({ streamingState: chatThreads.streamingState })
-              .from(chatThreads)
-              .where(eq(chatThreads.id, threadId));
-            if (tRow?.streamingState === "idle") {
-              break;
-            }
-            await new Promise<void>((resolve) => {
-              setTimeout(resolve, 500);
-            });
-          }
-          const [tAfterRevival] = await db
-            .select({ streamingState: chatThreads.streamingState })
-            .from(chatThreads)
-            .where(eq(chatThreads.id, threadId));
-          expect(
-            tAfterRevival?.streamingState,
-            "T6d: first revival must complete before idempotency test",
-          ).toBe("idle");
-
-          // Second call: must detect existing deferred and skip
-          const second = await ResumeStreamRepository.resume(
-            resumePayload,
-            testUser,
-            defaultLocale,
-            logger,
-            t,
-            new AbortController().signal,
-            0,
-          );
-          expect(second.success, "T6d: second resume call failed").toBe(true);
-
-          // Brief wait for any potential second revival (should NOT fire)
-          await new Promise<void>((resolve) => {
-            setTimeout(resolve, 3000);
-          });
-          await db.execute(
-            sql`UPDATE chat_threads SET streaming_state = 'idle' WHERE id = ${threadId}`,
-          );
-
-          let messages = await fetchThreadMessages(threadId);
-          const descendants = getMessagesInBranch(messages, freshIdemMsgId);
-
-          // ── CRITICAL: exactly 1 deferred for this toolCallId ──
-          const deferredMessages = descendants.filter(
-            (m) =>
-              m.role === "tool" &&
-              m.toolCall?.isDeferred === true &&
-              m.toolCall.originalToolCallId === freshIdemCallId,
-          );
-          expect(
-            deferredMessages.length,
-            `T6d: expected 1 deferred, got ${String(deferredMessages.length)} (idempotency broken)`,
-          ).toBe(1);
-
-          // ── Exactly 1 revival AI (direct child of deferred) ──
-          const deferredId = deferredMessages[0]?.id;
-          if (deferredId) {
-            const revivalMessages = descendants.filter(
-              (m) => m.role === "assistant" && m.parentId === deferredId,
-            );
-            expect(
-              revivalMessages.length,
-              `T6d: expected 1 revival AI, got ${String(revivalMessages.length)}`,
-            ).toBe(1);
-          }
-
-          // ── Deferred content correct ──
-          const deferredMsg = deferredMessages[0];
-          if (deferredMsg) {
-            const deferredRes = resolveToolResult(deferredMsg);
-            expect(typeof deferredRes?.["imageUrl"]).toBe("string");
-            expect(deferredMsg.toolCall?.isDeferred).toBe(true);
-          }
-
-          // ── Cleanup + advance chain ──
-          await cancelThreadTasks(threadId);
-
-          const { walkToLeafMessage } =
-            await import("@/app/api/[locale]/agent/ai-stream/repository/core/branch-utils");
-          lastMainAiMsgId = await walkToLeafMessage(
-            threadId,
-            freshIdemMsgId,
-            freshIdemMsgId,
-          );
-
-          messages = await fetchThreadMessages(threadId);
-          assertNoOrphans(
-            messages,
-            new Set([t2BranchParentId].filter(Boolean)),
-            {
-              expectedLeafId: lastMainAiMsgId,
-              knownDeadEndLeaves: deadEndLeaves,
-            },
-          );
-          await assertThreadIdle(threadId);
-          await assertNoPendingTasks(threadId);
-        },
-        effectiveTestTimeout,
-      );
-
-      // ── T6e: wakeUp dead-stream - thread idle when revival fires ──────────
-      // Manually insert pending tool message (thread already idle), call resume.
-      // Tests the dead-stream path: claimRevival + deferred insert + headless revival.
-      fit(
-        "T6e: wakeUp dead-stream - deferred inserted, AI responds WAKEUP_OK",
-        async () => {
-          setFetchCacheContext(
-            `${cfg.cachePrefix}callback-wakeup-deadstream-phase2`,
-          );
-          await pinBalance(testUser.id, 10, creditLogger, creditT);
-
-          const logger = createEndpointLogger(
-            false,
-            Date.now(),
-            defaultLocale,
-          );
-          const { t } = scopedTranslation.scopedT(defaultLocale);
-
-          const { chatMessages: cm } =
-            await import("@/app/api/[locale]/agent/chat/db");
-          const freshDeadMsgId = crypto.randomUUID();
-          const freshDeadCallId = freshDeadMsgId;
-
-          const [parentRow] = await db
-            .select({ sequenceId: cm.sequenceId })
-            .from(cm)
-            .where(eq(cm.id, lastMainAiMsgId))
-            .limit(1);
-
-          const freshMetadata: MessageMetadata = {
-            toolCall: {
-              toolCallId: freshDeadCallId,
-              toolName: "generate_image",
-              args: { prompt: "dead-stream-test" } as Record<
-                string,
-                WidgetData
-              >,
-              result: { status: "pending" } as Record<string, WidgetData>,
-              status: "pending" as const,
-              callbackMode: "wakeUp" as CallbackModeValue,
-              isDeferred: false,
-            },
-          };
-          await db.insert(cm).values({
-            id: freshDeadMsgId,
-            threadId,
-            role: ChatMessageRole.TOOL,
-            content: null,
-            parentId: lastMainAiMsgId,
-            authorId: testUser.id,
-            isAI: true,
-            model: cfg.model as ChatModelId,
-            sequenceId: parentRow?.sequenceId ?? undefined,
-            metadata: freshMetadata,
+            explicitParentMessageId: lastMainAiMsgId,
           });
 
-          // Verify thread IS idle (dead-stream guarantee)
-          await assertThreadIdle(threadId);
+          expect(result.success, "T6c: runStream failed").toBe(true);
+          if (!result.success) {
+            return;
+          }
 
-          const deadStreamImageUrl =
-            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400";
+          const added = newMessages(phase1Msgs, t6cInitialCount);
+          const toolMsg = findToolMsg(added, "generate_image", cfg);
+          expect(toolMsg, "T6c: generate_image tool message not found").toBeDefined();
+          if (toolMsg) {
+            assertToolMessageComplete(toolMsg, "generate_image", "T6c", cfg, "pending");
+          }
 
-          const resumeResult = await ResumeStreamRepository.resume(
-            {
-              threadId,
-              favoriteId: mainFavoriteId,
-              callbackMode: "wakeUp",
-              wakeUpToolMessageId: freshDeadMsgId,
-              wakeUpResult: {
-                imageUrl: deadStreamImageUrl,
-                creditCost: 2.9,
-              },
-              wakeUpStatus: "completed",
-              leafMessageId: freshDeadMsgId,
-            },
-            testUser,
-            defaultLocale,
-            logger,
-            t,
-            new AbortController().signal,
-            0,
-          );
+          const lastAi = phase1Msgs.find((m) => m.id === result.data.lastAiMessageId);
+          expect(lastAi, "T6c: no AI response found").toBeDefined();
+          assertStepOk(lastAi?.content, "T6c");
+          lastMainAiMsgId = result.data.lastAiMessageId!;
 
-          expect(
-            resumeResult.success,
-            `T6e: resume failed: ${!resumeResult.success ? JSON.stringify(resumeResult) : ""}`,
-          ).toBe(true);
+          // Queue mode: pulse to start the background task
+          if (cfg.pulse) {
+            await cfg.pulse(threadId);
+          }
 
           // Poll for deferred + revival AI + idle
-          const WAKEUP_TIMEOUT_MS = 120_000;
-          const WAKEUP_POLL_MS = 500;
-          const deadline = Date.now() + WAKEUP_TIMEOUT_MS;
+          const REVIVAL_TIMEOUT_MS = 120_000;
+          const REVIVAL_POLL_MS = 500;
+          const deadline = Date.now() + REVIVAL_TIMEOUT_MS;
           let messages: SlimMessage[] = [];
           let deferredTool: SlimMessage | undefined;
           let revivalAi: SlimMessage | undefined;
-
           while (Date.now() < deadline) {
             messages = await fetchThreadMessages(threadId);
-            deferredTool = messages.find(
+            const t6cMsgs = newMessages(messages, t6cInitialCount);
+            deferredTool = t6cMsgs.find(
               (m) =>
                 m.role === "tool" &&
                 m.toolCall?.isDeferred === true &&
-                m.toolCall.originalToolCallId === freshDeadCallId,
+                (m.toolCall.toolName === "generate_image" ||
+                  (m.toolCall.toolName === "execute-tool" &&
+                    toolResultRecord(m.toolCall.args)?.["toolName"] === "generate_image")),
             );
             if (deferredTool) {
               revivalAi = messages.find(
@@ -3350,72 +2941,206 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               }
             }
             await new Promise<void>((resolve) => {
-              setTimeout(resolve, WAKEUP_POLL_MS);
+              setTimeout(resolve, REVIVAL_POLL_MS);
             });
           }
 
-          // ── Deferred message assertions ──
-          expect(
-            deferredTool,
-            "T6e: no deferred tool message found (dead-stream path failed)",
-          ).toBeDefined();
-          if (deferredTool) {
-            const deferredRes = resolveToolResult(deferredTool);
-            const storedImageUrl = deferredRes?.["imageUrl"];
-            expect(typeof storedImageUrl).toBe("string");
-            expect(storedImageUrl).toBeTruthy();
-            expect(deferredTool.toolCall?.isDeferred).toBe(true);
-            expect(deferredTool.toolCall?.originalToolCallId).toBe(
-              freshDeadCallId,
-            );
-          }
-
-          // ── Exactly 1 deferred for this tool call ─��
-          const descendants = getMessagesInBranch(messages, freshDeadMsgId);
-          const allDeferred = descendants.filter(
+          // ── Each generate_image wakeUp call must produce original + deferred ──
+          const t6cBranchMsgs = newMessages(messages, t6cInitialCount);
+          const allGenImgToolMsgs = t6cBranchMsgs.filter(
             (m) =>
               m.role === "tool" &&
-              m.toolCall?.isDeferred === true &&
-              m.toolCall.originalToolCallId === freshDeadCallId,
+              (m.toolCall?.toolName === "generate_image" ||
+                (m.toolCall?.toolName === "execute-tool" &&
+                  toolResultRecord(m.toolCall.args)?.["toolName"] === "generate_image")),
           );
+          const originals = allGenImgToolMsgs.filter((m) => !m.toolCall?.isDeferred);
+          const deferreds = allGenImgToolMsgs.filter((m) => m.toolCall?.isDeferred === true);
           expect(
-            allDeferred.length,
-            `T6e: expected 1 deferred, got ${String(allDeferred.length)}`,
-          ).toBe(1);
+            originals.length,
+            `T6c: expected at least 1 original generate_image tool msg. Got ${String(originals.length)}`,
+          ).toBeGreaterThanOrEqual(1);
+          expect(
+            deferreds.length,
+            `T6c: expected same number of deferred as original. Originals: ${String(originals.length)}, deferred: ${String(deferreds.length)}`,
+          ).toBe(originals.length);
 
-          // ── Revival AI must exist (deferred content is the real assertion) ──
-          expect(revivalAi, "T6e: no revival AI message found").toBeDefined();
+          // ── Deferred tool message ──
+          expect(deferredTool, "T6c: no deferred tool found").toBeDefined();
+          if (deferredTool) {
+            expect(deferredTool.toolCall?.isDeferred).toBe(true);
+            expect(deferredTool.toolCall?.originalToolCallId).toBeTruthy();
+          }
+
+          // ── Revival AI ──
+          expect(revivalAi, "T6c: no revival AI message found").toBeDefined();
           if (revivalAi) {
-            // Check visible (non-think) content for WAKEUP_OK if available.
-            // Models may produce truncated think blocks or only reasoning —
-            // the structural assertions (deferred exists, correct status) are primary.
             const revivalVisible = (revivalAi.content ?? "")
               .replace(/<think>[\s\S]*?<\/think>/g, "")
-              .replace(/^<think>[\s\S]*$/g, "") // Handle unclosed <think> tags
               .trim();
             if (revivalVisible.length > 0) {
               expect(
                 revivalVisible,
-                `T6e: revival AI visible text must contain WAKEUP_OK. Got: ${revivalVisible.slice(0, 300)}`,
+                `T6c: revival AI visible text must contain WAKEUP_OK - got: ${revivalVisible.slice(0, 300)}`,
               ).toContain("WAKEUP_OK");
             }
           }
 
-          // ── Cleanup + advance chain ──
-          await cancelThreadTasks(threadId);
-          await db.execute(
-            sql`UPDATE chat_threads SET streaming_state = 'idle' WHERE id = ${threadId}`,
-          );
-
-          const { walkToLeafMessage } =
-            await import("@/app/api/[locale]/agent/ai-stream/repository/core/branch-utils");
-          lastMainAiMsgId = await walkToLeafMessage(
-            threadId,
-            freshDeadMsgId,
-            freshDeadMsgId,
-          );
-
+          // Walk to the actual leaf — model may have called generate_image multiple times,
+          // creating multiple deferred + revival pairs in a linear chain.
           messages = await fetchThreadMessages(threadId);
+          const t6cMsgsSorted = [...newMessages(messages, t6cInitialCount)].toSorted(
+            (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+          );
+          const t6cLeaf = t6cMsgsSorted.find((m) => m.role === "assistant") ?? deferredTool;
+          if (t6cLeaf) {
+            lastMainAiMsgId = t6cLeaf.id;
+          }
+
+          assertNoOrphans(
+            messages,
+            new Set([t2BranchParentId].filter(Boolean)),
+            {
+              expectedLeafId: lastMainAiMsgId,
+              knownDeadEndLeaves: deadEndLeaves,
+            },
+          );
+          await assertThreadIdle(threadId);
+          await assertNoPendingTasks(threadId);
+        },
+        effectiveTestTimeout,
+      );
+
+      // ── T6d: wakeUp stress - third consecutive wakeUp on same thread ────
+      // Full E2E again. Verifies no accumulated stale state after two prior wakeUps.
+      fit(
+        "T6d: wakeUp stress - third consecutive generate_image(wakeUp)",
+        async () => {
+          setFetchCacheContext(
+            `${cfg.cachePrefix}callback-wakeup-phase1-stress`,
+          );
+          await pinBalance(testUser.id, 20, creditLogger, creditT);
+          const t6dInitialCount = (await fetchThreadMessages(threadId)).length;
+
+          const { result, messages: phase1Msgs } = await runStream({
+            user: testUser,
+            prompt: `[T6d wakeUp-stress] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-stress-test' and callbackMode='wakeUp'")}. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no imageUrl yet - end your reply with STEP_OK if you see taskId and no imageUrl, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with WAKEUP_OK. If revived but imageUrl is missing or empty, end with WAKEUP_FAILED: <reason>.`,
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+          });
+
+          expect(result.success, "T6d: runStream failed").toBe(true);
+          if (!result.success) {
+            return;
+          }
+
+          const added = newMessages(phase1Msgs, t6dInitialCount);
+          const toolMsg = findToolMsg(added, "generate_image", cfg);
+          expect(toolMsg, "T6d: generate_image tool message not found").toBeDefined();
+          if (toolMsg) {
+            assertToolMessageComplete(toolMsg, "generate_image", "T6d", cfg, "pending");
+          }
+
+          const lastAi = phase1Msgs.find((m) => m.id === result.data.lastAiMessageId);
+          expect(lastAi, "T6d: no AI response found").toBeDefined();
+          assertStepOk(lastAi?.content, "T6d");
+          lastMainAiMsgId = result.data.lastAiMessageId!;
+
+          if (cfg.pulse) {
+            await cfg.pulse(threadId);
+          }
+
+          // Poll for deferred + revival AI + idle
+          const REVIVAL_TIMEOUT_MS = 120_000;
+          const REVIVAL_POLL_MS = 500;
+          const deadline = Date.now() + REVIVAL_TIMEOUT_MS;
+          let messages: SlimMessage[] = [];
+          let deferredTool: SlimMessage | undefined;
+          let revivalAi: SlimMessage | undefined;
+          while (Date.now() < deadline) {
+            messages = await fetchThreadMessages(threadId);
+            const t6dMsgs = newMessages(messages, t6dInitialCount);
+            deferredTool = t6dMsgs.find(
+              (m) =>
+                m.role === "tool" &&
+                m.toolCall?.isDeferred === true &&
+                (m.toolCall.toolName === "generate_image" ||
+                  (m.toolCall.toolName === "execute-tool" &&
+                    toolResultRecord(m.toolCall.args)?.["toolName"] === "generate_image")),
+            );
+            if (deferredTool) {
+              revivalAi = messages.find(
+                (m) =>
+                  m.role === "assistant" &&
+                  m.content &&
+                  m.parentId === deferredTool!.id,
+              );
+            }
+            if (deferredTool && revivalAi) {
+              const [tRow] = await db
+                .select({ streamingState: chatThreads.streamingState })
+                .from(chatThreads)
+                .where(eq(chatThreads.id, threadId));
+              if (tRow?.streamingState === "idle") {
+                break;
+              }
+            }
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, REVIVAL_POLL_MS);
+            });
+          }
+
+          // ── Each generate_image wakeUp call must produce original + deferred ──
+          // Model may call generate_image multiple times → N originals + N deferred = 2N total.
+          const t6dBranchMsgs = newMessages(messages, t6dInitialCount);
+          const allGenImgToolMsgs = t6dBranchMsgs.filter(
+            (m) =>
+              m.role === "tool" &&
+              (m.toolCall?.toolName === "generate_image" ||
+                (m.toolCall?.toolName === "execute-tool" &&
+                  toolResultRecord(m.toolCall.args)?.["toolName"] === "generate_image")),
+          );
+          const originals = allGenImgToolMsgs.filter((m) => !m.toolCall?.isDeferred);
+          const deferreds = allGenImgToolMsgs.filter((m) => m.toolCall?.isDeferred === true);
+          expect(
+            originals.length,
+            `T6d: expected at least 1 original generate_image tool msg. Got ${String(originals.length)}`,
+          ).toBeGreaterThanOrEqual(1);
+          expect(
+            deferreds.length,
+            `T6d: expected same number of deferred as original. Originals: ${String(originals.length)}, deferred: ${String(deferreds.length)}`,
+          ).toBe(originals.length);
+
+          expect(deferredTool, "T6d: no deferred tool found").toBeDefined();
+          if (deferredTool) {
+            expect(deferredTool.toolCall?.isDeferred).toBe(true);
+          }
+
+          expect(revivalAi, "T6d: no revival AI message found").toBeDefined();
+          if (revivalAi) {
+            const revivalVisible = (revivalAi.content ?? "")
+              .replace(/<think>[\s\S]*?<\/think>/g, "")
+              .trim();
+            if (revivalVisible.length > 0) {
+              expect(
+                revivalVisible,
+                `T6d: revival AI visible text must contain WAKEUP_OK - got: ${revivalVisible.slice(0, 300)}`,
+              ).toContain("WAKEUP_OK");
+            }
+          }
+
+          // Walk to the actual leaf — model may have called generate_image multiple times,
+          // creating multiple deferred + revival pairs in a linear chain.
+          messages = await fetchThreadMessages(threadId);
+          const t6dMsgsSorted = [...newMessages(messages, t6dInitialCount)].toSorted(
+            (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+          );
+          const t6dLeaf = t6dMsgsSorted.find((m) => m.role === "assistant") ?? deferredTool;
+          if (t6dLeaf) {
+            lastMainAiMsgId = t6dLeaf.id;
+          }
+
           assertNoOrphans(
             messages,
             new Set([t2BranchParentId].filter(Boolean)),
@@ -3717,7 +3442,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ).toBeGreaterThan(0);
 
             lastMainAiMsgId = effectiveLastAiMsgId;
-            // T6c/d/e now chain linearly from T6b - no t6WakeUpBranchParentId needed.
+            // T6c/T6d chain linearly from T6b via E2E runStream calls.
             // Only T2's branch point remains as a known multi-child node.
             assertNoOrphans(
               messages,

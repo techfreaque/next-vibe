@@ -523,6 +523,25 @@ const { GET } = createEndpoint({
         arrayField: "items",
       }),
     },
+    // Thread created - emitted by initial-events-handler when a new thread is created
+    // during streaming. Ensures the sidebar shows the thread even if the optimistic
+    // client-side update missed the cache (e.g. cache was empty, or another tab).
+    "thread-created": {
+      fields: {
+        items: [
+          "id",
+          "type",
+          "title",
+          "rootFolderId",
+          "folderId",
+          "status",
+          "streamingState",
+          "createdAt",
+          "updatedAt",
+        ] as const,
+      },
+      operation: "merge" as const,
+    },
     // Folder CRUD - emitted by folders/subfolders/[subFolderId]/repository.ts
     "folder-created": {
       fields: {

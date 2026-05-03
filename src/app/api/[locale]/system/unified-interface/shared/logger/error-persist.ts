@@ -4,12 +4,11 @@
  *
  * IMPORTANT: This module must never throw - logging persistence is best-effort.
  * All errors during persistence are silently swallowed to avoid cascading failures.
- *
- * Auto-registers itself as the global error sink when imported.
- * Only import this module from server-only code (seeds, server startup, etc.).
  */
 
 import "server-only";
+
+import { createHash } from "node:crypto";
 
 import {
   errorLogs,
@@ -18,11 +17,7 @@ import {
   type NewErrorLog,
 } from "@/app/api/[locale]/system/unified-interface/tasks/error-monitor/db";
 
-import {
-  type ErrorLogLevel,
-  type LoggerMetadata,
-  registerErrorSink,
-} from "./endpoint";
+import { type ErrorLogLevel, type LoggerMetadata } from "./endpoint";
 
 /** Truncate a string to maxLen, appending "..." if truncated */
 function truncate(str: string | undefined | null, maxLen: number): string {
@@ -102,7 +97,7 @@ function computeFingerprint(
 ): string {
   const metaStr = serializeMetaForFingerprint(allMeta);
   const key = `${level}:${errorType ?? "unknown"}:${message.slice(0, 100)}:${metaStr}`;
-  return Bun.hash(key).toString(36);
+  return createHash("sha256").update(key).digest("base64url").slice(0, 16);
 }
 
 /**
@@ -180,20 +175,4 @@ export function persistErrorLog(
       // Silently swallow - logging persistence must never cascade
     }
   })();
-}
-
-/**
- * Auto-register as the global error sink (preview + production only).
- * Dev environments skip persistence to avoid spamming the local DB.
- *
- * Production: NODE_ENV=production
- * Preview: NODE_ENV=development + IS_PREVIEW_MODE=true
- */
-const isProduction = process.env["NODE_ENV"] === "production";
-const isPreview = process.env["IS_PREVIEW_MODE"] === "true";
-
-if (isProduction || isPreview) {
-  registerErrorSink((level, message, error, metadata) => {
-    persistErrorLog(level, message, error, metadata);
-  });
 }

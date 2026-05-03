@@ -16,8 +16,6 @@
 
 // Register CLI widget plugin BEFORE any other imports.
 import "./cli-widget-plugin";
-// Side-effect: registers global error sink
-import "../shared/logger/error-persist";
 
 // Scoped endpoint registry - bundled at build time from the generated files
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";

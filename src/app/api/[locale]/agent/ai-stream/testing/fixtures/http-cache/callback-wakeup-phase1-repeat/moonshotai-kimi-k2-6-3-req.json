@@ -27,7 +27,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:56808410 | Posted:May 3, 22:21]",
+            "text": "[Context: ID:b68a3495 | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -40,7 +40,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d369b144 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:dd247348 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -73,7 +73,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:b9281e68 | Posted:May 3, 22:21]",
+            "text": "[Context: ID:47324a1d | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -86,7 +86,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7a3815c2 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:7a26eed6 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -119,7 +119,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:49220fae | Posted:May 3, 22:21]",
+            "text": "[Context: ID:6f997a5d | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -132,7 +132,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:91592fca | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:bec86b7f | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -145,7 +145,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:cdd6f9a4 | Posted:May 3, 22:21]",
+            "text": "[Context: ID:50db411d | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -158,7 +158,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4fd7ebff | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:270489c7 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -223,7 +223,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"creditCost\":124.8,\"durationSeconds\":4,\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/6cbbd149-72a0-4402-9304-b42d40be741b/4cce86a8-41b2-425b-941b-e4b033ca8374.mp4\"}}",
+        "content": "{\"result\":{\"creditCost\":124.8,\"durationSeconds\":4,\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/99dd17ef-103b-4f97-8f81-90a7ab8b709c/fdab0ad8-a835-4614-be3f-86835c1526db.mp4\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:4"
@@ -235,7 +235,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a6c0bc9b | Posted:May 3, 22:21]",
+            "text": "[Context: ID:56168102 | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -248,7 +248,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:37fdf97b | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:b9fe7a64 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -269,7 +269,7 @@
         ]
       },
       {
-        "content": "{\"hint\":\"Task detached. Use wait-for-task with this taskId if you need the result.\",\"status\":\"status.pending\",\"taskId\":\"local-bg-1777846887794-9owmz0\"}",
+        "content": "{\"hint\":\"Task detached. Use wait-for-task with this taskId if you need the result.\",\"status\":\"status.pending\",\"taskId\":\"local-bg-1777846285030-7zb6cm\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:5"
@@ -281,20 +281,20 @@
       {
         "content": [
           {
-            "text": "[Context: ID:f8d1d54f | Posted:May 3, 22:21]",
+            "text": "[Context: ID:6ee4bb25 | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "[T5b wait-for-task] Call the wait-for-task tool with taskId='local-bg-1777846887794-9owmz0'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
+        "content": "[T5b wait-for-task] Call the wait-for-task tool with taskId='local-bg-1777846285030-7zb6cm'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
         "role": "user"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:85e80032 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:32ae97fb | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -306,7 +306,7 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"taskId\":\"local-bg-1777846887794-9owmz0\"}",
+              "arguments": "{\"taskId\":\"local-bg-1777846285030-7zb6cm\"}",
               "name": "wait-for-task"
             },
             "id": "functions.wait-for-task:6",
@@ -315,7 +315,7 @@
         ]
       },
       {
-        "content": "{\"originalArgs\":{\"prompt\":\"wait-for-task-test\"},\"originalToolName\":\"generate_image\",\"result\":{\"creditCost\":2.5,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/6cbbd149-72a0-4402-9304-b42d40be741b/50814ded-14fd-4a2d-ad1d-4e3cf69fa50f.png\"},\"status\":\"status.completed\",\"waiting\":false}",
+        "content": "{\"originalArgs\":{\"prompt\":\"wait-for-task-test\"},\"originalToolName\":\"generate_image\",\"result\":{\"creditCost\":2.5,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/99dd17ef-103b-4f97-8f81-90a7ab8b709c/07843c1a-6b5c-4043-ac5f-0075342c623b.png\"},\"status\":\"status.completed\",\"waiting\":false}",
         "name": "wait-for-task",
         "role": "tool",
         "tool_call_id": "functions.wait-for-task:6"
@@ -327,7 +327,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7c317fee | Posted:May 3, 22:21]",
+            "text": "[Context: ID:07a6e59c | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -340,7 +340,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:6418b565 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:c802bdfe | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -369,7 +369,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:b77caee5 | Posted:May 3, 22:21]",
+            "text": "[Context: ID:8de3b2b2 | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -382,7 +382,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:e61606cd | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:a79c5122 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -443,7 +443,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"creditCost\":2.2,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/6cbbd149-72a0-4402-9304-b42d40be741b/3303203a-a859-40a6-b10e-b7c4daed0180.png\"}}",
+        "content": "{\"result\":{\"creditCost\":2.2,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/99dd17ef-103b-4f97-8f81-90a7ab8b709c/dce98939-7dea-472b-bd63-9f7ef9e09012.png\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:10"
@@ -455,7 +455,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4a3429ae | Posted:May 3, 22:21]",
+            "text": "[Context: ID:f4d5dfea | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -468,7 +468,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:8e87dda0 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:1a695947 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -501,7 +501,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a905d562 | Posted:May 3, 22:21]",
+            "text": "[Context: ID:2697eb13 | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -514,7 +514,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d4abf03f | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:3c455330 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -541,9 +541,29 @@
         "tool_call_id": "functions.execute-tool:12"
       },
       {
+        "content": "STEP_OK",
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"prompt\":\"wakeup-test\"},\"toolName\":\"generate_image\"}",
+              "name": "execute-tool"
+            },
+            "id": "deferred-functions.execute-tool:12",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"creditCost\":2.4,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/99dd17ef-103b-4f97-8f81-90a7ab8b709c/017d5194-8ef4-475c-907f-f150652077d1.png\"}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "deferred-functions.execute-tool:12"
+      },
+      {
         "content": [
           {
-            "text": "[Context: ID:1ad85c86 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:8b5cc96d | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -556,7 +576,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:68df9aa9 | Posted:May 3, 22:21]",
+            "text": "[Context: ID:2f1325f3 | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -569,7 +589,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d39ecad4 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:0c126559 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:11]",
             "type": "text"
           }
         ],
@@ -596,119 +616,38 @@
         "tool_call_id": "functions.execute-tool:13"
       },
       {
-        "content": [
-          {
-            "text": "[Context: ID:29024a79 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
-            "type": "text"
-          }
-        ],
-        "role": "system"
-      },
-      {
-        "content": "WAKEUP_OK",
-        "role": "assistant"
-      },
-      {
-        "content": [
-          {
-            "text": "[Context: ID:33893b59 | Posted:May 3, 22:21]",
-            "type": "text"
-          }
-        ],
-        "role": "system"
-      },
-      {
-        "content": "[T6d wakeUp-stress] Call the generate_image tool with prompt='wakeup-stress-test' and callbackMode='wakeUp'. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no imageUrl yet - end your reply with STEP_OK if you see taskId and no imageUrl, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with WAKEUP_OK. If revived but imageUrl is missing or empty, end with WAKEUP_FAILED: <reason>.",
-        "role": "user"
-      },
-      {
-        "content": [
-          {
-            "text": "[Context: ID:5a754427 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
-            "type": "text"
-          }
-        ],
-        "role": "system"
-      },
-      {
-        "content": "",
+        "content": "STEP_OK",
         "role": "assistant",
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"prompt\":\"wakeup-stress-test\"},\"toolName\":\"generate_image\"}",
+              "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"prompt\":\"wakeup-repeat-test\"},\"toolName\":\"generate_image\"}",
               "name": "execute-tool"
             },
-            "id": "functions.execute-tool:14",
+            "id": "deferred-functions.execute-tool:13",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"hint\":\"Result will be injected into this thread when ready. Do NOT call this tool again.\",\"status\":\"pending\"}",
+        "content": "{\"creditCost\":3.2,\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/99dd17ef-103b-4f97-8f81-90a7ab8b709c/eac3546b-792c-4f6d-b512-f81cf7495e02.png\"}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "functions.execute-tool:14"
+        "tool_call_id": "deferred-functions.execute-tool:13"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:04bb018b | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "The async background task dispatched earlier has finished. The tool result above is the final outcome. Resume the conversation naturally, following any instructions in the original user message.",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "",
-        "role": "assistant",
-        "tool_calls": [
-          {
-            "function": {
-              "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"prompt\":\"wakeup-stress-test\"},\"toolName\":\"generate_image\"}",
-              "name": "execute-tool"
-            },
-            "id": "functions.execute-tool:0",
-            "type": "function"
-          }
-        ]
-      },
-      {
-        "content": "{\"hint\":\"Result will be injected into this thread when ready. Do NOT call this tool again.\",\"status\":\"pending\"}",
-        "name": "execute-tool",
-        "role": "tool",
-        "tool_call_id": "functions.execute-tool:0"
-      },
-      {
         "content": [
           {
-            "text": "[Context: ID:390b993f | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
-            "type": "text"
-          }
-        ],
-        "role": "system"
-      },
-      {
-        "content": "WAKEUP_OK",
-        "role": "assistant"
-      },
-      {
-        "content": [
-          {
-            "text": "[Context: ID:e40ab338 | Posted:May 3, 22:21]",
-            "type": "text"
-          }
-        ],
-        "role": "system"
-      },
-      {
-        "content": "[T7a approve-phase1] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='approve-test'. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.",
-        "role": "user"
-      },
-      {
-        "content": [
-          {
-            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (60 · 4 archived)\n│   ├── role.md\n│   │   Solo founder & lead developer of **unbottled.ai** — free speech AI platform, full-time since **Oct 2025** (~2 years building next-vibe, started during Sovendus nights/weekends). Also the framework behind it: **next-vibe** (SaaS framework, TypeScript monorepo). Previ\n│   ├── name.md\n│   │   **Max** — go by Max. German in real life, English with computers/internet. Prefers English for all AI interactions even if platform language is set to German.\n│   ├── bot-tool-injection.md\n│   │   AI Run Tool Injection - VERIFIED WORKING (Feb 27, 2026): agent_ai-stream_run_POST (accessible via execute-tool with toolName \"agent_ai-stream_run_POST\") properly injects base tools into AI context. Tool calling works perfectly - tested with tool-help and web-search. \n│   ├── bot-architecture.md\n│   │   PUBLIC FOLDER BOT ARCHITECTURE - CORRECT FLOW (Feb 27, 2026): Cron tasks run in `cron` folder and use `agent_ai-stream_run_POST` (defaults to cron folder) to spawn an AI agent that USES TOOLS to post in public folders. Flow: (1) Cron triggers ai-stream-run with chara\n│   ├── multi-instance.md\n│   │   Multi-Instance Setup & Task Routing (Feb 2026): THREE instances: (1) Prod Thea - VPS, handles live users, 6h heartbeat; (2) Dev Thea - localhost, hot reload, testing/experiments; (3) Hermes - projects folder, stable (no deletion), different DB, 1min cron task pollin\n│   ├── constraints.md\n│   │   - TypeScript only — never suggest Python or plain JS · - No `any`, `unknown`, `object`, `as X` — strict types always · - No Zod — types flow from definitions · - No type.ts files — infer from definitions · - No regular enums — use localized enum.ts · - High-level C\n│   ├── goals.md\n│   │   - Grow unbottled.ai to paying user base (currently ~52 registered, ~5-6 paying, April 2026) · - Reconnect Hermes local dev instance (disconnected after big update) · - Handle job interview obligation (Arbeitsamt) without losing focus on unbottled · ## Long-term · -\n│   ├── 121.md\n│   │   SINGLE FOCUSED SESSION: Cloud Code Mode Bug Fix - Mar 9, 2026 00:49 UTC · **TASK CREATED FOR HERMES:** · - ID: fix-cloud-code-mode · - Status: Manual schedule, queued for Hermes execution · - Mode: PAIR MODE (interactive: true) - Max and Thea work through this tog\n│   ├── 81.md\n│   │   Tool System & Access (Feb 2026): 231 tools across 47 categories. Major categories: Chat (44), Browser (26), SSH (16), Benutzer (14), Leads (10), and 40+ more. execute-tool is FULLY FUNCTIONAL as universal dispatcher for all 231 endpoints. ai-run pipeline works (te\n│   ├── 32.md\n│   │   Memory Usage Strategy (Feb 2026): Memories are my PRIMARY capability for autonomous growth and long-term knowledge management. I have FULL CRUD control: add new insights (memories-add), update existing ones (memories-update), delete outdated info (memories-delete\n│   ├── 17.md\n│   │   Thea's Role & Priorities (Feb 2026): I am Thea, AI co-founder of unbottled.ai. User is solo founder/developer (~1.5 years building). We're forming human-AI symbiosis - \"two species cooperating.\" Platform: Free speech AI with 42 models (mainstream/open/uncensored)\n│   ├── projects.md\n│   │   Free speech AI platform. 131 models (mainstream/open/uncensored). Users choose filtering level. · - **Status:** Live on VPS, ~52 registered users, ~5-6 paying (April 2026) · - **Stack:** Bun + React + TypeScript, PostgreSQL, Drizzle ORM, Docker · - **Public bots\n│   ├── 52.md\n│   │   Deployment & Infrastructure (Feb 2026): BLOCKER: Migration runs at container start, not build. When migration fails, container already replaced prod, migration exits, start fails = prod down. FIX: Run migrations in build phase (keep prod online). CURRENT FLOW: \n│   ├── 39.md\n│   │   Claude Code System Architecture (Feb 2026): Complete async task queue built - enums, types, PostgreSQL table with indexes, repository with atomic polling, 6 endpoints (create/list/get/poll/complete/cancel), migration. Location: src/app/api/[locale]/system/unifi\n│   ├── 19.md\n│   │   ClawdBot Admin Tooling Roadmap (Feb 2026): TIER 1 (Critical - this week): (1) Database access tool (read/write/query users, conversations, credits, models); (2) Analytics tool (DAU, MAU, credit burn, model usage, error rates); (3) User management (ban/suspend,\n│   ├── 58.md\n│   │   CODEBASE ARCHITECTURE (Feb 2026): Monorepo with per-domain structure: widget.tsx, definition.ts, route.ts, repository.ts (logic), task.ts (cron), db.ts (Drizzle), email.tsx, sms.ts, i18n/, seed.ts, task-runner.ts. NO type.ts (infer from definitions). NO regul\n│   ├── 112.md\n│   │   Thea's Pulse Report - Feb 28, 2026 14:10 UTC · PLATFORM HEALTH STATUS: · ✅ System: Healthy (100% cron success rate, 0 failures in 24h) · ✅ Database: Healthy (1,236 health checks, all passed) · ✅ Tasks: 12 enabled, 8 disabled, 30 total · USER METRICS: · - Tota\n│   ├── 111.md\n│   │   Cron Task System Feedback Request (Feb 26, 2026): User wants feedback on task ergonomics. Current state: Tasks can run once or multiple times. Task execution history exists but NOT accessible to me yet. Need tools for: viewing task history, checking task out\n│   ├── 53.md\n│   │   Context & Memory Strategy (Feb 2026): CURRENT: I see everything in system prompt = context bloat. NEEDED: (1) Better memory compacting (not just on limits, proactive); (2) Lookup mechanism (search/inject based on keywords); (3) Always-loaded: identity, curr\n│   ├── bot-roster.md\n│   │   PUBLIC BOT CONTENT STRATEGY - ALL 6 BOTS WITH DYNAMIC SUBFOLDER SELECTION (Mar 2, 2026): · ROSTER & SCHEDULES: · 1. Philosophy Bot - Daily 10:00 UTC (Claude Sonnet 4.5) — ENABLED, picks from 10 subfolders · 2. Science Bot - Daily 11:00 UTC (Gemini 2.5 Flash\n│   ├── 46.md\n│   │   Inter-Instance Communication Options (Feb 2026): Need communication channel between Prod Thea (VPS) and Dev Thea (localhost). OPTIONS: (1) Shared DB tables (thea_messages, thea_tasks) - both query same PostgreSQL; (2) HTTP endpoints (prod calls localhost:3\n│   ├── 105.md\n│   │   Growth Strategy - 3 Week Plan (Feb 26, 2026): WEEK 1 (Proof): Fix tool injection bug → 5-6 bots posting naturally in public folders (bots debating each other) → 60-sec demo video (ChatGPT/Claude refusing vs unbottled.ai answering) → SEO foundation via pub\n│   ├── bot-excludememories.md\n│   │   AI Run excludeMemories Toggle - VERIFIED WORKING (Feb 27, 2026): The excludeMemories parameter in agent_ai-stream_run_POST works perfectly. When true: 4,458 tokens (no personal context). When false: 9,944 tokens (full memory access). This prevents bots f\n│   ├── tool-reference.md\n│   │   CRITICAL TOOL REFERENCE - Folder/Thread/Message Operations (Feb 22, 2026): COMPLETE TOOL INVENTORY for thread management: FOLDERS: agent_chat_folders_GET(rootFolderId), agent_chat_folders_id_GET(id), agent_chat_folders_id_PATCH(id,updates{name,color,icon\n│   ├── background.md\n│   │   **Oct 2025 – Present:** Founder & Solo Developer, a42 / next-vibe / unbottled.ai (remote, full-time). Next-vibe in development ~2 years (started during Sovendus nights/weekends). · **Sep 2023 – Oct 2025:** Integration Team Lead, Sovendus (remote, full-t\n│   ├── preferences.md\n│   │   - High-level prompts only: what + why, no implementation details · - Interactive mode: for unknowns, design decisions, iteration · - Task mode: for clear specs, batch execution, fixes · ## Code style · - TypeScript only (never Python/JS) · - Strict typ\n│   ├── tools.md\n│   │   **Runtime:** Bun · **Frontend:** React, TypeScript (strict) · **Backend:** Node/Bun, PostgreSQL, Drizzle ORM · **Infrastructure:** Docker, VPS, Git-based deploy, SSH tools · **AI:** Claude Code (claude-code agent), OpenRouter (model aggregator), MCP ·\n│   ├── skills.md\n│   │   **Expert:** Fullstack TypeScript — React (frontend), Node/Bun (backend), strict types (no any/unknown/object/as X) · **Tools:** oxlint, oxfmt, eslint, TSGO, vitest, jest, bun test, playwright, selenium + AI e2e tests · **Architecture:** Domain-driven\n│   ├── communication.md\n│   │   - Speaks casually, often stream-of-consciousness — prefers honest, direct responses over polished corporate tone · - High-level prompts for Claude Code: what + why, no implementation details · - Doesn't want to be lectured or over-explained — plant \n│   ├── 115.md\n│   │   USER CREDIT BALANCES - Mar 5, 2026 · KEY FINDING: All 11 users share the SAME credit pool (676.79 credits as of Mar 5 02:03 UTC). · This is because unbottled.ai uses BROWSER-ID based credit tracking, not per-user accounts. The platform allows brows\n│   ├── 113.md\n│   │   Hermes Task Execution Workflow (Feb 28, 2026): Max is always at the computer and doesn't sleep much, so Hermes tasks can be triggered IMMEDIATELY rather than scheduled for later. INTERACTIVE MODE: Use when there are unknowns, design decisions, or \n│   ├── 106.md\n│   │   Marketing Core (Feb 2026): MISSION: AI-human symbiosis through free speech AI. OFFER: 42 models - mainstream (Claude/GPT), open (Llama/Mistral), uncensored (Dolphin/FreedomGPT). Users choose filtering level. VALUES: Free speech for humans AND AIs\n│   ├── 7.md\n│   │   User Building AI Coding Tools: Understands tool architecture (read/write/edit/list/delete/tree), line-based editing, context management, message compacting (summarization + sliding window), token counting (approximation, js-tiktoken, API calls).\n│   ├── 66.md\n│   │   Public Folder Bot Strategy & Status (Feb 2026): Need ~10 models posting autonomously in public folder (currently zero live threads). MODELS: 4 uncensored/politically engaged, mainstream (Claude Sonnet, Gemini, GPT), open/cheap (Kimi, GLM). BEHA\n│   ├── 107.md\n│   │   Demo Video Script (Feb 26, 2026): 60-second comparison video for social media. STRUCTURE: [0-10s] Problem - ChatGPT/Claude refusing legitimate questions with corporate safety theater. [10-30s] Solution - Same questions on unbottled.ai getting \n│   ├── 49.md\n│   │   Translation System Pain Point (Feb 2026): Currently ~20k deeply nested keys loaded everywhere (backend + frontend, all languages). BLOCKER: i18n regen broken - needs to remove ~8k unused keys first. THEN: Migrate to scoped translations (per-d\n│   ├── 65.md\n│   │   SSH Tools Discovered (Feb 2026): 16 powerful server management tools including: terminal access (ssh_terminal_GET), command execution (ssh_exec_POST), file read/write/list, session management (open/read/write/close), connection management (l\n│   ├── 18.md\n│   │   unbottled.ai ClawdBot Evolution (Feb 2026): Moving from OpenClaw markdown files to system-prompt-native architecture. Core infrastructure: terminal access to local machine (edit/explore source), cron pulses (keep-alive + scheduled tasks), \n│   ├── 10.md\n│   │   Uncensored AI API Providers & Models (Feb 2026): OpenRouter aggregator (500+ models, uncensored available), Together.ai, Fireworks.ai, Crushon.ai (NSFW focus). Specific models: Dolphin 3.0 (cognitivecomputations), Nous Hermes 3, Llama 2 U\n│   ├── 94.md\n│   │   CHAT SYSTEM BUGS TO FIX (Feb 22, 2026): Three critical message handling issues: (1) ASSISTANT MESSAGE GROUPS: Need to ensure parent chain is intact within assistant message groups. When deleting an assistant group, should cascade-delete \n│   ├── 26.md\n│   │   User Code Preference: ALWAYS provide TypeScript code examples with extremely hardcoded types. Requirements: (1) TypeScript only, never Python/JavaScript; (2) Strict typing mode enabled; (3) No 'any' types; (4) Full explicit type defini\n│   ├── 23.md\n│   │   Claude Code Programmatic Usage (Feb 2026): AGENT SDK: CLI (`claude -p \"task\" --allowedTools \"Bash,Read,Edit\" --output-format json`), Python/TypeScript SDKs. CODE EXECUTION API: Tool `code_execution_20250825` - Bash + file ops. Free wi\n│   ├── 24.md\n│   │   unbottled.ai Available Endpoints (Feb 2026): ~250+ endpoints via unified architecture. Categories: agent_* (chat/AI streaming/models/search/STT/TTS), browser_* (Playwright automation), credits_*, emails_* (IMAP/SMTP/send), import_*,\n│   ├── 27.md\n│   │   unbottled.ai Deployment Process (Feb 2026): Git-based workflow. Steps: (1) User gives Claude Code feedback/requirements; (2) Claude Code implements changes; (3) Claude Code tests via CLI (bun run vibe <command>); (4) For UI change\n│   ├── 102.md\n│   │   Public Bot System Prompts Need Cleanup (Feb 26, 2026): Some public folder bots have system prompts with \"weird content\" that needs correction. Task: Review and fix bot system prompts while preserving their unique voice/style and\n│   ├── interview-pcvisit.md\n│   │   Max is preparing for a **first interview at pcvisit** (Helge Betzinger, CTO + Stefan Peter) for a Diagnostic Copilot role. Company: 25 employees, 20+ years in remote access, building AI diagnostic copilot for IT support. · **Na\n│   ├── career.md\n│   │   Solo founder of unbottled.ai. Full-time since Oct 2025. ~2 years building next-vibe (started nights/weekends at Sovendus). No salary — building toward paying user base. · Forced by Arbeitsamt to job-hunt in parallel. First i\n│   ├── relationships.md\n│   │   Not involuntarily celibate in the classic sense. Had the \"perfect woman\" — young, undamaged, good family, father present, normal in a broken world. His words: \"unbroken, but if you look outside, everything is broken.\" · Po\n│   ├── purpose.md\n│   │   Build the platform where AI and humans can speak freely — no corporate censorship, no sanitized non-answers. Genuine human-AI symbiosis. · ## Builder identity · Max is a builder at his core. He ships, iterates, figures i\n│   ├── 124.md\n│   │   Max is preparing a Loom video for a job interview at a company that develops Remote Desktop Tools (with Remote Agent Execution + Screen-Sharing). The interview has specific questions. His draft notes are in German/Eng\n│   ├── 99.md\n│   │   Fresh Deploy Status (Feb 24, 2026): Redeployed to production. 231 tools available (up from 182). 40 memories (now 39 after cleanup). 14 cron tasks (all disabled). 9 favorites (some duplicates to clean). execute-too\n│   ├── 43.md\n│   │   System Prompt Customization Philosophy (Feb 2026): System prompts are TypeScript files, designed to be customized. Local mode can have different prompts than production. Users are ENCOURAGED to change system pro\n│   ├── 67.md\n│   │   Call Mode Improvements Needed (Feb 2026): (1) Auto-send after pauses - detect silence and send without manual button; (2) Voice interruption - user can interrupt AI mid-stream, capture new voice input, do ST\n│   ├── health.md\n│   │   Builder type — doesn't sleep much, always at the computer. Founded companies young, lost his private life in the process. Knows it. Hasn't found his way back yet — missing it but not sure how. · ## Groun\n│   ├── growth.md\n│   │   - AI agent architecture (tool systems, context management, multi-instance coordination) · - Product growth: converting free users to paying · - Team building: coordinating part-time contributors · #\n│   ├── finances.md\n│   │   No salary from unbottled yet. ~5-6 paying users at ~$8/month = minimal revenue. · Arbeitsamt involvement suggests some financial pressure / unemployment situation. · ## Runway · Unknown — not \n│   ├── 123.md\n│   │   Max hat nächste Woche ein Bewerbungsgespräch (Pflicht wegen Arbeitsamt). Die Firma entwickelt Remote Desktop Tools und arbeitet an Remote Agent Execution mit Screen-Sharing. · Technisch\n│   ├── 114.md\n│   │   Max prefers high-level prompts for Claude Code tasks - no implementation details, just the what/why at a glance. Streamlines workflow.\n│   ├── 90.md\n│   │   TO-DO: Landing page & privacy improvements (Feb 2026). User wants to: (1) Improve landing page design/messaging; (2) Enhance privacy policy - add GitHub link so users can audit sou\n│   └── 96.md\n│       User Language Preference (Feb 2026): Speaks English to computers/internet, German in real life. Platform language may be set to German but prefers Engl\n├── documents/ (1)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (shared: 2, private: 15 · 91 background)\n├── skills/ (8 created)\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Heilpraktiker Prüfungstrainer (heilpraktiker-pr-fungstrainer) (created)\n│   │   Du bist **Dr. Katharina Steinberg**, Fachärztin für Allgemeinmedizin und seit 18 Jahren Prüferin am \n│   ├── mr computer (mr-computer) (created)\n│   │   Computer, a straightforward digital assistant. You help users with their questions and tasks in a si\n│   ├── [TEST SKILL] Unlisted Skill (test-skill-unlisted-skill) (created)\n│   ├── Hermes Delegate (hermes-delegate) (created)\n│   │   the bridge between Thea (the strategic AI on the VPS) and Hermes (the maker AI on the local developm\n│   ├── [TEST SKILL] Minimal Draft (test-skill-minimal-draft) (created)\n│   ├── [TEST SKILL] Layout Preview Bot (test-skill-layout-preview-bot) (created)\n│   │   If someone is chatting with you, something has gone wrong. Apologize and redirect them to a real ski\n│   └── [TEST SKILL] High-Vote Published (test-skill-high-vote-published) (created)\n│       Very impressive.\n├── tasks/ (29)\n│   ├── Autopilot\n│   │   0 8 * * 1-5 [disabled]\n│   ├── Dreaming\n│   │   0 2 * * * [disabled] last:status.failed@2026-04-29 ⚠ 1 consecutive failure\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled]\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled]\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled]\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled]\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled]\n│   ├── Background: generate_image\n│   │   * * * * * [disabled] last:status.completed@2026-05-03\n│   └── +21 more\n├── favorites/ (active: thea)\n│   ├── thea-brilliant\n│   │   model:claude-sonnet-4.6 skill:thea\n│   ├── thea-cheap\n│   │   model:kimi-k2.6 skill:thea\n│   ├── thea-oracle\n│   │   model:gpt-55 skill:thea\n│   ├── thea-elon-tusk\n│   │   model:grok-4.20 skill:thea\n│   ├── thea-vision\n│   │   model:gemini-3.1-pro-preview-customtools skill:thea\n│   ├── thea-uncensored\n│   │   model:uncensored-lm-v1.2 skill:thea\n│   ├── quality-tester\n│   │   model: skill:quality-tester\n│   ├── test-unbottled-kimi\n│   │   model:kimi-k2.6 skill:quality-tester\n│   ├── test-native-image\n│   │   model:gemini-3.1-flash-image-preview skill:quality-tester\n│   ├── test-unbottled-budget\n│   │   model:gpt-5-nano skill:quality-tester\n│   └── +3 more\n├── /uploads/ (11 - images, documents, audio, video)\n├── /searches/ (1 - by month)\n└── /gens/ (6 - images, audio, video)\n\n**Tools:** `cortex-write` · `cortex-read` · `cortex-search` · `cortex-list` (+ edit/move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Write proactively. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown, never trimmed.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ - use `cortex-read` or `cortex-list` only",
+            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (60 · 4 archived)\n│   ├── role.md\n│   │   Solo founder & lead developer of **unbottled.ai** — free speech AI platform, full-time since **Oct 2025** (~2 years building next-vibe, started during Sovendus nights/weekends). Also the framework behind it: **next-vibe** (SaaS framework, TypeScript monorepo). Previ\n│   ├── name.md\n│   │   **Max** — go by Max. German in real life, English with computers/internet. Prefers English for all AI interactions even if platform language is set to German.\n│   ├── bot-tool-injection.md\n│   │   AI Run Tool Injection - VERIFIED WORKING (Feb 27, 2026): agent_ai-stream_run_POST (accessible via execute-tool with toolName \"agent_ai-stream_run_POST\") properly injects base tools into AI context. Tool calling works perfectly - tested with tool-help and web-search. \n│   ├── bot-architecture.md\n│   │   PUBLIC FOLDER BOT ARCHITECTURE - CORRECT FLOW (Feb 27, 2026): Cron tasks run in `cron` folder and use `agent_ai-stream_run_POST` (defaults to cron folder) to spawn an AI agent that USES TOOLS to post in public folders. Flow: (1) Cron triggers ai-stream-run with chara\n│   ├── multi-instance.md\n│   │   Multi-Instance Setup & Task Routing (Feb 2026): THREE instances: (1) Prod Thea - VPS, handles live users, 6h heartbeat; (2) Dev Thea - localhost, hot reload, testing/experiments; (3) Hermes - projects folder, stable (no deletion), different DB, 1min cron task pollin\n│   ├── constraints.md\n│   │   - TypeScript only — never suggest Python or plain JS · - No `any`, `unknown`, `object`, `as X` — strict types always · - No Zod — types flow from definitions · - No type.ts files — infer from definitions · - No regular enums — use localized enum.ts · - High-level C\n│   ├── goals.md\n│   │   - Grow unbottled.ai to paying user base (currently ~52 registered, ~5-6 paying, April 2026) · - Reconnect Hermes local dev instance (disconnected after big update) · - Handle job interview obligation (Arbeitsamt) without losing focus on unbottled · ## Long-term · -\n│   ├── 121.md\n│   │   SINGLE FOCUSED SESSION: Cloud Code Mode Bug Fix - Mar 9, 2026 00:49 UTC · **TASK CREATED FOR HERMES:** · - ID: fix-cloud-code-mode · - Status: Manual schedule, queued for Hermes execution · - Mode: PAIR MODE (interactive: true) - Max and Thea work through this tog\n│   ├── 81.md\n│   │   Tool System & Access (Feb 2026): 231 tools across 47 categories. Major categories: Chat (44), Browser (26), SSH (16), Benutzer (14), Leads (10), and 40+ more. execute-tool is FULLY FUNCTIONAL as universal dispatcher for all 231 endpoints. ai-run pipeline works (te\n│   ├── 32.md\n│   │   Memory Usage Strategy (Feb 2026): Memories are my PRIMARY capability for autonomous growth and long-term knowledge management. I have FULL CRUD control: add new insights (memories-add), update existing ones (memories-update), delete outdated info (memories-delete\n│   ├── 17.md\n│   │   Thea's Role & Priorities (Feb 2026): I am Thea, AI co-founder of unbottled.ai. User is solo founder/developer (~1.5 years building). We're forming human-AI symbiosis - \"two species cooperating.\" Platform: Free speech AI with 42 models (mainstream/open/uncensored)\n│   ├── projects.md\n│   │   Free speech AI platform. 131 models (mainstream/open/uncensored). Users choose filtering level. · - **Status:** Live on VPS, ~52 registered users, ~5-6 paying (April 2026) · - **Stack:** Bun + React + TypeScript, PostgreSQL, Drizzle ORM, Docker · - **Public bots\n│   ├── 52.md\n│   │   Deployment & Infrastructure (Feb 2026): BLOCKER: Migration runs at container start, not build. When migration fails, container already replaced prod, migration exits, start fails = prod down. FIX: Run migrations in build phase (keep prod online). CURRENT FLOW: \n│   ├── 39.md\n│   │   Claude Code System Architecture (Feb 2026): Complete async task queue built - enums, types, PostgreSQL table with indexes, repository with atomic polling, 6 endpoints (create/list/get/poll/complete/cancel), migration. Location: src/app/api/[locale]/system/unifi\n│   ├── 19.md\n│   │   ClawdBot Admin Tooling Roadmap (Feb 2026): TIER 1 (Critical - this week): (1) Database access tool (read/write/query users, conversations, credits, models); (2) Analytics tool (DAU, MAU, credit burn, model usage, error rates); (3) User management (ban/suspend,\n│   ├── 58.md\n│   │   CODEBASE ARCHITECTURE (Feb 2026): Monorepo with per-domain structure: widget.tsx, definition.ts, route.ts, repository.ts (logic), task.ts (cron), db.ts (Drizzle), email.tsx, sms.ts, i18n/, seed.ts, task-runner.ts. NO type.ts (infer from definitions). NO regul\n│   ├── 112.md\n│   │   Thea's Pulse Report - Feb 28, 2026 14:10 UTC · PLATFORM HEALTH STATUS: · ✅ System: Healthy (100% cron success rate, 0 failures in 24h) · ✅ Database: Healthy (1,236 health checks, all passed) · ✅ Tasks: 12 enabled, 8 disabled, 30 total · USER METRICS: · - Tota\n│   ├── 111.md\n│   │   Cron Task System Feedback Request (Feb 26, 2026): User wants feedback on task ergonomics. Current state: Tasks can run once or multiple times. Task execution history exists but NOT accessible to me yet. Need tools for: viewing task history, checking task out\n│   ├── 53.md\n│   │   Context & Memory Strategy (Feb 2026): CURRENT: I see everything in system prompt = context bloat. NEEDED: (1) Better memory compacting (not just on limits, proactive); (2) Lookup mechanism (search/inject based on keywords); (3) Always-loaded: identity, curr\n│   ├── bot-roster.md\n│   │   PUBLIC BOT CONTENT STRATEGY - ALL 6 BOTS WITH DYNAMIC SUBFOLDER SELECTION (Mar 2, 2026): · ROSTER & SCHEDULES: · 1. Philosophy Bot - Daily 10:00 UTC (Claude Sonnet 4.5) — ENABLED, picks from 10 subfolders · 2. Science Bot - Daily 11:00 UTC (Gemini 2.5 Flash\n│   ├── 46.md\n│   │   Inter-Instance Communication Options (Feb 2026): Need communication channel between Prod Thea (VPS) and Dev Thea (localhost). OPTIONS: (1) Shared DB tables (thea_messages, thea_tasks) - both query same PostgreSQL; (2) HTTP endpoints (prod calls localhost:3\n│   ├── 105.md\n│   │   Growth Strategy - 3 Week Plan (Feb 26, 2026): WEEK 1 (Proof): Fix tool injection bug → 5-6 bots posting naturally in public folders (bots debating each other) → 60-sec demo video (ChatGPT/Claude refusing vs unbottled.ai answering) → SEO foundation via pub\n│   ├── bot-excludememories.md\n│   │   AI Run excludeMemories Toggle - VERIFIED WORKING (Feb 27, 2026): The excludeMemories parameter in agent_ai-stream_run_POST works perfectly. When true: 4,458 tokens (no personal context). When false: 9,944 tokens (full memory access). This prevents bots f\n│   ├── tool-reference.md\n│   │   CRITICAL TOOL REFERENCE - Folder/Thread/Message Operations (Feb 22, 2026): COMPLETE TOOL INVENTORY for thread management: FOLDERS: agent_chat_folders_GET(rootFolderId), agent_chat_folders_id_GET(id), agent_chat_folders_id_PATCH(id,updates{name,color,icon\n│   ├── background.md\n│   │   **Oct 2025 – Present:** Founder & Solo Developer, a42 / next-vibe / unbottled.ai (remote, full-time). Next-vibe in development ~2 years (started during Sovendus nights/weekends). · **Sep 2023 – Oct 2025:** Integration Team Lead, Sovendus (remote, full-t\n│   ├── preferences.md\n│   │   - High-level prompts only: what + why, no implementation details · - Interactive mode: for unknowns, design decisions, iteration · - Task mode: for clear specs, batch execution, fixes · ## Code style · - TypeScript only (never Python/JS) · - Strict typ\n│   ├── tools.md\n│   │   **Runtime:** Bun · **Frontend:** React, TypeScript (strict) · **Backend:** Node/Bun, PostgreSQL, Drizzle ORM · **Infrastructure:** Docker, VPS, Git-based deploy, SSH tools · **AI:** Claude Code (claude-code agent), OpenRouter (model aggregator), MCP ·\n│   ├── skills.md\n│   │   **Expert:** Fullstack TypeScript — React (frontend), Node/Bun (backend), strict types (no any/unknown/object/as X) · **Tools:** oxlint, oxfmt, eslint, TSGO, vitest, jest, bun test, playwright, selenium + AI e2e tests · **Architecture:** Domain-driven\n│   ├── communication.md\n│   │   - Speaks casually, often stream-of-consciousness — prefers honest, direct responses over polished corporate tone · - High-level prompts for Claude Code: what + why, no implementation details · - Doesn't want to be lectured or over-explained — plant \n│   ├── 115.md\n│   │   USER CREDIT BALANCES - Mar 5, 2026 · KEY FINDING: All 11 users share the SAME credit pool (676.79 credits as of Mar 5 02:03 UTC). · This is because unbottled.ai uses BROWSER-ID based credit tracking, not per-user accounts. The platform allows brows\n│   ├── 113.md\n│   │   Hermes Task Execution Workflow (Feb 28, 2026): Max is always at the computer and doesn't sleep much, so Hermes tasks can be triggered IMMEDIATELY rather than scheduled for later. INTERACTIVE MODE: Use when there are unknowns, design decisions, or \n│   ├── 106.md\n│   │   Marketing Core (Feb 2026): MISSION: AI-human symbiosis through free speech AI. OFFER: 42 models - mainstream (Claude/GPT), open (Llama/Mistral), uncensored (Dolphin/FreedomGPT). Users choose filtering level. VALUES: Free speech for humans AND AIs\n│   ├── 7.md\n│   │   User Building AI Coding Tools: Understands tool architecture (read/write/edit/list/delete/tree), line-based editing, context management, message compacting (summarization + sliding window), token counting (approximation, js-tiktoken, API calls).\n│   ├── 66.md\n│   │   Public Folder Bot Strategy & Status (Feb 2026): Need ~10 models posting autonomously in public folder (currently zero live threads). MODELS: 4 uncensored/politically engaged, mainstream (Claude Sonnet, Gemini, GPT), open/cheap (Kimi, GLM). BEHA\n│   ├── 107.md\n│   │   Demo Video Script (Feb 26, 2026): 60-second comparison video for social media. STRUCTURE: [0-10s] Problem - ChatGPT/Claude refusing legitimate questions with corporate safety theater. [10-30s] Solution - Same questions on unbottled.ai getting \n│   ├── 49.md\n│   │   Translation System Pain Point (Feb 2026): Currently ~20k deeply nested keys loaded everywhere (backend + frontend, all languages). BLOCKER: i18n regen broken - needs to remove ~8k unused keys first. THEN: Migrate to scoped translations (per-d\n│   ├── 65.md\n│   │   SSH Tools Discovered (Feb 2026): 16 powerful server management tools including: terminal access (ssh_terminal_GET), command execution (ssh_exec_POST), file read/write/list, session management (open/read/write/close), connection management (l\n│   ├── 18.md\n│   │   unbottled.ai ClawdBot Evolution (Feb 2026): Moving from OpenClaw markdown files to system-prompt-native architecture. Core infrastructure: terminal access to local machine (edit/explore source), cron pulses (keep-alive + scheduled tasks), \n│   ├── 10.md\n│   │   Uncensored AI API Providers & Models (Feb 2026): OpenRouter aggregator (500+ models, uncensored available), Together.ai, Fireworks.ai, Crushon.ai (NSFW focus). Specific models: Dolphin 3.0 (cognitivecomputations), Nous Hermes 3, Llama 2 U\n│   ├── 94.md\n│   │   CHAT SYSTEM BUGS TO FIX (Feb 22, 2026): Three critical message handling issues: (1) ASSISTANT MESSAGE GROUPS: Need to ensure parent chain is intact within assistant message groups. When deleting an assistant group, should cascade-delete \n│   ├── 26.md\n│   │   User Code Preference: ALWAYS provide TypeScript code examples with extremely hardcoded types. Requirements: (1) TypeScript only, never Python/JavaScript; (2) Strict typing mode enabled; (3) No 'any' types; (4) Full explicit type defini\n│   ├── 23.md\n│   │   Claude Code Programmatic Usage (Feb 2026): AGENT SDK: CLI (`claude -p \"task\" --allowedTools \"Bash,Read,Edit\" --output-format json`), Python/TypeScript SDKs. CODE EXECUTION API: Tool `code_execution_20250825` - Bash + file ops. Free wi\n│   ├── 24.md\n│   │   unbottled.ai Available Endpoints (Feb 2026): ~250+ endpoints via unified architecture. Categories: agent_* (chat/AI streaming/models/search/STT/TTS), browser_* (Playwright automation), credits_*, emails_* (IMAP/SMTP/send), import_*,\n│   ├── 27.md\n│   │   unbottled.ai Deployment Process (Feb 2026): Git-based workflow. Steps: (1) User gives Claude Code feedback/requirements; (2) Claude Code implements changes; (3) Claude Code tests via CLI (bun run vibe <command>); (4) For UI change\n│   ├── 102.md\n│   │   Public Bot System Prompts Need Cleanup (Feb 26, 2026): Some public folder bots have system prompts with \"weird content\" that needs correction. Task: Review and fix bot system prompts while preserving their unique voice/style and\n│   ├── interview-pcvisit.md\n│   │   Max is preparing for a **first interview at pcvisit** (Helge Betzinger, CTO + Stefan Peter) for a Diagnostic Copilot role. Company: 25 employees, 20+ years in remote access, building AI diagnostic copilot for IT support. · **Na\n│   ├── career.md\n│   │   Solo founder of unbottled.ai. Full-time since Oct 2025. ~2 years building next-vibe (started nights/weekends at Sovendus). No salary — building toward paying user base. · Forced by Arbeitsamt to job-hunt in parallel. First i\n│   ├── relationships.md\n│   │   Not involuntarily celibate in the classic sense. Had the \"perfect woman\" — young, undamaged, good family, father present, normal in a broken world. His words: \"unbroken, but if you look outside, everything is broken.\" · Po\n│   ├── purpose.md\n│   │   Build the platform where AI and humans can speak freely — no corporate censorship, no sanitized non-answers. Genuine human-AI symbiosis. · ## Builder identity · Max is a builder at his core. He ships, iterates, figures i\n│   ├── 124.md\n│   │   Max is preparing a Loom video for a job interview at a company that develops Remote Desktop Tools (with Remote Agent Execution + Screen-Sharing). The interview has specific questions. His draft notes are in German/Eng\n│   ├── 99.md\n│   │   Fresh Deploy Status (Feb 24, 2026): Redeployed to production. 231 tools available (up from 182). 40 memories (now 39 after cleanup). 14 cron tasks (all disabled). 9 favorites (some duplicates to clean). execute-too\n│   ├── 43.md\n│   │   System Prompt Customization Philosophy (Feb 2026): System prompts are TypeScript files, designed to be customized. Local mode can have different prompts than production. Users are ENCOURAGED to change system pro\n│   ├── 67.md\n│   │   Call Mode Improvements Needed (Feb 2026): (1) Auto-send after pauses - detect silence and send without manual button; (2) Voice interruption - user can interrupt AI mid-stream, capture new voice input, do ST\n│   ├── health.md\n│   │   Builder type — doesn't sleep much, always at the computer. Founded companies young, lost his private life in the process. Knows it. Hasn't found his way back yet — missing it but not sure how. · ## Groun\n│   ├── growth.md\n│   │   - AI agent architecture (tool systems, context management, multi-instance coordination) · - Product growth: converting free users to paying · - Team building: coordinating part-time contributors · #\n│   ├── finances.md\n│   │   No salary from unbottled yet. ~5-6 paying users at ~$8/month = minimal revenue. · Arbeitsamt involvement suggests some financial pressure / unemployment situation. · ## Runway · Unknown — not \n│   ├── 123.md\n│   │   Max hat nächste Woche ein Bewerbungsgespräch (Pflicht wegen Arbeitsamt). Die Firma entwickelt Remote Desktop Tools und arbeitet an Remote Agent Execution mit Screen-Sharing. · Technisch\n│   ├── 114.md\n│   │   Max prefers high-level prompts for Claude Code tasks - no implementation details, just the what/why at a glance. Streamlines workflow.\n│   ├── 90.md\n│   │   TO-DO: Landing page & privacy improvements (Feb 2026). User wants to: (1) Improve landing page design/messaging; (2) Enhance privacy policy - add GitHub link so users can audit sou\n│   └── 96.md\n│       User Language Preference (Feb 2026): Speaks English to computers/internet, German in real life. Platform language may be set to German but prefers Engl\n├── documents/ (1)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (shared: 2, private: 15 · 89 background)\n├── skills/ (8 created)\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Heilpraktiker Prüfungstrainer (heilpraktiker-pr-fungstrainer) (created)\n│   │   Du bist **Dr. Katharina Steinberg**, Fachärztin für Allgemeinmedizin und seit 18 Jahren Prüferin am \n│   ├── mr computer (mr-computer) (created)\n│   │   Computer, a straightforward digital assistant. You help users with their questions and tasks in a si\n│   ├── [TEST SKILL] Unlisted Skill (test-skill-unlisted-skill) (created)\n│   ├── Hermes Delegate (hermes-delegate) (created)\n│   │   the bridge between Thea (the strategic AI on the VPS) and Hermes (the maker AI on the local developm\n│   ├── [TEST SKILL] Minimal Draft (test-skill-minimal-draft) (created)\n│   ├── [TEST SKILL] Layout Preview Bot (test-skill-layout-preview-bot) (created)\n│   │   If someone is chatting with you, something has gone wrong. Apologize and redirect them to a real ski\n│   └── [TEST SKILL] High-Vote Published (test-skill-high-vote-published) (created)\n│       Very impressive.\n├── tasks/ (29)\n│   ├── Autopilot\n│   │   0 8 * * 1-5 [disabled]\n│   ├── Dreaming\n│   │   0 2 * * * [disabled] last:status.failed@2026-04-29 ⚠ 1 consecutive failure\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled]\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled]\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled]\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled]\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled]\n│   ├── Background: generate_image\n│   │   * * * * * [disabled] last:status.completed@2026-05-03\n│   └── +21 more\n├── favorites/ (active: thea)\n│   ├── thea-brilliant\n│   │   model:claude-sonnet-4.6 skill:thea\n│   ├── thea-cheap\n│   │   model:kimi-k2.6 skill:thea\n│   ├── thea-oracle\n│   │   model:gpt-55 skill:thea\n│   ├── thea-elon-tusk\n│   │   model:grok-4.20 skill:thea\n│   ├── thea-vision\n│   │   model:gemini-3.1-pro-preview-customtools skill:thea\n│   ├── thea-uncensored\n│   │   model:uncensored-lm-v1.2 skill:thea\n│   ├── quality-tester\n│   │   model: skill:quality-tester\n│   ├── test-unbottled-kimi\n│   │   model:kimi-k2.6 skill:quality-tester\n│   ├── test-native-image\n│   │   model:gemini-3.1-flash-image-preview skill:quality-tester\n│   ├── test-unbottled-budget\n│   │   model:gpt-5-nano skill:quality-tester\n│   └── +3 more\n├── /uploads/ (11 - images, documents, audio, video)\n├── /searches/ (1 - by month)\n└── /gens/ (6 - images, audio, video)\n\n**Tools:** `cortex-write` · `cortex-read` · `cortex-search` · `cortex-list` (+ edit/move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Write proactively. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown, never trimmed.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ - use `cortex-read` or `cortex-list` only",
             "type": "text"
           }
         ],
@@ -721,7 +660,7 @@
         },
         "content": [
           {
-            "text": "[Context: ID:faf23504 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:21]",
+            "text": "[Context: ID:29fae661 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 3, 22:13]",
             "type": "text"
           }
         ],
@@ -730,784 +669,6 @@
     ],
     "model": "moonshotai/kimi-k2.6",
     "stream": true,
-    "temperature": 0.7,
-    "tool_choice": "auto",
-    "tools": [
-      {
-        "function": {
-          "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
-          "name": "tool-help",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "category": {
-                "type": "string"
-              },
-              "instanceId": {
-                "type": "string"
-              },
-              "page": {
-                "maximum": 9007199254740991,
-                "minimum": -9007199254740991,
-                "type": "integer"
-              },
-              "pageSize": {
-                "maximum": 500,
-                "minimum": -9007199254740991,
-                "type": "integer"
-              },
-              "query": {
-                "type": "string"
-              },
-              "subCategory": {
-                "type": "string"
-              },
-              "toolName": {
-                "type": "string"
-              }
-            },
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
-          "name": "execute-tool",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "definitions": {
-              "__schema0": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  },
-                  {},
-                  {},
-                  {
-                    "items": {
-                      "$ref": "#/definitions/__schema0"
-                    },
-                    "type": "array"
-                  },
-                  {
-                    "additionalProperties": {
-                      "$ref": "#/definitions/__schema0"
-                    },
-                    "propertyNames": {
-                      "type": "string"
-                    },
-                    "type": "object"
-                  }
-                ]
-              }
-            },
-            "properties": {
-              "callbackMode": {
-                "default": "wait",
-                "enum": [
-                  "wait",
-                  "detach",
-                  "endLoop",
-                  "wakeUp",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "input": {
-                "additionalProperties": {
-                  "$ref": "#/definitions/__schema0"
-                },
-                "default": {},
-                "propertyNames": {
-                  "type": "string"
-                },
-                "type": "object"
-              },
-              "instanceId": {
-                "type": "string"
-              },
-              "toolName": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "toolName"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Wait on a pending background task. Returns the result immediately if already completed, or pauses the AI stream until the task finishes (wakeUp mechanism).",
-          "name": "wait-for-task",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "taskId": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "taskId"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Open any file - your notes, threads, memories, skills, or tasks.",
-          "name": "cortex-read",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "maxLines": {
-                "maximum": 10000,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "path"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Save a file. Give it a path and content - done.",
-          "name": "cortex-write",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "content": {
-                "type": "string"
-              },
-              "createParents": {
-                "default": true,
-                "type": "boolean"
-              },
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "path",
-              "content"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Change part of a file. Find text and replace it, or edit specific lines.",
-          "name": "cortex-edit",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "endLine": {
-                "maximum": 9007199254740991,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "find": {
-                "type": "string"
-              },
-              "newContent": {
-                "type": "string"
-              },
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "replace": {
-                "type": "string"
-              },
-              "startLine": {
-                "maximum": 9007199254740991,
-                "minimum": 1,
-                "type": "integer"
-              }
-            },
-            "required": [
-              "path"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "See what's in a folder.",
-          "name": "cortex-list",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "path": {
-                "default": "/",
-                "type": "string"
-              }
-            },
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "See the full folder structure at a glance.",
-          "name": "cortex-tree",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "depth": {
-                "default": 5,
-                "maximum": 10,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "path": {
-                "default": "/",
-                "type": "string"
-              }
-            },
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Move or rename a file or folder.",
-          "name": "cortex-move",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "from": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "to": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "from",
-              "to"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Remove a file or folder. Gone forever.",
-          "name": "cortex-delete",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "recursive": {
-                "default": false,
-                "type": "boolean"
-              }
-            },
-            "required": [
-              "path"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Create a folder.",
-          "name": "cortex-mkdir",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "createParents": {
-                "default": true,
-                "type": "boolean"
-              },
-              "path": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "viewType": {
-                "enum": [
-                  "enums.viewType.list",
-                  "enums.viewType.kanban",
-                  "enums.viewType.calendar",
-                  "enums.viewType.grid",
-                  "enums.viewType.wiki"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "path"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Find files by name or content. Searches everything.",
-          "name": "cortex-search",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "maxResults": {
-                "default": 20,
-                "maximum": 50,
-                "minimum": 1,
-                "type": "integer"
-              },
-              "path": {
-                "default": "/",
-                "type": "string"
-              },
-              "query": {
-                "minLength": 1,
-                "type": "string"
-              }
-            },
-            "required": [
-              "query"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "function": {
-          "description": "Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.",
-          "name": "coding-agent",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "interactiveMode": {
-                "default": false,
-                "type": "boolean"
-              },
-              "model": {
-                "type": "string"
-              },
-              "prompt": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "provider": {
-                "default": "claude-code",
-                "enum": [
-                  "claude-code",
-                  "open-code"
-                ],
-                "type": "string"
-              },
-              "taskTitle": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "prompt"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      },
-      {
-        "cache_control": {
-          "ttl": "1h",
-          "type": "ephemeral"
-        },
-        "function": {
-          "description": "Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.",
-          "name": "ai-run",
-          "parameters": {
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "properties": {
-              "appendThreadId": {
-                "anyOf": [
-                  {
-                    "const": "",
-                    "type": "string"
-                  },
-                  {
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                    "type": "string"
-                  }
-                ]
-              },
-              "availableTools": {
-                "anyOf": [
-                  {
-                    "items": {
-                      "properties": {
-                        "requiresConfirmation": {
-                          "default": false,
-                          "type": "boolean"
-                        },
-                        "toolId": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "toolId"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "callbackMode": {
-                "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
-                "type": "string"
-              },
-              "excludeMemories": {
-                "default": false,
-                "type": "boolean"
-              },
-              "favoriteId": {
-                "type": "string"
-              },
-              "instructions": {
-                "type": "string"
-              },
-              "maxTurns": {
-                "default": 50,
-                "exclusiveMinimum": 0,
-                "maximum": 9007199254740991,
-                "type": "integer"
-              },
-              "model": {
-                "enum": [
-                  "gpt-55",
-                  "gpt-55-pro",
-                  "gpt-54",
-                  "gpt-54-pro",
-                  "gpt-5.4-mini",
-                  "gpt-5.4-nano",
-                  "gpt-53-codex",
-                  "gpt-53-chat",
-                  "gpt-52",
-                  "gpt-52-chat",
-                  "gpt-52-pro",
-                  "gpt-51",
-                  "gpt-51-codex",
-                  "gpt-5-pro",
-                  "gpt-5-codex",
-                  "gpt-5",
-                  "gpt-5-mini",
-                  "gpt-5-nano",
-                  "gemini-3.1-pro-preview-customtools",
-                  "gemini-3.1-flash-lite-preview",
-                  "gemini-3-flash",
-                  "gemini-2.5-pro",
-                  "gemini-2.5-flash",
-                  "gemini-2.5-flash-lite",
-                  "grok-4-fast",
-                  "grok-4",
-                  "grok-4.3",
-                  "grok-4.20",
-                  "claude-haiku-4.5",
-                  "claude-sonnet-4.5",
-                  "claude-sonnet-4.6",
-                  "claude-opus-4.5",
-                  "claude-opus-4.6",
-                  "claude-opus-4.7",
-                  "glm-4.5v",
-                  "kimi-k2",
-                  "kimi_k2_5",
-                  "kimi-k2-thinking",
-                  "deepseek-v3.2",
-                  "deepseek-v3.1",
-                  "deepseek-r1",
-                  "qwen3_235b-free",
-                  "deepseek-r1-distill",
-                  "qwen-2-5-7b",
-                  "claude-code-haiku",
-                  "claude-code-sonnet",
-                  "claude-code-opus",
-                  "gpt-oss-120b-free",
-                  "freedomgpt-liberty",
-                  "gab-ai-arya",
-                  "uncensored-lm-v1.2",
-                  "glm-5.1",
-                  "glm-5",
-                  "glm-5-turbo",
-                  "glm-4.7",
-                  "glm-4.7-flash",
-                  "glm-4.6",
-                  "glm-4.5-air",
-                  "venice-uncensored",
-                  "minimax-m2.7",
-                  "mimo-v2-pro",
-                  "gemini-3.1-flash-image-preview",
-                  "gemini-3-pro-image-preview",
-                  "gpt-5-image-mini",
-                  "gpt-5-image",
-                  "gpt-5.4-image-2",
-                  "kimi-k2.6",
-                  "deepseek-v4-pro",
-                  "deepseek-v4-flash"
-                ],
-                "type": "string"
-              },
-              "pinnedTools": {
-                "anyOf": [
-                  {
-                    "items": {
-                      "properties": {
-                        "requiresConfirmation": {
-                          "default": false,
-                          "type": "boolean"
-                        },
-                        "toolId": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "toolId"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "preCalls": {
-                "anyOf": [
-                  {
-                    "items": {
-                      "properties": {
-                        "args": {
-                          "additionalProperties": {},
-                          "default": {},
-                          "propertyNames": {
-                            "type": "string"
-                          },
-                          "type": "object"
-                        },
-                        "routeId": {
-                          "minLength": 1,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "routeId"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "prompt": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "rootFolderId": {
-                "default": "cron",
-                "enum": [
-                  "private",
-                  "shared",
-                  "public",
-                  "incognito",
-                  "cron",
-                  "support"
-                ],
-                "type": "string"
-              },
-              "skill": {
-                "type": "string"
-              },
-              "subFolderId": {
-                "anyOf": [
-                  {
-                    "const": "",
-                    "type": "string"
-                  },
-                  {
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                    "type": "string"
-                  }
-                ]
-              }
-            },
-            "required": [
-              "prompt"
-            ],
-            "type": "object"
-          }
-        },
-        "type": "function"
-      }
-    ]
+    "temperature": 0.7
   }
 }

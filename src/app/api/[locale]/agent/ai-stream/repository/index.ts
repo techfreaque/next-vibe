@@ -26,6 +26,7 @@ import { buildFavoriteConfig } from "../../chat/favorites/repository";
 import { parseSkillId } from "../../chat/slugify";
 import {
   createMessagesEmitter,
+  emitThreadCreated,
   emitThreadTitleUpdated,
   type WsEmitCallback,
 } from "../../chat/threads/[threadId]/messages/emitter";
@@ -548,6 +549,19 @@ export class AiStreamRepository {
     const emitTitle = (threadId: string, title: string): void => {
       emitThreadTitleUpdated(threadId, title, data.rootFolderId, logger, user);
     };
+
+    // Emit thread-created so other tabs/clients can render the new thread in the
+    // sidebar immediately (the optimistic update only exists in the creating client).
+    if (isNewThread && !isIncognito) {
+      emitThreadCreated(
+        threadResultThreadId,
+        effectiveContent.slice(0, 50) || "New Chat",
+        data.rootFolderId,
+        data.subFolderId ?? null,
+        logger,
+        user,
+      );
+    }
 
     // Step 9: Start AI streaming (for all operations including answer-as-ai)
     try {
