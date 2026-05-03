@@ -28,6 +28,7 @@ const MOCK_CREDITS: ChatBootValue["initialCredits"] = {
   earned: 0,
   free: 0,
   expiresAt: null,
+  capacity: 20,
 };
 
 const MOCK_NAVIGATION: UseNavigationStackReturn = {

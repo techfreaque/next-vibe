@@ -29,6 +29,12 @@ export const translations = {
       medium: "Średni (~20 sek.)",
       long: "Długi (~30 sek.)",
     },
+    inputMediaUrl: {
+      label: "URL referencyjnego audio",
+      description:
+        "Audio źródłowe do transferu stylu lub remiksu. Model użyje go jako punktu wyjścia.",
+      placeholder: "https://przyklad.pl/audio.mp3",
+    },
     download: "Pobierz",
     separator: "·",
     backButton: {
@@ -43,7 +49,6 @@ export const translations = {
       audioUrl: "URL wygenerowanego audio",
       creditCost: "Użyte kredyty",
       durationSeconds: "Czas trwania w sekundach",
-      inputRef: "Referencja do mediów wejściowych",
       jobId: "ID zadania asynchronicznego",
     },
     errors: {

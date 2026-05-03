@@ -50,6 +50,7 @@ export enum ChatModelId {
   GEMINI_2_5_FLASH_LITE = "gemini-2.5-flash-lite",
   GROK_4_FAST = "grok-4-fast",
   GROK_4 = "grok-4",
+  GROK_4_3 = "grok-4.3",
   GROK_4_20 = "grok-4.20",
   CLAUDE_HAIKU_4_5 = "claude-haiku-4.5",
   CLAUDE_SONNET_4_5 = "claude-sonnet-4.5",
@@ -711,6 +712,40 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       toolCalling: true,
     },
   },
+  [ChatModelId.GROK_4_3]: {
+    name: "Grok 4.3",
+    by: "xAI",
+    description: "chat.models.descriptions.grok43",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-x",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GROK_4_3,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "x-ai/grok-4.3",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.25, // updated: 2026-05-03 from openrouter-api
+        outputTokenCost: 2.5, // updated: 2026-05-03 from openrouter-api
+      },
+    ],
+
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      toolCalling: true,
+    },
+  },
   [ChatModelId.GROK_4_20]: {
     name: "Grok 4.20",
     by: "xAI",
@@ -740,6 +775,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
 
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,

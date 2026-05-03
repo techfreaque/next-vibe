@@ -8,17 +8,17 @@
     "alt-svc": "h3=\":443\"; ma=86400",
     "cache-control": "no-cache, private",
     "cf-cache-status": "DYNAMIC",
-    "cf-ray": "9f25db48ce1ad23b-FRA",
+    "cf-ray": "9f61e4663aa99a15-FRA",
     "connection": "keep-alive",
     "content-encoding": "br",
     "content-type": "application/json",
-    "date": "Sun, 26 Apr 2026 13:15:32 GMT",
+    "date": "Sun, 03 May 2026 20:07:31 GMT",
     "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
-    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=bLyDZgDFAFOqcDHlDYY0kV9mfWEzlE2DYdi5KA4MkU1hBZLsJbt29g%2F3UrNmQUcOofkIXCMmf%2B7v9jQ9qOKOIXgiFeU2I8y5GvuR%2BhFl%2B8UUA0mhkAc4uMseyqD0u2Q%3D\"}]}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=x5tRhv6cdYozBy%2BDp02BvpNBziI5M3LIXNwE4fM%2FbSE5Rw7%2FicPqrgxkxV1jhBKebAg7gzRKvY9NBw40ZnIJsKYE5X2egmwO19h5qDzJHBsry%2BtQDrAF7BjMReo0rDk%3D\"}]}",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
-    "x-cloud-trace-context": "562651157deb83f2578052b7c107c98f",
-    "x-request-time": "2.694",
+    "x-cloud-trace-context": "ec0d579b1da40778ac634853798ae1c5",
+    "x-request-time": "2.623",
     "x-served-by": "octane-api",
     "x-upstream-connect": "0.000",
     "x-upstream-time": "-"
@@ -28,16 +28,17 @@
     "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
     "eta": 80,
     "message": "Request queued for processing. Try to fetch request after estimated seconds.",
-    "fetch_result": "https://modelslab.com/api/v6/video/fetch/175765989",
-    "id": 175765989,
+    "fetch_result": "https://modelslab.com/api/v6/video/fetch/176445188",
+    "id": 176445188,
     "output": [],
     "future_links": [
-      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/a01380e0-55b9-4021-b849-8fb516b09eac-0.mp4"
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/4d24498d-4bfe-44bf-990c-7bf4e4ef4bac-0.mp4"
     ],
     "meta": {
+      "id": 176445188,
       "model_id": "wan2.2",
       "prompt": "spinning cube",
-      "seed": 939744,
+      "seed": 779951,
       "portrait": "no",
       "negative_prompt": "low quality",
       "num_frames": 25,
@@ -49,10 +50,9 @@
       "webhook": null,
       "track_id": null,
       "watermark": "no",
-      "id": 175765989,
-      "file_prefix": "a01380e0-55b9-4021-b849-8fb516b09eac",
+      "file_prefix": "4d24498d-4bfe-44bf-990c-7bf4e4ef4bac",
       "output": [
-        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/a01380e0-55b9-4021-b849-8fb516b09eac-0.mp4"
+        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/4d24498d-4bfe-44bf-990c-7bf4e4ef4bac-0.mp4"
       ]
     }
   }

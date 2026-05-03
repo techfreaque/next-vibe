@@ -11,6 +11,7 @@ import type { JSX } from "react";
 
 import { getAvailableSkillCount } from "@/app/api/[locale]/agent/chat/skills/config";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -537,10 +538,10 @@ export function TanstackPage({
           </P>
           <Div className="rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 px-5 py-4 mb-4">
             <Div className="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-1">
-              {t("feedback.rewardTitle")}
+              {t("feedback.rewardTitle", { credits: FEEDBACK_REWARD_CREDITS })}
             </Div>
             <P className="text-sm text-purple-800 dark:text-purple-300 leading-relaxed mb-4">
-              {t("feedback.rewardBody")}
+              {t("feedback.rewardBody", { credits: FEEDBACK_REWARD_CREDITS })}
             </P>
             <Button
               asChild

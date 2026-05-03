@@ -85,12 +85,7 @@ export function SidebarFooter({
               {/* Credits label + bar */}
               {credits
                 ? (() => {
-                    const max =
-                      credits.expiring > 0
-                        ? 800
-                        : credits.free > 0
-                          ? 20
-                          : Math.max(credits.total, 1);
+                    const max = Math.max(credits.capacity, 1);
                     const pct = Math.min(credits.total / max, 1) * 100;
                     const indicatorColor =
                       pct > 50

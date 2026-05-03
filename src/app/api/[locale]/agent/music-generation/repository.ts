@@ -127,6 +127,7 @@ export class MusicGenerationRepository {
           providerModel: audioModel.providerModel,
           prompt: data.prompt,
           durationSeconds,
+          inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
         });
@@ -137,6 +138,7 @@ export class MusicGenerationRepository {
           providerModel: audioModel.providerModel,
           prompt: data.prompt,
           durationSeconds,
+          inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
         });

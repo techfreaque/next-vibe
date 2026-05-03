@@ -80,7 +80,7 @@ export const THEA_VARIANTS: SkillVariant[] = [
     variantName: "skills.thea.variants.elonTusk" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
-      manualModelId: ChatModelId.GROK_4_20,
+      manualModelId: ChatModelId.GROK_4_3,
       sortBy: ModelSortField.INTELLIGENCE,
       sortDirection: ModelSortDirection.DESC,
       sortBy2: ModelSortField.PRICE,

@@ -155,9 +155,10 @@ export const translations = {
     title: "Wir wollen von dir hören",
     p1: "Wenn du {{appName}} früher ausprobiert hast und eine schlechte Erfahrung hattest - sag uns, was schiefgelaufen ist. Nicht zum Streiten. Nur um es zu beheben.",
     p2: "Wenn du es jetzt nutzt und etwas fehlt oder kaputt ist - genauso. Was wir als nächstes bauen, hängt direkt davon ab, was Nutzer wirklich sagen.",
-    rewardTitle: "200 kostenlose Credits für nützliches Feedback",
+    rewardTitle:
+      "{{credits}} Credits fuer nuetzliches Feedback — ein voller Monat gratis",
     rewardBody:
-      "Sag uns, was kaputt ist, was fehlt, was du dir wünschst. Wenn dein Feedback uns hilft, ein echtes Problem zu finden oder ein echtes Bedürfnis zu verstehen, fügen wir 200 Credits zu deinem Konto hinzu. Kein Haken.",
+      "Sag uns, was kaputt ist, was fehlt, was du dir wuenschst. Wenn dein Feedback uns hilft, ein echtes Problem zu finden oder ein echtes Beduerfnis zu verstehen, fuegen wir {{credits}} Credits zu deinem Konto hinzu — ein kompletter Monat Abo. Kein Haken.",
     payingNote:
       "Zahlende Abonnenten: fehlende Must-have-Features kommen an die Spitze der Warteschlange. Nenn sie.",
     cta: "Feedback senden",

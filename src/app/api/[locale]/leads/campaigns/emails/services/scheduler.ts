@@ -7,10 +7,12 @@ import {
   and,
   count,
   eq,
+  inArray,
   isNotNull,
   isNull,
   lt,
   notInArray,
+  or,
   sql,
 } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
@@ -23,6 +25,7 @@ import {
   type CampaignTypeValue,
 } from "../../../../messenger/accounts/enum";
 import { MessageStatus } from "../../../../messenger/messages/enum";
+import { users } from "../../../../user/db";
 import { emailCampaigns, leads } from "../../../db";
 import type {
   EmailCampaignStageValue,
@@ -32,6 +35,7 @@ import type {
 import {
   EmailCampaignStage,
   EmailJourneyVariant,
+  LeadSource,
   LeadStatus,
 } from "../../../enum";
 import type { CampaignSchedulingOptions } from "../types";
@@ -382,18 +386,29 @@ export class CampaignSchedulerService {
           scheduledAt: emailCampaigns.scheduledAt,
           retryCount: emailCampaigns.retryCount,
           lead: leads,
+          userEmail: users.email,
         })
         .from(emailCampaigns)
         .innerJoin(leads, eq(emailCampaigns.leadId, leads.id))
+        .leftJoin(users, eq(leads.convertedUserId, users.id))
         .where(
           and(
             eq(emailCampaigns.status, MessageStatus.PENDING),
             lt(emailCampaigns.scheduledAt, now),
             isNull(emailCampaigns.sentAt),
-            // Only process leads with email addresses
-            isNotNull(leads.email),
-            // Exclude converted leads
-            isNull(leads.convertedAt),
+            // Lead or linked user must have an email
+            or(isNotNull(leads.email), isNotNull(users.email)),
+            // Exclude converted leads from cold campaigns only;
+            // post-conversion campaigns and newsletters target converted users
+            or(
+              isNull(leads.convertedAt),
+              inArray(emailCampaigns.campaignType, [
+                CampaignType.SIGNUP_NURTURE,
+                CampaignType.RETENTION,
+                CampaignType.WINBACK,
+                CampaignType.NEWSLETTER,
+              ]),
+            ),
             // Suppress bounced, unsubscribed, and invalid leads
             notInArray(leads.status, [
               LeadStatus.BOUNCED,
@@ -405,7 +420,14 @@ export class CampaignSchedulerService {
         .orderBy(emailCampaigns.scheduledAt)
         .limit(limit);
 
-      logger.debug(`Pending emails: ${pendingCampaigns.length}/${limit}`);
+      const variantCounts: Record<string, number> = {};
+      for (const c of pendingCampaigns) {
+        variantCounts[c.journeyVariant] =
+          (variantCounts[c.journeyVariant] ?? 0) + 1;
+      }
+      logger.debug(`Pending emails: ${pendingCampaigns.length}/${limit}`, {
+        variantCounts,
+      });
 
       return pendingCampaigns.map((campaign) => ({
         id: campaign.id,
@@ -417,7 +439,7 @@ export class CampaignSchedulerService {
         retryCount: campaign.retryCount,
         lead: {
           id: campaign.lead.id,
-          email: campaign.lead.email!,
+          email: campaign.lead.email ?? campaign.userEmail ?? "",
           businessName: campaign.lead.businessName,
           status: campaign.lead.status,
         },
@@ -691,6 +713,183 @@ export class CampaignSchedulerService {
     reason: string | null = null,
   ): Promise<number> {
     return this.haltCampaign(leadId, logger, { reason: reason ?? undefined });
+  }
+
+  /**
+   * Bootstrap a one-off newsletter blast for all users.
+   * Targets the users table (actual account holders), NOT cold leads.
+   * For each user, finds or creates a linked lead, then creates a campaign row.
+   * Deduplicates by email across all leads for the same journey variant.
+   */
+  async bootstrapNewsletterBlast(
+    journeyVariant: typeof EmailJourneyVariantValue,
+    logger: EndpointLogger,
+    options: { dryRun?: boolean } = {},
+  ): Promise<{ scheduled: number; skipped: number; errors: number }> {
+    const result = { scheduled: 0, skipped: 0, errors: 0 };
+
+    try {
+      // Find all users with an email address
+      const allUsers = await db
+        .select({
+          id: users.id,
+          email: users.email,
+          locale: users.locale,
+        })
+        .from(users)
+        .where(isNotNull(users.email));
+
+      logger.info("newsletter.blast.bootstrap.start", {
+        journeyVariant,
+        totalUsers: allUsers.length,
+        dryRun: options.dryRun ?? false,
+      });
+
+      // Track scheduled emails to deduplicate across users who share leads
+      const scheduledEmails = new Set<string>();
+
+      for (const user of allUsers) {
+        if (!user.email) {
+          continue;
+        }
+
+        // Deduplicate by email
+        if (scheduledEmails.has(user.email)) {
+          result.skipped++;
+          continue;
+        }
+
+        try {
+          // Find an existing lead linked to this user
+          let [leadRow] = await db
+            .select({ id: leads.id, status: leads.status })
+            .from(leads)
+            .where(eq(leads.convertedUserId, user.id))
+            .limit(1);
+
+          // If no lead exists, create one for this user
+          if (!leadRow) {
+            const localeParts = (user.locale ?? "en-GLOBAL").split("-");
+            const lang = (localeParts[0] ?? "en") as "en" | "de" | "pl";
+            const ctry = (localeParts[1] ?? "GLOBAL") as
+              | "DE"
+              | "PL"
+              | "US"
+              | "GLOBAL";
+
+            const [newLead] = await db
+              .insert(leads)
+              .values({
+                email: user.email,
+                businessName: "",
+                convertedUserId: user.id,
+                language: lang,
+                country: ctry,
+                status: LeadStatus.SIGNED_UP,
+                source: LeadSource.WEBSITE,
+                signedUpAt: new Date(),
+                convertedAt: new Date(),
+              })
+              .onConflictDoNothing()
+              .returning({ id: leads.id, status: leads.status });
+
+            if (!newLead) {
+              // Email already exists as a lead — find it
+              const [existingByEmail] = await db
+                .select({ id: leads.id, status: leads.status })
+                .from(leads)
+                .where(eq(leads.email, user.email))
+                .limit(1);
+
+              if (!existingByEmail) {
+                logger.error("newsletter.blast.lead.create_failed", {
+                  userId: user.id,
+                  email: user.email,
+                });
+                result.errors++;
+                continue;
+              }
+              leadRow = existingByEmail;
+            } else {
+              leadRow = newLead;
+            }
+          }
+
+          // Skip bounced/unsubscribed/invalid leads
+          if (
+            leadRow.status === LeadStatus.BOUNCED ||
+            leadRow.status === LeadStatus.UNSUBSCRIBED ||
+            leadRow.status === LeadStatus.INVALID
+          ) {
+            result.skipped++;
+            continue;
+          }
+
+          // Dedup: check if a campaign already exists for this lead + variant
+          const [existing] = await db
+            .select({ id: emailCampaigns.id })
+            .from(emailCampaigns)
+            .where(
+              and(
+                eq(emailCampaigns.leadId, leadRow.id),
+                eq(emailCampaigns.journeyVariant, journeyVariant),
+              ),
+            )
+            .limit(1);
+
+          if (existing) {
+            result.skipped++;
+            scheduledEmails.add(user.email);
+            continue;
+          }
+
+          if (options.dryRun) {
+            logger.debug("newsletter.blast.dryrun.would-schedule", {
+              userId: user.id,
+              leadId: leadRow.id,
+              email: user.email,
+            });
+            result.scheduled++;
+            scheduledEmails.add(user.email);
+            continue;
+          }
+
+          // Schedule the campaign
+          const campaignId = await this.scheduleEmail(
+            {
+              leadId: leadRow.id,
+              campaignType: CampaignType.NEWSLETTER,
+              journeyVariant,
+              stage: EmailCampaignStage.INITIAL,
+              scheduledAt: new Date(),
+            },
+            logger,
+          );
+
+          if (campaignId) {
+            result.scheduled++;
+            scheduledEmails.add(user.email);
+          } else {
+            result.errors++;
+          }
+        } catch (error) {
+          logger.error("newsletter.blast.user.error", parseError(error), {
+            userId: user.id,
+          });
+          result.errors++;
+        }
+      }
+
+      logger.info("newsletter.blast.bootstrap.done", {
+        journeyVariant,
+        ...result,
+      });
+
+      return result;
+    } catch (error) {
+      logger.error("newsletter.blast.bootstrap.error", parseError(error));
+      return result;
+    }
   }
 
   /**

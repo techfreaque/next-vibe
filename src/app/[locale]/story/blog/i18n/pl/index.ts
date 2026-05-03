@@ -16,6 +16,13 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    whatsNewMay2026: {
+      title: "Cortex. Dreamer. Autopilot. Twoja AI w koncu pamieta.",
+      category: "Aktualizacja produktu",
+      excerpt:
+        "Trwala pamiec, nocna refleksja, automatyczne dzialanie. Do tego generowanie mediow i {{credits}} kredytow — pelny miesiac gratis — za szczere opinie.",
+      readTime: "6 min czytania",
+    },
     whatsNewApril2026: {
       title: "unbottled wróciło. I jest teraz naprawdę dobre.",
       category: "Aktualizacja produktu",

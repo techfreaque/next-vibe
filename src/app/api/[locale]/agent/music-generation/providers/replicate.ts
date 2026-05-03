@@ -97,9 +97,17 @@ export async function generateMusicWithReplicate(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   signal?: AbortSignal;
+  inputMediaUrl?: string;
 }): Promise<ResponseType<{ audioUrl: string }>> {
-  const { providerModel, prompt, durationSeconds, logger, locale, signal } =
-    params;
+  const {
+    providerModel,
+    prompt,
+    durationSeconds,
+    logger,
+    locale,
+    signal,
+    inputMediaUrl,
+  } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.REPLICATE_API_TOKEN) {
@@ -132,6 +140,7 @@ export async function generateMusicWithReplicate(params: {
             model_version: "stereo-large",
             output_format: "mp3",
             normalization_strategy: "peak",
+            ...(inputMediaUrl ? { input_audio: inputMediaUrl } : {}),
           },
         }),
       },

@@ -565,10 +565,17 @@ function EndpointsPageInternal<
     const operation = endpointState.update ?? endpointState.create;
     if (operation) {
       response = operation.response;
-      responseData =
-        operation.response?.success === true
-          ? operation.response.data
-          : undefined;
+      // When disabled (display-only) and no mutation has been fired,
+      // seed response from autoPrefillData so useWidgetValue() works.
+      // Mirrors how GET endpoints use initialData to seed the response.
+      if (!response && disabled) {
+        const prefillData = (endpointOptions?.update?.autoPrefillData ??
+          endpointOptions?.create?.autoPrefillData) as WidgetData | undefined;
+        if (prefillData) {
+          response = { success: true, data: prefillData } as typeof response;
+        }
+      }
+      responseData = response?.success === true ? response.data : undefined;
       isLoading = operation.isSubmitting;
     }
 

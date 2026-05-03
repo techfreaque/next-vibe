@@ -791,6 +791,7 @@ export class CreditRepository {
     let totalExpiring = 0;
     let totalPermanent = 0;
     let totalEarned = 0;
+    let packCapacity = 0;
     let earliestExpiry: Date | null = null;
 
     const now = new Date();
@@ -813,6 +814,7 @@ export class CreditRepository {
         );
 
       for (const pack of packs) {
+        packCapacity += pack.originalAmount;
         if (pack.type === CreditPackType.SUBSCRIPTION && pack.expiresAt) {
           totalExpiring += pack.remaining;
           if (!earliestExpiry || pack.expiresAt < earliestExpiry) {
@@ -877,6 +879,7 @@ export class CreditRepository {
       permanent: totalPermanent,
       earned: totalEarned,
       expiresAt: earliestExpiry ?? null,
+      capacity: packCapacity + FREE_CREDIT_POOL,
     };
   }
 
@@ -1382,6 +1385,7 @@ export class CreditRepository {
         permanent: result.permanent,
         earned: result.earned,
         expiresAt: result.expires_at ? new Date(result.expires_at) : null,
+        capacity: result.capacity,
       });
     } catch (error) {
       logger.error("Failed to get balance", parseError(error), {
@@ -1493,6 +1497,7 @@ export class CreditRepository {
         permanent: result.permanent,
         earned: result.earned,
         expiresAt: result.expires_at ? new Date(result.expires_at) : null,
+        capacity: result.capacity,
       });
     } catch (error) {
       logger.error("Failed to get user balance", parseError(error), {
@@ -4148,7 +4153,7 @@ export class CreditRepository {
       if (!result.success) {
         return undefined;
       }
-      const { total, expiring, permanent, earned, free, expiresAt } =
+      const { total, expiring, permanent, earned, free, expiresAt, capacity } =
         result.data;
       const emitCredits = createEndpointEmitter(
         creditsDefinitions.GET,
@@ -4162,6 +4167,7 @@ export class CreditRepository {
         earned,
         free,
         expiresAt,
+        capacity,
       });
       return undefined;
     });

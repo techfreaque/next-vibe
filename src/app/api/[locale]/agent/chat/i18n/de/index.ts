@@ -542,8 +542,10 @@ export const translations: typeof enTranslations = {
         "Grok 4 - xAIs Flaggschiff-Reasoning-Modell mit Vision- und Web-Suchfähigkeiten",
       grok4Fast:
         "Grok 4 Fast - xAIs Hochgeschwindigkeitsmodell mit 2M-Token-Kontext optimiert für schnelle Antworten",
+      grok43:
+        "Grok 4.3 - xAIs Reasoning-Modell mit 1M-Token-Kontext, hoher Faktengenauigkeit und permanentem Reasoning für agentische Workflows und Tiefenrecherche",
       grok420Beta:
-        "Grok 4.20 Beta - xAIs neuestes Flaggschiff-Modell mit branchenführender Geschwindigkeit, agentischem Tool-Calling, niedrigster Halluzinationsrate und 2M-Token-Kontext",
+        "Grok 4.20 (Legacy) - xAIs vorheriges Flaggschiff-Modell mit agentischem Tool-Calling, niedriger Halluzinationsrate und 2M-Token-Kontext",
       gpt5Pro:
         "GPT-5 Pro - OpenAIs Premium-Modell mit erstklassigem Reasoning und fortgeschrittenen Coding-Fähigkeiten",
       gpt5Codex:

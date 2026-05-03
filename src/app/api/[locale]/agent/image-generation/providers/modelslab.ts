@@ -34,8 +34,17 @@ export async function generateImageWithModelsLab(params: {
   locale: CountryLanguage;
   signal?: AbortSignal;
   aspectRatio?: string;
+  inputMediaUrl?: string;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, logger, locale, signal, aspectRatio } = params;
+  const {
+    providerModel,
+    prompt,
+    logger,
+    locale,
+    signal,
+    aspectRatio,
+    inputMediaUrl,
+  } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.MODELSLAB_API_KEY) {
@@ -51,23 +60,26 @@ export async function generateImageWithModelsLab(params: {
   });
 
   try {
-    const submitResponse = await fetch(
-      "https://modelslab.com/api/v6/images/text2img",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          key: agentEnv.MODELSLAB_API_KEY,
-          // eslint-disable-next-line i18next/no-literal-string
-          model_id: providerModel,
-          prompt,
-          num_inference_steps: 30,
-          samples: 1,
-          ...(aspectRatio ? { aspect_ratio: aspectRatio } : {}),
-        }),
-        signal,
-      },
-    );
+    // Use img2img endpoint when a reference image is provided
+    const endpoint = inputMediaUrl
+      ? "https://modelslab.com/api/v6/images/img2img"
+      : "https://modelslab.com/api/v6/images/text2img";
+
+    const submitResponse = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        key: agentEnv.MODELSLAB_API_KEY,
+        // eslint-disable-next-line i18next/no-literal-string
+        model_id: providerModel,
+        prompt,
+        num_inference_steps: 30,
+        samples: 1,
+        ...(aspectRatio ? { aspect_ratio: aspectRatio } : {}),
+        ...(inputMediaUrl ? { init_image: inputMediaUrl } : {}),
+      }),
+      signal,
+    });
 
     if (!submitResponse.ok) {
       const errorText = await submitResponse.text();

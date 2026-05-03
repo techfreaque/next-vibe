@@ -53,7 +53,7 @@ export const translations: typeof enTranslations = {
     frequency: {
       title: "Częstotliwość e-maili",
       description:
-        "Wysyłamy newslettery co tydzień. Możesz wypisać się w dowolnym momencie.",
+        "Wysyłamy newslettery raz w miesiącu. Możesz wypisać się w dowolnym momencie.",
     },
   },
   subscription: {

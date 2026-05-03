@@ -97,8 +97,10 @@ export async function generateWithReplicate(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   signal?: AbortSignal;
+  inputMediaUrl?: string;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, size, logger, locale, signal } = params;
+  const { providerModel, prompt, size, logger, locale, signal, inputMediaUrl } =
+    params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.REPLICATE_API_TOKEN) {
@@ -136,7 +138,13 @@ export async function generateWithReplicate(params: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          input: { prompt, width, height, num_outputs: 1 },
+          input: {
+            prompt,
+            width,
+            height,
+            num_outputs: 1,
+            ...(inputMediaUrl ? { image: inputMediaUrl } : {}),
+          },
         }),
       },
     );

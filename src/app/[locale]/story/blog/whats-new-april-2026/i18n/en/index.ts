@@ -153,9 +153,9 @@ export const translations = {
     title: "We want to hear from you",
     p1: "If you tried {{appName}} before and had a bad experience - tell us what went wrong. Not to argue. Just to fix it.",
     p2: "If you're using it now and something is missing or broken - same. What we build next is shaped directly by what users actually say.",
-    rewardTitle: "200 free credits for useful feedback",
+    rewardTitle: "{{credits}} credits for useful feedback — a full month free",
     rewardBody:
-      "Tell us what's broken, what's missing, what you wish existed. If your feedback helps us find a real issue or understand a real need, we'll add 200 credits to your account. No catch.",
+      "Tell us what's broken, what's missing, what you wish existed. If your feedback helps us find a real issue or understand a real need, we'll add {{credits}} credits to your account — that's an entire month of subscription. No catch.",
     payingNote:
       "Paying subscribers: your must-have missing features go to the top of the queue. Name them.",
     cta: "Send feedback",

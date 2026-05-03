@@ -13,7 +13,7 @@ import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
-import { Coins } from "next-vibe-ui/ui/icons/Coins";
+import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
 import { Frame } from "next-vibe-ui/ui/icons/Frame";
 import { Home } from "next-vibe-ui/ui/icons/Home";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
@@ -173,10 +173,10 @@ export function AdminLayoutClient({
       hidden: false,
     },
     {
-      name: t("navigation.referralPayouts"),
-      href: `/${locale}/admin/referral` as const,
-      icon: Coins,
-      current: pathname.startsWith(`/${locale}/admin/referral`),
+      name: t("navigation.subscriptions"),
+      href: `/${locale}/admin/subscriptions` as const,
+      icon: CreditCard,
+      current: pathname.startsWith(`/${locale}/admin/subscriptions`),
       hidden: false,
     },
     {

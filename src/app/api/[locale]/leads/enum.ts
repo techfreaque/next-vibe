@@ -75,6 +75,8 @@ export const {
   SIGNUP_NURTURE: "enums.emailJourneyVariant.signupNurture",
   RETENTION: "enums.emailJourneyVariant.retention",
   WINBACK: "enums.emailJourneyVariant.winback",
+  // One-off newsletter blasts
+  NEWSLETTER_MAY_2026: "enums.emailJourneyVariant.newsletterMay2026",
 });
 
 export const {
@@ -89,6 +91,7 @@ export const {
   SIGNUP_NURTURE: "enums.emailJourneyVariantFilter.signupNurture",
   RETENTION: "enums.emailJourneyVariantFilter.retention",
   WINBACK: "enums.emailJourneyVariantFilter.winback",
+  NEWSLETTER_MAY_2026: "enums.emailJourneyVariantFilter.newsletterMay2026",
 });
 
 /**
@@ -614,6 +617,7 @@ export const EmailJourneyVariantDB = [
   EmailJourneyVariant.SIGNUP_NURTURE,
   EmailJourneyVariant.RETENTION,
   EmailJourneyVariant.WINBACK,
+  EmailJourneyVariant.NEWSLETTER_MAY_2026,
 ] as const;
 
 export const EmailProviderDB = [

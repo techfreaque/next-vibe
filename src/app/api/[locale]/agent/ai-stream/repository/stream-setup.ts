@@ -1525,7 +1525,9 @@ export async function setupAiStream(params: {
           ownerUser: user,
           logger,
           directResumeLocale: locale,
-          abortSignal: streamContext.abortSignal,
+          // The parent stream's abortSignal is already fired (REMOTE_TOOL_WAIT killed it).
+          // Pass a fresh signal so handleTaskCompletion → resume-stream isn't born aborted.
+          abortSignal: new AbortController().signal,
         });
       }
 

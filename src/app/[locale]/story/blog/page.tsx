@@ -11,6 +11,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX, ReactNode } from "react";
 
+import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -100,6 +101,19 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
 
   // Posts ordered to mix technical and referral content
   const ALL_POSTS: BlogPost[] = [
+    {
+      slug: "whats-new-may-2026",
+      titleKey: "posts.whatsNewMay2026.title",
+      categoryKey: "posts.whatsNewMay2026.category",
+      excerptKey: "posts.whatsNewMay2026.excerpt",
+      readTimeKey: "posts.whatsNewMay2026.readTime",
+      emoji: "🧠",
+      accentColor: "text-indigo-600 dark:text-indigo-400",
+      accentBg: "bg-indigo-50 dark:bg-indigo-950/30",
+      accentBorder: "border-indigo-200 dark:border-indigo-800/50",
+      badgeColor:
+        "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-800/50",
+    },
     {
       slug: "whats-new-april-2026",
       titleKey: "posts.whatsNewApril2026.title",
@@ -308,7 +322,9 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
 
                     <CardContent className="px-8 pb-8">
                       <P className="text-muted-foreground text-base leading-relaxed mb-6">
-                        {t(featured.excerptKey as Parameters<typeof t>[0])}
+                        {t(featured.excerptKey as Parameters<typeof t>[0], {
+                          credits: FEEDBACK_REWARD_CREDITS,
+                        })}
                       </P>
                       <Span
                         className={`inline-flex items-center gap-2 text-sm font-medium ${featured.accentColor} group-hover:gap-3 transition-all`}
@@ -365,7 +381,9 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <P className="text-sm text-muted-foreground leading-relaxed">
-                    {t(post.excerptKey as Parameters<typeof t>[0])}
+                    {t(post.excerptKey as Parameters<typeof t>[0], {
+                      credits: FEEDBACK_REWARD_CREDITS,
+                    })}
                   </P>
                   <Div className="flex items-center justify-end pt-1">
                     <Span

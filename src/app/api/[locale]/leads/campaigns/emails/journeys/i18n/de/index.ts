@@ -77,6 +77,13 @@ export const translations: typeof enTranslations = {
           longDescription:
             "Reaktivierungskampagne für Nutzer, die inaktiv geworden sind oder abgebrochen haben",
         },
+        newsletterMay2026: {
+          name: "Newsletter Mai 2026",
+          description:
+            "Einmaliger Newsletter über Cortex, Dreamer, Autopilot und Mediengenerierung",
+          longDescription:
+            "Produkt-Update-Newsletter Mai 2026 für alle registrierten Nutzer mit ehrlichem Bug-Eingeständnis und Feature-Highlights",
+        },
       },
     },
   },

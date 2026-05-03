@@ -102,7 +102,7 @@ function NewsletterUnsubscribeEmail({
 
       <Section style={{ textAlign: "center", marginTop: "32px" }}>
         <Button
-          href={`${env.NEXT_PUBLIC_APP_URL}/${locale}/newsletter/subscribe`}
+          href={`${env.NEXT_PUBLIC_APP_URL}/${locale}/story/newsletter`}
           style={{
             backgroundColor: "#4f46e5",
             borderRadius: "6px",

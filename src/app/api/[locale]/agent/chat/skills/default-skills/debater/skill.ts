@@ -85,7 +85,7 @@ export const debaterSkill: Skill = {
       variantName: "skills.debater.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GROK_4_20,
+        manualModelId: ChatModelId.GROK_4_3,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

@@ -111,35 +111,7 @@ export function WaitForTaskWidget(): JSX.Element {
     return {};
   }, [originalArgs, resultData]);
 
-  if (!originalToolName) {
-    return (
-      <Div className="flex flex-col gap-0">
-        <P className="text-sm text-muted-foreground">
-          {t("waitForTask.post.widget.noToolName")}
-        </P>
-      </Div>
-    );
-  }
-
-  if (resolveError) {
-    return (
-      <Div className="flex flex-col gap-0">
-        <P className="text-sm text-destructive">{resolveError}</P>
-      </Div>
-    );
-  }
-
-  if (!resolvedEndpoint) {
-    return (
-      <Div className="flex flex-col gap-0">
-        <P className="text-sm text-muted-foreground">
-          {t("waitForTask.post.widget.resolving")}
-        </P>
-      </Div>
-    );
-  }
-
-  const resolvedMethod = resolvedEndpoint.method;
+  const resolvedMethod = resolvedEndpoint?.method ?? "POST";
   const displayOptions = useMemo(() => {
     if (resolvedMethod === "GET") {
       return { read: { initialData: mergedData as never } };
@@ -161,13 +133,29 @@ export function WaitForTaskWidget(): JSX.Element {
 
   return (
     <Div className={disabled ? "flex flex-col gap-0" : "flex flex-col gap-2"}>
-      <EndpointsPage
-        endpoint={{ [resolvedMethod]: resolvedEndpoint }}
-        locale={locale}
-        user={user}
-        disabled={true}
-        endpointOptions={displayOptions}
-      />
+      {!originalToolName && (
+        <P className="text-sm text-muted-foreground">
+          {t("waitForTask.post.widget.noToolName")}
+        </P>
+      )}
+      {resolveError && (
+        <P className="text-sm text-destructive">{resolveError}</P>
+      )}
+      {originalToolName && !resolvedEndpoint && !resolveError && (
+        <P className="text-sm text-muted-foreground">
+          {t("waitForTask.post.widget.resolving")}
+        </P>
+      )}
+      {resolvedEndpoint && (
+        <EndpointsPage
+          key={originalToolName}
+          endpoint={{ [resolvedMethod]: resolvedEndpoint }}
+          locale={locale}
+          user={user}
+          disabled={true}
+          endpointOptions={displayOptions}
+        />
+      )}
     </Div>
   );
 }

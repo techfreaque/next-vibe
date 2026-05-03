@@ -40,6 +40,12 @@ export const translations = {
       label: "Aspect Ratio",
       description: "Output image aspect ratio",
     },
+    inputMediaUrl: {
+      label: "Reference Image URL",
+      description:
+        "Source image for image-to-image generation. The model will use this as a starting point.",
+      placeholder: "https://example.com/image.jpg",
+    },
     download: "Download",
     dimensionSeparator: "×",
     backButton: {
@@ -53,7 +59,6 @@ export const translations = {
     response: {
       imageUrl: "Generated image URL",
       creditCost: "Credits used",
-      inputRef: "Input media reference",
       jobId: "Async job ID",
     },
     errors: {

@@ -81,11 +81,13 @@ export function ExecuteToolWidget(): JSX.Element {
   // Use all form values as-is - the inner endpoint's widget knows what to render.
   const allFormValues = form.watch();
 
-  // In disabled (tool call display) mode, always use allFormValues as the prefill data
-  // for the inner endpoint - it contains both request fields (from args) and response fields
-  // (from result, merged in by ToolCallRenderer). fieldValue.result is only set for wait/endLoop
-  // mode where execute-tool itself wraps the inner response in a {result} key.
-  const resultData = disabled ? allFormValues : fieldValue?.result;
+  // In disabled (tool call display) mode, the inner tool's response data lives in
+  // fieldValue.result (a response field from the widget context, seeded by ToolCallRenderer).
+  // allFormValues only contains request schema fields (toolName, input, callbackMode) —
+  // it does NOT include the result. Use fieldValue.result for the actual response data.
+  const resultData = disabled
+    ? (fieldValue?.result ?? allFormValues)
+    : fieldValue?.result;
 
   // Parse remote tool prefix: "hermes__ssh_exec_POST" → instanceId + toolName
   const remoteInfo = useMemo(() => {

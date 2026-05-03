@@ -30,6 +30,7 @@ export enum ImageVisionModelId {
   KIMI_K2_6 = "kimi-k2.6",
   GROK_4_FAST = "grok-4-fast",
   GROK_4 = "grok-4",
+  GROK_4_3 = "grok-4.3",
   GROK_4_20 = "grok-4.20",
   CLAUDE_HAIKU_4_5 = "claude-haiku-4.5",
   CLAUDE_SONNET_4_5 = "claude-sonnet-4.5",

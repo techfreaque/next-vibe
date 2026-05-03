@@ -39,6 +39,7 @@ export async function generateWithOpenAI(params: {
   quality: string;
   logger: EndpointLogger;
   locale: CountryLanguage;
+  inputMediaUrl?: string;
 }): Promise<ResponseType<{ imageUrl: string }>> {
   const { providerModel, prompt, size, quality, logger, locale } = params;
   const { t } = scopedTranslation.scopedT(locale);

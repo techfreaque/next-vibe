@@ -154,7 +154,7 @@ function NewsletterWelcomeEmail({
       >
         {t("emailTemplate.welcome.unsubscribe_text")}{" "}
         <Link
-          href={`${env.NEXT_PUBLIC_APP_URL}/${locale}/newsletter/unsubscribe/${encodeURIComponent(
+          href={`${env.NEXT_PUBLIC_APP_URL}/${locale}/story/newsletter/unsubscribe/${encodeURIComponent(
             props.email,
           )}`}
           style={{ color: "#4f46e5" }}

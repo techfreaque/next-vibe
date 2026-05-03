@@ -87,6 +87,13 @@ const { GET } = createEndpoint({
         content: "get.expiresAt.content",
         schema: dateSchema.nullable(),
       }),
+
+      // Total capacity (sum of original pack amounts + free pool)
+      capacity: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.capacity.content",
+        schema: z.coerce.number(),
+      }),
     },
   }),
 
@@ -148,6 +155,7 @@ const { GET } = createEndpoint({
         "earned",
         "free",
         "expiresAt",
+        "capacity",
       ] as const,
       operation: "merge" as const,
     },
@@ -163,6 +171,7 @@ const { GET } = createEndpoint({
         earned: 0,
         free: 0,
         expiresAt: "2025-11-16T00:00:00.000Z",
+        capacity: 1820,
       },
     },
   },

@@ -237,6 +237,7 @@ export const translations: typeof enTranslations = {
       signupNurture: "Anmeldungs-Nurturing",
       retention: "Kundenbindung",
       winback: "Rückgewinnung",
+      newsletterMay2026: "Newsletter Mai 2026",
     },
     emailJourneyVariantFilter: {
       all: "Alle",
@@ -246,6 +247,7 @@ export const translations: typeof enTranslations = {
       signupNurture: "Anmeldungs-Nurturing",
       retention: "Kundenbindung",
       winback: "Rückgewinnung",
+      newsletterMay2026: "Newsletter Mai 2026",
     },
     sortOrder: {
       asc: "Aufsteigend",

@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
         "© {{currentYear}} {{appName}}. Wszelkie prawa zastrzeżone.",
       feedbackHook: "Masz coś do powiedzenia? Odpowiedz - naprawdę to czytamy.",
       feedbackBody:
-        "Zgłoś błąd, poproś o funkcję albo napisz, czego brakuje. Za pomocne opinie darzymy 200 darmowych kredytów.",
+        "Zglos blad, popros o funkcje albo napisz, czego brakuje. Za przydatna opinie dostajesz {{credits}} kredytow — pelny miesiac za darmo.",
       feedbackLink: "Wyślij opinię →",
       footerSeparator: " · ",
     },

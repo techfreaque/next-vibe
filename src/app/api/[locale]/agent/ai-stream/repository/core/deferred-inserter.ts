@@ -57,9 +57,12 @@ export async function insertDeferredWakeUpMessage(
     isConfirmed: false,
   };
 
+  // Walk from the best-known position to find the actual current leaf.
+  // leafMessageId is a hint from the caller (may be the tool message itself or a later message).
+  // Always walk forward to find the newest descendant — handles stale hints correctly.
   const chainParentId = await walkToLeafMessage(
     threadId,
-    leafMessageId ?? null,
+    leafMessageId ?? toolMessageId,
     toolMessageId,
   );
 

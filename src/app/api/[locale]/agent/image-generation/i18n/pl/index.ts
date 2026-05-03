@@ -40,6 +40,12 @@ export const translations = {
       label: "Proporcje obrazu",
       description: "Proporcje wyjściowego obrazu",
     },
+    inputMediaUrl: {
+      label: "URL obrazu referencyjnego",
+      description:
+        "Obraz źródłowy do generowania obraz-na-obraz. Model użyje go jako punktu wyjścia.",
+      placeholder: "https://przyklad.pl/obraz.jpg",
+    },
     download: "Pobierz",
     dimensionSeparator: "×",
     backButton: {
@@ -53,7 +59,6 @@ export const translations = {
     response: {
       imageUrl: "URL wygenerowanego obrazu",
       creditCost: "Użyte kredyty",
-      inputRef: "Referencja do mediów wejściowych",
       jobId: "ID zadania asynchronicznego",
     },
     errors: {

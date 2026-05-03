@@ -55,6 +55,7 @@ import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constant
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
+  useWidgetDisabled,
   useWidgetEndpointMutations,
   useWidgetForm,
   useWidgetLocale,
@@ -132,6 +133,7 @@ export function HelpToolsWidget(): JSX.Element {
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const endpointMutations = useWidgetEndpointMutations();
+  const disabled = useWidgetDisabled();
 
   // Tool configuration now lives on favorites/skills, not global settings.
   // Help widget shows all tools as available (null = all allowed).
@@ -636,15 +638,17 @@ export function HelpToolsWidget(): JSX.Element {
           </Div>
         )}
 
-        <Button
-          variant="default"
-          size="sm"
-          onClick={(): void => {
-            void handleOpenTool(tool.id ?? tool.name);
-          }}
-        >
-          {t("get.fields.openTool.label")}
-        </Button>
+        {!disabled && (
+          <Button
+            variant="default"
+            size="sm"
+            onClick={(): void => {
+              void handleOpenTool(tool.id ?? tool.name);
+            }}
+          >
+            {t("get.fields.openTool.label")}
+          </Button>
+        )}
       </Div>
     );
   }
@@ -863,66 +867,68 @@ export function HelpToolsWidget(): JSX.Element {
             />
           </Div>
 
-          <Div className="flex gap-2">
-            {visibleTools.length > 0 && (
-              <>
-                <Button
-                  onClick={
-                    expandedCategories.size === 0
-                      ? () =>
-                          setExpandedCategories(
-                            new Set(Object.keys(toolsByCategory)),
-                          )
-                      : () => setExpandedCategories(new Set())
-                  }
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 min-w-0"
-                >
-                  <Span className="truncate">
-                    {expandedCategories.size === 0
-                      ? t("aiTools.modal.expandAll")
-                      : t("aiTools.modal.collapseAll")}
-                  </Span>
-                </Button>
+          {!disabled && (
+            <Div className="flex gap-2">
+              {visibleTools.length > 0 && (
+                <>
+                  <Button
+                    onClick={
+                      expandedCategories.size === 0
+                        ? () =>
+                            setExpandedCategories(
+                              new Set(Object.keys(toolsByCategory)),
+                            )
+                        : () => setExpandedCategories(new Set())
+                    }
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 min-w-0"
+                  >
+                    <Span className="truncate">
+                      {expandedCategories.size === 0
+                        ? t("aiTools.modal.expandAll")
+                        : t("aiTools.modal.collapseAll")}
+                    </Span>
+                  </Button>
 
-                <Button
-                  onClick={handleEnableAll}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 min-w-0"
-                >
-                  {allVisibleEnabled ? (
-                    <>
-                      <X className="h-4 w-4 mr-1 shrink-0" />
-                      <Span className="truncate">
-                        {t("aiTools.modal.deselectAll")}
-                      </Span>
-                    </>
-                  ) : (
-                    <>
-                      <Check className="h-4 w-4 mr-1 shrink-0" />
-                      <Span className="truncate">
-                        {t("aiTools.modal.selectAll")}
-                      </Span>
-                    </>
-                  )}
-                </Button>
-              </>
-            )}
+                  <Button
+                    onClick={handleEnableAll}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 min-w-0"
+                  >
+                    {allVisibleEnabled ? (
+                      <>
+                        <X className="h-4 w-4 mr-1 shrink-0" />
+                        <Span className="truncate">
+                          {t("aiTools.modal.deselectAll")}
+                        </Span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-4 w-4 mr-1 shrink-0" />
+                        <Span className="truncate">
+                          {t("aiTools.modal.selectAll")}
+                        </Span>
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
 
-            <Button
-              onClick={handleResetToDefault}
-              variant="outline"
-              size="sm"
-              className="flex-1 min-w-0"
-            >
-              <RotateCcw className="h-3.5 w-3.5 mr-1 shrink-0" />
-              <Span className="truncate">
-                {t("aiTools.modal.resetToDefault")}
-              </Span>
-            </Button>
-          </Div>
+              <Button
+                onClick={handleResetToDefault}
+                variant="outline"
+                size="sm"
+                className="flex-1 min-w-0"
+              >
+                <RotateCcw className="h-3.5 w-3.5 mr-1 shrink-0" />
+                <Span className="truncate">
+                  {t("aiTools.modal.resetToDefault")}
+                </Span>
+              </Button>
+            </Div>
+          )}
         </Div>
 
         {/* Tools List */}
@@ -992,16 +998,18 @@ export function HelpToolsWidget(): JSX.Element {
                         >
                           {enabledCount}/{tools.length}
                         </Badge>
-                        <Div
-                          onClick={(e) => e.stopPropagation()}
-                          className="shrink-0"
-                        >
-                          <Switch
-                            checked={allCategoryEnabled}
-                            onCheckedChange={() => toggleCategoryTools(tools)}
-                            className="h-4 w-7"
-                          />
-                        </Div>
+                        {!disabled && (
+                          <Div
+                            onClick={(e) => e.stopPropagation()}
+                            className="shrink-0"
+                          >
+                            <Switch
+                              checked={allCategoryEnabled}
+                              onCheckedChange={() => toggleCategoryTools(tools)}
+                              className="h-4 w-7"
+                            />
+                          </Div>
+                        )}
                       </Div>
 
                       {/* Tools in category */}
@@ -1030,6 +1038,7 @@ export function HelpToolsWidget(): JSX.Element {
                                       }
                                       onOpenTool={handleOpenTool}
                                       t={t}
+                                      disabled={disabled}
                                     />
                                   ))}
                                 </Div>
@@ -1049,6 +1058,7 @@ export function HelpToolsWidget(): JSX.Element {
                                   }
                                   onOpenTool={handleOpenTool}
                                   t={t}
+                                  disabled={disabled}
                                 />
                               ))}
                             </Div>
@@ -1130,6 +1140,7 @@ function ToolRow({
   onToggleConfirmation,
   onOpenTool,
   t,
+  disabled,
 }: {
   tool: HelpToolMetadataSerialized;
   effectiveEnabledTools: EnabledTool[];
@@ -1138,6 +1149,7 @@ function ToolRow({
   onToggleConfirmation: (toolName: string) => void;
   onOpenTool: (toolName: string) => Promise<void>;
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+  disabled?: boolean;
 }): JSX.Element {
   const enabledTool = effectiveEnabledTools.find(
     (et) => et.id === (tool.id ?? tool.name),
@@ -1155,11 +1167,13 @@ function ToolRow({
       )}
     >
       <Div className="flex items-center gap-3">
-        <Switch
-          checked={isEnabled}
-          onCheckedChange={() => onToggleEnabled(tool.id ?? tool.name)}
-          className="h-4 w-7 shrink-0"
-        />
+        {!disabled && (
+          <Switch
+            checked={isEnabled}
+            onCheckedChange={() => onToggleEnabled(tool.id ?? tool.name)}
+            className="h-4 w-7 shrink-0"
+          />
+        )}
         <Div className="flex-1 min-w-0">
           <Div className="flex items-center gap-2">
             <P className="text-sm font-medium truncate">{getToolLabel(tool)}</P>
@@ -1201,7 +1215,7 @@ function ToolRow({
             )}
           </Div>
         </Div>
-        {isEnabled && (
+        {!disabled && isEnabled && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1236,7 +1250,7 @@ function ToolRow({
             </Tooltip>
           </TooltipProvider>
         )}
-        {isEnabled && (
+        {!disabled && isEnabled && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1267,26 +1281,28 @@ function ToolRow({
             </Tooltip>
           </TooltipProvider>
         )}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 shrink-0 text-muted-foreground/40 hover:text-primary hover:bg-primary/10"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  void onOpenTool(tool.id ?? tool.name);
-                }}
-              >
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left">
-              <P className="text-xs">{t("get.fields.openTool.label")}</P>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {!disabled && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 shrink-0 text-muted-foreground/40 hover:text-primary hover:bg-primary/10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void onOpenTool(tool.id ?? tool.name);
+                  }}
+                >
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <P className="text-xs">{t("get.fields.openTool.label")}</P>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </Div>
     </Div>
   );

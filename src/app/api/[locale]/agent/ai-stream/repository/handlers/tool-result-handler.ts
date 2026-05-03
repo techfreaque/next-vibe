@@ -342,6 +342,10 @@ export class ToolResultHandler {
     // handleTaskCompletion call (WS event, optional wakeUp revival). Do NOT
     // call handleTaskCompletion here - it would race with the goroutine and
     // overwrite the initial { taskId, status, hint } result with null.
+    //
+    // For wakeUp tools (local or remote): revival is handled by ONE code path:
+    // goroutine finishes → handleTaskCompletion → resume-stream → deferred + revival.
+    // Do NOT publish wakeUp signals here - that would create duplicate revivals.
 
     return {
       currentParentId: toolMessageId,

@@ -27,7 +27,7 @@
 
 import "server-only";
 
-import { and, eq, gt, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -86,6 +86,16 @@ export class ResumeStreamRepository {
       leafMessageId,
     } = data;
 
+    // Revival streams are independent of the caller's stream. The caller's abortSignal
+    // is typically already aborted (REMOTE_TOOL_WAIT killed the original stream before
+    // the goroutine finished and called handleTaskCompletion). Propagating that aborted
+    // signal to the headless revival via AbortControllerSetup.setupAbortController would
+    // immediately kill the revival (parentSignal.aborted → abort child). Instead, create
+    // a fresh signal. User cancellation is detected via streamingState='aborting' in DB.
+    void abortSignal; // kept in signature for callers; intentionally not propagated
+    const revivalAbortController = new AbortController();
+    const revivalAbortSignal = revivalAbortController.signal;
+
     try {
       // Read thread state - streamingState tells us if the live loop is still running.
       // If state is 'streaming', wait for it to settle (the stream is ending soon —
@@ -94,7 +104,7 @@ export class ResumeStreamRepository {
       let thread:
         | { streamingState: string | null; rootFolderId: string | null }
         | undefined;
-      const maxWaitMs = 10_000;
+      const maxWaitMs = 3_000;
       const pollIntervalMs = 500;
       const waitStart = Date.now();
       while (true) {
@@ -451,7 +461,7 @@ export class ResumeStreamRepository {
                 locale,
                 logger,
                 t,
-                abortSignal,
+                abortSignal: revivalAbortSignal,
               })
                 .then(async (result) => {
                   createMessagesEmitter(
@@ -471,12 +481,7 @@ export class ResumeStreamRepository {
                   if (wakeUpTaskId) {
                     await db
                       .delete(cronTasks)
-                      .where(
-                        and(
-                          eq(cronTasks.id, wakeUpTaskId),
-                          gt(cronTasks.executionCount, 0),
-                        ),
-                      )
+                      .where(eq(cronTasks.id, wakeUpTaskId))
                       .catch((cleanupErr: Error) => {
                         logger.warn(
                           "[ResumeStream] Cleanup failed (non-fatal)",
@@ -556,12 +561,7 @@ export class ResumeStreamRepository {
                 // deleting it here causes a FK violation when pulse tries to insert cron_task_executions.
                 if (wakeUpTaskId) {
                   db.delete(cronTasks)
-                    .where(
-                      and(
-                        eq(cronTasks.id, wakeUpTaskId),
-                        gt(cronTasks.executionCount, 0),
-                      ),
-                    )
+                    .where(eq(cronTasks.id, wakeUpTaskId))
                     .catch((cleanupErr: Error) => {
                       logger.warn(
                         "[ResumeStream] Live wakeUp cleanup failed (non-fatal)",
@@ -596,11 +596,12 @@ export class ResumeStreamRepository {
               );
 
               // Poll until isStreaming=false (sibling finished) or timeout.
+              // Short timeout: revival should be fast. If sibling takes >5s, something is wrong.
               const backoffStart = Date.now();
-              const backoffTimeoutMs = 30_000;
+              const backoffTimeoutMs = 5_000;
               while (Date.now() - backoffStart < backoffTimeoutMs) {
                 await new Promise<void>((resolve) => {
-                  setTimeout(resolve, 2_000);
+                  setTimeout(resolve, 500);
                 });
                 const [currentThread] = await db
                   .select({ streamingState: chatThreads.streamingState })
@@ -636,7 +637,7 @@ export class ResumeStreamRepository {
             // We have the revival claim. Walk to the current leaf.
             const leafId = await walkToLeafMessage(
               effectiveThreadId,
-              leafMessageId ?? null,
+              leafMessageId ?? resolvedToolMessageId,
               resolvedToolMessageId,
             );
 
@@ -737,7 +738,7 @@ export class ResumeStreamRepository {
               locale,
               logger,
               t,
-              abortSignal,
+              abortSignal: revivalAbortSignal,
             })
               .then(async (result) => {
                 createMessagesEmitter(
@@ -761,12 +762,7 @@ export class ResumeStreamRepository {
                   try {
                     await db
                       .delete(cronTasks)
-                      .where(
-                        and(
-                          eq(cronTasks.id, wakeUpTaskId),
-                          gt(cronTasks.executionCount, 0),
-                        ),
-                      );
+                      .where(eq(cronTasks.id, wakeUpTaskId));
                     logger.debug("[ResumeStream] Cleaned up wakeUp cron task", {
                       wakeUpTaskId,
                     });
@@ -842,14 +838,7 @@ export class ResumeStreamRepository {
               }
               if (wakeUpTaskId) {
                 cleanupOps.push(
-                  db
-                    .delete(cronTasks)
-                    .where(
-                      and(
-                        eq(cronTasks.id, wakeUpTaskId),
-                        gt(cronTasks.executionCount, 0),
-                      ),
-                    ),
+                  db.delete(cronTasks).where(eq(cronTasks.id, wakeUpTaskId)),
                 );
               }
               if (cleanupOps.length > 0) {
@@ -966,7 +955,7 @@ export class ResumeStreamRepository {
                 locale,
                 logger,
                 t,
-                abortSignal,
+                abortSignal: revivalAbortSignal,
                 headlessInstructions:
                   "The async remote task has completed. All tool results from the previous step are now available in the context above. Your ONLY task is to acknowledge the completion to the user. Do NOT call any tools. Do NOT re-execute any previous tool calls. Simply confirm the result in one or two sentences and stop.",
               });
@@ -1049,14 +1038,7 @@ export class ResumeStreamRepository {
                 }
                 if (wakeUpTaskId) {
                   cleanupOps.push(
-                    db
-                      .delete(cronTasks)
-                      .where(
-                        and(
-                          eq(cronTasks.id, wakeUpTaskId),
-                          gt(cronTasks.executionCount, 0),
-                        ),
-                      ),
+                    db.delete(cronTasks).where(eq(cronTasks.id, wakeUpTaskId)),
                   );
                 }
                 if (cleanupOps.length > 0) {

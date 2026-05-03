@@ -16,6 +16,13 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    whatsNewMay2026: {
+      title: "Cortex. Dreamer. Autopilot. Deine KI erinnert sich jetzt.",
+      category: "Produkt-Update",
+      excerpt:
+        "Persistenter Speicher, naechtliche Reflexion, automatische Ausfuehrung. Dazu Mediengenerierung und {{credits}} Credits — ein ganzer Monat gratis — fuer ehrliches Feedback.",
+      readTime: "6 Min. Lesezeit",
+    },
     whatsNewApril2026: {
       title: "unbottled ist zurück. Und es ist jetzt wirklich gut.",
       category: "Produkt-Update",

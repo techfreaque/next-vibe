@@ -8,17 +8,17 @@
     "alt-svc": "h3=\":443\"; ma=86400",
     "cache-control": "no-cache, private",
     "cf-cache-status": "DYNAMIC",
-    "cf-ray": "9f25da15daecd23b-FRA",
+    "cf-ray": "9f61d5314880e98c-FRA",
     "connection": "keep-alive",
     "content-encoding": "br",
     "content-type": "application/json",
-    "date": "Sun, 26 Apr 2026 13:14:42 GMT",
+    "date": "Sun, 03 May 2026 19:57:07 GMT",
     "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
-    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=gYt%2Bd6RHYp3cKa4natPoAQd1P6I6lZ%2F4rkK9IWDdmlUL8vxMbXtev2lXvWkdVBMPuOy8mIZXEuNJsqd95F83TwPx5F68ZRuajF1dmKL7T3N6QXsfU79B%2BinL9X1e9Ks%3D\"}]}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=pwHbybVhqZzpne%2BlaP%2Fxa6mhr1H%2BGiA%2FiepxNlGVwgpFJA5BrW9ZM71yHaQIPmsdqVcIbN%2BNMEVheQ%2F3EyYgyB32Xfju0nM3lWrkLGfcsiJaVlT1YLnrxUU7h0RhqbM%3D\"}]}",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
-    "x-cloud-trace-context": "cfc1089753105ec912bb12a967faed0e",
-    "x-request-time": "1.764",
+    "x-cloud-trace-context": "553f7c1f845ba86a0e41f0970e703383",
+    "x-request-time": "1.469",
     "x-served-by": "octane-api",
     "x-upstream-connect": "0.000",
     "x-upstream-time": "-"
@@ -28,15 +28,15 @@
     "tip": "Your audio is processing in background, you can get this image using fetch API",
     "eta": 5,
     "message": "Try to fetch request after seconds estimated",
-    "fetch_result": "https://modelslab.com/api/v7/voice/fetch/3973161",
-    "id": 3973161,
+    "fetch_result": "https://modelslab.com/api/v7/voice/fetch/4011115",
+    "id": 4011115,
     "output": [],
     "meta": {
       "prompt": "upbeat piano melody",
       "model_id": "sonauto_song"
     },
     "future_links": [
-      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/89c707f8-95e2-45bc-9078-d19b3b912b92.mp3"
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/88810796-8bc8-4ff0-a85f-2c3e40fe669b.mp3"
     ]
   }
 }

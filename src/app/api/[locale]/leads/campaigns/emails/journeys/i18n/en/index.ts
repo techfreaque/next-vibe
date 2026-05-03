@@ -72,6 +72,13 @@ export const translations = {
           longDescription:
             "Re-activation campaign targeting users who have gone quiet or cancelled",
         },
+        newsletterMay2026: {
+          name: "Newsletter May 2026",
+          description:
+            "One-off newsletter about Cortex, Dreamer, Autopilot, and media generation",
+          longDescription:
+            "May 2026 product update newsletter sent to all signed-up users with honest bug admission and feature highlights",
+        },
       },
     },
   },

@@ -35,6 +35,7 @@ export const getPoolBalance = defineDbFunction({
     permanent: "numeric",
     earned: "numeric",
     expires_at: "text",
+    capacity: "numeric",
   } as const,
 
   queries: (p) => ({
@@ -203,6 +204,7 @@ export const getPoolBalance = defineDbFunction({
       .select({
         type: creditPacks.type,
         remaining: creditPacks.remaining,
+        originalAmount: creditPacks.originalAmount,
         expiresAt: creditPacks.expiresAt,
       })
       .from(creditPacks)
@@ -232,6 +234,7 @@ export const getPoolBalance = defineDbFunction({
       .select({
         type: creditPacks.type,
         remaining: creditPacks.remaining,
+        originalAmount: creditPacks.originalAmount,
         expiresAt: creditPacks.expiresAt,
       })
       .from(creditPacks)
@@ -328,6 +331,7 @@ export const getPoolBalance = defineDbFunction({
         permanent: 0,
         earned: 0,
         expires_at: null,
+        capacity: MAX_FREE_PER_POOL,
       };
     }
 
@@ -347,10 +351,13 @@ export const getPoolBalance = defineDbFunction({
     let totalExpiring = 0;
     let totalPermanent = 0;
     let totalEarned = 0;
+    let packCapacity = 0;
     let earliestExpiry: Date | null = null;
 
     for (const pack of packs) {
       const rem = Number(pack.remaining) || 0;
+      const orig = Number(pack.originalAmount) || 0;
+      packCapacity += orig;
       if (
         pack.type === "enums.packType.subscription" &&
         pack.expiresAt !== null
@@ -411,6 +418,7 @@ export const getPoolBalance = defineDbFunction({
       permanent: totalPermanent,
       earned: totalEarned,
       expires_at: earliestExpiry ? earliestExpiry.toISOString() : null,
+      capacity: packCapacity + MAX_FREE_PER_POOL,
     };
   },
 });

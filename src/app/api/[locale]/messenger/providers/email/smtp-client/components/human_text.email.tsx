@@ -21,6 +21,13 @@ const TEXT_STYLES = {
     margin: "0 0 20px 0",
     fontWeight: "normal",
   },
+  heading: {
+    fontSize: "18px",
+    color: "#111827",
+    margin: "28px 0 8px 0",
+    fontWeight: "bold" as const,
+    lineHeight: "1.3",
+  },
   body: {
     fontSize: "16px",
     color: "#374151",

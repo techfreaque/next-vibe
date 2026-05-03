@@ -29,8 +29,9 @@ export async function generateWithOpenRouter(params: {
   prompt: string;
   logger: EndpointLogger;
   locale: CountryLanguage;
+  inputMediaUrl?: string;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, logger, locale } = params;
+  const { providerModel, prompt, logger, locale, inputMediaUrl } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.OPENROUTER_API_KEY) {
@@ -61,7 +62,17 @@ export async function generateWithOpenRouter(params: {
         },
         body: JSON.stringify({
           model: providerModel,
-          messages: [{ role: "user", content: prompt }],
+          messages: [
+            {
+              role: "user",
+              content: inputMediaUrl
+                ? [
+                    { type: "image_url", image_url: { url: inputMediaUrl } },
+                    { type: "text", text: prompt },
+                  ]
+                : prompt,
+            },
+          ],
         }),
       },
     );

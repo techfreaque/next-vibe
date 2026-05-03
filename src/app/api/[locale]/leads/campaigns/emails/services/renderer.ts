@@ -25,6 +25,7 @@ import { retentionJourneyTemplates } from "../journeys/retention.email";
 import { sideHustleJourneyTemplates } from "../journeys/side-hustle.email";
 import { signupNurtureJourneyTemplates } from "../journeys/signup-nurture.email";
 import { uncensoredConvertJourneyTemplates } from "../journeys/uncensored-convert.email";
+import { newsletterMay2026JourneyTemplates } from "../journeys/newsletter-may-2026.email";
 import { winbackJourneyTemplates } from "../journeys/winback.email";
 import type {
   EmailTemplateData,
@@ -159,6 +160,8 @@ const JOURNEY_TEMPLATES: Partial<
   [EmailJourneyVariant.SIGNUP_NURTURE]: signupNurtureJourneyTemplates,
   [EmailJourneyVariant.RETENTION]: retentionJourneyTemplates,
   [EmailJourneyVariant.WINBACK]: winbackJourneyTemplates,
+  // One-off newsletter blasts
+  [EmailJourneyVariant.NEWSLETTER_MAY_2026]: newsletterMay2026JourneyTemplates,
 };
 
 /**
@@ -407,6 +410,12 @@ export class EmailRendererService {
         name: t("emailJourneys.components.journeyInfo.winback.name"),
         description: t(
           "emailJourneys.components.journeyInfo.winback.description",
+        ),
+      },
+      [EmailJourneyVariant.NEWSLETTER_MAY_2026]: {
+        name: t("emailJourneys.components.journeyInfo.newsletterMay2026.name"),
+        description: t(
+          "emailJourneys.components.journeyInfo.newsletterMay2026.description",
         ),
       },
     };

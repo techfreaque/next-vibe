@@ -1352,7 +1352,7 @@ export class MessageDbWriter {
    * Write a synthetic TOOL message row for a natively-generated file part.
    * The LLM emitted a file directly (e.g. Gemini Flash Image); this creates
    * a sibling TOOL message so subsequent turns see the file URL in tool-result context.
-   * No SSE is emitted - the message is invisible to the user but visible to the LLM.
+   * Emits a TOOL_RESULT WS event so the frontend renders the generated media.
    */
   async emitSyntheticToolMessage(params: {
     messageId: string;
@@ -1391,6 +1391,12 @@ export class MessageDbWriter {
         model,
         skill,
         metadata: { toolCall },
+      });
+
+      // Emit WS event so the frontend renders the synthetic tool result
+      // (e.g. natively-generated image from Gemini appears in chat UI)
+      this.wsEmit("tool-result", {
+        messages: [{ id: messageId, metadata: { toolCall } }],
       });
     } catch (err) {
       this.logger.warn(

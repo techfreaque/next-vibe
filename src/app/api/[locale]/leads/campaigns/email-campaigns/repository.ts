@@ -18,7 +18,6 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { messengerAccounts } from "@/app/api/[locale]/messenger/accounts/db";
-import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
 import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/sending/repository";
 import { db } from "@/app/api/[locale]/system/db";
@@ -411,6 +410,15 @@ export class EmailCampaignsRepository {
 
       for (const campaign of pendingEmails) {
         try {
+          logger.info("campaign.process.start", {
+            campaignId: campaign.id,
+            leadId: campaign.leadId,
+            email: campaign.lead.email,
+            journeyVariant: campaign.journeyVariant,
+            stage: campaign.stage,
+            dryRun: options.dryRun,
+          });
+
           if (options.dryRun) {
             logger.debug("Dry run - would send email", {
               campaignId: campaign.id,
@@ -430,6 +438,10 @@ export class EmailCampaignsRepository {
             .limit(1);
 
           if (!fullLead) {
+            logger.error("campaign.process.lead_not_found", {
+              campaignId: campaign.id,
+              leadId: campaign.leadId,
+            });
             result.emailsFailed++;
             result.errors.push({
               leadId: campaign.leadId,
@@ -447,7 +459,9 @@ export class EmailCampaignsRepository {
           const { t: configLocalT } =
             configScopedTranslation.scopedT(leadLocale);
 
-          if (!fullLead.email) {
+          // Use resolved email from getPendingEmails (joins users table for converted leads)
+          const resolvedEmail = fullLead.email ?? campaign.lead.email;
+          if (!resolvedEmail) {
             result.emailsFailed++;
             result.errors.push({
               leadId: campaign.leadId,
@@ -460,7 +474,7 @@ export class EmailCampaignsRepository {
 
           const leadWithEmail: LeadWithEmailType = {
             ...fullLead,
-            email: fullLead.email,
+            email: resolvedEmail,
             linkedLeadsCount: 0,
             hasLinkedUser: false,
           };
@@ -504,7 +518,7 @@ export class EmailCampaignsRepository {
               companyName: variantCompanyName,
               companyEmail: variantCompanyEmail,
               campaignId: campaign.id,
-              unsubscribeUrl: `${emailBaseUrl}/${leadLocale}/story/newsletter/unsubscribe/${encodeURIComponent(fullLead.email ?? "")}?id=${encodeURIComponent(campaign.leadId)}`,
+              unsubscribeUrl: `${emailBaseUrl}/${leadLocale}/story/newsletter/unsubscribe/${encodeURIComponent(resolvedEmail)}?id=${encodeURIComponent(campaign.leadId)}`,
               trackingUrl: emailBaseUrl,
               baseUrl: emailBaseUrl,
             },
@@ -527,7 +541,7 @@ export class EmailCampaignsRepository {
           const smtpT = smtpScopedTranslation.scopedT(leadLocale).t;
           const sendResult = await SmtpSendingRepository.sendEmail(
             {
-              to: campaign.lead.email,
+              to: resolvedEmail,
               toName: campaign.lead.businessName || undefined,
               subject: rendered.subject,
               html,
@@ -535,7 +549,7 @@ export class EmailCampaignsRepository {
               senderName: variantSenderName,
               replyTo: contactClientRepository.getSupportEmail(leadLocale),
               selectionCriteria: {
-                campaignType: CampaignType.LEAD_CAMPAIGN,
+                campaignType: campaign.campaignType,
                 emailJourneyVariant: campaign.journeyVariant,
                 emailCampaignStage: campaign.stage,
                 country: fullLead.country,

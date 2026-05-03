@@ -540,8 +540,10 @@ export const translations: typeof enTranslations = {
         "Grok 4 - Flagowy model rozumowania xAI z możliwościami wizji i wyszukiwania w sieci",
       grok4Fast:
         "Grok 4 Fast - Szybki model xAI z kontekstem 2M tokenów zoptymalizowany dla szybkich odpowiedzi",
+      grok43:
+        "Grok 4.3 - Model rozumowania xAI z kontekstem 1M tokenów, wysoką dokładnością faktograficzną i stałym trybem rozumowania dla agentycznych przepływów pracy i głębokich badań",
       grok420Beta:
-        "Grok 4.20 Beta - Najnowszy flagowy model xAI z wiodącą szybkością, agentycznym wywoływaniem narzędzi, najniższym wskaźnikiem halucynacji i kontekstem 2M tokenów",
+        "Grok 4.20 (Legacy) - Poprzedni flagowy model xAI z agentycznym wywoływaniem narzędzi, niskim wskaźnikiem halucynacji i kontekstem 2M tokenów",
       gpt5Pro:
         "GPT-5 Pro - Premium model OpenAI z najwyższym poziomem rozumowania i zaawansowanymi możliwościami kodowania",
       gpt5Codex:

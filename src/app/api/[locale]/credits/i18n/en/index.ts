@@ -185,6 +185,9 @@ export const translations = {
     expiresAt: {
       content: "Expires At",
     },
+    capacity: {
+      content: "Total Capacity",
+    },
     success: {
       title: "Balance Retrieved",
       description: "Credit balance retrieved successfully",

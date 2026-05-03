@@ -191,6 +191,9 @@ export const translations: typeof enTranslations = {
     expiresAt: {
       content: "Wygasa",
     },
+    capacity: {
+      content: "Całkowita pojemność",
+    },
     success: {
       title: "Saldo pobrane",
       description: "Saldo kredytów pobrane pomyślnie",

@@ -14,6 +14,13 @@ export const translations = {
     },
   },
   posts: {
+    whatsNewMay2026: {
+      title: "Cortex. Dreamer. Autopilot. Your AI remembers now.",
+      category: "Product Update",
+      excerpt:
+        "Persistent memory, nightly reflection, background execution. Plus media generation and {{credits}} credits — a full month free — for telling us what's broken.",
+      readTime: "6 min read",
+    },
     whatsNewApril2026: {
       title: "123 models. Any modality. One companion.",
       category: "Product Update",

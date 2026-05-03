@@ -127,6 +127,15 @@ const { POST } = createEndpoint({
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.string().optional(),
       }),
+      inputMediaUrl: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.inputMediaUrl.label",
+        description: "post.inputMediaUrl.description",
+        columns: 12,
+        placeholder: "post.inputMediaUrl.placeholder",
+        schema: z.string().url().optional(),
+      }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,
         icon: "arrow-left",
@@ -153,12 +162,6 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "post.response.creditCost",
         schema: z.number(),
-      }),
-      /** Reference to input media used for media-to-media generation (e.g. image-to-image) */
-      inputRef: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "post.response.inputRef",
-        schema: z.string().optional(),
       }),
       /** Async job ID for polling (video generation only) */
       jobId: responseField(scopedTranslation, {

@@ -51,7 +51,7 @@ export const translations = {
     frequency: {
       title: "Email Frequency",
       description:
-        "We send newsletters weekly. You can unsubscribe at any time.",
+        "We send newsletters monthly. You can unsubscribe at any time.",
     },
   },
   subscription: {

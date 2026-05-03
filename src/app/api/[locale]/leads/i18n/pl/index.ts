@@ -237,6 +237,7 @@ export const translations: typeof enTranslations = {
       signupNurture: "Pielęgnacja po rejestracji",
       retention: "Utrzymanie klienta",
       winback: "Odzyskanie klienta",
+      newsletterMay2026: "Newsletter maj 2026",
     },
     emailJourneyVariantFilter: {
       all: "Wszystkie",
@@ -246,6 +247,7 @@ export const translations: typeof enTranslations = {
       signupNurture: "Pielęgnacja po rejestracji",
       retention: "Utrzymanie klienta",
       winback: "Odzyskanie klienta",
+      newsletterMay2026: "Newsletter maj 2026",
     },
     sortOrder: {
       asc: "Rosnąco",

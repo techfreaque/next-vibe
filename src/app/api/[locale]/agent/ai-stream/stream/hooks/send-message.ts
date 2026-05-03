@@ -341,7 +341,10 @@ export async function sendMessage(
         },
         {
           urlPathParams: { rootFolderId: currentRootFolderId },
-          requestData: { subFolderId: currentSubFolderId },
+          requestData: {
+            subFolderId: currentSubFolderId,
+            threadIds: null,
+          },
         },
       );
     }
@@ -436,7 +439,10 @@ export async function sendMessage(
         },
         {
           urlPathParams: { rootFolderId: currentRootFolderId },
-          requestData: { subFolderId: currentSubFolderId },
+          requestData: {
+            subFolderId: currentSubFolderId,
+            threadIds: null,
+          },
         },
       );
 

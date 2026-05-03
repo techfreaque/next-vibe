@@ -73,6 +73,7 @@ const FAKE_BOOT_VALUE: ChatBootValue = {
     earned: 0,
     free: 0,
     expiresAt: null,
+    capacity: 20,
   },
   rootFolderPermissions: { canCreateThread: false, canCreateFolder: false },
   initialFoldersData: null,

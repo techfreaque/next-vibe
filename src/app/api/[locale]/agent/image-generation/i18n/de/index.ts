@@ -40,6 +40,12 @@ export const translations = {
       label: "Seitenverhältnis",
       description: "Seitenverhältnis des Ausgabebildes",
     },
+    inputMediaUrl: {
+      label: "Referenzbild-URL",
+      description:
+        "Quellbild für Bild-zu-Bild-Generierung. Das Modell nutzt dies als Ausgangspunkt.",
+      placeholder: "https://beispiel.de/bild.jpg",
+    },
     download: "Herunterladen",
     dimensionSeparator: "×",
     backButton: {
@@ -53,7 +59,6 @@ export const translations = {
     response: {
       imageUrl: "URL des generierten Bildes",
       creditCost: "Verwendete Credits",
-      inputRef: "Eingabe-Medienreferenz",
       jobId: "Asynchrone Job-ID",
     },
     errors: {

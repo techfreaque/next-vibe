@@ -236,6 +236,7 @@ export const translations = {
       signupNurture: "Signup Nurture",
       retention: "Retention",
       winback: "Winback",
+      newsletterMay2026: "Newsletter May 2026",
     },
     emailJourneyVariantFilter: {
       all: "All",
@@ -245,6 +246,7 @@ export const translations = {
       signupNurture: "Signup Nurture",
       retention: "Retention",
       winback: "Winback",
+      newsletterMay2026: "Newsletter May 2026",
     },
     sortOrder: {
       asc: "Ascending",

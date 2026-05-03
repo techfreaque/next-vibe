@@ -1119,6 +1119,11 @@ export class RouteExecuteRepository {
                 return streamContext!.escalateToTask!(opts);
               }
             : undefined;
+          // The goroutine runs independently of the parent stream. The parent's
+          // abortSignal fires when the stream ends (REMOTE_TOOL_WAIT), which would
+          // kill the goroutine's in-flight API calls (e.g. image generation) before
+          // they complete. Use a fresh signal so the goroutine survives parent death.
+          const goroutineAbortController = new AbortController();
           const goroutineStreamContext: typeof streamContext = {
             ...streamContext,
             // Reset per-call fields - wakeUp goroutine is independent of parent stream
@@ -1130,7 +1135,7 @@ export class RouteExecuteRepository {
             waitingForRemoteResult: undefined,
             onEscalatedTaskCancel: undefined,
             cancelPendingStreamTimer: undefined,
-            abortSignal: streamContext.abortSignal,
+            abortSignal: goroutineAbortController.signal,
             // Wrapped escalateToTask: sets selfEscalated=true so we skip handleTaskCompletion.
             escalateToTask: wrappedEscalateToTask,
           };
@@ -1278,7 +1283,7 @@ export class RouteExecuteRepository {
                     ownerUser: user,
                     logger,
                     directResumeLocale: locale,
-                    abortSignal: streamContext.abortSignal,
+                    abortSignal: goroutineAbortController.signal,
                   });
                 }
               } catch (completionErr) {

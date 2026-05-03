@@ -105,6 +105,15 @@ const { POST } = createEndpoint({
         options: MusicDurationOptions,
         schema: z.enum(MusicDuration).default(MusicDuration.SHORT),
       }),
+      inputMediaUrl: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.inputMediaUrl.label",
+        description: "post.inputMediaUrl.description",
+        columns: 12,
+        placeholder: "post.inputMediaUrl.placeholder",
+        schema: z.string().url().optional(),
+      }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,
         icon: "arrow-left",
@@ -136,12 +145,6 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "post.response.durationSeconds",
         schema: z.number(),
-      }),
-      /** Reference to input media used for media-to-media generation */
-      inputRef: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "post.response.inputRef",
-        schema: z.string().optional(),
       }),
       /** Async job ID for polling (future async generation) */
       jobId: responseField(scopedTranslation, {

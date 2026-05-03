@@ -1,0 +1,6 @@
+{
+  "url": "http://example.com/idempotency-test.jpg",
+  "method": "GET",
+  "headers": {},
+  "body": ""
+}

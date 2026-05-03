@@ -193,6 +193,9 @@ export const translations: typeof enTranslations = {
     expiresAt: {
       content: "Läuft ab am",
     },
+    capacity: {
+      content: "Gesamtkapazität",
+    },
     success: {
       title: "Guthaben abgerufen",
       description: "Credit-Guthaben erfolgreich abgerufen",

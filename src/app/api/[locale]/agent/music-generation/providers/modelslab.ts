@@ -34,9 +34,17 @@ export async function generateMusicWithModelsLab(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   signal?: AbortSignal;
+  inputMediaUrl?: string;
 }): Promise<ResponseType<{ audioUrl: string }>> {
-  const { providerModel, prompt, durationSeconds, logger, locale, signal } =
-    params;
+  const {
+    providerModel,
+    prompt,
+    durationSeconds,
+    logger,
+    locale,
+    signal,
+    inputMediaUrl,
+  } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.MODELSLAB_API_KEY) {
@@ -64,6 +72,7 @@ export async function generateMusicWithModelsLab(params: {
           model_id: providerModel,
           prompt,
           duration: durationSeconds,
+          ...(inputMediaUrl ? { init_audio: inputMediaUrl } : {}),
         }),
         signal,
       },

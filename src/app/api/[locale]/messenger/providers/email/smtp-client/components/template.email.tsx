@@ -8,6 +8,7 @@ import {
 import type { JSX, ReactNode } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
 import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -202,7 +203,9 @@ export function EmailTemplate({
                 margin: "0 0 12px 0",
               }}
             >
-              {t("components.email.footer.feedbackBody")}
+              {t("components.email.footer.feedbackBody", {
+                credits: FEEDBACK_REWARD_CREDITS,
+              })}
             </div>
             <TrackedLink
               href={`mailto:${contactClientRepository.getSupportEmail(locale)}`}

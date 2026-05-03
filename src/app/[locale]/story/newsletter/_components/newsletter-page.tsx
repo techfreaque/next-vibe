@@ -19,6 +19,7 @@ import { useEffect, useRef } from "react";
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { configScopedTranslation } from "@/config/i18n";
 import { scopedTranslation } from "../i18n";
 
 interface NewsletterPageProps {
@@ -35,6 +36,8 @@ export function NewsletterPage({
   userEmail,
 }: NewsletterPageProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   const {
     email,
@@ -103,7 +106,7 @@ export function NewsletterPage({
           <H1 className="text-4xl md:text-6xl font-bold mb-6 bg-linear-to-br from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             {prefilledEmail !== undefined && prefilledEmail.length > 0
               ? t("page.emailProvided.title")
-              : t("page.title")}
+              : t("page.title", { appName })}
           </H1>
           <H2 className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
             {t("page.subtitle")}

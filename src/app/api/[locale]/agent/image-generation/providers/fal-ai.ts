@@ -35,8 +35,10 @@ export async function generateWithFalAi(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   signal?: AbortSignal;
+  inputMediaUrl?: string;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, size, logger, locale, signal } = params;
+  const { providerModel, prompt, size, logger, locale, signal, inputMediaUrl } =
+    params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.FAL_AI_API_KEY) {
@@ -69,7 +71,12 @@ export async function generateWithFalAi(params: {
           Authorization: `Key ${agentEnv.FAL_AI_API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt, image_size: imageSize, num_images: 1 }),
+        body: JSON.stringify({
+          prompt,
+          image_size: imageSize,
+          num_images: 1,
+          ...(inputMediaUrl ? { image_url: inputMediaUrl } : {}),
+        }),
       },
     );
 

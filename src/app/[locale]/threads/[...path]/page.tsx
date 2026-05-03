@@ -136,6 +136,7 @@ export async function tanstackLoader({
         earned: 0,
         free: 0,
         expiresAt: null,
+        capacity: 20,
       },
       initialRootFolderId: DefaultFolderId.PRIVATE,
       initialSubFolderId: null,
@@ -220,6 +221,7 @@ export async function tanstackLoader({
     earned: 0,
     free: 0,
     expiresAt: null,
+    capacity: 20,
   };
 
   // Compute root folder permissions server-side

@@ -30,6 +30,12 @@ export const translations = {
       medium: "Mittel (~20 Sek.)",
       long: "Lang (~30 Sek.)",
     },
+    inputMediaUrl: {
+      label: "Referenz-Audio-URL",
+      description:
+        "Quell-Audio für Stilübertragung oder Remix. Das Modell nutzt dies als Ausgangspunkt.",
+      placeholder: "https://beispiel.de/audio.mp3",
+    },
     download: "Herunterladen",
     separator: "·",
     backButton: {
@@ -44,7 +50,6 @@ export const translations = {
       audioUrl: "URL des generierten Audios",
       creditCost: "Verwendete Credits",
       durationSeconds: "Dauer in Sekunden",
-      inputRef: "Eingabe-Medienreferenz",
       jobId: "Asynchrone Job-ID",
     },
     errors: {

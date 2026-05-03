@@ -227,6 +227,7 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           aspectRatio: data.aspectRatio,
+          inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
         });
@@ -237,6 +238,7 @@ export class ImageGenerationRepository {
         generationResult = await generateWithOpenRouter({
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
+          inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
         });
@@ -247,6 +249,7 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           size: data.size,
+          inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
         });
@@ -258,6 +261,7 @@ export class ImageGenerationRepository {
           prompt: data.prompt,
           size: data.size,
           quality: data.quality,
+          inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
         });
@@ -268,6 +272,7 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           size: data.size,
+          inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
         });
@@ -379,12 +384,15 @@ export class ImageGenerationRepository {
 
     const sizeHint = data.size ? ` Output size: ${data.size}.` : "";
     const qualityHint = data.quality ? ` Quality: ${data.quality}.` : "";
+    const refHint = data.inputMediaUrl
+      ? ` Use this image as reference: ${data.inputMediaUrl}`
+      : "";
 
     const chatModel = chatModelOptionsIndex[modelConfig.id];
     const result = await runHeadlessAiStream({
       model: chatModel?.id,
       skill: NO_SKILL_ID,
-      prompt: `Generate an image: ${data.prompt}${sizeHint}${qualityHint}`,
+      prompt: `Generate an image: ${data.prompt}${sizeHint}${qualityHint}${refHint}`,
       favoriteConfig: buildFavoriteConfig({
         id: "image-gen-headless",
         skillId: NO_SKILL_ID,

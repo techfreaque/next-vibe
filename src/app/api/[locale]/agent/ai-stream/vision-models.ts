@@ -169,6 +169,9 @@ const imageVisionModelOptionsIndex: Record<
     ImageVisionModelId.GROK_4_FAST,
   ),
   [ImageVisionModelId.GROK_4]: makeImageVisionOption(ImageVisionModelId.GROK_4),
+  [ImageVisionModelId.GROK_4_3]: makeImageVisionOption(
+    ImageVisionModelId.GROK_4_3,
+  ),
   [ImageVisionModelId.GROK_4_20]: makeImageVisionOption(
     ImageVisionModelId.GROK_4_20,
   ),

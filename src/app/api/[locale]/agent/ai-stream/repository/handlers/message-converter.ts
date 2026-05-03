@@ -277,10 +277,11 @@ export class MessageConverter {
                 ),
               }
             : toolCall.result
-              ? MessageConverter.buildToolResultOutput(
+              ? await MessageConverter.buildToolResultOutput(
                   toolCall.result,
                   toolCall.toolName,
                   modelConfig,
+                  logger,
                 )
               : toolCall.waitingForConfirmation
                 ? {
@@ -572,10 +573,11 @@ export class MessageConverter {
                 ),
               }
             : toolCall.result
-              ? MessageConverter.buildToolResultOutput(
+              ? await MessageConverter.buildToolResultOutput(
                   toolCall.result,
                   toolCall.toolName,
                   modelConfig,
+                  logger,
                 )
               : toolCall.waitingForConfirmation
                 ? {
@@ -770,11 +772,12 @@ export class MessageConverter {
    * - Model supports the media modality → pass file URL (model can see it natively)
    * - Model does not support it → pass only text description (gap-fill ensures text is populated)
    */
-  private static buildToolResultOutput(
+  private static async buildToolResultOutput(
     result: WidgetData | undefined,
     toolName?: string,
     modelConfig?: ChatModelOption,
-  ):
+    logger?: EndpointLogger,
+  ): Promise<
     | {
         type: "json";
         value: JSONValue;
@@ -785,7 +788,8 @@ export class MessageConverter {
           | { type: "text"; text: string }
           | { type: "file-data"; data: string; mediaType: string }
         >;
-      } {
+      }
+  > {
     // Check if result is a ContentResponse (stored as JSON with marker fields)
     if (
       result &&
@@ -871,8 +875,37 @@ export class MessageConverter {
       const modelCanSee = modelConfig?.inputs?.includes(modality) ?? false;
 
       if (modelCanSee && fileUrl) {
-        // Model supports this modality - pass file URL so it can see its own output.
-        // Preserve text alongside so model has both the visual and the description.
+        // Model supports this modality - fetch + base64 encode the file so the model
+        // can actually see the generated media (passing a URL string as JSON doesn't
+        // let the model see the image). Same pattern as user attachments and assistant
+        // generatedMedia handling.
+        if (modality === "image") {
+          try {
+            const response = await fetch(fileUrl);
+            if (response.ok) {
+              const buffer = await response.arrayBuffer();
+              const base64Data = Buffer.from(buffer).toString("base64");
+              const mimeType = mediaResult.mediaType ?? "image/png";
+              const contentParts: Array<
+                | { type: "text"; text: string }
+                | { type: "file-data"; data: string; mediaType: string }
+              > = [
+                { type: "file-data", data: base64Data, mediaType: mimeType },
+              ];
+              if (mediaResult.text) {
+                contentParts.push({ type: "text", text: mediaResult.text });
+              }
+              return { type: "content" as const, value: contentParts };
+            }
+          } catch (fetchErr) {
+            logger?.error(
+              "[MessageConverter] Failed to fetch generated image for tool result",
+              { url: fileUrl, error: parseError(fetchErr) },
+            );
+          }
+        }
+
+        // Fallback for non-image modalities or failed fetch: pass URL as JSON
         return {
           type: "json" as const,
           value: {

@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
         "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
       feedbackHook: "Etwas zu sagen? Antworten - wir lesen es wirklich.",
       feedbackBody:
-        "Fehler melden, Funktion anfragen oder sagen, was fehlt. Nützliches Feedback bringt 200 Gratis-Credits.",
+        "Fehler melden, Funktion anfragen oder sagen, was fehlt. Nuetzliches Feedback bringt dir {{credits}} Credits — ein ganzer Monat gratis.",
       feedbackLink: "Feedback senden →",
       footerSeparator: " · ",
     },

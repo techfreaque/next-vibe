@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "Assistant: WAKEUP_OK\n\nUser: [T6d-phase1 wakeUp-idem-setup] Call the generate_image tool with prompt='idempotency-test' and callbackMode='wakeUp'. In this phase you should receive a taskId (no imageUrl). End with STEP_OK if you see taskId.\n\nAssistant: STEP_OK\n\n**Phase 1 Verification:**\n- `taskId`: \"local-wu-1777210028930-xigjs7\" ✓\n- `status`: \"status.pending\" ✓\n- `imageUrl`: NOT present (as expected for wakeUp phase 1) ✓\n\nUser:",
+    "input": "Assistant: <think>None </think> WAKEUP_OK\n\nAssistant: <think>The wakeUp result just came back with status \"failed\" and success: false. No error message included. Need to report this as WAKEUP_FAILED with the reason.\n\nWait, I need to check - was this the wakeUp from the previous call? It looks like the tool result was injected. The status is \"failed\" with success: false. I don't see an imageUrl. So this is a failure.\n\nI should report WAKEUP_FAILED with the reason being the failed status. </think> WAKEUP_FAILED: Tool returned status \"failed\" with success: false, no imageUrl present.\n\nUser:",
     "encoding_format": "float"
   }
 }

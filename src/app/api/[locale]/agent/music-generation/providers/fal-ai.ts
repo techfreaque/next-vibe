@@ -35,9 +35,17 @@ export async function generateMusicWithFalAi(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   signal?: AbortSignal;
+  inputMediaUrl?: string;
 }): Promise<ResponseType<{ audioUrl: string }>> {
-  const { providerModel, prompt, durationSeconds, logger, locale, signal } =
-    params;
+  const {
+    providerModel,
+    prompt,
+    durationSeconds,
+    logger,
+    locale,
+    signal,
+    inputMediaUrl,
+  } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.FAL_AI_API_KEY) {
@@ -63,7 +71,11 @@ export async function generateMusicWithFalAi(params: {
           Authorization: `Key ${agentEnv.FAL_AI_API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt, duration: durationSeconds }),
+        body: JSON.stringify({
+          prompt,
+          duration: durationSeconds,
+          ...(inputMediaUrl ? { audio_url: inputMediaUrl } : {}),
+        }),
       },
     );
 
