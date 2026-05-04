@@ -472,6 +472,8 @@ export const translations = {
     remoteSelf: "Self",
     users: "Users",
     support: "Support",
+    corvina: "Corvina",
+    corvinaOrganizations: "Organizations",
   },
   ui: {
     iconPicker: {

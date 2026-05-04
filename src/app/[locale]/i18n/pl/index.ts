@@ -478,6 +478,8 @@ export const translations: typeof enTranslations = {
     remoteSelf: "Własna",
     users: "Użytkownicy",
     support: "Wsparcie",
+    corvina: "Corvina",
+    corvinaOrganizations: "Organizacje",
   },
   ui: {
     iconPicker: {
