@@ -6,9 +6,9 @@
 
 import "server-only";
 
-import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { readFile, unlink } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -58,16 +58,32 @@ export class SetupUninstallRepository {
         });
       }
 
-      // Uninstall using npm unlink
-      // eslint-disable-next-line i18next/no-literal-string
-      const output = await SetupUninstallRepository.runCommand(
-        "npm",
-        ["unlink", "-g"],
-        {
-          cwd: process.cwd(),
-          verbose: data.verbose,
-        },
-      );
+      // Delete the binary file written by the install step (works on all
+      // platforms — npm unlink is unrelated to our Bun-based dispatcher).
+      const removed: string[] = [];
+      const failures: string[] = [];
+      for (const candidate of SetupUninstallRepository.candidatePaths()) {
+        if (existsSync(candidate)) {
+          try {
+            await unlink(candidate);
+            removed.push(candidate);
+          } catch (error) {
+            const parsed = parseError(error);
+            // eslint-disable-next-line i18next/no-literal-string
+            failures.push(`${candidate}: ${parsed.message}`);
+          }
+        }
+      }
+      const output =
+        // eslint-disable-next-line i18next/no-literal-string
+        [
+          // eslint-disable-next-line i18next/no-literal-string
+          removed.length ? `Removed: ${removed.join(", ")}` : "",
+          // eslint-disable-next-line i18next/no-literal-string
+          failures.length ? `Failed: ${failures.join("; ")}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n");
 
       // Verify uninstallation
       const newStatus =
@@ -93,98 +109,63 @@ export class SetupUninstallRepository {
     }
   }
 
+  /**
+   * Paths the install step may have written the dispatcher binary to,
+   * for each supported platform.
+   */
+  private static candidatePaths(): string[] {
+    const platform = os.platform();
+    const homeDir = os.homedir();
+    if (platform === "win32") {
+      const windowsAppData =
+        // eslint-disable-next-line i18next/no-literal-string
+        process.env.APPDATA || path.join(homeDir, "AppData", "Roaming");
+      const windowsLocalAppData =
+        // eslint-disable-next-line i18next/no-literal-string
+        process.env.LOCALAPPDATA || path.join(homeDir, "AppData", "Local");
+      return [
+        // eslint-disable-next-line i18next/no-literal-string
+        path.join(windowsAppData, "vibe", "bin", "vibe.cmd"),
+        // eslint-disable-next-line i18next/no-literal-string
+        path.join(windowsLocalAppData, "vibe", "bin", "vibe.cmd"),
+      ];
+    }
+    return [
+      // eslint-disable-next-line i18next/no-literal-string
+      path.join(homeDir, ".local", "bin", "vibe"),
+      // eslint-disable-next-line i18next/no-literal-string
+      path.join(homeDir, ".yarn", "bin", "vibe"),
+      "/usr/local/bin/vibe",
+      "/usr/bin/vibe",
+    ];
+  }
+
   private static async checkInstallationStatus(): Promise<{
     installed: boolean;
     version?: string;
     path?: string;
   }> {
     try {
-      // Try to run 'which vibe' or 'where vibe' to find the installation
-      const command = process.platform === "win32" ? "where" : "which";
-      const output = await SetupUninstallRepository.runCommand(
-        command,
-        ["vibe"],
-        {
-          verbose: false,
-          ignoreErrors: true,
-        },
-      );
-
-      if (output) {
-        // Get version
-        let version: string | undefined;
-        try {
-          const packageJsonPath = path.join(process.cwd(), "package.json");
-          if (existsSync(packageJsonPath)) {
-            const packageJson = JSON.parse(
-              await readFile(packageJsonPath, "utf8"),
-            ) as {
-              version?: string;
-            };
-            version = packageJson.version;
+      for (const candidate of SetupUninstallRepository.candidatePaths()) {
+        if (existsSync(candidate)) {
+          let version: string | undefined;
+          try {
+            const packageJsonPath = path.join(process.cwd(), "package.json");
+            if (existsSync(packageJsonPath)) {
+              const packageJson = JSON.parse(
+                await readFile(packageJsonPath, "utf8"),
+              ) as { version?: string };
+              version = packageJson.version;
+            }
+          } catch {
+            // Ignore version detection errors
           }
-        } catch {
-          // Ignore version detection errors
+          return { installed: true, version, path: candidate };
         }
-
-        return {
-          installed: true,
-          version,
-          path: output.trim(),
-        };
       }
-
       return { installed: false };
     } catch {
       return { installed: false };
     }
-  }
-
-  private static async runCommand(
-    command: string,
-    args: string[],
-    options: {
-      cwd?: string;
-      verbose?: boolean;
-      ignoreErrors?: boolean;
-    } = {},
-  ): Promise<string> {
-    return await new Promise((resolve, reject) => {
-      const childProcess = spawn(command, args, {
-        cwd: options.cwd || process.cwd(),
-        stdio: options.verbose ? "inherit" : "pipe",
-        shell: false,
-        env: { NODE_ENV: "development" },
-      });
-
-      let output = "";
-      let errorOutput = "";
-
-      if (!options.verbose) {
-        childProcess.stdout?.on("data", (data: Buffer) => {
-          output += data.toString();
-        });
-
-        childProcess.stderr?.on("data", (data: Buffer) => {
-          errorOutput += data.toString();
-        });
-      }
-
-      childProcess.on("close", (code: number | null) => {
-        if (code === 0 || options.ignoreErrors) {
-          resolve(output);
-        } else {
-          reject(new Error(errorOutput || output || String(code)));
-        }
-      });
-
-      childProcess.on("error", (error: Error) => {
-        if (!options.ignoreErrors) {
-          reject(error);
-        } else {
-          resolve(String());
-        }
-      });
-    });
   }
 }

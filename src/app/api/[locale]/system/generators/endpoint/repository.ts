@@ -30,6 +30,7 @@ import {
   findFilesRecursively,
   generateAbsoluteImportPath,
   generateFileHeader,
+  stripProjectRoot,
   writeGeneratedFile,
 } from "../shared/utils";
 import type { GeneratorsEndpointT } from "./i18n";
@@ -206,7 +207,7 @@ export class EndpointGeneratorRepository {
                 : String(retryError);
             logger.warn(
               formatWarning(
-                `Could not load definition: ${defFile.replace(process.cwd(), "").replace(/^\//, "")} - ${retryMsg}`,
+                `Could not load definition: ${stripProjectRoot(defFile)} - ${retryMsg}`,
               ),
             );
             continue;
@@ -214,7 +215,7 @@ export class EndpointGeneratorRepository {
         } else {
           logger.warn(
             formatWarning(
-              `Import error: ${defFile.replace(process.cwd(), "").replace(/^\//, "")}\n    ${errorMsg}`,
+              `Import error: ${stripProjectRoot(defFile)}\n    ${errorMsg}`,
             ),
           );
           continue;
@@ -238,7 +239,7 @@ export class EndpointGeneratorRepository {
               : String(retryError);
           logger.warn(
             formatWarning(
-              `Deferred init (Bun plugin race): ${defFile.replace(process.cwd(), "").replace(/^\//, "")}\n    ${errorMsg}`,
+              `Deferred init (Bun plugin race): ${stripProjectRoot(defFile)}\n    ${errorMsg}`,
             ),
           );
           continue;
@@ -247,9 +248,7 @@ export class EndpointGeneratorRepository {
 
       if (!defaultExport) {
         logger.warn(
-          formatWarning(
-            `No default export: ${defFile.replace(process.cwd(), "").replace(/^\//, "")}`,
-          ),
+          formatWarning(`No default export: ${stripProjectRoot(defFile)}`),
         );
         continue;
       }

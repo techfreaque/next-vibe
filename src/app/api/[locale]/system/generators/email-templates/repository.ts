@@ -29,6 +29,7 @@ import type { LiveIndex } from "../shared/live-index";
 import {
   findFilesRecursively,
   generateFileHeader,
+  stripProjectRoot,
   writeGeneratedFile,
 } from "../shared/utils";
 import type { GeneratorsEmailTemplatesT } from "./i18n";
@@ -243,9 +244,7 @@ export class EmailTemplateGeneratorRepository {
       try {
         const templateModule = await import(file);
 
-        const nestedPath = file
-          .replace(process.cwd(), "")
-          .replace(/^\//, "")
+        const nestedPath = stripProjectRoot(file)
           .replace(/^src\/app\/api\/\[locale\]\//, "")
           .replace(/\/email\.tsx$/, "")
           .replace(/\/.+\.email\.tsx$/, "");
@@ -348,7 +347,7 @@ export class EmailTemplateGeneratorRepository {
               description: templateDef.meta.description as string,
               // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- meta fields are string keys; any/unknown from EmailTemplateDefinitionAny
               category: templateDef.meta.category as string,
-              path: file.replace(process.cwd(), ""),
+              path: stripProjectRoot(file),
               exampleProps: validProps,
             },
           });

@@ -24,6 +24,7 @@ import {
   formatGenerator,
   formatWarning,
 } from "../../unified-interface/shared/logger/formatters";
+import { stripProjectRoot } from "../shared/utils";
 
 // RouteFileStructure represents a route module with HTTP method handlers
 interface RouteFileStructure {
@@ -147,7 +148,7 @@ export async function generateTRPCRouter(
 
     if (routesWithoutDefinition.length > 0) {
       const routeList = routesWithoutDefinition
-        .map((r) => `    • ${r.replace(process.cwd(), "").replace(/^\//, "")}`)
+        .map((r) => `    • ${stripProjectRoot(r)}`)
         .join("\n");
       logger.debug(
         formatWarning(

@@ -27,7 +27,12 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import path, { join, relative } from "node:path";
+
+// Use POSIX dirname so segment splitting on "/" works on Windows too —
+// node's platform-default dirname returns backslashes which then defeat
+// every dir.split("/") in this generator.
+const dirname = path.posix.dirname;
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -1018,6 +1023,12 @@ export class GenerateTanstackRoutesRepository {
   }
 
   private static findFiles(dir: string, pattern: string): string[] {
-    return findFilesByName(dir, pattern).map((r) => relative(dir, r.fullPath));
+    // Always return POSIX-style relative paths. Downstream code does
+    // dirname(...) and dir.split("/") which only works with forward slashes;
+    // on Windows, node's `relative` returns backslashes and breaks every
+    // segment split, causing routes to be written into nested subdirs.
+    return findFilesByName(dir, pattern).map((r) =>
+      relative(dir, r.fullPath).replaceAll("\\", "/"),
+    );
   }
 }

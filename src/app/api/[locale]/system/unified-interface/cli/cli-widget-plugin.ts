@@ -23,14 +23,18 @@ import { plugin } from "bun";
 import "react/jsx-dev-runtime";
 import "react/jsx-runtime";
 
-const WEB_UI_DIR = resolve(
-  import.meta.dir,
-  "../../../../../../packages/next-vibe-ui/web/ui",
+// Normalize to forward slashes so Windows (backslash separators from
+// path.resolve / Bun's onLoad path) and POSIX both match the same prefix
+// check below — otherwise the web→cli override never fires on Windows and
+// Radix UI primitives leak into the Ink/CLI render and crash.
+const toPosix = (p: string): string => p.replaceAll("\\", "/");
+
+const WEB_UI_DIR = toPosix(
+  resolve(import.meta.dir, "../../../../../../packages/next-vibe-ui/web/ui"),
 );
 
-const CLI_UI_DIR = resolve(
-  import.meta.dir,
-  "../../../../../../packages/next-vibe-ui/cli/ui",
+const CLI_UI_DIR = toPosix(
+  resolve(import.meta.dir, "../../../../../../packages/next-vibe-ui/cli/ui"),
 );
 
 // Paths that have already been served as cli overrides once.
@@ -46,18 +50,19 @@ plugin({
     // onLoad for .tsx must always return content - Bun requires it.
     // This is safe for .tsx because those files are not in the lazy require() chain.
     build.onLoad({ filter: /\.tsx$/ }, ({ path }) => {
+      const posixPath = toPosix(path);
       // Rule 1: web/ui/*.tsx → serve cli/ui/*.tsx contents
-      if (path.startsWith(`${WEB_UI_DIR}/`)) {
-        const rel = path.slice(WEB_UI_DIR.length + 1);
+      if (posixPath.startsWith(`${WEB_UI_DIR}/`)) {
+        const rel = posixPath.slice(WEB_UI_DIR.length + 1);
         const cliPath = resolve(CLI_UI_DIR, rel);
         if (existsSync(cliPath)) {
           // First load: serve cli/ui contents (DOM-free)
           // Second load (from cli/ui re-exporting web/ui): serve real web/ui content.
           // This lets pure values like buttonVariants pass through without Radix crashing.
-          if (webUiAlreadyOverridden.has(path)) {
+          if (webUiAlreadyOverridden.has(posixPath)) {
             return { contents: readFileSync(path, "utf-8"), loader: "tsx" }; // eslint-disable-line i18next/no-literal-string
           }
-          webUiAlreadyOverridden.add(path);
+          webUiAlreadyOverridden.add(posixPath);
           return { contents: readFileSync(cliPath, "utf-8"), loader: "tsx" }; // eslint-disable-line i18next/no-literal-string
         }
         return { contents: readFileSync(path, "utf-8"), loader: "tsx" }; // eslint-disable-line i18next/no-literal-string

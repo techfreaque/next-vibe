@@ -23,6 +23,7 @@ import {
   formatGenerator,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import { stripProjectRoot } from "../shared/utils";
 import type { GeneratorsEnvT } from "./i18n";
 import type { EnvValidationErrorType } from "./validator";
 
@@ -808,9 +809,7 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
         return a.key.localeCompare(b.key);
       });
 
-      const relativeSourcePath = mod.filePath
-        .replace(process.cwd(), "")
-        .replace(/^\//, "");
+      const relativeSourcePath = stripProjectRoot(mod.filePath);
       lines.push(`# Source: ${relativeSourcePath}`);
 
       for (const entry of sortedEntries) {

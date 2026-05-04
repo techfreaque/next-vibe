@@ -100,20 +100,26 @@ set "REL_PATH=${vibeRelativePath}"
 set "CURRENT_DIR=%CD%"
 
 :find_vibe
-if exist "%CURRENT_DIR%%REL_PATH%" (
-  bun "%CURRENT_DIR%%REL_PATH%" %*
-  exit /b %errorlevel%
+set "CANDIDATE=!CURRENT_DIR!\\!REL_PATH!"
+if exist "!CANDIDATE!" (
+  bun "!CANDIDATE!" %*
+  exit /b !errorlevel!
 )
 
-for %%I in ("%CURRENT_DIR%") do set "PARENT_DIR=%%~dpI"
-REM If we reached the root (parent dir is same as current), stop searching
-if /I "%PARENT_DIR:~0,-1%"=="%CURRENT_DIR%" goto not_found
+REM Compute parent directory of CURRENT_DIR
+for %%I in ("!CURRENT_DIR!") do set "PARENT_DIR=%%~dpI"
+REM Strip trailing backslash if present
+if "!PARENT_DIR:~-1!"=="\\" set "PARENT_DIR=!PARENT_DIR:~0,-1!"
 
-set "CURRENT_DIR=%PARENT_DIR:~0,-1%"
+REM Stop when we cannot ascend any further (drive root)
+if /I "!PARENT_DIR!"=="!CURRENT_DIR!" goto not_found
+if "!PARENT_DIR!"=="" goto not_found
+
+set "CURRENT_DIR=!PARENT_DIR!"
 goto find_vibe
 
 :not_found
-echo vibe: could not find vibe-runtime.ts starting from %CD% 1>&2
+echo vibe: could not find vibe-runtime.ts ^(looked for !REL_PATH! upwards from %CD%^) 1>&2
 exit /b 1
 `;
     }
@@ -297,8 +303,12 @@ exit 1
 
       // Add to PATH on Windows if needed
       if (os.platform() === "win32") {
+        const pathResult =
+          await SetupInstallRepository.ensureWindowsUserPath(binDir);
         // eslint-disable-next-line i18next/no-literal-string
-        output += `\nNote: You may need to add ${binDir} to your PATH manually or restart your terminal`;
+        output += `\n${pathResult}`;
+        // eslint-disable-next-line i18next/no-literal-string
+        output += `\nNote: open a new terminal so the updated PATH takes effect`;
       } else {
         // eslint-disable-next-line i18next/no-literal-string
         output += `\nNote: Make sure ${binDir} is in your PATH. Add this to your shell profile if needed:\nexport PATH="${binDir}:$PATH"`;
@@ -340,6 +350,9 @@ exit 1
    * Generate .mcp.json and mcp.json from .mcp.example.json by replacing
    * {{PROJECT_PATH}} with the actual project path (cwd). Both files are written
    * so they work for Claude Code (.mcp.json) and Cursor/Windsurf (mcp.json).
+   *
+   * Uses POSIX-style forward slashes so the embedded path is valid JSON on
+   * Windows (where backslashes would otherwise need to be escaped).
    */
   private static async setupMcpFiles(projectPath: string): Promise<void> {
     // eslint-disable-next-line i18next/no-literal-string
@@ -348,11 +361,61 @@ exit 1
       return;
     }
     const template = await readFile(examplePath, "utf8");
-    const content = template.replaceAll("{{PROJECT_PATH}}", projectPath);
+    const jsonSafePath = projectPath.replaceAll("\\", "/");
+    const content = template.replaceAll("{{PROJECT_PATH}}", jsonSafePath);
     // eslint-disable-next-line i18next/no-literal-string
     await writeFile(path.join(projectPath, ".mcp.json"), content, "utf8");
     // eslint-disable-next-line i18next/no-literal-string
     await writeFile(path.join(projectPath, "mcp.json"), content, "utf8");
+  }
+
+  /**
+   * Idempotently add `binDir` to the current user's PATH on Windows.
+   *
+   * Uses PowerShell's [Environment]::SetEnvironmentVariable with the "User"
+   * scope so the change persists across sessions without requiring admin
+   * rights. Existing shells need to be restarted to see the new PATH.
+   */
+  private static async ensureWindowsUserPath(binDir: string): Promise<string> {
+    /* eslint-disable i18next/no-literal-string */
+    const psScript = `
+$ErrorActionPreference = 'Stop'
+$binDir = ${SetupInstallRepository.toPowerShellLiteral(binDir)}
+$current = [Environment]::GetEnvironmentVariable('Path', 'User')
+if ($null -eq $current) { $current = '' }
+$parts = $current -split ';' | Where-Object { $_ -ne '' }
+$already = $false
+foreach ($p in $parts) {
+  if ($p.TrimEnd('\\') -ieq $binDir.TrimEnd('\\')) { $already = $true; break }
+}
+if ($already) {
+  Write-Output "PATH already contains $binDir"
+} else {
+  $newPath = if ($current) { "$current;$binDir" } else { $binDir }
+  [Environment]::SetEnvironmentVariable('Path', $newPath, 'User')
+  Write-Output "Added $binDir to user PATH"
+}
+`.trim();
+    try {
+      const output = await SetupInstallRepository.runCommand(
+        "powershell",
+        ["-NoProfile", "-NonInteractive", "-Command", psScript],
+        { verbose: false, ignoreErrors: false },
+      );
+      return output.trim() || `Updated user PATH to include ${binDir}`;
+    } catch (error) {
+      const parsedError = parseError(error);
+      return `Could not auto-update PATH (${parsedError.message}). Add manually: ${binDir}`;
+    }
+    /* eslint-enable i18next/no-literal-string */
+  }
+
+  /**
+   * Quote a string as a PowerShell single-quoted literal (escaping ').
+   */
+  private static toPowerShellLiteral(value: string): string {
+    // eslint-disable-next-line i18next/no-literal-string
+    return `'${value.replaceAll("'", "''")}'`;
   }
 
   private static async checkInstallationStatus(): Promise<{
@@ -361,18 +424,35 @@ exit 1
     path?: string;
   }> {
     try {
-      // Check common installation paths directly instead of using which/where
-      const homeDir = /*turbopackIgnore: true*/ process.env.HOME || "/tmp";
-      const possiblePaths = [
-        // eslint-disable-next-line i18next/no-literal-string
-        path.join(homeDir, ".local", "bin", "vibe"),
-        // eslint-disable-next-line i18next/no-literal-string
-        path.join(homeDir, ".yarn", "bin", "vibe"),
+      const platform = /*turbopackIgnore: true*/ os.platform();
+      const homeDir = /*turbopackIgnore: true*/ os.homedir();
 
-        "/usr/local/bin/vibe",
+      let possiblePaths: string[];
+      if (platform === "win32") {
+        const windowsAppData =
+          // eslint-disable-next-line i18next/no-literal-string
+          process.env.APPDATA || path.join(homeDir, "AppData", "Roaming");
+        const windowsLocalAppData =
+          // eslint-disable-next-line i18next/no-literal-string
+          process.env.LOCALAPPDATA || path.join(homeDir, "AppData", "Local");
+        possiblePaths = [
+          // eslint-disable-next-line i18next/no-literal-string
+          path.join(windowsAppData, "vibe", "bin", "vibe.cmd"),
+          // eslint-disable-next-line i18next/no-literal-string
+          path.join(windowsLocalAppData, "vibe", "bin", "vibe.cmd"),
+        ];
+      } else {
+        possiblePaths = [
+          // eslint-disable-next-line i18next/no-literal-string
+          path.join(homeDir, ".local", "bin", "vibe"),
+          // eslint-disable-next-line i18next/no-literal-string
+          path.join(homeDir, ".yarn", "bin", "vibe"),
 
-        "/usr/bin/vibe",
-      ];
+          "/usr/local/bin/vibe",
+
+          "/usr/bin/vibe",
+        ];
+      }
 
       for (const vibePath of possiblePaths) {
         if (existsSync(vibePath)) {

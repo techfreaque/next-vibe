@@ -50,6 +50,7 @@ import {
   findFilesRecursively,
   generateFileHeader,
   jsonToTs,
+  toPosixPath,
   writeGeneratedFile,
 } from "../shared/utils";
 import type { GeneratorsEndpointsMetaT } from "./i18n";
@@ -152,7 +153,7 @@ export class EndpointsMetaGeneratorRepository {
         definitionFiles = [...liveIndex.definitionFiles];
         routeFiles = [...liveIndex.routeFiles];
       } else {
-        const startDir = `${process.cwd()}/src/app/api/[locale]`;
+        const startDir = join(process.cwd(), "src", "app", "api", "[locale]");
 
         logger.debug("Discovering definition files");
         definitionFiles = findFilesRecursively(startDir, "definition.ts");
@@ -176,9 +177,11 @@ export class EndpointsMetaGeneratorRepository {
       }
 
       if (definitionsWithoutRoute.length > 0) {
+        const cwdPosix = toPosixPath(process.cwd());
         const defList = definitionsWithoutRoute
           .map(
-            (d) => `    • ${d.replace(process.cwd(), "").replace(/^\//, "")}`,
+            (d) =>
+              `    • ${toPosixPath(d).replace(cwdPosix, "").replace(/^\//, "")}`,
           )
           .join("\n");
         logger.warn(
