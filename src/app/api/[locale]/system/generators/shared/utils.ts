@@ -24,7 +24,35 @@ export const DEFAULT_EXCLUDE_DIRS = [
 ];
 
 /**
- * Recursively find files with specific filename in a directory
+ * Normalize a path to use forward slashes regardless of platform.
+ *
+ * Generators downstream of file discovery do substring matching with "/"
+ * separators (e.g. `defFile.replace("/definition.ts", "/route.ts")` and
+ * `filePath.split("/")`). Returning POSIX-style paths from discovery keeps
+ * those call sites working uniformly on Windows and Linux. Bun and Node both
+ * accept forward slashes for `import()` / `fs.*` on Windows.
+ */
+export function toPosixPath(p: string): string {
+  return p.replaceAll("\\", "/");
+}
+
+/**
+ * Strip the project root (process.cwd()) prefix from a file path.
+ *
+ * Always compares POSIX-normalized forms so this works on Windows where
+ * `process.cwd()` is `C:\foo` but the discovered file path is `C:/foo/...`.
+ * Returns a POSIX-style path with no leading slash.
+ */
+export function stripProjectRoot(filePath: string): string {
+  const posixCwd = toPosixPath(process.cwd());
+  return toPosixPath(filePath).replace(posixCwd, "").replace(/^\//, "");
+}
+
+/**
+ * Recursively find files with specific filename in a directory.
+ *
+ * Returns POSIX-style paths (forward slashes) so callers can do the standard
+ * `path.replace("/definition.ts", "/route.ts")` style matching on every OS.
  */
 export function findFilesRecursively(
   dir: string,
@@ -54,7 +82,7 @@ export function findFilesRecursively(
       );
     } else if (entry.isFile() && entry.name === targetFilename) {
       // Found a matching file
-      results.push(fullPath);
+      results.push(toPosixPath(fullPath));
     }
   }
 
@@ -92,7 +120,7 @@ export function extractNestedPath(
   startMarker = "[locale]",
   endMarker?: string,
 ): string[] {
-  const pathParts = filePath.split("/");
+  const pathParts = toPosixPath(filePath).split("/");
 
   const startIndex = pathParts.findIndex((p) => p === startMarker);
   if (startIndex === -1) {
@@ -137,7 +165,7 @@ export function extractModuleName(
   filePath: string,
   coreMarker = "core",
 ): string {
-  const pathParts = filePath.split("/");
+  const pathParts = toPosixPath(filePath).split("/");
   const coreIndex = pathParts.findIndex((p) => p === coreMarker);
 
   if (coreIndex === -1 || coreIndex >= pathParts.length - 1) {

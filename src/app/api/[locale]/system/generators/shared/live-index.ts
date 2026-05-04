@@ -11,7 +11,7 @@ import "server-only";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { findFilesRecursively } from "./utils";
+import { findFilesRecursively, toPosixPath } from "./utils";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -163,20 +163,21 @@ export function extractMethodsFromFile(absPath: string): string[] {
  * return which generator groups it affects - or null if irrelevant.
  */
 export function classifyFile(filename: string): FileClass | null {
+  const normalized = toPosixPath(filename);
   // Skip generated, temp, and hidden files
   if (
-    filename.includes("node_modules") ||
-    filename.includes(".git") ||
-    filename.includes(".next") ||
-    filename.includes("generated") ||
-    filename.includes(".tmp") ||
-    filename.includes("~") ||
-    filename.startsWith(".")
+    normalized.includes("node_modules") ||
+    normalized.includes(".git") ||
+    normalized.includes(".next") ||
+    normalized.includes("generated") ||
+    normalized.includes(".tmp") ||
+    normalized.includes("~") ||
+    normalized.startsWith(".")
   ) {
     return null;
   }
 
-  const base = filename.split("/").at(-1) ?? filename;
+  const base = normalized.split("/").at(-1) ?? normalized;
 
   if (base === "definition.ts") {
     return { endpoints: true };
@@ -206,7 +207,7 @@ export function classifyFile(filename: string): FileClass | null {
     return { graphSeedsIndex: true };
   }
   // system-prompt/prompt.ts - the fragment definition file
-  if (base === "prompt.ts" && filename.includes("/system-prompt/")) {
+  if (base === "prompt.ts" && normalized.includes("/system-prompt/")) {
     return { promptFragments: true };
   }
 
@@ -256,6 +257,8 @@ export function buildLiveIndex(): LiveIndex {
   const seedFiles = new Set(findFilesRecursively(apiDir, "seeds.ts"));
 
   const emailTsxFiles = findFilesRecursively(apiDir, "email.tsx");
+  // findFilesRecursively returns POSIX-style paths, so "/email.tsx" matches
+  // on every platform.
   const emailDotTsxFiles = findFilesRecursively(apiDir, ".email.tsx").filter(
     (f) => !f.endsWith("/email.tsx"),
   );
@@ -324,23 +327,26 @@ export function updateLiveIndex(
   eventType: "rename" | "change",
   absPath: string,
 ): void {
-  const base = absPath.split("/").at(-1) ?? "";
-  const fileExists = existsSync(absPath);
+  // Normalize so the index stays POSIX-style on every platform — matches
+  // what findFilesRecursively produces for the initial scan.
+  const normalized = toPosixPath(absPath);
+  const base = normalized.split("/").at(-1) ?? "";
+  const fileExists = existsSync(normalized);
 
   if (base === "definition.ts") {
     if (eventType === "rename") {
       if (fileExists) {
-        index.definitionFiles.add(absPath);
+        index.definitionFiles.add(normalized);
       } else {
-        index.definitionFiles.delete(absPath);
-        index.methodCache.delete(absPath);
+        index.definitionFiles.delete(normalized);
+        index.methodCache.delete(normalized);
       }
     }
     // For both rename and change, refresh method cache
     if (fileExists) {
-      const prevMethods = index.methodCache.get(absPath) ?? [];
-      const newMethods = extractMethodsFromFile(absPath);
-      index.methodCache.set(absPath, newMethods);
+      const prevMethods = index.methodCache.get(normalized) ?? [];
+      const newMethods = extractMethodsFromFile(normalized);
+      index.methodCache.set(normalized, newMethods);
       // Only dirty if methods actually changed (or file was added/removed)
       if (
         eventType === "rename" ||
@@ -356,9 +362,9 @@ export function updateLiveIndex(
 
   if (base === "route.ts") {
     if (fileExists) {
-      index.routeFiles.add(absPath);
+      index.routeFiles.add(normalized);
     } else {
-      index.routeFiles.delete(absPath);
+      index.routeFiles.delete(normalized);
     }
     index.dirty.endpoints = true;
     return;
@@ -366,9 +372,9 @@ export function updateLiveIndex(
 
   if (base === "route-client.ts") {
     if (fileExists) {
-      index.clientRouteFiles.add(absPath);
+      index.clientRouteFiles.add(normalized);
     } else {
-      index.clientRouteFiles.delete(absPath);
+      index.clientRouteFiles.delete(normalized);
     }
     index.dirty.clientRoutes = true;
     return;
@@ -376,9 +382,9 @@ export function updateLiveIndex(
 
   if (base === "task.ts") {
     if (fileExists) {
-      index.taskFiles.add(absPath);
+      index.taskFiles.add(normalized);
     } else {
-      index.taskFiles.delete(absPath);
+      index.taskFiles.delete(normalized);
     }
     index.dirty.taskIndex = true;
     return;
@@ -386,9 +392,9 @@ export function updateLiveIndex(
 
   if (base === "task-runner.ts") {
     if (fileExists) {
-      index.taskRunnerFiles.add(absPath);
+      index.taskRunnerFiles.add(normalized);
     } else {
-      index.taskRunnerFiles.delete(absPath);
+      index.taskRunnerFiles.delete(normalized);
     }
     index.dirty.taskIndex = true;
     return;
@@ -396,9 +402,9 @@ export function updateLiveIndex(
 
   if (base === "seeds.ts") {
     if (fileExists) {
-      index.seedFiles.add(absPath);
+      index.seedFiles.add(normalized);
     } else {
-      index.seedFiles.delete(absPath);
+      index.seedFiles.delete(normalized);
     }
     index.dirty.seeds = true;
     return;
@@ -406,9 +412,9 @@ export function updateLiveIndex(
 
   if (base === "email.tsx" || base.endsWith(".email.tsx")) {
     if (fileExists) {
-      index.emailFiles.add(absPath);
+      index.emailFiles.add(normalized);
     } else {
-      index.emailFiles.delete(absPath);
+      index.emailFiles.delete(normalized);
     }
     index.dirty.emailTemplates = true;
     return;
@@ -416,9 +422,9 @@ export function updateLiveIndex(
 
   if (base === "indicators.ts") {
     if (fileExists) {
-      index.indicatorFiles.add(absPath);
+      index.indicatorFiles.add(normalized);
     } else {
-      index.indicatorFiles.delete(absPath);
+      index.indicatorFiles.delete(normalized);
     }
     index.dirty.indicatorIndex = true;
     return;
@@ -426,19 +432,19 @@ export function updateLiveIndex(
 
   if (base === "graph-seeds.ts") {
     if (fileExists) {
-      index.graphSeedFiles.add(absPath);
+      index.graphSeedFiles.add(normalized);
     } else {
-      index.graphSeedFiles.delete(absPath);
+      index.graphSeedFiles.delete(normalized);
     }
     index.dirty.graphSeedsIndex = true;
     return;
   }
 
-  if (base === "prompt.ts" && absPath.includes("/system-prompt/")) {
+  if (base === "prompt.ts" && normalized.includes("/system-prompt/")) {
     if (fileExists) {
-      index.promptFragmentFiles.add(absPath);
+      index.promptFragmentFiles.add(normalized);
     } else {
-      index.promptFragmentFiles.delete(absPath);
+      index.promptFragmentFiles.delete(normalized);
     }
     index.dirty.promptFragments = true;
     return;
@@ -446,9 +452,9 @@ export function updateLiveIndex(
 
   if (base === "skill.ts") {
     if (fileExists) {
-      index.defaultSkillFiles.add(absPath);
+      index.defaultSkillFiles.add(normalized);
     } else {
-      index.defaultSkillFiles.delete(absPath);
+      index.defaultSkillFiles.delete(normalized);
     }
     index.dirty.skillsIndex = true;
   }

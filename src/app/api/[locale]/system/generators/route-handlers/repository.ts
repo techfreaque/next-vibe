@@ -29,6 +29,7 @@ import {
   findFilesRecursively,
   generateAbsoluteImportPath,
   generateFileHeader,
+  stripProjectRoot,
   writeGeneratedFile,
 } from "../shared/utils";
 import type { GeneratorsRouteHandlersT } from "./i18n";
@@ -98,9 +99,7 @@ export class RouteHandlersGeneratorRepository {
 
       if (routesWithoutDefinition.length > 0) {
         const routeList = routesWithoutDefinition
-          .map(
-            (r) => `    • ${r.replace(process.cwd(), "").replace(/^\//, "")}`,
-          )
+          .map((r) => `    • ${stripProjectRoot(r)}`)
           .join("\n");
         logger.debug(
           formatWarning(
@@ -269,9 +268,7 @@ export class RouteHandlersGeneratorRepository {
 
       if (methods.length === 0) {
         logger.warn(
-          formatWarning(
-            ` No methods found: ${routeFile.replace(process.cwd(), "").replace(/^\//, "")}`,
-          ),
+          formatWarning(` No methods found: ${stripProjectRoot(routeFile)}`),
         );
         continue;
       }

@@ -7,6 +7,8 @@ import "server-only";
 
 import { readFileSync } from "node:fs";
 
+import { stripProjectRoot } from "../shared/utils";
+
 /**
  * Entry for .env.example generation
  */
@@ -167,9 +169,7 @@ export function validateEnvFileExports(
 export function formatValidationErrors(errors: EnvValidationError[]): string {
   return errors
     .map((err) => {
-      const relativePath = err.filePath
-        .replace(process.cwd(), "")
-        .replace(/^\//, "");
+      const relativePath = stripProjectRoot(err.filePath);
       let msg = `    • ${relativePath}`;
       msg += `\n      ${err.message}`;
 
@@ -183,9 +183,7 @@ export function formatValidationErrors(errors: EnvValidationError[]): string {
           "existingFile" in err.details &&
           "duplicateFile" in err.details
         ) {
-          const existing = err.details.existingFile
-            .replace(process.cwd(), "")
-            .replace(/^\//, "");
+          const existing = stripProjectRoot(err.details.existingFile);
           msg += `\n      ⚠️  Conflicts with: ${existing}`;
         }
       }
