@@ -82,7 +82,6 @@ export function useEndpointSubscription(
       wirePayload: CreateApiEndpointAny["types"]["EventPayloads"][string],
     ): void {
       const declaration = endpoint?.events?.[eventName];
-
       if (!declaration) {
         logger.warn(
           `useEndpointSubscription: unknown event "${eventName}" on ${endpoint?.path.join("/")}`,

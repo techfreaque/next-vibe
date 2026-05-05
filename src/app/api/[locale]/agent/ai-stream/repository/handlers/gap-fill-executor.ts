@@ -24,6 +24,7 @@ import type {
 } from "ai";
 import { generateText as aiGenerateText } from "ai";
 
+import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
@@ -879,13 +880,30 @@ export class GapFillExecutor {
           ? "Describe this video in detail. Include the visual content, actions, scene, style, and any notable elements. This description will be shown to another AI model that cannot see video."
           : "Describe this audio in detail. Include the content, instruments, mood, tempo, and any notable elements. This description will be shown to another AI model that cannot hear audio.";
 
+    // Resolve media bytes via direct storage access (bypasses HTTP auth) or HTTP fetch.
+    // Direct storage is preferred because:
+    // 1. It avoids the authentication requirement on the file-serving endpoint
+    // 2. It works for localhost URLs in dev (no external access needed)
+    // 3. It works for S3/CDN URLs in production
+    const base64Data = await fetchStorageFileAsBase64(mediaUrl);
+    if (!base64Data) {
+      logger.warn("[GapFill] Failed to resolve media for vision bridge", {
+        mediaUrl: mediaUrl.slice(0, 80),
+      });
+      return null;
+    }
+
     // Build content parts per modality - separate paths for correct typing
     const contentParts: ImagePart | FilePart =
       modality === "image"
-        ? { type: "image" as const, image: new URL(mediaUrl) }
+        ? {
+            type: "image" as const,
+            image: base64Data,
+            mediaType: "image/png",
+          }
         : {
             type: "file" as const,
-            data: new URL(mediaUrl),
+            data: base64Data,
             mediaType: modality === "video" ? "video/mp4" : "audio/mpeg",
           };
 

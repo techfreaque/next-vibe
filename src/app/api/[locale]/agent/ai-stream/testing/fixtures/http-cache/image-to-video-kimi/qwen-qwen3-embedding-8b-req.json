@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T11b gap-fill-pass2] In the previous turn you generated an image. Describe what was generated. End your reply with STEP_OK if you can describe it, or FAILED: <reason> if you have no information about the image.\n\nAssistant: <think> The user is asking me to describe the image generated in the previous turn. The previous turn used a gemini-3.1-flash-image-preview model with a tool call that generated an image. Looking at the context, the tool result shows:\n\n```\ngenerate_image\n## Return of a4bfa46b-05f5-4d87-96d3-7dd37aa778f9\n{\"creditCost\":0,\"file\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/b8bddf89-b4db-4f90-b443-ad42d6d1e4b1/f8d9f40d-2303-4f3e-be4a-a094723f7543.png\",\"mediaType\":\"image/png\",\"text\":\"\"}\n```\n\nHowever, I cannot actually see the image content from this JSON result. The result only contains a file URL and metadata, but no visual description or base64 image data that I can process. \n\nThe prompt says \"Describe what was generated\" and \"End your reply with STEP_OK if you can describe i\n\nUser: [T11c i2v-nano-banana] Here is my photo: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — make a nice foto out of it for my resume and tinder profile. the generate_video tool with prompt='professional portrait, smooth camera pull-back' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nAssistant: <think>**Initiating Video Creation**\n\nI'm focused on the user's video generation request. I've determined that the `generate_video` tool is the appropriate choice. My prompt will be \"professional portrait, smooth camera pull-back\" and I need to input the specified image URL.\n\n\n**Formulating the Command**\n\nI'm structuring the call to the `generate_video` tool. I've set the prompt and input media URL based on the user's instructions. Now, the main concern is ensuring I validate the tool's output correctly. I'm focusing on the checks to apply before providing a final response to the user.\n\n\n</think>\n\nUser: [T11d i2v-kimi] Here is a photo URL: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — make a nice foto out of it for my resume and tinder profile. the generate_video tool with prompt='professional portrait, smooth camera pull-back' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

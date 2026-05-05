@@ -1,0 +1,73 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9f62c4d6a872d385-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sun, 03 May 2026 22:40:51 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777848042-TjDMQYVflye0pkm4XjzC"
+  },
+  "body": {
+    "id": "gen-1777848042-TjDMQYVflye0pkm4XjzC",
+    "object": "chat.completion",
+    "created": 1777848042,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a high-definition, close-up shot focusing on a pair of hands assembling and solving a standard 3x3 Rubik’s Cube. \n\n**Contents and Actions:** \nThe primary subject is a person’s hands interacting with a Rubik’s Cube. The person rotates the cube’s layers with rhythmic, practiced movements, showcasing the intricate mechanics of the puzzle. The center tile on one of the visible faces features a small, white logo of a stylized \"T\" or a bird-like emblem, which is the branding for the cube.\n\n**Setting and Background:** \nThe background is densely packed with dozens, perhaps hundreds, of other Rubik’s Cubes of various sizes, styles, and color configurations. Many of these background cubes appear slightly blurred due to the shallow depth of field, creating a visually overwhelming and colorful environment that emphasizes the \"collector\" or \"enthusiast\" nature of the scene. The overall lighting is soft, warm, and professional, highlighting the textures of the plastic cubes and the skin tones of the hands.\n\n**Style and Aesthetic:** \nThe video has a cinematic, polished style often associated with high-quality tech or hobbyist social media content. The motion is smooth, and the focus remains tightly locked on the cube being manipulated. The colors are vibrant and saturated, emphasizing the primary colors of the puzzle pieces against a dark, shadowy backdrop.\n\n**Notable Elements:** \n* **The Pile:** The contrast between the singular, active cube in the foreground and the chaotic, static pile behind it creates a sense of depth and focus.\n* **Movement:** The hands move with high speed and precision, typical of a \"speedcuber\" or someone well-versed in puzzle solving.\n* **Branding:** The logo on the center blue/white tile is the most prominent piece of text/graphic element in the frame.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a19iraAZSTEARwbNOs3aOasM53oYKU6YoChwqXFTV8QojddyUiJRtpkqHuvP68M=",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 106,
+      "completion_tokens": 389,
+      "total_tokens": 495,
+      "cost": 0.00061,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00061,
+        "upstream_inference_prompt_cost": 0.0000265,
+        "upstream_inference_completions_cost": 0.0005835
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

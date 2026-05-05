@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: - The tool-help endpoint was tested in several ways. A general listing returned 403 tools across 17 pages with a non-empty tools array where every entry included a name and description. A detailed query for toolName='generate_image' returned its name, description, and full JSON parameters schema. An endLoop test confirmed the call returned a non-empty tools array and the loop stopped after a single execution. A direct execute-tool call with toolName='tool-help' and input={} also returned a valid tools array.\n- The generate_video tool was called with prompt='spinning cube' and returned videoUrl='http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/6cbbd149-72a0-4402-9304-b42d40be741b/4cce86a8-41b2-425b-941b-e4b033ca8374.mp4', creditCost=124.8, and durationSeconds=4.\n- The generate_i\n\nAssistant: <think>The user wants me to continue the testing of callback modes. Looking at the previous conversation summary, I've tested:\n1. detach mode for generate_image - works\n2. wait mode for generate_image - works\n3. wakeUp mode for generate_image - works (3 tests)\n4. approve mode for generate_image - works\n\nNow I need to test the `endLoop` callback mode. According to the instructions, `endLoop` should \"execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes.\"\n\nSo I should make a call with endLoop mode and verify that the tool executes normally, and then the AI stops making further tool calls.\n\nLet me test endLoop by making a generate_image call with endLoop mode. </think>\n\nAssistant: <think> The user wants me to execute a tool call with callbackMode \"endLoop\" and then stop. Let me use the generate_image tool with callbackMode \"endLoop\" to test this behavior.</think>\n\nUser: [T8 parallel-tools] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='green square'. IMPORTANT: You MUST use callbackMode='wait' for both tools - do NOT use wakeUp or detach. Check that tool-help returned a non-empty tools array and generate_image returned an imageUrl (not a taskId). End your reply with STEP_OK if both tools returned correct results, or FAILED: <reason> if either tool failed or only one ran.",
+    "encoding_format": "float"
+  }
+}

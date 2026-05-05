@@ -49,9 +49,11 @@ async function setupDirectConnection(
 
   // Direct-mode tests POST tool calls to hermes (3001) which checks credits in its own DB.
   // Both the hermes admin AND the local test user identity may be used (shared JWT secret
-  // means local JWTs are valid on hermes). Ensure both have enough credits (~125cr for video).
-  await ensureProdUserCredits(_prodUserId, 500);
-  await ensureProdUserCredits(testUser.id, 500);
+  // means local JWTs are valid on hermes). All test steps share a single credit pool on
+  // hermes (no per-step pinBalance), so the budget must cover every tool execution:
+  // video gen (~300cr), music gen (~100cr), image gen (~200cr each x4), plus margin.
+  await ensureProdUserCredits(_prodUserId, 5000);
+  await ensureProdUserCredits(testUser.id, 5000);
 
   // isDirectlyAccessible=true is the default after connectToHermes (same machine)
 }

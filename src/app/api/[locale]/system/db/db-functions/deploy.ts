@@ -171,6 +171,8 @@ async function deployFile(
 
 /**
  * Deploy a single database function.
+ * If the return type changed, PostgreSQL rejects CREATE OR REPLACE —
+ * we detect this, DROP the old function, and retry.
  */
 async function deploySingleFunction(
   fn: DbFunctionLike,
@@ -184,7 +186,21 @@ async function deploySingleFunction(
     `Deploying db function: ${fn.name} (from ${filePath}:${exportName})`,
   );
 
-  await db.execute(sql.raw(sqlStatement));
+  try {
+    await db.execute(sql.raw(sqlStatement));
+  } catch (error) {
+    const message = parseError(error).message;
+    if (message.includes("cannot change return type of existing function")) {
+      logger.debug(
+        `Return type changed for ${fn.name}, dropping and recreating`,
+      );
+      await db.execute(sql.raw(`DROP FUNCTION IF EXISTS ${fn.name} CASCADE`));
+      await db.execute(sql.raw(sqlStatement));
+    } else {
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Re-throw non-return-type errors
+      throw error;
+    }
+  }
 
   logger.debug(
     `Deployed db function: ${fn.name} (tables: ${fn.tableNames.join(", ")})`,

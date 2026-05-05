@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-cortex-list-on--memories-to-list-its----0e39a2e5-c991-45ce-83ac-03dd58d3dd2c.md\n\n# Use cortex-list on /memories to list its...\nFolder: cron\n\nuser: Use cortex-list on /memories to list its contents. Report all entries you see and identify which are directories. List at least the subdirectories.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\nassistant: <think>The user wants me to use cortex-list on /memories to list its contents, report all entries, identify which are directories, and list at least the subdirectories. </think>\ntool: \nassistant: \nassistant: <think> The tool call succeeded. The /memories directory contains 11 entries, all of which are directories (nodeType: \"dir\"). I should report this clearly.\n\nEntries:\n1. archived (dir)\n2. bots (dir)\n3. context (dir)\n4. dev (dir)\n5. expertise (dir)\n6. growth (dir)\n7. identity (dir)\n8. inbox (dir)\n9. life (dir)\n10. platform (dir)\n11. test-dir (dir)\n\nAll are directories. No files. No subdirectories listed beyond these top-level ones because the tool only listed the contents of /memories itself.\n\nI n",
+    "encoding_format": "float"
+  }
+}

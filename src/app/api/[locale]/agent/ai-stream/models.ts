@@ -2977,6 +2977,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 8, // released: 2026-04-21 from openrouter
         outputTokenCost: 15, // released: 2026-04-21 from openrouter
       },
+      {
+        id: ChatModelId.GPT_5_4_IMAGE_2,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gpt-5.4-image-2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 10.4, // updated: 2026-05-05 from unbottled.ai
+        outputTokenCost: 19.5, // updated: 2026-05-05 from unbottled.ai
+      },
     ],
     utilities: [
       ModelUtility.IMAGE_GEN,

@@ -154,7 +154,6 @@ export function useEndpoint<
   const readQueryKey = options?.read?.queryOptions?.queryKey;
   const readInitialState = options?.read?.initialState;
   const readInitialData = options?.read?.initialData;
-
   const readOptions = useMemo(
     () => ({
       formOptions: {

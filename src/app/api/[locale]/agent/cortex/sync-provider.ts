@@ -69,9 +69,9 @@ export const documentsSyncProvider: SyncProvider = {
           and(
             eq(cortexNodes.userId, userId),
             sql`(${cortexNodes.syncPolicy} IS NULL OR ${cortexNodes.syncPolicy} = ${CortexSyncPolicy.SYNC})`,
+            sql`${cortexNodes.syncId} IS NOT NULL`,
           ),
-        )
-        .limit(500);
+        );
 
       const result: SyncedDocument[] = rows
         .filter((r): r is typeof r & { syncId: string } => r.syncId !== null)

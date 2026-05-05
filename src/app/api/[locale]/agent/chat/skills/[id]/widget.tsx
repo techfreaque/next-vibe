@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
+import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Brain } from "next-vibe-ui/ui/icons/Brain";
@@ -176,6 +177,30 @@ interface PatchWidgetProps {
  */
 interface GetWidgetProps {
   field: (typeof definitionGet.GET)["fields"];
+}
+
+/**
+ * Inline error display for model selection fields (mirrors form field error pattern).
+ */
+function ModelFieldError({
+  form,
+  name,
+}: {
+  form: { formState: { errors: Record<string, { message?: string }> } };
+  name: string;
+}): React.JSX.Element | null {
+  const error = form.formState.errors[name];
+  if (!error) {
+    return null;
+  }
+  return (
+    <Div className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2 mt-1">
+      <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+      <Span className="text-xs">
+        {error.message ?? "Invalid model selection"}
+      </Span>
+    </Div>
+  );
 }
 
 /**
@@ -872,6 +897,7 @@ export function SkillEditContainer({
                             locale={locale}
                             user={user}
                           />
+                          <ModelFieldError form={form} name="modelSelection" />
                         </Div>
                       </ModelGroup>
 
@@ -897,6 +923,10 @@ export function SkillEditContainer({
                             locale={locale}
                             user={user}
                           />
+                          <ModelFieldError
+                            form={form}
+                            name="imageVisionModelSelection"
+                          />
                         </Div>
                         <Div className="flex flex-col gap-1">
                           <Span className="text-xs opacity-40">
@@ -914,6 +944,10 @@ export function SkillEditContainer({
                             onClick={() => setActiveSelector("videoVision")}
                             locale={locale}
                             user={user}
+                          />
+                          <ModelFieldError
+                            form={form}
+                            name="videoVisionModelSelection"
                           />
                         </Div>
                       </ModelGroup>
@@ -936,6 +970,10 @@ export function SkillEditContainer({
                             locale={locale}
                             user={user}
                           />
+                          <ModelFieldError
+                            form={form}
+                            name="sttModelSelection"
+                          />
                         </Div>
                         <Div className="flex flex-col gap-1">
                           <Span className="text-xs opacity-40">
@@ -949,6 +987,10 @@ export function SkillEditContainer({
                             onClick={() => setActiveSelector("voice")}
                             locale={locale}
                             user={user}
+                          />
+                          <ModelFieldError
+                            form={form}
+                            name="voiceModelSelection"
                           />
                         </Div>
                         <Div className="flex flex-col gap-1">
@@ -967,6 +1009,10 @@ export function SkillEditContainer({
                             onClick={() => setActiveSelector("audioVision")}
                             locale={locale}
                             user={user}
+                          />
+                          <ModelFieldError
+                            form={form}
+                            name="audioVisionModelSelection"
                           />
                         </Div>
                       </ModelGroup>
@@ -991,6 +1037,10 @@ export function SkillEditContainer({
                             locale={locale}
                             user={user}
                           />
+                          <ModelFieldError
+                            form={form}
+                            name="imageGenModelSelection"
+                          />
                         </Div>
                         <Div className="flex flex-col gap-1">
                           <Span className="text-xs opacity-40">
@@ -1007,6 +1057,10 @@ export function SkillEditContainer({
                             locale={locale}
                             user={user}
                           />
+                          <ModelFieldError
+                            form={form}
+                            name="musicGenModelSelection"
+                          />
                         </Div>
                         <Div className="flex flex-col gap-1">
                           <Span className="text-xs opacity-40">
@@ -1022,6 +1076,10 @@ export function SkillEditContainer({
                             onClick={() => setActiveSelector("videoGen")}
                             locale={locale}
                             user={user}
+                          />
+                          <ModelFieldError
+                            form={form}
+                            name="videoGenModelSelection"
                           />
                         </Div>
                       </ModelGroup>

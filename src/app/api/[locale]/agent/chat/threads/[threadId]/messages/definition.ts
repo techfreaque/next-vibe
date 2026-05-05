@@ -112,8 +112,10 @@ const { GET } = createEndpoint({
             await import("@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store");
           useChatInputStore.getState().reset();
         } else {
-          // Real assistant message arrived - remove optimistic placeholder(s)
-          // with matching parentId across all folder caches.
+          // Real assistant/tool message arrived - remove optimistic placeholder(s)
+          // with matching parentId. Done SYNCHRONOUSLY via queryClient to avoid
+          // a render frame showing a spurious branch (the async dynamic import
+          // previously caused a timing gap where both optimistic + real coexisted).
           const newParentId = arrived.parentId;
           if (newParentId) {
             const { removeOptimisticByParentId } =

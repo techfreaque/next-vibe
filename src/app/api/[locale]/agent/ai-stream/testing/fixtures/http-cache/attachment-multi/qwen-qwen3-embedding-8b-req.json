@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T9 preCalls] An image was already generated for you before this message. Look at the generate_image tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.\n\nAssistant: <think> The user is asking me to look at a generate_image tool result that was already generated before this message. Looking at the context, I can see there's a precall result for generate_image with prompt \"mountain landscape at golden hour\". The result shows an image_url with a data URI (base64 encoded image), not a URL starting with 'https://images.unsplash.com'.\n\nThe instructions say: \"End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.\"\n\nI can see an imageUrl in the tool result, but it starts with \"data:image/png;base64,\" NOT \"https://images.unsplash.com\". So according to the instructions, I should report FAILED because the imageUrl does not start with 'https://images.un\n\nUser: [T10a image-attach] Describe the attached image briefly. End your reply with STEP_OK if you could see and describe it, or FAILED: <reason> if you could not process the image.\n\nAssistant: <think> The user has attached an image in the message. I can see it in the context - it's a red circle on a white background. I need to describe it briefly and end with STEP_OK.\n\nThe image shows a solid red circle centered on a plain white background. The circle is perfectly round and fills a significant portion of the frame.\n\nI should respond concisely as instructed</think> A solid red circle centered on a plain white background.\n\nSTEP_OK\n\nUser: [T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.",
+    "encoding_format": "float"
+  }
+}

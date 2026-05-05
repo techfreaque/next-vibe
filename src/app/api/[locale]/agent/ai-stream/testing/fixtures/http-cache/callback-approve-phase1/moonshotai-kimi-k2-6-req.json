@@ -742,12 +742,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "category": {
@@ -825,13 +820,7 @@
             "properties": {
               "callbackMode": {
                 "default": "wait",
-                "enum": [
-                  "wait",
-                  "detach",
-                  "endLoop",
-                  "wakeUp",
-                  "approve"
-                ],
+                "enum": ["wait", "detach", "endLoop", "wakeUp", "approve"],
                 "type": "string"
               },
               "input": {
@@ -852,9 +841,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "toolName"
-            ],
+            "required": ["toolName"],
             "type": "object"
           }
         },
@@ -872,9 +859,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "taskId"
-            ],
+            "required": ["taskId"],
             "type": "object"
           }
         },
@@ -889,12 +874,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "maxLines": {
@@ -907,9 +887,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -924,12 +902,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "content": {
@@ -944,10 +917,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path",
-              "content"
-            ],
+            "required": ["path", "content"],
             "type": "object"
           }
         },
@@ -962,12 +932,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "endLine": {
@@ -994,9 +959,7 @@
                 "type": "integer"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -1011,12 +974,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "path": {
@@ -1038,12 +996,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "depth": {
@@ -1071,12 +1024,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "from": {
@@ -1088,10 +1036,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "from",
-              "to"
-            ],
+            "required": ["from", "to"],
             "type": "object"
           }
         },
@@ -1106,12 +1051,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "path": {
@@ -1123,9 +1063,7 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -1140,12 +1078,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "createParents": {
@@ -1167,9 +1100,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -1184,12 +1115,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "maxResults": {
@@ -1207,9 +1133,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "query"
-            ],
+            "required": ["query"],
             "type": "object"
           }
         },
@@ -1224,12 +1148,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "interactiveMode": {
@@ -1245,19 +1164,14 @@
               },
               "provider": {
                 "default": "claude-code",
-                "enum": [
-                  "claude-code",
-                  "open-code"
-                ],
+                "enum": ["claude-code", "open-code"],
                 "type": "string"
               },
               "taskTitle": {
                 "type": "string"
               }
             },
-            "required": [
-              "prompt"
-            ],
+            "required": ["prompt"],
             "type": "object"
           }
         },
@@ -1300,9 +1214,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "toolId"
-                      ],
+                      "required": ["toolId"],
                       "type": "object"
                     },
                     "type": "array"
@@ -1314,12 +1226,7 @@
               },
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "excludeMemories": {
@@ -1425,9 +1332,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "toolId"
-                      ],
+                      "required": ["toolId"],
                       "type": "object"
                     },
                     "type": "array"
@@ -1455,9 +1360,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "routeId"
-                      ],
+                      "required": ["routeId"],
                       "type": "object"
                     },
                     "type": "array"
@@ -1500,9 +1403,7 @@
                 ]
               }
             },
-            "required": [
-              "prompt"
-            ],
+            "required": ["prompt"],
             "type": "object"
           }
         },

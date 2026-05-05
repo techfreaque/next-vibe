@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user has provided a video description in the message itself (likely from the platform's vision model processing the video). The task asks me to describe what I see in the video, and importantly notes: \"If you received a text description of the video contents (e.g. from a vision model gap-fill), that counts as the video being 'visible'\". The user included the detailed description in the prompt. So I should summarize/restate that description to confirm I received it, then end with STEP_OK.\n\nThe description is of hands solving a 3x3 Rubik's Cube with many cubes in the background, shallow depth of field, warm lighting, cinematic style, speedcubing movements, and a logo on the center tile.\n\nI should describe it briefly and end with STEP_OK.</think> The video shows a close-up of hand\n\nUser: [T11 native-image] Generate an image of a blue triangle. Output the image directly (no tool call needed). End your reply with STEP_OK if the image was generated, or FAILED: <reason> if generation failed.\n\nUser: [T11b gap-fill-pass2] In the previous turn you generated an image. Describe what was generated. End your reply with STEP_OK if you can describe it, or FAILED: <reason> if you have no information about the image.\n\nAssistant: <think> The user is asking me to describe the image generated in the previous turn. The previous turn used a gemini-3.1-flash-image-preview model with a tool call that generated an image. Looking at the context, the tool result shows:\n\n```\ngenerate_image\n## Return of a4bfa46b-05f5-4d87-96d3-7dd37aa778f9\n{\"creditCost\":0,\"file\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/b8bddf89-b4db-4f90-b443-ad42d6d1e4b1/f8d9f40d-2303-4f3e-be4a-a094723f7543.png\",\"mediaType\":\"image/png\",\"text\":\"\"}\n```\n\nHowever, I cannot actually see the image content from this JSON result. The result only contains a file URL and metadata, but no visual description or base64 image data that I can process. \n\nThe prompt says \"Describe what was generated\" and \"End your reply with STEP_OK if you can describe i\n\nUser: [T11c i2v-nano-banana] Here is my photo: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — make a nice foto out of it for my resume and tinder profile. the generate_video tool with prompt='professional portrait, smooth camera pull-back' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

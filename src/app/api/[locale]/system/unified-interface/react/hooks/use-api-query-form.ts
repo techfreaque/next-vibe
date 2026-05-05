@@ -599,13 +599,15 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // queryParams changed means a filter/search changed - always refetch.
         // Don't gate on isCachedData: that check was only meant to prevent
         // double-fetching on SSR hydration, but it also blocks filter-driven refetches.
-        if (!query.isLoading) {
+        // Skip when staleTime is Infinity - the caller explicitly opted out of refetching
+        // (e.g. optimistically pre-seeded messages cache for a new thread).
+        if (!query.isLoading && queryOptions.staleTime !== Infinity) {
           void query.refetch();
         }
       }
     }
     prevQueryParamsRef.current = queryParams;
-  }, [queryParams, query]);
+  }, [queryParams, query, queryOptions.staleTime]);
 
   // Watch for form changes and update query params (debounced)
   useEffect(() => {

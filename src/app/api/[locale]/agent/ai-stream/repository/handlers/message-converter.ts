@@ -4,8 +4,8 @@
 
 import "server-only";
 
-import type { JSONValue, ModelMessage, ToolCallPart, ToolResultPart } from "ai";
 import type { ToolResultOutput } from "@ai-sdk/provider-utils";
+import type { JSONValue, ModelMessage, ToolCallPart, ToolResultPart } from "ai";
 
 import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
@@ -19,10 +19,11 @@ import { parseError } from "@/app/api/[locale]/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
 import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 
-import type { DefaultFolderId } from "../../../chat/config";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { DefaultFolderId } from "../../../chat/config";
 
 import type { ChatMessage } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
@@ -213,23 +214,14 @@ export class MessageConverter {
         const generatedMedia =
           "metadata" in message ? message.metadata?.generatedMedia : undefined;
         if (generatedMedia?.url && generatedMedia.type === "image") {
-          try {
-            const response = await fetch(generatedMedia.url);
-            if (response.ok) {
-              const buffer = await response.arrayBuffer();
-              const base64Data = Buffer.from(buffer).toString("base64");
-              const mimeType = generatedMedia.mimeType ?? "image/png";
-              assistantParts.push({
-                type: "file",
-                data: base64Data,
-                mediaType: mimeType,
-              });
-            }
-          } catch (error) {
-            logger.error(
-              "[MessageConverter] Failed to fetch generated image for AI context",
-              { url: generatedMedia.url, error: parseError(error) },
-            );
+          const base64Data = await fetchStorageFileAsBase64(generatedMedia.url);
+          if (base64Data) {
+            const mimeType = generatedMedia.mimeType ?? "image/png";
+            assistantParts.push({
+              type: "file",
+              data: base64Data,
+              mediaType: mimeType,
+            });
           }
         }
 
@@ -765,7 +757,7 @@ export class MessageConverter {
   /**
    * Build tool result output, detecting ContentResponse to pass images to the AI model
    * When the result contains a ContentResponse (with __isContentResponse marker),
-   * we use the AI SDK's `type: 'content'` format with `file-data` parts so the
+   * we use the AI SDK's `type: 'content'` format with `media` parts so the
    * model can actually "see" images (e.g. screenshots from browser tools).
    *
    * For media tool results (image_gen / video_gen / audio_gen) applies modality-aware logic:
@@ -786,7 +778,7 @@ export class MessageConverter {
         type: "content";
         value: Array<
           | { type: "text"; text: string }
-          | { type: "file-data"; data: string; mediaType: string }
+          | { type: "media"; data: string; mediaType: string }
         >;
       }
   > {
@@ -802,7 +794,7 @@ export class MessageConverter {
       const blocks = result.content as ContentBlock[];
       const contentParts: Array<
         | { type: "text"; text: string }
-        | { type: "file-data"; data: string; mediaType: string }
+        | { type: "media"; data: string; mediaType: string }
       > = [];
 
       for (const block of blocks) {
@@ -810,7 +802,7 @@ export class MessageConverter {
           contentParts.push({ type: "text", text: block.text });
         } else if (block.type === "image") {
           contentParts.push({
-            type: "file-data",
+            type: "media",
             data: block.data,
             mediaType: block.mimeType,
           });
@@ -826,21 +818,53 @@ export class MessageConverter {
     // image_gen / video_gen / audio_gen results carry { file, text, mediaType, creditCost }
     // The model should see the file only if it natively supports that modality;
     // otherwise it sees only the text description (gap-fill guarantees text is populated).
+    //
+    // Results may arrive in two shapes:
+    // 1. Direct call: toolName = "generate_image", result = { imageUrl, creditCost }
+    // 2. Via execute-tool: toolName = "execute-tool", result = { result: { imageUrl, creditCost } }
+    // We detect both by checking shape after optional unwrapping of the execute-tool `result` key.
     const MEDIA_TOOL_NAMES = [
       IMAGE_GEN_ALIAS,
       VIDEO_GEN_TOOL_NAME,
       AUDIO_GEN_TOOL_NAME,
     ] as const;
+
+    // Unwrap execute-tool wrapper: { result: { imageUrl, ... } } → { imageUrl, ... }
+    let effectiveResult = result;
     if (
-      toolName &&
-      MEDIA_TOOL_NAMES.includes(
-        toolName as (typeof MEDIA_TOOL_NAMES)[number],
-      ) &&
+      toolName === "execute-tool" &&
       result &&
       typeof result === "object" &&
-      !Array.isArray(result)
+      !Array.isArray(result) &&
+      "result" in result &&
+      typeof result.result === "object" &&
+      result.result !== null &&
+      !Array.isArray(result.result)
     ) {
-      const mediaResult = result as {
+      effectiveResult = result.result;
+    }
+
+    // Detect media result by shape (imageUrl/videoUrl/audioUrl/file) or by tool name
+    const isMediaByName =
+      toolName !== undefined &&
+      MEDIA_TOOL_NAMES.includes(toolName as (typeof MEDIA_TOOL_NAMES)[number]);
+    const isMediaByShape =
+      effectiveResult !== null &&
+      effectiveResult !== undefined &&
+      typeof effectiveResult === "object" &&
+      !Array.isArray(effectiveResult) &&
+      ("imageUrl" in effectiveResult ||
+        "videoUrl" in effectiveResult ||
+        "audioUrl" in effectiveResult ||
+        "file" in effectiveResult);
+
+    if (
+      (isMediaByName || isMediaByShape) &&
+      effectiveResult &&
+      typeof effectiveResult === "object" &&
+      !Array.isArray(effectiveResult)
+    ) {
+      const mediaResult = effectiveResult as {
         file?: string;
         imageUrl?: string;
         videoUrl?: string;
@@ -864,11 +888,15 @@ export class MessageConverter {
         return { type: "json", value: (result ?? null) as JSONValue };
       }
 
-      // Determine which modality this tool produces
+      // Determine which modality this tool produces — detect by tool name first,
+      // then fall back to field presence (handles execute-tool wrapped results).
       const modality: Modality =
-        toolName === IMAGE_GEN_ALIAS
+        toolName === IMAGE_GEN_ALIAS ||
+        mediaResult.imageUrl !== undefined ||
+        mediaResult.file !== undefined
           ? "image"
-          : toolName === VIDEO_GEN_TOOL_NAME
+          : toolName === VIDEO_GEN_TOOL_NAME ||
+              mediaResult.videoUrl !== undefined
             ? "video"
             : "audio";
 
@@ -880,29 +908,22 @@ export class MessageConverter {
         // let the model see the image). Same pattern as user attachments and assistant
         // generatedMedia handling.
         if (modality === "image") {
-          try {
-            const response = await fetch(fileUrl);
-            if (response.ok) {
-              const buffer = await response.arrayBuffer();
-              const base64Data = Buffer.from(buffer).toString("base64");
-              const mimeType = mediaResult.mediaType ?? "image/png";
-              const contentParts: Array<
-                | { type: "text"; text: string }
-                | { type: "file-data"; data: string; mediaType: string }
-              > = [
-                { type: "file-data", data: base64Data, mediaType: mimeType },
-              ];
-              if (mediaResult.text) {
-                contentParts.push({ type: "text", text: mediaResult.text });
-              }
-              return { type: "content" as const, value: contentParts };
+          const base64Data = await fetchStorageFileAsBase64(fileUrl);
+          if (base64Data) {
+            const mimeType = mediaResult.mediaType ?? "image/png";
+            const contentParts: Array<
+              | { type: "text"; text: string }
+              | { type: "media"; data: string; mediaType: string }
+            > = [{ type: "media", data: base64Data, mediaType: mimeType }];
+            if (mediaResult.text) {
+              contentParts.push({ type: "text", text: mediaResult.text });
             }
-          } catch (fetchErr) {
-            logger?.error(
-              "[MessageConverter] Failed to fetch generated image for tool result",
-              { url: fileUrl, error: parseError(fetchErr) },
-            );
+            return { type: "content" as const, value: contentParts };
           }
+          logger?.error(
+            "[MessageConverter] Failed to fetch generated image for tool result",
+            { url: fileUrl },
+          );
         }
 
         // Fallback for non-image modalities or failed fetch: pass URL as JSON

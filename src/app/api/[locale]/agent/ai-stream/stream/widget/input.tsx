@@ -414,6 +414,10 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     user,
     options: {
       enabled: !!activeThreadId && activeThreadId !== NEW_MESSAGE_ID,
+      // Must match the main messages query staleTime to prevent this independent
+      // useApiQuery from refetching and overwriting optimistic cache data with a 404
+      // (the thread doesn't exist in the DB yet during optimistic creation).
+      staleTime: Infinity,
     },
   });
   const backgroundTasks = messagesQuery.data?.backgroundTasks ?? [];

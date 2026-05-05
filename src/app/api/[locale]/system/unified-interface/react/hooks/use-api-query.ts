@@ -138,6 +138,19 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
   const query = useQuery({
     queryKey,
     queryFn: async () => {
+      // When staleTime is Infinity the caller explicitly opted out of refetching.
+      // A forced refetch (e.g. from useApiQueryForm's queryParam-change effect) can
+      // still invoke this queryFn. If the cache already has valid data, return it
+      // instead of making a network request that would 404 for optimistic threads.
+      if (staleTime === Infinity) {
+        const existing =
+          queryClient.getQueryData<
+            ResponseType<TEndpoint["types"]["ResponseOutput"]>
+          >(queryKey);
+        if (existing?.success) {
+          return existing;
+        }
+      }
       // Read fresh value from the Zustand store directly using getState()
       // This ensures we always get the latest value, even when refetch() is called
       // immediately after a store update (before React re-renders)
@@ -262,14 +275,8 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     // initialDataUpdatedAt is required - without it React Query treats the data as
     // infinitely stale and immediately refetches, defeating the purpose of initialData.
     initialData: initialData
-      ? (): ResponseType<TEndpoint["types"]["ResponseOutput"]> => {
-          logger.debug("useApiQuery: Using initialData", {
-            endpointPath: endpoint.path.join("/"),
-            hasInitialData: !!initialData,
-            initialDataKeys: Object.keys(initialData ?? {}),
-          });
-          return success(initialData);
-        }
+      ? (): ResponseType<TEndpoint["types"]["ResponseOutput"]> =>
+          success(initialData)
       : undefined,
     initialDataUpdatedAt: initialData ? Date.now() : undefined,
   });

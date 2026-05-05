@@ -1,0 +1,73 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9f656c8a5abee85a-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Mon, 04 May 2026 06:24:45 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777875883-L5q9QWGERmCy6z6uL4li"
+  },
+  "body": {
+    "id": "gen-1777875883-L5q9QWGERmCy6z6uL4li",
+    "object": "chat.completion",
+    "created": 1777875883,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a high-definition, close-up shot focusing on a pair of hands assembling a standard 3x3 Rubik's Cube. The scene is set against a cluttered background consisting of dozens of other Rubik's Cubes, both solved and scrambled, resting on a dark surface.\n\n**Visual Content and Action:**\n*   **The Main Subject:** A person's hands are positioned at the center of the frame, actively manipulating a partially scrambled Rubik’s Cube. The cube features white, blue, red, green, orange, and yellow panels.\n*   **The Action:** The hands perform quick, fluid rotational movements, twisting the cube’s layers to align the colors. The movement suggests skill and familiarity with the puzzle.\n*   **Background:** The background is densely packed with assorted Rubik's Cubes of varying designs—some are standard, while others appear to be modified versions or different types of twisty puzzles. The lighting is cinematic, creating a shallow depth-of-field effect where the background cubes are softly blurred (bokeh), keeping the sharp focus strictly on the cube in the dancer's hands.\n\n**Style and Lighting:**\n*   The lighting is warm and directional, accentuating the plastic textures of the cubes and the skin tones of the hands. \n*   The overall aesthetic is professional and polished, reminiscent of a commercial or an instructional video.\n*   The camera remains steady with a tight perspective throughout the clip.\n\n**Notable Elements & Text:**\n*   **Text:** On one of the white center square pieces of the cube being manipulated, there is a small, black, stylized graphic logo that resembles a bird or a symbol oriented upright.\n*   **Atmosphere:** The sheer volume of cubes in the background implies an environment dedicated to puzzle-solving or a collection belonging to an enthusiast. The color palette is vibrant, dominated by the primary-colored panels of the puzzles.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "EjQKMgEMOdbHPAQhuDaqg6mM61MlB33yqhJrlivGbjvvcX2t5z29YIyQmrkv51VnsaEe/ev3",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 107,
+      "completion_tokens": 400,
+      "total_tokens": 507,
+      "cost": 0.00062675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00062675,
+        "upstream_inference_prompt_cost": 0.00002675,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -1015,6 +1015,44 @@ export class MessageContextBuilder {
                     // Images: fixed ~400 token overhead
                     return " ".repeat(400 * 4);
                   }
+                  // Tool-result parts may contain file-data (base64 images) in their
+                  // output.value array. JSON.stringify would include the raw base64 string
+                  // (~1MB+) causing wildly inflated token estimates and aggressive truncation.
+                  // Detect these and count each file-data entry as ~400 tokens (same as images).
+                  if (
+                    "type" in part &&
+                    part.type === "tool-result" &&
+                    "output" in part
+                  ) {
+                    const output = (
+                      part as {
+                        output?: {
+                          type?: string;
+                          value?: Array<{ type?: string }>;
+                        };
+                      }
+                    ).output;
+                    if (
+                      output?.type === "content" &&
+                      Array.isArray(output.value)
+                    ) {
+                      let tokens = 0;
+                      for (const entry of output.value) {
+                        if (
+                          entry.type === "file-data" ||
+                          entry.type === "media" ||
+                          entry.type === "image-data"
+                        ) {
+                          tokens += 400 * 4; // same as image overhead
+                        } else if ("text" in entry) {
+                          tokens += (entry as { text: string }).text.length;
+                        } else {
+                          tokens += 50; // small overhead for other parts
+                        }
+                      }
+                      return " ".repeat(tokens);
+                    }
+                  }
                 }
                 return JSON.stringify(part);
               })

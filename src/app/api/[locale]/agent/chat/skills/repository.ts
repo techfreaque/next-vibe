@@ -7,11 +7,31 @@ import "server-only";
 
 import { and, count, eq, inArray, ne, or, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
+import type { z } from "zod";
 
-import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import {
+  chatModelSelectionSchema,
+  type ChatModelSelection,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import {
+  imageGenModelSelectionSchema,
+  type ImageGenModelSelection,
+} from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import {
+  sttModelSelectionSchema,
+  type SttModelSelection,
+} from "@/app/api/[locale]/agent/speech-to-text/models";
+import {
+  voiceModelSelectionSchema,
+  type VoiceModelSelection,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -70,7 +90,12 @@ import type {
   SkillCreateRequestOutput,
   SkillCreateResponseOutput,
 } from "./create/definition";
-import { type SkillVariantData, customSkills, skillVotes } from "./db";
+import {
+  type SkillVariantData,
+  customSkills,
+  skillVariantSchema,
+  skillVotes,
+} from "./db";
 import type {
   SkillListItem,
   SkillListRequestOutput,
@@ -201,6 +226,54 @@ export class SkillsRepository {
       return null;
     }
     return sel;
+  }
+
+  /**
+   * Safely parse JSONB model selection data from the DB.
+   * Returns null if the data doesn't match the expected schema (e.g. stale/migrated data).
+   */
+  private static safeParseSelection<T>(
+    schema: z.ZodType<T>,
+    data:
+      | Record<string, string | number | boolean | null>
+      | T
+      | null
+      | undefined,
+  ): T | null {
+    if (!data) {
+      return null;
+    }
+    const result = schema.safeParse(data);
+    return result.success ? result.data : null;
+  }
+
+  /**
+   * Safely parse variants from DB JSONB, falling back to a single default variant
+   * built from the top-level modelSelection column.
+   */
+  private static safeParseVariants(
+    variants: SkillVariantData[] | null | undefined,
+    modelSelection: ChatModelSelection | null,
+  ): SkillVariantData[] {
+    if (variants && variants.length > 0) {
+      // Safe-parse each variant individually; drop ones that don't validate
+      const parsed = variants
+        .map((v) => skillVariantSchema.safeParse(v))
+        .filter((r): r is z.ZodSafeParseSuccess<SkillVariantData> => r.success)
+        .map((r) => r.data);
+      if (parsed.length > 0) {
+        return parsed;
+      }
+    }
+    // Fallback: build a single default variant from top-level modelSelection
+    const sel = SkillsRepository.safeParseSelection(
+      chatModelSelectionSchema,
+      modelSelection,
+    );
+    if (sel) {
+      return [{ id: "default", modelSelection: sel, isDefault: true }];
+    }
+    return [];
   }
 
   /**
@@ -909,21 +982,39 @@ export class SkillsRepository {
         description: customSkill.description,
         category: customSkill.category,
         isPublic: customSkill.ownershipType === SkillOwnershipType.PUBLIC,
-        voiceModelSelection: customSkill.voiceModelSelection ?? null,
-        sttModelSelection: customSkill.sttModelSelection ?? null,
-        imageVisionModelSelection:
-          customSkill.imageVisionModelSelection ?? null,
-        videoVisionModelSelection:
-          customSkill.videoVisionModelSelection ?? null,
-        audioVisionModelSelection:
-          customSkill.audioVisionModelSelection ?? null,
-        imageGenModelSelection: customSkill.imageGenModelSelection ?? null,
-        musicGenModelSelection: customSkill.musicGenModelSelection ?? null,
+        voiceModelSelection: SkillsRepository.safeParseSelection(
+          voiceModelSelectionSchema,
+          customSkill.voiceModelSelection,
+        ),
+        sttModelSelection: SkillsRepository.safeParseSelection(
+          sttModelSelectionSchema,
+          customSkill.sttModelSelection,
+        ),
+        imageVisionModelSelection: SkillsRepository.safeParseSelection(
+          imageVisionModelSelectionSchema,
+          customSkill.imageVisionModelSelection,
+        ),
+        videoVisionModelSelection: SkillsRepository.safeParseSelection(
+          videoVisionModelSelectionSchema,
+          customSkill.videoVisionModelSelection,
+        ),
+        audioVisionModelSelection: SkillsRepository.safeParseSelection(
+          audioVisionModelSelectionSchema,
+          customSkill.audioVisionModelSelection,
+        ),
+        imageGenModelSelection: SkillsRepository.safeParseSelection(
+          imageGenModelSelectionSchema,
+          customSkill.imageGenModelSelection,
+        ),
+        musicGenModelSelection: SkillsRepository.safeParseSelection(
+          musicGenModelSelectionSchema,
+          customSkill.musicGenModelSelection,
+        ),
         videoGenModelSelection: customSkill.videoGenModelId
-          ? {
+          ? SkillsRepository.safeParseSelection(videoGenModelSelectionSchema, {
               selectionType: ModelSelectionType.MANUAL,
               manualModelId: customSkill.videoGenModelId,
-            }
+            })
           : null,
         systemPrompt: customSkill.systemPrompt,
         skillOwnership: customSkill.ownershipType,
@@ -938,17 +1029,10 @@ export class SkillsRepository {
             toolId: tool.toolId,
             requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
-        variants:
-          customSkill.variants ??
-          (customSkill.modelSelection
-            ? [
-                {
-                  id: "default",
-                  modelSelection: customSkill.modelSelection,
-                  isDefault: true,
-                },
-              ]
-            : []),
+        variants: SkillsRepository.safeParseVariants(
+          customSkill.variants,
+          customSkill.modelSelection,
+        ),
         longContent: customSkill.longContent ?? null,
         favoritesCount,
         creatorProfile,
@@ -1317,9 +1401,9 @@ export class SkillsRepository {
         });
       }
 
-      // Only update icon if it's different from existing, otherwise set to null
+      // Only update icon if it's different from existing, otherwise skip (undefined gets filtered out)
       const iconToUpdate =
-        data.icon && data.icon !== existingSkill.icon ? data.icon : null;
+        data.icon && data.icon !== existingSkill.icon ? data.icon : undefined;
 
       // Map isPublic to ownershipType
       const ownershipType =

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> Both tools executed successfully in parallel:\n\n1. **tool-help**: Returned a non-empty tools array with 25 tools listed (403 total across 17 pages). Result includes categories, matchedCount, and tools array.\n\n2. **generate_image**: Returned imageUrl='http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/d3f7508d-387b-4add-8e13-ca7efcfdc909/bfd4aef3-81a9-4d1a-99bb-97f3b06b30dd.png' and creditCost=2.5. No taskId was returned.\n\nBoth tools returned correct results. STEP_OK.</think> STEP_OK\n\nUser: [T9 preCalls] An image was already generated for you before this message. Look at the generate_image tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.\n\nAssistant: <think> The user is asking me to look at a generate_image tool result that was already generated before this message. Looking at the context, I can see there's a precall result for generate_image with prompt \"mountain landscape at golden hour\". The result shows an image_url with a data URI (base64 encoded image), not a URL starting with 'https://images.unsplash.com'.\n\nThe instructions say: \"End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.\"\n\nI can see an imageUrl in the tool result, but it starts with \"data:image/png;base64,\" NOT \"https://images.unsplash.com\". So according to the instructions, I should report FAILED because the imageUrl does not start with 'https://images.un\n\nUser: [T10a image-attach] Describe the attached image briefly. End your reply with STEP_OK if you could see and describe it, or FAILED: <reason> if you could not process the image.",
+    "encoding_format": "float"
+  }
+}

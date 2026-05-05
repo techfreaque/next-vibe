@@ -2,7 +2,7 @@
  * Support System Test Suite
  *
  * Part A: Auto-generated endpoint tests (schema, auth, examples).
- * Part B: Integration tests for the escalate → join → message → close flow.
+ * Part B: Integration tests for the join → close flow.
  */
 
 import { eq } from "drizzle-orm";
@@ -24,21 +24,15 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
 import { supportSessions } from "./db";
 import sessionsEndpoint from "./sessions/definition";
-import escalateEndpoint from "./escalate/definition";
-import notifyEndpoint from "./notify/definition";
 import joinEndpoint from "./join/definition";
 import sessionJoinedEndpoint from "./session-joined/definition";
-import messageEndpoint from "./message/definition";
 import closeEndpoint from "./close/definition";
 
 // ── Part A: Auto-generated endpoint tests ────────────────────────────────────
 
 testEndpoint(sessionsEndpoint.GET);
-testEndpoint(escalateEndpoint.POST);
-testEndpoint(notifyEndpoint.POST);
 testEndpoint(joinEndpoint.POST);
 testEndpoint(sessionJoinedEndpoint.POST);
-testEndpoint(messageEndpoint.POST);
 testEndpoint(closeEndpoint.POST);
 
 // ── Part B: Integration Tests ────────────────────────────────────────────────
@@ -112,6 +106,20 @@ describe("Support System Integration", () => {
       .returning({ id: chatThreads.id });
     expect(thread, "Failed to create test thread").toBeTruthy();
     testThreadId = thread.id;
+
+    // Create a pending support session directly in DB
+    // (sessions are now created via ws-provider, not via an endpoint)
+    const [session] = await db
+      .insert(supportSessions)
+      .values({
+        threadId: testThreadId,
+        initiatorId: adminUser.id,
+        initiatorInstanceUrl: "https://test-instance.example.com",
+        status: "pending",
+      })
+      .returning({ id: supportSessions.id });
+    expect(session, "Failed to create test session").toBeTruthy();
+    testSessionId = session.id;
   }, TEST_TIMEOUT);
 
   afterAll(async () => {
@@ -146,42 +154,8 @@ describe("Support System Integration", () => {
     );
   }
 
-  // ── S1: Escalate - create support session ─────────────────────────────────
-  fit("S1: escalate creates a pending support session", async () => {
-    const response = await sendTestRequest({
-      endpoint: escalateEndpoint.POST,
-      data: { threadId: testThreadId },
-      user: adminUser,
-    });
-
-    expect(response.success, `Escalate failed: ${response.message}`).toBe(true);
-    if (!response.success) {
-      return;
-    }
-    expect(response.data.sessionId).toBeTruthy();
-    testSessionId = response.data.sessionId;
-
-    // Verify thread is now in "waiting" state
-    const [thread] = await db
-      .select({ streamingState: chatThreads.streamingState })
-      .from(chatThreads)
-      .where(eq(chatThreads.id, testThreadId));
-    expect(thread.streamingState).toBe("waiting");
-  });
-
-  // ── S2: Duplicate escalation returns conflict ─────────────────────────────
-  fit("S2: duplicate escalation returns conflict", async () => {
-    const response = await sendTestRequest({
-      endpoint: escalateEndpoint.POST,
-      data: { threadId: testThreadId },
-      user: adminUser,
-    });
-
-    expect(response.success).toBe(false);
-  });
-
-  // ── S3: List sessions shows pending session ───────────────────────────────
-  fit("S3: list sessions includes the pending session", async () => {
+  // ── S1: List sessions shows pending session ───────────────────────────────
+  fit("S1: list sessions includes the pending session", async () => {
     const response = await sendTestRequest({
       endpoint: sessionsEndpoint.GET,
       data: {},
@@ -200,12 +174,12 @@ describe("Support System Integration", () => {
     expect(found?.status).toBe("pending");
   });
 
-  // ── S4: Join session ──────────────────────────────────────────────────────
-  fit("S4: join session activates it", async () => {
-    // First manually update session to have customerInstanceId for the join to work
+  // ── S2: Join session ──────────────────────────────────────────────────────
+  fit("S2: join session activates it", async () => {
+    // Set customerInstanceId so join can work
     await db
       .update(supportSessions)
-      .set({ customerInstanceId: "test-instance" })
+      .set({ initiatorInstanceUrl: "https://test-instance.example.com" })
       .where(eq(supportSessions.id, testSessionId));
 
     const response = await sendTestRequest({
@@ -227,26 +201,8 @@ describe("Support System Integration", () => {
     expect(session.status).toBe("active");
   });
 
-  // ── S5: Send message ──────────────────────────────────────────────────────
-  fit("S5: send message through support session", async () => {
-    const response = await sendTestRequest({
-      endpoint: messageEndpoint.POST,
-      data: {
-        sessionId: testSessionId,
-        content: "Test support message",
-      },
-      user: adminUser,
-    });
-
-    expect(response.success, `Message failed: ${response.message}`).toBe(true);
-    if (!response.success) {
-      return;
-    }
-    expect(response.data.sent).toBe(true);
-  });
-
-  // ── S6: Close session ─────────────────────────────────────────────────────
-  fit("S6: close session marks it as closed", async () => {
+  // ── S3: Close session ─────────────────────────────────────────────────────
+  fit("S3: close session marks it as closed", async () => {
     const response = await sendTestRequest({
       endpoint: closeEndpoint.POST,
       data: { sessionId: testSessionId },
@@ -267,8 +223,8 @@ describe("Support System Integration", () => {
     expect(session.status).toBe("closed");
   });
 
-  // ── S7: List sessions no longer shows closed session ──────────────────────
-  fit("S7: list sessions excludes closed session", async () => {
+  // ── S4: List sessions no longer shows closed session ──────────────────────
+  fit("S4: list sessions excludes closed session", async () => {
     const response = await sendTestRequest({
       endpoint: sessionsEndpoint.GET,
       data: {},

@@ -1,0 +1,60 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v6/video/img2video",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "9f656d5fcaae9052-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Mon, 04 May 2026 06:25:19 GMT",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=7OVJ9BqbiKKJ51clTJlHz1%2F01t%2B3bXJbSZn9oK1xOFkGjVuX2EVMtyDvRMT1L7pX%2F%2BEvnPNI1XgiZAzTBue1somBXzAuNiDhpXof4%2FG0o7UIWjAeaBpQFBlCBDAhF68%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "9074ec262be4043418a9f126e3fd6912",
+    "x-request-time": "2.714",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "processing",
+    "tip": "Get 20x faster image generation using enterprise plan. Click here : https://modelslab.com/enterprise",
+    "eta": 80,
+    "message": "Request queued for processing. Try to fetch request after estimated seconds.",
+    "fetch_result": "https://modelslab.com/api/v6/video/fetch/176484804",
+    "id": 176484804,
+    "output": [],
+    "future_links": [
+      "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/c2ffd631-5ccf-4c70-acaf-cb9f30a90a3a-0.mp4"
+    ],
+    "meta": {
+      "id": 176484804,
+      "model_id": "wan2.2",
+      "num_frames": 25,
+      "num_inference_steps": 4,
+      "num_steps": 4,
+      "num_samples": 1,
+      "adaptive_resolution": "no",
+      "init_image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+      "seed": 956567,
+      "prompt": "professional portrait, smooth camera pull-back",
+      "base64": "no",
+      "webhook": null,
+      "track_id": null,
+      "temp": "no",
+      "watermark": "no",
+      "output_type": "mp4",
+      "file_prefix": "c2ffd631-5ccf-4c70-acaf-cb9f30a90a3a",
+      "output": [
+        "https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/c2ffd631-5ccf-4c70-acaf-cb9f30a90a3a-0.mp4"
+      ]
+    }
+  }
+}

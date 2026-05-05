@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user wants me to call the generate_video tool with:\n- prompt='professional portrait, smooth camera pull-back'\n- inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'\n\nThen check that the result has:\n1. non-empty videoUrl\n2. positive creditCost\n3. positive durationSeconds\n\nEnd with STEP_OK if correct, or FAILED: <reason>.\n\nLet me make the tool call.</think>\n\nAssistant: <think> The generate_video tool returned a non-empty videoUrl, a positive creditCost (124.8), and a positive durationSeconds (4). All checks pass. I should end with STEP_OK.</think> STEP_OK\n\nUser: [T11e i2i-nano-banana] Here is my photo: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — generate a stylized cartoon version of this image. the generate_image tool with prompt='stylized cartoon portrait, vibrant colors' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. Check that the result has a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if correct, or FAILED: <reason>.\n\nUser: [T11f i2i-kimi] Here is a photo URL: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — generate a stylized cartoon version of this image. the generate_image tool with prompt='stylized cartoon portrait, vibrant colors' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. Check that the result has a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if correct, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "9f656fa65fd00414-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Mon, 04 May 2026 06:26:53 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1777876010-2fdyphMmNxWwwGftQJk3"
+  },
+  "body": {
+    "id": "gen-1777876010-2fdyphMmNxWwwGftQJk3",
+    "object": "chat.completion",
+    "created": 1777876010,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video shows a close-up, high-definition shot of a person’s hands manipulating a Rubik’s Cube against a backdrop of dozens of other Rubik’s Cubes.\n\n**Visual Content and Setting:**\nThe central focus is a standard 3x3 Rubik’s Cube held by a pair of hands with a medium-tan skin tone. The cube has white, blue, red, orange, and green stickers visible, with a small black logo (a stylized \"X\" or geometric shape) on the white center square. The background is densely packed with a large collection of other Rubik's Cubes, scattered in a somewhat chaotic, mosaic-like arrangement. Some are solved, some are partially mixed, and some are out of focus, creating a shallow depth of field that keeps the viewer's attention locked on the cube being held.\n\n**Actions:**\nThe person’s hands are actively rotating the layers of the cube. The fingers move with fluid, practiced precision, twisting the segments to change the color patterns. The movement is consistent, suggesting someone who is familiar with solving or maneuvering the puzzle.\n\n**Style and Lighting:**\nThe video has a polished, professional aesthetic. The lighting is warm and well-distributed, highlighting the texture of the plastic cubes and the slightly glossy surfaces of the stickers. There is a sense of \"tech\" or \"hobbyist\" flair, often seen in high-quality YouTube content or promotional videos related to brain teasers and puzzle-solving.\n\n**Notable Elements:**\n*   **Contrast:** The vibrant primary colors of the cubes contrast sharply against the dark background.\n*   **Repetition:** The overwhelming number of cubes in the background emphasizes a theme of collection, obsession, or mastery of the puzzle.\n*   **Focus:** The cinematography employs a sharp focus on the primary cube while the background remains softly blurred, guiding the eye directly to the action of the hands.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "EjQKMgEMOdbHwqoYu48NOc9jFZ57q5aL/vf/5me3+MljL/rKwrL351/MVsqwziSGNyU52m2h",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 107,
+      "completion_tokens": 397,
+      "total_tokens": 504,
+      "cost": 0.00062225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00062225,
+        "upstream_inference_prompt_cost": 0.00002675,
+        "upstream_inference_completions_cost": 0.0005955
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}
