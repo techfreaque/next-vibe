@@ -8,6 +8,8 @@
  * (the functions are only ever called server-side via endpoint.ts lazy import).
  */
 
+import { isAbsolute, join } from "node:path";
+
 import type { LoggerMetadata } from "./endpoint";
 
 // File names - fixed
@@ -22,6 +24,20 @@ function getLogDir(): string | null {
     return null;
   }
   return p;
+}
+
+/**
+ * Resolve VIBE_LOG_PATH to an absolute directory.
+ * Uses path.isAbsolute / path.join so Windows drive-letter paths like
+ * "C:\\logs" are detected as absolute and relative paths join cleanly under
+ * PROJECT_ROOT (no mixed-separator strings like "C:\\proj/.tmp").
+ */
+function resolveLogDir(logDir: string): string {
+  if (isAbsolute(logDir)) {
+    return logDir;
+  }
+  const projectRoot = process.env["PROJECT_ROOT"] ?? process.cwd();
+  return join(projectRoot, logDir);
 }
 
 const _ESC = String.fromCodePoint(0x1b);
@@ -49,8 +65,7 @@ async function getLogFilePath(filename: string): Promise<string | null> {
     return null;
   }
   const { existsSync, mkdirSync } = await getFs();
-  const projectRoot = process.env["PROJECT_ROOT"] ?? process.cwd();
-  const debugDir = logDir.startsWith("/") ? logDir : `${projectRoot}/${logDir}`;
+  const debugDir = resolveLogDir(logDir);
   if (!existsSync(debugDir)) {
     try {
       mkdirSync(debugDir, { recursive: true });
@@ -60,7 +75,7 @@ async function getLogFilePath(filename: string): Promise<string | null> {
       );
     }
   }
-  return `${debugDir}/${filename}`;
+  return join(debugDir, filename);
 }
 
 function getLogDirSync(fs: {
@@ -71,8 +86,7 @@ function getLogDirSync(fs: {
   if (!logDir) {
     return null;
   }
-  const projectRoot = process.env["PROJECT_ROOT"] ?? process.cwd();
-  const debugDir = logDir.startsWith("/") ? logDir : `${projectRoot}/${logDir}`;
+  const debugDir = resolveLogDir(logDir);
   if (!fs.existsSync(debugDir)) {
     fs.mkdirSync(debugDir, { recursive: true });
   }
@@ -198,7 +212,7 @@ export function writeStartLogOfflineHint(): void {
       return;
     }
     const hint = `--- server offline --- run \`vibe start\` to restart\n`;
-    fs.appendFileSync(`${debugDir}/${START_LOG_FILE}`, hint, "utf-8");
+    fs.appendFileSync(join(debugDir, START_LOG_FILE), hint, "utf-8");
   } catch {
     // Best effort - process is exiting anyway
   }
@@ -219,7 +233,7 @@ export function writeDevLogOfflineHint(): void {
       return;
     }
     const hint = `--- server offline --- run \`vibe dev\` to restart\n`;
-    fs.appendFileSync(`${debugDir}/${DEV_LOG_FILE}`, hint, "utf-8");
+    fs.appendFileSync(join(debugDir, DEV_LOG_FILE), hint, "utf-8");
   } catch {
     // Best effort - process is exiting anyway
   }
@@ -260,10 +274,7 @@ export async function truncateClientLogs(): Promise<void> {
       return;
     }
     const { readdirSync, unlinkSync } = await getFs();
-    const projectRoot = process.env["PROJECT_ROOT"] ?? process.cwd();
-    const debugDir = logDir.startsWith("/")
-      ? logDir
-      : `${projectRoot}/${logDir}`;
+    const debugDir = resolveLogDir(logDir);
     let files: string[];
     try {
       files = readdirSync(debugDir);
@@ -273,7 +284,7 @@ export async function truncateClientLogs(): Promise<void> {
     for (const file of files) {
       if (file.startsWith("vibe-client-") && file.endsWith(".log")) {
         try {
-          unlinkSync(`${debugDir}/${file}`);
+          unlinkSync(join(debugDir, file));
         } catch {
           // best effort
         }

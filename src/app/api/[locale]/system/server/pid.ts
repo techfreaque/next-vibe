@@ -90,7 +90,7 @@ export function killPreviousInstance(
   // Wait up to 5 seconds for all to exit
   const deadline = Date.now() + 5000;
   while (Date.now() < deadline && running.some(isProcessRunning)) {
-    execSync("sleep 0.1");
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
   }
 
   // Force-kill any survivors
@@ -206,7 +206,11 @@ export function cleanupPidFile(pidFile: string): void {
  */
 export function isPortInUse(port: number): boolean {
   try {
-    execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
+    // stdio:'pipe' prevents Windows "/dev/null not found" noise leaking to terminal.
+    execSync(`fuser ${port}/tcp 2>/dev/null`, {
+      encoding: "utf-8",
+      stdio: "pipe",
+    });
     return true;
   } catch {
     return false;
@@ -222,6 +226,7 @@ export function isPortOwnedByUs(port: number, pidFile: string): boolean {
   try {
     const output = execSync(`fuser ${port}/tcp 2>/dev/null`, {
       encoding: "utf-8",
+      stdio: "pipe",
     }).trim();
     const parsed = parseInt(output.split(/\s+/)[0] ?? "", 10);
     if (!isNaN(parsed) && parsed > 0) {

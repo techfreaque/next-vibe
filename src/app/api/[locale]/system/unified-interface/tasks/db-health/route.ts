@@ -7,6 +7,7 @@
 import "server-only";
 
 import { execSync } from "node:child_process";
+import { freemem, totalmem } from "node:os";
 
 import {
   ErrorResponseTypes,
@@ -33,7 +34,10 @@ const THRESHOLDS = {
 /** Read /proc/meminfo - works on Linux (Docker). Returns null on other platforms. */
 function readProcMeminfo(): { totalKb: number; availableKb: number } | null {
   try {
-    const raw = execSync("cat /proc/meminfo", { encoding: "utf-8" });
+    const raw = execSync("cat /proc/meminfo", {
+      encoding: "utf-8",
+      stdio: "pipe",
+    });
     const total = parseInt(/MemTotal:\s+(\d+)/.exec(raw)?.[1] ?? "", 10);
     const available = parseInt(
       /MemAvailable:\s+(\d+)/.exec(raw)?.[1] ?? "",
@@ -53,9 +57,13 @@ function readDiskUsedPct(): number | null {
   try {
     // Use -P (POSIX format) - compatible with BusyBox df and GNU df.
     // POSIX output: "Filesystem 1024-blocks Used Available Capacity% Mounted"
-    const raw = execSync("df -P /app 2>/dev/null || df -P /", {
-      encoding: "utf-8",
-    });
+    // stdio:'pipe' suppresses Windows "command not recognized" stderr noise.
+    const raw = execSync(
+      process.platform === "win32"
+        ? "df -P /"
+        : "df -P /app 2>/dev/null || df -P /",
+      { encoding: "utf-8", stdio: "pipe" },
+    );
     // Pick the last data line's 5th column (e.g. "72%")
     const lines = raw.trim().split("\n");
     const dataLine = lines[lines.length - 1];
@@ -97,7 +105,13 @@ export const { POST, tools } = endpointsHandler({
         ? Math.round(
             ((procMem.totalKb - procMem.availableKb) / procMem.totalKb) * 100,
           )
-        : Math.round((nodeMem.heapUsed / nodeMem.heapTotal) * 100);
+        : ((): number => {
+            // Use OS-level memory (cross-platform) instead of V8 heap ratio,
+            // which can transiently exceed 100% on Windows causing false alerts.
+            const total = totalmem();
+            const free = freemem();
+            return total > 0 ? Math.round(((total - free) / total) * 100) : 0;
+          })();
 
       if (memoryUsedPct >= THRESHOLDS.memCriticalPct) {
         status = "critical";

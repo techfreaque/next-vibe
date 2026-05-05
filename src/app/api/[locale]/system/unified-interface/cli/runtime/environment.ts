@@ -285,12 +285,16 @@ export function loadEnvironment(): EnvironmentResult {
     }
   }
 
-  // Smart default for VIBE_LOG_PATH: enable file logging for dev/start commands,
-  // disable for plain production (deployed server with no local file system access).
-  // User .env value always wins - only set if not already configured.
+  // Smart default for VIBE_LOG_PATH: enable file logging for dev/start/mcp
+  // commands, disable for plain production (deployed server with no local
+  // file system access). User .env value always wins.
+  // MCP needs file logging because stdio is owned by the JSON-RPC transport —
+  // without it there's no way to debug what the server is doing.
+  const MCP_ALIASES = ["mcp", "mcp:serve", "mcp:start", "start-mcp"];
+  const isMcpCommand = MCP_ALIASES.some((a) => args.includes(a));
   if (!callerEnv["VIBE_LOG_PATH"] && !process.env["VIBE_LOG_PATH"]) {
     (process.env as Record<string, string>)["VIBE_LOG_PATH"] =
-      isDevCommand || isPreviewMode ? ".tmp" : "false";
+      isDevCommand || isPreviewMode || isMcpCommand ? ".tmp" : "false";
   }
 
   // Derive NEXT_PUBLIC_AGENT_* availability flags from raw process.env so the

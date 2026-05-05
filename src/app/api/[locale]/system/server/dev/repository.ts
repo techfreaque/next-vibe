@@ -141,9 +141,7 @@ export class DevRepository {
     // 2. Force-remove the container (hardcoded container_name in compose
     //    means `docker compose down` may not clean it up properly)
     try {
-      await execAsync("docker rm -f dev-postgres 2>/dev/null || true", {
-        timeout: 10000,
-      });
+      await execAsync("docker rm -f dev-postgres", { timeout: 10000 });
       logger.debug("Removed dev-postgres container");
     } catch {
       logger.debug("No dev-postgres container to remove");
@@ -191,9 +189,7 @@ export class DevRepository {
 
       try {
         // Remove the Docker volume (this is much cleaner than dealing with file permissions)
-        await execAsync(`docker volume rm ${volumeName} 2>/dev/null || true`, {
-          timeout: 10000,
-        });
+        await execAsync(`docker volume rm ${volumeName}`, { timeout: 10000 });
         logger.debug("Postgres data volume deleted");
       } catch {
         logger.debug("Postgres data volume not found or already deleted");
@@ -663,16 +659,19 @@ export class DevRepository {
   ): Promise<never> {
     const { spawn } = await import("node:child_process");
 
-    // Save tty state now (before anything touches it) so we can restore on exit
+    // Save tty state now (before anything touches it) so we can restore on exit.
+    // stty is POSIX-only; skip on Windows where it doesn't exist.
     let savedTtyState: string | null = null;
-    try {
-      savedTtyState = execSync("stty -g </dev/tty 2>/dev/null", {
-        shell: "/bin/sh",
-      })
-        .toString()
-        .trim();
-    } catch {
-      /* not a tty */
+    if (process.platform !== "win32") {
+      try {
+        savedTtyState = execSync("stty -g </dev/tty 2>/dev/null", {
+          shell: "/bin/sh",
+        })
+          .toString()
+          .trim();
+      } catch {
+        /* not a tty */
+      }
     }
 
     const { env: serverEnv } = await import("@/config/env");
@@ -708,6 +707,9 @@ export class DevRepository {
     let viteClose: (() => Promise<void>) | undefined;
 
     const restoreTty = (): void => {
+      if (process.platform === "win32") {
+        return;
+      }
       try {
         if (savedTtyState) {
           execSync(`stty ${savedTtyState} </dev/tty 2>/dev/null`, {
@@ -1165,8 +1167,10 @@ export class DevRepository {
     // Get PIDs on this port
     let pidOnPort: number | undefined;
     try {
+      // stdio:'pipe' prevents Windows "/dev/null not found" noise leaking to terminal.
       const output = execSync(`fuser ${port}/tcp 2>/dev/null`, {
         encoding: "utf-8",
+        stdio: "pipe",
       }).trim();
       const parsed = parseInt(output.split(/\s+/)[0] ?? "", 10);
       if (!isNaN(parsed) && parsed > 0) {
@@ -1215,8 +1219,11 @@ export class DevRepository {
     const gracePeriod = Date.now() + 2000;
     while (Date.now() < gracePeriod) {
       try {
-        execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
-        execSync("sleep 0.1");
+        execSync(`fuser ${port}/tcp 2>/dev/null`, {
+          encoding: "utf-8",
+          stdio: "pipe",
+        });
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
       } catch {
         return; // port released
       }
@@ -1233,8 +1240,11 @@ export class DevRepository {
     const deadline = Date.now() + 3000;
     while (Date.now() < deadline) {
       try {
-        execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
-        execSync("sleep 0.1");
+        execSync(`fuser ${port}/tcp 2>/dev/null`, {
+          encoding: "utf-8",
+          stdio: "pipe",
+        });
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
       } catch {
         return;
       }
