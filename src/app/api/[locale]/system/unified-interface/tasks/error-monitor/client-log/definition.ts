@@ -69,7 +69,9 @@ export const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "post.fields.metadata.label" as const,
         description: "post.fields.metadata.description" as const,
-        schema: z.array(z.record(z.string(), z.string())).optional(),
+        schema: z
+          .array(z.record(z.string(), z.union([z.string(), z.array(z.string())])))
+          .optional(),
       }),
       ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
