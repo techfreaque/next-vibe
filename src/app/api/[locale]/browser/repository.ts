@@ -278,9 +278,15 @@ async function ensureChrome(logger: EndpointLogger): Promise<void> {
   logger.info("[Browser] Launching Chrome");
   const isLinux = process.platform === "linux";
   const waylandDisplay = process.env["WAYLAND_DISPLAY"];
+  const homeDir =
+    process.env["HOME"] ??
+    process.env["USERPROFILE"] ??
+    (process.platform === "win32" ? "C:\\Users\\Default" : "/root");
   const userDataDir =
     browserEnv.CHROME_USER_DATA_DIR ??
-    `${process.env["HOME"] ?? "/root"}/.cache/chrome-devtools-mcp/chrome-profile`;
+    (process.platform === "win32"
+      ? `${process.env["LOCALAPPDATA"] ?? homeDir}\\chrome-devtools-mcp\\chrome-profile`
+      : `${homeDir}/.cache/chrome-devtools-mcp/chrome-profile`);
 
   // Use headless mode when explicitly requested, or when on Linux without any
   // display (neither X11 nor Wayland). With a display available, prefer X11
