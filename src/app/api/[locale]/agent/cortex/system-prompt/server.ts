@@ -35,7 +35,15 @@ const CHAR_BUDGET = {
 export async function loadCortexData(
   params: SystemPromptServerParams,
 ): Promise<CortexData> {
-  const { user, logger, isIncognito, lastUserMessage, locale } = params;
+  const {
+    user,
+    logger,
+    isIncognito,
+    lastUserMessage,
+    locale,
+    headless,
+    rootFolderId,
+  } = params;
 
   const { country } = getLanguageAndCountryFromLocale(locale);
   const countryInfo = languageConfig.countryInfo[country];
@@ -45,7 +53,7 @@ export async function loadCortexData(
   const { getLocaleRoots } = await import("../seeds/templates");
   const localeRoots = getLocaleRoots(locale);
 
-  const empty: CortexData = {
+  const emptyBase: Omit<CortexData, "unavailableNote"> = {
     tree: [],
     threadCounts: {},
     totalThreads: 0,
@@ -57,9 +65,30 @@ export async function loadCortexData(
     localeRoots,
   };
 
-  // No Cortex data for incognito or unauthenticated users
-  if (isIncognito || !userId) {
-    return empty;
+  // Headless agents always get cortex if authenticated (they need memory to do their job)
+  const isPublicFolder = rootFolderId === "public";
+  const blockCortex = !userId || (!headless && (isIncognito || isPublicFolder));
+
+  if (blockCortex) {
+    // Headless never sees this note - only UI-facing contexts
+    if (headless) {
+      return emptyBase;
+    }
+    let unavailableNote: string;
+    if (isIncognito && userId) {
+      unavailableNote =
+        "Not available in incognito - nothing leaves the browser by design. Switch to your private folder to access memories and tasks.";
+    } else if (isIncognito) {
+      unavailableNote =
+        "Not available in incognito. Create a free account and use the private folder to get persistent memory across conversations.";
+    } else if (isPublicFolder && userId) {
+      unavailableNote =
+        "Not available in the public folder. Switch to your private folder to access memories and tasks.";
+    } else {
+      unavailableNote =
+        "Not available without an account. Sign in and use the private folder to access persistent memory.";
+    }
+    return { ...emptyBase, unavailableNote };
   }
 
   try {

@@ -1,7 +1,6 @@
 import "server-only";
 
 import {
-  ErrorResponseTypes,
   fail,
   success,
   type ResponseType,
@@ -10,29 +9,20 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { buildSystemPrompt } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/builder";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type {
-  JwtPayloadType,
-  JwtPrivatePayloadType,
-} from "@/app/api/[locale]/user/auth/types";
-import { users as usersTable } from "@/app/api/[locale]/user/db";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { eq } from "drizzle-orm";
 
 import type { SystemPromptDebugResponseOutput } from "./definition";
 import type { SystemPromptDebugT } from "./i18n";
 
 interface DebugSystemPromptParams {
   rootFolderId: DefaultFolderId;
-  userRole: "public" | "customer" | "admin";
   userMessage?: string;
   threadId?: string;
-  userId?: string;
   skillId?: string;
   subFolderId?: string;
-  requestingUser: JwtPrivatePayloadType;
+  user: JwtPayloadType;
   locale: CountryLanguage;
   logger: EndpointLogger;
   t: SystemPromptDebugT;
@@ -43,80 +33,24 @@ export async function buildDebugSystemPrompt(
 ): Promise<ResponseType<SystemPromptDebugResponseOutput>> {
   const {
     rootFolderId,
-    userRole,
     userMessage,
     threadId,
-    userId,
     skillId,
     subFolderId,
-    requestingUser,
+    user,
     locale,
     logger,
     t,
   } = params;
 
-  // Resolve target user: use provided userId or fall back to requesting admin
-  let baseUser: JwtPrivatePayloadType = requestingUser;
-
-  if (userId && userId !== requestingUser.id) {
-    try {
-      const rows = await db
-        .select({ id: usersTable.id })
-        .from(usersTable)
-        .where(eq(usersTable.id, userId))
-        .limit(1);
-
-      const row = rows[0];
-      if (!row) {
-        return fail({
-          message: t("get.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      baseUser = {
-        id: row.id,
-        // Use requesting admin's leadId since user_leads is separate table
-        leadId: requestingUser.leadId,
-        isPublic: false,
-        roles: [UserPermissionRole.CUSTOMER],
-      };
-    } catch (error) {
-      logger.error("Failed to load target user", parseError(error), {
-        userId,
-      });
-      return fail({
-        message: t("get.errors.server.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  // Apply simulated role overlay
-  const simulatedUser: JwtPayloadType =
-    userRole === "public"
-      ? {
-          isPublic: true,
-          leadId: baseUser.leadId,
-          roles: [UserPermissionRole.PUBLIC],
-        }
-      : {
-          ...baseUser,
-          isPublic: false,
-          roles:
-            userRole === "admin"
-              ? [UserPermissionRole.ADMIN]
-              : [UserPermissionRole.CUSTOMER],
-        };
-
   try {
-    const targetUserId = simulatedUser.isPublic ? undefined : simulatedUser.id;
+    const userId = user.isPublic ? undefined : user.id;
 
     const [{ systemPrompt, trailingSystemMessage }, rawScores] =
       await Promise.all([
         buildSystemPrompt({
           skillId: skillId ?? null,
-          user: simulatedUser,
+          user,
           logger,
           locale,
           rootFolderId: rootFolderId as DefaultFolderId,
@@ -127,10 +61,10 @@ export async function buildDebugSystemPrompt(
           lastUserMessage: userMessage,
           threadId: threadId ?? null,
         }),
-        userMessage && targetUserId
+        userMessage && userId
           ? import("@/app/api/[locale]/agent/cortex/system-prompt/server")
               .then(({ loadRawEmbeddingScores }) =>
-                loadRawEmbeddingScores(targetUserId, userMessage),
+                loadRawEmbeddingScores(userId, userMessage),
               )
               .catch((err) => {
                 logger.warn("loadRawEmbeddingScores failed", {

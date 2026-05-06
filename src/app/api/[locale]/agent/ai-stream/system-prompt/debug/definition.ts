@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -18,7 +19,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
@@ -32,7 +32,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "ai-stream", "system-prompt", "debug"],
   aliases: ["system-prompt-debug"] as const,
-  allowedRoles: [UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC] as const,
 
   title: "get.title" as const,
   description: "get.description" as const,
@@ -79,17 +79,6 @@ const { GET } = createEndpoint({
             "Folder context: private | public | incognito | cron | shared | support",
           ),
       }),
-      userRole: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "get.fields.userRole.label" as const,
-        description: "get.fields.userRole.description" as const,
-        placeholder: "get.fields.userRole.placeholder" as const,
-        schema: z
-          .enum(["public", "customer", "admin"])
-          .default("admin")
-          .describe("Simulated user role: public | customer | admin"),
-      }),
       userMessage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -110,18 +99,6 @@ const { GET } = createEndpoint({
         description: "get.fields.threadId.description" as const,
         placeholder: "get.fields.threadId.placeholder" as const,
         schema: z.string().uuid().optional().describe("Thread ID for context"),
-      }),
-      userId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "get.fields.userId.label" as const,
-        description: "get.fields.userId.description" as const,
-        placeholder: "get.fields.userId.placeholder" as const,
-        schema: z
-          .string()
-          .uuid()
-          .optional()
-          .describe("Target user ID (defaults to own account)"),
       }),
       skillId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -232,17 +209,14 @@ const { GET } = createEndpoint({
     requests: {
       private: {
         rootFolderId: DefaultFolderId.PRIVATE,
-        userRole: "admin" as const,
         userMessage: "What tools can you use?",
       },
       public: {
         rootFolderId: DefaultFolderId.PUBLIC,
-        userRole: "customer" as const,
         userMessage: "Hello, who are you?",
       },
       incognito: {
         rootFolderId: DefaultFolderId.INCOGNITO,
-        userRole: "public" as const,
       },
     },
     responses: {

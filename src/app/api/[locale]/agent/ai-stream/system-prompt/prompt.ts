@@ -144,7 +144,7 @@ export const platformOverviewFragment: SystemPromptFragment<PromptContextData> =
 
 - **Platform:** Free speech AI - ${totalModelCount} models from Claude and GPT to ${uncensoredNames}. Users set their own filtering level.
 ${creditLines}
-- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), cron (system tasks).`;
+- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).`;
     },
   };
 
@@ -212,12 +212,19 @@ export const languageFragment: SystemPromptFragment<PromptContextData> = {
 Respond in ${languageName} (${locale}) unless the task explicitly specifies otherwise.`;
     }
 
+    const isIncognito = data.rootFolderId === DefaultFolderId.INCOGNITO;
+    const isPublicFolder =
+      data.rootFolderId === DefaultFolderId.PUBLIC || data.isPublicUser;
+    const cortexNote =
+      !isIncognito && !isPublicFolder
+        ? "\nWhen writing to Cortex (memories, documents, tasks), always use the user's language - not English - unless the content is inherently language-neutral (code, identifiers)."
+        : "";
+
     return `## User Language and Location
 
 **Default language:** ${languageName} (${locale}) | **Location:** ${countryName} ${flag}
 
-ALWAYS respond in the language of the user's current message. Default language is a fallback only.
-When writing to Cortex (memories, documents, tasks), always use the user's language - not English - unless the content is inherently language-neutral (code, identifiers).`;
+ALWAYS respond in the language of the user's current message. Default language is a fallback only.${cortexNote}`;
   },
 };
 
@@ -344,7 +351,10 @@ export const bootstrapFragment: SystemPromptFragment<PromptContextData> = {
   id: "bootstrap",
   placement: "leading",
   priority: 700,
-  condition: (data) => !data.headless && data.isFreshUser,
+  condition: (data) =>
+    !data.headless &&
+    data.isFreshUser &&
+    data.rootFolderId !== DefaultFolderId.INCOGNITO,
   build: (data) => {
     const {
       appName,
@@ -584,7 +594,10 @@ export const autonomyStatusFragment: SystemPromptFragment<PromptContextData> = {
   id: "autonomy-status",
   placement: "leading",
   priority: 720,
-  condition: (data) => !data.headless && !data.isPublicUser,
+  condition: (data) =>
+    !data.headless &&
+    !data.isPublicUser &&
+    data.rootFolderId !== DefaultFolderId.INCOGNITO,
   build: (data) => {
     const { dreamerEnabled, autopilotEnabled } = data;
 

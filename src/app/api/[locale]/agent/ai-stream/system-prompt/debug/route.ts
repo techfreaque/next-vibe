@@ -13,13 +13,11 @@ export const { GET, tools } = endpointsHandler({
       const { buildDebugSystemPrompt } = await import("./repository");
       return buildDebugSystemPrompt({
         rootFolderId: data.rootFolderId,
-        userRole: data.userRole,
         userMessage: data.userMessage,
         threadId: data.threadId,
-        userId: data.userId,
         skillId: data.skillId,
         subFolderId: data.subFolderId,
-        requestingUser: user,
+        user,
         locale,
         logger,
         t,

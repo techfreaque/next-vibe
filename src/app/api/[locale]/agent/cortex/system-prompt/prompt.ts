@@ -51,6 +51,12 @@ export interface CortexDirEntry {
 export type CortexEntry = CortexFileEntry | CortexDirEntry;
 
 export interface CortexData {
+  /**
+   * Set when cortex is not available in this context (incognito/public).
+   * The value is a context-appropriate one-liner to include in the fragment.
+   * When absent, cortex is fully available.
+   */
+  unavailableNote: string;
   /** Root-level dirs: memories, documents, threads, skills, tasks, favorites */
   tree: CortexEntry[];
   /** Thread counts by root folder id */
@@ -76,6 +82,10 @@ export const cortexFragment: SystemPromptFragment<CortexData> = {
   placement: "trailing",
   priority: 190,
   build: (data) => {
+    if (data.unavailableNote) {
+      return `## Cortex\n${data.unavailableNote}`;
+    }
+
     const {
       tree,
       uploadCount,

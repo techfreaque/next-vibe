@@ -78,19 +78,18 @@ export const DebugLinearMessageView = React.memo(
       () => ({
         read: {
           queryOptions: {
-            enabled: !user.isPublic,
+            enabled: true,
             staleTime: 10_000,
           },
           queryParams: {
             rootFolderId,
-            userRole: "admin" as const,
             userMessage: userMessage || undefined,
             subFolderId: subFolderId ?? undefined,
             skillId: selectedSkill ?? undefined,
           },
         },
       }),
-      [rootFolderId, userMessage, subFolderId, selectedSkill, user.isPublic],
+      [rootFolderId, userMessage, subFolderId, selectedSkill],
     );
 
     const debugEndpoint = useEndpoint(
