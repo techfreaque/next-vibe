@@ -110,7 +110,7 @@ export function useVoiceRecording({
 
   const onError = useCallback(
     (err: string) => {
-      logger.error("Voice input error", err);
+      logger.error("Voice input error", { error: err });
     },
     [logger],
   );

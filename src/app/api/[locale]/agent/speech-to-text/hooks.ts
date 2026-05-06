@@ -354,7 +354,9 @@ export function useEdenAISpeech({
         err instanceof DOMException || err instanceof Error
           ? getMicrophoneErrorMessage(err, t)
           : t("hooks.stt.failed-to-start");
-      logger.error("STT: Failed to start recording", parseError(err));
+      logger.error("STT: Failed to start recording", {
+        error: parseError(err).message,
+      });
       setError(errorMsg);
       onError?.(errorMsg);
       cleanup();

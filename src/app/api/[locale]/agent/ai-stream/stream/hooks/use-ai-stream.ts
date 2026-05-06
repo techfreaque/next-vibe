@@ -203,7 +203,7 @@ export function useAIStream(): UseAIStreamReturn {
         }
       } catch (error) {
         logger.error("Failed to call cancel endpoint", {
-          error: error instanceof Error ? error.message : String(error),
+          error: parseError(error).message,
           threadId,
         });
 

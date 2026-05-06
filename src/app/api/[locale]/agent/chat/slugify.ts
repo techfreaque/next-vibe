@@ -73,6 +73,8 @@ export const SKILL_ID_ALIASES: Record<string, string> = {
   unbiasedHistorian: "unbiased-historian",
   // Variant IDs
   cheapSmart: "cheap-smart",
+  // Legacy merged skill+variant IDs stored with hyphen instead of __ separator
+  "researcher-budget": "researcher__budget",
 };
 
 /**
@@ -113,12 +115,16 @@ export function parseSkillId(raw: string): {
   skillId: string;
   variantId: string | null;
 } {
-  const idx = raw.indexOf(SKILL_VARIANT_SEPARATOR);
+  // Resolve full-string alias first so legacy merged IDs like "researcher-budget"
+  // expand to "researcher__budget" before the separator split.
+  const resolved = resolveIdAlias(raw);
+  const idx = resolved.indexOf(SKILL_VARIANT_SEPARATOR);
   if (idx === -1) {
-    return { skillId: resolveIdAlias(raw), variantId: null };
+    return { skillId: resolved, variantId: null };
   }
-  const rawSkillId = raw.slice(0, idx);
-  const rawVariantId = raw.slice(idx + SKILL_VARIANT_SEPARATOR.length) || null;
+  const rawSkillId = resolved.slice(0, idx);
+  const rawVariantId =
+    resolved.slice(idx + SKILL_VARIANT_SEPARATOR.length) || null;
   return {
     skillId: resolveIdAlias(rawSkillId),
     variantId: rawVariantId ? resolveIdAlias(rawVariantId) : null,

@@ -76,6 +76,9 @@ export class cancelRepository {
         .limit(1);
 
       if (!thread) {
+        logger.warn("[Cancel] Thread not found for cancel request", {
+          threadId,
+        });
         return fail({
           message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,

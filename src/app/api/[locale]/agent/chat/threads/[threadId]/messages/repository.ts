@@ -220,6 +220,26 @@ export class MessagesRepository {
     };
     const hasMetadata = Object.keys(metadata).length > 0;
 
+    // Verify thread exists before attempting any insert - queued messages can arrive
+    // after a thread is deleted, causing an FK violation that surfaces as a 500.
+    const [threadExists] = await db
+      .select({ id: chatThreads.id })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, params.threadId))
+      .limit(1);
+
+    if (!threadExists) {
+      params.logger.error(
+        "createUserMessage: thread does not exist, dropping message",
+        {
+          threadId: params.threadId,
+          messageId: params.messageId,
+          isQueued: params.extraMetadata?.isQueued ?? false,
+        },
+      );
+      return;
+    }
+
     // Verify parent exists - the client may reference an optimistic message that was never
     // committed (e.g. stream interrupted mid-flight). Fall back to the actual last committed
     // message in the thread so the conversation stays connected.
