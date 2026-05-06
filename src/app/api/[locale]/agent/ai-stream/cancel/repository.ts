@@ -76,6 +76,15 @@ export class cancelRepository {
         .limit(1);
 
       if (!thread) {
+        // Incognito (client-only) threads are never written to DB but are still
+        // registered in StreamRegistry. The threadId itself is the ownership proof.
+        const wasIncognitoActive = StreamRegistry.cancel(threadId);
+        if (wasIncognitoActive) {
+          logger.info("[Cancel] Incognito stream cancelled via registry", {
+            threadId,
+          });
+          return success({ cancelled: true });
+        }
         logger.warn("[Cancel] Thread not found for cancel request", {
           threadId,
         });
