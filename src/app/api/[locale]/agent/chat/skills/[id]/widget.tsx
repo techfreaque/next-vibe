@@ -5,6 +5,7 @@
 "use client";
 
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
+import { FormField, FormMessage } from "next-vibe-ui/ui/form/form";
 import {
   Collapsible,
   CollapsibleContent,
@@ -183,22 +184,17 @@ interface GetWidgetProps {
  * Inline error display for model selection fields (mirrors form field error pattern).
  */
 function ModelFieldError({
-  form,
-  name,
+  error,
 }: {
-  form: { formState: { errors: Record<string, { message?: string }> } };
-  name: string;
+  error: string | undefined;
 }): React.JSX.Element | null {
-  const error = form.formState.errors[name];
   if (!error) {
     return null;
   }
   return (
     <Div className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2 mt-1">
       <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-      <Span className="text-xs">
-        {error.message ?? "Invalid model selection"}
-      </Span>
+      <Span className="text-xs">{error}</Span>
     </Div>
   );
 }
@@ -220,150 +216,6 @@ export function SkillEditContainer({
   const skillId = form.watch("id");
   const skillHook = useSkill(skillId, user, logger);
   const skillOwnership = skillHook.read?.data?.skillOwnership;
-
-  // Single active selector state replaces 5 separate open/close states
-  const [activeSelector, setActiveSelector] = useState<
-    | "chat"
-    | "voice"
-    | "imageGen"
-    | "musicGen"
-    | "videoGen"
-    | "stt"
-    | "imageVision"
-    | "videoVision"
-    | "audioVision"
-    | null
-  >(null);
-
-  // Platform-level default model selections (env-aware)
-  const platformChatDefault = useMemo((): ChatModelSelection | undefined => {
-    const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const parsed = chatModelSelectionSchema.safeParse({
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: m.id,
-    });
-    return parsed.success ? parsed.data : undefined;
-  }, [user]);
-
-  const platformTtsDefault = useMemo((): VoiceModelSelection | undefined => {
-    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const parsed = voiceModelSelectionSchema.safeParse({
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: m.id,
-    });
-    return parsed.success ? parsed.data : undefined;
-  }, [user]);
-
-  const platformImageGenDefault = useMemo(():
-    | ImageGenModelSelection
-    | undefined => {
-    const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const parsed = imageGenModelSelectionSchema.safeParse({
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: m.id,
-    });
-    return parsed.success ? parsed.data : undefined;
-  }, [user]);
-
-  const platformMusicGenDefault = useMemo(():
-    | MusicGenModelSelection
-    | undefined => {
-    const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const parsed = musicGenModelSelectionSchema.safeParse({
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: m.id,
-    });
-    return parsed.success ? parsed.data : undefined;
-  }, [user]);
-
-  const platformVideoGenDefault = useMemo(():
-    | VideoGenModelSelection
-    | undefined => {
-    const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const parsed = videoGenModelSelectionSchema.safeParse({
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: m.id,
-    });
-    return parsed.success ? parsed.data : undefined;
-  }, [user]);
-
-  const platformSttDefault = useMemo((): SttModelSelection | undefined => {
-    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
-    if (!m) {
-      return undefined;
-    }
-    const parsed = sttModelSelectionSchema.safeParse({
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: m.id,
-    });
-    return parsed.success ? parsed.data : undefined;
-  }, [user]);
-
-  const platformImageVisionDefault = useMemo(():
-    | ImageVisionModelSelection
-    | undefined => {
-    const m = getBestImageVisionModel(
-      DEFAULT_IMAGE_VISION_MODEL_SELECTION,
-      user,
-    );
-    if (!m) {
-      return undefined;
-    }
-    const parsed = imageVisionModelSelectionSchema.safeParse({
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: m.id,
-    });
-    return parsed.success ? parsed.data : undefined;
-  }, [user]);
-
-  const platformVideoVisionDefault = useMemo(():
-    | VideoVisionModelSelection
-    | undefined => {
-    const m = getBestVideoVisionModel(
-      DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-      user,
-    );
-    if (!m) {
-      return undefined;
-    }
-    const parsed = videoVisionModelSelectionSchema.safeParse({
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: m.id,
-    });
-    return parsed.success ? parsed.data : undefined;
-  }, [user]);
-
-  const platformAudioVisionDefault = useMemo(():
-    | AudioVisionModelSelection
-    | undefined => {
-    const m = getBestAudioVisionModel(
-      DEFAULT_AUDIO_VISION_MODEL_SELECTION,
-      user,
-    );
-    if (!m) {
-      return undefined;
-    }
-    const parsed = audioVisionModelSelectionSchema.safeParse({
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: m.id,
-    });
-    return parsed.success ? parsed.data : undefined;
-  }, [user]);
 
   // Stable props
   const emptyField = useMemo(() => ({}), []);
@@ -413,8 +265,6 @@ export function SkillEditContainer({
     [form],
   );
 
-  const [skillDefaultsOpen, setSkillDefaultsOpen] = useState(false);
-
   const watchedAllowedTools = form.watch("availableTools") ?? null;
   const watchedPinnedTools = form.watch("pinnedTools") ?? null;
 
@@ -452,19 +302,7 @@ export function SkillEditContainer({
     <Div className="flex flex-col gap-0">
       {/* Top Actions: Back, Delete, Submit */}
       <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
-        {/* Back Button - returns to selector when a model selector is open */}
-        {activeSelector !== null ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => setActiveSelector(null)}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        ) : (
-          <NavigateButtonWidget field={children.backButton} />
-        )}
+        <NavigateButtonWidget field={children.backButton} />
 
         {/* Delete Button - only show if user owns the skill */}
         {skillOwnership === SkillOwnershipType.USER && (
@@ -493,626 +331,72 @@ export function SkillEditContainer({
 
       {/* Scrollable Form Container */}
       <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
-        {activeSelector === "chat" ? (
-          <ModelSelector
-            modelSelection={form.watch("modelSelection") ?? undefined}
-            onChange={(sel) => {
-              const parsed = chatModelSelectionSchema.nullable().safeParse(sel);
-              form.setValue(
-                "modelSelection",
-                parsed.success ? parsed.data : null,
-                { shouldDirty: true, shouldValidate: true },
-              );
-            }}
-            onSelect={(confirmed) => {
-              const parsed = chatModelSelectionSchema
-                .nullable()
-                .safeParse(confirmed);
-              form.setValue(
-                "modelSelection",
-                parsed.success ? parsed.data : null,
-                { shouldDirty: true, shouldValidate: true },
-              );
-              setActiveSelector(null);
-            }}
-            locale={locale}
-            user={user}
-            chatOnly
-          />
-        ) : activeSelector === "voice" ? (
-          <ModelSelector
-            allowedRoles={["tts"]}
-            modelSelection={form.watch("voiceModelSelection") ?? undefined}
-            onChange={(sel) => {
-              const parsed = voiceModelSelectionSchema
-                .nullable()
-                .safeParse(sel);
-              form.setValue(
-                "voiceModelSelection",
-                parsed.success ? parsed.data : null,
-                { shouldDirty: true },
-              );
-            }}
-            onSelect={(confirmed) => {
-              const parsed = voiceModelSelectionSchema
-                .nullable()
-                .safeParse(confirmed);
-              const value = parsed.success ? parsed.data : null;
-              const isDefault =
-                value !== null &&
-                "manualModelId" in value &&
-                platformTtsDefault !== undefined &&
-                "manualModelId" in platformTtsDefault &&
-                platformTtsDefault.manualModelId === value.manualModelId;
-              form.setValue("voiceModelSelection", isDefault ? null : value, {
-                shouldDirty: true,
-                shouldValidate: true,
-              });
-              setActiveSelector(null);
-            }}
-            locale={locale}
-            user={user}
-          />
-        ) : activeSelector === "imageGen" ? (
-          <ModelSelector
-            allowedRoles={["image-gen"]}
-            modelSelection={form.watch("imageGenModelSelection") ?? undefined}
-            onChange={(sel) => {
-              const parsed = imageGenModelSelectionSchema
-                .nullable()
-                .safeParse(sel);
-              form.setValue(
-                "imageGenModelSelection",
-                parsed.success ? parsed.data : null,
-                { shouldDirty: true },
-              );
-            }}
-            onSelect={(confirmed) => {
-              const parsed = imageGenModelSelectionSchema
-                .nullable()
-                .safeParse(confirmed);
-              const value = parsed.success ? parsed.data : null;
-              const isDefault =
-                value !== null &&
-                "manualModelId" in value &&
-                platformImageGenDefault !== undefined &&
-                "manualModelId" in platformImageGenDefault &&
-                platformImageGenDefault.manualModelId === value.manualModelId;
-              form.setValue(
-                "imageGenModelSelection",
-                isDefault ? null : value,
-                { shouldDirty: true, shouldValidate: true },
-              );
-              setActiveSelector(null);
-            }}
-            locale={locale}
-            user={user}
-          />
-        ) : activeSelector === "musicGen" ? (
-          <ModelSelector
-            allowedRoles={["audio-gen"]}
-            modelSelection={form.watch("musicGenModelSelection") ?? undefined}
-            onChange={(sel) => {
-              const parsed = musicGenModelSelectionSchema
-                .nullable()
-                .safeParse(sel);
-              form.setValue(
-                "musicGenModelSelection",
-                parsed.success ? parsed.data : null,
-                { shouldDirty: true },
-              );
-            }}
-            onSelect={(confirmed) => {
-              const parsed = musicGenModelSelectionSchema
-                .nullable()
-                .safeParse(confirmed);
-              const value = parsed.success ? parsed.data : null;
-              const isDefault =
-                value !== null &&
-                "manualModelId" in value &&
-                platformMusicGenDefault !== undefined &&
-                "manualModelId" in platformMusicGenDefault &&
-                platformMusicGenDefault.manualModelId === value.manualModelId;
-              form.setValue(
-                "musicGenModelSelection",
-                isDefault ? null : value,
-                { shouldDirty: true, shouldValidate: true },
-              );
-              setActiveSelector(null);
-            }}
-            locale={locale}
-            user={user}
-          />
-        ) : activeSelector === "videoGen" ? (
-          <ModelSelector
-            allowedRoles={["video-gen"]}
-            modelSelection={form.watch("videoGenModelSelection") ?? undefined}
-            onChange={(sel) => {
-              const parsed = videoGenModelSelectionSchema
-                .nullable()
-                .safeParse(sel);
-              form.setValue(
-                "videoGenModelSelection",
-                parsed.success ? parsed.data : null,
-                { shouldDirty: true },
-              );
-            }}
-            onSelect={(confirmed) => {
-              const parsed = videoGenModelSelectionSchema
-                .nullable()
-                .safeParse(confirmed);
-              const value = parsed.success ? parsed.data : null;
-              const isDefault =
-                value !== null &&
-                "manualModelId" in value &&
-                platformVideoGenDefault !== undefined &&
-                "manualModelId" in platformVideoGenDefault &&
-                platformVideoGenDefault.manualModelId === value.manualModelId;
-              form.setValue(
-                "videoGenModelSelection",
-                isDefault ? null : value,
-                { shouldDirty: true, shouldValidate: true },
-              );
-              setActiveSelector(null);
-            }}
-            locale={locale}
-            user={user}
-          />
-        ) : activeSelector === "stt" ? (
-          <ModelSelector
-            allowedRoles={["stt"]}
-            modelSelection={form.watch("sttModelSelection") ?? undefined}
-            onChange={(sel) => {
-              const parsed = sttModelSelectionSchema.nullable().safeParse(sel);
-              form.setValue(
-                "sttModelSelection",
-                parsed.success ? parsed.data : null,
-                { shouldDirty: true },
-              );
-            }}
-            onSelect={(confirmed) => {
-              const parsed = sttModelSelectionSchema
-                .nullable()
-                .safeParse(confirmed);
-              const value = parsed.success ? parsed.data : null;
-              const isDefault =
-                value !== null &&
-                "manualModelId" in value &&
-                platformSttDefault !== undefined &&
-                "manualModelId" in platformSttDefault &&
-                platformSttDefault.manualModelId === value.manualModelId;
-              form.setValue("sttModelSelection", isDefault ? null : value, {
-                shouldDirty: true,
-                shouldValidate: true,
-              });
-              setActiveSelector(null);
-            }}
-            locale={locale}
-            user={user}
-          />
-        ) : activeSelector === "imageVision" ? (
-          <ModelSelector
-            allowedRoles={["image-vision"]}
-            modelSelection={
-              form.watch("imageVisionModelSelection") ?? undefined
-            }
-            onChange={(sel) => {
-              const parsed = imageVisionModelSelectionSchema
-                .nullable()
-                .safeParse(sel);
-              form.setValue(
-                "imageVisionModelSelection",
-                parsed.success ? parsed.data : null,
-                { shouldDirty: true },
-              );
-            }}
-            onSelect={(confirmed) => {
-              const parsed = imageVisionModelSelectionSchema
-                .nullable()
-                .safeParse(confirmed);
-              const value = parsed.success ? parsed.data : null;
-              const isDefault =
-                value !== null &&
-                "manualModelId" in value &&
-                platformImageVisionDefault !== undefined &&
-                "manualModelId" in platformImageVisionDefault &&
-                platformImageVisionDefault.manualModelId ===
-                  value.manualModelId;
-              form.setValue(
-                "imageVisionModelSelection",
-                isDefault ? null : value,
-                { shouldDirty: true, shouldValidate: true },
-              );
-              setActiveSelector(null);
-            }}
-            locale={locale}
-            user={user}
-          />
-        ) : activeSelector === "videoVision" ? (
-          <ModelSelector
-            allowedRoles={["video-vision"]}
-            modelSelection={
-              form.watch("videoVisionModelSelection") ?? undefined
-            }
-            onChange={(sel) => {
-              const parsed = videoVisionModelSelectionSchema
-                .nullable()
-                .safeParse(sel);
-              form.setValue(
-                "videoVisionModelSelection",
-                parsed.success ? parsed.data : null,
-                { shouldDirty: true },
-              );
-            }}
-            onSelect={(confirmed) => {
-              const parsed = videoVisionModelSelectionSchema
-                .nullable()
-                .safeParse(confirmed);
-              const value = parsed.success ? parsed.data : null;
-              const isDefault =
-                value !== null &&
-                "manualModelId" in value &&
-                platformVideoVisionDefault !== undefined &&
-                "manualModelId" in platformVideoVisionDefault &&
-                platformVideoVisionDefault.manualModelId ===
-                  value.manualModelId;
-              form.setValue(
-                "videoVisionModelSelection",
-                isDefault ? null : value,
-                { shouldDirty: true, shouldValidate: true },
-              );
-              setActiveSelector(null);
-            }}
-            locale={locale}
-            user={user}
-          />
-        ) : activeSelector === "audioVision" ? (
-          <ModelSelector
-            allowedRoles={["audio-vision"]}
-            modelSelection={
-              form.watch("audioVisionModelSelection") ?? undefined
-            }
-            onChange={(sel) => {
-              const parsed = audioVisionModelSelectionSchema
-                .nullable()
-                .safeParse(sel);
-              form.setValue(
-                "audioVisionModelSelection",
-                parsed.success ? parsed.data : null,
-                { shouldDirty: true },
-              );
-            }}
-            onSelect={(confirmed) => {
-              const parsed = audioVisionModelSelectionSchema
-                .nullable()
-                .safeParse(confirmed);
-              const value = parsed.success ? parsed.data : null;
-              const isDefault =
-                value !== null &&
-                "manualModelId" in value &&
-                platformAudioVisionDefault !== undefined &&
-                "manualModelId" in platformAudioVisionDefault &&
-                platformAudioVisionDefault.manualModelId ===
-                  value.manualModelId;
-              form.setValue(
-                "audioVisionModelSelection",
-                isDefault ? null : value,
-                { shouldDirty: true, shouldValidate: true },
-              );
-              setActiveSelector(null);
-            }}
-            locale={locale}
-            user={user}
-          />
-        ) : (
-          <>
-            {/* Form Alert */}
-            <FormAlertWidget field={emptyField} />
+        {/* Form Alert */}
+        <FormAlertWidget field={emptyField} />
 
-            {/* Success message (response only) */}
-            <AlertWidget
-              fieldName="success"
-              field={withValue(children.success, editResult?.success, null)}
+        {/* Success message (response only) */}
+        <AlertWidget
+          fieldName="success"
+          field={withValue(children.success, editResult?.success, null)}
+        />
+
+        <Div className="flex flex-col gap-4">
+          {/* Skill Info Card */}
+          <IconFieldWidget fieldName="icon" field={children.icon} />
+          <TextFieldWidget fieldName="name" field={children.name} />
+          <TextFieldWidget fieldName="tagline" field={children.tagline} />
+          <TextFieldWidget
+            fieldName="description"
+            field={children.description}
+          />
+
+          {/* Additional Fields */}
+          <SelectFieldWidget fieldName="category" field={children.category} />
+          <BooleanFieldWidget fieldName="isPublic" field={children.isPublic} />
+          {/* voiceModelSelection, imageGenModelSelection, musicGenModelSelection are JSONB fields managed via ModelSelector, not rendered as text inputs */}
+          <TextareaFieldWidget
+            fieldName="systemPrompt"
+            field={children.systemPrompt}
+          />
+
+          {/* ── VARIANTS ── */}
+          <Div className="flex flex-col gap-2">
+            <Span className="text-sm font-semibold">
+              {t("patch.variants.label")}
+            </Span>
+            <VariantList
+              variants={localVariants}
+              onChange={handleVariantsChange}
+              platformDefaults={platformDefaults}
+              locale={locale}
+              user={user}
+              t={t}
             />
+          </Div>
 
-            <Div className="flex flex-col gap-4">
-              {/* Skill Info Card */}
-              <IconFieldWidget fieldName="icon" field={children.icon} />
-              <TextFieldWidget fieldName="name" field={children.name} />
-              <TextFieldWidget fieldName="tagline" field={children.tagline} />
-              <TextFieldWidget
-                fieldName="description"
-                field={children.description}
-              />
+          {/* Context Memory Budget */}
+          {form && (
+            <CompactTriggerEdit
+              value={form.watch("compactTrigger") ?? null}
+              onChange={(v) =>
+                form.setValue("compactTrigger", v, { shouldDirty: true })
+              }
+              modelSelection={form.watch("modelSelection") ?? null}
+              user={user}
+              locale={locale}
+            />
+          )}
 
-              {/* Additional Fields */}
-              <SelectFieldWidget
-                fieldName="category"
-                field={children.category}
-              />
-              <BooleanFieldWidget
-                fieldName="isPublic"
-                field={children.isPublic}
-              />
-              {/* voiceModelSelection, imageGenModelSelection, musicGenModelSelection are JSONB fields managed via ModelSelector, not rendered as text inputs */}
-              <TextareaFieldWidget
-                fieldName="systemPrompt"
-                field={children.systemPrompt}
-              />
-
-              {/* ── VARIANTS ── */}
-              <Div className="flex flex-col gap-2">
-                <Span className="text-sm font-semibold">
-                  {t("patch.variants.label")}
-                </Span>
-                <VariantList
-                  variants={localVariants}
-                  onChange={handleVariantsChange}
-                  platformDefaults={platformDefaults}
-                  locale={locale}
-                  user={user}
-                  t={t}
-                />
-              </Div>
-
-              {/* ── SKILL-LEVEL DEFAULTS (collapsed) ── */}
-              <Collapsible
-                open={skillDefaultsOpen}
-                onOpenChange={setSkillDefaultsOpen}
-              >
-                <Div className="rounded-lg border">
-                  <CollapsibleTrigger asChild>
-                    <Div className="flex items-center justify-between px-3 py-2.5 cursor-pointer hover:bg-muted/30 transition-colors">
-                      <Div className="flex flex-col gap-0.5">
-                        <Span className="text-sm font-medium">
-                          {t("patch.variants.skillDefaults")}
-                        </Span>
-                        <Span className="text-xs text-muted-foreground">
-                          {t("patch.variants.skillDefaultsHint")}
-                        </Span>
-                      </Div>
-                      <ChevronDown
-                        className={cn(
-                          "h-4 w-4 opacity-40 transition-transform",
-                          skillDefaultsOpen && "rotate-180",
-                        )}
-                      />
-                    </Div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <Div className="px-3 pb-3 pt-1 flex flex-col gap-3 border-t">
-                      {/* ── BRAIN ── */}
-                      <ModelGroup
-                        icon={<Brain className="w-3.5 h-3.5" />}
-                        label={t("get.models.brain")}
-                      >
-                        <Div className="flex flex-col gap-1">
-                          <ModelSelectorTrigger
-                            modelSelection={
-                              form.watch("modelSelection") ?? undefined
-                            }
-                            defaultModelSelection={platformChatDefault}
-                            placeholder={t("patch.chatModel.placeholder")}
-                            onClick={() => setActiveSelector("chat")}
-                            locale={locale}
-                            user={user}
-                          />
-                          <ModelFieldError form={form} name="modelSelection" />
-                        </Div>
-                      </ModelGroup>
-
-                      {/* ── EYES ── */}
-                      <ModelGroup
-                        icon={<Eye className="w-3.5 h-3.5" />}
-                        label={t("get.models.eyes")}
-                      >
-                        <Div className="flex flex-col gap-1">
-                          <Span className="text-xs opacity-40">
-                            {t("get.models.slots.imageVision")}
-                          </Span>
-                          <ModelSelectorTrigger
-                            modelSelection={form.watch(
-                              "imageVisionModelSelection",
-                            )}
-                            allowedRoles={["image-vision"]}
-                            defaultModelSelection={platformImageVisionDefault}
-                            placeholder={t(
-                              "patch.imageVisionModel.placeholder",
-                            )}
-                            onClick={() => setActiveSelector("imageVision")}
-                            locale={locale}
-                            user={user}
-                          />
-                          <ModelFieldError
-                            form={form}
-                            name="imageVisionModelSelection"
-                          />
-                        </Div>
-                        <Div className="flex flex-col gap-1">
-                          <Span className="text-xs opacity-40">
-                            {t("get.models.slots.videoVision")}
-                          </Span>
-                          <ModelSelectorTrigger
-                            modelSelection={form.watch(
-                              "videoVisionModelSelection",
-                            )}
-                            allowedRoles={["video-vision"]}
-                            defaultModelSelection={platformVideoVisionDefault}
-                            placeholder={t(
-                              "patch.videoVisionModel.placeholder",
-                            )}
-                            onClick={() => setActiveSelector("videoVision")}
-                            locale={locale}
-                            user={user}
-                          />
-                          <ModelFieldError
-                            form={form}
-                            name="videoVisionModelSelection"
-                          />
-                        </Div>
-                      </ModelGroup>
-
-                      {/* ── EARS & VOICE ── */}
-                      <ModelGroup
-                        icon={<Mic className="w-3.5 h-3.5" />}
-                        label={t("get.models.ears")}
-                      >
-                        <Div className="flex flex-col gap-1">
-                          <Span className="text-xs opacity-40">
-                            {t("get.models.slots.stt")}
-                          </Span>
-                          <ModelSelectorTrigger
-                            modelSelection={form.watch("sttModelSelection")}
-                            allowedRoles={["stt"]}
-                            defaultModelSelection={platformSttDefault}
-                            placeholder={t("patch.sttModel.placeholder")}
-                            onClick={() => setActiveSelector("stt")}
-                            locale={locale}
-                            user={user}
-                          />
-                          <ModelFieldError
-                            form={form}
-                            name="sttModelSelection"
-                          />
-                        </Div>
-                        <Div className="flex flex-col gap-1">
-                          <Span className="text-xs opacity-40">
-                            {t("get.models.slots.tts")}
-                          </Span>
-                          <ModelSelectorTrigger
-                            modelSelection={form.watch("voiceModelSelection")}
-                            allowedRoles={["tts"]}
-                            defaultModelSelection={platformTtsDefault}
-                            placeholder={t("patch.voice.placeholder")}
-                            onClick={() => setActiveSelector("voice")}
-                            locale={locale}
-                            user={user}
-                          />
-                          <ModelFieldError
-                            form={form}
-                            name="voiceModelSelection"
-                          />
-                        </Div>
-                        <Div className="flex flex-col gap-1">
-                          <Span className="text-xs opacity-40">
-                            {t("get.models.slots.audioVision")}
-                          </Span>
-                          <ModelSelectorTrigger
-                            modelSelection={form.watch(
-                              "audioVisionModelSelection",
-                            )}
-                            allowedRoles={["audio-vision"]}
-                            defaultModelSelection={platformAudioVisionDefault}
-                            placeholder={t(
-                              "patch.audioVisionModel.placeholder",
-                            )}
-                            onClick={() => setActiveSelector("audioVision")}
-                            locale={locale}
-                            user={user}
-                          />
-                          <ModelFieldError
-                            form={form}
-                            name="audioVisionModelSelection"
-                          />
-                        </Div>
-                      </ModelGroup>
-
-                      {/* ── MEDIA ── */}
-                      <ModelGroup
-                        icon={<Film className="w-3.5 h-3.5" />}
-                        label={t("get.models.media")}
-                      >
-                        <Div className="flex flex-col gap-1">
-                          <Span className="text-xs opacity-40">
-                            {t("get.models.slots.imageGen")}
-                          </Span>
-                          <ModelSelectorTrigger
-                            modelSelection={form.watch(
-                              "imageGenModelSelection",
-                            )}
-                            allowedRoles={["image-gen"]}
-                            defaultModelSelection={platformImageGenDefault}
-                            placeholder={t("patch.imageGenModel.placeholder")}
-                            onClick={() => setActiveSelector("imageGen")}
-                            locale={locale}
-                            user={user}
-                          />
-                          <ModelFieldError
-                            form={form}
-                            name="imageGenModelSelection"
-                          />
-                        </Div>
-                        <Div className="flex flex-col gap-1">
-                          <Span className="text-xs opacity-40">
-                            {t("get.models.slots.musicGen")}
-                          </Span>
-                          <ModelSelectorTrigger
-                            modelSelection={form.watch(
-                              "musicGenModelSelection",
-                            )}
-                            allowedRoles={["audio-gen"]}
-                            defaultModelSelection={platformMusicGenDefault}
-                            placeholder={t("patch.musicGenModel.placeholder")}
-                            onClick={() => setActiveSelector("musicGen")}
-                            locale={locale}
-                            user={user}
-                          />
-                          <ModelFieldError
-                            form={form}
-                            name="musicGenModelSelection"
-                          />
-                        </Div>
-                        <Div className="flex flex-col gap-1">
-                          <Span className="text-xs opacity-40">
-                            {t("get.models.slots.videoGen")}
-                          </Span>
-                          <ModelSelectorTrigger
-                            modelSelection={form.watch(
-                              "videoGenModelSelection",
-                            )}
-                            allowedRoles={["video-gen"]}
-                            defaultModelSelection={platformVideoGenDefault}
-                            placeholder={t("patch.videoGenModel.placeholder")}
-                            onClick={() => setActiveSelector("videoGen")}
-                            locale={locale}
-                            user={user}
-                          />
-                          <ModelFieldError
-                            form={form}
-                            name="videoGenModelSelection"
-                          />
-                        </Div>
-                      </ModelGroup>
-                    </Div>
-                  </CollapsibleContent>
-                </Div>
-              </Collapsible>
-
-              {/* Context Memory Budget */}
-              {form && (
-                <CompactTriggerEdit
-                  value={form.watch("compactTrigger") ?? null}
-                  onChange={(v) =>
-                    form.setValue("compactTrigger", v, { shouldDirty: true })
-                  }
-                  modelSelection={form.watch("modelSelection") ?? null}
-                  user={user}
-                  locale={locale}
-                />
-              )}
-
-              {/* Tool configuration - per-skill override */}
-              {form && (
-                <ToolsConfigEdit
-                  value={toolsValue}
-                  onChange={handleToolsChange}
-                  user={user}
-                  logger={logger}
-                />
-              )}
-            </Div>
-          </>
-        )}
+          {/* Tool configuration - per-skill override */}
+          {form && (
+            <ToolsConfigEdit
+              value={toolsValue}
+              onChange={handleToolsChange}
+              user={user}
+              logger={logger}
+            />
+          )}
+        </Div>
       </Div>
     </Div>
   );
@@ -4208,6 +3492,7 @@ export function useVariantPlatformDefaults(
  */
 export function VariantEditorPanel({
   variant,
+  variantIndex,
   onChange,
   platformDefaults,
   locale,
@@ -4215,6 +3500,7 @@ export function VariantEditorPanel({
   t,
 }: {
   variant: SkillVariantData;
+  variantIndex: number;
   onChange: (updated: SkillVariantData) => void;
   platformDefaults: VariantPlatformDefaults;
   locale: CountryLanguage;
@@ -4223,6 +3509,7 @@ export function VariantEditorPanel({
 }): React.JSX.Element {
   const [activeSelector, setActiveSelector] =
     useState<VariantActiveSelector>(null);
+  const form = useWidgetForm<typeof definitionPatch.PATCH>();
 
   const update = useCallback(
     (patch: Partial<SkillVariantData>): void => {
@@ -4580,13 +3867,24 @@ export function VariantEditorPanel({
         icon={<Brain className="w-3.5 h-3.5" />}
         label={t("get.models.brain")}
       >
-        <ModelSelectorTrigger
-          modelSelection={variant.modelSelection ?? undefined}
-          defaultModelSelection={platformDefaults.chat}
-          placeholder={t("patch.chatModel.placeholder")}
-          onClick={() => setActiveSelector("chat")}
-          locale={locale}
-          user={user}
+        <FormField
+          control={form.control}
+          name={`variants.${variantIndex}.modelSelection`}
+          render={({ fieldState }) => (
+            <Div className="flex flex-col gap-1">
+              <ModelSelectorTrigger
+                modelSelection={variant.modelSelection ?? undefined}
+                defaultModelSelection={platformDefaults.chat}
+                placeholder={t("patch.chatModel.placeholder")}
+                onClick={() => setActiveSelector("chat")}
+                locale={locale}
+                user={user}
+              />
+              {fieldState.error && (
+                <ModelFieldError error={fieldState.error.message} />
+              )}
+            </Div>
+          )}
         />
       </ModelGroup>
 
@@ -4595,34 +3893,52 @@ export function VariantEditorPanel({
         icon={<Eye className="w-3.5 h-3.5" />}
         label={t("get.models.eyes")}
       >
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs opacity-40">
-            {t("get.models.slots.imageVision")}
-          </Span>
-          <ModelSelectorTrigger
-            modelSelection={variant.imageVisionModelSelection ?? undefined}
-            allowedRoles={["image-vision"]}
-            defaultModelSelection={platformDefaults.imageVision}
-            placeholder={t("patch.imageVisionModel.placeholder")}
-            onClick={() => setActiveSelector("imageVision")}
-            locale={locale}
-            user={user}
-          />
-        </Div>
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs opacity-40">
-            {t("get.models.slots.videoVision")}
-          </Span>
-          <ModelSelectorTrigger
-            modelSelection={variant.videoVisionModelSelection ?? undefined}
-            allowedRoles={["video-vision"]}
-            defaultModelSelection={platformDefaults.videoVision}
-            placeholder={t("patch.videoVisionModel.placeholder")}
-            onClick={() => setActiveSelector("videoVision")}
-            locale={locale}
-            user={user}
-          />
-        </Div>
+        <FormField
+          control={form.control}
+          name={`variants.${variantIndex}.imageVisionModelSelection`}
+          render={({ fieldState }) => (
+            <Div className="flex flex-col gap-1">
+              <Span className="text-xs opacity-40">
+                {t("get.models.slots.imageVision")}
+              </Span>
+              <ModelSelectorTrigger
+                modelSelection={variant.imageVisionModelSelection ?? undefined}
+                allowedRoles={["image-vision"]}
+                defaultModelSelection={platformDefaults.imageVision}
+                placeholder={t("patch.imageVisionModel.placeholder")}
+                onClick={() => setActiveSelector("imageVision")}
+                locale={locale}
+                user={user}
+              />
+              {fieldState.error && (
+                <ModelFieldError error={fieldState.error.message} />
+              )}
+            </Div>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name={`variants.${variantIndex}.videoVisionModelSelection`}
+          render={({ fieldState }) => (
+            <Div className="flex flex-col gap-1">
+              <Span className="text-xs opacity-40">
+                {t("get.models.slots.videoVision")}
+              </Span>
+              <ModelSelectorTrigger
+                modelSelection={variant.videoVisionModelSelection ?? undefined}
+                allowedRoles={["video-vision"]}
+                defaultModelSelection={platformDefaults.videoVision}
+                placeholder={t("patch.videoVisionModel.placeholder")}
+                onClick={() => setActiveSelector("videoVision")}
+                locale={locale}
+                user={user}
+              />
+              {fieldState.error && (
+                <ModelFieldError error={fieldState.error.message} />
+              )}
+            </Div>
+          )}
+        />
       </ModelGroup>
 
       {/* ── EARS & VOICE ── */}
@@ -4630,48 +3946,75 @@ export function VariantEditorPanel({
         icon={<Mic className="w-3.5 h-3.5" />}
         label={t("get.models.ears")}
       >
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs opacity-40">
-            {t("get.models.slots.stt")}
-          </Span>
-          <ModelSelectorTrigger
-            modelSelection={variant.sttModelSelection ?? undefined}
-            allowedRoles={["stt"]}
-            defaultModelSelection={platformDefaults.stt}
-            placeholder={t("patch.sttModel.placeholder")}
-            onClick={() => setActiveSelector("stt")}
-            locale={locale}
-            user={user}
-          />
-        </Div>
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs opacity-40">
-            {t("get.models.slots.tts")}
-          </Span>
-          <ModelSelectorTrigger
-            modelSelection={variant.voiceModelSelection ?? undefined}
-            allowedRoles={["tts"]}
-            defaultModelSelection={platformDefaults.tts}
-            placeholder={t("patch.voice.placeholder")}
-            onClick={() => setActiveSelector("voice")}
-            locale={locale}
-            user={user}
-          />
-        </Div>
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs opacity-40">
-            {t("get.models.slots.audioVision")}
-          </Span>
-          <ModelSelectorTrigger
-            modelSelection={variant.audioVisionModelSelection ?? undefined}
-            allowedRoles={["audio-vision"]}
-            defaultModelSelection={platformDefaults.audioVision}
-            placeholder={t("patch.audioVisionModel.placeholder")}
-            onClick={() => setActiveSelector("audioVision")}
-            locale={locale}
-            user={user}
-          />
-        </Div>
+        <FormField
+          control={form.control}
+          name={`variants.${variantIndex}.sttModelSelection`}
+          render={({ fieldState }) => (
+            <Div className="flex flex-col gap-1">
+              <Span className="text-xs opacity-40">
+                {t("get.models.slots.stt")}
+              </Span>
+              <ModelSelectorTrigger
+                modelSelection={variant.sttModelSelection ?? undefined}
+                allowedRoles={["stt"]}
+                defaultModelSelection={platformDefaults.stt}
+                placeholder={t("patch.sttModel.placeholder")}
+                onClick={() => setActiveSelector("stt")}
+                locale={locale}
+                user={user}
+              />
+              {fieldState.error && (
+                <ModelFieldError error={fieldState.error.message} />
+              )}
+            </Div>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name={`variants.${variantIndex}.voiceModelSelection`}
+          render={({ fieldState }) => (
+            <Div className="flex flex-col gap-1">
+              <Span className="text-xs opacity-40">
+                {t("get.models.slots.tts")}
+              </Span>
+              <ModelSelectorTrigger
+                modelSelection={variant.voiceModelSelection ?? undefined}
+                allowedRoles={["tts"]}
+                defaultModelSelection={platformDefaults.tts}
+                placeholder={t("patch.voice.placeholder")}
+                onClick={() => setActiveSelector("voice")}
+                locale={locale}
+                user={user}
+              />
+              {fieldState.error && (
+                <ModelFieldError error={fieldState.error.message} />
+              )}
+            </Div>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name={`variants.${variantIndex}.audioVisionModelSelection`}
+          render={({ fieldState }) => (
+            <Div className="flex flex-col gap-1">
+              <Span className="text-xs opacity-40">
+                {t("get.models.slots.audioVision")}
+              </Span>
+              <ModelSelectorTrigger
+                modelSelection={variant.audioVisionModelSelection ?? undefined}
+                allowedRoles={["audio-vision"]}
+                defaultModelSelection={platformDefaults.audioVision}
+                placeholder={t("patch.audioVisionModel.placeholder")}
+                onClick={() => setActiveSelector("audioVision")}
+                locale={locale}
+                user={user}
+              />
+              {fieldState.error && (
+                <ModelFieldError error={fieldState.error.message} />
+              )}
+            </Div>
+          )}
+        />
       </ModelGroup>
 
       {/* ── MEDIA ── */}
@@ -4679,48 +4022,75 @@ export function VariantEditorPanel({
         icon={<Film className="w-3.5 h-3.5" />}
         label={t("get.models.media")}
       >
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs opacity-40">
-            {t("get.models.slots.imageGen")}
-          </Span>
-          <ModelSelectorTrigger
-            modelSelection={variant.imageGenModelSelection ?? undefined}
-            allowedRoles={["image-gen"]}
-            defaultModelSelection={platformDefaults.imageGen}
-            placeholder={t("patch.imageGenModel.placeholder")}
-            onClick={() => setActiveSelector("imageGen")}
-            locale={locale}
-            user={user}
-          />
-        </Div>
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs opacity-40">
-            {t("get.models.slots.musicGen")}
-          </Span>
-          <ModelSelectorTrigger
-            modelSelection={variant.musicGenModelSelection ?? undefined}
-            allowedRoles={["audio-gen"]}
-            defaultModelSelection={platformDefaults.musicGen}
-            placeholder={t("patch.musicGenModel.placeholder")}
-            onClick={() => setActiveSelector("musicGen")}
-            locale={locale}
-            user={user}
-          />
-        </Div>
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs opacity-40">
-            {t("get.models.slots.videoGen")}
-          </Span>
-          <ModelSelectorTrigger
-            modelSelection={variant.videoGenModelSelection ?? undefined}
-            allowedRoles={["video-gen"]}
-            defaultModelSelection={platformDefaults.videoGen}
-            placeholder={t("patch.videoGenModel.placeholder")}
-            onClick={() => setActiveSelector("videoGen")}
-            locale={locale}
-            user={user}
-          />
-        </Div>
+        <FormField
+          control={form.control}
+          name={`variants.${variantIndex}.imageGenModelSelection`}
+          render={({ fieldState }) => (
+            <Div className="flex flex-col gap-1">
+              <Span className="text-xs opacity-40">
+                {t("get.models.slots.imageGen")}
+              </Span>
+              <ModelSelectorTrigger
+                modelSelection={variant.imageGenModelSelection ?? undefined}
+                allowedRoles={["image-gen"]}
+                defaultModelSelection={platformDefaults.imageGen}
+                placeholder={t("patch.imageGenModel.placeholder")}
+                onClick={() => setActiveSelector("imageGen")}
+                locale={locale}
+                user={user}
+              />
+              {fieldState.error && (
+                <ModelFieldError error={fieldState.error.message} />
+              )}
+            </Div>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name={`variants.${variantIndex}.musicGenModelSelection`}
+          render={({ fieldState }) => (
+            <Div className="flex flex-col gap-1">
+              <Span className="text-xs opacity-40">
+                {t("get.models.slots.musicGen")}
+              </Span>
+              <ModelSelectorTrigger
+                modelSelection={variant.musicGenModelSelection ?? undefined}
+                allowedRoles={["audio-gen"]}
+                defaultModelSelection={platformDefaults.musicGen}
+                placeholder={t("patch.musicGenModel.placeholder")}
+                onClick={() => setActiveSelector("musicGen")}
+                locale={locale}
+                user={user}
+              />
+              {fieldState.error && (
+                <ModelFieldError error={fieldState.error.message} />
+              )}
+            </Div>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name={`variants.${variantIndex}.videoGenModelSelection`}
+          render={({ fieldState }) => (
+            <Div className="flex flex-col gap-1">
+              <Span className="text-xs opacity-40">
+                {t("get.models.slots.videoGen")}
+              </Span>
+              <ModelSelectorTrigger
+                modelSelection={variant.videoGenModelSelection ?? undefined}
+                allowedRoles={["video-gen"]}
+                defaultModelSelection={platformDefaults.videoGen}
+                placeholder={t("patch.videoGenModel.placeholder")}
+                onClick={() => setActiveSelector("videoGen")}
+                locale={locale}
+                user={user}
+              />
+              {fieldState.error && (
+                <ModelFieldError error={fieldState.error.message} />
+              )}
+            </Div>
+          )}
+        />
       </ModelGroup>
     </Div>
   );
@@ -4805,7 +4175,7 @@ export function VariantList({
 
   return (
     <Div className="flex flex-col gap-2">
-      {variants.map((variant) => {
+      {variants.map((variant, variantIndex) => {
         const isExpanded = expandedId === variant.id;
         const isDefault = variant.isDefault ?? false;
         const canRemove = variants.length > 1;
@@ -4880,6 +4250,7 @@ export function VariantList({
               <Div className="px-3 pb-3 border-t pt-3">
                 <VariantEditorPanel
                   variant={variant}
+                  variantIndex={variantIndex}
                   onChange={handleUpdate}
                   platformDefaults={platformDefaults}
                   locale={locale}
