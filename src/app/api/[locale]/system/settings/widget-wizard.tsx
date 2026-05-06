@@ -40,6 +40,7 @@ import {
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";
 
@@ -231,7 +232,7 @@ function UnbottledLoginField({
   setting: Setting;
   onEdit: (key: string, value: string) => void;
   t: (k: string, params?: Record<string, string>) => string;
-  locale: string;
+  locale: CountryLanguage;
 }): JSX.Element {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -402,7 +403,7 @@ function WizardField({
   editedValue: string | undefined;
   onEdit: (key: string, value: string) => void;
   onGenerate?: (key: string) => Promise<void>;
-  locale: string;
+  locale: CountryLanguage;
   t: (k: string) => string;
 }): JSX.Element {
   if (setting.key === "CLAUDE_CODE_ENABLED") {
