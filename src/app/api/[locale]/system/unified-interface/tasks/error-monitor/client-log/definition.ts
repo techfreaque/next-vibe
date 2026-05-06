@@ -70,7 +70,42 @@ export const { POST } = createEndpoint({
         label: "post.fields.metadata.label" as const,
         description: "post.fields.metadata.description" as const,
         schema: z
-          .array(z.record(z.string(), z.union([z.string(), z.array(z.string())])))
+          .array(
+            z.record(
+              z.string(),
+              z.union([
+                z.string(),
+                z.number(),
+                z.boolean(),
+                z.null(),
+                z.array(
+                  z.union([
+                    z.string(),
+                    z.number(),
+                    z.boolean(),
+                    z.null(),
+                    z.record(
+                      z.string(),
+                      z.union([
+                        z.string(),
+                        z.number(),
+                        z.boolean(),
+                        z.null(),
+                        z.array(
+                          z.union([
+                            z.string(),
+                            z.number(),
+                            z.boolean(),
+                            z.null(),
+                          ]),
+                        ),
+                      ]),
+                    ),
+                  ]),
+                ),
+              ]),
+            ),
+          )
           .optional(),
       }),
       ok: responseField(scopedTranslation, {

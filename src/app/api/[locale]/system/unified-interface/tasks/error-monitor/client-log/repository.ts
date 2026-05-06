@@ -19,7 +19,7 @@ import type {
 } from "./definition";
 
 function extractTabId(
-  metadata: Record<string, string>[] | undefined,
+  metadata: ClientLogRequestOutput["metadata"],
 ): string | undefined {
   if (!metadata) {
     return undefined;
