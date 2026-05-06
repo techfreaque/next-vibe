@@ -27,7 +27,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/env/env-crypto";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { SystemSettingsGetResponseOutput } from "./definition";
+import type {
+  SystemSettingsGetResponseOutput,
+  SystemSettingsPostRequestOutput,
+  SystemSettingsPostResponseOutput,
+} from "./definition";
 import type { SystemSettingsT } from "./i18n";
 
 export class SystemSettingsRepository {
@@ -625,6 +629,93 @@ export class SystemSettingsRepository {
         });
         setting.health = "error";
       }
+    }
+  }
+
+  /**
+   * POST - Proxy login to a remote unbottled.ai instance.
+   * Runs server-side to avoid browser CORS restrictions.
+   */
+  static async unbottledLogin(
+    data: SystemSettingsPostRequestOutput,
+    locale: string,
+    logger: EndpointLogger,
+    t: SystemSettingsT,
+  ): Promise<ResponseType<SystemSettingsPostResponseOutput>> {
+    const { email, password, remoteUrl } = data;
+
+    // Ping remote page to get lead_id cookie for session continuity
+    let remotePingLeadId: string | undefined;
+    try {
+      const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
+      const pingResponse = await fetch(`${remoteUrl}/${locale}`, {
+        method: "GET",
+        redirect: "follow",
+        signal: AbortSignal.timeout(10_000),
+      });
+      const setCookie = pingResponse.headers.get("set-cookie") ?? "";
+      const match = setCookie.match(
+        new RegExp(`${LEAD_ID_COOKIE_NAME}=([^;]+)`),
+      );
+      if (match?.[1]) {
+        remotePingLeadId = match[1];
+      }
+    } catch (pingErr) {
+      // Non-fatal — continue without lead_id
+      logger.debug(
+        "[Settings] Unbottled ping failed, continuing without lead_id",
+        {
+          error: String(pingErr),
+        },
+      );
+    }
+
+    try {
+      const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
+      const loginUrl = `${remoteUrl}/api/${locale}/user/public/login`;
+      const loginHeaders: Record<string, string> = {
+        // eslint-disable-next-line i18next/no-literal-string
+        "Content-Type": "application/json",
+      };
+      if (remotePingLeadId) {
+        loginHeaders.Cookie = `${LEAD_ID_COOKIE_NAME}=${remotePingLeadId}`;
+      }
+
+      const loginResponse = await fetch(loginUrl, {
+        method: "POST",
+        headers: loginHeaders,
+        body: JSON.stringify({ email, password, rememberMe: true }),
+        signal: AbortSignal.timeout(15_000),
+      });
+
+      if (!loginResponse.ok) {
+        return fail({
+          message: t("post.errors.server.title"),
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
+      }
+
+      const body = (await loginResponse.json()) as {
+        success?: boolean;
+        data?: { token?: string; leadId?: string };
+      };
+
+      if (!body.success || !body.data?.token) {
+        return fail({
+          message: t("post.errors.server.title"),
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
+      }
+
+      const effectiveLeadId = body.data.leadId ?? remotePingLeadId ?? "";
+      const credential = `${effectiveLeadId}:${body.data.token}:${remoteUrl}`;
+      return success({ credential });
+    } catch (err) {
+      logger.error("[Settings] Unbottled login failed", { error: String(err) });
+      return fail({
+        message: t("post.errors.network.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
     }
   }
 }

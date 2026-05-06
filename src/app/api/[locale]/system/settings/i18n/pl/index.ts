@@ -256,6 +256,67 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  post: {
+    title: "Zaloguj się do unbottled.ai",
+    description:
+      "Logowanie przez serwer — dane nigdy nie opuszczają twojego serwera",
+    tags: { settings: "Logowanie Unbottled" },
+    fields: {
+      email: {
+        label: "E-mail",
+        description: "E-mail konta unbottled.ai",
+        placeholder: "ty@przykład.pl",
+      },
+      password: {
+        label: "Hasło",
+        description: "Hasło konta unbottled.ai",
+        placeholder: "Hasło",
+      },
+      remoteUrl: {
+        label: "Zdalny URL",
+        description: "URL instancji unbottled.ai",
+        placeholder: "https://unbottled.ai",
+      },
+      credential: {
+        label: "Dane logowania",
+        description: "Zakodowany ciąg uwierzytelniający",
+      },
+    },
+    success: { title: "Zalogowano", description: "Dane logowania pobrane" },
+    errors: {
+      validation: {
+        title: "Błąd walidacji",
+        description: "Sprawdź e-mail, hasło i URL",
+      },
+      unauthorized: {
+        title: "Brak autoryzacji",
+        description: "Wymagana autoryzacja",
+      },
+      forbidden: {
+        title: "Zabronione",
+        description: "Wymagany dostęp administratora",
+      },
+      notFound: { title: "Nie znaleziono", description: "Nie znaleziono" },
+      network: {
+        title: "Błąd połączenia",
+        description: "Nie można połączyć z zdalną instancją",
+      },
+      server: {
+        title: "Logowanie nieudane",
+        description: "Błędny e-mail lub hasło",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieoczekiwany błąd",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+      conflict: { title: "Konflikt", description: "Wystąpił konflikt" },
+    },
+  },
+
   export: {
     title: "Eksportuj dla produkcji",
     subtitle:

@@ -31,7 +31,7 @@ const patchHandler: ApiHandlerFunction<any, any, any, any, any, any> = ({
   return SystemSettingsRepository.updateSettings({ settings }, logger, t);
 };
 
-export const { GET, PATCH, tools } = endpointsHandler({
+export const { GET, PATCH, POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     handler: ({ logger, t }) => {
@@ -40,4 +40,8 @@ export const { GET, PATCH, tools } = endpointsHandler({
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [Methods.PATCH]: { handler: patchHandler } as any,
+  [Methods.POST]: {
+    handler: ({ data, logger, t, locale }) =>
+      SystemSettingsRepository.unbottledLogin(data, locale, logger, t),
+  },
 });

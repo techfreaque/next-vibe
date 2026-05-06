@@ -258,6 +258,73 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  post: {
+    title: "Bei unbottled.ai anmelden",
+    description:
+      "Server-seitige Proxy-Anmeldung — Zugangsdaten verlassen nie deinen Server",
+    tags: { settings: "Unbottled-Anmeldung" },
+    fields: {
+      email: {
+        label: "E-Mail",
+        description: "unbottled.ai-Konto-E-Mail",
+        placeholder: "du@beispiel.de",
+      },
+      password: {
+        label: "Passwort",
+        description: "unbottled.ai-Konto-Passwort",
+        placeholder: "Passwort",
+      },
+      remoteUrl: {
+        label: "Remote-URL",
+        description: "URL der unbottled.ai-Instanz",
+        placeholder: "https://unbottled.ai",
+      },
+      credential: {
+        label: "Zugangsdaten",
+        description: "Kodierter Anmelde-String",
+      },
+    },
+    success: {
+      title: "Angemeldet",
+      description: "Zugangsdaten erfolgreich abgerufen",
+    },
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "E-Mail, Passwort und URL prüfen",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Administratorzugang erforderlich",
+      },
+      notFound: { title: "Nicht gefunden", description: "Nicht gefunden" },
+      network: {
+        title: "Verbindung fehlgeschlagen",
+        description: "Remote-Instanz nicht erreichbar",
+      },
+      server: {
+        title: "Anmeldung fehlgeschlagen",
+        description: "Falsche E-Mail oder falsches Passwort",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Du hast ungespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Ein Konflikt ist aufgetreten",
+      },
+    },
+  },
+
   export: {
     title: "Für Produktion exportieren",
     subtitle:

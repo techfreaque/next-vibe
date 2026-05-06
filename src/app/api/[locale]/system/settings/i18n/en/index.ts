@@ -252,6 +252,61 @@ export const translations = {
     },
   },
 
+  post: {
+    title: "Sign In to unbottled.ai",
+    description:
+      "Server-side proxy login — credentials never leave your server",
+    tags: { settings: "Unbottled Login" },
+    fields: {
+      email: {
+        label: "Email",
+        description: "unbottled.ai account email",
+        placeholder: "you@example.com",
+      },
+      password: {
+        label: "Password",
+        description: "unbottled.ai account password",
+        placeholder: "Password",
+      },
+      remoteUrl: {
+        label: "Remote URL",
+        description: "unbottled.ai instance URL",
+        placeholder: "https://unbottled.ai",
+      },
+      credential: {
+        label: "Credential",
+        description: "Encoded credential string",
+      },
+    },
+    success: { title: "Signed in", description: "Credential retrieved" },
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "Check email, password, and URL",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      forbidden: { title: "Forbidden", description: "Admin access required" },
+      notFound: { title: "Not Found", description: "Not found" },
+      network: {
+        title: "Connection Failed",
+        description: "Could not reach the remote instance",
+      },
+      server: { title: "Login Failed", description: "Wrong email or password" },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: { title: "Conflict", description: "A conflict occurred" },
+    },
+  },
+
   export: {
     title: "Export for Production",
     subtitle:

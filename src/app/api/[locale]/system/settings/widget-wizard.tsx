@@ -32,7 +32,6 @@ import { Cloud } from "next-vibe-ui/ui/icons/Cloud";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
-import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -248,76 +247,40 @@ function UnbottledLoginField({
     ? (setting.value?.match(/https?:\/\/.+$/)?.[0] ?? "")
     : "";
 
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+
   const handleSignIn = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
 
     try {
-      // Step 1: Ping remote to get lead_id cookie
+      const { apiClient } =
+        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+      const def = await import("./definition");
       const normalizedUrl = remoteUrl.replace(/\/+$/, "");
-      let remotePingLeadId: string | undefined;
-      try {
-        const pingResponse = await fetch(`${normalizedUrl}/${locale}`, {
-          method: "GET",
-          redirect: "follow",
-          signal: AbortSignal.timeout(10_000),
-        });
-        const setCookie = pingResponse.headers.get("set-cookie") ?? "";
-        const match = setCookie.match(
-          new RegExp(`${LEAD_ID_COOKIE_NAME}=([^;]+)`),
-        );
-        remotePingLeadId = match?.[1];
-      } catch {
-        setError(t("wizard.ai.unbottledConnectionError"));
-        setLoading(false);
-        return;
-      }
+      const result = await apiClient.fetch(
+        def.default.POST,
+        logger,
+        user,
+        { email, password, remoteUrl: normalizedUrl },
+        undefined,
+        locale,
+      );
 
-      // Step 2: POST login with email/password
-      const loginUrl = `${normalizedUrl}/api/${locale}/user/public/login`;
-      const loginResponse = await fetch(loginUrl, {
-        method: "POST",
-        headers: {
-          // eslint-disable-next-line i18next/no-literal-string
-          "Content-Type": "application/json",
-          ...(remotePingLeadId && {
-            Cookie: `${LEAD_ID_COOKIE_NAME}=${remotePingLeadId}`,
-          }),
-        },
-        body: JSON.stringify({ email, password, rememberMe: true }),
-        signal: AbortSignal.timeout(15_000),
-      });
-
-      if (!loginResponse.ok) {
+      if (!result.success || !result.data?.credential) {
         setError(t("wizard.ai.unbottledLoginFailed"));
         setLoading(false);
         return;
       }
 
-      const loginBody = (await loginResponse.json()) as {
-        success?: boolean;
-        data?: { token?: string; leadId?: string };
-      };
-
-      if (!loginBody.success || !loginBody.data?.token) {
-        setError(t("wizard.ai.unbottledLoginFailed"));
-        setLoading(false);
-        return;
-      }
-
-      const token = loginBody.data.token;
-      const effectiveLeadId = loginBody.data.leadId ?? remotePingLeadId ?? "";
-
-      // Step 3: Format credential string and pass to save
-      // eslint-disable-next-line i18next/no-literal-string
-      const credential = `${effectiveLeadId}:${token}:${normalizedUrl}`;
-      onEdit("UNBOTTLED_CLOUD_CREDENTIALS", credential);
+      onEdit("UNBOTTLED_CLOUD_CREDENTIALS", result.data.credential);
     } catch {
       setError(t("wizard.ai.unbottledConnectionError"));
     } finally {
       setLoading(false);
     }
-  }, [email, password, remoteUrl, locale, onEdit, t]);
+  }, [email, password, remoteUrl, locale, onEdit, t, user, logger]);
 
   const handleDisconnect = useCallback((): void => {
     onEdit("UNBOTTLED_CLOUD_CREDENTIALS", "");

@@ -9,11 +9,14 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
+  objectField,
+  requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
+  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -380,6 +383,124 @@ export const { PATCH } = createEndpoint({
   },
 });
 
+/**
+ * POST - Proxy unbottled.ai login server-side (avoids CORS)
+ * Browser sends email/password/remoteUrl → server pings remote, logs in, returns credential.
+ */
+export const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["system", "settings"] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
+  title: "post.title" as const,
+  description: "post.description" as const,
+  icon: "settings" as const,
+  category: "endpointCategories.settings",
+  subCategory: "endpointCategories.settingsEnv",
+  tags: ["post.tags.settings" as const],
+  aliases: ["unbottled-login"] as const,
+
+  fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    noCard: true,
+    usage: { request: "data", response: true },
+    children: {
+      email: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "post.fields.email.label" as const,
+        description: "post.fields.email.description" as const,
+        placeholder: "post.fields.email.placeholder" as const,
+        schema: z.string().min(1).email(),
+      }),
+      password: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.PASSWORD,
+        label: "post.fields.password.label" as const,
+        description: "post.fields.password.description" as const,
+        placeholder: "post.fields.password.placeholder" as const,
+        schema: z.string().min(1),
+      }),
+      remoteUrl: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.URL,
+        label: "post.fields.remoteUrl.label" as const,
+        description: "post.fields.remoteUrl.description" as const,
+        placeholder: "post.fields.remoteUrl.placeholder" as const,
+        schema: z
+          .string()
+          .min(1)
+          .url()
+          .transform((v) => v.replace(/\/+$/, "")),
+      }),
+      credential: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string(),
+      }),
+    },
+  }),
+
+  successTypes: {
+    title: "post.success.title" as const,
+    description: "post.success.description" as const,
+  },
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "post.errors.unauthorized.title" as const,
+      description: "post.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "post.errors.forbidden.title" as const,
+      description: "post.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "post.errors.notFound.title" as const,
+      description: "post.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "post.errors.network.title" as const,
+      description: "post.errors.network.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "post.errors.unknown.title" as const,
+      description: "post.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "post.errors.unsavedChanges.title" as const,
+      description: "post.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "post.errors.conflict.title" as const,
+      description: "post.errors.conflict.description" as const,
+    },
+  },
+
+  examples: {
+    requests: {
+      default: {
+        email: "you@example.com",
+        password: "yourpassword",
+        remoteUrl: "https://unbottled.ai",
+      },
+    },
+    responses: {
+      default: {
+        credential: "leadid123:token456:https://unbottled.ai",
+      },
+    },
+  },
+});
+
 export type SystemSettingsGetResponseOutput = typeof GET.types.ResponseOutput;
 /**
  * Flat record of env key → string value (each key is optional).
@@ -392,6 +513,8 @@ export type SystemSettingsPatchRequestInput = Record<
 >;
 export type SystemSettingsPatchResponseOutput =
   typeof PATCH.types.ResponseOutput;
+export type SystemSettingsPostRequestOutput = typeof POST.types.RequestOutput;
+export type SystemSettingsPostResponseOutput = typeof POST.types.ResponseOutput;
 
-const endpoints = { GET, PATCH };
+const endpoints = { GET, PATCH, POST };
 export default endpoints;
