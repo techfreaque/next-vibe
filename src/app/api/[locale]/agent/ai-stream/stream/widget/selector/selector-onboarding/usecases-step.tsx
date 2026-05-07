@@ -132,13 +132,18 @@ async function seedFavorites(
   // Create one favorite per companion variant
   const variants = companion.variants ?? [];
   for (const variant of variants) {
-    const companionDefaultVariant =
-      companion.variants.find((v) => v.isDefault) ?? companion.variants[0];
     const id = await addFavorite({
       skillId: formatSkillId(companionId, variant.id),
       icon: companion.icon,
-      voiceModelSelection: companionDefaultVariant?.voiceModelSelection,
-      modelSelection: variant.modelSelection ?? null,
+      modelSelection: variant.modelSelection,
+      voiceModelSelection: variant.voiceModelSelection,
+      sttModelSelection: variant.sttModelSelection,
+      imageVisionModelSelection: variant.imageVisionModelSelection,
+      videoVisionModelSelection: variant.videoVisionModelSelection,
+      audioVisionModelSelection: variant.audioVisionModelSelection,
+      imageGenModelSelection: variant.imageGenModelSelection,
+      musicGenModelSelection: variant.musicGenModelSelection,
+      videoGenModelSelection: variant.videoGenModelSelection,
     });
     if (id) {
       if (variant.isDefault ?? false) {
@@ -188,7 +193,16 @@ async function seedFavorites(
         for (const variant of skillVariants) {
           const id = await addFavorite({
             skillId: formatSkillId(skillId, variant.id),
-            modelSelection: variant.modelSelection ?? null,
+            icon: skill.icon,
+            modelSelection: variant.modelSelection,
+            voiceModelSelection: variant.voiceModelSelection,
+            sttModelSelection: variant.sttModelSelection,
+            imageVisionModelSelection: variant.imageVisionModelSelection,
+            videoVisionModelSelection: variant.videoVisionModelSelection,
+            audioVisionModelSelection: variant.audioVisionModelSelection,
+            imageGenModelSelection: variant.imageGenModelSelection,
+            musicGenModelSelection: variant.musicGenModelSelection,
+            videoGenModelSelection: variant.videoGenModelSelection,
           });
           if (id) {
             entries.push({
@@ -199,9 +213,27 @@ async function seedFavorites(
           }
         }
       } else {
-        const id = await addFavorite({ skillId, modelSelection: null });
+        const fallbackVariant =
+          skill.variants.find((v) => v.isDefault) ?? skill.variants[0];
+        const id = await addFavorite({
+          skillId,
+          icon: skill.icon,
+          modelSelection: fallbackVariant?.modelSelection,
+          voiceModelSelection: fallbackVariant?.voiceModelSelection,
+          sttModelSelection: fallbackVariant?.sttModelSelection,
+          imageVisionModelSelection: fallbackVariant?.imageVisionModelSelection,
+          videoVisionModelSelection: fallbackVariant?.videoVisionModelSelection,
+          audioVisionModelSelection: fallbackVariant?.audioVisionModelSelection,
+          imageGenModelSelection: fallbackVariant?.imageGenModelSelection,
+          musicGenModelSelection: fallbackVariant?.musicGenModelSelection,
+          videoGenModelSelection: fallbackVariant?.videoGenModelSelection,
+        });
         if (id) {
-          entries.push({ id, skillId, modelSelection: null });
+          entries.push({
+            id,
+            skillId,
+            modelSelection: fallbackVariant?.modelSelection ?? null,
+          });
         }
       }
     }
@@ -264,10 +296,13 @@ export function UsecasesStep({
           ? skill?.variants?.find((v) => v.id === entryVariantId)
           : undefined;
         const effectiveModelSelection = variant?.modelSelection ?? null;
-        const skillDefaultVariant = skill
-          ? (skill.variants.find((v) => v.isDefault) ?? skill.variants[0])
-          : null;
-        const skillVoiceSel = skillDefaultVariant?.voiceModelSelection ?? null;
+        const skillVoiceSel =
+          variant?.voiceModelSelection ??
+          (skill
+            ? (skill.variants.find((v) => v.isDefault) ?? skill.variants[0])
+                ?.voiceModelSelection
+            : null) ??
+          null;
         return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
           {
             id: entry.id,

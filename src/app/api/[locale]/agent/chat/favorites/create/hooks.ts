@@ -126,7 +126,7 @@ export function useAddToFavorites({
 
     try {
       // Parse merged skillId ("skillSlug" or "skillSlug__variantId") to get plain skillId for lookups
-      const { skillId: plainSkillId } = parseSkillId(skillId);
+      const { skillId: plainSkillId, variantId } = parseSkillId(skillId);
 
       // Get character data - use provided data, cache, or fetch
       let fullChar: SkillDataForFavorite | undefined = characterData;
@@ -142,13 +142,20 @@ export function useAddToFavorites({
         );
 
         if (cachedData?.success) {
+          const cachedVariants = cachedData.data.variants;
+          const cachedVariant =
+            (variantId
+              ? cachedVariants.find((v) => v.id === variantId)
+              : null) ??
+            cachedVariants.find((v) => v.isDefault) ??
+            cachedVariants[0];
           fullChar = {
             id: plainSkillId,
             icon: cachedData.data.icon,
             name: cachedData.data.name,
             tagline: cachedData.data.tagline,
             description: cachedData.data.description,
-            voiceModelSelection: cachedData.data.voiceModelSelection ?? null,
+            voiceModelSelection: cachedVariant?.voiceModelSelection ?? null,
             modelSelection: null,
           };
         } else {
@@ -167,14 +174,20 @@ export function useAddToFavorites({
             return;
           }
 
+          const responseVariants = characterResponse.data.variants;
+          const responseVariant =
+            (variantId
+              ? responseVariants.find((v) => v.id === variantId)
+              : null) ??
+            responseVariants.find((v) => v.isDefault) ??
+            responseVariants[0];
           fullChar = {
             id: plainSkillId,
             icon: characterResponse.data.icon,
             name: characterResponse.data.name,
             tagline: characterResponse.data.tagline,
             description: characterResponse.data.description,
-            voiceModelSelection:
-              characterResponse.data.voiceModelSelection ?? null,
+            voiceModelSelection: responseVariant?.voiceModelSelection ?? null,
             modelSelection: null,
           };
         }

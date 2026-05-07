@@ -5,7 +5,12 @@
 "use client";
 
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import { FormField, FormMessage } from "next-vibe-ui/ui/form/form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "next-vibe-ui/ui/form/form";
 import {
   Collapsible,
   CollapsibleContent,
@@ -227,40 +232,19 @@ export function SkillEditContainer({
     if (watchedVariants && watchedVariants.length > 0) {
       return watchedVariants;
     }
-    // Synthesize a single default variant from the skill's model selections if no variants yet
+    // Fallback: synthesize a single default variant
     return [
       {
         id: "default",
         isDefault: true,
-        modelSelection:
-          form.getValues("modelSelection") ?? DEFAULT_CHAT_MODEL_SELECTION,
-        voiceModelSelection: form.getValues("voiceModelSelection") ?? undefined,
-        sttModelSelection: form.getValues("sttModelSelection") ?? undefined,
-        imageVisionModelSelection:
-          form.getValues("imageVisionModelSelection") ?? undefined,
-        videoVisionModelSelection:
-          form.getValues("videoVisionModelSelection") ?? undefined,
-        audioVisionModelSelection:
-          form.getValues("audioVisionModelSelection") ?? undefined,
-        imageGenModelSelection:
-          form.getValues("imageGenModelSelection") ?? undefined,
-        musicGenModelSelection:
-          form.getValues("musicGenModelSelection") ?? undefined,
+        modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
       },
     ];
-  }, [watchedVariants, form]);
+  }, [watchedVariants]);
 
   const handleVariantsChange = useCallback(
     (newVariants: SkillVariantData[]): void => {
       form.setValue("variants", newVariants, { shouldDirty: true });
-      // Sync top-level modelSelection with default variant for backward compat
-      const defaultVariant =
-        newVariants.find((v) => v.isDefault) ?? newVariants[0];
-      if (defaultVariant) {
-        form.setValue("modelSelection", defaultVariant.modelSelection, {
-          shouldDirty: true,
-        });
-      }
     },
     [form],
   );
@@ -360,42 +344,87 @@ export function SkillEditContainer({
           />
 
           {/* ── VARIANTS ── */}
-          <Div className="flex flex-col gap-2">
-            <Span className="text-sm font-semibold">
-              {t("patch.variants.label")}
-            </Span>
-            <VariantList
-              variants={localVariants}
-              onChange={handleVariantsChange}
-              platformDefaults={platformDefaults}
-              locale={locale}
-              user={user}
-              t={t}
-            />
-          </Div>
+          <FormField
+            control={form.control}
+            name="variants"
+            render={({ fieldState }) => (
+              <FormItem className="flex flex-col gap-2">
+                <Span className="text-sm font-semibold">
+                  {t("patch.variants.label")}
+                </Span>
+                <FormControl>
+                  <VariantList
+                    variants={localVariants}
+                    onChange={handleVariantsChange}
+                    platformDefaults={platformDefaults}
+                    locale={locale}
+                    user={user}
+                    t={t}
+                  />
+                </FormControl>
+                {fieldState.error && (
+                  <Div className="flex items-center gap-2 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0 text-destructive" />
+                    <FormMessage t={t} />
+                  </Div>
+                )}
+              </FormItem>
+            )}
+          />
 
           {/* Context Memory Budget */}
-          {form && (
-            <CompactTriggerEdit
-              value={form.watch("compactTrigger") ?? null}
-              onChange={(v) =>
-                form.setValue("compactTrigger", v, { shouldDirty: true })
-              }
-              modelSelection={form.watch("modelSelection") ?? null}
-              user={user}
-              locale={locale}
-            />
-          )}
+          <FormField
+            control={form.control}
+            name="compactTrigger"
+            render={({ fieldState }) => (
+              <FormItem>
+                <FormControl>
+                  <CompactTriggerEdit
+                    value={form.watch("compactTrigger") ?? null}
+                    onChange={(v) =>
+                      form.setValue("compactTrigger", v, { shouldDirty: true })
+                    }
+                    modelSelection={
+                      localVariants.find((v) => v.isDefault)?.modelSelection ??
+                      null
+                    }
+                    user={user}
+                    locale={locale}
+                  />
+                </FormControl>
+                {fieldState.error && (
+                  <Div className="flex items-center gap-2 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0 text-destructive" />
+                    <FormMessage t={t} />
+                  </Div>
+                )}
+              </FormItem>
+            )}
+          />
 
           {/* Tool configuration - per-skill override */}
-          {form && (
-            <ToolsConfigEdit
-              value={toolsValue}
-              onChange={handleToolsChange}
-              user={user}
-              logger={logger}
-            />
-          )}
+          <FormField
+            control={form.control}
+            name="availableTools"
+            render={({ fieldState }) => (
+              <FormItem>
+                <FormControl>
+                  <ToolsConfigEdit
+                    value={toolsValue}
+                    onChange={handleToolsChange}
+                    user={user}
+                    logger={logger}
+                  />
+                </FormControl>
+                {fieldState.error && (
+                  <Div className="flex items-center gap-2 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0 text-destructive" />
+                    <FormMessage t={t} />
+                  </Div>
+                )}
+              </FormItem>
+            )}
+          />
         </Div>
       </Div>
     </Div>
@@ -1743,46 +1772,20 @@ function VariantCard({
   // Resolve all models for THIS variant (with skill-level + platform fallbacks)
   const resolved = useMemo(() => {
     const chatSel = variant.modelSelection ?? viewDefaults.chat ?? null;
-    const ttsSel =
-      variant.voiceModelSelection ??
-      skillData?.voiceModelSelection ??
-      viewDefaults.tts ??
-      null;
-    const sttSel =
-      variant.sttModelSelection ??
-      skillData?.sttModelSelection ??
-      viewDefaults.stt ??
-      null;
+    const ttsSel = variant.voiceModelSelection ?? viewDefaults.tts ?? null;
+    const sttSel = variant.sttModelSelection ?? viewDefaults.stt ?? null;
     const imageVisionSel =
-      variant.imageVisionModelSelection ??
-      skillData?.imageVisionModelSelection ??
-      viewDefaults.imageVision ??
-      null;
+      variant.imageVisionModelSelection ?? viewDefaults.imageVision ?? null;
     const videoVisionSel =
-      variant.videoVisionModelSelection ??
-      skillData?.videoVisionModelSelection ??
-      viewDefaults.videoVision ??
-      null;
+      variant.videoVisionModelSelection ?? viewDefaults.videoVision ?? null;
     const audioVisionSel =
-      variant.audioVisionModelSelection ??
-      skillData?.audioVisionModelSelection ??
-      viewDefaults.audioVision ??
-      null;
+      variant.audioVisionModelSelection ?? viewDefaults.audioVision ?? null;
     const imageGenSel =
-      variant.imageGenModelSelection ??
-      skillData?.imageGenModelSelection ??
-      viewDefaults.imageGen ??
-      null;
+      variant.imageGenModelSelection ?? viewDefaults.imageGen ?? null;
     const musicGenSel =
-      variant.musicGenModelSelection ??
-      skillData?.musicGenModelSelection ??
-      viewDefaults.musicGen ??
-      null;
+      variant.musicGenModelSelection ?? viewDefaults.musicGen ?? null;
     const videoGenSel =
-      variant.videoGenModelSelection ??
-      skillData?.videoGenModelSelection ??
-      viewDefaults.videoGen ??
-      null;
+      variant.videoGenModelSelection ?? viewDefaults.videoGen ?? null;
     return {
       chat: chatSel ? getBestChatModel(chatSel, user) : null,
       tts: ttsSel ? getBestTtsModel(ttsSel, user) : null,
@@ -1800,7 +1803,7 @@ function VariantCard({
       musicGen: musicGenSel ? getBestMusicGenModel(musicGenSel, user) : null,
       videoGen: videoGenSel ? getBestVideoGenModel(videoGenSel, user) : null,
     };
-  }, [variant, skillData, viewDefaults, user]);
+  }, [variant, viewDefaults, user]);
 
   const provider = resolved.chat
     ? modelProviders[resolved.chat.provider]
@@ -1825,8 +1828,7 @@ function VariantCard({
         name: skillData.name ?? null,
         tagline: skillData.tagline ?? null,
         description: skillData.description ?? null,
-        voiceModelSelection:
-          variant.voiceModelSelection ?? skillData.voiceModelSelection ?? null,
+        voiceModelSelection: variant.voiceModelSelection ?? null,
         modelSelection: variant.modelSelection ?? null,
       }
     : undefined;
@@ -2639,7 +2641,7 @@ function VoiceDisplayName({
   voiceModelSelection,
   t,
 }: {
-  voiceModelSelection: SkillGetResponseOutput["voiceModelSelection"];
+  voiceModelSelection: SkillVariantData["voiceModelSelection"];
   t: ReturnType<typeof useWidgetTranslation>;
 }): React.JSX.Element {
   const resolved = useMemo(() => {
@@ -2677,7 +2679,7 @@ interface SkillCardProps {
   name: string | null;
   tagline: string | null;
   description: string | null;
-  voiceModelSelection: SkillGetResponseOutput["voiceModelSelection"];
+  voiceModelSelection: SkillVariantData["voiceModelSelection"];
   skillOwnership: typeof SkillOwnershipTypeValue;
   locale: CountryLanguage;
   isLoading?: boolean;

@@ -203,7 +203,8 @@ export function FavoriteEditContainer({
   const characterData = characterEndpoint.read?.data;
   const characterVariant = variantId
     ? characterData?.variants?.find((v) => v.id === variantId)
-    : characterData?.variants?.[0];
+    : (characterData?.variants?.find((v) => v.isDefault) ??
+      characterData?.variants?.[0]);
   const characterModelSelection = characterVariant?.modelSelection;
 
   // Get settings to check if this favorite is active
@@ -594,7 +595,7 @@ export function FavoriteEditContainer({
             allowedRoles={["tts"]}
             modelSelection={voiceModelSelection ?? undefined}
             characterModelSelection={
-              characterData?.voiceModelSelection ?? platformTtsDefault
+              characterVariant?.voiceModelSelection ?? platformTtsDefault
             }
             onChange={(sel) => {
               const parsed = voiceModelSelectionSchema
@@ -630,7 +631,8 @@ export function FavoriteEditContainer({
             allowedRoles={["image-gen"]}
             modelSelection={imageGenModelSelection ?? undefined}
             characterModelSelection={
-              characterData?.imageGenModelSelection ?? platformImageGenDefault
+              characterVariant?.imageGenModelSelection ??
+              platformImageGenDefault
             }
             onChange={(sel) => {
               const parsed = imageGenModelSelectionSchema
@@ -668,7 +670,8 @@ export function FavoriteEditContainer({
             allowedRoles={["audio-gen"]}
             modelSelection={musicGenModelSelection ?? undefined}
             characterModelSelection={
-              characterData?.musicGenModelSelection ?? platformMusicGenDefault
+              characterVariant?.musicGenModelSelection ??
+              platformMusicGenDefault
             }
             onChange={(sel) => {
               const parsed = musicGenModelSelectionSchema
@@ -706,7 +709,8 @@ export function FavoriteEditContainer({
             allowedRoles={["video-gen"]}
             modelSelection={videoGenModelSelection ?? undefined}
             characterModelSelection={
-              characterData?.videoGenModelSelection ?? platformVideoGenDefault
+              characterVariant?.videoGenModelSelection ??
+              platformVideoGenDefault
             }
             onChange={(sel) => {
               const parsed = videoGenModelSelectionSchema
@@ -744,7 +748,7 @@ export function FavoriteEditContainer({
             allowedRoles={["stt"]}
             modelSelection={sttModelSelection ?? undefined}
             characterModelSelection={
-              characterData?.sttModelSelection ?? platformSttDefault
+              characterVariant?.sttModelSelection ?? platformSttDefault
             }
             onChange={(sel) => {
               const parsed = sttModelSelectionSchema.nullable().safeParse(sel);
@@ -778,7 +782,7 @@ export function FavoriteEditContainer({
             allowedRoles={["image-vision"]}
             modelSelection={imageVisionModelSelection ?? undefined}
             characterModelSelection={
-              characterData?.imageVisionModelSelection ??
+              characterVariant?.imageVisionModelSelection ??
               platformImageVisionDefault
             }
             onChange={(sel) => {
@@ -818,7 +822,7 @@ export function FavoriteEditContainer({
             allowedRoles={["video-vision"]}
             modelSelection={videoVisionModelSelection ?? undefined}
             characterModelSelection={
-              characterData?.videoVisionModelSelection ??
+              characterVariant?.videoVisionModelSelection ??
               platformVideoVisionDefault
             }
             onChange={(sel) => {
@@ -858,7 +862,7 @@ export function FavoriteEditContainer({
             allowedRoles={["audio-vision"]}
             modelSelection={audioVisionModelSelection ?? undefined}
             characterModelSelection={
-              characterData?.audioVisionModelSelection ??
+              characterVariant?.audioVisionModelSelection ??
               platformAudioVisionDefault
             }
             onChange={(sel) => {
@@ -1046,7 +1050,7 @@ export function FavoriteEditContainer({
                     <ModelSelectorTrigger
                       modelSelection={imageVisionModelSelection ?? null}
                       characterModelSelection={
-                        characterData?.imageVisionModelSelection ??
+                        characterVariant?.imageVisionModelSelection ??
                         platformImageVisionDefault
                       }
                       allowedRoles={["image-vision"]}
@@ -1064,7 +1068,7 @@ export function FavoriteEditContainer({
                     <ModelSelectorTrigger
                       modelSelection={videoVisionModelSelection ?? null}
                       characterModelSelection={
-                        characterData?.videoVisionModelSelection ??
+                        characterVariant?.videoVisionModelSelection ??
                         platformVideoVisionDefault
                       }
                       allowedRoles={["video-vision"]}
@@ -1091,7 +1095,8 @@ export function FavoriteEditContainer({
                     <ModelSelectorTrigger
                       modelSelection={sttModelSelection ?? null}
                       characterModelSelection={
-                        characterData?.sttModelSelection ?? platformSttDefault
+                        characterVariant?.sttModelSelection ??
+                        platformSttDefault
                       }
                       allowedRoles={["stt"]}
                       defaultModelSelection={platformSttDefault}
@@ -1108,7 +1113,8 @@ export function FavoriteEditContainer({
                     <ModelSelectorTrigger
                       modelSelection={voiceModelSelection ?? null}
                       characterModelSelection={
-                        characterData?.voiceModelSelection ?? platformTtsDefault
+                        characterVariant?.voiceModelSelection ??
+                        platformTtsDefault
                       }
                       allowedRoles={["tts"]}
                       defaultModelSelection={platformTtsDefault}
@@ -1125,7 +1131,7 @@ export function FavoriteEditContainer({
                     <ModelSelectorTrigger
                       modelSelection={audioVisionModelSelection ?? null}
                       characterModelSelection={
-                        characterData?.audioVisionModelSelection ??
+                        characterVariant?.audioVisionModelSelection ??
                         platformAudioVisionDefault
                       }
                       allowedRoles={["audio-vision"]}
@@ -1152,7 +1158,7 @@ export function FavoriteEditContainer({
                     <ModelSelectorTrigger
                       modelSelection={imageGenModelSelection ?? null}
                       characterModelSelection={
-                        characterData?.imageGenModelSelection ??
+                        characterVariant?.imageGenModelSelection ??
                         platformImageGenDefault
                       }
                       allowedRoles={["image-gen"]}
@@ -1170,7 +1176,7 @@ export function FavoriteEditContainer({
                     <ModelSelectorTrigger
                       modelSelection={musicGenModelSelection ?? null}
                       characterModelSelection={
-                        characterData?.musicGenModelSelection ??
+                        characterVariant?.musicGenModelSelection ??
                         platformMusicGenDefault
                       }
                       allowedRoles={["audio-gen"]}
@@ -1188,7 +1194,7 @@ export function FavoriteEditContainer({
                     <ModelSelectorTrigger
                       modelSelection={videoGenModelSelection ?? null}
                       characterModelSelection={
-                        characterData?.videoGenModelSelection ??
+                        characterVariant?.videoGenModelSelection ??
                         platformVideoGenDefault
                       }
                       allowedRoles={["video-gen"]}

@@ -20,6 +20,7 @@ import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context"
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/widget/new-thread/empty-state";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { CortexModal } from "@/app/api/[locale]/agent/cortex/widget/cortex-modal";
 import { AIToolsModal } from "@/app/api/[locale]/agent/tools/widget/ai-tools-modal";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
@@ -92,24 +93,48 @@ function AiStreamChatArea(): JSX.Element {
     activeThreadId && activeThreadId !== NEW_MESSAGE_ID ? activeThreadId : null;
 
   // Prefer initialMessagesData (full messages list); fall back to initialPathData messages.
-  // Both apply only to the boot thread - navigated-to threads fetch fresh
-  // (or use the pre-seeded cache for optimistically created threads).
+  // For optimistically created threads, read the pre-seeded cache so useQuery receives
+  // initialData and doesn't fire a network fetch (which would 404 since the thread
+  // doesn't exist in the DB yet).
   const messagesInitialData = useMemo(() => {
-    if (!threadIdToRender || threadIdToRender !== initialThreadId) {
+    if (!threadIdToRender) {
       return null;
     }
-    if (initialMessagesData) {
-      return initialMessagesData;
+    // Boot thread: use SSR data
+    if (threadIdToRender === initialThreadId) {
+      if (initialMessagesData) {
+        return initialMessagesData;
+      }
+      if (initialPathData?.messages?.length) {
+        return {
+          streamingState: "idle" as const,
+          backgroundTasks: [],
+          messages: initialPathData.messages,
+        };
+      }
+      // Fall through to cache lookup below — optimistic threads trigger a route
+      // change (TanStack loader) which updates initialThreadId to match the new
+      // UUID, but there's no SSR data since the thread doesn't exist in the DB yet.
+      // The pre-seeded React Query cache has the optimistic messages.
     }
-    if (initialPathData?.messages?.length) {
-      return {
-        streamingState: "idle" as const,
-        backgroundTasks: [],
-        messages: initialPathData.messages,
-      };
+    // Navigated-to thread or optimistic thread without SSR data:
+    // check if cache was pre-seeded (optimistic creation)
+    const cached = apiClient.getEndpointData(messagesDefinition.GET, logger, {
+      urlPathParams: { threadId: threadIdToRender },
+      requestData: { rootFolderId },
+    });
+    if (cached?.success) {
+      return cached.data;
     }
     return null;
-  }, [threadIdToRender, initialThreadId, initialMessagesData, initialPathData]);
+  }, [
+    threadIdToRender,
+    initialThreadId,
+    initialMessagesData,
+    initialPathData,
+    logger,
+    rootFolderId,
+  ]);
 
   const inputContainerRef = useRef<DivRefObject>(null);
   const inputHeight = useInputHeight(inputContainerRef);

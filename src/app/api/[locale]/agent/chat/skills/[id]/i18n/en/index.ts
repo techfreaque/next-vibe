@@ -8,6 +8,19 @@ export const translations = {
     FEMALE: "Female voice",
   },
   enums: {
+    category: {
+      companion: "Companions",
+      assistant: "Assistants",
+      coding: "Coding",
+      creative: "Creative",
+      writing: "Writing",
+      analysis: "Analysis",
+      roleplay: "Roleplay",
+      education: "Education",
+      controversial: "Controversial",
+      background: "Background",
+      custom: "Custom",
+    },
     ownershipType: {
       system: "Built-in skill",
       user: "Created by you",
@@ -255,8 +268,8 @@ export const translations = {
         "Give your skill a memorable name. This is how you and others will identify them.",
       placeholder: "Enter skill name",
       validation: {
-        minLength: "Name must be at least 2 skills",
-        maxLength: "Name must be less than 100 skills",
+        minLength: "Name must be at least 2 characters",
+        maxLength: "Name must be less than 100 characters",
       },
     },
     tagline: {
@@ -265,8 +278,8 @@ export const translations = {
         "A catchy one-liner that captures the essence of your skill. Keep it short and descriptive.",
       placeholder: "Enter a short tagline",
       validation: {
-        minLength: "Tagline must be at least 2 skills",
-        maxLength: "Tagline must be less than 500 skills",
+        minLength: "Tagline must be at least 2 characters",
+        maxLength: "Tagline must be less than 500 characters",
       },
     },
     icon: {

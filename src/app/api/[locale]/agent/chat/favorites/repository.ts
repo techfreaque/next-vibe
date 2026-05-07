@@ -181,14 +181,15 @@ export class ChatFavoritesRepository {
               characterName = skillResult.data.name;
               characterTagline = skillResult.data.tagline;
               characterDescription = skillResult.data.description;
-              characterVoice = skillResult.data.voiceModelSelection ?? null;
-              // Resolve variant's modelSelection from the skill's variants list
+              // Resolve variant's model selections from the skill's variants list
               // If no variantId, use the default variant (mirrors headless.ts resolveFavorite logic)
               const variants = skillResult.data.variants;
               const variant = favorite.variantId
                 ? variants.find((v) => v.id === favorite.variantId)
                 : (variants.find((v) => v.isDefault) ?? variants[0] ?? null);
               characterModelSelection = variant?.modelSelection ?? null;
+              // Derive voice from the resolved variant; fall back to skill-level top field
+              characterVoice = variant?.voiceModelSelection ?? null;
             }
           }
 

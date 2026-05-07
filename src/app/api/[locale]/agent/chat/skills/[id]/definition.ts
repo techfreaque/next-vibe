@@ -5,19 +5,8 @@
 
 import { z } from "zod";
 
-import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
-import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -43,10 +32,10 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
-import { ChatModelId, getBestChatModel } from "../../../ai-stream/models";
-import { TtsModelId } from "../../../text-to-speech/models";
+import { getBestChatModel } from "../../../ai-stream/models";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -58,14 +47,9 @@ import {
   SKILL_GET_ALIAS,
   SKILL_UPDATE_ALIAS,
 } from "../constants";
-import type {
-  FiltersModelSelection,
-  ManualModelSelection,
-} from "../create/definition";
 import type { SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { scopedTranslation } from "./i18n";
 
 const SkillEditContainer = lazyWidget(() =>
@@ -353,18 +337,10 @@ const { PATCH } = createEndpoint({
               return undefined;
             }
 
-            // If modelSelection changed, update the default variant's modelSelection in variants[]
+            // Update variants if provided
             const newVariants =
-              data.requestData.modelSelection !== undefined
-                ? oldData.data.variants.map((v) =>
-                    v.isDefault
-                      ? {
-                          ...v,
-                          modelSelection:
-                            data.requestData.modelSelection ?? v.modelSelection,
-                        }
-                      : v,
-                  )
+              data.requestData.variants && data.requestData.variants.length > 0
+                ? data.requestData.variants
                 : oldData.data.variants;
 
             return {
@@ -378,9 +354,6 @@ const { PATCH } = createEndpoint({
                   data.requestData.description ?? oldData.data.description,
                 category: data.requestData.category ?? oldData.data.category,
                 isPublic: data.requestData.isPublic ?? oldData.data.isPublic,
-                voiceModelSelection:
-                  data.requestData.voiceModelSelection ??
-                  oldData.data.voiceModelSelection,
                 systemPrompt:
                   data.requestData.systemPrompt ?? oldData.data.systemPrompt,
                 variants: newVariants,
@@ -418,10 +391,15 @@ const { PATCH } = createEndpoint({
                     }
 
                     // Update the skill with new data from the request
-                    // Recalculate model info if modelSelection changed
-                    const modelSel = data.requestData.modelSelection;
-                    const bestModel = modelSel
-                      ? getBestChatModel(modelSel, data.user)
+                    // Recalculate model info from default variant if variants changed
+                    const defaultVariant = data.requestData.variants?.find(
+                      (v) => v.isDefault,
+                    );
+                    const bestModel = defaultVariant?.modelSelection
+                      ? getBestChatModel(
+                          defaultVariant.modelSelection,
+                          data.user,
+                        )
                       : null;
 
                     return {
@@ -605,102 +583,7 @@ const { PATCH } = createEndpoint({
           descriptionStyle: "inline",
         } as const,
       }),
-      voiceModelSelection: requestField(scopedTranslation, {
-        schema: voiceModelSelectionSchema.nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "patch.voice.label" as const,
-        description: "patch.voice.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
-      sttModelSelection: requestField(scopedTranslation, {
-        schema: sttModelSelectionSchema.nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "patch.sttModel.label" as const,
-        description: "patch.sttModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
-      imageVisionModelSelection: requestField(scopedTranslation, {
-        schema: imageVisionModelSelectionSchema.nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "patch.imageVisionModel.label" as const,
-        description: "patch.imageVisionModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
-      videoVisionModelSelection: requestField(scopedTranslation, {
-        schema: videoVisionModelSelectionSchema.nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "patch.videoVisionModel.label" as const,
-        description: "patch.videoVisionModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
-      audioVisionModelSelection: requestField(scopedTranslation, {
-        schema: audioVisionModelSelectionSchema.nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "patch.audioVisionModel.label" as const,
-        description: "patch.audioVisionModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
-      imageGenModelSelection: requestField(scopedTranslation, {
-        schema: imageGenModelSelectionSchema.nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "patch.imageGenModel.label" as const,
-        description: "patch.imageGenModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
-      musicGenModelSelection: requestField(scopedTranslation, {
-        schema: musicGenModelSelectionSchema.nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "patch.musicGenModel.label" as const,
-        description: "patch.musicGenModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
-      videoGenModelSelection: requestField(scopedTranslation, {
-        schema: videoGenModelSelectionSchema.nullable().optional(),
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "patch.videoGenModel.label" as const,
-        description: "patch.videoGenModel.description" as const,
-        columns: 6,
-        theme: {
-          descriptionStyle: "inline",
-          optionalColor: "transparent",
-        },
-      }),
+
       systemPrompt: requestField(scopedTranslation, {
         schema: z.string().nullable(),
         type: WidgetType.FORM_FIELD,
@@ -714,13 +597,7 @@ const { PATCH } = createEndpoint({
           descriptionStyle: "inline",
         } as const,
       }),
-      modelSelection: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "patch.modelSelection.label" as const,
-        description: "patch.modelSelection.description" as const,
-        schema: chatModelSelectionSchema.nullable(),
-      }),
+
       // Named variants with per-variant model selections
       variants: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -845,18 +722,6 @@ const { PATCH } = createEndpoint({
         category: SkillCategory.CODING,
         tagline: "Updated tagline",
         isPublic: true,
-        voiceModelSelection: null,
-        sttModelSelection: undefined,
-        imageVisionModelSelection: undefined,
-        videoVisionModelSelection: undefined,
-        audioVisionModelSelection: undefined,
-        imageGenModelSelection: undefined,
-        musicGenModelSelection: undefined,
-        videoGenModelSelection: undefined,
-        modelSelection: {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ChatModelId.GPT_5,
-        },
         availableTools: [
           { toolId: "execute-tool", requiresConfirmation: false },
         ],
@@ -960,47 +825,6 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.boolean(),
-      }),
-      voiceModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: voiceModelSelectionSchema.nullable(),
-      }),
-      sttModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: sttModelSelectionSchema.nullable(),
-      }),
-      imageVisionModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: imageVisionModelSelectionSchema.nullable(),
-      }),
-      videoVisionModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: videoVisionModelSelectionSchema.nullable(),
-      }),
-      audioVisionModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: audioVisionModelSelectionSchema.nullable(),
-      }),
-      imageGenModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: imageGenModelSelectionSchema.nullable(),
-      }),
-      musicGenModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: musicGenModelSelectionSchema.nullable(),
-      }),
-
-      videoGenModelSelection: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: videoGenModelSelectionSchema.nullable(),
       }),
       systemPrompt: responseField(scopedTranslation, {
         type: WidgetType.MARKDOWN,
@@ -1160,14 +984,6 @@ const { GET } = createEndpoint({
         "variants",
         "availableTools",
         "pinnedTools",
-        "voiceModelSelection",
-        "sttModelSelection",
-        "imageVisionModelSelection",
-        "videoVisionModelSelection",
-        "audioVisionModelSelection",
-        "imageGenModelSelection",
-        "musicGenModelSelection",
-        "videoGenModelSelection",
       ] as const,
       operation: "merge" as const,
     },
@@ -1184,14 +1000,7 @@ const { GET } = createEndpoint({
         category: SkillCategory.ASSISTANT,
         isPublic: false,
         skillOwnership: SkillOwnershipType.SYSTEM,
-        voiceModelSelection: null,
-        sttModelSelection: null,
-        imageVisionModelSelection: null,
-        videoVisionModelSelection: null,
-        audioVisionModelSelection: null,
-        imageGenModelSelection: null,
-        musicGenModelSelection: null,
-        videoGenModelSelection: null,
+
         systemPrompt: "",
         compactTrigger: null,
         availableTools: null,
@@ -1226,17 +1035,7 @@ const { GET } = createEndpoint({
         category: SkillCategory.CODING,
         isPublic: true,
         skillOwnership: SkillOwnershipType.PUBLIC,
-        voiceModelSelection: {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: TtsModelId.OPENAI_ONYX,
-        },
-        sttModelSelection: null,
-        imageVisionModelSelection: null,
-        videoVisionModelSelection: null,
-        audioVisionModelSelection: null,
-        imageGenModelSelection: null,
-        musicGenModelSelection: null,
-        videoGenModelSelection: null,
+
         systemPrompt: "You are an expert code reviewer...",
         compactTrigger: null,
         availableTools: null,
@@ -1290,18 +1089,3 @@ export type SkillDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 
 const definitions = { GET, PATCH, DELETE } as const;
 export default definitions;
-
-// Patch request tests
-type SkillModelSelection = SkillUpdateRequestOutput["modelSelection"];
-type SkillFiltersModelSelection = Extract<
-  SkillModelSelection,
-  { selectionType: typeof ModelSelectionType.FILTERS }
->;
-type SkillManualModelSelection = Extract<
-  SkillModelSelection,
-  { selectionType: typeof ModelSelectionType.MANUAL }
->;
-// oxlint-disable-next-line no-unused-vars
-const _test1: FiltersModelSelection = {} as SkillFiltersModelSelection;
-// oxlint-disable-next-line no-unused-vars
-const _test2: ManualModelSelection = {} as SkillManualModelSelection;

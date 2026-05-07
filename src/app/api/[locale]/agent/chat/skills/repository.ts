@@ -13,25 +13,9 @@ import {
   chatModelSelectionSchema,
   type ChatModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import {
-  imageGenModelSelectionSchema,
-  type ImageGenModelSelection,
-} from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import {
-  sttModelSelectionSchema,
-  type SttModelSelection,
-} from "@/app/api/[locale]/agent/speech-to-text/models";
-import {
-  voiceModelSelectionSchema,
-  type VoiceModelSelection,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -256,7 +240,6 @@ export class SkillsRepository {
     modelSelection: ChatModelSelection | null,
   ): SkillVariantData[] {
     if (variants && variants.length > 0) {
-      // Safe-parse each variant individually; drop ones that don't validate
       const parsed = variants
         .map((v) => skillVariantSchema.safeParse(v))
         .filter((r): r is z.ZodSafeParseSuccess<SkillVariantData> => r.success)
@@ -271,7 +254,13 @@ export class SkillsRepository {
       modelSelection,
     );
     if (sel) {
-      return [{ id: "default", modelSelection: sel, isDefault: true }];
+      return [
+        {
+          id: "default",
+          modelSelection: sel,
+          isDefault: true,
+        },
+      ];
     }
     return [];
   }
@@ -771,13 +760,6 @@ export class SkillsRepository {
       // Check default skills first
       const defaultSkill = DEFAULT_SKILLS.find((p) => p.id === skillId);
       if (defaultSkill) {
-        // Use the requested variant if specified, otherwise fall back to default
-        const defaultVariant =
-          (variantId
-            ? defaultSkill.variants.find((v) => v.id === variantId)
-            : null) ??
-          defaultSkill.variants.find((v) => v.isDefault) ??
-          defaultSkill.variants[0];
         return success<SkillGetResponseOutput>({
           internalId: null,
           icon: defaultSkill.icon,
@@ -786,20 +768,6 @@ export class SkillsRepository {
           description: t(defaultSkill.description),
           category: defaultSkill.category,
           isPublic: false,
-          voiceModelSelection: defaultVariant?.voiceModelSelection ?? null,
-          sttModelSelection: defaultVariant?.sttModelSelection ?? null,
-          imageVisionModelSelection:
-            defaultVariant?.imageVisionModelSelection ?? null,
-          videoVisionModelSelection:
-            defaultVariant?.videoVisionModelSelection ?? null,
-          audioVisionModelSelection:
-            defaultVariant?.audioVisionModelSelection ?? null,
-          imageGenModelSelection:
-            defaultVariant?.imageGenModelSelection ?? null,
-          musicGenModelSelection:
-            defaultVariant?.musicGenModelSelection ?? null,
-          videoGenModelSelection:
-            defaultVariant?.videoGenModelSelection ?? null,
           systemPrompt: defaultSkill.systemPrompt,
           skillOwnership: SkillOwnershipType.SYSTEM,
           compactTrigger: null,
@@ -845,14 +813,6 @@ export class SkillsRepository {
           description: null,
           category: NO_SKILL.category,
           isPublic: false,
-          voiceModelSelection: null,
-          sttModelSelection: null,
-          imageVisionModelSelection: null,
-          videoVisionModelSelection: null,
-          audioVisionModelSelection: null,
-          imageGenModelSelection: null,
-          musicGenModelSelection: null,
-          videoGenModelSelection: null,
           systemPrompt: null,
           skillOwnership: SkillOwnershipType.SYSTEM,
           compactTrigger: null,
@@ -974,6 +934,12 @@ export class SkillsRepository {
 
       // Return only response fields (exclude database fields like userId, createdAt, updatedAt)
       // Flattened response
+
+      const parsedVariants = SkillsRepository.safeParseVariants(
+        customSkill.variants,
+        customSkill.modelSelection,
+      );
+
       return success<SkillGetResponseOutput>({
         internalId: customSkill.slug ? customSkill.id : null,
         icon: customSkill.icon,
@@ -982,40 +948,6 @@ export class SkillsRepository {
         description: customSkill.description,
         category: customSkill.category,
         isPublic: customSkill.ownershipType === SkillOwnershipType.PUBLIC,
-        voiceModelSelection: SkillsRepository.safeParseSelection(
-          voiceModelSelectionSchema,
-          customSkill.voiceModelSelection,
-        ),
-        sttModelSelection: SkillsRepository.safeParseSelection(
-          sttModelSelectionSchema,
-          customSkill.sttModelSelection,
-        ),
-        imageVisionModelSelection: SkillsRepository.safeParseSelection(
-          imageVisionModelSelectionSchema,
-          customSkill.imageVisionModelSelection,
-        ),
-        videoVisionModelSelection: SkillsRepository.safeParseSelection(
-          videoVisionModelSelectionSchema,
-          customSkill.videoVisionModelSelection,
-        ),
-        audioVisionModelSelection: SkillsRepository.safeParseSelection(
-          audioVisionModelSelectionSchema,
-          customSkill.audioVisionModelSelection,
-        ),
-        imageGenModelSelection: SkillsRepository.safeParseSelection(
-          imageGenModelSelectionSchema,
-          customSkill.imageGenModelSelection,
-        ),
-        musicGenModelSelection: SkillsRepository.safeParseSelection(
-          musicGenModelSelectionSchema,
-          customSkill.musicGenModelSelection,
-        ),
-        videoGenModelSelection: customSkill.videoGenModelId
-          ? SkillsRepository.safeParseSelection(videoGenModelSelectionSchema, {
-              selectionType: ModelSelectionType.MANUAL,
-              manualModelId: customSkill.videoGenModelId,
-            })
-          : null,
         systemPrompt: customSkill.systemPrompt,
         skillOwnership: customSkill.ownershipType,
         compactTrigger: customSkill.compactTrigger ?? null,
@@ -1029,10 +961,7 @@ export class SkillsRepository {
             toolId: tool.toolId,
             requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
-        variants: SkillsRepository.safeParseVariants(
-          customSkill.variants,
-          customSkill.modelSelection,
-        ),
+        variants: parsedVariants,
         longContent: customSkill.longContent ?? null,
         favoritesCount,
         creatorProfile,
@@ -1294,6 +1223,20 @@ export class SkillsRepository {
           data.name,
         );
 
+        // Derive model selections from the default variant (variants are now the source of truth)
+        const derivedVariants: SkillVariantData[] =
+          data.variants && data.variants.length > 0
+            ? data.variants
+            : [
+                {
+                  id: "default",
+                  modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
+                  isDefault: true,
+                },
+              ];
+        const derivedDefaultVariant =
+          derivedVariants.find((v) => v.isDefault) ?? derivedVariants[0];
+
         const [derivedSkill] = await db
           .insert(customSkills)
           .values({
@@ -1305,37 +1248,34 @@ export class SkillsRepository {
             icon: iconToUse,
             systemPrompt: data.systemPrompt,
             category: data.category,
+            // Sync top-level columns from default variant for backward compat
             voiceModelSelection: SkillsRepository.normalizeTtsSelection(
-              data.voiceModelSelection ?? null,
+              derivedDefaultVariant?.voiceModelSelection ?? null,
             ),
             sttModelSelection: SkillsRepository.normalizeSttSelection(
-              data.sttModelSelection ?? null,
+              derivedDefaultVariant?.sttModelSelection ?? null,
             ),
-            imageVisionModelSelection: data.imageVisionModelSelection ?? null,
-            videoVisionModelSelection: data.videoVisionModelSelection ?? null,
-            audioVisionModelSelection: data.audioVisionModelSelection ?? null,
+            imageVisionModelSelection:
+              derivedDefaultVariant?.imageVisionModelSelection ?? null,
+            videoVisionModelSelection:
+              derivedDefaultVariant?.videoVisionModelSelection ?? null,
+            audioVisionModelSelection:
+              derivedDefaultVariant?.audioVisionModelSelection ?? null,
             imageGenModelSelection: SkillsRepository.normalizeImageGenSelection(
-              data.imageGenModelSelection ?? null,
+              derivedDefaultVariant?.imageGenModelSelection ?? null,
             ),
-            musicGenModelSelection: data.musicGenModelSelection ?? null,
+            musicGenModelSelection:
+              derivedDefaultVariant?.musicGenModelSelection ?? null,
             videoGenModelId:
-              data.videoGenModelSelection?.selectionType ===
+              derivedDefaultVariant?.videoGenModelSelection?.selectionType ===
                 ModelSelectionType.MANUAL &&
-              data.videoGenModelSelection.manualModelId
-                ? data.videoGenModelSelection.manualModelId
+              derivedDefaultVariant.videoGenModelSelection.manualModelId
+                ? derivedDefaultVariant.videoGenModelSelection.manualModelId
                 : null,
-            modelSelection: data.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
-            variants:
-              data.variants && data.variants.length > 0
-                ? data.variants
-                : [
-                    {
-                      id: "default",
-                      modelSelection:
-                        data.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
-                      isDefault: true,
-                    },
-                  ],
+            modelSelection:
+              derivedDefaultVariant?.modelSelection ??
+              DEFAULT_CHAT_MODEL_SELECTION,
+            variants: derivedVariants,
             ownershipType: data.isPublic
               ? SkillOwnershipType.PUBLIC
               : SkillOwnershipType.USER,
@@ -1417,21 +1357,9 @@ export class SkillsRepository {
       // Normalize model selections: store null if same as platform default (defense-in-depth)
       // oxlint-disable-next-line no-unused-vars
       const { isPublic, ...dataWithoutIsPublic } = data;
-      const videoGenModelIdToUpdate =
-        data.videoGenModelSelection !== undefined
-          ? data.videoGenModelSelection?.selectionType ===
-              ModelSelectionType.MANUAL &&
-            data.videoGenModelSelection.manualModelId
-            ? data.videoGenModelSelection.manualModelId
-            : null
-          : undefined;
-      // Remove videoGenModelSelection from spread (we use videoGenModelId column instead)
-      const {
-        videoGenModelSelection,
-        variants: requestVariants,
-        ...dataWithoutVideoGen
-      } = dataWithoutIsPublic;
-      void videoGenModelSelection;
+      // Remove variants from spread — handled separately below
+      const { variants: requestVariants, ...dataWithoutVariants } =
+        dataWithoutIsPublic;
 
       // Sync modelSelection from default variant when variants are provided
       const variantsToWrite = requestVariants ?? undefined;
@@ -1439,23 +1367,44 @@ export class SkillsRepository {
         ? variantsToWrite.find((v) => v.isDefault)?.modelSelection
         : undefined;
 
+      // Derive per-modality selections from the default variant (variants are now the source of truth)
+      const updateDefaultVariant = variantsToWrite
+        ? (variantsToWrite.find((v) => v.isDefault) ?? variantsToWrite[0])
+        : undefined;
+
+      const videoGenModelIdToUpdate =
+        updateDefaultVariant?.videoGenModelSelection
+          ? updateDefaultVariant.videoGenModelSelection.selectionType ===
+              ModelSelectionType.MANUAL &&
+            updateDefaultVariant.videoGenModelSelection.manualModelId
+            ? updateDefaultVariant.videoGenModelSelection.manualModelId
+            : null
+          : undefined;
+
       const updateValues = Object.fromEntries(
         Object.entries({
-          ...dataWithoutVideoGen,
+          ...dataWithoutVariants,
           icon: iconToUpdate,
           ownershipType,
           variants: variantsToWrite,
           // Sync top-level modelSelection from default variant for backward compat
-          modelSelection: defaultVariantModelSelection ?? data.modelSelection,
-          voiceModelSelection: SkillsRepository.normalizeTtsSelection(
-            data.voiceModelSelection ?? null,
-          ),
-          sttModelSelection: SkillsRepository.normalizeSttSelection(
-            data.sttModelSelection ?? null,
-          ),
-          imageGenModelSelection: SkillsRepository.normalizeImageGenSelection(
-            data.imageGenModelSelection ?? null,
-          ),
+          modelSelection: defaultVariantModelSelection,
+          // Sync legacy per-modality columns from default variant for backward compat
+          voiceModelSelection: updateDefaultVariant
+            ? SkillsRepository.normalizeTtsSelection(
+                updateDefaultVariant.voiceModelSelection ?? null,
+              )
+            : undefined,
+          sttModelSelection: updateDefaultVariant
+            ? SkillsRepository.normalizeSttSelection(
+                updateDefaultVariant.sttModelSelection ?? null,
+              )
+            : undefined,
+          imageGenModelSelection: updateDefaultVariant
+            ? SkillsRepository.normalizeImageGenSelection(
+                updateDefaultVariant.imageGenModelSelection ?? null,
+              )
+            : undefined,
           videoGenModelId: videoGenModelIdToUpdate,
         }).filter(([, value]) => value !== undefined),
       );
@@ -1548,19 +1497,6 @@ export class SkillsRepository {
             toolId: tool.toolId,
             requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
-        voiceModelSelection: updated.voiceModelSelection ?? null,
-        sttModelSelection: updated.sttModelSelection ?? null,
-        imageVisionModelSelection: updated.imageVisionModelSelection ?? null,
-        videoVisionModelSelection: updated.videoVisionModelSelection ?? null,
-        audioVisionModelSelection: updated.audioVisionModelSelection ?? null,
-        imageGenModelSelection: updated.imageGenModelSelection ?? null,
-        musicGenModelSelection: updated.musicGenModelSelection ?? null,
-        videoGenModelSelection: updated.videoGenModelId
-          ? {
-              selectionType: ModelSelectionType.MANUAL,
-              manualModelId: updated.videoGenModelId,
-            }
-          : null,
       });
 
       // Return the full updated skill to match GET response structure

@@ -1171,21 +1171,28 @@ function AddVariantButton({
       const characterSingleDefinitions =
         await import("../skills/[id]/definition");
       const createFavoriteDefinitions = await import("./create/definition");
+      const { skillId: baseSkillId, variantId } = parseSkillId(skillId);
+
       // Fetch character data from cache or API
       const cachedData = apiClient.getEndpointData(
         characterSingleDefinitions.default.GET,
         logger,
         {
-          urlPathParams: { id: skillId },
+          urlPathParams: { id: baseSkillId },
         },
       );
 
       if (cachedData?.success) {
+        const cachedVariants = cachedData.data.variants;
+        const cachedVariant =
+          (variantId ? cachedVariants.find((v) => v.id === variantId) : null) ??
+          cachedVariants.find((v) => v.isDefault) ??
+          cachedVariants[0];
         navigate(createFavoriteDefinitions.default.POST, {
           data: {
             skillId,
             icon: cachedData.data.icon ?? undefined,
-            voiceModelSelection: cachedData.data.voiceModelSelection ?? null,
+            voiceModelSelection: cachedVariant?.voiceModelSelection ?? null,
             modelSelection: null,
           },
           popNavigationOnSuccess: 1,
@@ -1198,19 +1205,23 @@ function AddVariantButton({
         logger,
         user,
         undefined,
-        { id: skillId },
+        { id: baseSkillId },
         locale,
       );
       if (!characterResponse.success) {
         return;
       }
 
+      const responseVariants = characterResponse.data.variants;
+      const responseVariant =
+        (variantId ? responseVariants.find((v) => v.id === variantId) : null) ??
+        responseVariants.find((v) => v.isDefault) ??
+        responseVariants[0];
       navigate(createFavoriteDefinitions.default.POST, {
         data: {
           skillId,
           icon: characterResponse.data.icon ?? undefined,
-          voiceModelSelection:
-            characterResponse.data.voiceModelSelection ?? null,
+          voiceModelSelection: responseVariant?.voiceModelSelection ?? null,
           modelSelection: null,
         },
         popNavigationOnSuccess: 1,

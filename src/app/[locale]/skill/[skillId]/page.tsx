@@ -27,6 +27,7 @@ import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/
 import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import { Div } from "next-vibe-ui/ui/div";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { scopedTranslation } from "./i18n";
 import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import {
@@ -121,8 +122,9 @@ export async function tanstackLoader({
   }
   const skillUser: JwtPayloadType = user;
 
+  const { skillId: baseSkillId, variantId } = parseSkillId(skillId);
   const skillResult = await SkillsRepository.getSkillById(
-    { id: skillId },
+    { id: baseSkillId },
     skillUser,
     logger,
     locale,
@@ -208,46 +210,34 @@ export async function tanstackLoader({
     rv.toolCount = skillToolCount;
   }
 
+  const allVariants = initialSkillData?.variants ?? [];
   const defaultVariant =
-    initialSkillData?.variants.find((v) => v.isDefault) ??
-    initialSkillData?.variants[0] ??
+    (variantId ? allVariants.find((v) => v.id === variantId) : null) ??
+    allVariants.find((v) => v.isDefault) ??
+    allVariants[0] ??
     null;
 
-  const voiceSel =
-    defaultVariant?.voiceModelSelection ??
-    initialSkillData?.voiceModelSelection ??
-    null;
+  const voiceSel = defaultVariant?.voiceModelSelection ?? null;
   const voiceName = voiceSel
     ? (getBestTtsModel(voiceSel, skillUser)?.name ?? null)
     : null;
 
-  const imageGenSel =
-    defaultVariant?.imageGenModelSelection ??
-    initialSkillData?.imageGenModelSelection ??
-    null;
+  const imageGenSel = defaultVariant?.imageGenModelSelection ?? null;
   const imageGenName = imageGenSel
     ? (getBestImageGenModel(imageGenSel, skillUser)?.name ?? null)
     : null;
 
-  const musicGenSel =
-    defaultVariant?.musicGenModelSelection ??
-    initialSkillData?.musicGenModelSelection ??
-    null;
+  const musicGenSel = defaultVariant?.musicGenModelSelection ?? null;
   const musicGenName = musicGenSel
     ? (getBestMusicGenModel(musicGenSel, skillUser)?.name ?? null)
     : null;
 
-  const videoGenSel =
-    defaultVariant?.videoGenModelSelection ??
-    initialSkillData?.videoGenModelSelection ??
-    null;
+  const videoGenSel = defaultVariant?.videoGenModelSelection ?? null;
   const videoGenName = videoGenSel
     ? (getBestVideoGenModel(videoGenSel, skillUser)?.name ?? null)
     : null;
 
-  const hasStt = !!(
-    defaultVariant?.sttModelSelection ?? initialSkillData?.sttModelSelection
-  );
+  const hasStt = !!defaultVariant?.sttModelSelection;
 
   const resolvedModels: ResolvedSkillModels = {
     variants: resolvedVariants,

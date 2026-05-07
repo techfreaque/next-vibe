@@ -1137,11 +1137,20 @@ export function ChatSettingsWidget({
         return existing.id;
       }
       const skill = DEFAULT_SKILLS.find((s) => s.id === skillId);
+      const defaultVariant =
+        skill?.variants.find((v) => v.isDefault) ?? skill?.variants[0];
       return addFavorite({
         skillId,
         icon: skill?.icon,
-        modelSelection: null,
-        voiceModelSelection: null,
+        modelSelection: defaultVariant?.modelSelection,
+        voiceModelSelection: defaultVariant?.voiceModelSelection,
+        sttModelSelection: defaultVariant?.sttModelSelection,
+        imageVisionModelSelection: defaultVariant?.imageVisionModelSelection,
+        videoVisionModelSelection: defaultVariant?.videoVisionModelSelection,
+        audioVisionModelSelection: defaultVariant?.audioVisionModelSelection,
+        imageGenModelSelection: defaultVariant?.imageGenModelSelection,
+        musicGenModelSelection: defaultVariant?.musicGenModelSelection,
+        videoGenModelSelection: defaultVariant?.videoGenModelSelection,
       });
     },
     [favorites, addFavorite],

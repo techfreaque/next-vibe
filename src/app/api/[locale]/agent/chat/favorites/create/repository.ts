@@ -331,6 +331,10 @@ export class FavoritesCreateRepository {
         : (character?.variants?.find((v) => v.isDefault) ??
           character?.variants?.[0] ??
           null);
+      const characterDefaultVariant =
+        character?.variants?.find((v) => v.isDefault) ??
+        character?.variants?.[0] ??
+        null;
       const newFavoriteCard =
         ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
           {
@@ -346,14 +350,14 @@ export class FavoritesCreateRepository {
             position: nextPosition,
           },
           variantForDisplay?.modelSelection ??
-            character?.variants?.[0]?.modelSelection ??
+            characterDefaultVariant?.modelSelection ??
             null,
           character?.icon ?? null,
           character?.name ?? null,
           character?.tagline ?? null,
           character?.description ?? null,
           null,
-          character?.voiceModelSelection ?? null,
+          characterDefaultVariant?.voiceModelSelection ?? null,
           locale,
           user,
         );

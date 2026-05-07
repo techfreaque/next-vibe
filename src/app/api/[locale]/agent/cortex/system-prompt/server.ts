@@ -70,10 +70,6 @@ export async function loadCortexData(
   const blockCortex = !userId || (!headless && (isIncognito || isPublicFolder));
 
   if (blockCortex) {
-    // Headless never sees this note - only UI-facing contexts
-    if (headless) {
-      return emptyBase;
-    }
     let unavailableNote: string;
     if (isIncognito && userId) {
       unavailableNote =
@@ -178,6 +174,7 @@ export async function loadCortexData(
     ];
 
     return {
+      unavailableNote: "",
       tree,
       threadCounts: counts.threads.byRoot,
       totalThreads: counts.threads.total,
@@ -193,7 +190,7 @@ export async function loadCortexData(
       userId,
       error: error instanceof Error ? error.message : String(error),
     });
-    return empty;
+    return { ...emptyBase, unavailableNote: "" };
   }
 }
 

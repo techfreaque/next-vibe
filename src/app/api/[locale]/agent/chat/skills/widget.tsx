@@ -1453,29 +1453,31 @@ export function EditFavBeforeAddButton({
 
       const fullChar = skillResponse.data;
 
-      // Resolve model selections - prefer the specific variant if one is selected
+      // Resolve model selections from the user's selected variant
       const { variantId } = parseSkillId(char.skillId);
-      const matchedVariant = variantId
-        ? fullChar.variants.find((v) => v.id === variantId)
-        : undefined;
+      const selectedVariant =
+        (variantId
+          ? fullChar.variants.find((v) => v.id === variantId)
+          : null) ??
+        fullChar.variants.find((v) => v.isDefault) ??
+        fullChar.variants[0];
 
-      const modelSelection = matchedVariant?.modelSelection;
+      const modelSelection = selectedVariant?.modelSelection;
       const voiceModelSelection =
-        (matchedVariant ?? fullChar).voiceModelSelection ?? undefined;
-      const sttModelSelection =
-        (matchedVariant ?? fullChar).sttModelSelection ?? undefined;
+        selectedVariant?.voiceModelSelection ?? undefined;
+      const sttModelSelection = selectedVariant?.sttModelSelection ?? undefined;
       const imageVisionModelSelection =
-        (matchedVariant ?? fullChar).imageVisionModelSelection ?? undefined;
+        selectedVariant?.imageVisionModelSelection ?? undefined;
       const videoVisionModelSelection =
-        (matchedVariant ?? fullChar).videoVisionModelSelection ?? undefined;
+        selectedVariant?.videoVisionModelSelection ?? undefined;
       const audioVisionModelSelection =
-        (matchedVariant ?? fullChar).audioVisionModelSelection ?? undefined;
+        selectedVariant?.audioVisionModelSelection ?? undefined;
       const imageGenModelSelection =
-        (matchedVariant ?? fullChar).imageGenModelSelection ?? undefined;
+        selectedVariant?.imageGenModelSelection ?? undefined;
       const musicGenModelSelection =
-        (matchedVariant ?? fullChar).musicGenModelSelection ?? undefined;
+        selectedVariant?.musicGenModelSelection ?? undefined;
       const videoGenModelSelection =
-        (matchedVariant ?? fullChar).videoGenModelSelection ?? undefined;
+        selectedVariant?.videoGenModelSelection ?? undefined;
 
       // Navigate to create favorite with skill data
       const editFavoriteDefinitions =
@@ -1485,7 +1487,7 @@ export function EditFavBeforeAddButton({
         data: {
           skillId: char.skillId,
           icon: fullChar.icon ?? undefined,
-          customVariantName: matchedVariant?.displayName ?? null,
+          customVariantName: selectedVariant?.displayName ?? null,
           modelSelection,
           voiceModelSelection,
           sttModelSelection,
@@ -1783,35 +1785,32 @@ export function SkillFavoriteActions({
       await import("../favorites/[id]/definition");
 
     const { variantId: addVarId } = parseSkillId(char.skillId);
-    const addMatchedVariant = addVarId
-      ? fullChar.variants.find((v) => v.id === addVarId)
-      : undefined;
+    const addSelectedVariant =
+      (addVarId ? fullChar.variants.find((v) => v.id === addVarId) : null) ??
+      fullChar.variants.find((v) => v.isDefault) ??
+      fullChar.variants[0];
 
     navigate(createFavoriteDefinitions.default.POST, {
       data: {
         skillId: char.skillId,
         icon: fullChar.icon ?? undefined,
-        customVariantName: addMatchedVariant?.displayName ?? null,
-        modelSelection: addMatchedVariant?.modelSelection,
+        customVariantName: addSelectedVariant?.displayName ?? null,
+        modelSelection: addSelectedVariant?.modelSelection,
         voiceModelSelection:
-          (addMatchedVariant ?? fullChar).voiceModelSelection ?? undefined,
-        sttModelSelection:
-          (addMatchedVariant ?? fullChar).sttModelSelection ?? undefined,
+          addSelectedVariant?.voiceModelSelection ?? undefined,
+        sttModelSelection: addSelectedVariant?.sttModelSelection ?? undefined,
         imageVisionModelSelection:
-          (addMatchedVariant ?? fullChar).imageVisionModelSelection ??
-          undefined,
+          addSelectedVariant?.imageVisionModelSelection ?? undefined,
         videoVisionModelSelection:
-          (addMatchedVariant ?? fullChar).videoVisionModelSelection ??
-          undefined,
+          addSelectedVariant?.videoVisionModelSelection ?? undefined,
         audioVisionModelSelection:
-          (addMatchedVariant ?? fullChar).audioVisionModelSelection ??
-          undefined,
+          addSelectedVariant?.audioVisionModelSelection ?? undefined,
         imageGenModelSelection:
-          (addMatchedVariant ?? fullChar).imageGenModelSelection ?? undefined,
+          addSelectedVariant?.imageGenModelSelection ?? undefined,
         musicGenModelSelection:
-          (addMatchedVariant ?? fullChar).musicGenModelSelection ?? undefined,
+          addSelectedVariant?.musicGenModelSelection ?? undefined,
         videoGenModelSelection:
-          (addMatchedVariant ?? fullChar).videoGenModelSelection ?? undefined,
+          addSelectedVariant?.videoGenModelSelection ?? undefined,
       },
       replaceOnSuccess: {
         endpoint: editFavoriteDefinitions.default.PATCH,

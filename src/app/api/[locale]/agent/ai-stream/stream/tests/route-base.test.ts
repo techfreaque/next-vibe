@@ -836,22 +836,44 @@ async function loadFixture(filename: string, mimeType: string): Promise<File> {
   return new File([buffer], filename, { type: mimeType });
 }
 
-/** Pin the test user's balance to an exact amount, zeroing all wallets first */
+/** Pin the test user's balance to an exact amount, zeroing all wallets first.
+ * Uses the same comprehensive wallet discovery as getPoolBalance to prevent
+ * stale lead wallets from inflating the balance during tests.
+ */
 async function pinBalance(
   userId: string,
   credits: number,
   creditLogger: ReturnType<typeof createEndpointLogger>,
   creditT: ReturnType<typeof creditsScopedTranslation.scopedT>["t"],
 ): Promise<void> {
+  // Find ALL wallets that getPoolBalance would include:
+  // 1. User's own wallet (by user_id)
+  // 2. Lead wallets linked via user_lead_links
+  // 3. Lead wallets reachable via recursive lead_lead_links graph
   const wallets = await db.execute<{
     id: string;
     balance: number;
     free_credits_remaining: number;
   }>(
-    sql`SELECT cw.id, cw.balance, cw.free_credits_remaining
+    sql`SELECT DISTINCT cw.id, cw.balance, cw.free_credits_remaining
         FROM credit_wallets cw
-        LEFT JOIN user_lead_links ull ON ull.lead_id = cw.lead_id
-        WHERE cw.user_id = ${userId} OR ull.user_id = ${userId}`,
+        WHERE cw.user_id = ${userId}
+           OR cw.lead_id IN (
+             SELECT ull.lead_id FROM user_lead_links ull WHERE ull.user_id = ${userId}
+           )
+           OR cw.lead_id IN (
+             WITH RECURSIVE connected(lead_id) AS (
+               SELECT ull.lead_id FROM user_lead_links ull WHERE ull.user_id = ${userId}
+               UNION
+               SELECT CASE
+                 WHEN ll.lead_id_1 = c.lead_id THEN ll.lead_id_2
+                 ELSE ll.lead_id_1
+               END
+               FROM lead_lead_links ll
+               JOIN connected c ON ll.lead_id_1 = c.lead_id OR ll.lead_id_2 = c.lead_id
+             )
+             SELECT DISTINCT lead_id FROM connected
+           )`,
   );
 
   const now = new Date();
@@ -940,6 +962,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         return;
       }
       testUser = resolved;
+
+      // Clean up stale lead links that may have been created by browsing the app
+      // or interrupted test runs. Keep only the primary lead link used by testUser.
+      await db.execute(
+        sql`DELETE FROM user_lead_links
+            WHERE user_id = ${testUser.id} AND lead_id != ${testUser.leadId}`,
+      );
 
       creditLogger = createEndpointLogger(false, Date.now(), defaultLocale);
       const { t } = creditsScopedTranslation.scopedT(defaultLocale);

@@ -10,6 +10,19 @@ export const translations: typeof enTranslations = {
     FEMALE: "Weibliche Stimme",
   },
   enums: {
+    category: {
+      companion: "Begleiter",
+      assistant: "Assistenten",
+      coding: "Programmierung",
+      creative: "Kreativ",
+      writing: "Schreiben",
+      analysis: "Analyse",
+      roleplay: "Rollenspiel",
+      education: "Bildung",
+      controversial: "Kontrovers",
+      background: "Hintergrund",
+      custom: "Benutzerdefiniert",
+    },
     ownershipType: {
       system: "Eingebaute Fertigkeit",
       user: "Von dir erstellt",

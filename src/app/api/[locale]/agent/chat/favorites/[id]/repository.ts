@@ -245,11 +245,11 @@ export class SingleFavoriteRepository {
           favorite.audioVisionModelSelection ?? undefined,
         imageGenModelSelection:
           favorite.imageGenModelSelection ??
-          character?.imageGenModelSelection ??
+          variant?.imageGenModelSelection ??
           undefined,
         musicGenModelSelection:
           favorite.musicGenModelSelection ??
-          character?.musicGenModelSelection ??
+          variant?.musicGenModelSelection ??
           undefined,
         videoGenModelSelection: favorite.videoGenModelSelection ?? undefined,
         modelSelection,
@@ -497,6 +497,10 @@ export class SingleFavoriteRepository {
         : (updatedSkill?.variants?.find((v) => v.isDefault) ??
           updatedSkill?.variants?.[0] ??
           null);
+      const updatedSkillDefaultVariant =
+        updatedSkill?.variants?.find((v) => v.isDefault) ??
+        updatedSkill?.variants?.[0] ??
+        null;
       const updatedFavoriteCard =
         ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
           {
@@ -512,14 +516,14 @@ export class SingleFavoriteRepository {
             position: updated.position,
           },
           variantForDisplay?.modelSelection ??
-            updatedSkill?.variants?.[0]?.modelSelection ??
+            updatedSkillDefaultVariant?.modelSelection ??
             null,
           updatedSkill?.icon ?? null,
           updatedSkill?.name ?? null,
           updatedSkill?.tagline ?? null,
           updatedSkill?.description ?? null,
           null,
-          updatedSkill?.voiceModelSelection ?? null,
+          variantForDisplay?.voiceModelSelection ?? null,
           locale,
           user,
         );
