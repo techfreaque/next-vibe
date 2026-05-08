@@ -14,9 +14,6 @@
  * `define` at build time with the literal values from the package manifest.
  */
 
-// Register CLI widget plugin BEFORE any other imports.
-import "./cli-widget-plugin";
-
 // Scoped endpoint registry - bundled at build time from the generated files
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 

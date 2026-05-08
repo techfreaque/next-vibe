@@ -19,6 +19,7 @@ import {
   SourcemapModeEnum,
 } from "@/app/api/[locale]/system/builder/enum";
 import type { BuildConfig } from "@/app/api/[locale]/system/builder/repository";
+import { createCliWidgetPlugin } from "@/app/api/[locale]/system/unified-interface/cli/cli-widget-plugin-factory";
 
 import manifest from "./package";
 
@@ -38,6 +39,14 @@ const config: BuildConfig = {
         target: BunTargetEnum.NODE,
         sourcemap: SourcemapModeEnum.EXTERNAL,
         banner: "#!/usr/bin/env node",
+        // Apply web/ui → cli/ui redirects at bundle time (replaces runtime plugin import)
+        plugins: [
+          createCliWidgetPlugin(
+            // build.config.ts lives in src/app/api/[locale]/system/check/
+            // 5 levels up → src/   (packages/next-vibe-ui lives under src/)
+            new URL("../../../../../", import.meta.url).pathname,
+          ),
+        ],
       },
     },
 
