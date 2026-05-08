@@ -35,8 +35,9 @@ const config: BuildConfig = {
       output: ".dist/checker/bin/vibe-check.js",
       type: BunBuildTypeEnum.EXECUTABLE,
       bunOptions: {
-        target: BunTargetEnum.BUN,
+        target: BunTargetEnum.NODE,
         sourcemap: SourcemapModeEnum.EXTERNAL,
+        banner: "#!/usr/bin/env node",
       },
     },
 

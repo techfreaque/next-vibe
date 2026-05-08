@@ -34,6 +34,9 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Generate indexes
+        run: bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts gen
+
       - name: Run vibe check (lint, typecheck, tests)
         run: bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts check
 
