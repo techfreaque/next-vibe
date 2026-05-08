@@ -75,6 +75,218 @@ import type meDefinition from "./definition";
 import type { MePostResponseOutput } from "./definition";
 import { useUser } from "./hooks";
 
+export function MeDeleteWidget(): JSX.Element {
+  const locale = useWidgetLocale();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const t = useWidgetTranslation<typeof meDefinition.DELETE>();
+  const { pop } = useWidgetNavigation();
+  const [confirmText, setConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleted, setDeleted] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const canDelete = confirmText === "DELETE";
+
+  const handleDelete = useCallback(async (): Promise<void> => {
+    if (!user || !canDelete || isDeleting) {
+      return;
+    }
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    const meDef = await import("./definition");
+    const result = await apiClient.mutate(
+      meDef.default.DELETE,
+      logger,
+      user,
+      undefined,
+      undefined,
+      locale,
+    );
+
+    if (result.success) {
+      setDeleted(true);
+      setTimeout(() => {
+        window.location.href = `/${locale}`;
+      }, 1500);
+    } else {
+      setIsDeleting(false);
+      setDeleteError(result.message ?? t("delete.errors.internal.title"));
+    }
+  }, [user, logger, locale, canDelete, isDeleting, t]);
+
+  const deletedItems = [
+    t("widget.deleteAccount.items.profile"),
+    t("widget.deleteAccount.items.chats"),
+    t("widget.deleteAccount.items.skills"),
+    t("widget.deleteAccount.items.files"),
+    t("widget.deleteAccount.items.subscriptions"),
+    t("widget.deleteAccount.items.credits"),
+  ];
+
+  if (deleted) {
+    return (
+      <Div
+        style={{
+          padding: 48,
+          textAlign: "center",
+          color: "rgba(255,255,255,0.6)",
+          fontSize: 14,
+        }}
+      >
+        {t("widget.deleteAccount.success")}
+      </Div>
+    );
+  }
+
+  return (
+    <Div
+      style={{
+        background: "#0f0520",
+        color: "#fff",
+        padding: 24,
+        display: "flex",
+        flexDirection: "column",
+        gap: 20,
+      }}
+    >
+      <Div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <Div style={{ color: "#ef4444", flexShrink: 0, display: "flex" }}>
+          <AlertTriangle className="h-5 w-5" />
+        </Div>
+        <H2
+          style={{ color: "#ef4444", fontSize: 16, fontWeight: 700, margin: 0 }}
+        >
+          {t("widget.deleteAccount.confirmTitle")}
+        </H2>
+      </Div>
+
+      <P
+        style={{
+          color: "rgba(255,255,255,0.55)",
+          fontSize: 13,
+          margin: 0,
+          lineHeight: 1.6,
+        }}
+      >
+        {t("widget.deleteAccount.confirmDescription")}
+      </P>
+
+      <Div
+        style={{
+          background: "rgba(239,68,68,0.06)",
+          border: "1px solid rgba(239,68,68,0.2)",
+          borderRadius: 8,
+          padding: "12px 16px",
+        }}
+      >
+        <Span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: "rgba(239,68,68,0.75)",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+          }}
+        >
+          {t("widget.deleteAccount.whatGetsDeleted")}
+        </Span>
+        <Div
+          style={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          {deletedItems.map((item) => (
+            <Div
+              key={item}
+              style={{ display: "flex", alignItems: "center", gap: 8 }}
+            >
+              <Div
+                style={{
+                  width: 4,
+                  height: 4,
+                  borderRadius: "50%",
+                  background: "rgba(239,68,68,0.4)",
+                  flexShrink: 0,
+                }}
+              />
+              <Span
+                style={{
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.4)",
+                  lineHeight: 1.5,
+                }}
+              >
+                {item}
+              </Span>
+            </Div>
+          ))}
+        </Div>
+      </Div>
+
+      <Div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <Span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+          {t("widget.deleteAccount.confirmLabel")}
+        </Span>
+        <Input
+          value={confirmText}
+          onChange={(e): void => {
+            setConfirmText(e.target.value);
+          }}
+          placeholder={t("widget.deleteAccount.confirmPlaceholder")}
+          disabled={isDeleting}
+          style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
+        />
+      </Div>
+
+      {deleteError !== null && (
+        <Span style={{ fontSize: 12, color: "#ef4444" }}>{deleteError}</Span>
+      )}
+
+      <Div style={{ display: "flex", gap: 10 }}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={isDeleting}
+          onClick={(): void => {
+            pop();
+          }}
+          style={{ flex: 1, color: "rgba(255,255,255,0.5)" }}
+        >
+          {t("widget.deleteAccount.cancelButton")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={!canDelete || isDeleting}
+          onClick={(): void => {
+            void handleDelete();
+          }}
+          style={{
+            flex: 1,
+            background: canDelete ? "rgba(239,68,68,0.12)" : undefined,
+            border: "1px solid",
+            borderColor: canDelete
+              ? "rgba(239,68,68,0.4)"
+              : "rgba(255,255,255,0.08)",
+            color: canDelete ? "#ef4444" : "rgba(255,255,255,0.2)",
+          }}
+        >
+          {isDeleting
+            ? t("widget.deleteAccount.deleting")
+            : t("widget.deleteAccount.confirmButton")}
+        </Button>
+      </Div>
+    </Div>
+  );
+}
+
 interface MeUpdateWidgetProps {
   field: {
     value: MePostResponseOutput | null | undefined;
@@ -206,6 +418,14 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
 
   // Skills list context - reuse the real components from skills/widget.tsx
   const { push: navigate } = useWidgetNavigation();
+
+  const handleDeleteAccount = useCallback(async (): Promise<void> => {
+    const meDef = await import("./definition");
+    navigate(meDef.default.DELETE, {
+      renderInModal: true,
+    });
+  }, [navigate]);
+
   const isTouch = useTouchDevice();
   const skillsT = skillsScopedTranslation.scopedT(locale).t;
   const skillsFieldChildren = skillsDef.GET.fields.children;
@@ -774,6 +994,68 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
           {t("widget.emailCard.description")}
         </P>
         <EndpointsPage endpoint={configDef} user={user} locale={locale} />
+      </Div>
+
+      {/* ── DANGER ZONE ── */}
+      <Div
+        style={{
+          maxWidth: 720,
+          margin: "0 auto",
+          padding: "0 24px 64px",
+        }}
+      >
+        <Div
+          style={{
+            border: "1px solid rgba(239,68,68,0.2)",
+            borderRadius: 10,
+            padding: "16px 20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 16,
+          }}
+        >
+          <Div>
+            <Span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "rgba(239,68,68,0.6)",
+              }}
+            >
+              {t("widget.deleteAccount.dangerZone")}
+            </Span>
+            <P
+              style={{
+                fontSize: 12,
+                color: "rgba(255,255,255,0.35)",
+                margin: "4px 0 0",
+              }}
+            >
+              {t("widget.deleteAccount.confirmDescription")}
+            </P>
+          </Div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={(): void => {
+              void handleDeleteAccount();
+            }}
+            style={{
+              flexShrink: 0,
+              border: "1px solid rgba(239,68,68,0.35)",
+              color: "rgba(239,68,68,0.75)",
+              fontSize: 12,
+              height: 32,
+              padding: "0 14px",
+            }}
+          >
+            {t("widget.deleteAccount.button")}
+          </Button>
+        </Div>
       </Div>
     </Div>
   );

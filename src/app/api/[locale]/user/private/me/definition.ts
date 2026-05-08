@@ -14,6 +14,7 @@ import {
   SkillTrustLevelDB,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { leadId } from "@/app/api/[locale]/leads/types";
+import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -23,7 +24,6 @@ import {
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -39,6 +39,10 @@ import { scopedTranslation } from "./i18n";
 
 const MeUpdateWidget = lazy(() =>
   import("./widget").then((m) => ({ default: m.MeUpdateWidget })),
+);
+
+const MeDeleteWidget = lazy(() =>
+  import("./widget").then((m) => ({ default: m.MeDeleteWidget })),
 );
 
 /**
@@ -1189,7 +1193,7 @@ const { POST } = createEndpoint({
 });
 
 /**
- * DELETE /me - Delete current user account
+ * DELETE /me - Delete current user account (web only, not callable by AI tools)
  */
 const { DELETE } = createEndpoint({
   scopedTranslation,
@@ -1208,13 +1212,9 @@ const { DELETE } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "delete.response.title" as const,
-    description: "delete.response.description" as const,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { response: true },
+  fields: customWidgetObject({
+    render: MeDeleteWidget,
+    usage: { response: true } as const,
     children: {
       exists: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

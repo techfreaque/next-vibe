@@ -462,6 +462,28 @@ export const translations: typeof enTranslations = {
       public: "Społeczność",
       showLess: "Pokaż mniej",
     },
+    deleteAccount: {
+      dangerZone: "Strefa zagrożenia",
+      button: "Usuń konto",
+      confirmTitle: "Trwale usuń swoje konto",
+      confirmDescription:
+        "Twoje konto i wszystkie powiązane dane zostaną nieodwracalnie usunięte. Bez możliwości przywrócenia.",
+      confirmLabel: 'Wpisz "DELETE" aby potwierdzić',
+      confirmPlaceholder: "DELETE",
+      confirmButton: "Usuń moje konto na zawsze",
+      cancelButton: "Anuluj",
+      whatGetsDeleted: "Co zostanie usunięte:",
+      items: {
+        profile: "Twój profil i wszystkie ustawienia",
+        chats: "Cała historia czatów i wątki",
+        skills: "Wszystkie własne skille i konfiguracje",
+        files: "Wszystkie pliki cortex i wspomnienia",
+        subscriptions: "Aktywne subskrypcje",
+        credits: "Pozostałe kredyty",
+      },
+      deleting: "Usuwanie...",
+      success: "Konto usunięte. Przekierowanie...",
+    },
   },
 
   // Sub-routes

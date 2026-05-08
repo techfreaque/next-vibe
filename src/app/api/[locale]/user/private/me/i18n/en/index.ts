@@ -460,6 +460,28 @@ export const translations = {
       public: "Community",
       showLess: "Show less",
     },
+    deleteAccount: {
+      dangerZone: "Danger Zone",
+      button: "Delete Account",
+      confirmTitle: "Delete your account permanently",
+      confirmDescription:
+        "This permanently deletes your account and all associated data. No recovery. No undo.",
+      confirmLabel: 'Type "DELETE" to confirm',
+      confirmPlaceholder: "DELETE",
+      confirmButton: "Delete my account forever",
+      cancelButton: "Cancel",
+      whatGetsDeleted: "What gets deleted:",
+      items: {
+        profile: "Your profile and all settings",
+        chats: "All chat history and threads",
+        skills: "All custom skills and configurations",
+        files: "All cortex files and memories",
+        subscriptions: "Active subscriptions",
+        credits: "Any remaining credits",
+      },
+      deleting: "Deleting...",
+      success: "Account deleted. Redirecting...",
+    },
   },
 
   // Sub-routes

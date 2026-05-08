@@ -29,9 +29,16 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
+import { creditWallets } from "../../../credits/db";
+import { csvImportJobs, importBatches } from "../../../leads/import/db";
 import { leads } from "../../../leads/db";
+import { messengerAccounts } from "../../../messenger/accounts/db";
+import { payoutRequests } from "../../../referral/db";
+import { subscriptions } from "../../../subscription/db";
+import { SubscriptionRepository } from "../../../subscription/repository";
 import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
-import { users } from "../../db";
+import { users, userRoles } from "../../db";
+import { passwordResets } from "../../public/reset-password/db";
 import { UserDetailLevel } from "../../enum";
 import { UserRepository } from "../../repository";
 import type {
@@ -548,7 +555,75 @@ export class UserProfileRepository {
         });
       }
 
-      // Delete user from database
+      // Cancel Stripe subscription before deletion so Stripe is notified properly.
+      const [activeSubscription] = await db
+        .select({
+          id: subscriptions.id,
+          providerSubscriptionId: subscriptions.providerSubscriptionId,
+        })
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
+        .limit(1);
+
+      if (activeSubscription?.providerSubscriptionId) {
+        const cancelResult = await SubscriptionRepository.cancelSubscription(
+          { cancelAtPeriodEnd: false },
+          userId,
+          logger,
+          locale,
+        );
+        if (!cancelResult.success) {
+          logger.warn(
+            "Failed to cancel Stripe subscription during account deletion",
+            {
+              userId,
+              error: cancelResult.message,
+            },
+          );
+        }
+      }
+
+      // Handle FK constraints with ON DELETE no action before deleting the user.
+      // user_roles must be sequential: nullify assignedBy first so the delete doesn't
+      // violate the self-referential FK on rows where assignedBy = userId = same row.
+      await db
+        .update(userRoles)
+        .set({ assignedBy: null })
+        .where(eq(userRoles.assignedBy, userId));
+      await db.delete(userRoles).where(eq(userRoles.userId, userId));
+
+      // Nullify all other no-action FK references to this user in parallel.
+      // credit_wallets.userId is nullified (not deleted) so the wallet and all
+      // credit transaction history are preserved as an audit record.
+      // leads linked via user_lead_links cascade automatically; the actual lead
+      // records (email captures) are never deleted.
+      await Promise.all([
+        db.delete(passwordResets).where(eq(passwordResets.userId, userId)),
+        db
+          .update(leads)
+          .set({ convertedUserId: null })
+          .where(eq(leads.convertedUserId, userId)),
+        db
+          .update(creditWallets)
+          .set({ userId: null })
+          .where(eq(creditWallets.userId, userId)),
+        db.delete(csvImportJobs).where(eq(csvImportJobs.uploadedBy, userId)),
+        db.delete(importBatches).where(eq(importBatches.uploadedBy, userId)),
+        db
+          .update(messengerAccounts)
+          .set({ createdBy: null })
+          .where(eq(messengerAccounts.createdBy, userId)),
+        db
+          .update(messengerAccounts)
+          .set({ updatedBy: null })
+          .where(eq(messengerAccounts.updatedBy, userId)),
+        db
+          .update(payoutRequests)
+          .set({ processedByUserId: null })
+          .where(eq(payoutRequests.processedByUserId, userId)),
+      ]);
+
+      // Delete user — all remaining FK constraints use ON DELETE cascade.
       await db.delete(users).where(eq(users.id, userId));
 
       logger.debug("Successfully deleted user account", { userId });
