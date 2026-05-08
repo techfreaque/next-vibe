@@ -133,7 +133,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.webpack.title",
         description: "post.fields.webpack.description",
-        schema: z.boolean().optional().default(false),
+        schema: z.boolean().optional().default(true),
       }),
 
       // === RESPONSE FIELDS ===

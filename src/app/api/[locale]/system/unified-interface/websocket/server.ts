@@ -105,6 +105,7 @@ export function broadcastLocalBatch(events: WsBatchEvent[]): void {
   if (events.length === 0) {
     return;
   }
+
   // Collect union of all channels referenced
   const channelNames = [...new Set(events.map((e) => e.channel))];
 
@@ -447,7 +448,10 @@ export function startWebSocketServer(
             );
           }
           return new Response("ok", { status: 200 });
-        } catch {
+        } catch (err) {
+          logger.error("[WS] /ws/broadcast POST failed to parse body", {
+            error: err instanceof Error ? err.message : String(err),
+          });
           return new Response("Bad Request", { status: 400 });
         }
       }
@@ -876,9 +880,7 @@ export function startWebSocketServer(
         for (const channel of initialChannels) {
           subscribeToChannel(ws, channel);
         }
-        logger.debug(
-          `[WS] Connection opened (channels: ${initialChannels.join(", ") || "none"})`,
-        );
+        logger.debug(`[WS] Connection opened (channels: ${initialChannels.join(", ") || "none"})`);
       },
 
       async message(ws, raw): Promise<void> {
@@ -893,9 +895,9 @@ export function startWebSocketServer(
         }
         // Normal /ws connection
         try {
-          const msg = JSON.parse(
-            typeof raw === "string" ? raw : new TextDecoder().decode(raw),
-          ) as WsClientMessage;
+          const rawStr =
+            typeof raw === "string" ? raw : new TextDecoder().decode(raw);
+          const msg = JSON.parse(rawStr) as WsClientMessage;
 
           if (msg.type === "subscribe") {
             if (
@@ -914,8 +916,14 @@ export function startWebSocketServer(
             );
             logger.debug(`[WS] Unsubscribed from ${msg.channel}`);
           }
-        } catch {
-          logger.warn("[WS] Invalid message received");
+        } catch (err) {
+          const rawStr =
+            typeof raw === "string" ? raw : new TextDecoder().decode(raw);
+          logger.error("[WS] Failed to process client message", {
+            error: err instanceof Error ? err.message : String(err),
+            rawPreview: rawStr.slice(0, 500),
+            subscribedChannels: [...ws.data.channels],
+          });
         }
       },
 
