@@ -486,6 +486,12 @@ export const translations = {
     postLint: {
       title: "Post-Lint Hook",
     },
+    preTypecheck: {
+      title: "Pre-Typecheck Hook",
+    },
+    postTypecheck: {
+      title: "Post-Typecheck Hook",
+    },
     preBuild: {
       title: "Pre-Build Hook",
     },

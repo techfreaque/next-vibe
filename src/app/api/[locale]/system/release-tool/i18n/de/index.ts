@@ -490,6 +490,12 @@ export const translations: typeof enTranslations = {
     postLint: {
       title: "Post-Lint-Hook",
     },
+    preTypecheck: {
+      title: "Pre-Typecheck-Hook",
+    },
+    postTypecheck: {
+      title: "Post-Typecheck-Hook",
+    },
     preBuild: {
       title: "Pre-Build-Hook",
     },

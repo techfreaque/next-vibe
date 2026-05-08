@@ -592,6 +592,19 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
         // Typecheck
         if (pkg.typecheck && !skipTypecheck && !packageFailed) {
+          if (pkg.hooks?.preTypecheck) {
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.preTypecheck,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+              locale,
+            );
+            if (!hookResult.success && handleHookFailure("preTypecheck")) {
+              continue;
+            }
+          }
           const typecheckCommand =
             typeof pkg.typecheck === "string" ? pkg.typecheck : undefined;
           const typecheckResult = qualityRunner.runTypecheck(
@@ -604,6 +617,19 @@ export class ReleaseExecutor implements IReleaseExecutor {
           );
           if (handleFailure(typecheckResult, "Typecheck")) {
             continue;
+          }
+          if (pkg.hooks?.postTypecheck) {
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.postTypecheck,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+              locale,
+            );
+            if (!hookResult.success && handleHookFailure("postTypecheck")) {
+              continue;
+            }
           }
         }
 

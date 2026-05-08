@@ -1267,6 +1267,38 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
+                    preTypecheck: requestField(scopedTranslation, {
+                      type: WidgetType.FORM_FIELD,
+                      fieldType: FieldDataType.TEXT,
+                      label: "fields.preTypecheck.title",
+                      optional: true,
+                      schema: z
+                        .object({
+                          command: z.string(),
+                          cwd: z.string().optional(),
+                          continueOnError: z.boolean().optional(),
+                          env: z.record(z.string(), z.string()).optional(),
+                          timeout: z.coerce.number().optional(),
+                          shell: z.boolean().optional(),
+                        })
+                        .optional(),
+                    }),
+                    postTypecheck: requestField(scopedTranslation, {
+                      type: WidgetType.FORM_FIELD,
+                      fieldType: FieldDataType.TEXT,
+                      label: "fields.postTypecheck.title",
+                      optional: true,
+                      schema: z
+                        .object({
+                          command: z.string(),
+                          cwd: z.string().optional(),
+                          continueOnError: z.boolean().optional(),
+                          env: z.record(z.string(), z.string()).optional(),
+                          timeout: z.coerce.number().optional(),
+                          shell: z.boolean().optional(),
+                        })
+                        .optional(),
+                    }),
                     preBuild: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,

@@ -112,6 +112,9 @@ const releaseConfig: ReleaseFileConfig = {
       // Required GitHub Actions secrets: VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_APP_DIR
       // Skips gracefully when not in CI (local `vibe pub` won't have the env vars).
       hooks: {
+        preTypecheck: {
+          command: "vibe gen",
+        },
         postPublish: {
           command:
             // Guard: skip deploy when VPS_HOST is not set (local release)
