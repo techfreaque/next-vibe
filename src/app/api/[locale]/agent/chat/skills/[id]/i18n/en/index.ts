@@ -61,6 +61,7 @@ export const translations = {
       title: "Variants",
     },
     addToCollection: "Add to your collection:",
+    addAllToFavorites: "Add All",
     quickAdd: "Quick Add",
     tweakAndAdd: "Tweak & Add",
     edit: "Edit",

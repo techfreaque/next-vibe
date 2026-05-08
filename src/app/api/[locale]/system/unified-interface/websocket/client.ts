@@ -32,6 +32,19 @@ import type {
  */
 type WireHandler = EventHandler<WsWireMessage["data"]>;
 
+/** Buffered event for replay when first listener registers */
+interface BufferedEvent {
+  event: string;
+  data: WsWireMessage["data"];
+  fullMsg: WsWireMessage;
+  ts: number;
+}
+
+/** Max buffered events per channel (prevents memory leak for long-running tabs) */
+const BUFFER_MAX = 200;
+/** Buffer TTL - discard events older than 30s (handles case where listener never registers) */
+const BUFFER_TTL_MS = 30_000;
+
 /**
  * Per-channel subscription state.
  * The physical WS connection is shared; this tracks virtual subscriptions.
@@ -41,6 +54,8 @@ interface ChannelState {
   listeners: Map<string, Set<WireHandler>>;
   /** Wildcard handlers: receive the full WsWireMessage for lastEvent tracking */
   wildcardListeners: Set<EventHandler<WsWireMessage>>;
+  /** Events buffered while no listeners are registered - replayed on first addListener */
+  buffer: BufferedEvent[];
 }
 
 // Shared connection state
@@ -73,6 +88,10 @@ function connect(): void {
     return;
   }
 
+  if (typeof window === "undefined") {
+    return;
+  }
+
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const url = `${protocol}//${window.location.host}/ws`;
 
@@ -95,10 +114,24 @@ function connect(): void {
     }
 
     const handlers = channelState.listeners.get(msg.event);
-    if (handlers) {
+    if (handlers && handlers.size > 0) {
       for (const handler of handlers) {
         handler(msg.data);
       }
+    } else if (
+      channelState.listeners.size === 0 &&
+      channelState.wildcardListeners.size === 0
+    ) {
+      // No listeners registered yet (pre-warmed channel) - buffer for replay
+      if (channelState.buffer.length < BUFFER_MAX) {
+        channelState.buffer.push({
+          event: msg.event,
+          data: msg.data,
+          fullMsg: msg,
+          ts: Date.now(),
+        });
+      }
+      return;
     }
 
     // Notify wildcard listeners (for lastEvent tracking)
@@ -161,6 +194,7 @@ function getOrCreateChannel(channel: string): ChannelState {
   state = {
     listeners: new Map(),
     wildcardListeners: new Set(),
+    buffer: [],
   };
   channels.set(channel, state);
 
@@ -193,6 +227,25 @@ function addListener(
   }
   handlers.add(handler);
 
+  // Replay buffered events for this event name (and wildcards)
+  if (state.buffer.length > 0) {
+    const now = Date.now();
+    const remaining: BufferedEvent[] = [];
+    for (const buffered of state.buffer) {
+      if (buffered.event === event && now - buffered.ts < BUFFER_TTL_MS) {
+        handler(buffered.data);
+        for (const wh of state.wildcardListeners) {
+          wh(buffered.fullMsg);
+        }
+      } else if (now - buffered.ts < BUFFER_TTL_MS) {
+        // Keep events for other event names (they'll be replayed by their handler)
+        remaining.push(buffered);
+      }
+      // Expired events are simply dropped
+    }
+    state.buffer = remaining;
+  }
+
   return (): void => {
     handlers.delete(handler);
     if (handlers.size === 0) {
@@ -208,6 +261,19 @@ function addWildcardListener(
   channel: string,
 ): () => void {
   state.wildcardListeners.add(handler);
+
+  // Replay all buffered events for wildcard listener (keeps buffer for event-specific replay)
+  if (state.buffer.length > 0) {
+    const now = Date.now();
+    const remaining: BufferedEvent[] = [];
+    for (const buffered of state.buffer) {
+      if (now - buffered.ts < BUFFER_TTL_MS) {
+        handler(buffered.fullMsg);
+        remaining.push(buffered); // Keep for event-specific listeners
+      }
+    }
+    state.buffer = remaining;
+  }
 
   return (): void => {
     state.wildcardListeners.delete(handler);

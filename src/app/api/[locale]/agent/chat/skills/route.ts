@@ -17,5 +17,6 @@ export const { GET, tools } = endpointsHandler({
     handler: ({ data, user, logger, locale, platform }) => {
       return SkillsRepository.getSkills(data, user, logger, locale, platform);
     },
+    canSubscribe: ({ user }) => !!user.leadId,
   },
 });

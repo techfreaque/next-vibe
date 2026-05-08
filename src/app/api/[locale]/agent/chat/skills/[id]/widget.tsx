@@ -153,6 +153,7 @@ import {
 import { formatSkillId, parseSkillId } from "../../slugify";
 import {
   useAddToFavorites,
+  useFavoriteCreate,
   type SkillDataForFavorite,
 } from "../../favorites/create/hooks";
 import type { FavoriteCard } from "../../favorites/definition";
@@ -748,6 +749,19 @@ export function SkillViewContainer({
   const isOwner = skillOwnership === SkillOwnershipType.USER;
   const isLoading = !skillData;
 
+  const handleOpenEdit = useCallback(async (): Promise<void> => {
+    if (!skillId) {
+      return;
+    }
+    const patchDef = await import("./definition");
+    navigation.push(patchDef.default.PATCH, {
+      urlPathParams: { id: skillId },
+      popNavigationOnSuccess: 1,
+      prefillFromGet: true,
+      getEndpoint: patchDef.default.GET,
+    });
+  }, [skillId, navigation]);
+
   const handleCopyPrompt = useCallback((): void => {
     const prompt = skillData?.systemPrompt;
     if (!prompt) {
@@ -863,8 +877,71 @@ export function SkillViewContainer({
     </>
   );
 
-  // Variants to render - always show at least the single variant
-  const variantsToRender = variants ?? [];
+  // Variants to render - memoized so array identity is stable
+  const variantsToRender = useMemo(() => variants ?? [], [variants]);
+
+  const skillReferenceIdsForFav = useMemo(
+    () =>
+      skillData?.internalId
+        ? [skillId ?? "", skillData.internalId]
+        : [skillId ?? ""],
+    [skillId, skillData?.internalId],
+  );
+  const allFavorited =
+    skillId !== undefined &&
+    variantsToRender.length > 0 &&
+    variantsToRender.every((v) =>
+      favorites.some(
+        (fav) =>
+          skillReferenceIdsForFav.includes(parseSkillId(fav.skillId).skillId) &&
+          parseSkillId(fav.skillId).variantId === v.id,
+      ),
+    );
+
+  const [isAddingAll, setIsAddingAll] = useState(false);
+  const { addFavorite } = useFavoriteCreate(user, logger);
+
+  const handleAddAllToFavorites = useCallback(async (): Promise<void> => {
+    if (!skillId) {
+      return;
+    }
+    setIsAddingAll(true);
+    try {
+      for (const v of variantsToRender) {
+        const alreadyFaved = favorites.some(
+          (fav) =>
+            skillReferenceIdsForFav.includes(
+              parseSkillId(fav.skillId).skillId,
+            ) && parseSkillId(fav.skillId).variantId === v.id,
+        );
+        if (alreadyFaved) {
+          continue;
+        }
+        await addFavorite({
+          skillId: formatSkillId(skillId, v.id),
+          icon: skillData?.icon ?? undefined,
+          modelSelection: v.modelSelection,
+          voiceModelSelection: v.voiceModelSelection,
+          sttModelSelection: v.sttModelSelection,
+          imageVisionModelSelection: v.imageVisionModelSelection,
+          videoVisionModelSelection: v.videoVisionModelSelection,
+          audioVisionModelSelection: v.audioVisionModelSelection,
+          imageGenModelSelection: v.imageGenModelSelection,
+          musicGenModelSelection: v.musicGenModelSelection,
+          videoGenModelSelection: v.videoGenModelSelection,
+        });
+      }
+    } finally {
+      setIsAddingAll(false);
+    }
+  }, [
+    skillId,
+    variantsToRender,
+    favorites,
+    skillReferenceIdsForFav,
+    skillData,
+    addFavorite,
+  ]);
 
   const creator = skillData?.creatorProfile ?? null;
   const accent = creator?.creatorAccentColor ?? "#8b5cf6";
@@ -1190,24 +1267,45 @@ export function SkillViewContainer({
           {/* Variants - top-level, VariantCard has own border */}
           {!isLoading && variantsToRender.length > 0 && (
             <Div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {/* Owner header row: edit button */}
+              {/* Header row: add-all + delete + edit */}
               {skillId && (
-                <Div className="flex items-center justify-end">
+                <Div className="flex items-center justify-end gap-1">
+                  {!allFavorited && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={handleAddAllToFavorites}
+                      disabled={isAddingAll}
+                    >
+                      {isAddingAll ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Zap className="h-3 w-3" />
+                      )}
+                      {t("get.addAllToFavorites")}
+                    </Button>
+                  )}
+                  {isOwner && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5 h-7 text-xs text-destructive hover:bg-destructive/10"
+                      onClick={handleDelete}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      {t("get.delete")}
+                    </Button>
+                  )}
                   {isOwner ? (
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
-                      onClick={async () => {
-                        const patchDef = await import("./definition");
-                        navigation.push(patchDef.default.PATCH, {
-                          urlPathParams: { id: skillId },
-                          popNavigationOnSuccess: 1,
-                          prefillFromGet: true,
-                          getEndpoint: patchDef.default.GET,
-                        });
-                      }}
+                      onClick={handleOpenEdit}
                     >
                       <Pencil className="h-3 w-3" />
                       {t("get.edit")}
@@ -1238,7 +1336,7 @@ export function SkillViewContainer({
                   t={t}
                   viewDefaults={viewDefaults}
                   isOwner={isOwner}
-                  handleDelete={handleDelete}
+                  onEdit={handleOpenEdit}
                   defaultExpanded={false}
                 />
               ))}
@@ -1627,7 +1725,7 @@ export function SkillViewContainer({
         <Div className="px-4 pb-4 flex flex-col gap-4">
           {!isLoading && variantsToRender.length > 0 && (
             <Div className="flex flex-col gap-2">
-              {/* Owner / non-owner header row */}
+              {/* Header row: variants label + add-all + delete + edit */}
               <Div className="flex items-center justify-between">
                 {variantsToRender.length > 1 && (
                   <Div className="text-sm font-semibold opacity-60">
@@ -1635,35 +1733,58 @@ export function SkillViewContainer({
                   </Div>
                 )}
                 <Div className="flex-1" />
-                {isOwner && skillId ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
-                    onClick={async () => {
-                      const patchDef = await import("./definition");
-                      navigation.push(patchDef.default.PATCH, {
-                        urlPathParams: { id: skillId },
-                        popNavigationOnSuccess: 1,
-                        prefillFromGet: true,
-                        getEndpoint: patchDef.default.GET,
-                      });
-                    }}
-                  >
-                    <Pencil className="h-3 w-3" />
-                    {t("get.edit")}
-                  </Button>
-                ) : skillId ? (
-                  <EditSkillButton
-                    skillId={skillId}
-                    navigation={navigation}
-                    t={t}
-                    isOwner={false}
-                    variant="ghost"
-                    size="sm"
-                  />
-                ) : null}
+                <Div className="flex items-center gap-1">
+                  {!allFavorited && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={handleAddAllToFavorites}
+                      disabled={isAddingAll}
+                    >
+                      {isAddingAll ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Zap className="h-3 w-3" />
+                      )}
+                      {t("get.addAllToFavorites")}
+                    </Button>
+                  )}
+                  {isOwner && skillId && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5 h-7 text-xs text-destructive hover:bg-destructive/10"
+                      onClick={handleDelete}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      {t("get.delete")}
+                    </Button>
+                  )}
+                  {isOwner && skillId ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={handleOpenEdit}
+                    >
+                      <Pencil className="h-3 w-3" />
+                      {t("get.edit")}
+                    </Button>
+                  ) : skillId ? (
+                    <EditSkillButton
+                      skillId={skillId}
+                      navigation={navigation}
+                      t={t}
+                      isOwner={false}
+                      variant="ghost"
+                      size="sm"
+                    />
+                  ) : null}
+                </Div>
               </Div>
 
               {variantsToRender.map((v) => (
@@ -1680,7 +1801,7 @@ export function SkillViewContainer({
                   t={t}
                   viewDefaults={viewDefaults}
                   isOwner={isOwner}
-                  handleDelete={handleDelete}
+                  onEdit={handleOpenEdit}
                   defaultExpanded={false}
                 />
               ))}
@@ -1750,7 +1871,7 @@ function VariantCard({
   t,
   viewDefaults,
   isOwner,
-  handleDelete,
+  onEdit,
   defaultExpanded,
 }: {
   variant: SkillVariantData;
@@ -1764,7 +1885,7 @@ function VariantCard({
   t: ReturnType<typeof useWidgetTranslation>;
   viewDefaults: ReturnType<typeof useViewDefaults>;
   isOwner: boolean;
-  handleDelete: () => void;
+  onEdit: () => void;
   defaultExpanded: boolean;
 }): React.JSX.Element {
   const [expanded, setExpanded] = useState(defaultExpanded);
@@ -2065,11 +2186,11 @@ function VariantCard({
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-1 text-destructive hover:bg-destructive/10 ml-auto"
-                onClick={handleDelete}
+                className="gap-1 text-muted-foreground hover:text-foreground ml-auto"
+                onClick={onEdit}
               >
-                <Trash2 className="h-3.5 w-3.5" />
-                {t("get.delete")}
+                <Pencil className="h-3.5 w-3.5" />
+                {t("get.edit")}
               </Button>
             </Div>
           )}

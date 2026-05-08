@@ -20,5 +20,6 @@ export const { GET, tools } = endpointsHandler({
         t,
       );
     },
+    canSubscribe: ({ user }) => !!user.id,
   },
 });

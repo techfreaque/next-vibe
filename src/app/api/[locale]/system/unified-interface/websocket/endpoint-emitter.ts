@@ -17,7 +17,7 @@ import "server-only";
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { buildWsChannel } from "./channel";
+import { buildUserChannel, buildWsChannel } from "./channel";
 import { publishWsEvent } from "./emitter";
 import type {
   ComputeEventPayloads,
@@ -62,7 +62,9 @@ export function createEndpointEmitter<
   user: JwtPayloadType,
   urlPathParams: { readonly [K in string]: string } = {},
 ): EmitEventNamed<TEventPayloads> {
-  const channel = buildWsChannel(endpoint.path, urlPathParams);
+  const pathChannel = buildWsChannel(endpoint.path, urlPathParams);
+  const userId = user.isPublic ? user.leadId : user.id;
+  const channel = buildUserChannel(userId);
 
   return function emit(eventName, payload) {
     const envelope: EndpointEventEnvelope<TEventPayloads[typeof eventName]> = {
@@ -71,6 +73,7 @@ export function createEndpointEmitter<
       urlPathParams,
       eventName: eventName as string,
       payload,
+      channel: pathChannel,
     };
     publishWsEvent(
       { channel, event: "__event__", data: envelope },

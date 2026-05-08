@@ -23,6 +23,7 @@ import http from "node:http";
 import type { ServerWebSocket } from "bun";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WsChannelEntry } from "./ws-channel-registry";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
@@ -37,7 +38,6 @@ import type {
   WsConnectionData,
   WsWireMessage,
 } from "./types";
-import { wsIdentityKey } from "./types";
 
 // ============================================================================
 // CHANNEL REGISTRY (singleton)
@@ -52,13 +52,6 @@ let globalSeq = 0;
 /** Set to true during shutdown to suppress expected proxy errors */
 let shuttingDown = false;
 
-/**
- * Broadcast an event to LOCAL subscribers of a channel (this process only).
- * Called directly by the emitter (same process - no HTTP POST needed).
- *
- * When `identity` is provided, only the connection matching that user receives
- * the event. userId takes priority; leadId is the fallback for anonymous users.
- */
 /**
  * Broadcast to all subscribers on a channel (no user filter).
  * Used by pub/sub adapters that relay events from other processes.
@@ -91,70 +84,31 @@ export function broadcastLocalToAll(
   }
 }
 
+/**
+ * Broadcast an event to all LOCAL subscribers of a channel.
+ * Access control is enforced at subscribe time (not at broadcast time).
+ */
 export function broadcastLocal(
   channel: string,
   event: string,
   data: WsWireMessage["data"],
-  user: JwtPayloadType,
-  logger: EndpointLogger,
 ): void {
-  const subscribers = channels.get(channel);
-  if (!subscribers || subscribers.size === 0) {
-    return;
-  }
-
-  globalSeq++;
-  const message: WsWireMessage = {
-    channel,
-    event,
-    data,
-    seq: globalSeq,
-  };
-
-  const targetKey = wsIdentityKey(user);
-  const payload = JSON.stringify(message);
-  let sent = 0;
-  for (const ws of subscribers) {
-    const wsKey = wsIdentityKey(ws.data.user);
-    if (wsKey !== targetKey) {
-      logger.error("[WS] Identity mismatch - event not delivered", {
-        wsIdentity: wsKey,
-        emitterIdentity: targetKey,
-        cookieName: AUTH_TOKEN_COOKIE_NAME,
-        wsIsPublic: ws.data.user.isPublic,
-        emitterIsPublic: user.isPublic,
-        channel,
-        event,
-        env: process.env.NODE_ENV,
-      });
-      continue;
-    }
-    try {
-      ws.send(payload);
-      sent++;
-    } catch {
-      // Socket may be closing - silently skip
-    }
-  }
+  broadcastLocalToAll(channel, event, data);
 }
 
 /**
  * Broadcast multiple events to LOCAL subscribers in a single WS frame per socket.
  * More efficient than calling broadcastLocal() N times when emitting a batch.
+ * Access control is enforced at subscribe time (not at broadcast time).
  */
-export function broadcastLocalBatch(
-  events: WsBatchEvent[],
-  user: JwtPayloadType,
-): void {
+export function broadcastLocalBatch(events: WsBatchEvent[]): void {
   if (events.length === 0) {
     return;
   }
-
   // Collect union of all channels referenced
   const channelNames = [...new Set(events.map((e) => e.channel))];
 
-  // Find sockets subscribed to at least one of those channels matching the user
-  const targetKey = wsIdentityKey(user);
+  // Find all sockets subscribed to at least one of those channels
   const socketsToSend = new Set<ServerWebSocket<WsConnectionData>>();
   for (const ch of channelNames) {
     const subs = channels.get(ch);
@@ -162,9 +116,7 @@ export function broadcastLocalBatch(
       continue;
     }
     for (const ws of subs) {
-      if (wsIdentityKey(ws.data.user) === targetKey) {
-        socketsToSend.add(ws);
-      }
+      socketsToSend.add(ws);
     }
   }
 
@@ -205,6 +157,91 @@ export function publish(
  */
 export function getChannelSize(channel: string): number {
   return channels.get(channel)?.size ?? 0;
+}
+
+// ============================================================================
+// CHANNEL AUTHORIZATION (endpoint-driven)
+// ============================================================================
+
+interface ChannelMatcher {
+  pattern: RegExp;
+  paramNames: string[];
+  entry: WsChannelEntry;
+}
+
+let channelMatcherCache: ChannelMatcher[] | null = null;
+
+async function getChannelMatchers(): Promise<ChannelMatcher[]> {
+  if (channelMatcherCache) {
+    return channelMatcherCache;
+  }
+  const { getWsEndpoints } = await import("./ws-channel-registry");
+  const wsEndpoints = await getWsEndpoints();
+  channelMatcherCache = wsEndpoints.map((entry) => {
+    const paramNames: string[] = [];
+    const regexParts = entry.endpoint.path.map((seg) => {
+      if (seg.startsWith("[") && seg.endsWith("]")) {
+        paramNames.push(seg.slice(1, -1));
+        return "([^/]+)";
+      }
+      return seg.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    });
+    return {
+      pattern: new RegExp(`^${regexParts.join("/")}$`),
+      paramNames,
+      entry,
+    };
+  });
+  return channelMatcherCache;
+}
+
+async function authorizeWsChannel(
+  user: JwtPayloadType,
+  channel: string,
+  logger: EndpointLogger,
+): Promise<boolean> {
+  // User channel is always allowed — scoped to the authenticated user already
+  if (channel.startsWith("user/")) {
+    return true;
+  }
+
+  const matchers = await getChannelMatchers();
+
+  for (const { pattern, paramNames, entry } of matchers) {
+    const match = pattern.exec(channel);
+    if (!match) {
+      continue;
+    }
+
+    const urlPathParams: Record<string, string> = {};
+    paramNames.forEach((name, i) => {
+      urlPathParams[name] = match[i + 1]!;
+    });
+
+    // Role-based check via the permissions registry
+    const { permissionsRegistry } =
+      await import("../shared/endpoints/permissions/registry");
+    const { Platform } = await import("../shared/types/platform");
+    const roleResult = permissionsRegistry.validateEndpointAccess(
+      entry.endpoint,
+      user,
+      Platform.NEXT_PAGE,
+      "en-US",
+    );
+    if (!roleResult.success) {
+      return false;
+    }
+
+    // Resource-level check declared in the route handler
+    if (entry.canSubscribe) {
+      return entry.canSubscribe({ user, urlPathParams, logger });
+    }
+
+    return true;
+  }
+
+  // No endpoint matched — unknown/system channel, allow
+  return true;
 }
 
 // ============================================================================
@@ -395,22 +432,18 @@ export function startWebSocketServer(
             const batchBody = body as {
               type: "batch";
               events: WsBatchEvent[];
-              user: JwtPayloadType;
             };
-            broadcastLocalBatch(batchBody.events, batchBody.user);
+            broadcastLocalBatch(batchBody.events);
           } else {
             const singleBody = body as {
               channel: string;
               event: string;
               data: WsWireMessage["data"];
-              user: JwtPayloadType;
             };
             broadcastLocal(
               singleBody.channel,
               singleBody.event,
               singleBody.data,
-              singleBody.user,
-              logger,
             );
           }
           return new Response("ok", { status: 200 });
@@ -465,6 +498,10 @@ export function startWebSocketServer(
         if (!user) {
           logger.warn("[WS] Rejected upgrade - missing lead_id cookie");
           return new Response("Missing lead_id cookie", { status: 401 });
+        }
+
+        if (channel && !(await authorizeWsChannel(user, channel, logger))) {
+          return new Response("Forbidden", { status: 403 });
         }
 
         const upgraded = bunServer.upgrade(req, {
@@ -861,11 +898,15 @@ export function startWebSocketServer(
           ) as WsClientMessage;
 
           if (msg.type === "subscribe") {
+            if (
+              !(await authorizeWsChannel(ws.data.user, msg.channel, logger))
+            ) {
+              return;
+            }
             subscribeToChannel(
               ws as ServerWebSocket<WsConnectionData>,
               msg.channel,
             );
-            logger.debug(`[WS] Subscribed to ${msg.channel}`);
           } else if (msg.type === "unsubscribe") {
             unsubscribeFromChannel(
               ws as ServerWebSocket<WsConnectionData>,

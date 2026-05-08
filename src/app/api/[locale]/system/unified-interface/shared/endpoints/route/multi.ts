@@ -160,6 +160,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       });
       result[Methods.GET] = handler[Methods.GET];
       result.tools[Methods.GET] = handler.tools[Methods.GET];
+      if (methodConfig.canSubscribe) {
+        result.tools[Methods.GET].canSubscribe = methodConfig.canSubscribe;
+      }
     }
   }
 
@@ -181,6 +184,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       });
       result[Methods.POST] = handler[Methods.POST];
       result.tools[Methods.POST] = handler.tools[Methods.POST];
+      if (methodConfig.canSubscribe) {
+        result.tools[Methods.POST].canSubscribe = methodConfig.canSubscribe;
+      }
     }
   }
 
@@ -202,6 +208,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       });
       result[Methods.PUT] = handler[Methods.PUT];
       result.tools[Methods.PUT] = handler.tools[Methods.PUT];
+      if (methodConfig.canSubscribe) {
+        result.tools[Methods.PUT].canSubscribe = methodConfig.canSubscribe;
+      }
     }
   }
 
@@ -223,6 +232,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       });
       result[Methods.PATCH] = handler[Methods.PATCH];
       result.tools[Methods.PATCH] = handler.tools[Methods.PATCH];
+      if (methodConfig.canSubscribe) {
+        result.tools[Methods.PATCH].canSubscribe = methodConfig.canSubscribe;
+      }
     }
   }
 
@@ -244,6 +256,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       });
       result[Methods.DELETE] = handler[Methods.DELETE];
       result.tools[Methods.DELETE] = handler.tools[Methods.DELETE];
+      if (methodConfig.canSubscribe) {
+        result.tools[Methods.DELETE].canSubscribe = methodConfig.canSubscribe;
+      }
     }
   }
 

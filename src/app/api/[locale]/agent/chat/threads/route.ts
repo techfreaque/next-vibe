@@ -16,6 +16,7 @@ export const { GET, POST, tools } = endpointsHandler({
     handler: async ({ data, user, t, logger, locale }) => {
       return await ThreadsRepository.listThreads(data, user, t, logger, locale);
     },
+    canSubscribe: ({ user }) => !!user.leadId,
   },
   [Methods.POST]: {
     email: undefined,

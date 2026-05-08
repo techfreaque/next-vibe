@@ -949,7 +949,10 @@ export class SkillsRepository {
         category: customSkill.category,
         isPublic: customSkill.ownershipType === SkillOwnershipType.PUBLIC,
         systemPrompt: customSkill.systemPrompt,
-        skillOwnership: customSkill.ownershipType,
+        skillOwnership:
+          customSkill.userId === userId
+            ? SkillOwnershipType.USER
+            : customSkill.ownershipType,
         compactTrigger: customSkill.compactTrigger ?? null,
         availableTools:
           customSkill.availableTools?.map((tool) => ({
@@ -1483,7 +1486,7 @@ export class SkillsRepository {
         description: updated.description ?? null,
         category: updated.category,
         isPublic: updated.ownershipType === SkillOwnershipType.PUBLIC,
-        skillOwnership: updated.ownershipType,
+        skillOwnership: SkillOwnershipType.USER,
         systemPrompt: updated.systemPrompt ?? null,
         compactTrigger: updated.compactTrigger ?? null,
         variants: updated.variants ?? [],

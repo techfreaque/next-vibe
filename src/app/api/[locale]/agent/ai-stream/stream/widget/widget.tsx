@@ -153,7 +153,7 @@ function AiStreamChatArea(): JSX.Element {
       create: {
         urlPathParams: { threadId: threadIdToRender ?? "" },
       },
-      subscribeToEvents: true,
+      subscribeToEvents: !!threadIdToRender,
     }),
     [threadIdToRender, rootFolderId, messagesInitialData],
   );

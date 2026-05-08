@@ -43,8 +43,8 @@ import {
   generateRoleFilteredRequestSchema,
 } from "../../field/utils";
 import type { EndpointLogger } from "../../logger/endpoint";
-import type { WidgetData } from "../../types/json";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
+import type { WidgetData } from "../../types/json";
 import type { Platform } from "../../types/platform";
 import type { ServerDefaultContext } from "../../types/server-default";
 import { permissionsRegistry } from "../permissions/registry";
@@ -205,10 +205,16 @@ export type ApiHandlerFunction<
   | Promise<HandlerResponse<TResponseOutput>>
   | HandlerResponse<TResponseOutput>;
 
+export type CanSubscribeFn<TUrlVariables> = {
+  bivarianceHack(params: {
+    user: JwtPayloadType;
+    urlPathParams: TUrlVariables;
+    logger: EndpointLogger;
+  }): Promise<boolean> | boolean;
+}["bivarianceHack"];
+
 /**
- * Handler configuration for a single method with proper typing
- * Handlers receive validated data (OUTPUT types) from Zod
- * and return validated response data (OUTPUT types)
+ * Handler configuration for a single method.
  */
 export interface MethodHandlerConfig<
   TRequestOutput,
@@ -238,18 +244,13 @@ export interface MethodHandlerConfig<
     TUrlVariablesOutput,
     TScopedTranslationKey
   >[];
-  /**
-   * Server-side field defaults for fields hidden from this platform.
-   * Runs after validation, before the handler. Values from here take precedence
-   * over any `serverDefault` declared on the definition field.
-   * Keyed by request field name. Only fires if the field is absent in the validated data.
-   */
   fieldDefaults?: Partial<
     Record<
       keyof TRequestOutput & string,
       (ctx: ServerDefaultContext) => Promise<WidgetData | undefined>
     >
   >;
+  canSubscribe?: CanSubscribeFn<TUrlVariablesOutput>;
 }
 
 export interface ApiHandlerOptions<
@@ -307,7 +308,7 @@ export type GenericHandlerReturnType<
   TResponseOutput,
   TUrlVariablesOutput,
   TUserRoleValue extends readonly UserRoleValue[],
-> = (props: {
+> = ((props: {
   data: TRequestOutput;
   urlPathParams: TUrlVariablesOutput;
   user?: InferJwtPayloadTypeFromRoles<TUserRoleValue>; // Optional: if provided, skip auth; if not, do auth
@@ -317,7 +318,9 @@ export type GenericHandlerReturnType<
   request?: NextRequest; // Optional NextRequest for Next.js platform
   cronTaskId?: string; // Cron task DB ID when executed by the task runner
   streamContext: ToolExecutionContext;
-}) => Promise<HandlerResponse<TResponseOutput>>;
+}) => Promise<HandlerResponse<TResponseOutput>>) & {
+  canSubscribe?: CanSubscribeFn<TUrlVariablesOutput>;
+};
 
 /**
  * Base type for generic handlers when exact types are not known

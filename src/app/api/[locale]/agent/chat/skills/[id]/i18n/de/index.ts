@@ -64,6 +64,7 @@ export const translations: typeof enTranslations = {
       title: "Varianten",
     },
     addToCollection: "Zu deiner Sammlung hinzufügen:",
+    addAllToFavorites: "Alle hinzufügen",
     quickAdd: "Schnell hinzufügen",
     tweakAndAdd: "Anpassen & hinzufügen",
     edit: "Bearbeiten",

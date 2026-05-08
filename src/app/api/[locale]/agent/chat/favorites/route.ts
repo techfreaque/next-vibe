@@ -25,5 +25,6 @@ export const { GET, tools } = endpointsHandler({
         data.pageSize,
         platform,
       ),
+    canSubscribe: ({ user }) => !!user.id,
   },
 });

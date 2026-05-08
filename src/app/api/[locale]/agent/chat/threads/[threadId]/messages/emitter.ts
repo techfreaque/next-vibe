@@ -21,12 +21,10 @@
 import "server-only";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { buildWsChannel } from "@/app/api/[locale]/system/unified-interface/websocket/channel";
-import {
-  createBatchingEmitter,
-  publishWsEventToChannels,
-} from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
+import { createBatchingEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
@@ -51,27 +49,23 @@ export function emitThreadTitleUpdated(
   logger: EndpointLogger,
   user: JwtPayloadType,
 ): void {
-  const threadsChannel = buildWsChannel(threadsDefinitions.GET.path, {});
-  const sidebarChannels = rootFolderId
-    ? [
-        threadsChannel,
-        buildWsChannel(folderContentsDefinitions.GET.path, {
-          rootFolderId,
-        }),
-      ]
-    : [threadsChannel];
-  publishWsEventToChannels(
-    sidebarChannels,
-    {
-      event: "thread-title-updated",
-      data: {
-        threads: [{ id: threadId, title }],
-        items: [{ id: threadId, title }],
-      },
-    },
+  const emitThreads = createEndpointEmitter(
+    threadsDefinitions.GET,
     logger,
     user,
   );
+  emitThreads("thread-title-updated", { threads: [{ id: threadId, title }] });
+  if (rootFolderId) {
+    const emitFolderContents = createEndpointEmitter(
+      folderContentsDefinitions.GET,
+      logger,
+      user,
+      { rootFolderId },
+    );
+    emitFolderContents("thread-title-updated", {
+      items: [{ id: threadId, title }],
+    });
+  }
 }
 
 /**
@@ -89,48 +83,46 @@ export function emitThreadCreated(
   user: JwtPayloadType,
 ): void {
   const now = new Date();
-  const threadsChannel = buildWsChannel(threadsDefinitions.GET.path, {});
-  const sidebarChannels = [
-    threadsChannel,
-    buildWsChannel(folderContentsDefinitions.GET.path, {
-      rootFolderId,
-    }),
-  ];
-  publishWsEventToChannels(
-    sidebarChannels,
-    {
-      event: "thread-created",
-      data: {
-        threads: [
-          {
-            id: threadId,
-            title,
-            rootFolderId,
-            folderId,
-            status: "active",
-            streamingState: "streaming",
-            createdAt: now,
-            updatedAt: now,
-          },
-        ],
-        items: [
-          {
-            id: threadId,
-            type: "thread",
-            title,
-            rootFolderId,
-            folderId,
-            status: "active",
-            streamingState: "streaming",
-            createdAt: now,
-            updatedAt: now,
-          },
-        ],
-      },
-    },
+  const emitThreads = createEndpointEmitter(
+    threadsDefinitions.GET,
     logger,
     user,
   );
+  const emitFolderContents = createEndpointEmitter(
+    folderContentsDefinitions.GET,
+    logger,
+    user,
+    { rootFolderId },
+  );
+  emitThreads("thread-created", {
+    threads: [
+      {
+        id: threadId,
+        title,
+        rootFolderId,
+        folderId,
+        status: ThreadStatus.ACTIVE,
+        streamingState: "streaming" as const,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+  });
+  emitFolderContents("thread-created", {
+    items: [
+      {
+        id: threadId,
+        type: "thread" as const,
+        title,
+        rootFolderId,
+        folderId,
+        status: ThreadStatus.ACTIVE,
+        streamingState: "streaming" as const,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+  });
 }
 
 /**
@@ -153,15 +145,16 @@ export function createMessagesEmitter(
   setStreamPreview: (p: { preview: string | null; updatedAt: Date }) => void;
 } {
   const channel = buildMessagesChannel(threadId);
-  const threadsChannel = buildWsChannel(threadsDefinitions.GET.path, {});
-  const sidebarChannels = rootFolderId
-    ? [
-        threadsChannel,
-        buildWsChannel(folderContentsDefinitions.GET.path, {
-          rootFolderId,
-        }),
-      ]
-    : [threadsChannel];
+  const emitThreads = createEndpointEmitter(
+    threadsDefinitions.GET,
+    logger,
+    user,
+  );
+  const emitFolderContents = rootFolderId
+    ? createEndpointEmitter(folderContentsDefinitions.GET, logger, user, {
+        rootFolderId,
+      })
+    : null;
 
   // When a support session is active, also broadcast key events to the support feed channel
   // so local supporters subscribed to this session see live updates.
@@ -184,57 +177,37 @@ export function createMessagesEmitter(
 
     const typedPayload =
       payload !== null && typeof payload === "object" && !Array.isArray(payload)
-        ? (payload as { streamingState?: string })
+        ? (payload as {
+            streamingState?: "idle" | "streaming" | "aborting" | "waiting";
+          })
         : null;
 
     if (eventName === "stream-finished") {
       // Flush the batch immediately so the UI sees the stream end without the 16ms delay
       batcher.flush();
 
-      const finalStreamingState =
+      const finalStreamingState: "idle" | "waiting" =
         typedPayload?.streamingState === "waiting" ? "waiting" : "idle";
 
-      // Build thread update - include preview + updatedAt if available so sidebar
-      // shows the final AI response without a separate round-trip.
-      const threadUpdate: {
-        id: string;
-        streamingState: string;
-        preview?: string | null;
-        updatedAt?: Date;
-      } = { id: threadId, streamingState: finalStreamingState };
-      if (streamPreview) {
-        if (streamPreview.preview !== null) {
-          threadUpdate.preview = streamPreview.preview;
-        }
-        threadUpdate.updatedAt = streamPreview.updatedAt;
-      }
+      const threadUpdate = {
+        id: threadId,
+        streamingState: finalStreamingState,
+        preview: streamPreview?.preview ?? null,
+        updatedAt: streamPreview?.updatedAt ?? new Date(),
+      };
 
-      publishWsEventToChannels(
-        sidebarChannels,
-        {
-          event: eventName,
-          data: {
-            threads: [threadUpdate],
-            items: [threadUpdate],
-          },
-        },
-        logger,
-        user,
-      );
+      emitThreads("stream-finished", { threads: [threadUpdate] });
+      emitFolderContents?.("stream-finished", { items: [threadUpdate] });
     } else if (eventName === "streaming-state-changed") {
       const streamingState = typedPayload?.streamingState;
-      publishWsEventToChannels(
-        sidebarChannels,
-        {
-          event: eventName,
-          data: {
-            threads: [{ id: threadId, streamingState }],
-            items: [{ id: threadId, streamingState }],
-          },
-        },
-        logger,
-        user,
-      );
+      if (streamingState !== undefined) {
+        emitThreads("streaming-state-changed", {
+          threads: [{ id: threadId, streamingState }],
+        });
+        emitFolderContents?.("streaming-state-changed", {
+          items: [{ id: threadId, streamingState }],
+        });
+      }
     }
   }
 

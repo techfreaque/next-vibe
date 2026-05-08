@@ -587,8 +587,12 @@ function EndpointsPageInternal<
         readResponse?.success === true ? readResponse.data : undefined;
       if (readData) {
         responseData = readData;
-        // CRITICAL: Also set response to the GET response so widgets have access to it in context
-        response = readResponse;
+        // Use GET response as fallback only before any mutation has fired.
+        // Once a mutation runs, its response (success or error) takes priority
+        // so FormAlertWidget and AlertWidget reflect the actual mutation outcome.
+        if (!response) {
+          response = readResponse;
+        }
       }
     }
   } else if (isDeleteEndpoint && endpointState.delete) {

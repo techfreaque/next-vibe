@@ -16,5 +16,6 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     handler: async ({ data, user, locale, logger, t, streamContext }) =>
       AiStreamRunRepository.run(data, user, locale, logger, t, streamContext),
+    canSubscribe: ({ user }) => !!user.leadId,
   },
 });

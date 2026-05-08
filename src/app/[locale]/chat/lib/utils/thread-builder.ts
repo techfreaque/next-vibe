@@ -13,7 +13,13 @@ function isRealBranch(siblings: ChatMessage[]): boolean {
   if (siblings.length <= 1) {
     return false;
   }
-  const seqs = new Set(siblings.map((s) => s.sequenceId));
+  // Optimistic placeholders coexist briefly with real messages during streaming.
+  // Filter them out before checking for real branches to avoid spurious branch nav.
+  const realSiblings = siblings.filter((s) => !s.metadata?.isOptimistic);
+  if (realSiblings.length <= 1) {
+    return false;
+  }
+  const seqs = new Set(realSiblings.map((s) => s.sequenceId));
   // If all siblings share the same non-null sequenceId → parallel tool calls, not a real branch
   if (seqs.size === 1) {
     const [onlySeq] = seqs;
@@ -100,14 +106,19 @@ export function buildMessagePath(
     reversePath.reverse();
 
     // Continue walking DOWN from the leaf to include children (e.g. optimistic
-    // assistant placeholder). Uses the same latest-child logic as the fallback path.
+    // assistant placeholder). Prefers non-optimistic (real) messages when both exist.
     let downCur = leafMessageId;
     while (downCur) {
       const children = childrenMap.get(downCur);
       if (!children || children.length === 0) {
         break;
       }
-      const child = children[children.length - 1]!;
+      // Prefer real messages over optimistic placeholders
+      const realChildren = children.filter((c) => !c.metadata?.isOptimistic);
+      const child =
+        realChildren.length > 0
+          ? realChildren[realChildren.length - 1]!
+          : children[children.length - 1]!;
       reversePath.push(child);
       downCur = child.id;
     }
@@ -203,8 +214,13 @@ export function buildMessagePath(
       };
       currentMessage = children[validIndex];
     } else if (children.length > 1) {
-      // Same-sequence siblings (parallel tool calls) - pick latest by createdAt
-      currentMessage = children[children.length - 1];
+      // Same-sequence siblings (parallel tool calls) or optimistic+real overlap.
+      // Prefer non-optimistic (real) messages; fallback to latest by createdAt.
+      const realChildren = children.filter((c) => !c.metadata?.isOptimistic);
+      currentMessage =
+        realChildren.length > 0
+          ? realChildren[realChildren.length - 1]!
+          : children[children.length - 1]!;
     } else {
       currentMessage = children[0];
     }
