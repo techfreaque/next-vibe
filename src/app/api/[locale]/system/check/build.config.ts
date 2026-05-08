@@ -143,6 +143,17 @@ const config: BuildConfig = {
       "eslint-plugin-simple-import-sort": ">=12.0.0",
       "typescript-eslint": ">=8.0.0",
     },
+    peerDependenciesMeta: {
+      oxlint: { optional: true },
+      oxfmt: { optional: true },
+      "@typescript/native-preview": { optional: true },
+      eslint: { optional: true },
+      typescript: { optional: true },
+      "eslint-plugin-react-compiler": { optional: true },
+      "eslint-plugin-react-hooks": { optional: true },
+      "eslint-plugin-simple-import-sort": { optional: true },
+      "typescript-eslint": { optional: true },
+    },
   },
 };
 

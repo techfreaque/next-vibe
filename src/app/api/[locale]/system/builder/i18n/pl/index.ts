@@ -550,6 +550,11 @@ export const translations: typeof enTranslations = {
         description: "Zależności peer jako JSON",
         placeholder: '{"react": ">=18.0.0"}',
       },
+      packagePeerDependenciesMeta: {
+        title: "Metadane zależności peer",
+        description: "Oznacz zależności peer jako opcjonalne",
+        placeholder: '{"react": {"optional": true}}',
+      },
       packageFiles: {
         title: "Dołączone pliki",
         description: "Pliki do dołączenia do opublikowanego pakietu",

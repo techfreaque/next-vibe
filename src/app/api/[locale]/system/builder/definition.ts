@@ -1141,6 +1141,25 @@ const { POST } = createEndpoint({
                 schema: z.record(z.string(), z.string()).optional(),
               }),
 
+              peerDependenciesMeta: requestField(scopedTranslation, {
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.JSON,
+                label: "post.fields.packagePeerDependenciesMeta.title",
+                description:
+                  "post.fields.packagePeerDependenciesMeta.description",
+                placeholder:
+                  "post.fields.packagePeerDependenciesMeta.placeholder",
+                optional: true,
+                icon: "settings",
+                colSpan: 6,
+                schema: z
+                  .record(
+                    z.string(),
+                    z.object({ optional: z.boolean().optional() }),
+                  )
+                  .optional(),
+              }),
+
               files: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TAGS,

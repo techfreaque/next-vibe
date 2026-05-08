@@ -547,6 +547,11 @@ export const translations = {
         description: "Peer dependencies as JSON",
         placeholder: '{"react": ">=18.0.0"}',
       },
+      packagePeerDependenciesMeta: {
+        title: "Peer Dependencies Meta",
+        description: "Mark peer dependencies as optional",
+        placeholder: '{"react": {"optional": true}}',
+      },
       packageFiles: {
         title: "Included Files",
         description: "Files to include in published package",

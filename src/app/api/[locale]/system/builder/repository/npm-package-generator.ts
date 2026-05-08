@@ -37,6 +37,7 @@ interface GeneratedPackageJson {
   files?: string[];
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
+  peerDependenciesMeta?: Record<string, { optional?: boolean }>;
 }
 
 // ============================================================================
@@ -108,6 +109,10 @@ export class NpmPackageGenerator implements INpmPackageGenerator {
       ...(config.peerDependencies &&
         Object.keys(config.peerDependencies).length > 0 && {
           peerDependencies: config.peerDependencies,
+        }),
+      ...(config.peerDependenciesMeta &&
+        Object.keys(config.peerDependenciesMeta).length > 0 && {
+          peerDependenciesMeta: config.peerDependenciesMeta,
         }),
     };
 
