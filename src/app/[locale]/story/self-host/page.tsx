@@ -14,6 +14,7 @@ import type { JSX } from "react";
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
+import { GITHUB_REPO_URL } from "@/config/constants";
 import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -171,7 +172,7 @@ function SelfHostPageContent({
               className="border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10"
               asChild
             >
-              <Link href="https://github.com/techfreaque/next-vibe">
+              <Link href={GITHUB_REPO_URL}>
                 <GitBranch className="mr-2 h-4 w-4" />
                 {t("hero.ctaGithub")}
               </Link>

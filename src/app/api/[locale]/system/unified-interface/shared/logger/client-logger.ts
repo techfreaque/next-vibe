@@ -10,6 +10,42 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { EndpointLogger, LoggerMetadata } from "./endpoint";
 import { createLogger } from "./logger-core";
 
+/** Coerce any LoggerMetadata value to a schema-safe primitive */
+function toPrimitive(v: LoggerMetadata): string | number | boolean | null {
+  if (v === null || v === undefined) {
+    return null;
+  }
+  if (
+    typeof v === "string" ||
+    typeof v === "number" ||
+    typeof v === "boolean"
+  ) {
+    return v;
+  }
+  if (v instanceof Error) {
+    return v.message;
+  }
+  if (v instanceof Date) {
+    return v.toISOString();
+  }
+  try {
+    return JSON.stringify(v);
+  } catch {
+    return String(v);
+  }
+}
+
+/** Flatten a metadata record so all values are primitives accepted by the server schema */
+function sanitizeMetadata(
+  record: Record<string, LoggerMetadata>,
+): Record<string, string | number | boolean | null> {
+  const out: Record<string, string | number | boolean | null> = {};
+  for (const [k, v] of Object.entries(record)) {
+    out[k] = toPrimitive(v);
+  }
+  return out;
+}
+
 function reportToServer(
   level: "error" | "warn",
   message: string,
@@ -28,13 +64,12 @@ function reportToServer(
         !(m instanceof Date) &&
         !Array.isArray(m),
     )
-    .map((m) => m as Record<string, LoggerMetadata>);
+    .map(sanitizeMetadata);
 
   // Append tab identity so server-side logs are traceable per browser tab
-  const tabMeta: Record<string, LoggerMetadata> | undefined = tabId
-    ? { tabId }
-    : undefined;
-  const fullMeta = tabMeta ? [...metaPayload, tabMeta] : metaPayload;
+  if (tabId) {
+    metaPayload.push({ tabId });
+  }
 
   // Use the typed executeMutation transport - handles CSRF, auth, and response parsing.
   // Import lazily so this file stays tree-shakeable in non-browser bundles.
@@ -53,20 +88,13 @@ function reportToServer(
         roles: [UserPermissionRole.PUBLIC],
       };
 
-      // Cast metadata to Record<string, string>[] as required by the endpoint schema.
-      // Values are already serialised strings at this point.
-      const typedMeta =
-        fullMeta.length > 0
-          ? (fullMeta as Record<string, string>[])
-          : undefined;
-
       await executeMutation({
         endpoint: POST,
         logger: createLogger(false, Date.now(), locale),
         requestData: {
           level,
           message: message.slice(0, 500),
-          metadata: typedMeta,
+          metadata: metaPayload.length > 0 ? metaPayload : undefined,
         },
         pathParams: undefined as never,
         locale,

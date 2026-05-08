@@ -15,6 +15,7 @@ import { storage } from "next-vibe-ui/lib/storage";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm, type UseFormProps } from "react-hook-form";
 
+import { containsFile } from "./api-utils";
 import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -208,6 +209,22 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           const parsedData = JSON.parse(
             savedFormData,
           ) as TEndpoint["types"]["RequestOutput"];
+
+          // Validate persisted data against the schema before restoring.
+          // File/Blob objects serialize to {} in JSON; restoring them would
+          // corrupt the form state and break subsequent submissions.
+          const validation = endpoint.requestSchema.safeParse(parsedData);
+          if (!validation.success) {
+            logger.debug("Discarding invalid persisted form data", {
+              storageKey,
+              error: validation.error.issues
+                .map((i) => `${i.path.join(".")}: ${i.message}`)
+                .join("; "),
+            });
+            await storage.removeItem(storageKey);
+            return;
+          }
+
           formMethods.reset(parsedData);
         }
       } catch (error) {
@@ -217,7 +234,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         );
       }
     })();
-  }, [formMethods, storageKey, persistForm, logger]);
+  }, [formMethods, storageKey, persistForm, endpoint.requestSchema, logger]);
 
   // Save form values when they change
   useEffect(() => {
@@ -230,6 +247,13 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
 
     const subscription = formMethods.watch((formValues) => {
       if (Object.keys(formValues).length > 0) {
+        // Skip persistence entirely when form contains File/Blob values.
+        // File objects serialize to {} via JSON.stringify, and on remount
+        // the corrupted {} gets loaded back, breaking subsequent submissions.
+        if (containsFile(formValues)) {
+          return;
+        }
+
         // Clear any existing timer
         if (debounceTimer !== null) {
           window.clearTimeout(debounceTimer);
@@ -336,8 +360,17 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           });
         }
       } catch (error) {
-        logger.error("Error in submitForm", parseError(error), {
+        const formSnapshot = formMethods.getValues();
+        logger.error("[client] Error in submitForm", parseError(error), {
           endpoint: endpoint.path.join("/"),
+          fieldKeys: Object.keys(formSnapshot).join(", "),
+          hasFiles: Object.values(formSnapshot).some(
+            (v) =>
+              v instanceof File ||
+              (typeof v === "object" &&
+                v !== null &&
+                Object.values(v).some((vv) => vv instanceof File)),
+          ),
         });
 
         // Handle any errors that occur during submission

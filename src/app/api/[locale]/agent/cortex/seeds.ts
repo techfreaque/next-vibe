@@ -305,8 +305,18 @@ async function materializeBuiltInSkills(logger: EndpointLogger): Promise<void> {
   const allUsers = await db.select({ id: users.id }).from(users);
 
   let totalCount = 0;
+  let skippedCount = 0;
   for (const user of allUsers) {
     for (const skill of DEFAULT_SKILLS) {
+      if (!skill?.id) {
+        if (skippedCount === 0) {
+          logger.warn(
+            "Cortex seed: skipping skill with missing id (module may have failed to load)",
+          );
+        }
+        skippedCount++;
+        continue;
+      }
       const path = `/skills/default/${skill.id}.md`;
       const content = [`# ${skill.id}`, "", skill.systemPrompt].join("\n");
       const emb = embedMap.get(skill.id);
@@ -327,7 +337,7 @@ async function materializeBuiltInSkills(logger: EndpointLogger): Promise<void> {
   }
 
   logger.info(
-    `Cortex seed: materialized ${DEFAULT_SKILLS.length} built-in skills (${embeddedCount} with embeddings) × ${allUsers.length} users = ${totalCount} nodes`,
+    `Cortex seed: materialized ${DEFAULT_SKILLS.length} built-in skills (${embeddedCount} with embeddings) × ${allUsers.length} users = ${totalCount} nodes${skippedCount > 0 ? ` (${String(skippedCount)} skipped - missing id)` : ""}`,
   );
 }
 

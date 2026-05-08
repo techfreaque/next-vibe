@@ -17,7 +17,7 @@ The widget lives alongside the endpoint's `definition.ts`, in one of two forms:
 | Simple     | `widget.tsx` (single file)                      | One main component, fits in <1000 lines |
 | Complex    | `widget/` folder with `widget/widget.tsx` entry | Multiple sub-components, complex layout |
 
-A `widget.cli.tsx` should accompany every endpoint that returns non-trivial data or is callable from CLI/MCP - see [widget.cli.md](widget.cli.md).
+Every widget must consider all platforms it will render on. Design for web, CLI, MCP, AI tool, and native simultaneously - use platform conditionals in a single `widget.tsx` rather than separate files per platform. See the [Multi-Platform Design](#multi-platform-design) section.
 
 ## Fundamental Rules
 
@@ -319,9 +319,9 @@ export function MyCustomWidget({ field }: CustomWidgetProps): JSX.Element {
 }
 ```
 
-## Web vs Native Platform Divergence
+## Multi-Platform Design
 
-`widget.tsx` renders on both web (`Platform.NEXT_PAGE`) and React Native. Use `useWidgetPlatform()` to branch when the two surfaces need different UI - don't try to make one layout work everywhere by force.
+**Every widget must consider all platforms it will render on.** A single `widget.tsx` handles web, CLI, MCP, AI tool, and native - use `useWidgetPlatform()` to branch when surfaces need different behavior. Don't create separate files per platform.
 
 ```typescript
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -329,8 +329,13 @@ import { useWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/u
 
 export function MyWidget({ field }: MyWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
-  const isWeb = platform === Platform.NEXT_PAGE;
   const children = field.children;
+
+  // Platform-specific behavior via conditionals
+  const isWeb = platform === Platform.NEXT_PAGE;
+  const isCli = platform === Platform.CLI;
+  const isMcp = platform === Platform.MCP;
+  const isAi = platform === Platform.AI;
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -341,7 +346,7 @@ export function MyWidget({ field }: MyWidgetProps): JSX.Element {
           <SelectFieldWidget fieldName="category" field={children.category} />
         </Div>
       ) : (
-        // Native: stacked, touch-friendly, no hover states
+        // Native/other: stacked, touch-friendly, no hover states
         <>
           <TextFieldWidget fieldName="name" field={children.name} />
           <SelectFieldWidget fieldName="category" field={children.category} />
@@ -355,14 +360,46 @@ export function MyWidget({ field }: MyWidgetProps): JSX.Element {
 }
 ```
 
-**Platform values for `widget.tsx`:**
+**Platform values:**
 
-| Value                | Context                        |
-| -------------------- | ------------------------------ |
-| `Platform.NEXT_PAGE` | Web browser (Next.js)          |
-| `Platform.ELECTRON`  | Desktop app (Electron wrapper) |
-| `Platform.FRAME`     | Embedded vibe-frame widget     |
-| `Platform.TRPC`      | tRPC API call (no UI)          |
+| Value                   | Context                        | Design for                                |
+| ----------------------- | ------------------------------ | ----------------------------------------- |
+| `Platform.NEXT_PAGE`    | Web browser (Next.js)          | Rich layout, hover, keyboard shortcuts    |
+| `Platform.ELECTRON`     | Desktop app (Electron wrapper) | Same as web, may have OS integrations     |
+| `Platform.FRAME`        | Embedded vibe-frame widget     | Compact web, limited space                |
+| `Platform.CLI`          | Terminal (vibe CLI)            | Expanded details, no collapsible sections |
+| `Platform.MCP`          | AI agent (MCP tool)            | Compact, plain text, AI-parseable         |
+| `Platform.AI`           | AI tool call                   | Structured, machine-readable              |
+| `Platform.TRPC`         | tRPC API call (no UI)          | Data only, no rendering                   |
+| `Platform.CRON`         | Scheduled task                 | Data only, no rendering                   |
+| `Platform.REMOTE_SKILL` | Remote skill execution         | Data only, no rendering                   |
+
+### Platform design principles
+
+**Web (`NEXT_PAGE`, `ELECTRON`, `FRAME`):**
+
+- Collapsible sections, toggle buttons, pagination controls
+- Hover states, keyboard shortcuts, animations
+- Use `next-vibe-ui/ui/*` components - platform-aware and resolve automatically
+
+**CLI (`CLI`):**
+
+- Expand all details by default - no collapsible sections, no "click to expand"
+- Stack traces, metadata, full error messages shown inline
+- Users read sequentially in a terminal; hiding info behind toggles is hostile
+
+**MCP / AI (`MCP`, `AI`):**
+
+- Compact, one meaningful line per item
+- No decorative formatting - every token counts
+- Include pagination hints as plain text: `Page 1/3 - use page=2 for next`
+- Structured enough for AI to parse, concise enough to not waste context
+
+**Native (React Native):**
+
+- Touch-friendly: larger tap targets, no hover-only interactions
+- Stacked layouts over grids
+- Never import React Native modules unconditionally - they crash on web
 
 For React Native-specific utilities (`isNative`, `platformSelect`, etc.), use:
 
@@ -373,11 +410,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/react-native/platform-helpers";
 ```
 
-**Rules:**
+### Legacy: `widget.cli.tsx` (deprecated for new code)
 
-- Never import React Native modules unconditionally in `widget.tsx` - they crash on web
-- Use `next-vibe-ui/ui/*` components - they are platform-aware and resolve to the correct implementation automatically
-- Keep native branches touch-friendly: larger tap targets, no hover-only interactions, stacked layouts over grids
+Existing endpoints may have a separate `widget.cli.tsx` file for CLI/MCP rendering. This is a legacy pattern - the Bun CLI plugin swaps `widget.tsx` for `widget.cli.tsx` at build time. New endpoints should handle all platforms in `widget.tsx` with conditionals instead. See [widget.cli.md](widget.cli.md) for the legacy pattern reference.
 
 ## Dialog Wrapper Pattern
 
@@ -528,8 +563,6 @@ Skipping `widget.tsx` is only acceptable when ALL of the following are true:
 - The fields are trivially obvious (one or two inputs, one text response)
 - No platform-specific rendering is needed
 - The default form layout is genuinely sufficient
-
-When you skip a widget, you still need a `widget.cli.tsx` if the endpoint is callable from CLI or MCP and returns structured data.
 
 The auto-renderer exists as a fallback for prototyping and internal tools - not as the default for real endpoints.
 

@@ -15,6 +15,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import type { EndpointLogger } from "../shared/logger/endpoint";
 import type {
   EventHandler,
   WsClientMessage,
@@ -61,6 +62,14 @@ interface ChannelState {
 // Shared connection state
 let sharedWs: WebSocket | null = null;
 let reconnectAttempts = 0;
+
+/** Module-level logger - set via setWsLogger() from LoggerProvider */
+let wsClientLogger: EndpointLogger | null = null;
+
+/** Inject a logger for the WS client. Call once from LoggerProvider on mount. */
+export function setWsLogger(logger: EndpointLogger): void {
+  wsClientLogger = logger;
+}
 
 // Connection state listeners - notified immediately on open/close
 const connectionListeners = new Set<(connected: boolean) => void>();
@@ -150,8 +159,14 @@ function connect(): void {
       } else {
         dispatch(frame as WsWireMessage);
       }
-    } catch {
-      // Invalid JSON - ignore
+    } catch (err) {
+      wsClientLogger?.error("[WS Client] Failed to parse message", {
+        error: err instanceof Error ? err.message : String(err),
+        dataPreview:
+          typeof event.data === "string"
+            ? (event.data as string).slice(0, 500)
+            : "[non-string data]",
+      });
     }
   };
 

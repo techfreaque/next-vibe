@@ -10,6 +10,7 @@ import { H2, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
+import { GITHUB_REPO_URL } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
@@ -75,7 +76,7 @@ function PersonalCta({ locale }: { locale: CountryLanguage }): JSX.Element {
               className="bg-transparent border-white/20 text-white/80 hover:bg-white/8 hover:text-white hover:border-white/40 font-semibold px-8"
               asChild
             >
-              <Link href="https://github.com/unbottled-ai/next-vibe">
+              <Link href={GITHUB_REPO_URL}>
                 {t("home.ctaPersonal.secondary")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

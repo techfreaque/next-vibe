@@ -163,16 +163,22 @@ export class MCPServer {
     // Handle uncaught errors
     process.on("uncaughtException", (error) => {
       logger.error("[MCP Server] Uncaught exception (non-fatal)", {
+        name: error.name,
         error: error.message,
-        stack: error.stack,
+        stack: error.stack?.split("\n").slice(0, 5).join("\n"),
       });
       // Do NOT exit - log and continue so one bad route import
       // doesn't kill the whole MCP session.
     });
 
     process.on("unhandledRejection", (reason) => {
+      const isError = reason instanceof Error;
       logger.error("[MCP Server] Unhandled rejection (non-fatal)", {
-        reason: String(reason),
+        name: isError ? reason.name : undefined,
+        reason: isError ? reason.message : String(reason),
+        stack: isError
+          ? reason.stack?.split("\n").slice(0, 5).join("\n")
+          : undefined,
       });
       // Do NOT exit - one bad dynamic import (e.g. server-only in a route)
       // must not kill the whole MCP session.

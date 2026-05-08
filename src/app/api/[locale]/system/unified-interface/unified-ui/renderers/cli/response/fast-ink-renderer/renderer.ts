@@ -1267,8 +1267,17 @@ function renderWithReconciler(
   }
 
   if (!container.node) {
+    const elType = element.type;
+    const componentName =
+      typeof elType === "function"
+        ? ((elType as { displayName?: string }).displayName ??
+          elType.name ??
+          "Anonymous")
+        : typeof elType === "string"
+          ? elType
+          : "Unknown";
     logger.error(
-      "[Fast Renderer] Reconciler produced no output (container.node is null)",
+      `[Fast Renderer] Reconciler produced no output for <${componentName}>${boundaryError ? " (boundary caught error)" : ""}`,
     );
   }
 

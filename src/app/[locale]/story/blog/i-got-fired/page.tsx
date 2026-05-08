@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Button } from "next-vibe-ui/ui/button";
+import { GITHUB_REPO_URL } from "@/config/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
@@ -571,7 +572,7 @@ vibe dev`}
           </Button>
           <Button asChild className="bg-purple-700 hover:bg-purple-600">
             <Link
-              href="https://github.com/techfreaque/next-vibe"
+              href={GITHUB_REPO_URL}
               target="_blank"
             >
               {t("close.github")}

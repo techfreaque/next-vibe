@@ -412,7 +412,13 @@ export async function parseRequestBody(
     >;
     return body;
   } catch (error) {
-    logger.error("Failed to parse request body", parseError(error));
+    const contentType = request.headers.get("content-type") || "(none)";
+    logger.error("Failed to parse request body", {
+      ...parseError(error),
+      contentType,
+      contentLength: request.headers.get("content-length") ?? "(none)",
+      url: request.url,
+    });
     // If parsing fails, return empty object
     // genericHandler will handle validation errors
     return {};

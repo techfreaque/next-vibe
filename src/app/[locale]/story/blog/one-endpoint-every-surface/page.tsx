@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Button } from "next-vibe-ui/ui/button";
+import { GITHUB_REPO_URL } from "@/config/constants";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
@@ -199,7 +200,7 @@ export function TanstackPage({
         <Div className="space-y-4">
           <Button asChild>
             <Link
-              href="https://github.com/techfreaque/next-vibe"
+              href={GITHUB_REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
             >

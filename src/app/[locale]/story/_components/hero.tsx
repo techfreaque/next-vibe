@@ -10,6 +10,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
+import { GITHUB_REPO_URL } from "@/config/constants";
 import { useCallback, useMemo, useState } from "react";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -855,7 +856,7 @@ const Hero = ({
               className="text-base h-12 px-8 w-full sm:w-auto"
               asChild
             >
-              <Link href="https://github.com/techfreaque/next-vibe">
+              <Link href={GITHUB_REPO_URL}>
                 <Code className="mr-2 h-5 w-5" />
                 {t("home.hero.secondaryCta")}
               </Link>

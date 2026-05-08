@@ -21,6 +21,7 @@
  */
 
 import type { PackageManifest } from "../packages/types";
+import { GITHUB_REPO_URL } from "@/config/constants";
 import { CHECK_CONFIG_CREATE_ALIAS } from "./config/create/constants";
 import { VIBE_CHECK_ALIAS } from "./vibe-check/constants";
 
@@ -69,7 +70,7 @@ const manifest: PackageManifest = {
     ],
     repository: {
       type: "git",
-      url: "https://github.com/techfreaque/next-vibe",
+      url: GITHUB_REPO_URL,
     },
     license: "MIT",
   },

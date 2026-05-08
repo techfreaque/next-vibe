@@ -37,6 +37,7 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { GITHUB_REPO_URL } from "@/config/constants";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
   useWidgetLocale,
@@ -374,7 +375,7 @@ function CloudView({
       {/* CTA buttons */}
       <Div className="flex flex-wrap gap-3">
         <Link
-          href="https://github.com/techfreaque/next-vibe"
+          href={GITHUB_REPO_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
@@ -383,7 +384,7 @@ function CloudView({
           {t("widget.cloud.githubCta")}
         </Link>
         <Link
-          href="https://github.com/techfreaque/next-vibe#quick-start"
+          href={`${GITHUB_REPO_URL}#quick-start`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors"

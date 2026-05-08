@@ -82,52 +82,89 @@ export class CortexTemplatesEmbeddingsGeneratorRepository {
       let skipped = 0;
       const total = ALL_SEEDS.length;
 
+      // Dynamic templates (no physical seed file) get written to a generated embeddings file
+      const dynamicEmbeddings: Array<{
+        id: string;
+        path: string;
+        hash: string;
+        embedding: string;
+      }> = [];
+      const dynamicEmbeddingsFile = join(seedsDir, "dynamic.embedding.ts");
+      const existingDynamic = readFileSafe(dynamicEmbeddingsFile);
+
       for (const { item } of ALL_SEEDS) {
         const seedFile = idToSeedFile.get(item.id);
-        if (!seedFile) {
-          logger.warn(`  skipped (no file found for id): ${item.id}`);
-          skipped++;
-          continue;
-        }
-
-        const embeddingFile = seedFile.replace(/\.ts$/, ".embedding.ts");
         const hash = computeEmbeddingHash(item.path, item.content);
 
-        // Check existing hash
-        const existingContent = readFileSafe(embeddingFile);
-        const existingHash = extractHash(existingContent);
-        if (existingHash === hash) {
-          skipped++;
-          continue;
+        if (seedFile) {
+          // File-based template: write embedding alongside the seed file
+          const embeddingFile = seedFile.replace(/\.ts$/, ".embedding.ts");
+
+          // Check existing hash
+          const existingContent = readFileSafe(embeddingFile);
+          const existingHash = extractHash(existingContent);
+          if (existingHash === hash) {
+            skipped++;
+            continue;
+          }
+
+          const textToEmbed = `${item.path}\n\n${item.content}`;
+          const embedding = await generateEmbedding(textToEmbed);
+
+          if (!embedding) {
+            logger.warn(`  skipped (API unavailable): ${item.id}`);
+            skipped++;
+            continue;
+          }
+
+          const relPath = embeddingFile.replace(`${seedsDir}/`, "");
+          const depth = relPath.split("/").length - 1;
+          const relPrefix = "../".repeat(depth);
+
+          const embeddingStr = `[${embedding.map((v) => Number(v.toPrecision(15))).join(",")}]`;
+          const newContent = buildSeedEmbeddingFile(
+            item.path,
+            hash,
+            embeddingStr,
+            `${relPrefix}types`,
+          );
+          writeFileSync(embeddingFile, newContent, "utf-8");
+
+          generated++;
+          logger.debug(`  embedded: ${item.id}`);
+        } else {
+          // Dynamic template (generated from i18n, no physical file)
+          // Check if already embedded with same hash in dynamic file
+          if (existingDynamic.includes(`"${hash}"`)) {
+            skipped++;
+            continue;
+          }
+
+          const textToEmbed = `${item.path}\n\n${item.content}`;
+          const embedding = await generateEmbedding(textToEmbed);
+
+          if (!embedding) {
+            logger.warn(`  skipped (API unavailable): ${item.id}`);
+            skipped++;
+            continue;
+          }
+
+          const embeddingStr = `[${embedding.map((v) => Number(v.toPrecision(15))).join(",")}]`;
+          dynamicEmbeddings.push({
+            id: item.id,
+            path: item.path,
+            hash,
+            embedding: embeddingStr,
+          });
+          generated++;
+          logger.debug(`  embedded (dynamic): ${item.id}`);
         }
+      }
 
-        // Generate embedding
-        const textToEmbed = `${item.path}\n\n${item.content}`;
-        const embedding = await generateEmbedding(textToEmbed);
-
-        if (!embedding) {
-          logger.warn(`  skipped (API unavailable): ${item.id}`);
-          skipped++;
-          continue;
-        }
-
-        // Determine correct relative import path to types.ts
-        // e.g. seeds/memories/identity/name.embedding.ts → ../../types (depth=3, prefix=../../)
-        const relPath = embeddingFile.replace(`${seedsDir}/`, "");
-        const depth = relPath.split("/").length - 1;
-        const relPrefix = "../".repeat(depth);
-
-        const embeddingStr = `[${embedding.map((v) => Number(v.toPrecision(15))).join(",")}]`;
-        const newContent = buildSeedEmbeddingFile(
-          item.path,
-          hash,
-          embeddingStr,
-          `${relPrefix}types`,
-        );
-        writeFileSync(embeddingFile, newContent, "utf-8");
-
-        generated++;
-        logger.debug(`  embedded: ${item.id}`);
+      // Write dynamic embeddings file if any were generated
+      if (dynamicEmbeddings.length > 0) {
+        const dynamicContent = buildDynamicEmbeddingsFile(dynamicEmbeddings);
+        writeFileSync(dynamicEmbeddingsFile, dynamicContent, "utf-8");
       }
 
       const duration = Date.now() - startTime;
@@ -208,5 +245,30 @@ export const embedding: CortexSeedEmbedding = {
   // prettier-ignore
   embedding: ${embeddingStr},
 };
+`;
+}
+
+function buildDynamicEmbeddingsFile(
+  entries: Array<{
+    id: string;
+    path: string;
+    hash: string;
+    embedding: string;
+  }>,
+): string {
+  const items = entries
+    .map(
+      (e) =>
+        `  {\n    id: "${e.id}",\n    path: "${e.path}",\n    embeddingHash: "${e.hash}",\n    // prettier-ignore\n    embedding: ${e.embedding},\n  }`,
+    )
+    .join(",\n");
+
+  return `import type { CortexSeedEmbedding } from "./types";
+
+/** Generated by \`vibe gen\` - do not edit manually.
+ * Embeddings for dynamic templates (i18n-generated, no physical seed file). */
+export const dynamicEmbeddings: (CortexSeedEmbedding & { id: string })[] = [
+${items},
+];
 `;
 }

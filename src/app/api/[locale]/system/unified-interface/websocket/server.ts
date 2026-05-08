@@ -880,7 +880,9 @@ export function startWebSocketServer(
         for (const channel of initialChannels) {
           subscribeToChannel(ws, channel);
         }
-        logger.debug(`[WS] Connection opened (channels: ${initialChannels.join(", ") || "none"})`);
+        logger.debug(
+          `[WS] Connection opened (channels: ${initialChannels.join(", ") || "none"})`,
+        );
       },
 
       async message(ws, raw): Promise<void> {

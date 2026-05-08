@@ -1,21 +1,10 @@
-# CLI Widget Pattern (`widget.cli.tsx`)
+# CLI Widget Pattern (`widget.cli.tsx`) - LEGACY
+
+> **Deprecated for new code.** New endpoints should handle all platforms (web, CLI, MCP, AI tool, native) in a single `widget.tsx` with platform conditionals. See [widget.md](widget.md#multi-platform-design) for the current approach.
+>
+> This document remains as reference for the ~50 existing `widget.cli.tsx` files in the codebase. When modifying an existing endpoint that has a `widget.cli.tsx`, prefer migrating to the unified `widget.tsx` approach if the change is small enough. For large existing CLI widgets, maintain them in-place until a dedicated migration.
 
 CLI widgets are **Ink-based React components** that override the default definition-driven rendering when an endpoint is invoked via the CLI or MCP. The web widget (`widget.tsx`) renders on the browser; the CLI widget (`widget.cli.tsx`) renders in the terminal.
-
----
-
-## When to Write a CLI Widget
-
-**Every endpoint that returns non-trivial data or is callable from CLI/MCP gets a `widget.cli.tsx`.** The default field-driven CLI renderer outputs a raw dump of field values - acceptable only for the simplest internal tooling.
-
-Write a `widget.cli.tsx` for any endpoint that:
-
-- Returns a list, table, or structured result a human or AI will read
-- Is exposed as a vibe CLI command or MCP tool
-- Benefits from MCP vs CLI divergence (different formatting for AI agents vs humans)
-- Has response data that should be scannable, colored, or grouped
-
-Skip it only for purely internal endpoints with one or two trivially obvious output fields (e.g. a success boolean) where the raw dump is genuinely sufficient.
 
 ---
 

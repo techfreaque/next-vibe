@@ -10,6 +10,7 @@ import {
 
 import { createClientLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/client-logger";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { setWsLogger } from "@/app/api/[locale]/system/unified-interface/websocket/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 const LoggerContext = createContext<EndpointLogger | null>(null);
@@ -37,11 +38,12 @@ export function LoggerProvider({
   locale: CountryLanguage;
   children: ReactNode;
 }): JSX.Element {
-  const logger = useMemo(
-    () => createClientLogger(false, Date.now(), locale, getOrCreateTabId()),
+  const logger = useMemo(() => {
+    const l = createClientLogger(false, Date.now(), locale, getOrCreateTabId());
+    setWsLogger(l);
+    return l;
     // locale changes are rare but must re-create so API calls use correct path
-    [locale],
-  );
+  }, [locale]);
 
   return (
     <LoggerContext.Provider value={logger}>{children}</LoggerContext.Provider>

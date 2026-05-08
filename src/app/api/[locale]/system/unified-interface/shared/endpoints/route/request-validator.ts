@@ -194,6 +194,14 @@ export function validateHandlerRequestData<
       logReq("Request validation failed", {
         endpoint: context.endpointPath,
         error: requestValidation.message,
+        receivedKeys:
+          normalizedRequestData &&
+          typeof normalizedRequestData === "object" &&
+          !Array.isArray(normalizedRequestData)
+            ? Object.keys(normalizedRequestData as Record<string, string>).join(
+                ", ",
+              )
+            : typeof normalizedRequestData,
       });
       return requestValidation;
     }
@@ -207,7 +215,7 @@ export function validateHandlerRequestData<
       },
     };
   } catch (error) {
-    logger.error("Request validation failed", parseError(error), {
+    logger.error("Request validation failed (exception)", parseError(error), {
       endpoint: context.endpointPath,
     });
     const { t } = sharedScopedTranslation.scopedT(context.locale);

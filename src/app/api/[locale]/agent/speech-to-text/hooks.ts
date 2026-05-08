@@ -198,6 +198,22 @@ export function useEdenAISpeech({
         return;
       }
 
+      // Validate file is still a valid File before submitting
+      if (!(audioFile instanceof File) || audioFile.size === 0) {
+        const errorMsg = `STT: Invalid audio file (type=${typeof audioFile}, size=${audioFile instanceof File ? audioFile.size : "N/A"})`;
+        logger.error(errorMsg);
+        setError(t("hooks.stt.transcription-failed"));
+        onError?.(t("hooks.stt.transcription-failed"));
+        setIsProcessing(false);
+        return;
+      }
+
+      logger.debug("STT: Submitting to endpoint", {
+        fileName: audioFile.name,
+        fileSize: audioFile.size,
+        fileType: audioFile.type,
+      });
+
       // Set form values - set the nested object structure directly
       currentEndpoint.create.form.setValue("fileUpload", { file: audioFile });
 
@@ -239,7 +255,8 @@ export function useEdenAISpeech({
           logger.error("STT: API returned error", {
             errorType: apiError.errorType,
             errorMessage: apiError.message,
-            translatedMessage: errorMessage,
+            audioFileSize: audioFile.size,
+            audioFileType: audioFile.type,
           });
           // Keep savedAudioFileRef so user can retry
           setError(errorMessage);

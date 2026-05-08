@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GITHUB_REPO_URL } from "@/config/constants";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -1053,7 +1054,7 @@ vibe dev`}
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               <Link
-                href="https://github.com/techfreaque/next-vibe"
+                href={GITHUB_REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
               >

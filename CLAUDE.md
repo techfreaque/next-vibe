@@ -53,12 +53,11 @@ src/app/api/[locale]/<category>/<feature>/
   repository.ts    - DB operations returning ResponseType<T>, no throw
   route.ts         - endpointsHandler() wiring definition + repository
   i18n/            - Scoped translations (index.ts + en/, de/, pl/ subdirs)
-  widget.tsx       - Custom widget - required for all non-trivial endpoints
-  widget.cli.tsx   - CLI/MCP widget - required for all CLI-callable or data-returning endpoints
+  widget.tsx       - Custom widget - handles ALL platforms (web, CLI, MCP, AI, native)
   hooks.ts         - useEndpoint wrapper (only if used cross-module) - OR hooks/ folder
 ```
 
-**Widget rules:** Every endpoint gets a widget - the auto-renderer is a last resort for trivial internal tooling only. `widget.tsx` handles web + native (use `useWidgetPlatform()` to branch). `widget.cli.tsx` handles CLI + MCP (use `useInkWidgetPlatform()` to branch - chalk+colors for CLI, plain compact text for MCP, detail threshold for lists). Widgets are scoped to deepest route, self-contained. Shared UI lives in the canonical owner's widget; others import from owner, never reverse. Embed foreign UI via `EndpointsPage` (dialog) or `navigation.push()` - never import internal components.
+**Widget rules:** Every endpoint gets a widget - the auto-renderer is a last resort for trivial internal tooling only. `widget.tsx` handles ALL platforms: web, CLI, MCP, AI tool, native. Use `useWidgetPlatform()` to branch per platform. Design for every surface simultaneously: CLI expands all details inline (no collapsibles), MCP is compact and AI-parseable, web has rich interactive UI. Widgets are scoped to deepest route, self-contained. Shared UI lives in the canonical owner's widget; others import from owner, never reverse. Embed foreign UI via `EndpointsPage` (dialog) or `navigation.push()` - never import internal components.
 
 ## Pattern Reference
 

@@ -1,5 +1,6 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string -- code examples are not user-facing text */
 import type { Metadata } from "next";
+import { GITHUB_REPO_URL } from "@/config/constants";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
@@ -747,7 +748,7 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
 
           <Div className="flex flex-wrap gap-3 justify-center pt-2">
             <Link
-              href="https://github.com/techfreaque/next-vibe"
+              href={GITHUB_REPO_URL}
               className="inline-flex items-center gap-2 rounded-lg border px-6 py-3 text-sm font-medium hover:bg-muted transition-colors"
             >
               {t("closing.ctaGitHub")}

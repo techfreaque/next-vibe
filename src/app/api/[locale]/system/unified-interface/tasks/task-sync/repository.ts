@@ -547,9 +547,19 @@ export class TaskSyncRepository {
                 isActive: false,
               });
             } else {
+              let responsePreview: string | undefined;
+              try {
+                const text = await response.text();
+                responsePreview = text.slice(0, 300);
+              } catch {
+                // body already consumed or unreadable
+              }
               logger.warn("Pull from remote failed", {
                 userId: conn.userId,
+                instanceId: conn.instanceId,
                 status: response.status,
+                statusText: response.statusText,
+                responsePreview,
               });
             }
             continue;
@@ -560,6 +570,7 @@ export class TaskSyncRepository {
           if (!result.success || !result.data) {
             logger.warn("Pull from remote returned failure", {
               userId: conn.userId,
+              instanceId: conn.instanceId,
             });
             continue;
           }
