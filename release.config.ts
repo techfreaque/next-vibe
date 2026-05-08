@@ -28,7 +28,7 @@ const releaseConfig: ReleaseFileConfig = {
 
   // Global version for synchronized releases (optional)
   // When set, all packages will use this version
-  globalVersion: "3.3.0",
+  globalVersion: "3.3.1",
 
   // Branch configuration
   branch: {
@@ -121,7 +121,7 @@ const releaseConfig: ReleaseFileConfig = {
             'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$KEY" ' +
             '"$VPS_USER@$VPS_HOST" "cd $VPS_APP_DIR && bash scripts/install-docker.sh" ; ' +
             'EXIT=$? ; rm -f "$KEY" ; exit $EXIT',
-          timeout: 300000, // 5 minutes
+          timeout: 600000, // 10 minutes
           continueOnError: false,
         },
       },

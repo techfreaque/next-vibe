@@ -571,10 +571,7 @@ vibe dev`}
             </Link>
           </Button>
           <Button asChild className="bg-purple-700 hover:bg-purple-600">
-            <Link
-              href={GITHUB_REPO_URL}
-              target="_blank"
-            >
+            <Link href={GITHUB_REPO_URL} target="_blank">
               {t("close.github")}
             </Link>
           </Button>
