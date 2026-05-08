@@ -42,14 +42,11 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Generate indexes
-        run: bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts gen
+      - name: Build package (dry run)
+        run: bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build --run-prod-database=false
 
       - name: Run checks (lint, typecheck, tests)
         run: bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts check
-
-      - name: Build package (dry run)
-        run: bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build --run-prod-database=false
 
   # Publish to npm + deploy to VPS on tag creation
   # Triggered by: vibe pub (locally) → creates tag → pushes → this runs
