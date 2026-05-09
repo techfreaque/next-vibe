@@ -138,6 +138,10 @@ export const translations: typeof enTranslations = {
           name: "Publiczny",
           suffix: "— widoczny dla wszystkich",
         },
+        background: {
+          name: "W tle",
+          suffix: "— agenci AI pracują dla Ciebie",
+        },
       },
       privateFolder: {
         name: "Prywatny",
@@ -164,6 +168,13 @@ export const translations: typeof enTranslations = {
         description:
           "Udostępniaj swoje rozmowy AI światu. Inni mogą przeglądać i forkować Twoje wątki.",
         note: "Wszystko w folderze publicznym jest widoczne dla wszystkich użytkowników i wyszukiwarek.",
+      },
+      backgroundFolder: {
+        name: "W tle",
+        suffix: "Folder",
+        description:
+          "Tu pracują Twoi agenci AI, gdy Cię nie ma. Dreamer i Autopilot wykonują zaplanowane zadania i zostawiają wyniki tutaj. Każdy wątek jest prywatny.",
+        note: "Tylko Ty widzisz swoje wątki w tle. Agenci tworzą je automatycznie.",
       },
       newChatButton: {
         title: "Rozpocznij nowy czat",

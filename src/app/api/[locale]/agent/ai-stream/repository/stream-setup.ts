@@ -1301,6 +1301,7 @@ export async function setupAiStream(params: {
           applyDeniedFilter(resolvedToolConfig.availableTools),
         ),
         confirmationOverrides: resolvedToolConfig.availableTools,
+        rootFolderId: data.rootFolderId,
         user,
         locale,
         logger,

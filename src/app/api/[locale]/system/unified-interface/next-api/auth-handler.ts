@@ -106,11 +106,7 @@ export class WebAuthHandler extends BaseAuthHandler {
         sameSite: "lax" as const,
       };
 
-      // Only set maxAge if rememberMe is true (30 days)
-      // If false, cookie is session-only (deleted when browser closes)
-      if (rememberMe) {
-        cookieOptions.maxAge = AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS; // 30 days
-      }
+      cookieOptions.maxAge = AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS;
 
       cookieStore.set(cookieOptions);
 

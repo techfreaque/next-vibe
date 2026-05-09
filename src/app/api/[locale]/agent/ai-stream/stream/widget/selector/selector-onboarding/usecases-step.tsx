@@ -46,6 +46,7 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import {
@@ -163,6 +164,37 @@ async function seedFavorites(
   }
 
   const seededSkillIds = new Set<string>();
+
+  // Always seed vibe-coder for admins on local/claude-code instances
+  const isAdmin = userRoles.includes(UserPermissionRole.ADMIN);
+  if (isAdmin && agentEnvAvailability.claudeCode) {
+    const vibeCoderSkill = DEFAULT_SKILLS.find((s) => s.id === "vibe-coder");
+    if (vibeCoderSkill && !seededSkillIds.has("vibe-coder")) {
+      seededSkillIds.add("vibe-coder");
+      for (const variant of vibeCoderSkill.variants ?? []) {
+        const id = await addFavorite({
+          skillId: formatSkillId("vibe-coder", variant.id),
+          icon: vibeCoderSkill.icon,
+          modelSelection: variant.modelSelection,
+          voiceModelSelection: variant.voiceModelSelection,
+          sttModelSelection: variant.sttModelSelection,
+          imageVisionModelSelection: variant.imageVisionModelSelection,
+          videoVisionModelSelection: variant.videoVisionModelSelection,
+          audioVisionModelSelection: variant.audioVisionModelSelection,
+          imageGenModelSelection: variant.imageGenModelSelection,
+          musicGenModelSelection: variant.musicGenModelSelection,
+          videoGenModelSelection: variant.videoGenModelSelection,
+        });
+        if (id) {
+          entries.push({
+            id,
+            skillId: formatSkillId("vibe-coder", variant.id),
+            modelSelection: variant.modelSelection ?? null,
+          });
+        }
+      }
+    }
+  }
 
   for (const useCase of USE_CASE_IDS) {
     if (!selected.has(useCase)) {

@@ -91,13 +91,14 @@ export function ExecuteToolWidget(): JSX.Element {
 
   // Parse remote tool prefix: "hermes__ssh_exec_POST" → instanceId + toolName
   const remoteInfo = useMemo(() => {
-    const sepIdx = rawToolName.indexOf("__");
+    const name = rawToolName ?? "";
+    const sepIdx = name.indexOf("__");
     if (sepIdx === -1) {
-      return { instanceId: undefined, toolName: rawToolName };
+      return { instanceId: undefined, toolName: name };
     }
     return {
-      instanceId: rawToolName.slice(0, sepIdx),
-      toolName: rawToolName.slice(sepIdx + 2),
+      instanceId: name.slice(0, sepIdx),
+      toolName: name.slice(sepIdx + 2),
     };
   }, [rawToolName]);
   const toolName = remoteInfo.toolName;

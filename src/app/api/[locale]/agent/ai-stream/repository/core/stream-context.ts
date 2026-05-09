@@ -46,6 +46,8 @@ export class StreamContext {
 
   // Tool tracking
   pendingToolMessages = new Map<string, PendingToolData>();
+  /** Accumulated raw argument text per toolCallId during tool-input-delta streaming */
+  streamingToolInputs = new Map<string, string>();
   /** All toolCallIds ever seen in this stream - prevents duplicate DB rows
    *  when a provider reuses IDs across steps or retries. */
   allSeenToolCallIds = new Set<string>();
@@ -176,6 +178,7 @@ export class StreamContext {
     this.currentAssistantContent = "";
     this.currentAssistantMessageId = null;
     this.pendingToolMessages.clear();
+    this.streamingToolInputs.clear();
     // Run registered cleanup callbacks (e.g. pub/sub unsubscribe)
     for (const cb of this.cleanupCallbacks) {
       try {

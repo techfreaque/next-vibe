@@ -64,7 +64,6 @@ export abstract class BaseAuthHandler {
    * Web: Sets HTTP-only cookies
    * CLI/MCP: Writes to .vibe.session file
    * Native: Writes to AsyncStorage
-   * @param rememberMe - If true, session cookie lasts 30 days; if false, session-only (browser session)
    */
   abstract storeAuthToken(
     token: string,

@@ -136,6 +136,10 @@ export const translations = {
           name: "Public",
           suffix: "— visible to everyone",
         },
+        background: {
+          name: "Background",
+          suffix: "— AI agents working for you",
+        },
       },
       privateFolder: {
         name: "Private",
@@ -162,6 +166,13 @@ export const translations = {
         description:
           "Share your AI conversations with the world. Others can view and fork your threads.",
         note: "Everything in Public is visible to all users and search engines.",
+      },
+      backgroundFolder: {
+        name: "Background",
+        suffix: "Folder",
+        description:
+          "Where your AI agents work while you're away. Dreamer and Autopilot run scheduled tasks and drop results here. Each thread is private to you.",
+        note: "Only you see your background threads. Agents create them automatically.",
       },
       newChatButton: {
         title: "Start a New Chat",

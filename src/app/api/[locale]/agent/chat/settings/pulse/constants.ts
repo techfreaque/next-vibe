@@ -31,7 +31,7 @@ export function generateRandomDreamerSchedule(timezone: string): string {
   // Local window: 1–4 AM
   const localHour = 1 + Math.floor(Math.random() * 4); // 1, 2, 3, or 4
   const utcOffset = getUtcOffsetHours(timezone);
-  const utcHour = ((localHour - utcOffset) % 24 + 24) % 24;
+  const utcHour = (((localHour - utcOffset) % 24) + 24) % 24;
   return `${minute} ${utcHour} * * *`;
 }
 
@@ -45,6 +45,6 @@ export function generateRandomAutopilotSchedule(timezone: string): string {
   // Local window: 8–11 AM
   const localHour = 8 + Math.floor(Math.random() * 4); // 8, 9, 10, or 11
   const utcOffset = getUtcOffsetHours(timezone);
-  const utcHour = ((localHour - utcOffset) % 24 + 24) % 24;
+  const utcHour = (((localHour - utcOffset) % 24) + 24) % 24;
   return `${minute} ${utcHour} * * 1-5`;
 }

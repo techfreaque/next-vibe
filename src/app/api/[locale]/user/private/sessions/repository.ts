@@ -18,6 +18,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -96,8 +97,9 @@ export class SessionManagementRepository {
       }
 
       const token = tokenResult.data;
-      // 90-day expiry (same as AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS)
-      const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+      const expiresAt = new Date(
+        Date.now() + AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS * 1000,
+      );
 
       const [row] = await db
         .insert(sessions)

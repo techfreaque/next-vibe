@@ -10,7 +10,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolExecutionContext } from "../../../chat/config";
-import { getDefaultToolIdsForUser } from "../../../chat/constants";
+import { getDefaultToolIdsForFolder } from "../../../chat/constants";
 import type { ToolCall } from "../../../chat/db";
 
 /**
@@ -40,6 +40,8 @@ export class ToolsSetupHandler {
      * so confirmation settings survive even when the cascade overrides availableTools.
      */
     confirmationOverrides: ToolConfigItem[] | null | undefined;
+    /** Root folder ID - used to select folder-appropriate default tools in agent mode */
+    rootFolderId: string;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
@@ -127,7 +129,7 @@ export class ToolsSetupHandler {
     // of the user's saved tool list (it may predate the tool being added to defaults).
     const visibleToolIdsFromClient = params.pinnedTools
       ? params.pinnedTools.map((t) => getFullPath(t.toolId) ?? t.toolId)
-      : [...getDefaultToolIdsForUser(params.user)]; // agent mode = role-appropriate default tool set
+      : [...getDefaultToolIdsForFolder(params.user, params.rootFolderId)]; // agent mode = folder+role-appropriate default tool set
 
     // Inject pinned remote tools (from availableTools) into visible set.
     // Remote tools use "instanceId__toolName" format and are only in availableTools

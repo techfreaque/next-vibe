@@ -27,6 +27,7 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
@@ -65,6 +66,7 @@ function ErrorLogCard({
   onToggle,
   onToggleResolved,
   isUpdating,
+  isCli,
   t,
 }: {
   log: ErrorLog;
@@ -72,6 +74,7 @@ function ErrorLogCard({
   onToggle: (section: "stack" | "meta") => void;
   onToggleResolved: (fingerprint: string, resolved: boolean) => void;
   isUpdating: boolean;
+  isCli: boolean;
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): React.JSX.Element {
   const hasStack = Boolean(log.stackTrace);
@@ -121,6 +124,11 @@ function ErrorLogCard({
             )}
             {log.errorType && (
               <Span className="bg-muted px-1 rounded">{log.errorType}</Span>
+            )}
+            {isCli && (
+              <Span className="text-muted-foreground/60">
+                {log.fingerprint}
+              </Span>
             )}
           </Div>
         </Div>
@@ -189,7 +197,7 @@ function ErrorLogCard({
       </Div>
 
       {/* Expanded: stack trace */}
-      {expandedSection === "stack" && hasStack && (
+      {(expandedSection === "stack" || isCli) && hasStack && (
         <Div className="border-t bg-muted/40 p-3">
           <Pre className="text-xs font-mono text-foreground overflow-auto max-h-48 whitespace-pre-wrap break-words">
             {log.stackTrace}
@@ -198,7 +206,7 @@ function ErrorLogCard({
       )}
 
       {/* Expanded: metadata */}
-      {expandedSection === "meta" && hasMeta && (
+      {(expandedSection === "meta" || isCli) && hasMeta && (
         <Div className="border-t bg-muted/40 p-3">
           <Pre className="text-xs font-mono text-foreground overflow-auto max-h-48 whitespace-pre-wrap break-words">
             {JSON.stringify(log.metadata, null, 2)}
@@ -221,6 +229,8 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
   const user = useWidgetUser();
   const locale = useWidgetLocale();
   const logger = useWidgetLogger();
+  const platform = useWidgetPlatform();
+  const isCli = platform === "cli";
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [updatingFingerprint, setUpdatingFingerprint] = useState<string | null>(
@@ -322,23 +332,31 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
       </Div>
 
       {/* -- Filters -- */}
-      <Div className="flex flex-wrap items-end gap-3 px-4 py-3 border-b">
-        <Div className="w-40">
-          <SelectFieldWidget fieldName={"status"} field={children.status} />
+      {"status" in children && (
+        <Div className="flex flex-wrap items-end gap-3 px-4 py-3 border-b">
+          <Div className="w-40">
+            <SelectFieldWidget fieldName={"status"} field={children.status} />
+          </Div>
+          <Div className="w-56">
+            <TextFieldWidget fieldName={"search"} field={children.search} />
+          </Div>
+          <Div className="w-44">
+            <TextFieldWidget
+              fieldName={"errorType"}
+              field={children.errorType}
+            />
+          </Div>
+          <Div className="w-40">
+            <DateFieldWidget
+              fieldName={"startDate"}
+              field={children.startDate}
+            />
+          </Div>
+          <Div className="w-40">
+            <DateFieldWidget fieldName={"endDate"} field={children.endDate} />
+          </Div>
         </Div>
-        <Div className="w-56">
-          <TextFieldWidget fieldName={"search"} field={children.search} />
-        </Div>
-        <Div className="w-44">
-          <TextFieldWidget fieldName={"errorType"} field={children.errorType} />
-        </Div>
-        <Div className="w-40">
-          <DateFieldWidget fieldName={"startDate"} field={children.startDate} />
-        </Div>
-        <Div className="w-40">
-          <DateFieldWidget fieldName={"endDate"} field={children.endDate} />
-        </Div>
-      </Div>
+      )}
 
       {/* -- Loading state -- */}
       {isLoading && (
@@ -375,6 +393,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
                   onToggle={(section) => handleToggle(log.id, section)}
                   onToggleResolved={handleToggleResolved}
                   isUpdating={updatingFingerprint === log.fingerprint}
+                  isCli={isCli}
                   t={t}
                 />
               );

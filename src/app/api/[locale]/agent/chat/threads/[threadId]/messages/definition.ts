@@ -174,6 +174,14 @@ const { GET } = createEndpoint({
       onEvent: onEventPersistMessage(),
     },
 
+    // ── tool-input-delta ────────────────────────────────────────────────────
+    // Streaming tool call arguments from the AI model. Framework merges the
+    // partial metadata (argsText) onto the existing tool message.
+    "tool-input-delta": {
+      fields: { messages: ["id", "metadata"] as const },
+      operation: "merge" as const,
+    },
+
     // ── tool-result ──────────────────────────────────────────────────────────
     // onEvent: persist tool result metadata to localStorage for incognito.
     "tool-result": {

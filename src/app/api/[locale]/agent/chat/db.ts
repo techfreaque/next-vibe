@@ -104,6 +104,10 @@ export interface ToolCall {
   isDeferred?: boolean;
   /** True when this is a partial/intermediate result - tool is still executing */
   isPartial?: boolean;
+  /** True while the AI model is still streaming tool call arguments */
+  isInputStreaming?: boolean;
+  /** Raw accumulated argument text during streaming (before JSON parsing completes) */
+  argsText?: string;
 }
 
 /**

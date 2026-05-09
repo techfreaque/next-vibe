@@ -278,19 +278,6 @@ export class AuthRepository {
         return null;
       }
 
-      // Check if session is expired
-      const session = sessionResponse.data;
-      if (session.expiresAt < new Date()) {
-        logger.debug("Session expired, deleting only this session", {
-          userId,
-          sessionId: session.id,
-          expiresAt: session.expiresAt,
-        });
-        // Delete only this specific expired session, not all sessions for the user
-        await SessionRepository.deleteById(session.id, sessionT);
-        return null;
-      }
-
       const { leadId } = await AuthRepository.getLeadIdFromDb(
         userId,
         locale,
@@ -1019,20 +1006,16 @@ export class AuthRepository {
         return false;
       }
 
-      // Check if session is expired
-      const now = new Date();
-      if (session.expiresAt < now) {
-        logger.debug(`Session expired`);
-        return false;
-      }
-
       // Auto-extend session when within 25% of remaining lifetime.
-      // This keeps remote connection sessions alive as long as they're actively used.
+      // Keeps old short-lived sessions alive as long as they're actively used.
+      const now = new Date();
       const totalLifetime =
         session.expiresAt.getTime() - session.createdAt.getTime();
       const remaining = session.expiresAt.getTime() - now.getTime();
       if (remaining < totalLifetime * 0.25 && totalLifetime > 0) {
-        const newExpiry = new Date(now.getTime() + totalLifetime);
+        const newExpiry = new Date(
+          now.getTime() + AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS * 1000,
+        );
         void SessionRepository.extendSession(token, newExpiry, sessionT);
         logger.debug("Session auto-extended", {
           userId,

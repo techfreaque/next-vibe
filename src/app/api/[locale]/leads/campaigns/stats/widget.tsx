@@ -371,7 +371,14 @@ function CronHealthSection({
                   </Button>
                 </Div>
                 <Div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <Span>{formatCronScheduleShort(task.schedule, getDefaultTimezone(locale), locale, logger)}</Span>
+                  <Span>
+                    {formatCronScheduleShort(
+                      task.schedule,
+                      getDefaultTimezone(locale),
+                      locale,
+                      logger,
+                    )}
+                  </Span>
                   {successRate !== null && (
                     <Span
                       className={cn(
@@ -762,7 +769,13 @@ export function CampaignStatsWidget(): React.JSX.Element {
           <Span className="text-sm font-semibold">
             {t("widget.cronHealth.title")}
           </Span>
-          <CronHealthSection data={data} t={t} onRun={handleRun} locale={locale} logger={logger} />
+          <CronHealthSection
+            data={data}
+            t={t}
+            onRun={handleRun}
+            locale={locale}
+            logger={logger}
+          />
         </Div>
       )}
 

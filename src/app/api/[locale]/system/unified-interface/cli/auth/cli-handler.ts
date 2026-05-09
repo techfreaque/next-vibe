@@ -1,5 +1,6 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
@@ -46,7 +47,6 @@ export class CliAuthHandler extends BaseAuthHandler {
 
   /**
    * Store authentication token in .vibe.session file.
-   * @param rememberMe - 30 days if true, 7 days if false
    */
   async storeAuthToken(
     token: string,
@@ -54,11 +54,9 @@ export class CliAuthHandler extends BaseAuthHandler {
     leadId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-    rememberMe = true,
   ): Promise<ResponseType<void>> {
-    const sessionDurationDays = rememberMe ? 30 : 7;
     const expiresAt = new Date(
-      Date.now() + sessionDurationDays * 24 * 60 * 60 * 1000,
+      Date.now() + AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS * 1000,
     );
 
     return writeSessionFile(

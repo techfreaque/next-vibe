@@ -109,17 +109,6 @@ export async function readSessionFile(
     });
   }
 
-  // Check if session is locally expired (hint only - DB is authoritative)
-  const expiresAt = new Date(sessionData.expiresAt);
-  if (expiresAt < new Date()) {
-    const { t } = cliScopedTranslation.scopedT(locale);
-    return fail({
-      message: t("vibe.errors.sessionExpired"),
-      errorType: ErrorResponseTypes.UNAUTHORIZED,
-      messageParams: { expiresAt: sessionData.expiresAt },
-    });
-  }
-
   return success(sessionData);
 }
 

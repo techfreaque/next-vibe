@@ -40,7 +40,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
           ownershipType: customSkills.ownershipType,
         })
         .from(customSkills)
-        .where(eq(customSkills.id, skillId))
+        .where(eq(customSkills.slug, skillId))
         .limit(1);
       if (!skill) {
         return false;

@@ -421,7 +421,7 @@ const { GET } = createEndpoint({
         placeholder: "get.ref.placeholder",
         helpText: "get.ref.helpText",
         columns: 12,
-        schema: z.string().optional(),
+        schema: z.coerce.string().optional(),
       }),
 
       // === RESPONSE FIELDS ===

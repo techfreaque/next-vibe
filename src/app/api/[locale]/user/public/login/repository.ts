@@ -385,11 +385,7 @@ export class LoginRepository {
         });
       }
 
-      // Session duration matches JWT cookie lifetime so both expire together.
-      // rememberMe=false → 7-day session (browser-session cookie, shorter DB row)
-      const sessionDurationSeconds = rememberMe
-        ? AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS
-        : 7 * 24 * 60 * 60;
+      const sessionDurationSeconds = AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS;
 
       // Fetch user roles from DB to include in JWT
       const rolesResult = await UserRolesRepository.getUserRoles(

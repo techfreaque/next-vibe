@@ -1138,11 +1138,11 @@ export const translations: typeof enTranslations = {
         3: "Untersuche einen Bug und schlage einen Fix vor",
       },
       variants: {
-        kimi: "Kimi",
-        claudeCodeOpus: "Claude Code Opus",
-        claudeCodeSonnet: "Claude Code Sonnet",
-        claudeSonnet: "Claude Sonnet",
-        claudeOpus: "Claude Opus",
+        budget: "Günstig & Klug",
+        open: "Offene Grenze",
+        fast: "Scharf",
+        max: "Maximum",
+        broad: "Breit",
       },
     },
     skillCreator: {

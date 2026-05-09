@@ -8,6 +8,8 @@ import { envClient } from "@/config/env-client";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { DefaultFolderId } from "./config";
+
 import { SSH_EXEC_ALIAS } from "../../ssh/exec/constants";
 import { SSH_FILES_READ_ALIAS } from "../../ssh/files/read/constants";
 import { SSH_FILES_WRITE_ALIAS } from "../../ssh/files/write/constants";
@@ -155,6 +157,37 @@ export function getDefaultToolIdsForUser(
   }
   const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
   return getDefaultToolIds(isAdmin, !isAdmin);
+}
+
+/**
+ * Folder-aware default pinned tool IDs.
+ * Incognito and public folders strip all cortex tools from the defaults
+ * because cortex requires authenticated server-side storage.
+ * For all other folders, falls back to the standard role-based defaults.
+ */
+export function getDefaultToolIdsForFolder(
+  user: JwtPayloadType,
+  rootFolderId: string,
+): readonly string[] {
+  const base = getDefaultToolIdsForUser(user);
+  if (
+    rootFolderId === DefaultFolderId.INCOGNITO ||
+    rootFolderId === DefaultFolderId.PUBLIC
+  ) {
+    const cortexAliases = new Set([
+      CORTEX_LIST_ALIAS,
+      CORTEX_READ_ALIAS,
+      CORTEX_WRITE_ALIAS,
+      CORTEX_EDIT_ALIAS,
+      CORTEX_MKDIR_ALIAS,
+      CORTEX_MOVE_ALIAS,
+      CORTEX_DELETE_ALIAS,
+      CORTEX_TREE_ALIAS,
+      CORTEX_SEARCH_ALIAS,
+    ]);
+    return base.filter((id) => !cortexAliases.has(id));
+  }
+  return base;
 }
 
 /**

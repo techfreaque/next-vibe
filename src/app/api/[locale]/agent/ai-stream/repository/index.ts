@@ -337,18 +337,31 @@ export class AiStreamRepository {
           // Chain error as child of user message (if present), else child of last AI message.
           const setupErrorParentId =
             data.userMessageId || data.parentMessageId || null;
-          // Persist error message to DB only for non-incognito threads (incognito has no DB row)
+          // Persist error message to DB only for non-incognito threads (incognito has no DB row).
+          // Skip silently if the thread doesn't exist yet (new thread where setup failed before any DB write).
           if (!isIncognito) {
-            await MessagesRepository.createErrorMessage({
-              messageId: errorMessageId,
-              threadId,
-              content: errorContent,
-              errorType,
-              parentId: setupErrorParentId,
-              user,
-              sequenceId: null,
-              logger,
-            });
+            try {
+              await MessagesRepository.createErrorMessage({
+                messageId: errorMessageId,
+                threadId,
+                content: errorContent,
+                errorType,
+                parentId: setupErrorParentId,
+                user,
+                sequenceId: null,
+                logger,
+              });
+            } catch (dbErr) {
+              // Thread may not exist in DB yet (new thread, setup failed before creation).
+              // Still emit via WS so the client can display the error.
+              logger.debug(
+                "[AiStream] Could not persist setup error message to DB (thread may not exist yet)",
+                {
+                  threadId,
+                  error: dbErr instanceof Error ? dbErr.message : String(dbErr),
+                },
+              );
+            }
           }
           // Always emit via WS so the frontend can display the error (incognito stores it client-side)
           const setupErrorEmit = createMessagesEmitter(

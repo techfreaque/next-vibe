@@ -277,6 +277,7 @@ export class ToolErrorHandler {
       logger.warn("[AI Stream] Emitting tool error result to model", {
         toolName: part.toolName,
         error: fallbackResult.error,
+        toolCallId: part.toolCallId,
       });
 
       // Pass the actual error message from the tool so the model gets actionable context,
@@ -397,12 +398,16 @@ export class ToolErrorHandler {
         logger.warn("[AI Stream] Fallback tool execution failed", {
           toolName,
           error: result.message,
-          params: result.messageParams,
+          messageParams: result.messageParams,
+          args: JSON.stringify(args ?? {}).slice(0, 500),
         });
-        // Return the error so the model can see it and retry with correct params
-        const errorMsg = result.messageParams?.error
-          ? `${result.message}: ${result.messageParams.error}`
-          : result.message;
+        // Return the error so the model can see it and retry with correct params.
+        // Avoid duplicating if messageParams.error is already embedded in message.
+        const extraDetail = result.messageParams?.error;
+        const errorMsg =
+          extraDetail && !result.message.includes(extraDetail as string)
+            ? `${result.message}: ${extraDetail}`
+            : result.message;
         return { error: errorMsg };
       }
 

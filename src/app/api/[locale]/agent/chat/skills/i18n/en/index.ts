@@ -1134,11 +1134,11 @@ export const translations = {
         3: "Investigate a bug and propose a fix",
       },
       variants: {
-        kimi: "Kimi",
-        claudeCodeOpus: "Claude Code Opus",
-        claudeCodeSonnet: "Claude Code Sonnet",
-        claudeSonnet: "Claude Sonnet",
-        claudeOpus: "Claude Opus",
+        budget: "Cheap & Smart",
+        open: "Open Frontier",
+        fast: "Sharp",
+        max: "Max",
+        broad: "Broad",
       },
     },
     skillCreator: {

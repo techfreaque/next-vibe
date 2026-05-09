@@ -16,7 +16,7 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
+import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { remoteConnections } from "../../db";
@@ -78,22 +78,32 @@ export class RemoteConnectionDisconnectRepository {
         return success({ disconnected: true });
       }
       const remoteDeleteUrl = `${row.remoteUrl}/api/${locale}/user/remote-connection/${selfId}/disconnect`;
+      // Embed leadId in Bearer token using the ####leadId suffix so remote auth picks it up correctly.
+      const bearerWithLead = row.leadId
+        ? `${plainToken}${BEARER_LEAD_ID_SEPARATOR}${row.leadId}`
+        : plainToken;
       fetch(remoteDeleteUrl, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${plainToken}`,
-          ...(row.leadId
-            ? { Cookie: `${LEAD_ID_COOKIE_NAME}=${row.leadId}` }
-            : {}),
+          Authorization: `Bearer ${bearerWithLead}`,
         },
         signal: AbortSignal.timeout(10000),
       })
         .then((res) => {
           if (!res.ok) {
-            logger.warn("Remote disconnect failed - cloud record may remain", {
-              instanceId,
-              status: res.status,
-            });
+            if (res.status === 401 || res.status === 403) {
+              // Token expired - remote session is gone. Remote record will be
+              // cleaned up on next reauth or when it detects we're gone.
+              logger.warn(
+                "Remote disconnect skipped - token expired, remote record may remain until next reauth",
+                { instanceId, status: res.status },
+              );
+            } else {
+              logger.warn(
+                "Remote disconnect failed - cloud record may remain",
+                { instanceId, status: res.status },
+              );
+            }
           } else {
             logger.info("Remote disconnect acknowledged by cloud", {
               instanceId,

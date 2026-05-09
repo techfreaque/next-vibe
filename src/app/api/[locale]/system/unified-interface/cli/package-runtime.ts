@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * Package CLI Entry Point
  *

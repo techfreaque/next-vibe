@@ -44,7 +44,9 @@ export const chatSettings = pgTable("chat_settings", {
   searchProvider: jsonb("search_provider").$type<SearchProviderValue | null>(),
 
   // Coding agent provider preference (admin-only). null = "claude-code" (default)
-  codingAgent: jsonb("coding_agent").$type<"claude-code" | "open-code">(),
+  codingAgent: jsonb("coding_agent").$type<
+    "claude-code" | "open-code" | "next-vibe-coder"
+  >(),
 
   // Dreaming pulse - AI reorganizes cortex on a schedule. null = disabled (false)
   dreamerEnabled: jsonb("dreamer_enabled").$type<boolean>(),

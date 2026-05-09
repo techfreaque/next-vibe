@@ -532,6 +532,77 @@ export class MessageDbWriter {
   }
 
   /**
+   * Emit a streaming tool-input-delta WS event.
+   * Sends the accumulated argsText so the UI can render the partial arguments.
+   * No DB write - too frequent. DB is updated on the final tool-call event.
+   */
+  emitToolInputDelta(toolMessageId: string, toolCall: ToolCall): void {
+    this.wsEmit("tool-input-delta", {
+      messages: [{ id: toolMessageId, metadata: { toolCall } }],
+    });
+  }
+
+  /**
+   * Update an existing tool message with final parsed args after streaming completes.
+   * Emits message-created (merge) with the finalized toolCall metadata and
+   * updates the DB row. Called when tool-call arrives after tool-input-start.
+   */
+  async emitToolCallUpdate(params: {
+    toolMessageId: string;
+    threadId: string;
+    toolCall: ToolCall;
+  }): Promise<void> {
+    const { toolMessageId, threadId, toolCall } = params;
+
+    // WS: message-created merge so UI gets final args + isInputStreaming=false
+    this.wsEmit("message-created", {
+      streamingState: "streaming" as const,
+      messages: [
+        {
+          id: toolMessageId,
+          threadId,
+          role: ChatMessageRole.TOOL,
+          isAI: true,
+          content: null,
+          parentId: null,
+          sequenceId: null,
+          model: null,
+          skill: null,
+          metadata: { toolCall },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          authorId: null,
+          authorName: null,
+          errorType: null,
+          errorCode: null,
+          errorMessage: null,
+          upvotes: 0,
+          downvotes: 0,
+          searchVector: null,
+        },
+      ],
+    });
+
+    // DB: update the existing tool message with final args
+    if (!this.isIncognito) {
+      try {
+        await db
+          .update(chatMessages)
+          .set({ metadata: { toolCall }, updatedAt: new Date() })
+          .where(eq(chatMessages.id, toolMessageId));
+      } catch (err) {
+        this.logger.warn(
+          "[MessageDbWriter] Failed to update tool message with final args",
+          {
+            messageId: toolMessageId,
+            error: err instanceof Error ? err.message : String(err),
+          },
+        );
+      }
+    }
+  }
+
+  /**
    * Emit TOOL_WAITING SSE (tool requires user confirmation before execution).
    * No-op: tool-waiting is not a declared event on the messages channel.
    * The UI derives waiting state from the tool message's metadata.toolCall field.

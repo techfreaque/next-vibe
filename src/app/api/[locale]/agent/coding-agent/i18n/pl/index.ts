@@ -90,6 +90,11 @@ export const translations: typeof enTranslations = {
             title: "Nie znaleziono",
             description: "Zasób lub katalog roboczy nie został znaleziony",
           },
+          vibeCoderRedirect: {
+            title: "Użyj ai-run z vibe-coder zamiast tego",
+            description:
+              "Agent kodowania jest ustawiony na vibe-coder. Użyj narzędzia ai-run ze skillem vibe-coder.",
+          },
           network: {
             title: "Błąd sieci",
             description: "Błąd sieci podczas komunikacji z agentem kodowania",

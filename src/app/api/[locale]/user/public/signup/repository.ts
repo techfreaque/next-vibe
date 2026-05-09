@@ -22,6 +22,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { AuthRepository } from "../../auth/repository";
 import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
 import type { NewUser } from "../../db";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import { UserDetailLevel } from "../../enum";
 import { SessionRepository } from "../../private/session/repository";
 import { UserRepository } from "../../repository";
@@ -339,9 +340,9 @@ export class SignupRepository {
         });
         // Continue without auto-login - user can manually log in
       } else {
-        // Create session in database - default (no rememberMe) uses 7-day session
-        const sessionDurationSeconds = 7 * 24 * 60 * 60;
-        const expiresAt = new Date(Date.now() + sessionDurationSeconds * 1000);
+        const expiresAt = new Date(
+          Date.now() + AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS * 1000,
+        );
         const sessionData = {
           userId: userData.id,
           token: tokenResponse.data,

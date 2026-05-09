@@ -113,6 +113,7 @@ export const translations: typeof enTranslations = {
       options: {
         claudeCode: "Claude Code (domyślny)",
         openCode: "OpenCode",
+        nextVibeCoder: "Next Vibe Coder",
       },
     },
     dreaming: {

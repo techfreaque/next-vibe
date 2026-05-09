@@ -136,24 +136,20 @@ function RootFolderBar({
   const rootFolders = useMemo(
     () =>
       Object.values(DEFAULT_FOLDER_CONFIGS)
-        .filter(
-          (f) =>
-            (f.id !== DefaultFolderId.BACKGROUND &&
-              f.id !== DefaultFolderId.SUPPORT) ||
-            isAdmin,
-        )
+        .filter((f) => f.id !== DefaultFolderId.SUPPORT || isAdmin)
+        .filter((f) => f.id !== DefaultFolderId.BACKGROUND || isAuthenticated)
         .toSorted((a, b) => a.order - b.order),
-    [isAdmin],
+    [isAdmin, isAuthenticated],
   );
 
   const isFolderAccessible = (folderId: string): boolean => {
-    if (isAuthenticated) {
-      return true;
-    }
-    return (
+    if (
       folderId === DefaultFolderId.PUBLIC ||
       folderId === DefaultFolderId.INCOGNITO
-    );
+    ) {
+      return true;
+    }
+    return isAuthenticated;
   };
 
   const handleClick = (folderId: string): void => {

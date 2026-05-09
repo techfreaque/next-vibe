@@ -109,9 +109,7 @@ function buildCron(s: CustomState): string {
     case "minutes":
       return interval === 1 ? "* * * * *" : `*/${interval} * * * *`;
     case "hours":
-      return interval === 1
-        ? `${mm} * * * *`
-        : `${mm} */${interval} * * *`;
+      return interval === 1 ? `${mm} * * * *` : `${mm} */${interval} * * *`;
     case "days":
       return interval === 1
         ? `${mm} ${hh} * * *`
@@ -152,18 +150,36 @@ function cronToCustomState(cron: string): CustomState | null {
   // Every N minutes: */N * * * *
   if (hr === "*" && dom === "*" && month === "*" && dow === "*") {
     if (min === "*") {
-      return { interval: 1, unit: "minutes", timeHour: 0, timeMinute: 0, weekdays: [] };
+      return {
+        interval: 1,
+        unit: "minutes",
+        timeHour: 0,
+        timeMinute: 0,
+        weekdays: [],
+      };
     }
     if (min.startsWith("*/")) {
       const n = parseInt(min.slice(2), 10);
       if (!isNaN(n)) {
-        return { interval: n, unit: "minutes", timeHour: 0, timeMinute: 0, weekdays: [] };
+        return {
+          interval: n,
+          unit: "minutes",
+          timeHour: 0,
+          timeMinute: 0,
+          weekdays: [],
+        };
       }
     }
     // At :MM every hour
     const mm = parseInt(min, 10);
     if (!isNaN(mm) && !min.includes("*")) {
-      return { interval: 1, unit: "hours", timeHour: 0, timeMinute: mm, weekdays: [] };
+      return {
+        interval: 1,
+        unit: "hours",
+        timeHour: 0,
+        timeMinute: mm,
+        weekdays: [],
+      };
     }
   }
 
@@ -171,13 +187,25 @@ function cronToCustomState(cron: string): CustomState | null {
   if (dom === "*" && month === "*" && dow === "*") {
     if (hr === "*") {
       const mm = parseInt(min, 10);
-      return { interval: 1, unit: "hours", timeHour: 0, timeMinute: isNaN(mm) ? 0 : mm, weekdays: [] };
+      return {
+        interval: 1,
+        unit: "hours",
+        timeHour: 0,
+        timeMinute: isNaN(mm) ? 0 : mm,
+        weekdays: [],
+      };
     }
     if (hr.startsWith("*/")) {
       const n = parseInt(hr.slice(2), 10);
       const mm = parseInt(min, 10);
       if (!isNaN(n)) {
-        return { interval: n, unit: "hours", timeHour: 0, timeMinute: isNaN(mm) ? 0 : mm, weekdays: [] };
+        return {
+          interval: n,
+          unit: "hours",
+          timeHour: 0,
+          timeMinute: isNaN(mm) ? 0 : mm,
+          weekdays: [],
+        };
       }
     }
   }
@@ -186,8 +214,17 @@ function cronToCustomState(cron: string): CustomState | null {
   if (dom === "*" && month === "*" && dow !== "*" && !dow.includes("/")) {
     const hh = parseInt(hr, 10);
     const mm = parseInt(min, 10);
-    const days = dow.split(",").map((s) => parseInt(s, 10)).filter((d) => !isNaN(d));
-    return { interval: 1, unit: "weeks", timeHour: isNaN(hh) ? 0 : hh, timeMinute: isNaN(mm) ? 0 : mm, weekdays: days };
+    const days = dow
+      .split(",")
+      .map((s) => parseInt(s, 10))
+      .filter((d) => !isNaN(d));
+    return {
+      interval: 1,
+      unit: "weeks",
+      timeHour: isNaN(hh) ? 0 : hh,
+      timeMinute: isNaN(mm) ? 0 : mm,
+      weekdays: days,
+    };
   }
 
   // Daily: MM HH * * * or MM HH */N * *
@@ -195,16 +232,34 @@ function cronToCustomState(cron: string): CustomState | null {
     const hh = parseInt(hr, 10);
     const mm = parseInt(min, 10);
     if (dom === "*") {
-      return { interval: 1, unit: "days", timeHour: isNaN(hh) ? 0 : hh, timeMinute: isNaN(mm) ? 0 : mm, weekdays: [] };
+      return {
+        interval: 1,
+        unit: "days",
+        timeHour: isNaN(hh) ? 0 : hh,
+        timeMinute: isNaN(mm) ? 0 : mm,
+        weekdays: [],
+      };
     }
     if (dom.startsWith("*/")) {
       const n = parseInt(dom.slice(2), 10);
       if (!isNaN(n)) {
-        return { interval: n, unit: "days", timeHour: isNaN(hh) ? 0 : hh, timeMinute: isNaN(mm) ? 0 : mm, weekdays: [] };
+        return {
+          interval: n,
+          unit: "days",
+          timeHour: isNaN(hh) ? 0 : hh,
+          timeMinute: isNaN(mm) ? 0 : mm,
+          weekdays: [],
+        };
       }
     }
     if (dom === "1") {
-      return { interval: 1, unit: "months", timeHour: isNaN(hh) ? 0 : hh, timeMinute: isNaN(mm) ? 0 : mm, weekdays: [] };
+      return {
+        interval: 1,
+        unit: "months",
+        timeHour: isNaN(hh) ? 0 : hh,
+        timeMinute: isNaN(mm) ? 0 : mm,
+        weekdays: [],
+      };
     }
   }
 
@@ -215,10 +270,22 @@ function cronToCustomState(cron: string): CustomState | null {
     if (month.startsWith("*/")) {
       const n = parseInt(month.slice(2), 10);
       if (!isNaN(n)) {
-        return { interval: n, unit: "months", timeHour: isNaN(hh) ? 0 : hh, timeMinute: isNaN(mm) ? 0 : mm, weekdays: [] };
+        return {
+          interval: n,
+          unit: "months",
+          timeHour: isNaN(hh) ? 0 : hh,
+          timeMinute: isNaN(mm) ? 0 : mm,
+          weekdays: [],
+        };
       }
     }
-    return { interval: 1, unit: "months", timeHour: isNaN(hh) ? 0 : hh, timeMinute: isNaN(mm) ? 0 : mm, weekdays: [] };
+    return {
+      interval: 1,
+      unit: "months",
+      timeHour: isNaN(hh) ? 0 : hh,
+      timeMinute: isNaN(mm) ? 0 : mm,
+      weekdays: [],
+    };
   }
 
   return null;
@@ -372,12 +439,15 @@ export function ScheduleAutocomplete({
 
   return (
     <Div className={cn("relative", className)}>
-      <Popover open={open} onOpenChange={(o) => {
-        setOpen(o);
-        if (!o) {
-          onBlur?.();
-        }
-      }}>
+      <Popover
+        open={open}
+        onOpenChange={(o) => {
+          setOpen(o);
+          if (!o) {
+            onBlur?.();
+          }
+        }}
+      >
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -397,11 +467,7 @@ export function ScheduleAutocomplete({
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent
-          className="w-[420px] p-0"
-          align="start"
-          sideOffset={4}
-        >
+        <PopoverContent className="w-[420px] p-0" align="start" sideOffset={4}>
           <Div className="flex flex-col">
             {/* ── Presets grid ── */}
             <Div className="p-3 border-b">
@@ -414,8 +480,7 @@ export function ScheduleAutocomplete({
                   return (
                     <Div key={group} className="flex flex-wrap gap-1.5">
                       {presets.map((preset) => {
-                        const isSelected =
-                          matchedPreset?.cron === preset.cron;
+                        const isSelected = matchedPreset?.cron === preset.cron;
                         return (
                           <Button
                             key={preset.key}
@@ -430,7 +495,9 @@ export function ScheduleAutocomplete({
                             onClick={() => handlePresetSelect(preset.cron)}
                           >
                             {t(
-                              `widget.schedulePicker.presets.${preset.key}` as Parameters<typeof t>[0],
+                              `widget.schedulePicker.presets.${preset.key}` as Parameters<
+                                typeof t
+                              >[0],
                             )}
                           </Button>
                         );
@@ -534,7 +601,15 @@ function CustomBuilder({
   const showWeekdays = state.unit === "weeks";
   const showInterval = state.unit !== "weeks";
 
-  const weekdayKeys = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+  const weekdayKeys = [
+    "mon",
+    "tue",
+    "wed",
+    "thu",
+    "fri",
+    "sat",
+    "sun",
+  ] as const;
 
   const description = useMemo(() => {
     if (!currentCron) {
@@ -581,15 +656,17 @@ function CustomBuilder({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {(["minutes", "hours", "days", "weeks", "months"] as FrequencyUnit[]).map(
-              (u) => (
-                <SelectItem key={u} value={u}>
-                  {t(
-                    `widget.schedulePicker.custom.unit.${u}` as Parameters<typeof t>[0],
-                  )}
-                </SelectItem>
-              ),
-            )}
+            {(
+              ["minutes", "hours", "days", "weeks", "months"] as FrequencyUnit[]
+            ).map((u) => (
+              <SelectItem key={u} value={u}>
+                {t(
+                  `widget.schedulePicker.custom.unit.${u}` as Parameters<
+                    typeof t
+                  >[0],
+                )}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </Div>
@@ -632,8 +709,7 @@ function CustomBuilder({
                   size="sm"
                   className={cn(
                     "h-7 w-9 p-0 text-xs font-normal",
-                    isOn &&
-                      "bg-primary text-primary-foreground border-primary",
+                    isOn && "bg-primary text-primary-foreground border-primary",
                   )}
                   onClick={() => {
                     const next = isOn
@@ -643,7 +719,9 @@ function CustomBuilder({
                   }}
                 >
                   {t(
-                    `widget.schedulePicker.custom.days.${key}` as Parameters<typeof t>[0],
+                    `widget.schedulePicker.custom.days.${key}` as Parameters<
+                      typeof t
+                    >[0],
                   )}
                 </Button>
               );
@@ -708,7 +786,8 @@ function AdvancedInput({
   const [rawInput, setRawInput] = useState(value);
 
   const isValid = useMemo(
-    () => rawInput.trim() !== "" && validateCronSchedule(rawInput.trim(), timezone),
+    () =>
+      rawInput.trim() !== "" && validateCronSchedule(rawInput.trim(), timezone),
     [rawInput, timezone],
   );
 
@@ -757,7 +836,9 @@ function AdvancedInput({
         placeholder={t("widget.schedulePicker.custom.advancedPlaceholder")}
         className={cn(
           "h-8 font-mono text-sm",
-          rawInput.trim() !== "" && !isValid && "border-destructive focus-visible:ring-destructive",
+          rawInput.trim() !== "" &&
+            !isValid &&
+            "border-destructive focus-visible:ring-destructive",
         )}
       />
 

@@ -98,7 +98,9 @@ const { GET } = createEndpoint({
       codingAgent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.enum(["claude-code", "open-code"]).nullable(),
+        schema: z
+          .enum(["claude-code", "open-code", "next-vibe-coder"])
+          .nullable(),
       }),
 
       // Dreaming pulse settings
@@ -353,8 +355,15 @@ const { POST } = createEndpoint({
             value: "open-code",
             label: "post.codingAgent.options.openCode" as const,
           },
+          {
+            value: "next-vibe-coder",
+            label: "post.codingAgent.options.nextVibeCoder" as const,
+          },
         ],
-        schema: z.enum(["claude-code", "open-code"]).nullable().optional(),
+        schema: z
+          .enum(["claude-code", "open-code", "next-vibe-coder"])
+          .nullable()
+          .optional(),
       }),
 
       // Dreaming pulse settings

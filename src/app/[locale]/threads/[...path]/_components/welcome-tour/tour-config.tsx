@@ -243,6 +243,14 @@ export const getTourSteps = (
               </Strong>{" "}
               - {t("components.welcomeTour.rootFolders.public.suffix")}
             </Li>
+            {isAuthenticated && (
+              <Li>
+                <Strong className="text-green-400">
+                  {t("components.welcomeTour.rootFolders.background.name")}
+                </Strong>{" "}
+                - {t("components.welcomeTour.rootFolders.background.suffix")}
+              </Li>
+            )}
           </Ul>
         </Div>
       ),
@@ -349,6 +357,35 @@ export const getTourSteps = (
       ),
       placement: TOUR_PLACEMENTS.RIGHT,
     },
+    // Background Folder - Only show if authenticated
+    ...(isAuthenticated
+      ? [
+          {
+            target: getTourSelector(TOUR_DATA_ATTRS.BACKGROUND_FOLDER),
+            content: (
+              <Div className="space-y-3">
+                <H3 className="text-lg font-semibold flex items-center gap-2">
+                  <Icon
+                    icon={DEFAULT_FOLDER_CONFIGS.cron.icon}
+                    className="h-5 w-5"
+                  />
+                  <Span className="text-green-400">
+                    {t("components.welcomeTour.backgroundFolder.name")}
+                  </Span>
+                  {t("components.welcomeTour.backgroundFolder.suffix")}
+                </H3>
+                <P className="text-sm">
+                  {t("components.welcomeTour.backgroundFolder.description")}
+                </P>
+                <P className="text-xs text-muted-foreground">
+                  {t("components.welcomeTour.backgroundFolder.note")}
+                </P>
+              </Div>
+            ),
+            placement: TOUR_PLACEMENTS.RIGHT,
+          },
+        ]
+      : []),
     {
       target: getTourSelector(TOUR_DATA_ATTRS.NEW_CHAT_BUTTON),
       content: (

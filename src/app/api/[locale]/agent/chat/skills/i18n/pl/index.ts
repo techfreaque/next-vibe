@@ -1140,11 +1140,11 @@ export const translations: typeof enTranslations = {
         3: "Zbadaj błąd i zaproponuj poprawkę",
       },
       variants: {
-        kimi: "Kimi",
-        claudeCodeOpus: "Claude Code Opus",
-        claudeCodeSonnet: "Claude Code Sonnet",
-        claudeSonnet: "Claude Sonnet",
-        claudeOpus: "Claude Opus",
+        budget: "Tanio i Mądrze",
+        open: "Otwarta Granica",
+        fast: "Ostry",
+        max: "Maksimum",
+        broad: "Szeroki",
       },
     },
     skillCreator: {

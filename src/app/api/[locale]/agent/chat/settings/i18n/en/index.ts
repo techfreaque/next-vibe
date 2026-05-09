@@ -111,6 +111,7 @@ export const translations = {
       options: {
         claudeCode: "Claude Code (default)",
         openCode: "OpenCode",
+        nextVibeCoder: "Next Vibe Coder",
       },
     },
     dreaming: {

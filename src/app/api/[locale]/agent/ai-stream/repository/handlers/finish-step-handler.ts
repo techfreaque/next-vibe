@@ -153,6 +153,11 @@ export class FinishStepHandler {
     ctx.currentAssistantMessageId = null;
     ctx.currentAssistantContent = "";
 
+    // Clear seen toolCallIds so next step can use any ID.
+    // The duplicate guard is per-step: within one step, duplicate IDs cause DB conflicts.
+    // Across steps, the same ID is valid (different tool call in a new step).
+    ctx.allSeenToolCallIds.clear();
+
     // NOTE: do NOT reset stepHasToolsAwaitingConfirmation here —
     // it persists across steps so sequential approve tool calls still abort correctly.
 

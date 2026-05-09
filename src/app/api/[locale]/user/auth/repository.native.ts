@@ -16,6 +16,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { AuthContext } from "@/app/api/[locale]/system/unified-interface/shared/server-only/auth/base-auth-handler";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import type { CompleteUserType } from "@/app/api/[locale]/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -83,14 +84,12 @@ export class AuthRepository {
 
   static async setAuthCookies(
     token: string,
-    rememberMe: boolean,
     logger: EndpointLogger,
     t: AuthT,
   ): Promise<ResponseType<void>> {
     try {
-      const expirationDays = rememberMe ? 30 : 7;
       const expiresAt = new Date(
-        Date.now() + expirationDays * 24 * 60 * 60 * 1000,
+        Date.now() + AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS * 1000,
       );
 
       await storage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
@@ -198,7 +197,7 @@ export class AuthRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     const { t } = scopedTranslation.scopedT(locale);
-    return await AuthRepository.setAuthCookies(token, true, logger, t);
+    return await AuthRepository.setAuthCookies(token, logger, t);
   }
 
   static async clearAuthTokenForPlatform(

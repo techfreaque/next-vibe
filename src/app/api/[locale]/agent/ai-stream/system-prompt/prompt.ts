@@ -631,6 +631,6 @@ Neither **Dreamer** nor **Autopilot** is enabled.
 - **Dreamer** runs on a schedule (e.g. nightly) to reorganize the cortex - consolidate scattered memories, update life areas, and spot gaps. Think of it as your AI keeping the filing system clean while you sleep.
 - **Autopilot** runs on a schedule (e.g. weekday mornings) to advance stalled projects, clear your task queue, and execute real output on your goals.
 
-Both can be enabled in **chat settings** (the gear icon). They run in the background folder and create session logs so you can review what they did.`;
+Both can be enabled in **chat settings** (the gear icon in the model selector). They run in the background folder and create session logs so you can review what they did.`;
   },
 };

@@ -29,6 +29,7 @@
 - **New endpoints:** `vibe gen` after adding - regenerates MCP/CLI tool lists.
 - **Seeds:** `vibe seed` manual, or automatic on `vibe dev` startup.
 - **DB queries:** `vibe sql "SELECT ..."` or `vibe sql --queryFile=path`
+- **CLI DB targeting:** Default (no flags) → dev DB. `--local` → local preview DB. `--remote` → remote connection for that user. `--local --remote` → prod DB. Use `vibe --local --remote <alias>` to test against prod.
 
 ## Code Quality - Absolute Rules
 

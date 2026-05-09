@@ -1,5 +1,4 @@
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
 
 import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/constants";
 import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
@@ -76,6 +75,7 @@ export const PROJECT_INSTRUCTIONS = `# Project Overview
 - **New endpoints:** \`vibe gen\` after adding - regenerates MCP/CLI tool lists.
 - **Seeds:** \`vibe seed\` manual, or automatic on \`vibe dev\` startup.
 - **DB queries:** \`vibe sql "SELECT ..."\` or \`vibe sql --queryFile=path\`
+- **CLI DB targeting:** Default (no flags) → dev DB. \`--local\` → local preview DB. \`--remote\` → remote connection for that user. \`--local --remote\` → prod DB. Use \`vibe --local --remote <alias>\` to test against prod.
 
 ## Code Quality - Absolute Rules
 
@@ -233,11 +233,11 @@ export const vibeCoderSkill: Skill = {
   ],
   variants: [
     {
-      id: "kimi",
-      variantName: "skills.vibeCoder.variants.kimi" as const,
+      id: "budget",
+      variantName: "skills.vibeCoder.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: DEFAULT_CHAT_MODEL_ID,
+        manualModelId: ChatModelId.KIMI_K2_6,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -258,18 +258,18 @@ export const vibeCoderSkill: Skill = {
       audioVisionModelSelection: AUDIO_VISION.cheap,
     },
     {
-      id: "claude-code-opus",
-      variantName: "skills.vibeCoder.variants.claudeCodeOpus" as const,
+      id: "open",
+      variantName: "skills.vibeCoder.variants.open" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_CODE_OPUS,
+        manualModelId: ChatModelId.DEEPSEEK_V4_PRO,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
         },
         contentRange: {
-          min: ContentLevel.MAINSTREAM,
-          max: ContentLevel.MAINSTREAM,
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
         },
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
@@ -282,32 +282,8 @@ export const vibeCoderSkill: Skill = {
       audioVisionModelSelection: AUDIO_VISION.cheap,
     },
     {
-      id: "claude-code-sonnet",
-      variantName: "skills.vibeCoder.variants.claudeCodeSonnet" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_CODE_SONNET,
-        intelligenceRange: {
-          min: IntelligenceLevel.SMART,
-          max: IntelligenceLevel.SMART,
-        },
-        contentRange: {
-          min: ContentLevel.MAINSTREAM,
-          max: ContentLevel.MAINSTREAM,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
-      imageGenModelSelection: IMAGE_GEN.mainstreamCheap,
-      musicGenModelSelection: MUSIC_GEN.mainstreamCheap,
-      videoGenModelSelection: VIDEO_GEN.cheap,
-      voiceModelSelection: VOICE.maleDeep,
-      sttModelSelection: STT.cheap,
-      audioVisionModelSelection: AUDIO_VISION.cheap,
-    },
-    {
-      id: "claude-sonnet",
-      variantName: "skills.vibeCoder.variants.claudeSonnet" as const,
+      id: "fast",
+      variantName: "skills.vibeCoder.variants.fast" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
@@ -330,11 +306,35 @@ export const vibeCoderSkill: Skill = {
       audioVisionModelSelection: AUDIO_VISION.cheap,
     },
     {
-      id: "claude-opus",
-      variantName: "skills.vibeCoder.variants.claudeOpus" as const,
+      id: "max",
+      variantName: "skills.vibeCoder.variants.max" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_OPUS_4_7,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      imageGenModelSelection: IMAGE_GEN.mainstreamCheap,
+      musicGenModelSelection: MUSIC_GEN.mainstreamCheap,
+      videoGenModelSelection: VIDEO_GEN.cheap,
+      voiceModelSelection: VOICE.maleDeep,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+    {
+      id: "broad",
+      variantName: "skills.vibeCoder.variants.broad" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.GPT_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

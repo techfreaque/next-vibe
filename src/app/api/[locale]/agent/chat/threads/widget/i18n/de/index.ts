@@ -138,6 +138,10 @@ export const translations: typeof enTranslations = {
           name: "Öffentlich",
           suffix: "— für alle sichtbar",
         },
+        background: {
+          name: "Hintergrund",
+          suffix: "— KI-Agenten arbeiten für dich",
+        },
       },
       privateFolder: {
         name: "Privat",
@@ -164,6 +168,13 @@ export const translations: typeof enTranslations = {
         description:
           "Teilen Sie Ihre KI-Gespräche mit der Welt. Andere können Ihre Threads ansehen und forken.",
         note: "Alles im öffentlichen Bereich ist für alle Benutzer und Suchmaschinen sichtbar.",
+      },
+      backgroundFolder: {
+        name: "Hintergrund",
+        suffix: "Ordner",
+        description:
+          "Hier arbeiten deine KI-Agenten, während du weg bist. Dreamer und Autopilot erledigen geplante Aufgaben und legen die Ergebnisse hier ab. Jeder Thread gehört nur dir.",
+        note: "Nur du siehst deine Hintergrund-Threads. Agenten erstellen sie automatisch.",
       },
       newChatButton: {
         title: "Einen neuen Chat starten",

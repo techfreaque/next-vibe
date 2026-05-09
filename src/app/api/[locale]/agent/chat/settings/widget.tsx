@@ -1304,6 +1304,9 @@ export function ChatSettingsWidget({
                 <SelectItem value="open-code">
                   {t("post.codingAgent.options.openCode")}
                 </SelectItem>
+                <SelectItem value="next-vibe-coder">
+                  {t("post.codingAgent.options.nextVibeCoder")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </SettingsRow>

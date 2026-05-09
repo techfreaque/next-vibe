@@ -87,6 +87,11 @@ export const translations = {
             title: "Not Found",
             description: "Resource or working directory not found",
           },
+          vibeCoderRedirect: {
+            title: "Use ai-run with vibe-coder instead",
+            description:
+              "Coding agent is set to vibe-coder. Use the ai-run tool with the vibe-coder skill.",
+          },
           network: {
             title: "Network Error",
             description: "Network error communicating with coding agent",
