@@ -23,6 +23,19 @@ export const COMPACT_TRIGGER = 32_000;
 export const COMPACT_TRIGGER_PERCENTAGE = 0.6;
 
 /**
+ * Error type strings written to chatMessages.errorType for stream-generated error messages.
+ * Used server-side (emitErrorMessage) and client-side (ErrorMessageBubble) to determine rendering.
+ */
+export enum StreamErrorType {
+  /** Unhandled/unexpected stream failure - shown as a bug-reportable error */
+  STREAM_ERROR = "STREAM_ERROR",
+  /** Stream timed out waiting for a response */
+  TIMEOUT_ERROR = "TIMEOUT_ERROR",
+  /** User explicitly cancelled the generation - shown as a neutral "stopped" indicator */
+  STREAM_INTERRUPTED = "STREAM_INTERRUPTED",
+}
+
+/**
  * Stream abort reasons - typed enum for control flow.
  * Used as the `reason` property on StreamAbortError.
  */

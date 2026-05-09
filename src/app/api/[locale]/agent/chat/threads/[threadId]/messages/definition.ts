@@ -111,11 +111,16 @@ const { GET } = createEndpoint({
           const { useChatInputStore } =
             await import("@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store");
           useChatInputStore.getState().reset();
-        } else {
+        } else if (
+          arrived.role === ChatMessageRole.ASSISTANT ||
+          arrived.role === ChatMessageRole.TOOL
+        ) {
           // Real assistant/tool message arrived - remove optimistic placeholder(s)
           // with matching parentId. Done SYNCHRONOUSLY via queryClient to avoid
           // a render frame showing a spurious branch (the async dynamic import
           // previously caused a timing gap where both optimistic + real coexisted).
+          // Error role messages are excluded - they are not replacements for
+          // optimistic placeholders and must not remove them.
           const newParentId = arrived.parentId;
           if (newParentId) {
             const { removeOptimisticByParentId } =

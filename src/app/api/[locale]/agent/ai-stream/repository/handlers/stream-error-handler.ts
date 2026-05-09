@@ -12,6 +12,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { AiStreamT, AiStreamTranslationKey } from "../../stream/i18n";
+import { StreamErrorType } from "../core/constants";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class StreamErrorHandler {
@@ -113,7 +114,7 @@ export class StreamErrorHandler {
     // Emit MESSAGE_CREATED SSE + save to DB + emit ERROR SSE
     await dbWriter.emitErrorMessage({
       threadId,
-      errorType: "STREAM_ERROR",
+      errorType: StreamErrorType.STREAM_ERROR,
       error: structuredError,
       parentId: lastParentId,
       sequenceId: lastSequenceId,

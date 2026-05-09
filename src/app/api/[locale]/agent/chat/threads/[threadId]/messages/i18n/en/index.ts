@@ -23,6 +23,10 @@ export const translations = {
     hideAnalysis: "Hide analysis",
   },
   errorCode: "Error Code",
+  streamInterrupted: {
+    label: "Generation stopped",
+    hint: "Partial response saved. Send a new message to continue.",
+  },
   errorFeedback: {
     autoReported: "Error reported automatically",
     helpFix: "Help us fix this",

@@ -41,6 +41,7 @@ import type {
   AiStreamPostResponseOutput,
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
+import { StreamErrorType } from "./core/constants";
 import {
   clearStreamingState,
   setStreamingStateWaiting,
@@ -1332,7 +1333,7 @@ export class AiStreamRepository {
               messageId: errorMessageId,
               threadId: errorThreadId,
               content: errorContent,
-              errorType: "STREAM_ERROR",
+              errorType: StreamErrorType.STREAM_ERROR,
               parentId: errorParentId,
               user,
               sequenceId: null,
@@ -1363,7 +1364,7 @@ export class AiStreamRepository {
                 updatedAt: new Date(),
                 authorId: userId ?? null,
                 authorName: null,
-                errorType: "STREAM_ERROR",
+                errorType: StreamErrorType.STREAM_ERROR,
                 errorCode: null,
                 errorMessage: null,
                 upvotes: 0,

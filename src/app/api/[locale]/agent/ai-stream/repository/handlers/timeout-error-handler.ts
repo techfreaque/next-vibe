@@ -14,6 +14,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { AiStreamT } from "../../stream/i18n";
+import { StreamErrorType } from "../core/constants";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class TimeoutErrorHandler {
@@ -60,7 +61,7 @@ export class TimeoutErrorHandler {
     // Emit MESSAGE_CREATED SSE + save to DB + emit ERROR SSE
     await dbWriter.emitErrorMessage({
       threadId,
-      errorType: "TIMEOUT_ERROR",
+      errorType: StreamErrorType.TIMEOUT_ERROR,
       error: timeoutError,
       parentId: lastParentId,
       sequenceId: lastSequenceId,

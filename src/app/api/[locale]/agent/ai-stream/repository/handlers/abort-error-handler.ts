@@ -26,6 +26,7 @@ import type { AiStreamT } from "../../stream/i18n";
 import {
   AbortReason,
   isStreamAbort,
+  StreamErrorType,
   type StreamAbortError,
 } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
@@ -399,9 +400,16 @@ export class AbortErrorHandler {
         // Skipped for CLIENT_DISCONNECTED - nobody is there to see it, and it would
         // create orphan branches if a confirm/wakeUp stream already updated the thread.
         if (!isNoErrorStop) {
+          // USER_CANCELLED: STREAM_INTERRUPTED so the UI renders a distinct
+          // "stopped" indicator instead of a generic error bubble with report UI.
+          // All other abort reasons that reach this point use STREAM_ERROR.
+          const emitErrorType =
+            streamAbort?.reason === AbortReason.USER_CANCELLED
+              ? StreamErrorType.STREAM_INTERRUPTED
+              : StreamErrorType.STREAM_ERROR;
           await ctx.dbWriter.emitErrorMessage({
             threadId,
-            errorType: "STREAM_ERROR",
+            errorType: emitErrorType,
             error: fail({
               message: t("info.streamInterrupted"),
               errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -416,6 +424,7 @@ export class AbortErrorHandler {
             isIncognito,
             hasPartialContent: !!ctx.currentAssistantMessageId,
             pendingToolsCount: ctx.pendingToolMessages.size,
+            reason: streamAbort?.reason ?? error.name,
           });
         }
       } catch (saveError) {

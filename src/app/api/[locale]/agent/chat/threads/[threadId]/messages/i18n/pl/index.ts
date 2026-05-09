@@ -25,6 +25,10 @@ export const translations: typeof enTranslations = {
     hideAnalysis: "Ukryj analizę",
   },
   errorCode: "Kod błędu",
+  streamInterrupted: {
+    label: "Generowanie zatrzymane",
+    hint: "Częściowa odpowiedź zapisana. Wyślij nową wiadomość, aby kontynuować.",
+  },
   errorFeedback: {
     autoReported: "Błąd zgłoszony automatycznie",
     helpFix: "Pomóż nam to naprawić",

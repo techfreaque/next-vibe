@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, StopCircle } from "lucide-react";
 import { Div } from "next-vibe-ui/ui/div";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Span } from "next-vibe-ui/ui/span";
@@ -23,6 +23,7 @@ import {
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { useTranslation } from "@/i18n/core/client";
 
+import { StreamErrorType } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
@@ -59,6 +60,64 @@ export function ErrorMessageBubble({
     useState<CreateApiEndpointAny | null>(null);
   const [contactPrefill, setContactPrefill] =
     useState<Partial<ContactRequest> | null>(null);
+
+  // User-cancelled streams get a compact "stopped" indicator, not an error bubble
+  if (message.errorType === StreamErrorType.STREAM_INTERRUPTED) {
+    return (
+      <Div className={cn("flex items-start gap-3", group)}>
+        <Div className="max-w-full">
+          <Div
+            className={cn(
+              "rounded-2xl px-4 py-2.5 border",
+              "bg-muted/40 border-border/40",
+            )}
+          >
+            <Div className="flex items-center gap-2">
+              <StopCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <Div className="flex-1">
+                <Span className="text-sm font-medium text-muted-foreground">
+                  {ts("streamInterrupted.label")}
+                </Span>
+                <Span className="text-xs text-muted-foreground/70 ml-2">
+                  {ts("streamInterrupted.hint")}
+                </Span>
+              </Div>
+            </Div>
+          </Div>
+          <Div
+            className={cn(
+              "flex items-center gap-1 mt-1",
+              "transition-opacity duration-150",
+              isTouch
+                ? "opacity-70 active:opacity-100"
+                : `opacity-0 ${groupHover} focus-within:opacity-100`,
+            )}
+          >
+            <MessageActionButton
+              icon={Trash2}
+              onClick={(): void => {
+                void (async (): Promise<void> => {
+                  const messageIdDefs =
+                    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+                  navigate(messageIdDefs.default.DELETE, {
+                    urlPathParams: {
+                      threadId: message.threadId,
+                      messageId: message.id,
+                    },
+                    data: { rootFolderId },
+                    renderInModal: true,
+                    popNavigationOnSuccess: 1,
+                  });
+                })();
+              }}
+              title={ts("widget.common.userMessageActions.deleteMessage")}
+              variant="destructive"
+            />
+          </Div>
+        </Div>
+      </Div>
+    );
+  }
 
   let errorData: ErrorResponseType | null = null;
   let displayContent: string;
