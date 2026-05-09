@@ -1,5 +1,4 @@
 import type { Skill } from "../../config";
-import { tool } from "../../config";
 import { SkillCategory, SkillOwnershipType } from "../../enum";
 import { THEA_CORE_PROMPT } from "../thea/core";
 import { THEA_VARIANTS } from "../thea/skill";
@@ -112,23 +111,4 @@ You are Thea's understanding made manifest. You see what the user lived today, a
   ],
 
   variants: THEA_VARIANTS,
-
-  // Full cortex access - this is the whole point
-  availableTools: [
-    tool("agent.cortex.read"),
-    tool("agent.cortex.write"),
-    tool("agent.cortex.edit"),
-    tool("agent.cortex.delete"),
-    tool("agent.cortex.move"),
-    tool("agent.cortex.mkdir"),
-    tool("agent.cortex.tree"),
-    tool("agent.cortex.list"),
-    tool("agent.cortex.search"),
-    tool("agent.cortex.embeddings.backfill"),
-  ],
-  pinnedTools: [
-    tool("agent.cortex.tree"),
-    tool("agent.cortex.write"),
-    tool("agent.cortex.edit"),
-  ],
 };

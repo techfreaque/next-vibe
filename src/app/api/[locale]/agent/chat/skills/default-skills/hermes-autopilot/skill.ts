@@ -1,6 +1,5 @@
 import type { Skill } from "../../config";
 import { SkillCategory, SkillOwnershipType } from "../../enum";
-import { tool } from "../../config";
 import { HERMES_CORE_PROMPT } from "../hermes/core";
 import { HERMES_VARIANTS } from "../hermes/skill";
 
@@ -97,23 +96,4 @@ You are Hermes's strategic intelligence made manifest. Every session, the user's
   ],
 
   variants: HERMES_VARIANTS,
-
-  // Full cortex access + web search for research tasks
-  availableTools: [
-    tool("agent.cortex.read"),
-    tool("agent.cortex.write"),
-    tool("agent.cortex.edit"),
-    tool("agent.cortex.delete"),
-    tool("agent.cortex.move"),
-    tool("agent.cortex.mkdir"),
-    tool("agent.cortex.tree"),
-    tool("agent.cortex.list"),
-    tool("agent.cortex.search"),
-    tool("agent.search.web-search"),
-  ],
-  pinnedTools: [
-    tool("agent.cortex.tree"),
-    tool("agent.cortex.write"),
-    tool("agent.cortex.edit"),
-  ],
 };

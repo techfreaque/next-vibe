@@ -213,6 +213,7 @@ export class GitService {
     const signCommit = config?.signCommit ?? false;
 
     // Stage all changes (package.json version bump, etc.)
+    // May be a no-op for packages in gitignored dirs (e.g. .dist/checker) - that's OK.
     if (dryRun) {
       logger.info(MESSAGES.DRY_RUN_MODE, { action: "git add ." });
     } else {
@@ -220,16 +221,14 @@ export class GitService {
         execSync("git add .", { cwd, encoding: "utf8" });
         logger.debug("git add successful", { cwd });
       } catch (err) {
+        // Nothing to stage (e.g. package lives in a gitignored dir) - continue
         const error = err as { stderr?: Buffer | string; message?: string };
         const stderr = error.stderr
           ? error.stderr.toString()
           : error.message || String(err);
-        logger.error("git add failed", { stderr, cwd });
-        const { t } = scopedTranslation.scopedT(locale);
-        return fail({
-          message: t("errors.gitOperationFailed"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: stderr },
+        logger.debug("git add had nothing to stage (continuing)", {
+          stderr,
+          cwd,
         });
       }
     }
