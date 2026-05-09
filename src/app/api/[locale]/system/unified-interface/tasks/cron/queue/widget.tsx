@@ -52,6 +52,10 @@ import React, {
 } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {
   useWidgetContext,
@@ -286,6 +290,8 @@ function QueueRow({
   t,
   tTasks,
   isTouch,
+  locale,
+  logger,
 }: {
   task: Task;
   position: number;
@@ -297,6 +303,8 @@ function QueueRow({
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
   tTasks: ReturnType<typeof tasksScopedTranslation.scopedT>["t"];
   isTouch: boolean;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
 }): React.JSX.Element {
   const nextRunText = formatDate(task.nextExecutionAt);
   const lastRunText = formatDate(task.lastExecutedAt);
@@ -390,8 +398,13 @@ function QueueRow({
           )}
         </Div>
 
-        <Span className="text-xs font-mono text-muted-foreground">
-          {task.schedule}
+        <Span className="text-xs text-muted-foreground">
+          {formatCronScheduleShort(
+            task.schedule,
+            getDefaultTimezone(locale),
+            locale,
+            logger,
+          )}
         </Span>
 
         {/* Stats */}
@@ -1143,6 +1156,8 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
               t={t}
               tTasks={tTasks}
               isTouch={isTouch}
+              locale={locale}
+              logger={logger}
             />
           ))}
         </Div>

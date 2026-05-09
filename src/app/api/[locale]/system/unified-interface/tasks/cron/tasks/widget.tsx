@@ -47,6 +47,10 @@ import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {
   useWidgetContext,
@@ -225,6 +229,8 @@ function TaskRow({
   t,
   tTasks,
   isTouch,
+  locale,
+  logger,
 }: {
   task: Task;
   selected: boolean;
@@ -237,6 +243,8 @@ function TaskRow({
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
   tTasks: ReturnType<typeof tasksScopedTranslation.scopedT>["t"];
   isTouch: boolean;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
 }): React.JSX.Element {
   const rate = successRate(task);
   const lastRunText = formatDate(task.lastExecutedAt);
@@ -320,8 +328,13 @@ function TaskRow({
           </Span>
         )}
 
-        <Span className="text-xs font-mono text-muted-foreground">
-          {task.schedule}
+        <Span className="text-xs text-muted-foreground">
+          {formatCronScheduleShort(
+            task.schedule,
+            getDefaultTimezone(locale),
+            locale,
+            logger,
+          )}
         </Span>
 
         {/* Stats row (hidden on small screens) */}
@@ -1417,6 +1430,8 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
               t={t}
               tTasks={tTasks}
               isTouch={isTouch}
+              locale={locale}
+              logger={logger}
             />
           ))}
         </Div>

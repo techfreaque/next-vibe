@@ -22,11 +22,17 @@ import React, { useMemo } from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
+  useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";
 
@@ -233,10 +239,14 @@ function CronHealthSection({
   data,
   t,
   onRun,
+  locale,
+  logger,
 }: {
   data: GetResponseOutput;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
   onRun: (taskId: string) => void;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
 }): React.JSX.Element {
   const tasks: CampaignTask[] = data.campaignTasks ?? [];
   const alerts: TaskAlert[] = data.alerts ?? [];
@@ -361,7 +371,7 @@ function CronHealthSection({
                   </Button>
                 </Div>
                 <Div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <Span className="font-mono">{task.schedule}</Span>
+                  <Span>{formatCronScheduleShort(task.schedule, getDefaultTimezone(locale), locale, logger)}</Span>
                   {successRate !== null && (
                     <Span
                       className={cn(
@@ -436,6 +446,8 @@ export function CampaignStatsWidget(): React.JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
   const data = useWidgetValue<typeof definition.GET>();
+  const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
 
   const handleRun = React.useCallback(
     (taskId: string): void => {
@@ -750,7 +762,7 @@ export function CampaignStatsWidget(): React.JSX.Element {
           <Span className="text-sm font-semibold">
             {t("widget.cronHealth.title")}
           </Span>
-          <CronHealthSection data={data} t={t} onRun={handleRun} />
+          <CronHealthSection data={data} t={t} onRun={handleRun} locale={locale} logger={logger} />
         </Div>
       )}
 

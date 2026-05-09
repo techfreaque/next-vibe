@@ -33,6 +33,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetResponse,
@@ -47,6 +48,9 @@ import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+
+import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 
 import { CronTaskPriority, CronTaskStatus } from "../../../enum";
 import type endpoints from "../definition";
@@ -550,6 +554,8 @@ export function CronTaskDetailContainer({
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const { push: navigate } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
+  const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
   const children = field.children;
 
   const isLoading = endpointMutations?.read?.isLoading;
@@ -811,17 +817,13 @@ export function CronTaskDetailContainer({
               <Badge label={t(task.priority)} className={priorityColorClass} />
             </InfoRow>
             <InfoRow label={t("widget.schedule")}>
-              <Div
-                style={{
-                  fontFamily: "monospace",
-                  fontSize: "0.85rem",
-                  background: "var(--muted)",
-                  borderRadius: "4px",
-                  padding: "1px 6px",
-                  display: "inline-block",
-                }}
-              >
-                {task.schedule}
+              <Div className="text-sm">
+                {formatCronScheduleShort(
+                  task.schedule,
+                  task.timezone ?? getDefaultTimezone(locale),
+                  locale,
+                  logger,
+                )}
               </Div>
             </InfoRow>
             {task.timezone && (

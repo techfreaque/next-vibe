@@ -75,6 +75,7 @@ import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favor
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 
 import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
 import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
@@ -97,6 +98,8 @@ import {
   AUTOPILOT_DEFAULT_SCHEDULE,
   DREAM_DEFAULT_SCHEDULE,
   MAMA_DEFAULT_SCHEDULE,
+  generateRandomDreamerSchedule,
+  generateRandomAutopilotSchedule,
 } from "./pulse/constants";
 
 const MIN_VALUE = 1_000;
@@ -1160,8 +1163,13 @@ export function ChatSettingsWidget({
     async (val: boolean): Promise<void> => {
       if (val) {
         const favId = await ensureBackgroundFavorite("thea-dreamer");
+        // Generate a random schedule on first enable to spread server load
+        const schedule =
+          settings?.dreamerSchedule ??
+          generateRandomDreamerSchedule(getDefaultTimezone(locale));
         await updateSettings({
           dreamerEnabled: true,
+          dreamerSchedule: schedule,
           ...(favId && !settings?.dreamerFavoriteId
             ? { dreamerFavoriteId: favId }
             : {}),
@@ -1174,7 +1182,9 @@ export function ChatSettingsWidget({
       ensureBackgroundFavorite,
       updateSettings,
       settings?.dreamerFavoriteId,
+      settings?.dreamerSchedule,
       handleUpdate,
+      locale,
     ],
   );
 
@@ -1182,8 +1192,13 @@ export function ChatSettingsWidget({
     async (val: boolean): Promise<void> => {
       if (val) {
         const favId = await ensureBackgroundFavorite("hermes-autopilot");
+        // Generate a random schedule on first enable to spread server load
+        const schedule =
+          settings?.autopilotSchedule ??
+          generateRandomAutopilotSchedule(getDefaultTimezone(locale));
         await updateSettings({
           autopilotEnabled: true,
+          autopilotSchedule: schedule,
           ...(favId && !settings?.autopilotFavoriteId
             ? { autopilotFavoriteId: favId }
             : {}),
@@ -1196,7 +1211,9 @@ export function ChatSettingsWidget({
       ensureBackgroundFavorite,
       updateSettings,
       settings?.autopilotFavoriteId,
+      settings?.autopilotSchedule,
       handleUpdate,
+      locale,
     ],
   );
 
