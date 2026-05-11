@@ -337,7 +337,6 @@ export class AiStreamRepository {
           const errorType = setupResult.errorType
             ? `${setupResult.errorType.errorCode}`
             : "SETUP_ERROR";
-
           // Persist error message to DB only for non-incognito threads (incognito has no DB row).
           // Skip silently if the thread doesn't exist yet (new thread where setup failed before any DB write).
           if (!isIncognito) {

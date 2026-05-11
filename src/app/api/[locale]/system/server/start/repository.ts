@@ -9,6 +9,12 @@
 
 import type { ChildProcess } from "node:child_process";
 import { execSync, spawn } from "node:child_process";
+import {
+  appendFileSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 
 import {
   ErrorResponseTypes,
@@ -51,6 +57,7 @@ import {
   killPreviousInstance,
   removePidFromFile,
   VIBE_START_PID_FILE,
+  VIBE_SUPERVISOR_PID_FILE,
   writePidFile,
 } from "../pid";
 import type {
@@ -66,6 +73,15 @@ import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
 /** Restart backoff delays in ms (doubles each attempt, capped at 30s) */
 const NEXT_RESTART_DELAYS = [2000, 4000, 8000, 16000, 30000];
 
+/** Health snapshot file written every 60s so the supervisor can read pre-crash memory on OOM */
+const HEALTH_SNAPSHOT_FILE = ".tmp/.vibe-health.json";
+
+/** Supervisor restart backoff: 2s → 5s → 10s → 30s (stays at 30s) */
+const SUPERVISOR_RESTART_DELAYS_MS = [2000, 5000, 10000, 30000];
+
+/** Task runner restart backoff: 5s → 10s → 30s → 60s (stays at 60s) */
+const TASK_RESTART_DELAYS_MS = [5000, 10000, 30000, 60000];
+
 export class ServerStartRepository {
   private static taskRunnerStarted = false;
   private static nextServerProcess: ChildProcess | null = null;
@@ -76,6 +92,12 @@ export class ServerStartRepository {
   /** Set to true during SIGUSR1-triggered restart to suppress the exit→restart handler */
   private static nextServerRestarting = false;
   private static nextRestartCount = 0;
+  private static taskRunnerRestartCount = 0;
+  /** The supervised child process (only set in supervisor mode) */
+  private static supervisedChild: ChildProcess | null = null;
+  /** Handle for the health-snapshot interval (only set in the child/server process) */
+  private static healthSnapshotInterval: ReturnType<typeof setInterval> | null =
+    null;
 
   /** Extract port number from a URL string, returns undefined if not parseable */
   private static portFromUrl(url: string | undefined): number | undefined {
@@ -144,6 +166,186 @@ export class ServerStartRepository {
   private static log(msg: string): void {
     // eslint-disable-next-line no-console
     console.log(msg);
+  }
+
+  /**
+   * Supervisor mode: spawn this process as a supervised child and restart it on any crash.
+   * OOM kills (SIGKILL) are detected; the last known memory from the health snapshot file
+   * is logged so there is always a record even when the child can't log itself.
+   *
+   * Called when VIBE_SUPERVISED is not set. The child inherits VIBE_SUPERVISED=1 and
+   * skips this path, proceeding with normal server startup.
+   */
+  private static async runSupervisor(logger: EndpointLogger): Promise<never> {
+    // Kill any existing supervisor, then register our own PID.
+    killPreviousInstance(VIBE_SUPERVISOR_PID_FILE, logger);
+    writePidFile(VIBE_SUPERVISOR_PID_FILE, logger);
+
+    // Remove supervisor PID file on any exit (best-effort - SIGKILL won't trigger this).
+    process.on("exit", () => {
+      cleanupPidFile(VIBE_SUPERVISOR_PID_FILE);
+    });
+
+    let supervisorShuttingDown = false;
+    let restartCount = 0;
+
+    const spawnChild = (): ChildProcess => {
+      const child = spawn(process.execPath, process.argv.slice(1), {
+        // inherit: child stdout/stderr flow directly to terminal/log files
+        stdio: "inherit",
+        env: { ...process.env, VIBE_SUPERVISED: "1" },
+      });
+
+      logger.debug(
+        `[Supervisor] Child started (PID ${String(child.pid)}, restart #${restartCount})`,
+      );
+
+      child.on("exit", (code, signal) => {
+        ServerStartRepository.supervisedChild = null;
+
+        if (supervisorShuttingDown) {
+          // Intentional shutdown - exit the supervisor with the same code
+          process.exit(code ?? 0);
+          return;
+        }
+
+        // Read last health snapshot - provides pre-crash memory even on SIGKILL.
+        // Stored as a raw string to stay within LoggerMetadata bounds.
+        let lastHealth: string | undefined;
+        try {
+          lastHealth = readFileSync(HEALTH_SNAPSHOT_FILE, "utf-8");
+        } catch {
+          // No snapshot yet (crashed before first write)
+        }
+
+        const likelyOom = signal === "SIGKILL";
+        const crashInfo = {
+          timestamp: new Date().toISOString(),
+          code,
+          signal,
+          restartCount,
+          likelyOom,
+          lastHealth,
+        };
+
+        const crashMessage = likelyOom
+          ? "[Supervisor] Server OOM-killed (SIGKILL) - will restart"
+          : signal !== null
+            ? `[Supervisor] Server killed by signal ${signal} - will restart`
+            : `[Supervisor] Server crashed (exit code ${String(code)}) - will restart`;
+
+        logger.error(crashMessage, crashInfo);
+
+        // Persist crash record to log file so it survives supervisor restarts
+        try {
+          mkdirSync(".tmp", { recursive: true });
+          appendFileSync(
+            ".tmp/vibe-start.log",
+            `${JSON.stringify({ type: "supervisor_crash", ...crashInfo })}\n`,
+          );
+        } catch {
+          // Ignore fs errors
+        }
+
+        const delay =
+          SUPERVISOR_RESTART_DELAYS_MS[
+            Math.min(restartCount, SUPERVISOR_RESTART_DELAYS_MS.length - 1)
+          ] ?? 30000;
+        restartCount++;
+
+        logger.warn(
+          `[Supervisor] Restart #${restartCount} scheduled in ${Math.round(delay / 1000)}s`,
+        );
+
+        setTimeout(() => {
+          if (supervisorShuttingDown) {
+            return;
+          }
+          ServerStartRepository.supervisedChild = spawnChild();
+        }, delay);
+      });
+
+      return child;
+    };
+
+    ServerStartRepository.supervisedChild = spawnChild();
+
+    // SIGINT arrives at the whole process group (child gets it too) - just set the flag.
+    process.on("SIGINT", () => {
+      supervisorShuttingDown = true;
+      // Child handles its own graceful shutdown; supervisor exits when child exits.
+    });
+
+    // SIGTERM is sent to a specific PID - forward it to the child.
+    process.on("SIGTERM", () => {
+      supervisorShuttingDown = true;
+      if (
+        ServerStartRepository.supervisedChild &&
+        !ServerStartRepository.supervisedChild.killed
+      ) {
+        ServerStartRepository.supervisedChild.kill("SIGTERM");
+      }
+    });
+
+    // SIGUSR1 (vibe rebuild) - forward directly; child handles the hot-restart.
+    process.on("SIGUSR1", () => {
+      if (
+        ServerStartRepository.supervisedChild &&
+        !ServerStartRepository.supervisedChild.killed
+      ) {
+        ServerStartRepository.supervisedChild.kill("SIGUSR1");
+      }
+    });
+
+    return new Promise<never>(() => {
+      /* Supervisor runs forever - exits only via signal handlers above */
+    });
+  }
+
+  /**
+   * Write a memory snapshot to HEALTH_SNAPSHOT_FILE every 60 seconds.
+   * The supervisor reads this on crash to report pre-OOM memory even when
+   * the child process was SIGKILL-ed and could not log itself.
+   * The interval is unref'd so it never prevents a clean process exit.
+   */
+  private static startHealthSnapshot(): void {
+    if (ServerStartRepository.healthSnapshotInterval !== null) {
+      return;
+    }
+
+    const writeSnapshot = (): void => {
+      try {
+        const mem = process.memoryUsage();
+        mkdirSync(".tmp", { recursive: true });
+        writeFileSync(
+          HEALTH_SNAPSHOT_FILE,
+          JSON.stringify({
+            heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
+            rssMb: Math.round(mem.rss / 1024 / 1024),
+            heapTotalMb: Math.round(mem.heapTotal / 1024 / 1024),
+            timestamp: new Date().toISOString(),
+            uptime: Math.floor(process.uptime()),
+            nextRestartCount: ServerStartRepository.nextRestartCount,
+            taskRunnerRestartCount:
+              ServerStartRepository.taskRunnerRestartCount,
+            taskRunnerRunning: ServerStartRepository.taskRunnerStarted,
+          }),
+          "utf-8",
+        );
+      } catch {
+        // Ignore fs errors (read-only fs, etc.)
+      }
+    };
+
+    // Store handle only to guard against double-initialization.
+    // No unref() needed: all shutdown paths call process.exit() explicitly.
+    ServerStartRepository.healthSnapshotInterval = setInterval(
+      writeSnapshot,
+      60_000,
+    );
+
+    // Write immediately so there is data even if the process crashes before 60s
+    writeSnapshot();
   }
 
   private static logStartupInfo(
@@ -290,18 +492,48 @@ export class ServerStartRepository {
 
       UnifiedTaskRunnerRepository.environment = "production";
 
-      // manageRunner("start") blocks forever - must NOT await
-      void UnifiedTaskRunnerRepository.manageRunner(
-        { action: "start", taskFilter: "cron", dryRun: false },
-        user,
-        locale,
-        logger,
-        skipTanstack,
-      ).catch((catchError) => {
-        logger.error("Task runner exited unexpectedly", {
-          error: parseError(catchError).message,
+      // Closure so the restart loop can call itself recursively with backoff.
+      const runRunner = (): void => {
+        void UnifiedTaskRunnerRepository.manageRunner(
+          { action: "start", taskFilter: "cron", dryRun: false },
+          user,
+          locale,
+          logger,
+          skipTanstack,
+        ).catch((catchError) => {
+          if (ServerStartRepository.nextServerShuttingDown) {
+            return; // Intentional shutdown - do not restart
+          }
+
+          ServerStartRepository.taskRunnerStarted = false;
+
+          const delay =
+            TASK_RESTART_DELAYS_MS[
+              Math.min(
+                ServerStartRepository.taskRunnerRestartCount,
+                TASK_RESTART_DELAYS_MS.length - 1,
+              )
+            ] ?? 60000;
+          ServerStartRepository.taskRunnerRestartCount++;
+
+          logger.error(
+            `[TaskRunner] Exited unexpectedly - restart #${ServerStartRepository.taskRunnerRestartCount} in ${Math.round(delay / 1000)}s`,
+            { error: parseError(catchError).message },
+          );
+
+          setTimeout(() => {
+            if (ServerStartRepository.nextServerShuttingDown) {
+              return;
+            }
+            logger.info(
+              `[TaskRunner] Restarting (attempt #${ServerStartRepository.taskRunnerRestartCount})...`,
+            );
+            runRunner();
+          }, delay);
         });
-      });
+      };
+
+      runRunner();
 
       // Poll until running or timeout
       const pollStart = Date.now();
@@ -341,6 +573,13 @@ export class ServerStartRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ServerStartResponseOutput>> {
+    // Enter supervisor mode unless we are already the supervised child.
+    // The supervisor is a thin wrapper that restarts this process on any crash,
+    // including OOM kills (SIGKILL) where the process itself cannot log anything.
+    if (!process.env["VIBE_SUPERVISED"]) {
+      return ServerStartRepository.runSupervisor(logger);
+    }
+
     const { t } = serverStartScopedTranslation.scopedT(locale);
 
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
@@ -926,6 +1165,7 @@ export class ServerStartRepository {
           };
 
           const isCleanExit = code === 0 || signal === "SIGTERM";
+          const likelyOom = signal === "SIGKILL";
           if (isCleanExit) {
             // clean exit without shuttingDown flag = unexpected (e.g. Next.js self-exited 0)
             logger.warn(
@@ -934,10 +1174,12 @@ export class ServerStartRepository {
             );
           } else {
             logger.error(
-              signal
-                ? `Next.js killed by signal ${signal} - restarting`
-                : `Next.js exited with code ${String(code)} - restarting`,
-              diag,
+              likelyOom
+                ? "Next.js killed by SIGKILL (likely OOM) - restarting"
+                : signal !== null
+                  ? `Next.js killed by signal ${signal} - restarting`
+                  : `Next.js exited with code ${String(code)} - restarting`,
+              { ...diag, likelyOom },
             );
           }
 
@@ -992,6 +1234,9 @@ export class ServerStartRepository {
       // --- Start WS server (proxy or sidecar depending on mode) ---
       const wsHandle = startWebSocketServer({ port: wsPort, logger });
       ServerStartRepository.wsServerHandle = wsHandle;
+
+      // Start writing periodic health snapshots so the supervisor has pre-crash memory data
+      ServerStartRepository.startHealthSnapshot();
 
       // Wait for Next.js to be ready on its port
       await ServerStartRepository.waitForNextServer(

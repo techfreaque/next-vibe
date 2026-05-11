@@ -36,7 +36,7 @@ export const { DELETE } = createEndpoint({
   icon: "user",
   category: "endpointCategories.ssh",
   subCategory: "endpointCategories.sshExecution",
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
   tags: ["category" as const],
 
   fields: customWidgetObject({

@@ -18,6 +18,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
   getConnectionCredentials,
@@ -76,6 +77,14 @@ export class FilesReadRepository {
   ): Promise<ResponseType<FilesReadResponseOutput>> {
     if (data.connectionId) {
       return FilesReadRepository.readSftp(data, user, logger, t);
+    }
+
+    // LOCAL filesystem — admin only
+    if (user.isPublic || !user.roles.includes(UserPermissionRole.ADMIN)) {
+      return fail({
+        message: t("get.errors.forbidden.title"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
     }
 
     const filePath = FilesReadRepository.resolvePath(data.path);

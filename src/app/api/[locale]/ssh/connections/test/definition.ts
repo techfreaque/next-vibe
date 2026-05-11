@@ -36,7 +36,7 @@ export const { POST } = createEndpoint({
   icon: "wifi",
   category: "endpointCategories.ssh",
   subCategory: "endpointCategories.sshConnections",
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
   tags: ["category" as const],
 
   fields: customWidgetObject({

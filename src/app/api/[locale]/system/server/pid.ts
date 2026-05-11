@@ -24,6 +24,9 @@ export const NEXT_PORT_OFFSET = 100;
 /** PID file for production server (vibe start) */
 export const VIBE_START_PID_FILE = ".tmp/.vibe-start.pid";
 
+/** PID file for the supervisor wrapper around vibe start (owns the outer Bun process) */
+export const VIBE_SUPERVISOR_PID_FILE = ".tmp/.vibe-supervisor.pid";
+
 /** PID file for development server (vibe dev) */
 export const VIBE_DEV_PID_FILE = ".tmp/.vibe-dev.pid";
 

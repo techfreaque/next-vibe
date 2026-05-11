@@ -19,6 +19,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { env } from "@/config/env";
 import { sshConnections } from "../../db";
@@ -78,6 +79,16 @@ export class ConnectionCreateRepository {
     t: ConnectionsCreateT,
   ): Promise<ResponseType<ConnectionCreateResponseOutput>> {
     const isLocal = data.authType === SshAuthType.LOCAL;
+
+    if (
+      isLocal &&
+      (user.isPublic || !user.roles.includes(UserPermissionRole.ADMIN))
+    ) {
+      return fail({
+        message: t("post.errors.forbidden.title"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
 
     if (!isLocal) {
       const secretKey = ConnectionCreateRepository.getSecretKey();

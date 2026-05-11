@@ -19,6 +19,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
   getConnectionCredentials,
@@ -158,7 +159,13 @@ export class SshExecRepository {
       );
     }
 
-    // LOCAL backend
+    // LOCAL backend — admin only
+    if (user.isPublic || !user.roles.includes(UserPermissionRole.ADMIN)) {
+      return fail({
+        message: t("post.errors.forbidden.title"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
     const start = Date.now();
     try {
       logger.info(`Running local command: ${command.slice(0, 200)}`);

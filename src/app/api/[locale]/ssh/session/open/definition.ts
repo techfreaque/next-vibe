@@ -37,7 +37,7 @@ export const { POST } = createEndpoint({
   icon: "terminal",
   category: "endpointCategories.ssh",
   subCategory: "endpointCategories.sshTerminal",
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
   tags: ["category" as const],
 
   fields: customWidgetObject({
