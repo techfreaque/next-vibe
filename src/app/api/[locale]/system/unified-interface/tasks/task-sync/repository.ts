@@ -384,9 +384,14 @@ export class TaskSyncRepository {
           displayName: remoteTask.displayName,
         });
       } catch (error) {
+        const parsedErr = parseError(error);
         logger.error("Failed to upsert remote cron task", {
           routeId: remoteTask.routeId,
-          ...parseError(error),
+          error: parsedErr.message,
+          cause:
+            parsedErr.cause instanceof Error
+              ? parsedErr.cause.message
+              : undefined,
         });
       }
     }

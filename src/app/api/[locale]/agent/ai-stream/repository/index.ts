@@ -328,15 +328,16 @@ export class AiStreamRepository {
       const threadId = data.threadId;
       const isIncognito = data.rootFolderId === "incognito";
       if (threadId && !user.isPublic && "id" in user) {
+        // Chain error as child of user message (if present), else child of last AI message.
+        const setupErrorParentId =
+          data.userMessageId || data.parentMessageId || null;
         try {
           const errorMessageId = crypto.randomUUID();
           const errorContent = serializeError(setupResult);
           const errorType = setupResult.errorType
             ? `${setupResult.errorType.errorCode}`
             : "SETUP_ERROR";
-          // Chain error as child of user message (if present), else child of last AI message.
-          const setupErrorParentId =
-            data.userMessageId || data.parentMessageId || null;
+
           // Persist error message to DB only for non-incognito threads (incognito has no DB row).
           // Skip silently if the thread doesn't exist yet (new thread where setup failed before any DB write).
           if (!isIncognito) {
@@ -400,7 +401,12 @@ export class AiStreamRepository {
         } catch (emitErr) {
           logger.warn("[AiStream] Failed to emit setup error to chat", {
             threadId,
+            parentId: setupErrorParentId,
             error: emitErr instanceof Error ? emitErr.message : String(emitErr),
+            cause:
+              emitErr instanceof Error && emitErr.cause instanceof Error
+                ? emitErr.cause.message
+                : undefined,
           });
         }
       }
@@ -1265,23 +1271,16 @@ export class AiStreamRepository {
                   aiStreamT,
                   data.rootFolderId,
                   subAgentDepth,
-                ).catch(
-                  (
-                    err: Error & {
-                      code?: string;
-                      detail?: string;
-                      constraint?: string;
-                    },
-                  ) => {
-                    logger.error("[Queue] Failed to process queued message", {
-                      error: err.message,
-                      dbCode: err.code,
-                      dbDetail: err.detail,
-                      dbConstraint: err.constraint,
-                      threadId: threadResultThreadId,
-                    });
-                  },
-                );
+                ).catch((err: Error) => {
+                  logger.error("[Queue] Failed to process queued message", {
+                    error: err.message,
+                    cause:
+                      err.cause instanceof Error
+                        ? err.cause.message
+                        : undefined,
+                    threadId: threadResultThreadId,
+                  });
+                });
               }
 
               return Promise.resolve();

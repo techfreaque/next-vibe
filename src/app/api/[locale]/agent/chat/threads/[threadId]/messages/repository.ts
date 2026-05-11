@@ -272,9 +272,6 @@ export class MessagesRepository {
     }
 
     const now = new Date();
-    // onConflictDoNothing: queued messages are pre-inserted when the user sends them.
-    // processNextQueuedMessage re-uses the same messageId but has already updated
-    // parentId/metadata via UPDATE, so a silent skip on duplicate key is correct.
     await db
       .insert(chatMessages)
       .values({
@@ -288,6 +285,8 @@ export class MessagesRepository {
         isAI: false,
         metadata: hasMetadata ? metadata : undefined,
       })
+      // Queue processor already inserted + updated this message before calling
+      // createAiStream — skip the duplicate rather than failing the stream.
       .onConflictDoNothing();
 
     // Update thread's updatedAt and bubble activity to parent folder
