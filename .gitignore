@@ -4,6 +4,7 @@ dist
 .next*
 .env
 .env.staging
+.npmrc
 
 # Generated files - these are just to big and will generated before build anyways
 **/system/generated/endpoints-meta
