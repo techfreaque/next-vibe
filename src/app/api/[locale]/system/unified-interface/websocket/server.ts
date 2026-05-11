@@ -527,8 +527,10 @@ export function startWebSocketServer(
       // ── Proxy everything else to Next.js ─────────────────────────────────
       // Use a raw Node http pipe instead of fetch() - Bun's fetch auto-decompresses
       // responses which breaks streaming SSR and compressed assets.
-      // On ECONNREFUSED (Next.js restarting), retry with backoff so the browser
-      // gets a real response once Next.js recovers instead of a hard 502.
+      // On ECONNREFUSED (Next.js restarting), retry with backoff for idempotent methods.
+      // Non-idempotent methods (POST/PUT/PATCH/DELETE) cannot be safely retried and
+      // their bodies must not be buffered in memory - return 503 immediately if Next.js
+      // is down so bodies are never held across the retry window.
       const clientIp =
         req.headers.get("x-forwarded-for") ??
         req.headers.get("x-real-ip") ??
@@ -544,13 +546,16 @@ export function startWebSocketServer(
       // the proxy port (e.g. 3000) rather than the internal Vite port (3100).
       outHeaders["x-forwarded-host"] = req.headers.get("host") ?? url.host;
 
-      // Read body once before retry loop (body can only be consumed once)
-      const bodyBuffer =
-        req.body && req.method !== "GET" && req.method !== "HEAD"
-          ? Buffer.from(await req.arrayBuffer())
-          : null;
+      // Only idempotent methods get retry logic. Non-idempotent methods are
+      // proxied fire-and-forget (no body buffering, no retry on ECONNREFUSED).
+      const isIdempotent =
+        req.method === "GET" ||
+        req.method === "HEAD" ||
+        req.method === "OPTIONS";
 
-      const PROXY_RETRY_DELAYS = [500, 1000, 2000, 4000, 8000];
+      const PROXY_RETRY_DELAYS = isIdempotent
+        ? [500, 1000, 2000, 4000, 8000]
+        : [];
       // Timeout for a single proxy attempt. Vite can take 30-60s on cold start
       // for the first SSR render (full dep pre-bundle + module evaluation).
       // If it takes longer than this, something is genuinely stuck - return 504.
@@ -633,11 +638,22 @@ export function startWebSocketServer(
           proxyReq.on("error", (err) => {
             const isConnRefused =
               (err as NodeJS.ErrnoException).code === "ECONNREFUSED";
-            // On ECONNREFUSED while running - signal retry via null.
-            // While shutting down - return 502 immediately, no retry.
-            if (isConnRefused && !shuttingDown) {
+            // On ECONNREFUSED while running - signal retry via null (idempotent only).
+            // Non-idempotent methods and shutdown: return 502/503 immediately, no retry.
+            if (isConnRefused && !shuttingDown && isIdempotent) {
               lastProxyError = err.message;
               settle(null); // null = retry
+              return;
+            }
+            if (isConnRefused && !shuttingDown && !isIdempotent) {
+              // Non-idempotent method, server not ready - return 503 immediately
+              // so the body is never buffered and caller can retry on their own.
+              settle(
+                new Response("Service Unavailable", {
+                  status: 503,
+                  headers: { "retry-after": "5" },
+                }),
+              );
               return;
             }
             if (!shuttingDown) {
@@ -649,11 +665,35 @@ export function startWebSocketServer(
             settle(new Response("Bad Gateway", { status: 502 }));
           });
 
-          // Write buffered body
-          if (bodyBuffer) {
-            proxyReq.write(bodyBuffer);
+          // Pipe the request body directly from the original request - no buffering.
+          // For idempotent methods there is no body. For non-idempotent methods we
+          // pipe the stream once (no retry means single-use is safe).
+          if (req.body && !isIdempotent) {
+            const reader = req.body.getReader();
+            const pumpBody = (): void => {
+              reader
+                .read()
+                .then(({ done, value }) => {
+                  if (done) {
+                    proxyReq.end();
+                    return undefined;
+                  }
+                  if (!proxyReq.write(value)) {
+                    // Backpressure: wait for drain before reading more
+                    proxyReq.once("drain", pumpBody);
+                  } else {
+                    pumpBody();
+                  }
+                  return undefined;
+                })
+                .catch(() => {
+                  proxyReq.destroy();
+                });
+            };
+            pumpBody();
+          } else {
+            proxyReq.end();
           }
-          proxyReq.end();
         });
 
         if (proxyResult !== null) {

@@ -319,6 +319,14 @@ ipcMain.handle("vibe:restart", async () => {
       setTimeout(resolve, 1000);
     });
   }
+  // Detach stdio listeners from the old process before spawning a new one.
+  // Without this, the old child's streams retain their data/exit handlers
+  // and prevent the process object from being garbage collected.
+  if (vibeProcess) {
+    vibeProcess.stdout?.removeAllListeners();
+    vibeProcess.stderr?.removeAllListeners();
+    vibeProcess.removeAllListeners("exit");
+  }
   process.env["IS_PREVIEW_MODE"] = "true";
   const port = derivePort();
   vibeProcess = spawnVibeStart();

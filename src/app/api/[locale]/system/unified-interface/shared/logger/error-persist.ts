@@ -101,8 +101,17 @@ function computeFingerprint(
 }
 
 /**
+ * Maximum concurrent DB writes in flight at once.
+ * Prevents error storms (e.g. pre-OOM cascades) from accumulating thousands
+ * of pending async operations in the event loop, each holding DB context.
+ */
+const MAX_INFLIGHT = 8;
+let inflightCount = 0;
+
+/**
  * Persist an error log to the database (fire-and-forget).
  * Never throws - all errors are silently caught.
+ * Drops writes silently when MAX_INFLIGHT concurrent writes are already in progress.
  */
 export function persistErrorLog(
   level: ErrorLogLevel,
@@ -110,6 +119,11 @@ export function persistErrorLog(
   error: LoggerMetadata | undefined,
   extraMeta: LoggerMetadata[],
 ): void {
+  if (inflightCount >= MAX_INFLIGHT) {
+    // Drop - best-effort logging must never become an OOM vector
+    return;
+  }
+  inflightCount++;
   // Fire-and-forget - do not await
   void (async (): Promise<void> => {
     try {
@@ -173,6 +187,8 @@ export function persistErrorLog(
         });
     } catch {
       // Silently swallow - logging persistence must never cascade
+    } finally {
+      inflightCount--;
     }
   })();
 }

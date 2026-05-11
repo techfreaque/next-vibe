@@ -30,6 +30,8 @@ export class StdioTransport implements IMCPTransport {
   private running = false;
   private initializationReceived = false;
   private startupTimeout?: ReturnType<typeof setTimeout>;
+  private stdinErrorHandler?: (error: Error) => void;
+  private stdoutErrorHandler?: (error: Error) => void;
 
   constructor(logger: EndpointLogger) {
     this.logger = logger;
@@ -65,18 +67,19 @@ export class StdioTransport implements IMCPTransport {
       process.exit(0);
     });
 
-    // Handle errors
-    process.stdin.on("error", (error: Error) => {
+    // Handle errors - store refs so stop() can remove them precisely
+    this.stdinErrorHandler = (error: Error): void => {
       this.logger.error("[MCP Transport] stdin error", {
         error: error.message,
       });
-    });
-
-    process.stdout.on("error", (error: Error) => {
+    };
+    this.stdoutErrorHandler = (error: Error): void => {
       this.logger.error("[MCP Transport] stdout error", {
         error: error.message,
       });
-    });
+    };
+    process.stdin.on("error", this.stdinErrorHandler);
+    process.stdout.on("error", this.stdoutErrorHandler);
 
     this.running = true;
     this.logger.info("[MCP Transport] STDIO transport started");
@@ -113,6 +116,15 @@ export class StdioTransport implements IMCPTransport {
     if (this.readlineInterface) {
       this.readlineInterface.close();
       this.readlineInterface = undefined;
+    }
+
+    if (this.stdinErrorHandler) {
+      process.stdin.removeListener("error", this.stdinErrorHandler);
+      this.stdinErrorHandler = undefined;
+    }
+    if (this.stdoutErrorHandler) {
+      process.stdout.removeListener("error", this.stdoutErrorHandler);
+      this.stdoutErrorHandler = undefined;
     }
 
     this.running = false;

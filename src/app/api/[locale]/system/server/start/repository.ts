@@ -79,8 +79,25 @@ const HEALTH_SNAPSHOT_FILE = ".tmp/.vibe-health.json";
 /** Supervisor restart backoff: 2s → 5s → 10s → 30s (stays at 30s) */
 const SUPERVISOR_RESTART_DELAYS_MS = [2000, 5000, 10000, 30000];
 
+/**
+ * OOM-specific backoff: longer delays to let the OS reclaim memory before restarting.
+ * Used when consecutive OOM kills are detected (signal === "SIGKILL").
+ * 10s → 30s → 60s → 120s (stays at 120s)
+ */
+const SUPERVISOR_OOM_RESTART_DELAYS_MS = [10000, 30000, 60000, 120000];
+
+/** How many consecutive OOMs before we switch to the longer OOM backoff */
+const OOM_CONSECUTIVE_THRESHOLD = 2;
+
 /** Task runner restart backoff: 5s → 10s → 30s → 60s (stays at 60s) */
 const TASK_RESTART_DELAYS_MS = [5000, 10000, 30000, 60000];
+
+/**
+ * Supervisor heap cap in MB. The supervisor only runs the watch loop — no app code.
+ * Capping it low ensures it can never OOM even if the child is thrashing memory.
+ * Strips any large --max-old-space-size inherited from the parent environment.
+ */
+const SUPERVISOR_MAX_HEAP_MB = 256;
 
 export class ServerStartRepository {
   private static taskRunnerStarted = false;
@@ -177,6 +194,18 @@ export class ServerStartRepository {
    * skips this path, proceeding with normal server startup.
    */
   private static async runSupervisor(logger: EndpointLogger): Promise<never> {
+    // Cap the supervisor's own heap so it can never OOM even if the child is
+    // thrashing memory. Strips any large --max-old-space-size inherited from the
+    // parent environment, replacing it with the supervisor-specific cap.
+    const existingNodeOptions = process.env["NODE_OPTIONS"] ?? "";
+    const strippedNodeOptions = existingNodeOptions
+      .replace(/--max-old-space-size=\d+/g, "")
+      .trim();
+    Object.assign(process.env, {
+      NODE_OPTIONS:
+        `${strippedNodeOptions} --max-old-space-size=${SUPERVISOR_MAX_HEAP_MB}`.trim(),
+    });
+
     // Kill any existing supervisor, then register our own PID.
     killPreviousInstance(VIBE_SUPERVISOR_PID_FILE, logger);
     writePidFile(VIBE_SUPERVISOR_PID_FILE, logger);
@@ -186,14 +215,56 @@ export class ServerStartRepository {
       cleanupPidFile(VIBE_SUPERVISOR_PID_FILE);
     });
 
+    // Supervisor-level crash guard: any unhandled error in supervisor code must be
+    // logged and cause the supervisor itself to exit so Docker restarts the whole stack.
+    process.on("uncaughtException", (err) => {
+      logger.error("[Supervisor] Uncaught exception in supervisor - exiting", {
+        error: err.message,
+        stack: err.stack,
+      });
+      try {
+        mkdirSync(".tmp", { recursive: true });
+        appendFileSync(
+          ".tmp/vibe-start.log",
+          `${JSON.stringify({ type: "supervisor_uncaught", error: err.message, stack: err.stack, timestamp: new Date().toISOString() })}\n`,
+        );
+      } catch {
+        // Ignore fs errors
+      }
+      process.exit(2);
+    });
+    process.on("unhandledRejection", (reason) => {
+      const message = reason instanceof Error ? reason.message : String(reason);
+      const stack = reason instanceof Error ? reason.stack : undefined;
+      logger.error(
+        "[Supervisor] Unhandled rejection in supervisor - continuing",
+        { error: message, stack },
+      );
+    });
+
     let supervisorShuttingDown = false;
     let restartCount = 0;
+    let consecutiveOoms = 0;
 
     const spawnChild = (): ChildProcess => {
+      // Restore full heap cap for the child - it runs the actual application.
+      // NODE_OPTIONS was already modified above for the supervisor; the child
+      // inherits the stripped version and startNextServer re-applies 8GB via
+      // NODE_OPTIONS on the Next.js spawn. This env entry ensures the Bun child
+      // (the server process wrapper itself) also gets the full cap back.
+      const childEnv = {
+        ...process.env,
+        VIBE_SUPERVISED: "1",
+        // Remove the supervisor's small cap so the child isn't artificially limited
+        NODE_OPTIONS: (process.env["NODE_OPTIONS"] ?? "")
+          .replace(/--max-old-space-size=\d+/g, "")
+          .trim(),
+      };
+
       const child = spawn(process.execPath, process.argv.slice(1), {
         // inherit: child stdout/stderr flow directly to terminal/log files
         stdio: "inherit",
-        env: { ...process.env, VIBE_SUPERVISED: "1" },
+        env: childEnv,
       });
 
       logger.debug(
@@ -219,22 +290,39 @@ export class ServerStartRepository {
         }
 
         const likelyOom = signal === "SIGKILL";
+
+        // Track consecutive OOMs to detect a server that can't stay up due to
+        // memory pressure. After OOM_CONSECUTIVE_THRESHOLD in a row, switch to
+        // longer backoff and log a distinct critical alert.
+        if (likelyOom) {
+          consecutiveOoms++;
+        } else {
+          consecutiveOoms = 0;
+        }
+
         const crashInfo = {
           timestamp: new Date().toISOString(),
           code,
           signal,
           restartCount,
           likelyOom,
+          consecutiveOoms,
           lastHealth,
         };
 
-        const crashMessage = likelyOom
-          ? "[Supervisor] Server OOM-killed (SIGKILL) - will restart"
-          : signal !== null
-            ? `[Supervisor] Server killed by signal ${signal} - will restart`
-            : `[Supervisor] Server crashed (exit code ${String(code)}) - will restart`;
-
-        logger.error(crashMessage, crashInfo);
+        if (likelyOom && consecutiveOoms >= OOM_CONSECUTIVE_THRESHOLD) {
+          logger.error(
+            `[Supervisor] CRITICAL: ${consecutiveOoms} consecutive OOM kills - server cannot stay up. Waiting longer before restart.`,
+            crashInfo,
+          );
+        } else {
+          const crashMessage = likelyOom
+            ? "[Supervisor] Server OOM-killed (SIGKILL) - will restart"
+            : signal !== null
+              ? `[Supervisor] Server killed by signal ${signal} - will restart`
+              : `[Supervisor] Server crashed (exit code ${String(code)}) - will restart`;
+          logger.error(crashMessage, crashInfo);
+        }
 
         // Persist crash record to log file so it survives supervisor restarts
         try {
@@ -247,10 +335,13 @@ export class ServerStartRepository {
           // Ignore fs errors
         }
 
+        // OOM crashes use a longer backoff to let the OS reclaim memory.
+        const delayTable =
+          likelyOom && consecutiveOoms >= OOM_CONSECUTIVE_THRESHOLD
+            ? SUPERVISOR_OOM_RESTART_DELAYS_MS
+            : SUPERVISOR_RESTART_DELAYS_MS;
         const delay =
-          SUPERVISOR_RESTART_DELAYS_MS[
-            Math.min(restartCount, SUPERVISOR_RESTART_DELAYS_MS.length - 1)
-          ] ?? 30000;
+          delayTable[Math.min(restartCount, delayTable.length - 1)] ?? 30000;
         restartCount++;
 
         logger.warn(
@@ -303,26 +394,42 @@ export class ServerStartRepository {
   }
 
   /**
-   * Write a memory snapshot to HEALTH_SNAPSHOT_FILE every 60 seconds.
-   * The supervisor reads this on crash to report pre-OOM memory even when
-   * the child process was SIGKILL-ed and could not log itself.
-   * The interval is unref'd so it never prevents a clean process exit.
+   * Write a memory snapshot to HEALTH_SNAPSHOT_FILE every 60 seconds and log
+   * memory pressure warnings as heap approaches the --max-old-space-size limit.
+   *
+   * Thresholds (% of heapTotal):
+   *   ≥ 90% → error  (imminent OOM - log loudly)
+   *   ≥ 80% → warn
+   *   ≥ 70% → info
+   *
+   * The supervisor reads the snapshot on crash to report pre-OOM memory even
+   * when the child process was SIGKILL-ed and could not log itself.
    */
-  private static startHealthSnapshot(): void {
+  private static startHealthSnapshot(logger: EndpointLogger): void {
     if (ServerStartRepository.healthSnapshotInterval !== null) {
       return;
     }
 
+    // Track which pressure level we last logged to avoid repeating the same
+    // message on every tick when the server is consistently under pressure.
+    let lastPressureLevel = 0;
+
     const writeSnapshot = (): void => {
       try {
         const mem = process.memoryUsage();
+        const heapUsedMb = Math.round(mem.heapUsed / 1024 / 1024);
+        const rssMb = Math.round(mem.rss / 1024 / 1024);
+        const heapTotalMb = Math.round(mem.heapTotal / 1024 / 1024);
+        const heapPct = heapTotalMb > 0 ? (heapUsedMb / heapTotalMb) * 100 : 0;
+
         mkdirSync(".tmp", { recursive: true });
         writeFileSync(
           HEALTH_SNAPSHOT_FILE,
           JSON.stringify({
-            heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
-            rssMb: Math.round(mem.rss / 1024 / 1024),
-            heapTotalMb: Math.round(mem.heapTotal / 1024 / 1024),
+            heapUsedMb,
+            rssMb,
+            heapTotalMb,
+            heapPct: Math.round(heapPct),
             timestamp: new Date().toISOString(),
             uptime: Math.floor(process.uptime()),
             nextRestartCount: ServerStartRepository.nextRestartCount,
@@ -332,6 +439,31 @@ export class ServerStartRepository {
           }),
           "utf-8",
         );
+
+        // Memory pressure warnings - only log when crossing a new threshold
+        const memMeta = {
+          heapUsedMb,
+          rssMb,
+          heapTotalMb,
+          heapPct: Math.round(heapPct),
+          uptime: Math.floor(process.uptime()),
+        };
+        if (heapPct >= 90 && lastPressureLevel < 3) {
+          lastPressureLevel = 3;
+          logger.error(
+            "[Memory] CRITICAL: heap at ≥90% - OOM imminent, consider restarting",
+            memMeta,
+          );
+        } else if (heapPct >= 80 && lastPressureLevel < 2) {
+          lastPressureLevel = 2;
+          logger.warn("[Memory] High pressure: heap at ≥80%", memMeta);
+        } else if (heapPct >= 70 && lastPressureLevel < 1) {
+          lastPressureLevel = 1;
+          logger.info("[Memory] Elevated: heap at ≥70%", memMeta);
+        } else if (heapPct < 60) {
+          // Reset so warnings fire again if pressure rises
+          lastPressureLevel = 0;
+        }
       } catch {
         // Ignore fs errors (read-only fs, etc.)
       }
@@ -621,16 +753,19 @@ export class ServerStartRepository {
     killPreviousInstance(VIBE_START_PID_FILE, logger);
     writePidFile(VIBE_START_PID_FILE, logger, [], port);
 
-    // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately
-    const earlyExitHandler = (writeHint: boolean): void => {
+    // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately.
+    // Use stable named functions so process.off() can remove them precisely.
+    const earlyExitOnInt = (): void => {
       cleanupPidFile(VIBE_START_PID_FILE);
-      if (writeHint) {
-        writeStartLogOfflineHint();
-      }
+      writeStartLogOfflineHint();
       process.exit(0);
     };
-    process.on("SIGINT", () => earlyExitHandler(true));
-    process.on("SIGTERM", () => earlyExitHandler(false));
+    const earlyExitOnTerm = (): void => {
+      cleanupPidFile(VIBE_START_PID_FILE);
+      process.exit(0);
+    };
+    process.on("SIGINT", earlyExitOnInt);
+    process.on("SIGTERM", earlyExitOnTerm);
 
     // Setup database if enabled
     if (runDb) {
@@ -655,8 +790,8 @@ export class ServerStartRepository {
     if (!runNext) {
       logger.vibe(formatSkip("Next.js server skipped"));
       // Replace early exit handler with graceful shutdown
-      process.off("SIGINT", earlyExitHandler);
-      process.off("SIGTERM", earlyExitHandler);
+      process.off("SIGINT", earlyExitOnInt);
+      process.off("SIGTERM", earlyExitOnTerm);
       const handleShutdown = (): void => {
         cleanupPidFile(VIBE_START_PID_FILE);
         ServerStartRepository.stopAllProcesses();
@@ -715,24 +850,28 @@ export class ServerStartRepository {
     }
 
     // Replace early exit handler with full graceful shutdown
-    process.off("SIGINT", earlyExitHandler);
-    process.off("SIGTERM", earlyExitHandler);
+    process.off("SIGINT", earlyExitOnInt);
+    process.off("SIGTERM", earlyExitOnTerm);
 
-    const handleShutdown = (writeHint: boolean): void => {
+    const handleShutdownOnInt = (): void => {
       // Signal auto-restart loop not to re-spawn after we kill Next.js
       ServerStartRepository.nextServerShuttingDown = true;
       cleanupPidFile(VIBE_START_PID_FILE);
       ServerStartRepository.stopAllProcesses();
-      // Only write the offline hint on user-initiated shutdown (SIGINT/Ctrl+C).
-      // On SIGTERM the new vibe start process already wrote it before truncating.
-      if (writeHint) {
-        writeStartLogOfflineHint();
-      }
+      writeStartLogOfflineHint();
+      process.exit(0);
+    };
+    const handleShutdownOnTerm = (): void => {
+      // Signal auto-restart loop not to re-spawn after we kill Next.js
+      ServerStartRepository.nextServerShuttingDown = true;
+      cleanupPidFile(VIBE_START_PID_FILE);
+      ServerStartRepository.stopAllProcesses();
+      // On SIGTERM the new vibe start process already wrote the offline hint.
       process.exit(0);
     };
 
-    process.on("SIGINT", () => handleShutdown(true));
-    process.on("SIGTERM", () => handleShutdown(false));
+    process.on("SIGINT", handleShutdownOnInt);
+    process.on("SIGTERM", handleShutdownOnTerm);
 
     // SIGUSR1: hot-restart Next.js (triggered by `vibe rebuild`)
     process.on("SIGUSR1", () => {
@@ -810,7 +949,7 @@ export class ServerStartRepository {
       process.stdin.setEncoding("utf8");
       process.stdin.on("data", (key: string) => {
         if (key === "\u0003") {
-          handleShutdown(true);
+          handleShutdownOnInt();
           return;
         }
         if (key === "p" || key === "P") {
@@ -1236,7 +1375,7 @@ export class ServerStartRepository {
       ServerStartRepository.wsServerHandle = wsHandle;
 
       // Start writing periodic health snapshots so the supervisor has pre-crash memory data
-      ServerStartRepository.startHealthSnapshot();
+      ServerStartRepository.startHealthSnapshot(logger);
 
       // Wait for Next.js to be ready on its port
       await ServerStartRepository.waitForNextServer(
@@ -1296,6 +1435,12 @@ export class ServerStartRepository {
    * Stop all running processes
    */
   private static stopAllProcesses(): void {
+    // Stop the health snapshot interval
+    if (ServerStartRepository.healthSnapshotInterval !== null) {
+      clearInterval(ServerStartRepository.healthSnapshotInterval);
+      ServerStartRepository.healthSnapshotInterval = null;
+    }
+
     // Stop the WS sidecar
     if (ServerStartRepository.wsServerHandle) {
       try {
@@ -1324,9 +1469,16 @@ export class ServerStartRepository {
       try {
         if (process && !process.killed) {
           process.kill("SIGTERM");
+          // SIGKILL fallback after 5s if SIGTERM didn't work.
+          // All callers invoke process.exit() immediately after stopAllProcesses(),
+          // so this timer only fires if the process stays alive (e.g. tasks-only mode).
           setTimeout(() => {
-            if (!process.killed) {
-              process.kill("SIGKILL");
+            try {
+              if (!process.killed) {
+                process.kill("SIGKILL");
+              }
+            } catch {
+              // Already dead
             }
           }, 5000);
         }
