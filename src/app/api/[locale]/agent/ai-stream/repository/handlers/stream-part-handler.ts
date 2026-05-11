@@ -100,6 +100,15 @@ export class StreamPartHandler {
         logger,
       });
 
+      // Flush and reset TTS between steps so the generationChain doesn't grow
+      // unboundedly across a multi-step run. Each step gets a clean chain;
+      // audio for step N is fully emitted before step N+1 starts.
+      // On abort we skip this - StreamCompletionHandler handles the final flush.
+      if (!shouldAbort && ttsHandler) {
+        await ttsHandler.flush();
+        ttsHandler.reset();
+      }
+
       return { shouldAbort };
     }
 
@@ -140,6 +149,21 @@ export class StreamPartHandler {
         // Record time-to-first-token on first message creation
         if (ctx.streamStartTime === null) {
           ctx.streamStartTime = Date.now();
+        }
+        // Reset estimated token counter for the new message
+        ctx.lastEstimatedTokenEmitLength = 0;
+      }
+
+      // Emit estimated token count every ~200 chars of accumulated content.
+      // SSE-only, no DB write. Corrected by real counts from onStepFinish.
+      if (ctx.currentAssistantMessageId) {
+        const contentLength = ctx.currentAssistantContent.length;
+        if (contentLength - ctx.lastEstimatedTokenEmitLength >= 200) {
+          ctx.lastEstimatedTokenEmitLength = contentLength;
+          ctx.dbWriter.emitEstimatedTokens(
+            ctx.currentAssistantMessageId,
+            contentLength,
+          );
         }
       }
 

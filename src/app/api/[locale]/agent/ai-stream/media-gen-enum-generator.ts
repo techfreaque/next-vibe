@@ -65,7 +65,7 @@ export function updateMediaGenInlineEnum(
   modality: Modality,
   chatDefs: Record<string, ModelDefinition>,
   chatEnumEntries: Array<[string, string]>,
-  logger?: { info: (msg: string) => void; warn: (msg: string) => void },
+  logger: { info: (msg: string) => void; warn: (msg: string) => void },
 ): boolean {
   const entries = collectEntriesForModality(
     modality,
@@ -78,6 +78,6 @@ export function updateMediaGenInlineEnum(
     return false;
   }
   writeFileSync(filePath, updated, "utf-8");
-  logger?.info(`Media-gen ${modality} enum updated in ${filePath}`);
+  logger.info(`Media-gen ${modality} enum updated in ${filePath}`);
   return true;
 }

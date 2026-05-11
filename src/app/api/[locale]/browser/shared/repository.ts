@@ -75,6 +75,7 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    threadId?: string,
   ): Promise<ResponseType<T> | ContentResponse> {
     try {
       // Prepare request data for main browser repository
@@ -91,6 +92,7 @@ export class BrowserSharedRepository {
         requestData,
         t,
         logger,
+        threadId,
       );
 
       // Content responses (e.g. inline screenshots) must be propagated directly —
@@ -340,8 +342,9 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    threadId?: string,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool(params, t, logger, threadId);
   }
 
   static executeTakeSnapshot(

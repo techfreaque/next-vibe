@@ -133,6 +133,7 @@ export class CompactingHandler {
     const timestamp = formatAbsoluteTimestamp(
       compactingMessageCreatedAt,
       timezone,
+      logger,
     );
 
     const compactingModeContext = `${CONTEXT_LINE_PREFIX}ID:${shortId} | Posted:${timestamp} | Mode:auto-compacting]`;

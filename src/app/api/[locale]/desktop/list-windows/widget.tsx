@@ -55,10 +55,11 @@ function WindowRow({
             {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
             ×{w.height}
           </Span>
-          <Badge variant="outline" className="text-xs py-0 h-4">
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-            Desktop {w.desktopId}
-          </Badge>
+          {w.monitor ? (
+            <Badge variant="outline" className="text-xs py-0 h-4">
+              {w.monitor}
+            </Badge>
+          ) : null}
         </Div>
       </Div>
       <Button

@@ -44,6 +44,7 @@ import type { AiStreamT } from "../stream/i18n";
 import { StreamErrorType } from "./core/constants";
 import {
   clearStreamingState,
+  QueueRegistry,
   setStreamingStateWaiting,
   StreamRegistry,
 } from "./core/stream-registry";
@@ -282,6 +283,15 @@ export class AiStreamRepository {
         ],
       });
 
+      // Register in-memory so the running stream's prepareStep can inject this
+      // message as the next user turn without ending and restarting the stream.
+      QueueRegistry.push(data.threadId, {
+        id: data.userMessageId,
+        content: data.content,
+        metadata: { isQueued: true },
+        createdAt: new Date(),
+      });
+
       logger.info("[AI Stream] Queued message created", {
         messageId: data.userMessageId,
         threadId: data.threadId,
@@ -490,6 +500,9 @@ export class AiStreamRepository {
     let capturedLastGeneratedMediaUrl: string | null = null;
     let capturedTotalCreditsDeducted = 0;
     const capturedPinnedToolCount = tools ? Object.keys(tools).length : 0;
+    // Set to true when prepareStep injects a queued message mid-stream.
+    // Used by the interactive finally block to skip processNextQueuedMessage.
+    let capturedQueueInjected = false;
     // Captured wakeUp payloads - queue written by the signal handler, processed in finally for deferred insertion + revival.
     // Array supports parallel wakeUp tools: each completion pushes its payload; all are processed sequentially.
     const capturedWakeUpPayloads: WakeUpPayload[] = [];
@@ -1052,12 +1065,27 @@ export class AiStreamRepository {
               imageQuality: data.imageQuality ?? undefined,
               musicDuration: data.musicDuration ?? undefined,
               systemPromptParams,
+              // Mid-stream compacting fires when real API-reported input tokens
+              // exceed effectiveCompactTrigger — same threshold as pre-stream compacting,
+              // applied to real token counts from onStepFinish.
+              midStreamCompactingThreshold: tools ? effectiveCompactTrigger : 0,
+              midStreamCompactingParams: {
+                model: data.model,
+                skill: data.skill,
+                threadId: threadResultThreadId,
+                isIncognito,
+                userId,
+                user,
+                providerModel: provider.chat(modelConfig.providerModel),
+                t: aiStreamT,
+              },
             });
           }
 
           // After stream completes, capture the last assistant message ID from the writer.
           // In a tool loop there can be multiple assistant messages; lastAssistantMessageId
           // on the writer is updated on every write so it always holds the final one.
+          capturedQueueInjected = ctx.queueInjectedInStream;
           if (ctx.dbWriter.lastAssistantMessageId) {
             capturedLastAiMessageId = ctx.dbWriter.lastAssistantMessageId;
             capturedLastAiMessageContent = ctx.dbWriter.lastAssistantContent;
@@ -1257,9 +1285,18 @@ export class AiStreamRepository {
                 );
               }
 
+              // On abort/cancel: clear the in-memory queue so orphaned QueueRegistry
+              // entries don't leak. The DB messages remain (isQueued=true) and will
+              // be picked up by processNextQueuedMessage on the next stream attempt.
+              if (wasAborted) {
+                QueueRegistry.clear(threadResultThreadId);
+              }
+
               // Queue processing: if stream completed naturally (not aborted)
               // and no wakeUp revival, check for queued messages.
-              if (!wasAborted) {
+              // Skip if prepareStep already injected a queued message mid-stream
+              // (the AI already processed it — starting a new stream would double-process).
+              if (!wasAborted && !capturedQueueInjected) {
                 const { processNextQueuedMessage } =
                   await import("./core/queue-processor");
                 await processNextQueuedMessage(

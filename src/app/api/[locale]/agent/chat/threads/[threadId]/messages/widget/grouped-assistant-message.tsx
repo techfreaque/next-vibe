@@ -847,6 +847,17 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   userVote,
   voteScore,
 }: MessageActionsWrapperProps): JSX.Element {
+  // The last assistant message in the group is the correct parent for "answer as AI".
+  // Using primaryId (the first message) would anchor the new response at the wrong place.
+  const lastAssistantId = useMemo(() => {
+    for (let i = allMessages.length - 1; i >= 0; i--) {
+      if (allMessages[i].role === "assistant") {
+        return allMessages[i].id;
+      }
+    }
+    return primaryId;
+  }, [allMessages, primaryId]);
+
   // Process content for actions - skip while streaming: the actions bar is hidden
   // during streaming and these async calls (TTS/copy processing) are expensive.
   // They run once when streaming completes (isGroupStreaming flips to false).
@@ -919,7 +930,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
 
   return (
     <AssistantMessageActions
-      messageId={primaryId}
+      messageId={lastAssistantId}
       threadId={primaryThreadId}
       rootFolderId={rootFolderId}
       content={allContent}

@@ -111,6 +111,24 @@ const { GET } = createEndpoint({
           const { useChatInputStore } =
             await import("@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store");
           useChatInputStore.getState().reset();
+          // When a queued user message is dequeued and re-confirmed, the optimistic
+          // assistant placeholder that was added when the message was first sent
+          // (parentId = arrived.id) must be removed - the real stream will add its
+          // own assistant message shortly. Without this removal the placeholder
+          // stays in the cache, the leafMessageId points to it, and after
+          // stream-finished removes it the leaf goes stale.
+          if (
+            arrived.metadata &&
+            typeof arrived.metadata === "object" &&
+            arrived.metadata.isQueued === true
+          ) {
+            const msgId = arrived.id;
+            if (msgId) {
+              const { removeOptimisticByParentId } =
+                await import("./hooks/update-messages");
+              removeOptimisticByParentId(threadId, msgId, logger);
+            }
+          }
         } else if (
           arrived.role === ChatMessageRole.ASSISTANT ||
           arrived.role === ChatMessageRole.TOOL
@@ -232,17 +250,25 @@ const { GET } = createEndpoint({
             : "";
         const msg = ctx.partial.messages?.[0];
         const msgId = msg?.id;
+        const threadId = ctx.urlPathParams["threadId"] ?? "";
         if (msgId) {
           await persistMessageIfIncognito(
-            ctx.urlPathParams["threadId"] ?? "",
+            threadId,
             msgId,
             rootFolderId,
             ctx.logger,
             false,
           );
         }
+        // Any error arriving mid-stream means the stream is dead.
+        // Remove ALL optimistic assistant placeholders so they don't dangle
+        // alongside the error message. Covers both the queued case and
+        // stream errors / compacting failures that arrive after the stream started.
+        const { removeAllOptimistic, removeOptimisticByParentId } =
+          await import("./hooks/update-messages");
+        removeAllOptimistic(threadId, ctx.logger);
         // When the server queued a message (thread was already streaming),
-        // remove the optimistic assistant placeholder the client created.
+        // the error message IS the queued placeholder — remove by its id too.
         if (
           msg?.metadata &&
           typeof msg.metadata === "object" &&
@@ -250,13 +276,7 @@ const { GET } = createEndpoint({
           msg.metadata.isQueued === true &&
           msgId
         ) {
-          const { removeOptimisticByParentId } =
-            await import("./hooks/update-messages");
-          removeOptimisticByParentId(
-            ctx.urlPathParams["threadId"] ?? "",
-            msgId,
-            ctx.logger,
-          );
+          removeOptimisticByParentId(threadId, msgId, ctx.logger);
         }
       },
     },
@@ -361,23 +381,24 @@ const { GET } = createEndpoint({
       },
       operation: "merge" as const,
       onEvent: async (ctx) => {
+        const threadId = ctx.urlPathParams["threadId"] ?? "";
         const { useChatStore } = await import("../../../hooks/store");
-        useChatStore
-          .getState()
-          .clearThreadPendingCreate(ctx.urlPathParams.threadId);
+        useChatStore.getState().clearThreadPendingCreate(threadId);
         // Clear aborting state - the framework already merged
         // streamingState: "idle" into the cache; clear the cancel spinner.
         const { useAIStreamStore } =
           await import("../../../../ai-stream/stream/hooks/store");
-        useAIStreamStore.getState().clearThread(ctx.urlPathParams.threadId);
+        useAIStreamStore.getState().clearThread(threadId);
+        // Sweep any dangling optimistic placeholders - normally gone by now
+        // (removed when real assistant message-created arrived), but guards
+        // against edge cases where the stream ends without emitting a message.
+        const { removeAllOptimistic } = await import("./hooks/update-messages");
+        removeAllOptimistic(threadId, ctx.logger);
         const rootFolderId =
           typeof ctx.requestData["rootFolderId"] === "string"
             ? ctx.requestData["rootFolderId"]
             : "";
-        await finishIncognitoThreadIfIncognito(
-          ctx.urlPathParams["threadId"] ?? "",
-          rootFolderId,
-        );
+        await finishIncognitoThreadIfIncognito(threadId, rootFolderId);
       },
     },
 

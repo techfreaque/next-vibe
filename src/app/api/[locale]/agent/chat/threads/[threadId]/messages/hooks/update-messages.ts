@@ -134,6 +134,19 @@ export function removeOptimisticByParentId(
   }
 }
 
+/** Remove ALL optimistic placeholders from the thread across all folder caches.
+ * Used when an error arrives mid-stream - any dangling optimistic assistants must go. */
+export function removeAllOptimistic(
+  threadId: string,
+  logger: EndpointLogger,
+): void {
+  for (const folderId of Object.values(DefaultFolderId)) {
+    writeMessages(threadId, folderId, logger, (msgs) =>
+      msgs.filter((m) => !m.metadata?.isOptimistic),
+    );
+  }
+}
+
 /** Read-only cache access - for incognito persistence and error handling. */
 export function getCachedMessages(
   threadId: string,

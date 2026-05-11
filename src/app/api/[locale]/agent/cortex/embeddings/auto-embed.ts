@@ -35,7 +35,7 @@ export interface EmbedOptions {
   /** Locale for credit translation strings */
   locale: CountryLanguage;
   /** Logger for credit deduction */
-  logger?: EndpointLogger;
+  logger: EndpointLogger;
   /** Feature name for usage history */
   feature?: CortexCreditFeatureValue;
 }

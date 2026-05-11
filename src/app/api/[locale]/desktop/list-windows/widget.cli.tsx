@@ -39,24 +39,24 @@ export function ListWindowsCliWidget({ field }: CliWidgetProps): JSX.Element {
       return windows
         .map(
           (w) =>
-            `${w.windowId} | ${w.pid} | ${w.width}x${w.height} | desktop:${w.desktopId} | ${w.title}`,
+            `${w.windowId} | ${w.pid} | ${w.width}x${w.height} | monitor:${w.monitor} | ${w.title}`,
         )
         .join("\n");
     }
 
-    // Group by desktop
-    const byDesktop = new Map<string, typeof windows>();
+    // Group by monitor
+    const byMonitor = new Map<string, typeof windows>();
     for (const w of windows) {
-      const key = w.desktopId === "-1" ? "sticky" : `Desktop ${w.desktopId}`;
-      if (!byDesktop.has(key)) {
-        byDesktop.set(key, []);
+      const key = w.monitor || "unknown";
+      if (!byMonitor.has(key)) {
+        byMonitor.set(key, []);
       }
-      byDesktop.get(key)!.push(w);
+      byMonitor.get(key)!.push(w);
     }
 
     const lines: string[] = [];
-    for (const [desktop, wins] of byDesktop) {
-      lines.push(chalk.bold.cyan(`\n  ${desktop}:`));
+    for (const [monitor, wins] of byMonitor) {
+      lines.push(chalk.bold.cyan(`\n  ${monitor}:`));
       for (const w of wins) {
         const id = chalk.dim(w.windowId.padEnd(12));
         const size = chalk.green(`${w.width}×${w.height}`.padEnd(12));

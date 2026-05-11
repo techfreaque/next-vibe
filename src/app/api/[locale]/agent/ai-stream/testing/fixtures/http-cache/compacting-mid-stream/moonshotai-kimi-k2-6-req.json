@@ -1,0 +1,45 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "authorization": "[redacted]",
+    "content-type": "application/json",
+    "http-referer": "https://unbottled.ai",
+    "user-agent": "ai-sdk/openrouter/2.5.1 ai-sdk/provider-utils/4.0.1 runtime/bun/1.3.10",
+    "x-openrouter-categories": "general-chat,roleplay,personal-agent",
+    "x-title": "Unbottled AI"
+  },
+  "body": {
+    "messages": [
+      {
+        "content": [
+          {
+            "text": "[Context: ID:b7bed347 | Posted:May 11, 22:41 | Mode:auto-compacting]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "You are a conversation summarizer. Your task is to compress the conversation history above into a compact summary that preserves all essential context for continuing the conversation.\n\n**What to preserve:**\n- Key decisions, conclusions, and outcomes reached\n- Important facts, data, or values mentioned by the user\n- User preferences, constraints, and goals stated\n- Significant code, technical details, or instructions (keep verbatim if important)\n- The most recent topic/task being worked on\n- Results of tool calls and actions taken\n- CDN URLs for images, audio, and video - copy these verbatim exactly as they appear (e.g. https://...)\n\n**What to omit:**\n- System instructions, skill personas, or role-play framing\n- Tool definitions, function signatures, or available-tool descriptions\n- Greetings, pleasantries, and filler exchanges\n- Redundant or superseded information\n- Any content that is only relevant to the system and not to the user conversation\n\n**Format:**\n- Write in past tense from a neutral observer perspective\n- Group related points together\n- Use bullet points for clarity\n- Output ONLY the summary - no preamble, no meta-commentary, no section headers like \"Summary:\"",
+        "role": "user"
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": [
+          {
+            "text": "[Context: ID:b7bed347 | Model:kimi-k2.6 | Skill:quality-tester | Mode:compacting | Posted:May 11, 22:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      }
+    ],
+    "model": "moonshotai/kimi-k2.6",
+    "stream": true,
+    "temperature": 0.3
+  }
+}

@@ -9,6 +9,8 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
+import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
+import type { MCPContent } from "./types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { McpResultFormatter } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -330,7 +332,7 @@ export class MCPRegistry {
         }
       }
 
-      return this.convertToMCPResult(
+      return await this.convertToMCPResult(
         result,
         context.toolName,
         context.locale,
@@ -353,7 +355,7 @@ export class MCPRegistry {
         try {
           const retryResult =
             await RouteExecutionExecutor.executeGenericHandler(executeArgs);
-          return this.convertToMCPResult(
+          return await this.convertToMCPResult(
             retryResult,
             context.toolName,
             context.locale,
@@ -428,14 +430,14 @@ export class MCPRegistry {
   /**
    * Convert route execution result to MCP format
    */
-  private convertToMCPResult<TData>(
+  private async convertToMCPResult<TData>(
     result: ResponseType<TData>,
     toolName: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
     endpoint: CreateApiEndpointAny | null,
     user: JwtPayloadType,
-  ): MCPToolCallResult {
+  ): Promise<MCPToolCallResult> {
     const { t } = mcpScopedTranslation.scopedT(locale);
 
     if (result.success && result.data) {
@@ -461,7 +463,29 @@ export class MCPRegistry {
         "content" in data &&
         Array.isArray((data as Record<string, ContentBlock[]>).content)
       ) {
-        const content = (data as Record<string, ContentBlock[]>).content;
+        const rawContent = (data as Record<string, ContentBlock[]>).content;
+        // Convert all blocks to MCP-compatible format.
+        // image_url blocks are read from storage (with ownership check) and converted
+        // to base64 image blocks so MCP clients can render them inline.
+        const content: MCPContent[] = (
+          await Promise.all(
+            rawContent.map(async (block): Promise<MCPContent | null> => {
+              if (block.type === "text" || block.type === "image") {
+                return block;
+              }
+              // image_url: read from storage adapter with user ownership check
+              const base64 = await fetchStorageFileAsBase64(block.url, user);
+              if (!base64) {
+                logger.warn(
+                  "[MCP Registry] Failed to fetch image_url block, skipping",
+                  { url: block.url, toolName },
+                );
+                return null;
+              }
+              return { type: "image", data: base64, mimeType: block.mimeType };
+            }),
+          )
+        ).filter((block): block is MCPContent => block !== null);
         logger.debug(
           "[MCP Registry] ContentResponse with native content blocks",
           { toolName, blockCount: content.length },

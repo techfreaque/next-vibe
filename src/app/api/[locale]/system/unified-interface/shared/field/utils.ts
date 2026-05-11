@@ -9,6 +9,7 @@ import { z } from "zod";
 
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,
@@ -30,7 +31,6 @@ import type { CreateApiEndpointAny } from "../types/endpoint-base";
 import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
 import type { Platform } from "../types/platform";
 import type { ServerDefaultContext } from "../types/server-default";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   ArrayWidgetConfig,
   DisplayOnlyWidgetConfig,
@@ -107,7 +107,7 @@ function getDefProperty<T>(
  */
 export function extractSchemaDefaults<T>(
   schema: z.ZodTypeAny,
-  logger?: EndpointLogger,
+  logger: EndpointLogger,
   path = "",
   forFormInit = false,
 ): T | Partial<T> | undefined {

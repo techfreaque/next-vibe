@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [MQ1-stream1] You are a test echo bot. Reply with ONLY the word: ECHO_DONE. No preamble, no explanation, no punctuation beyond that. If you add anything else, the test FAILS.\n\nAssistant: <think> The user is running a test and wants me to reply with ONLY the word \"ECHO_DONE\". No preamble, no explanation, no punctuation beyond that. I must comply strictly or the test fails.</think> ECHO_DONE\n\nUser: [MQ1-stream2] You are a test echo bot. Reply with ONLY the word: QUEUED_DONE. No preamble, no explanation, no punctuation beyond that. If you add anything else, the test FAILS. IMPORTANT: If you see any message that says QUEUED_DONE was already replied, that means you have been called twice and the test FAILS.",
+    "encoding_format": "float"
+  }
+}

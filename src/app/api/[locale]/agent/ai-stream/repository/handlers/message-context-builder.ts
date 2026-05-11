@@ -1,16 +1,13 @@
 import "server-only";
 
 import type { ModelMessage, streamText } from "ai";
-import { asc, eq } from "drizzle-orm";
-
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { db } from "../../../../system/db";
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, MessageMetadata, ToolCall } from "../../../chat/db";
-import { chatMessages } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
+import { fetchAncestorBranch } from "../core/branch-utils";
 import {
   getChatModelById,
   type ChatModelId,
@@ -514,6 +511,7 @@ export class MessageContextBuilder {
       const timestamp = formatAbsoluteTimestamp(
         params.upcomingAssistantMessageCreatedAt,
         params.timezone,
+        params.logger,
       );
       metadataParts.push(`Posted:${timestamp}`);
       contextLine = `${CONTEXT_LINE_PREFIX}${metadataParts.join(" | ")}]`;
@@ -636,48 +634,16 @@ export class MessageContextBuilder {
       });
       return branchMessages;
     } else {
-      // For server: fetch ALL thread messages in ONE query, then filter branch
-      const allMessages = await db
-        .select()
-        .from(chatMessages)
-        .where(eq(chatMessages.threadId, threadId))
-        .orderBy(asc(chatMessages.createdAt));
-
-      logger.debug("[fetchBranchMessages] Fetched all thread messages", {
-        totalMessages: allMessages.length,
+      const branchMessages = await fetchAncestorBranch(
         threadId,
-      });
-
-      // Walk up parent chain
-      const branchMessages: ChatMessage[] = [];
-      const messageMap = new Map(allMessages.map((m) => [m.id, m]));
-
-      // Start from parentMessageId (the message the new user message will reply to)
-      // Walk up the chain INCLUDING this message
-      let currentId: string | null = parentMessageId;
-
-      while (currentId) {
-        const msg = messageMap.get(currentId);
-        if (!msg) {
-          break;
-        }
-        branchMessages.push(msg);
-
-        // Stop if we hit a compacting message (include it, then stop)
-        if (msg.metadata?.isCompacting) {
-          break;
-        }
-
-        currentId = msg.parentId;
-      }
-
-      branchMessages.reverse(); // Oldest first
-      logger.debug("[fetchBranchMessages] Server branch messages filtered", {
+        parentMessageId,
+        logger,
+      );
+      logger.debug("[fetchBranchMessages] Server branch messages fetched", {
         count: branchMessages.length,
         parentMessageId,
-        stoppedAtCompacting: branchMessages[branchMessages.length - 1]?.metadata
-          ?.isCompacting
-          ? branchMessages[branchMessages.length - 1]?.id
+        stoppedAtCompacting: branchMessages[0]?.metadata?.isCompacting
+          ? branchMessages[0]?.id
           : null,
       });
       return branchMessages;
@@ -972,6 +938,7 @@ export class MessageContextBuilder {
     const timestamp = formatAbsoluteTimestamp(
       params.upcomingAssistantMessageCreatedAt,
       params.timezone,
+      params.logger,
     );
     metadataParts.push(`Posted:${timestamp}`);
     const contextLine = `${CONTEXT_LINE_PREFIX}${metadataParts.join(" | ")}]`;

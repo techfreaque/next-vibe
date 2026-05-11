@@ -268,11 +268,19 @@ const PreCallEndpointsPage = React.memo(function PreCallEndpointsPage({
   locale: CountryLanguage;
   user: ReturnType<typeof useWidgetUser>;
 }): JSX.Element {
+  const logger = useWidgetLogger();
   const endpoint = useMemo(
     () => ({ [method]: resolvedEndpoint }),
     [method, resolvedEndpoint],
   );
-  return <EndpointsPage endpoint={endpoint} locale={locale} user={user} />;
+  return (
+    <EndpointsPage
+      endpoint={endpoint}
+      locale={locale}
+      user={user}
+      logger={logger}
+    />
+  );
 });
 
 // ─── Pre-Calls Editor ───────────────────────────────────────────────────────
@@ -833,6 +841,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
                   className="rounded-lg bg-background"
                   refetchInterval={isSubmitting ? 2000 : false}
                   initialData={mockMessagesInitialData}
+                  logger={logger}
                 />
               </ChatNavigationProvider>
             )}

@@ -76,6 +76,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Process ID of the focused window"),
       }),
+      width: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get-focused-window.response.width",
+        schema: z.number().optional().describe("Window width in pixels"),
+      }),
+      height: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get-focused-window.response.height",
+        schema: z.number().optional().describe("Window height in pixels"),
+      }),
+      monitor: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get-focused-window.response.monitor",
+        schema: z
+          .string()
+          .optional()
+          .describe("Monitor/display the window is on (e.g. DP-1, HDMI-A-1)"),
+      }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get-focused-window.response.error",
@@ -102,6 +120,9 @@ const { POST } = createEndpoint({
         windowId: "0x3200001",
         windowTitle: "Mozilla Firefox",
         pid: 12345,
+        width: 1920,
+        height: 1080,
+        monitor: "DP-1",
         executionId: "exec_123",
       },
     },

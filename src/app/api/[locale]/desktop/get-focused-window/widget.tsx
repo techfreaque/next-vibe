@@ -44,6 +44,20 @@ export function GetFocusedWindowWidget(_props: CustomWidgetProps): JSX.Element {
                 {data.windowId}
               </Badge>
             ) : null}
+            {data.width !== null &&
+            data.width !== undefined &&
+            data.height !== null &&
+            data.height !== undefined ? (
+              <Badge variant="outline" className="text-xs">
+                {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                {data.width}×{data.height}
+              </Badge>
+            ) : null}
+            {data.monitor ? (
+              <Badge variant="outline" className="text-xs">
+                {data.monitor}
+              </Badge>
+            ) : null}
           </Div>
         </Div>
       ) : data?.error ? (

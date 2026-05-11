@@ -44,6 +44,17 @@ export function GetFocusedWindowCliWidget({
       if (v.windowId) {
         parts.push(`id: ${v.windowId}`);
       }
+      if (
+        v.width !== null &&
+        v.width !== undefined &&
+        v.height !== null &&
+        v.height !== undefined
+      ) {
+        parts.push(`size: ${v.width}x${v.height}`);
+      }
+      if (v.monitor) {
+        parts.push(`monitor: ${v.monitor}`);
+      }
       return parts.join("\n");
     }
 
@@ -56,6 +67,17 @@ export function GetFocusedWindowCliWidget({
     }
     if (v.windowId) {
       meta.push(`id: ${chalk.dim(v.windowId)}`);
+    }
+    if (
+      v.width !== null &&
+      v.width !== undefined &&
+      v.height !== null &&
+      v.height !== undefined
+    ) {
+      meta.push(`${chalk.green(`${v.width}×${v.height}`)}`);
+    }
+    if (v.monitor) {
+      meta.push(`monitor: ${chalk.cyan(v.monitor)}`);
     }
     if (meta.length) {
       lines.push(`    ${chalk.dim(meta.join("  "))}`);

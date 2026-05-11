@@ -113,6 +113,89 @@ export class MessageDbWriter {
     this.emitTitle = emitTitle;
   }
 
+  // ─── Internal helpers ─────────────────────────────────────────────────────
+
+  /**
+   * After each new message is committed to DB, advance any queued messages in
+   * the thread so their parentId always points to the latest frontier message.
+   *
+   * This prevents queued messages from branching off a mid-stream point:
+   * as tool calls, tool results, and assistant messages are added, every
+   * queued message rolls forward with the chain.
+   *
+   * Fire-and-forget: never blocks the stream. SSE is emitted per queued
+   * message so the client updates position live without a page refresh.
+   */
+  private advanceQueuedMessages(threadId: string, newParentId: string): void {
+    if (this.isIncognito) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      try {
+        // Find all queued messages in this thread
+        const queued = await db
+          .select({ id: chatMessages.id, metadata: chatMessages.metadata })
+          .from(chatMessages)
+          .where(
+            sql`${chatMessages.threadId} = ${threadId}
+              AND ${chatMessages.role} = 'user'
+              AND ${chatMessages.metadata}->>'isQueued' = 'true'`,
+          );
+        if (queued.length === 0) {
+          return;
+        }
+        const now = new Date();
+        await db
+          .update(chatMessages)
+          .set({ parentId: newParentId, updatedAt: now })
+          .where(
+            sql`${chatMessages.threadId} = ${threadId}
+              AND ${chatMessages.role} = 'user'
+              AND ${chatMessages.metadata}->>'isQueued' = 'true'`,
+          );
+        // Emit SSE for each queued message so the client tracks live
+        for (const q of queued) {
+          this.wsEmit("message-created", {
+            streamingState: "streaming",
+            messages: [
+              {
+                id: q.id,
+                threadId,
+                role: ChatMessageRole.USER,
+                isAI: false,
+                content: null,
+                parentId: newParentId,
+                sequenceId: null,
+                model: null,
+                skill: null,
+                metadata: q.metadata ?? { isQueued: true },
+                createdAt: now,
+                updatedAt: now,
+                authorId: null,
+                authorName: null,
+                errorType: null,
+                errorCode: null,
+                errorMessage: null,
+                upvotes: 0,
+                downvotes: 0,
+                searchVector: null,
+              },
+            ],
+          });
+        }
+      } catch (err) {
+        this.logger.warn(
+          "[MessageDbWriter] Failed to advance queued messages",
+          {
+            threadId,
+            newParentId,
+            error: err instanceof Error ? err.message : String(err),
+          },
+        );
+      }
+    })();
+  }
+
   // ─── High-level methods (SSE + DB in one call) ────────────────────────────
 
   /**
@@ -192,6 +275,8 @@ export class MessageDbWriter {
           },
         );
       }
+      // Roll any queued messages forward to this new frontier
+      this.advanceQueuedMessages(threadId, messageId);
     }
   }
 
@@ -262,6 +347,26 @@ export class MessageDbWriter {
         timeToFirstToken: timeToFirstToken ?? null,
       });
     }
+  }
+
+  /**
+   * Emit a lightweight TOKENS_UPDATED SSE event with an estimated completion token count.
+   * SSE-only, no DB write. Used mid-stream (during content delta) to give the UI a
+   * live approximation before the real count arrives from the API at step finish.
+   * Estimate: chars / 4 (rough GPT-style average).
+   */
+  emitEstimatedTokens(messageId: string, charCount: number): void {
+    const estimatedTokens = Math.ceil(charCount / 4);
+    this.wsEmit("tokens-updated", {
+      messages: [
+        {
+          id: messageId,
+          metadata: {
+            completionTokens: estimatedTokens,
+          },
+        },
+      ],
+    });
   }
 
   /**
@@ -444,6 +549,8 @@ export class MessageDbWriter {
           },
         );
       }
+      // Roll any queued messages forward to this new frontier
+      this.advanceQueuedMessages(threadId, messageId);
     }
   }
 
@@ -528,6 +635,8 @@ export class MessageDbWriter {
           error: createResult.message,
         });
       }
+      // Roll any queued messages forward to this new frontier
+      this.advanceQueuedMessages(threadId, toolMessageId);
     }
   }
 
@@ -739,15 +848,16 @@ export class MessageDbWriter {
 
   /**
    * Emit a generic SSE error event.
+   * @param parentId - Optional parent message ID so the error appears as a child of a specific message (e.g. a failed compacting bubble).
    */
-  emitError(errorResponse: ErrorResponseType): void {
+  emitError(errorResponse: ErrorResponseType, parentId?: string | null): void {
     this.wsEmit("error", {
       messages: [
         {
           id: crypto.randomUUID(),
           role: ChatMessageRole.ERROR,
           content: errorResponse.message ?? null,
-          parentId: null,
+          parentId: parentId ?? null,
           sequenceId: null,
           model: null,
           skill: null,
@@ -943,6 +1053,7 @@ export class MessageDbWriter {
           skill: skill ?? null,
           metadata: {
             isCompacting: true,
+            isStreaming: true,
             compactedMessageCount: messagesToCompact.length,
             ...(containsMediaReferences && { containsMediaReferences: true }),
           },
@@ -976,23 +1087,28 @@ export class MessageDbWriter {
         metadata: {
           isCompacting: true,
           compactedMessageCount: messagesToCompact.length,
-          compactedTimeRange: {
-            start: messagesToCompact[0]?.createdAt.toISOString() ?? "",
-            end:
-              messagesToCompact[
-                messagesToCompact.length - 1
-              ]?.createdAt.toISOString() ?? "",
-          },
-          originalMessageIds: messagesToCompact.map((m) => m.id),
+          ...(messagesToCompact.length > 0 && {
+            compactedTimeRange: {
+              start: messagesToCompact[0]?.createdAt.toISOString() ?? "",
+              end:
+                messagesToCompact[
+                  messagesToCompact.length - 1
+                ]?.createdAt.toISOString() ?? "",
+            },
+            originalMessageIds: messagesToCompact.map((m) => m.id),
+          }),
           ...(containsMediaReferences && { containsMediaReferences: true }),
         },
         createdAt,
       });
+      // Roll any queued messages forward to this new frontier
+      this.advanceQueuedMessages(threadId, messageId);
     }
   }
 
   /**
-   * Mark a compacting message as failed in the DB (no SSE - stream is already dead).
+   * Mark a compacting message as failed: emits SSE so live clients exit loading state,
+   * and updates DB so the next session shows the failed state.
    * Sets metadata.compactingFailed = true and errorMessage so the UI can show a failed state,
    * and the next send can detect it and retry compacting as a sibling.
    */
@@ -1000,14 +1116,30 @@ export class MessageDbWriter {
     messageId: string;
     errorMessage: string;
   }): Promise<void> {
+    const { messageId, errorMessage } = params;
+
+    // SSE: notify live clients immediately so the loading spinner clears
+    this.wsEmit("compacting-done", {
+      messages: [
+        {
+          id: messageId,
+          content: "",
+          metadata: {
+            isCompacting: true,
+            isStreaming: false,
+            compactingFailed: true,
+          },
+        },
+      ],
+    });
+
     if (this.isIncognito) {
       return;
     }
-    const { messageId, errorMessage } = params;
     await db
       .update(chatMessages)
       .set({
-        metadata: sql`metadata || ${JSON.stringify({ isCompacting: true, compactingFailed: true })}::jsonb`,
+        metadata: sql`metadata || ${JSON.stringify({ isCompacting: true, isStreaming: false, compactingFailed: true })}::jsonb`,
         errorMessage,
       })
       .where(eq(chatMessages.id, messageId));
@@ -1069,14 +1201,16 @@ export class MessageDbWriter {
             compactedMessageCount: messagesToCompact.length,
             promptTokens: inputTokens,
             completionTokens: outputTokens,
-            compactedTimeRange: {
-              start: messagesToCompact[0]?.createdAt.toISOString() ?? "",
-              end:
-                messagesToCompact[
-                  messagesToCompact.length - 1
-                ]?.createdAt.toISOString() ?? "",
-            },
-            originalMessageIds: messagesToCompact.map((m) => m.id),
+            ...(messagesToCompact.length > 0 && {
+              compactedTimeRange: {
+                start: messagesToCompact[0]?.createdAt.toISOString() ?? "",
+                end:
+                  messagesToCompact[
+                    messagesToCompact.length - 1
+                  ]?.createdAt.toISOString() ?? "",
+              },
+              originalMessageIds: messagesToCompact.map((m) => m.id),
+            }),
           },
         })
         .where(eq(chatMessages.id, messageId));
@@ -1857,10 +1991,6 @@ export class MessageDbWriter {
 
   /** Emit a single CONTENT_DELTA SSE event. */
   emitDelta(messageId: string, delta: string): void {
-    this.logger.debug("[MessageDbWriter] CONTENT_DELTA", {
-      messageId,
-      deltaLength: delta.length,
-    });
     this.wsEmit("content-delta", {
       messages: [{ id: messageId, content: delta }],
     });

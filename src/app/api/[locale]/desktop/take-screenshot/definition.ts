@@ -152,6 +152,14 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Base64-encoded PNG screenshot data"),
       }),
+      imageUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "take-screenshot.response.imageUrl",
+        schema: z
+          .string()
+          .optional()
+          .describe("URL of the uploaded screenshot"),
+      }),
       width: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "take-screenshot.response.width",

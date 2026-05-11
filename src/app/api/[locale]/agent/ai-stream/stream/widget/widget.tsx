@@ -15,14 +15,16 @@ import type { JSX } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/widget/new-thread/empty-state";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { CortexModal } from "@/app/api/[locale]/agent/cortex/widget/cortex-modal";
 import { AIToolsModal } from "@/app/api/[locale]/agent/tools/widget/ai-tools-modal";
+import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
@@ -30,7 +32,6 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
 import { platform } from "@/config/env-client";
 
 import type definition from "../definition";
@@ -163,9 +164,12 @@ function AiStreamChatArea(): JSX.Element {
     logger,
     user,
   );
+  interface MessagesGetEndpoint {
+    GET: typeof messagesDefinition.GET;
+  }
   // endpointOptions for EndpointsPage type constraint - only read needed since we pass GET only
   const messagesEndpointOptions = useMemo(
-    () => ({
+    (): UseEndpointOptions<MessagesGetEndpoint> => ({
       read: {
         urlPathParams: { threadId: threadIdToRender ?? "" },
         initialState: { rootFolderId },
@@ -202,7 +206,7 @@ function AiStreamChatArea(): JSX.Element {
             <ErrorBoundary locale={locale}>
               <Div className="max-w-screen overflow-hidden h-dvh">
                 {threadIdToRender ? (
-                  <EndpointsPage
+                  <EndpointsPage<MessagesGetEndpoint>
                     key={threadIdToRender}
                     endpoint={{ GET: messagesDefinition.GET }}
                     endpointOptions={messagesEndpointOptions}

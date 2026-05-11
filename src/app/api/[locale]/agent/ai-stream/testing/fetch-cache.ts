@@ -530,6 +530,31 @@ function nextCallIndex(modelName: string): number {
   return n;
 }
 
+/** Count of external fetch calls currently in-flight (started but not resolved). */
+let inflightCount = 0;
+
+/**
+ * Wait until all in-flight external fetch calls have resolved.
+ * Use this between tests to prevent fire-and-forget goroutines from one test
+ * polluting the call counters of the next test.
+ */
+export async function waitForInflightFetches(
+  maxWaitMs = 10_000,
+): Promise<void> {
+  const start = Date.now();
+  const deadline = start + maxWaitMs;
+  // Poll until no more in-flight calls. inflightCount is mutated by the
+  // global fetch interceptor (not inside the loop body), so we read it via
+  // a getter to satisfy the loop-condition linter rule.
+  const getInflight = (): number => inflightCount;
+  while (getInflight() > 0 && Date.now() < deadline) {
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 50);
+    });
+  }
+}
+
 function cacheDir(testCase: string): string {
   return join(HTTP_CACHE_DIR, testCase);
 }
@@ -763,119 +788,124 @@ export function installFetchCache(): void {
       return originalFetch(input, init);
     }
 
-    let bodyStr = "";
-    if (init?.body) {
-      bodyStr =
-        typeof init.body === "string"
-          ? init.body
-          : init.body instanceof URLSearchParams
-            ? init.body.toString()
-            : JSON.stringify(init.body);
-    }
+    inflightCount++;
+    try {
+      let bodyStr = "";
+      if (init?.body) {
+        bodyStr =
+          typeof init.body === "string"
+            ? init.body
+            : init.body instanceof URLSearchParams
+              ? init.body.toString()
+              : JSON.stringify(init.body);
+      }
 
-    const modelName = deriveModelName(url, bodyStr);
-    const testCaseDir = cacheDir(currentTestCase);
-    const callIndex = nextCallIndex(modelName);
-    const stem = fileStem(modelName, callIndex);
-    const rp = join(testCaseDir, `${stem}-res.json`);
+      const modelName = deriveModelName(url, bodyStr);
+      const testCaseDir = cacheDir(currentTestCase);
+      const callIndex = nextCallIndex(modelName);
+      const stem = fileStem(modelName, callIndex);
+      const rp = join(testCaseDir, `${stem}-res.json`);
 
-    // ── Cache hit ────────────────────────────────────────────────────────────
-    if (existsSync(rp)) {
+      // ── Cache hit ────────────────────────────────────────────────────────────
+      if (existsSync(rp)) {
+        // eslint-disable-next-line no-console
+        console.log("[FetchCache] HIT", {
+          rp: rp.split("/").slice(-3).join("/"),
+          model: modelName,
+          index: callIndex,
+        });
+        const cached = JSON.parse(readFileSync(rp, "utf-8")) as ResFile;
+        // SSE responses use sseEventsToTickingStream (pull-based, one event per
+        // macrotask tick) - see replayFromCache. Non-SSE responses still need one
+        // yield so the caller's await-fetch itself is truly async.
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 0);
+        });
+        return replayFromCache(cached);
+      }
       // eslint-disable-next-line no-console
-      console.log("[FetchCache] HIT", {
+      console.log("[FetchCache] MISS", {
         rp: rp.split("/").slice(-3).join("/"),
         model: modelName,
         index: callIndex,
       });
-      const cached = JSON.parse(readFileSync(rp, "utf-8")) as ResFile;
-      // SSE responses use sseEventsToTickingStream (pull-based, one event per
-      // macrotask tick) - see replayFromCache. Non-SSE responses still need one
-      // yield so the caller's await-fetch itself is truly async.
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 0);
-      });
-      return replayFromCache(cached);
-    }
-    // eslint-disable-next-line no-console
-    console.log("[FetchCache] MISS", {
-      rp: rp.split("/").slice(-3).join("/"),
-      model: modelName,
-      index: callIndex,
-    });
 
-    // ── Cache miss ────────────────────────────────────────────────────────────
-    if (strictMode) {
-      // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached fetch
-      throw new Error(
-        // eslint-disable-next-line i18next/no-literal-string
-        `[FetchCache STRICT] No fixture for external URL: ${url} (context: ${currentTestCase})`,
+      // ── Cache miss ────────────────────────────────────────────────────────────
+      if (strictMode) {
+        // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached fetch
+        throw new Error(
+          // eslint-disable-next-line i18next/no-literal-string
+          `[FetchCache STRICT] No fixture for external URL: ${url} (context: ${currentTestCase})`,
+        );
+      }
+
+      const real = await originalFetch(input, init);
+      const responseHeaders = headersToRecord(real.headers);
+
+      mkdirSync(testCaseDir, { recursive: true });
+
+      // Write req file (full body, human-readable)
+      const reqEntry: ReqFile = {
+        url,
+        method: init?.method ?? "GET",
+        headers: sanitiseRequestHeaders(init?.headers),
+        body: parseBodyForStorage(bodyStr),
+      };
+      writeFileSync(
+        join(testCaseDir, `${stem}-req.json`),
+        JSON.stringify(reqEntry, null, 2),
+        "utf-8",
       );
-    }
 
-    const real = await originalFetch(input, init);
-    const responseHeaders = headersToRecord(real.headers);
+      const isStream =
+        (responseHeaders["content-type"] ?? "").includes("event-stream") ||
+        (responseHeaders["transfer-encoding"] ?? "") === "chunked";
 
-    mkdirSync(testCaseDir, { recursive: true });
+      if (isStream && real.body) {
+        // TransformStream: pass chunks through to caller AND collect them.
+        // Cache is written in flush() - after the caller has fully consumed the
+        // stream - so the file is always complete before the test ends.
+        const chunks: Uint8Array[] = [];
+        const transform = new TransformStream<Uint8Array, Uint8Array>({
+          transform(chunk, controller): void {
+            chunks.push(chunk);
+            controller.enqueue(chunk);
+          },
+          flush(): void {
+            const total = chunks.reduce((n, c) => n + c.length, 0);
+            const merged = new Uint8Array(total);
+            let offset = 0;
+            for (const c of chunks) {
+              merged.set(c, offset);
+              offset += c.length;
+            }
+            const resEntry = buildResFile(
+              url,
+              real.status,
+              responseHeaders,
+              merged,
+            );
+            writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
+          },
+        });
 
-    // Write req file (full body, human-readable)
-    const reqEntry: ReqFile = {
-      url,
-      method: init?.method ?? "GET",
-      headers: sanitiseRequestHeaders(init?.headers),
-      body: parseBodyForStorage(bodyStr),
-    };
-    writeFileSync(
-      join(testCaseDir, `${stem}-req.json`),
-      JSON.stringify(reqEntry, null, 2),
-      "utf-8",
-    );
+        return new Response(real.body.pipeThrough(transform), {
+          status: real.status,
+          headers: responseHeaders,
+        });
+      }
 
-    const isStream =
-      (responseHeaders["content-type"] ?? "").includes("event-stream") ||
-      (responseHeaders["transfer-encoding"] ?? "") === "chunked";
+      // Non-streaming: drain, build human-readable entry, return stream
+      const bytes = await drainStream(real.clone().body!);
+      const resEntry = buildResFile(url, real.status, responseHeaders, bytes);
+      writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
 
-    if (isStream && real.body) {
-      // TransformStream: pass chunks through to caller AND collect them.
-      // Cache is written in flush() - after the caller has fully consumed the
-      // stream - so the file is always complete before the test ends.
-      const chunks: Uint8Array[] = [];
-      const transform = new TransformStream<Uint8Array, Uint8Array>({
-        transform(chunk, controller): void {
-          chunks.push(chunk);
-          controller.enqueue(chunk);
-        },
-        flush(): void {
-          const total = chunks.reduce((n, c) => n + c.length, 0);
-          const merged = new Uint8Array(total);
-          let offset = 0;
-          for (const c of chunks) {
-            merged.set(c, offset);
-            offset += c.length;
-          }
-          const resEntry = buildResFile(
-            url,
-            real.status,
-            responseHeaders,
-            merged,
-          );
-          writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
-        },
-      });
-
-      return new Response(real.body.pipeThrough(transform), {
+      return new Response(bytesToStream(bytes), {
         status: real.status,
         headers: responseHeaders,
       });
+    } finally {
+      inflightCount--;
     }
-
-    // Non-streaming: drain, build human-readable entry, return stream
-    const bytes = await drainStream(real.clone().body!);
-    const resEntry = buildResFile(url, real.status, responseHeaders, bytes);
-    writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
-
-    return new Response(bytesToStream(bytes), {
-      status: real.status,
-      headers: responseHeaders,
-    });
   }) as typeof globalThis.fetch;
 }

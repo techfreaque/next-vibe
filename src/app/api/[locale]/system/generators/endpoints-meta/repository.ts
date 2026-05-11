@@ -217,7 +217,7 @@ export class EndpointsMetaGeneratorRepository {
         const entries = EndpointsMetaGeneratorRepository.serializeForLocale(
           loadedEndpoints,
           locale,
-          localeIndex === 0 ? logger : undefined,
+          logger,
         );
         const content = EndpointsMetaGeneratorRepository.renderFile(
           entries,
@@ -365,7 +365,7 @@ export class EndpointsMetaGeneratorRepository {
   private static serializeForLocale(
     loaded: Array<{ definition: CreateApiEndpointAny }>,
     locale: CountryLanguage,
-    logger?: EndpointLogger,
+    logger: EndpointLogger,
   ): EndpointMeta[] {
     const { t: appLocaleT } = appLocaleScopedTranslation.scopedT(locale);
 

@@ -170,7 +170,7 @@ export class VibeSenseRepository {
   private static validateConfig(
     config: GraphConfig,
     t: VibeSenseT,
-    logger?: EndpointLogger,
+    logger: EndpointLogger,
   ): ResponseType<never> | null {
     const nodeIds = new Set(Object.keys(config.nodes));
     const badEdges: string[] = [];
@@ -185,7 +185,7 @@ export class VibeSenseRepository {
     }
 
     if (badEdges.length > 0) {
-      logger?.warn("[vibe-sense] validateConfig: bad edges", badEdges);
+      logger.warn("[vibe-sense] validateConfig: bad edges", badEdges);
       return fail({
         message: t("graphs.create.errors.validation.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

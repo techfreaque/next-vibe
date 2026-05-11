@@ -20,7 +20,9 @@ import {
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
+import { v4 as uuid } from "uuid";
 
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { DesktopT } from "../i18n";
@@ -570,7 +572,7 @@ export interface ScreenshotResult {
   imageData?: string;
   width?: number;
   height?: number;
-  monitorName?: string;
+  capturedMonitor?: string;
   originalWidth?: number;
   originalHeight?: number;
   error?: string;
@@ -587,6 +589,7 @@ export class DesktopScreenshotRepository {
     },
     t: DesktopT,
     logger: EndpointLogger,
+    threadId?: string,
   ): Promise<ResponseType<ScreenshotResult> | ContentResponse> {
     const platformErr = checkLinux(t);
     if (platformErr) {
@@ -603,9 +606,11 @@ export class DesktopScreenshotRepository {
     let monitorGeometry:
       | { x: number; y: number; width: number; height: number }
       | undefined;
+    let allMonitors: MonitorInfo[] = [];
 
     {
       const monitors = await listMonitors(logger);
+      allMonitors = monitors;
       let targetName = data.monitorName;
 
       if (!targetName && data.screen === undefined) {
@@ -673,7 +678,10 @@ export class DesktopScreenshotRepository {
         }
         const { x, y, width, height } = monitorGeometry;
 
-        // Get screenshot dimensions to compute the scale factor
+        // Get screenshot dimensions to compute the scale factor.
+        // Compare the full screenshot pixel dimensions against the logical
+        // bounding box of all monitors (from the same source as monitorGeometry)
+        // to avoid mixing coordinate spaces between kscreen-doctor and xrandr.
         const dimResult = await runCommand(
           "magick",
           ["identify", "-ping", "-format", "%w %h", fullPath],
@@ -686,19 +694,23 @@ export class DesktopScreenshotRepository {
           const parts = dimResult.stdout.trim().split(" ");
           const imgW = parseInt(parts[0] ?? "0", 10);
           const imgH = parseInt(parts[1] ?? "0", 10);
-          // Get xrandr virtual screen size
-          const xrandrResult = await runCommand("xrandr", [], t, logger);
-          if (!isCommandError(xrandrResult) && imgW > 0 && imgH > 0) {
-            const screenMatch = /current (\d+) x (\d+)/.exec(
-              xrandrResult.stdout,
-            );
-            if (screenMatch) {
-              const xrandrW = parseInt(screenMatch[1] ?? "0", 10);
-              const xrandrH = parseInt(screenMatch[2] ?? "0", 10);
-              if (xrandrW > 0 && xrandrH > 0) {
-                scaleX = imgW / xrandrW;
-                scaleY = imgH / xrandrH;
+          if (imgW > 0 && imgH > 0 && allMonitors.length > 0) {
+            // Compute bounding box of all monitors in logical coordinates
+            let logicalMaxX = 0;
+            let logicalMaxY = 0;
+            for (const m of allMonitors) {
+              const right = m.x + m.width;
+              const bottom = m.y + m.height;
+              if (right > logicalMaxX) {
+                logicalMaxX = right;
               }
+              if (bottom > logicalMaxY) {
+                logicalMaxY = bottom;
+              }
+            }
+            if (logicalMaxX > 0 && logicalMaxY > 0) {
+              scaleX = imgW / logicalMaxX;
+              scaleY = imgH / logicalMaxY;
             }
           }
         }
@@ -813,9 +825,30 @@ export class DesktopScreenshotRepository {
           height: finalDims?.height,
           originalWidth: origDims?.width,
           originalHeight: origDims?.height,
-          monitorName: resolvedMonitorName,
+          capturedMonitor: resolvedMonitorName,
           executionId,
         });
+      }
+
+      try {
+        const storage = getStorageAdapter();
+        const uploaded = await storage.uploadFile(buf, {
+          filename: `desktop-screenshot-${executionId}.png`,
+          mimeType: "image/png",
+          threadId: threadId || uuid(),
+        });
+        return success({
+          success: true,
+          imageUrl: uploaded.url,
+          width: finalDims?.width,
+          height: finalDims?.height,
+          originalWidth: origDims?.width,
+          originalHeight: origDims?.height,
+          capturedMonitor: resolvedMonitorName,
+          executionId,
+        });
+      } catch {
+        // Fall back to inline base64 content response if upload fails
       }
 
       const blocks: ContentBlock[] = [
@@ -823,7 +856,7 @@ export class DesktopScreenshotRepository {
           type: "text",
           text: `Screenshot: ${monitorLabel} (${dimensionLabel})`,
         },
-        { type: "image", data: imageData, mimeType: "image/png" },
+        { type: "image" as const, data: imageData, mimeType: "image/png" },
       ];
       return createContentResponse(blocks);
     } catch (err) {
@@ -1450,20 +1483,22 @@ export interface FocusedWindowResult {
   windowId?: string;
   windowTitle?: string;
   pid?: number;
+  width?: number;
+  height?: number;
+  monitor?: string;
   error?: string;
   executionId: string;
 }
 
 export interface WindowInfo {
   windowId: string;
-  desktopId: string;
+  monitor: string;
   pid: number;
   x: number;
   y: number;
   width: number;
   height: number;
   title: string;
-  monitor?: string;
 }
 
 export interface ListWindowsResult {
@@ -1502,7 +1537,11 @@ if (w) {
   print(JSON.stringify({
     uuid: String(w.internalId),
     caption: w.caption,
-    pid: w.pid
+    pid: w.pid,
+    x: Math.round(w.x),
+    y: Math.round(w.y),
+    width: Math.round(w.width),
+    height: Math.round(w.height)
   }));
   print("KWIN_ACTIVE_END_${executionId}");
 } else {
@@ -1611,12 +1650,24 @@ if (w) {
       });
     }
 
-    let parsed: { uuid?: string; caption?: string; pid?: number };
+    let parsed: {
+      uuid?: string;
+      caption?: string;
+      pid?: number;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+    };
     try {
       parsed = JSON.parse(jsonLine) as {
         uuid?: string;
         caption?: string;
         pid?: number;
+        x?: number;
+        y?: number;
+        width?: number;
+        height?: number;
       };
     } catch {
       return fail({
@@ -1629,8 +1680,39 @@ if (w) {
     const windowTitle = parsed.caption;
     const pid =
       parsed.pid !== undefined && parsed.pid > 0 ? parsed.pid : undefined;
+    const winWidth =
+      parsed.width && parsed.width > 0 ? parsed.width : undefined;
+    const winHeight =
+      parsed.height && parsed.height > 0 ? parsed.height : undefined;
 
-    return success({ success: true, windowId, windowTitle, pid, executionId });
+    // Determine which monitor the focused window is on using its center point
+    let monitor: string | undefined;
+    if (
+      parsed.x !== undefined &&
+      parsed.y !== undefined &&
+      winWidth !== undefined &&
+      winHeight !== undefined
+    ) {
+      const monitors = await listMonitors(logger);
+      const cx = parsed.x + winWidth / 2;
+      const cy = parsed.y + winHeight / 2;
+      const hit = monitors.find(
+        (m) =>
+          cx >= m.x && cx < m.x + m.width && cy >= m.y && cy < m.y + m.height,
+      );
+      monitor = hit?.name;
+    }
+
+    return success({
+      success: true,
+      windowId,
+      windowTitle,
+      pid,
+      width: winWidth,
+      height: winHeight,
+      monitor,
+      executionId,
+    });
   }
 
   static async listWindows(
@@ -1658,7 +1740,6 @@ for (var i = 0; i < wins.length; i++) {
     y: Math.round(w.y),
     width: Math.round(w.width),
     height: Math.round(w.height),
-    desktop: w.desktops && w.desktops[0] ? String(w.desktops[0]) : "0",
     minimized: w.minimized
   }));
 }
@@ -1749,7 +1830,6 @@ print("KWIN_LIST_END_${executionId}");
               y?: number;
               width?: number;
               height?: number;
-              desktop?: string;
             };
             if (w.uuid) {
               windows.push({
@@ -1760,7 +1840,7 @@ print("KWIN_LIST_END_${executionId}");
                 y: w.y ?? 0,
                 width: w.width ?? 0,
                 height: w.height ?? 0,
-                desktopId: w.desktop ?? "0",
+                monitor: "",
               });
             }
           } catch {
@@ -1783,7 +1863,7 @@ print("KWIN_LIST_END_${executionId}");
           (m) =>
             cx >= m.x && cx < m.x + m.width && cy >= m.y && cy < m.y + m.height,
         );
-        win.monitor = hit?.name;
+        win.monitor = hit?.name ?? "";
       }
     }
 
@@ -2002,12 +2082,17 @@ for (var i = 0; i < wins.length; i++) {
     const targetY = my + Math.round(mh / 4);
 
     const safeId = resolvedId.replace(/[^a-zA-Z0-9{}-]/g, "");
+    // Use object literal instead of Qt.rect() — Qt is not available in the
+    // KWin scripting context on KDE Plasma 6+. Object literals work natively.
+    // Also call setMaximize(false, false) first: maximized windows ignore
+    // frameGeometry assignments silently.
     const script = `
 var wins = workspace.windowList();
 for (var i = 0; i < wins.length; i++) {
   var w = wins[i];
   if (String(w.internalId) === "${safeId}") {
-    w.frameGeometry = Qt.rect(${targetX}, ${targetY}, w.width, w.height);
+    if (w.maximizable) { w.setMaximize(false, false); }
+    w.frameGeometry = {x: ${targetX}, y: ${targetY}, width: w.frameGeometry.width, height: w.frameGeometry.height};
     workspace.activeWindow = w;
     break;
   }
@@ -2065,6 +2150,114 @@ for (var i = 0; i < wins.length; i++) {
       t,
       logger,
     );
+
+    // Verify the move by running a second KWin script that reads final position,
+    // then checking via journalctl. Use a unique marker so we only match this run.
+    const verifyMarker = `KWIN_VERIFY_${executionId}`;
+    const verifyScript = `
+var wins = workspace.windowList();
+for (var i = 0; i < wins.length; i++) {
+  var w = wins[i];
+  if (String(w.internalId) === "${safeId}") {
+    print("${verifyMarker}:x=" + Math.round(w.x) + ":y=" + Math.round(w.y));
+    break;
+  }
+}
+`.trim();
+    const verifyPath = `/tmp/kwin-verify-${executionId}.js`;
+    writeFileSync(verifyPath, verifyScript, "utf-8");
+
+    const vLoadResult = await runCommand(
+      "qdbus6",
+      [
+        "org.kde.KWin",
+        "/Scripting",
+        "org.kde.kwin.Scripting.loadScript",
+        verifyPath,
+      ],
+      t,
+      logger,
+    );
+
+    let verified = false;
+    if (!isCommandError(vLoadResult)) {
+      const vScriptId = vLoadResult.stdout.trim();
+      await runCommand(
+        "qdbus6",
+        [
+          "org.kde.KWin",
+          `/Scripting/Script${vScriptId}`,
+          "org.kde.kwin.Script.run",
+        ],
+        t,
+        logger,
+      );
+      try {
+        unlinkSync(verifyPath);
+      } catch {
+        /* non-fatal */
+      }
+      await runCommand(
+        "qdbus6",
+        [
+          "org.kde.KWin",
+          `/Scripting/Script${vScriptId}`,
+          "org.kde.kwin.Script.stop",
+        ],
+        t,
+        logger,
+      );
+
+      const journalResult = await runCommand(
+        "journalctl",
+        [
+          "--user",
+          "-n",
+          "500",
+          "--no-pager",
+          "-o",
+          "cat",
+          "_COMM=kwin_wayland",
+        ],
+        t,
+        logger,
+      );
+
+      if (!isCommandError(journalResult)) {
+        const markerLine = journalResult.stdout
+          .split("\n")
+          .findLast((l) => l.startsWith(verifyMarker));
+        if (markerLine) {
+          const xMatch = /:x=(-?\d+)/.exec(markerLine);
+          const yMatch = /:y=(-?\d+)/.exec(markerLine);
+          if (xMatch && yMatch) {
+            const finalX = parseInt(xMatch[1], 10);
+            const finalY = parseInt(yMatch[1], 10);
+            // Window top-left must be within target monitor bounds (50px tolerance)
+            verified =
+              finalX >= mx - 50 &&
+              finalX < mx + mw + 50 &&
+              finalY >= my - 50 &&
+              finalY < my + mh + 50;
+          }
+        }
+      }
+    } else {
+      try {
+        unlinkSync(verifyPath);
+      } catch {
+        /* non-fatal */
+      }
+    }
+
+    if (!verified) {
+      return fail({
+        message: t("repository.commandFailed", {
+          error: `Window move did not take effect — window did not reach monitor ${monName}`,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
 
     return success({
       success: true,

@@ -142,12 +142,20 @@ export class FinishStepHandler {
       };
     }
 
-    // After a step finishes, update currentParentId to point to the last message
+    // After a step finishes, update currentParentId to point to the last message.
+    // If prepareStep injected a queued message (pendingQueueParentId is set),
+    // override to the queued message so the next AI turn is its child.
+    // prepareStep fires BEFORE the consumer processes tool-result/finish-step events,
+    // so we can't set currentParentId there directly — it would be overwritten by
+    // tool-result processing. We defer the override to here instead.
+    const nextParentId = ctx.pendingQueueParentId ?? ctx.lastParentId;
     logger.debug("[AI Stream] Step finished - updating parent chain", {
       oldParentId: ctx.currentParentId,
-      newParentId: ctx.lastParentId,
+      newParentId: nextParentId,
+      pendingQueueParentId: ctx.pendingQueueParentId,
     });
-    ctx.currentParentId = ctx.lastParentId;
+    ctx.currentParentId = nextParentId;
+    ctx.pendingQueueParentId = null;
 
     // Reset currentAssistantMessageId so the next step creates a new ASSISTANT message
     ctx.currentAssistantMessageId = null;

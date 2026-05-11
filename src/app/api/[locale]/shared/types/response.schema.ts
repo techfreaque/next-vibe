@@ -159,7 +159,9 @@ export interface FileResponse {
  */
 export type ContentBlock =
   | { type: "text"; text: string }
-  | { type: "image"; data: string; mimeType: string };
+  | { type: "image"; data: string; mimeType: string }
+  /** Storage URL variant — base64 is never stored; fetched on-demand when building AI messages */
+  | { type: "image_url"; url: string; mimeType: string };
 
 /**
  * Content response marker

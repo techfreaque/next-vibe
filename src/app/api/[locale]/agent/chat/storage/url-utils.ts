@@ -1,4 +1,6 @@
 import { envClient } from "@/config/env-client";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { getStorageAdapter } from "./index";
 
@@ -38,42 +40,53 @@ export function parseStorageUrl(
 }
 
 /**
- * Resolve a file URL to base64 data. Tries direct storage access first
- * (bypasses HTTP auth), then falls back to HTTP fetch for external URLs.
+ * Resolve a storage URL to base64 data using the storage adapter directly.
  *
- * Use this instead of bare `fetch(url)` when loading generated media
- * (images/video/audio) for AI model consumption. The direct storage path
- * avoids the authentication requirement on the file-serving endpoint and
- * works reliably in both dev (localhost) and production (CDN/S3) contexts.
+ * When `user` is provided, ownership is verified: the file's `uploadedBy` must
+ * match `user.id`, or the user must be an ADMIN. Returns null if the file is not
+ * found, ownership check fails, or the URL is not a recognised storage URL.
+ *
+ * For external URLs (non-storage), pass no user and use a plain fetch instead.
  */
 export async function fetchStorageFileAsBase64(
   url: string,
+  user?: JwtPayloadType,
 ): Promise<string | null> {
-  // Try direct storage access if the URL matches our storage URL pattern
   const parsed = parseStorageUrl(url);
-  if (parsed) {
+  if (!parsed) {
+    // External URL - plain fetch, no auth concern
     try {
-      const storage = getStorageAdapter();
-      const base64 = await storage.readFileAsBase64(
-        parsed.fileId,
-        parsed.threadId,
-      );
-      if (base64) {
-        return base64;
+      const response = await fetch(url);
+      if (!response.ok) {
+        return null;
       }
+      const buffer = await response.arrayBuffer();
+      return Buffer.from(buffer).toString("base64");
     } catch {
-      // Fall through to HTTP fetch
+      return null;
     }
   }
 
-  // HTTP fetch fallback for external URLs or when direct storage access fails
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      return null;
+  const storage = getStorageAdapter();
+
+  // Verify ownership when a user is provided
+  if (user) {
+    const isAdmin =
+      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+    if (!isAdmin) {
+      const meta = await storage.getFileMetadata(parsed.fileId);
+      if (!meta) {
+        return null;
+      }
+      const userId = user.isPublic ? undefined : user.id;
+      if (meta.uploadedBy !== userId) {
+        return null;
+      }
     }
-    const buffer = await response.arrayBuffer();
-    return Buffer.from(buffer).toString("base64");
+  }
+
+  try {
+    return await storage.readFileAsBase64(parsed.fileId, parsed.threadId);
   } catch {
     return null;
   }

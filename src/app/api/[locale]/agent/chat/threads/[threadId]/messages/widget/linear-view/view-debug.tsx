@@ -140,7 +140,12 @@ export const DebugLinearMessageView = React.memo(
                   chatShadows.sm,
                 )}
               >
-                {createMetadataSystemMessage(message, rootFolderId, timezone)}
+                {createMetadataSystemMessage(
+                  message,
+                  rootFolderId,
+                  timezone,
+                  logger,
+                )}
               </Div>
             </Div>
           )}
@@ -183,7 +188,7 @@ export const DebugLinearMessageView = React.memo(
           )}
         </>
       ),
-      [debugParts, locale, rootFolderId, timezone, t],
+      [debugParts, locale, logger, rootFolderId, timezone, t],
     );
 
     const debugTrailing =

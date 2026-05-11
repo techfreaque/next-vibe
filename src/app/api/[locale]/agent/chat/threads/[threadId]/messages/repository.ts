@@ -15,6 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/branch-utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -78,71 +79,54 @@ export class MessagesRepository {
       return [];
     }
 
-    // Fetch all messages in the thread to build the tree
-    const allMessages = await db
-      .select()
-      .from(chatMessages)
-      .where(eq(chatMessages.threadId, threadId))
-      .orderBy(chatMessages.createdAt);
-
-    logger.debug("Fetched all thread messages for branch filtering", {
+    // Walk the ancestor chain via the shared fetchAncestorBranch utility.
+    // Stops at a successful compacting boundary; returns rows oldest-first.
+    // After the walk, a single extra query fetches sibling tool messages
+    // (parallel tool calls from the same assistant turn) if needed.
+    const branchMessages = await fetchAncestorBranch(
       threadId,
-      totalMessageCount: allMessages.length,
       parentMessageId,
-    });
+      logger,
+    );
 
-    // Build ancestry chain by traversing UP from parent to root.
-    // Stop at the most recent SUCCESSFUL compacting message - it contains a
-    // summary of everything before it, so we only need it + subsequent messages.
-    // This prevents sending the full uncompacted history alongside the summary.
-    const messageMap = new Map(allMessages.map((msg) => [msg.id, msg]));
-    const ancestorIds = new Set<string>();
-
-    let currentId: string | null = parentMessageId;
-    while (currentId) {
-      ancestorIds.add(currentId);
-      const currentMessage = messageMap.get(currentId);
-
-      // Stop at a successful compacting message (include it, but not its ancestors)
-      if (
-        currentMessage?.metadata?.isCompacting === true &&
-        currentMessage.metadata.compactingFailed !== true
-      ) {
-        break;
-      }
-
-      currentId = currentMessage?.parentId ?? null;
-    }
-
-    // Include sibling tool messages: when the parent is a tool message, the AI called
-    // multiple tools in parallel. All sibling tool results share the same parent
-    // (the assistant message that spawned them). Including only the direct ancestor
-    // misses the other tool results, causing the AI to re-call missing tools on revival.
-    // Add all tool-role siblings so the AI sees the complete parallel batch.
-    const parentMsg = messageMap.get(parentMessageId);
+    // Sibling tool messages: if the starting parent is a tool message, other tool
+    // messages from the same assistant turn share the same parentId. We need them
+    // all so the model sees the complete parallel batch. Fetch only their IDs first,
+    // then their full rows — avoids loading unrelated messages.
+    const parentMsg = branchMessages.find((m) => m.id === parentMessageId);
     if (parentMsg?.role === "tool" && parentMsg.parentId) {
-      for (const msg of allMessages) {
-        if (
-          msg.parentId === parentMsg.parentId &&
-          msg.role === "tool" &&
-          !ancestorIds.has(msg.id)
-        ) {
-          ancestorIds.add(msg.id);
+      const siblingAssistantParentId = parentMsg.parentId;
+      // Check if any siblings exist that aren't already in the branch
+      const branchIds = new Set(branchMessages.map((m) => m.id));
+      const siblings = await db
+        .select()
+        .from(chatMessages)
+        .where(
+          and(
+            eq(chatMessages.threadId, threadId),
+            eq(chatMessages.parentId, siblingAssistantParentId),
+            eq(chatMessages.role, ChatMessageRole.TOOL),
+          ),
+        );
+      for (const sibling of siblings) {
+        if (!branchIds.has(sibling.id)) {
+          branchMessages.push(sibling);
         }
       }
+      // Re-sort after appending siblings
+      branchMessages.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      );
     }
 
-    // Filter messages to only include ancestors and maintain chronological order
-    const branchMessages = allMessages.filter((msg) => ancestorIds.has(msg.id));
-
-    logger.debug("Branch messages after compacting filter", {
+    logger.debug("Fetched branch message history via recursive CTE", {
       threadId,
       branchMessageCount: branchMessages.length,
-      totalMessageCount: allMessages.length,
+      parentMessageId,
       stoppedAtCompacting: branchMessages[0]?.metadata?.isCompacting === true,
     });
 
-    // Map to role+content format (keep ERROR messages in chain)
     return branchMessages;
   }
 

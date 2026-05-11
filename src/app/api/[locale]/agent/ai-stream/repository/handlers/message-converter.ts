@@ -51,6 +51,7 @@ export class MessageConverter {
     logger: EndpointLogger,
     locale: CountryLanguage,
     modelConfig?: ChatModelOption,
+    isCurrentTurn?: boolean,
   ): Promise<ModelMessage | ModelMessage[] | null> {
     switch (message.role) {
       case ChatMessageRole.USER: {
@@ -270,10 +271,11 @@ export class MessageConverter {
               }
             : toolCall.result
               ? await MessageConverter.buildToolResultOutput(
+                  logger,
                   toolCall.result,
                   toolCall.toolName,
                   modelConfig,
-                  logger,
+                  isCurrentTurn,
                 )
               : toolCall.waitingForConfirmation
                 ? {
@@ -491,6 +493,10 @@ export class MessageConverter {
         // Skip ahead past all consumed messages (tools + skipped empty assistants)
         i = j - 1;
 
+        // This tool group is the "current turn" if it ends at the last message in the array.
+        // Current-turn images are fetched as base64; history images become URL stubs.
+        const isCurrentTurn = j - 1 === messages.length - 1;
+
         // Check if the last message in result is an ASSISTANT message with text content
         // If so, we need to merge the tool calls into that message
         const lastResultMsg = result[result.length - 1];
@@ -566,10 +572,11 @@ export class MessageConverter {
               }
             : toolCall.result
               ? await MessageConverter.buildToolResultOutput(
+                  logger,
                   toolCall.result,
                   toolCall.toolName,
                   modelConfig,
-                  logger,
+                  isCurrentTurn,
                 )
               : toolCall.waitingForConfirmation
                 ? {
@@ -667,6 +674,7 @@ export class MessageConverter {
             msg,
             rootFolderId,
             timezone,
+            logger,
           );
           result.push({
             role: "system",
@@ -765,10 +773,11 @@ export class MessageConverter {
    * - Model does not support it → pass only text description (gap-fill ensures text is populated)
    */
   private static async buildToolResultOutput(
+    logger: EndpointLogger,
     result: WidgetData | undefined,
     toolName?: string,
     modelConfig?: ChatModelOption,
-    logger?: EndpointLogger,
+    isCurrentTurn?: boolean,
   ): Promise<
     | {
         type: "json";
@@ -806,6 +815,33 @@ export class MessageConverter {
             data: block.data,
             mediaType: block.mimeType,
           });
+        } else if (block.type === "image_url") {
+          if (isCurrentTurn) {
+            // Current turn: fetch base64 on-demand so the model can see the image
+            const base64 = await fetchStorageFileAsBase64(block.url);
+            if (base64) {
+              contentParts.push({
+                type: "media",
+                data: base64,
+                mediaType: block.mimeType,
+              });
+            } else {
+              logger.error(
+                "[MessageConverter] Failed to fetch image_url block",
+                { url: block.url },
+              );
+              contentParts.push({
+                type: "text",
+                text: `[image: ${block.url}]`,
+              });
+            }
+          } else {
+            // History turn: stub with URL + hint — model can re-examine via view_image
+            contentParts.push({
+              type: "text",
+              text: `[image: ${block.url}] — use view_image tool to re-examine`,
+            });
+          }
         }
       }
 
@@ -920,7 +956,7 @@ export class MessageConverter {
             }
             return { type: "content" as const, value: contentParts };
           }
-          logger?.error(
+          logger.error(
             "[MessageConverter] Failed to fetch generated image for tool result",
             { url: fileUrl },
           );

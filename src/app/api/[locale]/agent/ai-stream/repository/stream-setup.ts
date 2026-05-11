@@ -6,7 +6,7 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import {
   ErrorResponseTypes,
@@ -214,40 +214,35 @@ async function buildInitialEmbeddingQuery(
     );
   }
 
-  // Server threads: walk up parent chain via PK lookups
+  // Server threads: walk up parent chain via a single recursive CTE.
+  // Replaces the previous N+1 loop (one PK lookup per hop).
   if (!parentMessageId) {
     return ""; // New conversation - no prior context
   }
 
-  const results: Array<{
+  const rows = await db.execute<{
     role: string;
     content: string | null;
-    parentId: string | null;
-  }> = [];
-  let currentId: string | null = parentMessageId;
+    depth: number;
+  }>(sql`
+    WITH RECURSIVE ancestors AS (
+      SELECT role, content, parent_id, 0 AS depth
+      FROM ${chatMessages}
+      WHERE id = ${parentMessageId}
 
-  for (let i = 0; i < EMBEDDING_RECENT_MESSAGE_COUNT && currentId; i++) {
-    const [row] = await db
-      .select({
-        role: chatMessages.role,
-        content: chatMessages.content,
-        parentId: chatMessages.parentId,
-      })
-      .from(chatMessages)
-      .where(eq(chatMessages.id, currentId))
-      .limit(1);
+      UNION ALL
 
-    if (!row) {
-      break;
-    }
+      SELECT m.role, m.content, m.parent_id, a.depth + 1
+      FROM ${chatMessages} m
+      INNER JOIN ancestors a ON m.id = a.parent_id
+      WHERE a.depth < ${EMBEDDING_RECENT_MESSAGE_COUNT - 1}
+    )
+    SELECT role, content, depth
+    FROM ancestors
+    ORDER BY depth DESC
+  `);
 
-    results.push(row);
-    currentId = row.parentId;
-  }
-
-  // Collected newest-first, reverse for chronological order
-  results.reverse();
-  return dbRowsToEmbeddingQuery(results);
+  return dbRowsToEmbeddingQuery(rows.rows);
 }
 
 export interface StreamSetupResult {

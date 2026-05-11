@@ -6,13 +6,27 @@
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 /**
  * Format absolute timestamp for message metadata
  * CACHE-STABLE: Returns absolute timestamp that never changes
  * Format: "Feb 12, 18:23" (localized to user's timezone)
  */
-export function formatAbsoluteTimestamp(date: Date, timezone: string): string {
+export function formatAbsoluteTimestamp(
+  date: Date,
+  timezone: string,
+  logger: EndpointLogger,
+): string {
+  // Guard against invalid dates (NaN) which cause Intl.DateTimeFormat.format() to throw.
+  // Invalid dates can occur when raw CTE results have missing/unparseable date columns.
+  if (isNaN(date.getTime())) {
+    logger.error(
+      "[formatAbsoluteTimestamp] Invalid date encountered — this should never happen. Date value is NaN, which means a DB column returned null or an unparseable value.",
+      { date, timezone },
+    );
+    return "unknown";
+  }
   const formatter = new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
@@ -33,6 +47,7 @@ export function createMessageMetadata(
   message: ChatMessage,
   rootFolderId: DefaultFolderId,
   timezone: string,
+  logger: EndpointLogger,
 ): string {
   const parts: string[] = [];
 
@@ -73,7 +88,11 @@ export function createMessageMetadata(
   }
 
   // Timestamp (absolute, cache-stable)
-  const timestamp = formatAbsoluteTimestamp(message.createdAt, timezone);
+  const timestamp = formatAbsoluteTimestamp(
+    message.createdAt,
+    timezone,
+    logger,
+  );
   parts.push(`Posted:${timestamp}`);
 
   return parts.join(" | ");
@@ -101,7 +120,13 @@ export function createMetadataSystemMessage(
   message: ChatMessage,
   rootFolderId: DefaultFolderId,
   timezone: string,
+  logger: EndpointLogger,
 ): string {
-  const metadata = createMessageMetadata(message, rootFolderId, timezone);
+  const metadata = createMessageMetadata(
+    message,
+    rootFolderId,
+    timezone,
+    logger,
+  );
   return `${CONTEXT_LINE_PREFIX}${metadata}]`;
 }

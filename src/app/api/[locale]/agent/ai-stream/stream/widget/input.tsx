@@ -420,7 +420,10 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       staleTime: Infinity,
     },
   });
-  const backgroundTasks = messagesQuery.data?.backgroundTasks ?? [];
+  const backgroundTasks =
+    activeThreadId && activeThreadId !== NEW_MESSAGE_ID
+      ? (messagesQuery.data?.backgroundTasks ?? [])
+      : [];
 
   const deleteTaskMutation = useApiMutation(
     cronIdEndpoints.DELETE,
@@ -466,7 +469,10 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // Show stop button when streaming OR when TTS is playing OR when aborting OR when waiting.
   // streamingState from messages cache is the authoritative signal (driven by WS events).
   // "waiting" = stream ended but a background task is still in flight (set by streaming-state-changed WS event).
-  const cacheStreamingState = messagesQuery.data?.streamingState;
+  const cacheStreamingState =
+    activeThreadId && activeThreadId !== NEW_MESSAGE_ID
+      ? messagesQuery.data?.streamingState
+      : undefined;
   const isActivelyStreaming = cacheStreamingState === "streaming";
   const isWaiting = cacheStreamingState === "waiting";
   const showStopButton =

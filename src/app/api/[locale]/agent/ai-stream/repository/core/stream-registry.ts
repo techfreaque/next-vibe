@@ -17,6 +17,8 @@ import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cro
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
+
 import { AbortReason, StreamAbortError } from "./constants";
 
 interface StreamEntry {
@@ -84,6 +86,54 @@ export const StreamRegistry = {
    */
   getEntry(threadId: string): StreamEntry | undefined {
     return activeStreams.get(threadId);
+  },
+};
+
+// ─── Queue Registry ───────────────────────────────────────────────────────────
+// In-memory list of queued messages per thread. When a user message is queued
+// while a stream is active, it's registered here so the running stream's
+// stopWhen predicate can keep the loop alive and prepareStep can inject the
+// queued message as the next user turn — instead of the stream ending and
+// restarting via the finally-block queue processor.
+interface QueuedMessageEntry {
+  id: string;
+  content: string;
+  metadata: MessageMetadata;
+  createdAt: Date;
+}
+
+const queuedMessages = new Map<string, QueuedMessageEntry[]>();
+
+export const QueueRegistry = {
+  /** Register a queued message for a thread. */
+  push(threadId: string, entry: QueuedMessageEntry): void {
+    const existing = queuedMessages.get(threadId) ?? [];
+    existing.push(entry);
+    queuedMessages.set(threadId, existing);
+  },
+
+  /** Returns true if there are queued messages for this thread (sync, for stopWhen). */
+  hasQueued(threadId: string): boolean {
+    const q = queuedMessages.get(threadId);
+    return q !== undefined && q.length > 0;
+  },
+
+  /** Pop the oldest queued message. Returns undefined if none. */
+  shift(threadId: string): QueuedMessageEntry | undefined {
+    const q = queuedMessages.get(threadId);
+    if (!q || q.length === 0) {
+      return undefined;
+    }
+    const entry = q.shift();
+    if (q.length === 0) {
+      queuedMessages.delete(threadId);
+    }
+    return entry;
+  },
+
+  /** Clear all queued messages for a thread (on stream abort/error). */
+  clear(threadId: string): void {
+    queuedMessages.delete(threadId);
   },
 };
 

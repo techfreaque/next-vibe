@@ -26,22 +26,11 @@ interface CustomWidgetProps {
   field: (typeof definition.POST)["fields"];
 }
 
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) {
-    return `${bytes}B`;
-  }
-  if (bytes < 1024 * 1024) {
-    return `${Math.round(bytes / 1024)}KB`;
-  }
-  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
-}
-
 function ScreenshotResult({
   data,
 }: {
   data: DesktopTakeScreenshotResponseOutput;
 }): JSX.Element {
-  const hasImage = Boolean(data.imageData);
   const hasScaling =
     data.originalWidth && data.width && data.originalWidth !== data.width;
   const dimStr = hasScaling
@@ -50,9 +39,9 @@ function ScreenshotResult({
       ? `${data.width}×${data.height}`
       : null;
 
-  const sizeStr = data.imageData
-    ? formatBytes(Math.round((data.imageData.length * 3) / 4))
-    : null;
+  const imgSrc =
+    data.imageUrl ??
+    (data.imageData ? `data:image/png;base64,${data.imageData}` : null);
 
   return (
     <Div className="flex flex-col gap-3">
@@ -68,17 +57,15 @@ function ScreenshotResult({
             {dimStr}
           </Badge>
         ) : null}
-        {sizeStr ? (
-          <Span className="text-xs text-muted-foreground">{sizeStr}</Span>
-        ) : null}
       </Div>
 
-      {/* Inline image */}
-      {hasImage ? (
+      {/* Image */}
+      {imgSrc ? (
         <Div className="rounded-lg overflow-hidden border bg-muted/30">
           <Image
-            src={`data:image/png;base64,${data.imageData}`}
+            src={imgSrc}
             alt=""
+            unoptimized
             className="w-full h-auto max-h-[500px] object-contain"
           />
         </Div>
@@ -124,7 +111,7 @@ export function TakeScreenshotWidget({
       </Div>
 
       {/* Result */}
-      {data?.success && data.width ? <ScreenshotResult data={data} /> : null}
+      {data?.success ? <ScreenshotResult data={data} /> : null}
 
       {data?.error ? (
         <Span className="text-sm text-destructive">{data.error}</Span>

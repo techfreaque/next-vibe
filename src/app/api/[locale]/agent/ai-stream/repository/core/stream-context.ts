@@ -59,6 +59,22 @@ export class StreamContext {
   // Loop control - set to true when model requests to stop the tool loop
   shouldStopLoop = false;
 
+  /** Set to true when prepareStep injects a queued message mid-stream.
+   *  Prevents processNextQueuedMessage from double-processing in the finally block. */
+  queueInjectedInStream = false;
+
+  /**
+   * Set by prepareStep when a queued message is injected mid-stream.
+   * finish-step-handler reads this and overrides currentParentId after the normal
+   * parent chain update. This avoids a race where tool-result processing resets
+   * ctx.lastParentId after prepareStep has already set it to the queued message.
+   *
+   * Flow: prepareStep fires (AI SDK) → sets this → tool-result event processed
+   * (resets lastParentId) → finish-step event processed → reads this → overrides
+   * currentParentId → step-1 AI message gets correct parentId.
+   */
+  pendingQueueParentId: string | null = null;
+
   /** Set when a wake-up-ready pub/sub signal arrives mid-stream.
    *  Causes the stream to yield at the next finish-step boundary (same as endLoop)
    *  so a headless revival can take over with the deferred result in DB context. */
@@ -79,6 +95,13 @@ export class StreamContext {
   // Timing: requestStartTime set just before AI model call; streamStartTime set on first token
   requestStartTime: number | null = null;
   streamStartTime: number | null = null;
+
+  /**
+   * Tracks how many chars were present when we last emitted an estimated token count.
+   * Reset to 0 when a new assistant message starts (currentAssistantMessageId changes).
+   * Allows throttled estimated token emission every ~200 chars during streaming.
+   */
+  lastEstimatedTokenEmitLength = 0;
 
   // Parent chain
   currentParentId: string | null;
@@ -177,6 +200,7 @@ export class StreamContext {
     });
     this.currentAssistantContent = "";
     this.currentAssistantMessageId = null;
+    this.lastEstimatedTokenEmitLength = 0;
     this.pendingToolMessages.clear();
     this.streamingToolInputs.clear();
     // Run registered cleanup callbacks (e.g. pub/sub unsubscribe)

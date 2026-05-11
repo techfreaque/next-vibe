@@ -101,6 +101,7 @@ const { POST } = createEndpoint({
         ],
         schema: z
           .enum(["left", "middle", "right"])
+          .default("left")
           .describe('Mouse button to click. Default is "left".'),
       }),
       doubleClick: requestField(scopedTranslation, {

@@ -7,20 +7,24 @@
  * Maximum number of tool calls allowed in a single streaming session
  * Used internally by the streaming system, not exposed to the model
  */
-export const MAX_TOOL_CALLS = 50;
+export const MAX_TOOL_CALLS = 150;
 
 /**
- * Token threshold for triggering history compacting
- * When conversation history exceeds this, older messages are automatically summarized
- * This is the absolute cap - we also enforce 60% of model's max context (whichever is lower)
+ * Default token threshold for triggering history compacting.
+ * When estimated input tokens exceed this, older messages are summarized before the next AI call.
+ * Overridable per skill or favorite (cascade: favorite → skill → this default).
+ * The effective trigger is Math.min(COMPACT_TRIGGER, floor(contextWindow * COMPACT_TRIGGER_PERCENTAGE))
+ * so the percentage cap always wins for small-context models.
  */
 export const COMPACT_TRIGGER = 32_000;
 
 /**
- * Maximum percentage of model's context window to use before triggering compacting
- * Set to 60% to keep costs manageable and ensure efficient cache reuse
+ * Maximum fraction of the model's context window allowed before compacting is forced.
+ * Acts as a ceiling on the effective trigger: even if COMPACT_TRIGGER is set higher,
+ * compacting will fire once input tokens reach this fraction of the model's context window.
+ * Ensures at least (1 - COMPACT_TRIGGER_PERCENTAGE) of the window is reserved for the response.
  */
-export const COMPACT_TRIGGER_PERCENTAGE = 0.6;
+export const COMPACT_TRIGGER_PERCENTAGE = 0.7;
 
 /**
  * Error type strings written to chatMessages.errorType for stream-generated error messages.

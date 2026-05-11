@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
@@ -24,7 +24,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import type { AiStreamT } from "../../stream/i18n";
-import { walkToLeafMessage } from "./branch-utils";
+import { QueueRegistry } from "./stream-registry";
 
 /**
  * Check for queued messages in a thread and start processing the next one.
@@ -65,17 +65,39 @@ export async function processNextQueuedMessage(
     threadId,
   });
 
-  // Find the current leaf of the conversation (the latest message in the branch)
-  const leafId = await walkToLeafMessage(
-    threadId,
-    queuedMessage.parentId,
-    queuedMessage.id,
-  );
+  // The queued message's parentId is advanced by advanceQueuedMessages()
+  // fire-and-forget during the stream. On slow runs this is already accurate.
+  // On fast fixture replay, advanceQueuedMessages may not have committed yet,
+  // leaving parentId as null. In that case, find the last non-queued message
+  // in the thread to use as parent so the chain stays connected.
+  let resolvedParentId = queuedMessage.parentId;
+  if (!resolvedParentId) {
+    const [lastMsg] = await db
+      .select({ id: chatMessages.id })
+      .from(chatMessages)
+      .where(
+        and(
+          eq(chatMessages.threadId, threadId),
+          sql`${chatMessages.metadata}->>'isQueued' IS DISTINCT FROM 'true'`,
+        ),
+      )
+      .orderBy(desc(chatMessages.createdAt))
+      .limit(1);
+    if (lastMsg) {
+      resolvedParentId = lastMsg.id;
+      logger.debug(
+        "[Queue] advanceQueuedMessages race: resolved parent from last thread message",
+        {
+          resolvedParentId,
+          messageId: queuedMessage.id,
+        },
+      );
+    }
+  }
 
-  // Update the queued message: resolve parentId to the true leaf and clear isQueued
+  // Remove queue-specific fields from metadata before re-saving
   const metadata = queuedMessage.metadata;
   const queuedSettings = metadata?.queuedSettings;
-  // Remove queue-specific fields from metadata before re-saving
   const {
     isQueued,
     queuedSettings: savedSettings,
@@ -83,10 +105,6 @@ export async function processNextQueuedMessage(
   } = metadata ?? {};
   void isQueued;
   void savedSettings;
-
-  // If the leaf is different from the stored parentId, update it
-  const resolvedParentId =
-    leafId !== queuedMessage.id ? leafId : queuedMessage.parentId;
 
   await db
     .update(chatMessages)
@@ -113,8 +131,10 @@ export async function processNextQueuedMessage(
         sequenceId: null,
         model: null,
         skill: null,
-        metadata: cleanMetadata,
-        createdAt: new Date(),
+        // Explicitly set isQueued: false so the client cache deep-merge clears
+        // the flag (absent keys are not removed by the merge; false overrides true).
+        metadata: { ...cleanMetadata, isQueued: false },
+        createdAt: queuedMessage.createdAt,
         updatedAt: new Date(),
         authorId: null,
         authorName: null,
@@ -127,6 +147,28 @@ export async function processNextQueuedMessage(
       },
     ],
   });
+
+  // Drain the in-memory QueueRegistry entry for this message before starting a
+  // new stream. Without this, the new stream's prepareStep would find the entry
+  // and inject it a second time, causing duplicate processing.
+  // QueueRegistry is keyed by threadId; shift until we consume the matching entry
+  // or the queue is empty (handles the case where multiple messages were queued).
+  {
+    let drained = QueueRegistry.shift(threadId);
+    while (drained && drained.id !== queuedMessage.id) {
+      // This entry was for a different message — it was already cleared from DB
+      // by an in-stream prepareStep dequeue. Drop it (DB is the source of truth).
+      logger.debug("[Queue] Dropping stale QueueRegistry entry", {
+        drainedId: drained.id,
+        targetId: queuedMessage.id,
+        threadId,
+      });
+      drained = QueueRegistry.shift(threadId);
+    }
+    // If drained.id === queuedMessage.id, we consumed our target entry. Good.
+    // If queue emptied without finding it, prepareStep already consumed it
+    // and updated DB — but we still proceed since DB showed isQueued=true.
+  }
 
   // Start the AI stream for this dequeued message using its saved settings
   const { AiStreamRepository } = await import("../index");

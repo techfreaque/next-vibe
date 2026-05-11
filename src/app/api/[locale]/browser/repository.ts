@@ -16,6 +16,8 @@ import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
+
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   type ContentBlock,
@@ -644,6 +646,7 @@ export class BrowserRepository {
     data: { tool: string; arguments?: string },
     t: BrowserT,
     logger: EndpointLogger,
+    threadId?: string,
   ): Promise<ResponseType<MCPBridgeResponse> | ContentResponse> {
     const sessionId = env.VIBE_PID;
     logger.info("[Browser] Executing tool", {
@@ -768,10 +771,33 @@ export class BrowserRepository {
 
         const hasImages = resultContent.some((b) => b.type === "image");
         if (hasImages && toolSuccess) {
-          const blocks: ContentBlock[] = resultContent.map((b) =>
-            b.type === "image" && b.data && b.mimeType
-              ? { type: "image" as const, data: b.data, mimeType: b.mimeType }
-              : { type: "text" as const, text: b.text ?? "" },
+          const storage = getStorageAdapter();
+          const blocks: ContentBlock[] = await Promise.all(
+            resultContent.map(async (b) => {
+              if (b.type === "image" && b.data && b.mimeType) {
+                try {
+                  const buffer = Buffer.from(b.data, "base64");
+                  const uploaded = await storage.uploadFile(buffer, {
+                    filename: `screenshot-${Date.now()}.png`,
+                    mimeType: b.mimeType,
+                    threadId: threadId ?? sessionId,
+                  });
+                  return {
+                    type: "image_url" as const,
+                    url: uploaded.url,
+                    mimeType: b.mimeType,
+                  };
+                } catch {
+                  // Fall back to inline base64 if upload fails
+                  return {
+                    type: "image" as const,
+                    data: b.data,
+                    mimeType: b.mimeType,
+                  };
+                }
+              }
+              return { type: "text" as const, text: b.text ?? "" };
+            }),
           );
           return createContentResponse(blocks);
         }

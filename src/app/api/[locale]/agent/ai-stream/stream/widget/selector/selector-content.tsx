@@ -98,6 +98,11 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
   }
 
   return (
-    <EndpointsPage endpoint={favoritesEndpoint} locale={locale} user={user} />
+    <EndpointsPage
+      endpoint={favoritesEndpoint}
+      locale={locale}
+      user={user}
+      logger={logger}
+    />
   );
 }

@@ -31,8 +31,30 @@ function ContentBlockItem({ block }: { block: ContentBlock }): JSX.Element {
     return <Span className="text-sm whitespace-pre-wrap">{block.text}</Span>;
   }
 
+  if (block.type === "image_url") {
+    return <UrlImage url={block.url} />;
+  }
+
   // Image block - render base64 as data URI
   return <Base64Image data={block.data} mimeType={block.mimeType} />;
+}
+
+/**
+ * Renders an image from a URL (e.g. uploaded storage URLs from screenshot tools).
+ */
+function UrlImage({ url }: { url: string }): JSX.Element {
+  return (
+    <Div className="rounded-md overflow-hidden border border-border/50">
+      <Image
+        src={url}
+        alt=""
+        width={1280}
+        height={720}
+        unoptimized
+        className="max-w-full h-auto"
+      />
+    </Div>
+  );
 }
 
 /**
