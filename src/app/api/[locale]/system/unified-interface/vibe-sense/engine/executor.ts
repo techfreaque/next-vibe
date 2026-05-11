@@ -369,7 +369,14 @@ async function callEndpoint(
 
   logger.error(`[vibe-sense] Endpoint call failed: ${toolName}`, {
     error: result.message,
-    errorType: "errorType" in result ? String(result.errorType) : undefined,
+    errorType:
+      "errorType" in result && result.errorType
+        ? result.errorType.errorKey
+        : undefined,
+    errorCode:
+      "errorType" in result && result.errorType
+        ? result.errorType.errorCode
+        : undefined,
     errorDetail: result.messageParams
       ? JSON.stringify(result.messageParams)
       : undefined,

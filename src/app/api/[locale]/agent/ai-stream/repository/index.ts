@@ -1265,12 +1265,23 @@ export class AiStreamRepository {
                   aiStreamT,
                   data.rootFolderId,
                   subAgentDepth,
-                ).catch((err: Error) => {
-                  logger.error("[Queue] Failed to process queued message", {
-                    error: err.message,
-                    threadId: threadResultThreadId,
-                  });
-                });
+                ).catch(
+                  (
+                    err: Error & {
+                      code?: string;
+                      detail?: string;
+                      constraint?: string;
+                    },
+                  ) => {
+                    logger.error("[Queue] Failed to process queued message", {
+                      error: err.message,
+                      dbCode: err.code,
+                      dbDetail: err.detail,
+                      dbConstraint: err.constraint,
+                      threadId: threadResultThreadId,
+                    });
+                  },
+                );
               }
 
               return Promise.resolve();

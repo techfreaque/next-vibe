@@ -392,6 +392,20 @@ export class SkillsRepository {
                     trustLevel: char.trustLevel,
                     variants: variants.map((v: SkillVariantData) => ({
                       ...v,
+                      voiceModelSelection: v.voiceModelSelection ?? undefined,
+                      sttModelSelection: v.sttModelSelection ?? undefined,
+                      imageVisionModelSelection:
+                        v.imageVisionModelSelection ?? undefined,
+                      videoVisionModelSelection:
+                        v.videoVisionModelSelection ?? undefined,
+                      audioVisionModelSelection:
+                        v.audioVisionModelSelection ?? undefined,
+                      imageGenModelSelection:
+                        v.imageGenModelSelection ?? undefined,
+                      musicGenModelSelection:
+                        v.musicGenModelSelection ?? undefined,
+                      videoGenModelSelection:
+                        v.videoGenModelSelection ?? undefined,
                       variantName: (v.displayName ??
                         v.id) as SkillsTranslationKey,
                     })),
@@ -564,6 +578,20 @@ export class SkillsRepository {
                   trustLevel: char.trustLevel,
                   variants: variants.map((v: SkillVariantData) => ({
                     ...v,
+                    voiceModelSelection: v.voiceModelSelection ?? undefined,
+                    sttModelSelection: v.sttModelSelection ?? undefined,
+                    imageVisionModelSelection:
+                      v.imageVisionModelSelection ?? undefined,
+                    videoVisionModelSelection:
+                      v.videoVisionModelSelection ?? undefined,
+                    audioVisionModelSelection:
+                      v.audioVisionModelSelection ?? undefined,
+                    imageGenModelSelection:
+                      v.imageGenModelSelection ?? undefined,
+                    musicGenModelSelection:
+                      v.musicGenModelSelection ?? undefined,
+                    videoGenModelSelection:
+                      v.videoGenModelSelection ?? undefined,
                     variantName: (v.displayName ??
                       v.id) as SkillsTranslationKey,
                   })),

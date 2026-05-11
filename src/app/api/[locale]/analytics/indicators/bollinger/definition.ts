@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.period.label",
         description: "post.fields.period.description",
-        schema: z.number().int().min(2).max(200),
+        schema: z.number().int().min(2).max(200).default(20),
         columns: 6,
       }),
       stdDev: requestField(scopedTranslation, {
@@ -85,7 +85,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.stdDev.label",
         description: "post.fields.stdDev.description",
-        schema: z.number().min(0.1).max(5),
+        schema: z.number().min(0.1).max(5).default(2),
         columns: 6,
       }),
       upper: timeSeriesResponseField(scopedTranslation, {

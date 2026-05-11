@@ -272,17 +272,23 @@ export class MessagesRepository {
     }
 
     const now = new Date();
-    await db.insert(chatMessages).values({
-      id: params.messageId,
-      threadId: params.threadId,
-      role: params.role,
-      content: params.content,
-      parentId: resolvedParentId,
-      authorId: params.userId ?? null,
-      authorName: params.authorName ?? null,
-      isAI: false,
-      metadata: hasMetadata ? metadata : undefined,
-    });
+    // onConflictDoNothing: queued messages are pre-inserted when the user sends them.
+    // processNextQueuedMessage re-uses the same messageId but has already updated
+    // parentId/metadata via UPDATE, so a silent skip on duplicate key is correct.
+    await db
+      .insert(chatMessages)
+      .values({
+        id: params.messageId,
+        threadId: params.threadId,
+        role: params.role,
+        content: params.content,
+        parentId: resolvedParentId,
+        authorId: params.userId ?? null,
+        authorName: params.authorName ?? null,
+        isAI: false,
+        metadata: hasMetadata ? metadata : undefined,
+      })
+      .onConflictDoNothing();
 
     // Update thread's updatedAt and bubble activity to parent folder
     const [updatedThread] = await db

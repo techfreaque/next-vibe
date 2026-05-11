@@ -303,14 +303,20 @@ export const skillVariantSchema = z.object({
     ),
   displayName: z.string().max(50).optional(),
   modelSelection: chatModelSelectionSchema,
-  imageGenModelSelection: imageGenModelSelectionSchema.optional(),
-  musicGenModelSelection: musicGenModelSelectionSchema.optional(),
-  videoGenModelSelection: videoGenModelSelectionSchema.optional(),
-  voiceModelSelection: voiceModelSelectionSchema.optional(),
-  sttModelSelection: sttModelSelectionSchema.optional(),
-  imageVisionModelSelection: imageVisionModelSelectionSchema.optional(),
-  videoVisionModelSelection: videoVisionModelSelectionSchema.optional(),
-  audioVisionModelSelection: audioVisionModelSelectionSchema.optional(),
+  imageGenModelSelection: imageGenModelSelectionSchema.nullable().optional(),
+  musicGenModelSelection: musicGenModelSelectionSchema.nullable().optional(),
+  videoGenModelSelection: videoGenModelSelectionSchema.nullable().optional(),
+  voiceModelSelection: voiceModelSelectionSchema.nullable().optional(),
+  sttModelSelection: sttModelSelectionSchema.nullable().optional(),
+  imageVisionModelSelection: imageVisionModelSelectionSchema
+    .nullable()
+    .optional(),
+  videoVisionModelSelection: videoVisionModelSelectionSchema
+    .nullable()
+    .optional(),
+  audioVisionModelSelection: audioVisionModelSelectionSchema
+    .nullable()
+    .optional(),
   isDefault: z.boolean().optional(),
 });
 

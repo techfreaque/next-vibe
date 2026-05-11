@@ -974,7 +974,7 @@ const { GET } = createEndpoint({
       voiceModelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: voiceModelSelectionSchema.nullable(),
+        schema: voiceModelSelectionSchema.nullable().optional(),
       }),
 
       sttModelSelection: responseField(scopedTranslation, {
