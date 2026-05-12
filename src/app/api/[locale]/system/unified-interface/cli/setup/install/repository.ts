@@ -124,13 +124,15 @@ exit /b 1
 `;
     }
 
-    // Unix shell script (Linux/macOS)
-    // The script starts from $(pwd) and walks up the directory tree,
-    // searching for the configured relative path.
+    return SetupInstallRepository.createUnixBinaryContent(vibeRelativePath);
+  }
+
+  /** Bash shim used on Linux/macOS and as a Git Bash companion on Windows. */
+  private static createUnixBinaryContent(vibeRelativePath: string): string {
     // eslint-disable-next-line i18next/no-literal-string
     return `#!/bin/bash
 
-# Vibe CLI Unix Binary
+# Vibe CLI Unix/Git Bash Binary
 # Searches for vibe-runtime.ts from current directory upwards and executes with Bun
 
 REL_PATH="${vibeRelativePath}"
@@ -138,11 +140,22 @@ REL_PATH="${vibeRelativePath}"
 current_dir="$(pwd)"
 root="/"
 
+# On Windows (Git Bash/MSYS2), bun.exe is a native Windows binary that does not
+# understand POSIX paths like /c/Users/.... cygpath -m converts them to C:/Users/...
+# which bun accepts. On Linux/macOS cygpath is absent so we pass the path unchanged.
+_bun_path() {
+  if command -v cygpath &>/dev/null; then
+    cygpath -m "$1"
+  else
+    echo "$1"
+  fi
+}
+
 while [ "$current_dir" != "$root" ]; do
   candidate="$current_dir/$REL_PATH"
   if [ -f "$candidate" ]; then
     PROC_NAME="vibe-\${1:-cli}"
-    exec -a "$PROC_NAME" bun "$candidate" "$@"
+    exec -a "$PROC_NAME" bun "$(_bun_path "$candidate")" "$@"
   fi
   current_dir="$(dirname "$current_dir")"
 done
@@ -262,6 +275,18 @@ exit 1
         }
       }
 
+      // On Windows, also remove the Git Bash shim if force-reinstalling
+      const bashShimPath =
+        os.platform() === "win32" ? path.join(binDir, "vibe") : null;
+      if (data.force && bashShimPath && existsSync(bashShimPath)) {
+        try {
+          const fs = await import("node:fs/promises");
+          await fs.unlink(bashShimPath);
+        } catch {
+          // Ignore removal errors
+        }
+      }
+
       // Ensure binary directory exists
       try {
         mkdirSync(binDir, { recursive: true });
@@ -291,6 +316,16 @@ exit 1
       // Make executable on Unix systems
       if (os.platform() !== "win32") {
         chmodSync(targetPath, 0o755);
+      }
+
+      // On Windows, also write a bash shim (no extension) so Git Bash can invoke vibe.
+      // Git Bash doesn't execute .cmd files; it needs a plain shell script in PATH.
+      // The path separator must be POSIX-style for the bash script to work correctly.
+      if (os.platform() === "win32" && bashShimPath) {
+        const posixRelativePath = vibeRelativePath.replaceAll("\\", "/");
+        const bashContent =
+          SetupInstallRepository.createUnixBinaryContent(posixRelativePath);
+        writeFileSync(bashShimPath, bashContent, { mode: 0o755 });
       }
 
       // Set up MCP config files (.mcp.json and mcp.json) from the example template
