@@ -130,9 +130,13 @@ export class FinishStepHandler {
         );
       }, timeoutMs);
       // Cancel the timer if the stream aborts for any other reason first
-      streamAbortController.signal.addEventListener("abort", () => {
-        clearTimeout(timer);
-      });
+      streamAbortController.signal.addEventListener(
+        "abort",
+        () => {
+          clearTimeout(timer);
+        },
+        { once: true },
+      );
       // Expose a cancel function so the stream's finally block can cancel
       // the timer when the stream ends naturally (e.g. wakeUp mode where the
       // AI writes a response and the loop exits without hitting the timeout).

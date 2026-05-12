@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: dragEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, platform }) =>
       BrowserSharedRepository.executeDrag<DragResponseOutput>(
         {
           toolName: BrowserTool.DRAG,
@@ -24,6 +24,7 @@ export const { POST, tools } = endpointsHandler({
         },
         t,
         logger,
+        platform,
       ),
   },
 });

@@ -9,9 +9,10 @@ const nextConfig: NextConfig = {
     // which hits 23 workers locally - each worker loads the full module graph causing
     // 14+ GB peak. 4 workers keeps peak under control with acceptable build time.
     cpus:
-      process.env.NODE_ENV === "production" &&
-      process.env.NEXT_PUBLIC_LOCAL_MODE === "true"
-        ? 1
+      process.env.NODE_ENV === "production"
+        ? process.env.NEXT_PUBLIC_LOCAL_MODE === "true"
+          ? undefined
+          : 1
         : undefined,
     webpackBuildWorker: true,
     webpackMemoryOptimizations: true,
@@ -19,9 +20,10 @@ const nextConfig: NextConfig = {
     // Does NOT cap peak RSS - Turbopack still peaks at ~12 GB while building the module graph.
     // May reduce memory after compilation phase. Unit: bytes.
     turbopackMemoryLimit:
-      process.env.NODE_ENV === "production" &&
-      process.env.NEXT_PUBLIC_LOCAL_MODE === "true"
-        ? 8 * 1024 * 1024 * 1024
+      process.env.NODE_ENV === "production"
+        ? process.env.NEXT_PUBLIC_LOCAL_MODE === "true"
+          ? undefined
+          : 8 * 1024 * 1024 * 1024
         : undefined, // 8 GB
     // parallelServerBuildTraces: true,
     // parallelServerCompiles: true,

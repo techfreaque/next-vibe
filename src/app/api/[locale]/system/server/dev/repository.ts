@@ -51,6 +51,7 @@ import { ServerFramework } from "../enum";
 import {
   addPidToFile,
   cleanupPidFile,
+  getPidOnPort,
   killPreviousInstance,
   removePidFromFile,
   VIBE_DEV_PID_FILE,
@@ -746,13 +747,12 @@ export class DevRepository {
         currentNext.stderr?.destroy();
         currentNext.kill("SIGINT");
       }
-      cleanupPidFile(VIBE_DEV_PID_FILE);
-      // Close Vite dev server (TanStack mode) then exit.
-      // We await it so Vite can flush its cleanup before process.exit —
-      // skipping the await causes the OS to SIGKILL the process mid-cleanup.
-      // A 2s timeout prevents hanging if Vite's shutdown stalls.
+      // Keep PID file alive until the process is about to exit so the next
+      // `vibe dev` can identify us as the owner of ports 3000/3100 and kill us.
+      // cleanupPidFile is called just before each process.exit() below.
       if (viteClose) {
         const timer = setTimeout(() => {
+          cleanupPidFile(VIBE_DEV_PID_FILE);
           process.exit(code);
         }, 2000);
         void viteClose()
@@ -761,11 +761,23 @@ export class DevRepository {
           })
           .finally(() => {
             clearTimeout(timer);
+            cleanupPidFile(VIBE_DEV_PID_FILE);
             process.exit(code);
           });
+      } else if (currentNext && !currentNext.killed) {
+        // Wait for Next.js to exit before we do — otherwise it becomes an orphan
+        // holding port 3100, causing "port already in use" on the next `vibe dev`.
+        const exitTimer = setTimeout(() => {
+          cleanupPidFile(VIBE_DEV_PID_FILE);
+          process.exit(code);
+        }, 5000);
+        currentNext.once("exit", () => {
+          clearTimeout(exitTimer);
+          cleanupPidFile(VIBE_DEV_PID_FILE);
+          setImmediate(() => process.exit(code));
+        });
       } else {
-        // Use setImmediate so synchronous cleanup above finishes before exit,
-        // preventing Bun from seeing live handles and sending SIGKILL.
+        cleanupPidFile(VIBE_DEV_PID_FILE);
         setImmediate(() => process.exit(code));
       }
     };
@@ -1164,23 +1176,7 @@ export class DevRepository {
    * This prevents killing processes from other project instances running on the same port.
    */
   private static killProcessOnPort(port: number, logger: EndpointLogger): void {
-    // Get PIDs on this port
-    let pidOnPort: number | undefined;
-    try {
-      // stdio:'pipe' prevents Windows "/dev/null not found" noise leaking to terminal.
-      const output = execSync(`fuser ${port}/tcp 2>/dev/null`, {
-        encoding: "utf-8",
-        stdio: "pipe",
-      }).trim();
-      const parsed = parseInt(output.split(/\s+/)[0] ?? "", 10);
-      if (!isNaN(parsed) && parsed > 0) {
-        pidOnPort = parsed;
-      }
-    } catch {
-      // No process on port - nothing to do
-      return;
-    }
-
+    const pidOnPort = getPidOnPort(port);
     if (!pidOnPort) {
       return;
     }
@@ -1218,15 +1214,10 @@ export class DevRepository {
     // Wait up to 2s for graceful shutdown, then SIGKILL
     const gracePeriod = Date.now() + 2000;
     while (Date.now() < gracePeriod) {
-      try {
-        execSync(`fuser ${port}/tcp 2>/dev/null`, {
-          encoding: "utf-8",
-          stdio: "pipe",
-        });
-        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
-      } catch {
+      if (getPidOnPort(port) === undefined) {
         return; // port released
       }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
     }
 
     // Still alive - force kill
@@ -1239,15 +1230,10 @@ export class DevRepository {
     // Wait up to 3 more seconds for port release after SIGKILL
     const deadline = Date.now() + 3000;
     while (Date.now() < deadline) {
-      try {
-        execSync(`fuser ${port}/tcp 2>/dev/null`, {
-          encoding: "utf-8",
-          stdio: "pipe",
-        });
-        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
-      } catch {
+      if (getPidOnPort(port) === undefined) {
         return;
       }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
     }
 
     logger.warn(`Port ${port} did not free up within 5 seconds`);

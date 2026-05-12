@@ -21,6 +21,9 @@ function getPlatform(): DesktopPlatform {
 }
 
 function detectDesktopEnv(): SupportedDesktopEnv | null {
+  if (process.platform === "win32") {
+    return "windows";
+  }
   if (process.platform !== "linux") {
     return null;
   }

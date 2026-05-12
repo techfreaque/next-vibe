@@ -1,11 +1,17 @@
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import type { JSX } from "react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
+  useWidgetEndpoint,
   useWidgetForm,
+  useWidgetNavigation,
+  useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
@@ -32,9 +38,49 @@ export function ConnectionDetailContainer({
   const form = useWidgetForm<typeof endpoints.PATCH>();
   const emptyField = useMemo(() => ({}), []);
   const loadedData = useWidgetValue<typeof endpoints.GET>();
+  const navigation = useWidgetNavigation();
+  const endpoint = useWidgetEndpoint();
 
-  // Watch authType reactively; fall back to loaded value before form initialises
+  const t = useWidgetTranslation<typeof endpoints.PATCH>();
+  const isDeleteMode = endpoint.method === Methods.DELETE;
+  const connectionId = form.watch("id");
   const watchedAuthType = form.watch("authType");
+
+  const handleDelete = useCallback((): void => {
+    if (!connectionId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const connDef = await import("./definition");
+      navigation.push(connDef.DELETE, {
+        urlPathParams: { id: connectionId },
+        renderInModal: true,
+        popNavigationOnSuccess: 2,
+      });
+    })();
+  }, [navigation, connectionId]);
+
+  if (isDeleteMode) {
+    return (
+      <Div className="flex flex-col gap-4 px-6 py-6">
+        <FormAlertWidget field={emptyField} />
+        <Div className="flex flex-row gap-2">
+          <NavigateButtonWidget
+            field={{ icon: "arrow-left", variant: "outline" }}
+          />
+          <SubmitButtonWidget<typeof endpoints.DELETE>
+            field={{
+              text: "delete.title",
+              loadingText: "delete.title",
+              icon: "trash",
+              variant: "destructive",
+            }}
+          />
+        </Div>
+      </Div>
+    );
+  }
+
   const authType = watchedAuthType ?? loadedData?.authType;
   const isLocal = authType === SshAuthType.LOCAL;
   const isKeyAgent = authType === SshAuthType.KEY_AGENT;
@@ -55,14 +101,16 @@ export function ConnectionDetailContainer({
             className: "ml-auto",
           }}
         />
-        <SubmitButtonWidget<typeof endpoints.DELETE>
-          field={{
-            text: "widget.deleteButton",
-            loadingText: "widget.deleteButton",
-            icon: "trash",
-            variant: "destructive",
-          }}
-        />
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={handleDelete}
+          disabled={!connectionId}
+        >
+          <Trash2 className="h-4 w-4 mr-1" />
+          {t("widget.deleteButton")}
+        </Button>
       </Div>
 
       <Div className="px-4 pb-4 flex flex-col gap-4">

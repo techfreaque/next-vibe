@@ -3,12 +3,16 @@
  * Static class for formatting CLI execution results and rendering responses
  */
 
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { parseError } from "next-vibe/shared/utils";
 import React, { createElement } from "react";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { RouteExecutionResult } from "../../../../cli/runtime/route-executor";
@@ -18,6 +22,47 @@ import { Platform } from "../../../../shared/types/platform";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { CliErrorFormatter } from "./error-formatter";
 import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
+
+/**
+ * Save image blocks from a ContentResponse to .tmp/screenshots/ and replace
+ * them with text blocks referencing the saved file paths.
+ * Only called in the CLI pipeline so fs access is safe.
+ */
+function saveContentResponseImages(data: WidgetData): WidgetData {
+  if (
+    !data ||
+    typeof data !== "object" ||
+    Array.isArray(data) ||
+    !("__isContentResponse" in data) ||
+    !data.__isContentResponse ||
+    !("content" in data) ||
+    !Array.isArray(data.content)
+  ) {
+    return data;
+  }
+
+  const tmpDir = join(process.cwd(), ".tmp", "screenshots");
+  mkdirSync(tmpDir, { recursive: true });
+
+  const lines: string[] = [];
+  for (const block of data.content as ContentBlock[]) {
+    if (block.type === "text") {
+      lines.push(block.text);
+    } else {
+      const ext = block.mimeType.split("/")[1] ?? "png";
+      const filename = `screenshot-${Date.now()}.${ext}`;
+      const filePath = join(tmpDir, filename);
+      writeFileSync(filePath, Buffer.from(block.data, "base64"));
+      lines.push(`Saved to: ${filePath}`);
+    }
+  }
+
+  // Merge into a single text block so CLI renderer outputs proper newlines
+  return {
+    ...data,
+    content: [{ type: "text" as const, text: lines.join("\n") }],
+  } as WidgetData;
+}
 
 /**
  * Pre-warm React.lazy widgets so their promises resolve before sync rendering.
@@ -169,6 +214,9 @@ export class CliResultFormatter {
       // Pre-warm any lazy CLI widgets so they're resolved before sync rendering
       await prewarmLazyWidgets(endpoint);
 
+      // Save ContentResponse images to .tmp/screenshots/ for CLI
+      const processedData = saveContentResponseImages(data);
+
       // Create component
       const createStart = performance.now();
       const component = createElement(
@@ -177,10 +225,10 @@ export class CliResultFormatter {
         createElement(EndpointRenderer, {
           endpoint,
           locale,
-          data,
+          data: processedData,
           logger,
           user,
-          response: { success: true, data },
+          response: { success: true, data: processedData },
           responseOnly: true,
           platform: Platform.CLI,
         }),

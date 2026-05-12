@@ -1065,9 +1065,6 @@ export class AiStreamRepository {
               imageQuality: data.imageQuality ?? undefined,
               musicDuration: data.musicDuration ?? undefined,
               systemPromptParams,
-              // Mid-stream compacting fires when real API-reported input tokens
-              // exceed effectiveCompactTrigger — same threshold as pre-stream compacting,
-              // applied to real token counts from onStepFinish.
               midStreamCompactingThreshold: tools ? effectiveCompactTrigger : 0,
               midStreamCompactingParams: {
                 model: data.model,

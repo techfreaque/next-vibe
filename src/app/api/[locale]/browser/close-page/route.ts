@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: closePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, platform }) =>
       BrowserSharedRepository.executeClosePage<ClosePageResponseOutput>(
         {
           toolName: BrowserTool.CLOSE_PAGE,
@@ -23,6 +23,7 @@ export const { POST, tools } = endpointsHandler({
         },
         t,
         logger,
+        platform,
       ),
   },
 });

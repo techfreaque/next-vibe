@@ -27,7 +27,9 @@ export class AbortControllerSetup {
         new StreamAbortError(AbortReason.STREAM_TIMEOUT),
       );
     };
-    timeoutAbortController.addEventListener("abort", timeoutAbortHandler);
+    timeoutAbortController.addEventListener("abort", timeoutAbortHandler, {
+      once: true,
+    });
 
     // Propagate parent cancellation (e.g. parent AI stream cancelled while sub-agent runs)
     if (parentSignal) {

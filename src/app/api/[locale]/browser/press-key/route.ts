@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: pressKeyEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, platform }) =>
       BrowserSharedRepository.executePressKey(
         {
           toolName: BrowserTool.PRESS_KEY,
@@ -23,6 +23,7 @@ export const { POST, tools } = endpointsHandler({
         },
         t,
         logger,
+        platform,
       ),
   },
 });

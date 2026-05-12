@@ -57,11 +57,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ChatModelId, ChatModelOption } from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
-import {
-  AbortReason,
-  MAX_TOOL_CALLS,
-  StreamAbortError,
-} from "../core/constants";
+import { MAX_TOOL_CALLS } from "../core/constants";
 import type { ProviderFactory } from "../core/provider-factory";
 import { QueueRegistry } from "../core/stream-registry";
 import type { StreamContext } from "../core/stream-context";
@@ -162,12 +158,6 @@ export class StreamExecutionHandler {
           },
         ]
       : undefined;
-
-    // Context window guard for tool loops: abort when real token usage from
-    // the API approaches the model's hard context limit. This prevents
-    // "238K tokens to a 131K model" errors that occur when tool call results
-    // accumulate across many steps. We abort at 90% to leave headroom.
-    const contextGuardThreshold = Math.floor(modelConfig.contextWindow * 0.9);
 
     // Build generation settings for custom media providers.
     // providerOptions must be Record<string, JSONObject> (provider-keyed objects).
@@ -607,22 +597,6 @@ export class StreamExecutionHandler {
                   finishReason: stepResult.finishReason ?? null,
                   creditCost: stepCreditCost,
                 });
-              }
-
-              // Hard abort guard: if we are approaching the model's context window.
-              if (inputTokens > 0 && inputTokens >= contextGuardThreshold) {
-                logger.warn(
-                  "[ToolLoop] Context window guard triggered - aborting tool loop",
-                  {
-                    inputTokens,
-                    contextGuardThreshold,
-                    modelContextWindow: modelConfig.contextWindow,
-                    model,
-                  },
-                );
-                streamAbortController.abort(
-                  new StreamAbortError(AbortReason.CONTEXT_WINDOW_GUARD),
-                );
               }
             },
           }

@@ -4,20 +4,21 @@
 
 import "server-only";
 
-import {
-  isContentResponse,
-  success,
-} from "next-vibe/shared/types/response.schema";
 import type {
   ContentResponse,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import {
+  isContentResponse,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { BrowserTool } from "../enum";
 import type { BrowserT } from "../i18n";
 import type { MCPContentBlock } from "../shared/repository";
 import { BrowserSharedRepository } from "../shared/repository";
-import { BrowserTool } from "../enum";
 import type {
   GetNetworkRequestRequestOutput,
   GetNetworkRequestResponseOutput,
@@ -28,6 +29,7 @@ export class GetNetworkRequestRepository {
     data: GetNetworkRequestRequestOutput,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<GetNetworkRequestResponseOutput> | ContentResponse> {
     const result =
       await BrowserSharedRepository.executeGetNetworkRequest<GetNetworkRequestResponseOutput>(
@@ -41,6 +43,7 @@ export class GetNetworkRequestRepository {
         },
         t,
         logger,
+        platform,
       );
 
     // Apply maxBodyLength truncation when specified and result has inline bodies

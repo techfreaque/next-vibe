@@ -10,7 +10,10 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type {
+  ContentResponse,
+  ResponseType,
+} from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
@@ -26,7 +29,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { CliCompatiblePlatform } from "../../../cli/runtime/route-executor";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "../../logger/endpoint";
-import type { Platform } from "../../types/platform";
+import { Platform } from "../../types/platform";
 import { splitArgs } from "../../utils/split-args";
 import type { GenericHandlerBase } from "./handler";
 
@@ -125,8 +128,35 @@ export class RouteExecutionExecutor {
         });
       }
 
-      // Content responses carry mixed content blocks (text + images)
+      // Content responses carry mixed content blocks (text + images).
+      // For AI platform: convert to ToolResultOutput { type: "content", value: [...] } so
+      // the AI SDK sends image parts as structured image-data (image tokens) instead of
+      // serializing the ContentResponse as raw JSON text (which counts base64 as millions
+      // of text tokens and causes context overflow).
       if (isContentResponse(result)) {
+        if (params.platform === Platform.AI) {
+          const cr = result as ContentResponse;
+          type AiPart =
+            | { type: "text"; text: string }
+            | { type: "image-data"; data: string; mediaType: string };
+          const parts: AiPart[] = [];
+          for (const b of cr.content) {
+            if (b.type === "text") {
+              parts.push({ type: "text", text: b.text });
+            } else if (b.type === "image") {
+              parts.push({
+                type: "image-data",
+                data: b.data,
+                mediaType: b.mimeType,
+              });
+            }
+          }
+          return success(
+            (parts.length > 0
+              ? { type: "content", value: parts }
+              : { status: "screenshot_taken" }) as TResult,
+          );
+        }
         return success(result as TResult);
       }
 

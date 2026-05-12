@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: listNetworkRequestsEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, platform }) =>
       BrowserSharedRepository.executeMCPTool(
         {
           toolName: BrowserTool.LIST_NETWORK_REQUESTS,
@@ -26,6 +26,7 @@ export const { POST, tools } = endpointsHandler({
         },
         t,
         logger,
+        platform,
       ),
   },
 });

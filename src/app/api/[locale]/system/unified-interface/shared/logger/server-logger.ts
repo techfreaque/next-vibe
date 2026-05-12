@@ -26,8 +26,8 @@ export function createEndpointLogger(
     startTime,
     locale,
     shouldPersist
-      ? (level, message, error, metadata) => {
-          persistErrorLog(level, message, error, metadata);
+      ? (level, message, error, metadata, loc) => {
+          persistErrorLog(level, message, error, metadata, loc);
         }
       : undefined,
   );

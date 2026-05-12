@@ -28,9 +28,14 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
+import type {
+  Platform} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import {
+  isCliPlatform
+} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { env } from "@/config/env";
 
 import { CHROME_REMOTE_DEBUG_PORT, getChromeMCPConfig } from "./config";
@@ -168,7 +173,9 @@ function createMCPProcess(logger: EndpointLogger): MCPProcess {
       cb.reject(new Error("chrome-devtools-mcp exited"));
     }
     mcp.pending.clear();
-    sessions.clear();
+    // Do NOT clear sessions here. Chrome tabs may still be alive; ensureSession
+    // will re-resolve MCP integer page IDs when the process restarts.
+    // Only dead CDP targets (Chrome itself closed) get cleaned up inside ensureSession.
     if (getSharedMCP() === mcp) {
       setSharedMCP(null);
     }
@@ -346,6 +353,24 @@ async function ensureChrome(logger: EndpointLogger): Promise<void> {
     });
     if (await isChromeReady()) {
       logger.info("[Browser] Chrome ready");
+      // Chrome creates an initial blank tab on startup even with --no-startup-window.
+      // Close it now so that the first session tab creation results in exactly 1 tab.
+      // This runs only once: when Chrome was just launched (not when already running).
+      const initialTargets = await listCDPTargets();
+      for (const t of initialTargets) {
+        try {
+          await fetch(
+            `http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}/json/close/${t.id}`,
+            { signal: AbortSignal.timeout(2000) },
+          );
+          logger.info("[Browser] Closed initial Chrome tab", {
+            targetId: t.id,
+            url: t.url,
+          });
+        } catch {
+          // Non-fatal — tab may already be gone.
+        }
+      }
       return;
     }
   }
@@ -479,6 +504,94 @@ async function findMCPPageForTarget(
 }
 
 /**
+ * Return true if the process that owns the given sessionId is still running.
+ * SessionIds are PIDs set by the vibe runtime on startup (VIBE_PID=process.pid).
+ * A dead session's tab can be safely reclaimed.
+ */
+function isSessionAlive(sessionId: string): boolean {
+  const pid = parseInt(sessionId, 10);
+  if (isNaN(pid) || pid <= 0) {
+    return true; // non-PID session IDs (future-proofing) - assume alive
+  }
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Try to claim an existing unclaimed MCP page for this session instead of
+ * opening a new tab. Prevents a second tab from appearing when Chrome already
+ * has an idle page (e.g. the blank tab Chrome creates on startup, or tabs
+ * left behind by dead CLI processes).
+ *
+ * Dead sessions (process gone) are evicted here so their tabs are available.
+ * For duplicate URLs (e.g. multiple about:blank tabs) candidates are consumed
+ * in order so each concurrent caller gets a distinct target.
+ */
+async function claimExistingTab(
+  sessionId: string,
+  mcp: MCPProcess,
+  logger: EndpointLogger,
+): Promise<SessionState | null> {
+  const [mcpPages, cdpTargets] = await Promise.all([
+    listMCPPages(mcp),
+    listCDPTargets(),
+  ]);
+  if (mcpPages.length === 0) {
+    return null;
+  }
+
+  // Evict sessions whose process is dead, then collect IDs claimed by live ones.
+  const claimedTargetIds = new Set<string>();
+  for (const [sid, state] of sessions) {
+    if (sid === sessionId) {
+      continue;
+    }
+    if (!isSessionAlive(sid)) {
+      sessions.delete(sid);
+      logger.info("[Browser] Evicted dead session", { evictedSessionId: sid });
+      continue;
+    }
+    if (!state.cdpTargetId.startsWith("unknown-")) {
+      claimedTargetIds.add(state.cdpTargetId);
+    }
+  }
+
+  // Build a per-URL queue of unclaimed targets so duplicate URLs are consumed
+  // one-by-one rather than always resolving to the same first target.
+  const urlQueue = new Map<string, CDPTarget[]>();
+  for (const t of cdpTargets) {
+    if (claimedTargetIds.has(t.id)) {
+      continue;
+    }
+    const list = urlQueue.get(t.url) ?? [];
+    list.push(t);
+    urlQueue.set(t.url, list);
+  }
+
+  for (const page of mcpPages) {
+    const candidates = urlQueue.get(page.url);
+    if (!candidates?.length) {
+      continue;
+    }
+    const target = candidates.shift()!;
+    const state: SessionState = { cdpTargetId: target.id, mcpPageId: page.id };
+    sessions.set(sessionId, state);
+    saveSessions(sessions);
+    logger.info("[Browser] Claimed existing tab for new session", {
+      sessionId,
+      cdpTargetId: target.id,
+      mcpPageId: page.id,
+    });
+    return state;
+  }
+  return null;
+}
+
+/**
  * Create a new Puppeteer-tracked tab via chrome-devtools-mcp's new_page tool,
  * then immediately identify its CDP target ID via /json HTTP endpoint.
  * Puppeteer-created tabs are the ONLY ones visible to createPagesSnapshot(),
@@ -587,7 +700,9 @@ async function ensureSession(
   }
 
   if (!state) {
-    state = await createSessionTab(sessionId, mcp, logger);
+    state =
+      (await claimExistingTab(sessionId, mcp, logger)) ??
+      (await createSessionTab(sessionId, mcp, logger));
     if (!state) {
       return null;
     }
@@ -646,9 +761,12 @@ export class BrowserRepository {
     data: { tool: string; arguments?: string },
     t: BrowserT,
     logger: EndpointLogger,
-    threadId?: string,
+    platform: Platform,
   ): Promise<ResponseType<MCPBridgeResponse> | ContentResponse> {
-    const sessionId = env.VIBE_PID;
+    // CLI invocations are short-lived (new PID per call). Use a single shared
+    // session ID so all CLI calls reuse one stable tab instead of each creating
+    // a new one. Every other platform (MCP, web, …) has a stable process PID.
+    const sessionId = isCliPlatform(platform) ? "cli" : env.VIBE_PID;
     logger.info("[Browser] Executing tool", {
       tool: data.tool,
       sessionId,

@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
   description: "Steruj pulpitem: zrzuty ekranu, mysz, klawiatura, okna",
   category: "Desktop",
   summary:
-    "Automatyzacja pulpitu Linux przez xdotool, wmctrl, spectacle/scrot i pyatspi",
+    "Wieloplatformowa automatyzacja pulpitu: Linux (ydotool/KWin/pyatspi) i Windows (PowerShell/UIAutomation)",
   tags: {
     desktopAutomation: "Automatyzacja pulpitu",
     inputAutomation: "Automatyzacja wprowadzania",
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
 
   repository: {
     platformNotSupported:
-      "Platforma nieobsługiwana: {{platform}}. Obsługiwany jest tylko Linux.",
+      "Platforma nieobsługiwana: {{platform}}. Obsługiwane są Linux i Windows.",
     windowsNotSupported: "Obsługa Windows wkrótce",
     macosNotSupported: "Obsługa macOS wkrótce",
     commandFailed: "Polecenie nie powiodło się: {{error}}",

@@ -41,7 +41,7 @@ export class ClientLogRepository {
     const metadata = data.metadata ?? [];
 
     // DB gets locale in metadata, file does not
-    persistErrorLog(data.level, message, undefined, [...metadata, { locale }]);
+    persistErrorLog(data.level, message, undefined, metadata, locale);
 
     if (isFileLoggingEnabled()) {
       const tabId = extractTabId(data.metadata);

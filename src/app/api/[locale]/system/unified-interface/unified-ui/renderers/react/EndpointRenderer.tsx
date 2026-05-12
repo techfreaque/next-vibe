@@ -275,7 +275,12 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     "content" in data &&
     Array.isArray(data.content)
   ) {
-    return <ContentBlocksRenderer blocks={data.content as ContentBlock[]} />;
+    return (
+      <ContentBlocksRenderer
+        blocks={data.content as ContentBlock[]}
+        platform={platformProp}
+      />
+    );
   }
 
   // Check if there are any request fields

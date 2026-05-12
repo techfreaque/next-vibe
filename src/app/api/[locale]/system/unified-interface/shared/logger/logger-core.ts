@@ -72,6 +72,7 @@ export type PersistFn = (
   message: string,
   error: LoggerMetadata | undefined,
   metadata: LoggerMetadata[],
+  locale: CountryLanguage,
 ) => void;
 
 export function createLogger(
@@ -120,7 +121,7 @@ export function createLogger(
       error?: LoggerMetadata,
       ...metadata: LoggerMetadata[]
     ): void {
-      onPersist?.("error", message, error, metadata);
+      onPersist?.("error", message, error, metadata, locale);
 
       const typedError = error ? parseError(error) : undefined;
       const metadataObj = {
@@ -139,7 +140,11 @@ export function createLogger(
         );
       } else {
         // oxlint-disable-next-line no-console
-        console.error(fmt(message), error, ...metadata, locale);
+        console.error(
+          fmt(message),
+          ...(error !== undefined ? [error] : []),
+          ...metadata,
+        );
       }
       if (isFileLoggingEnabled()) {
         void _fl().then(({ devFileLog, startFileLog }) =>
@@ -152,7 +157,7 @@ export function createLogger(
     },
 
     warn(message: string, ...metadata: LoggerMetadata[]): void {
-      onPersist?.("warn", message, undefined, metadata);
+      onPersist?.("warn", message, undefined, metadata, locale);
 
       const metadataObj = metadata.length > 0 ? { metadata } : undefined;
       if (mcpSilentMode) {
@@ -162,7 +167,7 @@ export function createLogger(
         writeToFile(`[WARN] ${fmt(message)}`, metadataObj);
       } else {
         // oxlint-disable-next-line no-console
-        console.warn(fmt(message), ...metadata, locale);
+        console.warn(fmt(message), ...metadata);
       }
       if (isFileLoggingEnabled()) {
         void _fl().then(({ devFileLog, startFileLog }) =>

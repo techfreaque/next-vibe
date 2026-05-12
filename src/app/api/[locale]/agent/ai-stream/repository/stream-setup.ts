@@ -64,7 +64,12 @@ import { createMessagesEmitter } from "../../chat/threads/[threadId]/messages/em
 import { ThreadsRepository } from "../../chat/threads/repository";
 import { type AiStreamPostRequestOutput } from "../stream/definition";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
-import { AbortReason, COMPACT_TRIGGER, isStreamAbort } from "./core/constants";
+import {
+  AbortReason,
+  COMPACT_TRIGGER,
+  COMPACT_TRIGGER_PERCENTAGE,
+  isStreamAbort,
+} from "./core/constants";
 import { CreditValidatorHandler } from "./core/credit-validator-handler";
 import { ModalityResolver, type BridgeContext } from "./core/modality-resolver";
 import { ProviderFactory as ProviderFactoryClass } from "./core/provider-factory";
@@ -717,17 +722,29 @@ export async function setupAiStream(params: {
     : undefined;
 
   // Resolve effective compact trigger: favorite → skill → global default
+  // Always capped at min(configured, floor(contextWindow * COMPACT_TRIGGER_PERCENTAGE))
   const effectiveCompactTrigger = await (async (): Promise<number> => {
+    const cap = Math.floor(
+      modelConfig.contextWindow * COMPACT_TRIGGER_PERCENTAGE,
+    );
+
     // 1. Check favorite compactTrigger
     if (
       resolvedFavoriteConfig?.compactTrigger !== null &&
       resolvedFavoriteConfig?.compactTrigger !== undefined
     ) {
-      return resolvedFavoriteConfig.compactTrigger;
+      return Math.min(resolvedFavoriteConfig.compactTrigger, cap);
     }
 
-    // 2. Check skill compactTrigger (custom skills by UUID or slug)
+    // 2. Check skill compactTrigger (default skills first, then custom skills by UUID or slug)
     if (data.skill) {
+      const defaultSkill = DEFAULT_SKILLS.find((c) => c.id === data.skill);
+      if (
+        defaultSkill?.compactTrigger !== null &&
+        defaultSkill?.compactTrigger !== undefined
+      ) {
+        return Math.min(defaultSkill.compactTrigger, cap);
+      }
       const skillIdCondition = isUuid(data.skill)
         ? eq(customSkills.id, data.skill)
         : eq(customSkills.slug, data.skill);
@@ -737,12 +754,12 @@ export async function setupAiStream(params: {
         .where(skillIdCondition)
         .limit(1);
       if (char?.compactTrigger !== null && char?.compactTrigger !== undefined) {
-        return char.compactTrigger;
+        return Math.min(char.compactTrigger, cap);
       }
     }
 
-    // 3. Fall back to global constant
-    return COMPACT_TRIGGER;
+    // 3. Fall back to global constant (also capped)
+    return Math.min(COMPACT_TRIGGER, cap);
   })();
 
   logger.debug("[Setup] Effective compact trigger resolved", {
@@ -1545,16 +1562,20 @@ export async function setupAiStream(params: {
 
   // When the user cancels the stream, propagate cancellation to any escalated task.
   // The abort signal fires synchronously when StreamRegistry.cancel() is called.
-  streamAbortController.signal.addEventListener("abort", () => {
-    const abortErr = streamAbortController.signal.reason;
-    if (
-      isStreamAbort(abortErr) &&
-      abortErr.reason === AbortReason.USER_CANCELLED &&
-      streamContext.onEscalatedTaskCancel
-    ) {
-      void streamContext.onEscalatedTaskCancel();
-    }
-  });
+  streamAbortController.signal.addEventListener(
+    "abort",
+    () => {
+      const abortErr = streamAbortController.signal.reason;
+      if (
+        isStreamAbort(abortErr) &&
+        abortErr.reason === AbortReason.USER_CANCELLED &&
+        streamContext.onEscalatedTaskCancel
+      ) {
+        void streamContext.onEscalatedTaskCancel();
+      }
+    },
+    { once: true },
+  );
 
   // Mark thread as streaming in DB (for refresh recovery + cross-tab detection)
   if (!isIncognito) {

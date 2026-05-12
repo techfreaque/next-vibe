@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: navigatePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, platform }) =>
       BrowserSharedRepository.executeMCPTool(
         {
           toolName: BrowserTool.NAVIGATE_PAGE,
@@ -28,6 +28,7 @@ export const { POST, tools } = endpointsHandler({
         },
         t,
         logger,
+        platform,
       ),
   },
 });

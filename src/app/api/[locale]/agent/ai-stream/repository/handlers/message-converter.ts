@@ -787,7 +787,7 @@ export class MessageConverter {
         type: "content";
         value: Array<
           | { type: "text"; text: string }
-          | { type: "media"; data: string; mediaType: string }
+          | { type: "image-data"; data: string; mediaType: string }
         >;
       }
   > {
@@ -801,17 +801,19 @@ export class MessageConverter {
       Array.isArray(result.content)
     ) {
       const blocks = result.content as ContentBlock[];
+      const modelSupportsImages =
+        modelConfig?.inputs?.includes("image") ?? false;
       const contentParts: Array<
         | { type: "text"; text: string }
-        | { type: "media"; data: string; mediaType: string }
+        | { type: "image-data"; data: string; mediaType: string }
       > = [];
 
       for (const block of blocks) {
         if (block.type === "text") {
           contentParts.push({ type: "text", text: block.text });
-        } else if (block.type === "image") {
+        } else if (block.type === "image" && modelSupportsImages) {
           contentParts.push({
-            type: "media",
+            type: "image-data",
             data: block.data,
             mediaType: block.mimeType,
           });
@@ -848,6 +850,44 @@ export class MessageConverter {
       if (contentParts.length > 0) {
         return { type: "content", value: contentParts };
       }
+      // Only image blocks but model can't see images — minimal placeholder.
+      return {
+        type: "json",
+        value: { status: "screenshot_taken" },
+      };
+    }
+
+    // Detect a stored ToolResultOutput `{ type: "content", value: [...] }` written
+    // by executor.ts when running on the AI platform. Pass it through directly so
+    // image-data parts remain as structured content instead of being re-wrapped as JSON text.
+    if (
+      result &&
+      typeof result === "object" &&
+      !Array.isArray(result) &&
+      "type" in result &&
+      result.type === "content" &&
+      "value" in result &&
+      Array.isArray(result.value)
+    ) {
+      const modelSupportsImages =
+        modelConfig?.inputs?.includes("image") ?? false;
+      const parts = result.value as Array<
+        | { type: "text"; text: string }
+        | { type: "image-data"; data: string; mediaType: string }
+      >;
+      const filtered = parts.filter(
+        (p) => p.type !== "image-data" || modelSupportsImages,
+      );
+      if (filtered.length > 0) {
+        return {
+          type: "content",
+          value: filtered as Array<
+            | { type: "text"; text: string }
+            | { type: "image-data"; data: string; mediaType: string }
+          >,
+        };
+      }
+      return { type: "json", value: { status: "screenshot_taken" } };
     }
 
     // Media tool result modality-aware handling:
@@ -949,8 +989,8 @@ export class MessageConverter {
             const mimeType = mediaResult.mediaType ?? "image/png";
             const contentParts: Array<
               | { type: "text"; text: string }
-              | { type: "media"; data: string; mediaType: string }
-            > = [{ type: "media", data: base64Data, mediaType: mimeType }];
+              | { type: "image-data"; data: string; mediaType: string }
+            > = [{ type: "image-data", data: base64Data, mediaType: mimeType }];
             if (mediaResult.text) {
               contentParts.push({ type: "text", text: mediaResult.text });
             }

@@ -17,6 +17,8 @@ import {
   type NewErrorLog,
 } from "@/app/api/[locale]/system/unified-interface/tasks/error-monitor/db";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { type ErrorLogLevel, type LoggerMetadata } from "./endpoint";
 
 /** Truncate a string to maxLen, appending "..." if truncated */
@@ -118,6 +120,7 @@ export function persistErrorLog(
   message: string,
   error: LoggerMetadata | undefined,
   extraMeta: LoggerMetadata[],
+  locale: CountryLanguage,
 ): void {
   if (inflightCount >= MAX_INFLIGHT) {
     // Drop - best-effort logging must never become an OOM vector
@@ -138,7 +141,7 @@ export function persistErrorLog(
       // Collect all metadata: include the error object itself when it's a plain
       // object (not an Error instance) so structured context isn't lost.
       // Error instances are captured via stackTrace/message - no need to duplicate.
-      const allMeta: LoggerMetadata[] = [];
+      const allMeta: LoggerMetadata[] = [{ locale }];
       if (
         error !== null &&
         error !== undefined &&

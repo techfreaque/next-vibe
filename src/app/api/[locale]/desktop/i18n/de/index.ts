@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
   description: "Desktop steuern: Screenshots, Maus, Tastatur, Fenster",
   category: "Desktop",
   summary:
-    "Linux-Desktop-Automatisierung über xdotool, wmctrl, spectacle/scrot und pyatspi",
+    "Plattformübergreifende Desktop-Automatisierung: Linux (ydotool/KWin/pyatspi) und Windows (PowerShell/UIAutomation)",
   tags: {
     desktopAutomation: "Desktop-Automatisierung",
     inputAutomation: "Eingabe-Automatisierung",
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
 
   repository: {
     platformNotSupported:
-      "Plattform nicht unterstützt: {{platform}}. Nur Linux wird unterstützt.",
+      "Plattform nicht unterstützt: {{platform}}. Linux und Windows werden unterstützt.",
     windowsNotSupported: "Windows-Unterstützung kommt bald",
     macosNotSupported: "macOS-Unterstützung kommt bald",
     commandFailed: "Befehl fehlgeschlagen: {{error}}",

@@ -33,7 +33,7 @@ export const translations = {
   description: "Control the desktop: screenshots, mouse, keyboard, windows",
   category: "Desktop",
   summary:
-    "Linux desktop automation via xdotool, wmctrl, spectacle/scrot, and pyatspi",
+    "Cross-platform desktop automation: Linux (ydotool/KWin/pyatspi) and Windows (PowerShell/UIAutomation)",
   tags: {
     desktopAutomation: "Desktop Automation",
     inputAutomation: "Input Automation",
@@ -59,7 +59,7 @@ export const translations = {
 
   repository: {
     platformNotSupported:
-      "Platform not supported: {{platform}}. Only Linux is supported.",
+      "Platform not supported: {{platform}}. Linux and Windows are supported.",
     windowsNotSupported: "Windows support coming soon",
     macosNotSupported: "macOS support coming soon",
     commandFailed: "Command failed: {{error}}",

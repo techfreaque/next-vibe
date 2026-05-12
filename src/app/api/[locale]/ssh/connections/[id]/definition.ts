@@ -6,10 +6,13 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   customWidgetObject,
   requestField,
   requestUrlPathParamsField,
   responseField,
+  submitButton,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -324,19 +327,37 @@ export const { DELETE } = createEndpoint({
 
   fields: customWidgetObject({
     render: ConnectionDetailContainer,
-    usage: { request: "data&urlPathParams", response: true } as const,
+    usage: { request: "urlPathParams", response: true } as const,
     children: {
+      title: widgetField(scopedTranslation, {
+        type: WidgetType.TITLE,
+        level: 5,
+        content: "widget.confirmDelete",
+        usage: { request: "urlPathParams" },
+      }),
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         schema: z.string().uuid(),
         label: "delete.fields.id.label",
         description: "delete.fields.id.description",
+        hidden: true,
       }),
       deleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.deleted.title",
         schema: z.boolean(),
+      }),
+      backButton: backButton(scopedTranslation, {
+        icon: "arrow-left",
+        variant: "outline",
+        usage: { request: "urlPathParams" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "delete.title",
+        icon: "trash",
+        variant: "destructive",
+        usage: { request: "urlPathParams" },
       }),
     },
   }),

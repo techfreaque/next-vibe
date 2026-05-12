@@ -14,6 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import type { BrowserTool } from "../enum";
 import type { BrowserT } from "../i18n";
@@ -75,10 +76,9 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
-    threadId?: string,
+    platform: Platform,
   ): Promise<ResponseType<T> | ContentResponse> {
     try {
-      // Prepare request data for main browser repository
       const requestData: {
         tool: string;
         arguments?: string;
@@ -87,21 +87,17 @@ export class BrowserSharedRepository {
         arguments: JSON.stringify(params.args),
       };
 
-      // Call main browser repository
       const result = await BrowserRepository.executeTool(
         requestData,
         t,
         logger,
-        threadId,
+        platform,
       );
 
-      // Content responses (e.g. inline screenshots) must be propagated directly —
-      // wrapping them in success() would break serialization in the execute-tool pipeline.
       if (isContentResponse(result)) {
         return result;
       }
 
-      // Return the result directly - it already has the correct structure
       return result as ResponseType<T>;
     } catch (error) {
       logger.error(`MCP tool execution failed: ${params.toolName}`, {
@@ -126,83 +122,119 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<T> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool<T>(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool<T>(
+      params,
+      t,
+      logger,
+      platform,
+    );
   }
 
   static executeClosePage<T = BrowserToolResponse>(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<T> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool<T>(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool<T>(
+      params,
+      t,
+      logger,
+      platform,
+    );
   }
 
   static executeDrag<T = BrowserToolResponse>(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<T> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool<T>(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool<T>(
+      params,
+      t,
+      logger,
+      platform,
+    );
   }
 
   static executeFill<T = BrowserToolResponse>(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<T> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool<T>(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool<T>(
+      params,
+      t,
+      logger,
+      platform,
+    );
   }
 
   static executeEmulate(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
   }
 
   static executeEvaluateScript(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
   }
 
   static executeFillForm(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
   }
 
   static executeGetConsoleMessage(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
   }
 
   static executeGetNetworkRequest<T = BrowserToolResponse>(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<T> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool<T>(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool<T>(
+      params,
+      t,
+      logger,
+      platform,
+    );
   }
 
   static executeHandleDialog(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
+      platform,
     );
   }
 
@@ -210,11 +242,13 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
+      platform,
     );
   }
 
@@ -222,11 +256,13 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
+      platform,
     );
   }
 
@@ -234,11 +270,13 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
+      platform,
     );
   }
 
@@ -246,11 +284,13 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
+      platform,
     );
   }
 
@@ -258,11 +298,13 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
+      platform,
     );
   }
 
@@ -270,11 +312,13 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
+      platform,
     );
   }
 
@@ -282,11 +326,13 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
+      platform,
     );
   }
 
@@ -294,11 +340,13 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
+      platform,
     );
   }
 
@@ -306,11 +354,13 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
+      platform,
     );
   }
 
@@ -318,56 +368,77 @@ export class BrowserSharedRepository {
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<T> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool<T>(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool<T>(
+      params,
+      t,
+      logger,
+      platform,
+    );
   }
 
   static executeResizePage<T = BrowserToolResponse>(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<T> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool<T>(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool<T>(
+      params,
+      t,
+      logger,
+      platform,
+    );
   }
 
   static executeSelectPage<T = BrowserToolResponse>(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<T> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool<T>(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool<T>(
+      params,
+      t,
+      logger,
+      platform,
+    );
   }
 
   static executeTakeScreenshot(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
-    threadId?: string,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger, threadId);
+    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
   }
 
   static executeTakeSnapshot(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
   }
 
   static executeUploadFile(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
   }
 
   static executeWaitFor(
     params: MCPToolParams,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger);
+    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
   }
 }

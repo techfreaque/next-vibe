@@ -8,7 +8,7 @@
 // Process environment access is required for server configuration
 
 import type { ChildProcess } from "node:child_process";
-import { execSync, spawn } from "node:child_process";
+import { spawn } from "node:child_process";
 import {
   appendFileSync,
   mkdirSync,
@@ -53,6 +53,7 @@ import { ServerFramework } from "../enum";
 import {
   addPidToFile,
   cleanupPidFile,
+  getPidOnPort,
   isPortOwnedByUs,
   killPreviousInstance,
   removePidFromFile,
@@ -1124,21 +1125,7 @@ export class ServerStartRepository {
    * This prevents killing processes from other project instances running on the same port.
    */
   private static killProcessOnPort(port: number, logger: EndpointLogger): void {
-    // Get PID on this port
-    let pidOnPort: number | undefined;
-    try {
-      const output = execSync(`fuser ${port}/tcp 2>/dev/null`, {
-        encoding: "utf-8",
-      }).trim();
-      const parsed = parseInt(output.split(/\s+/)[0] ?? "", 10);
-      if (!isNaN(parsed) && parsed > 0) {
-        pidOnPort = parsed;
-      }
-    } catch {
-      // No process on port - nothing to do
-      return;
-    }
-
+    const pidOnPort = getPidOnPort(port);
     if (!pidOnPort) {
       return;
     }
@@ -1160,12 +1147,10 @@ export class ServerStartRepository {
     // Wait up to 2s for graceful shutdown, then SIGKILL
     const gracePeriod = Date.now() + 2000;
     while (Date.now() < gracePeriod) {
-      try {
-        execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
-        execSync("sleep 0.1");
-      } catch {
-        return; // port released
+      if (getPidOnPort(port) === undefined) {
+        return;
       }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
     }
 
     // Still alive - force kill
@@ -1178,12 +1163,10 @@ export class ServerStartRepository {
     // Wait up to 3 more seconds for port release after SIGKILL
     const deadline = Date.now() + 3000;
     while (Date.now() < deadline) {
-      try {
-        execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
-        execSync("sleep 0.1");
-      } catch {
+      if (getPidOnPort(port) === undefined) {
         return;
       }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
     }
 
     logger.warn(`Port ${port} did not free up within 5 seconds`);

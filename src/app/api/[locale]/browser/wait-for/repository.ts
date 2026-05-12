@@ -4,20 +4,21 @@
 
 import "server-only";
 
-import {
-  isContentResponse,
-  success,
-} from "next-vibe/shared/types/response.schema";
 import type {
   ContentResponse,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import {
+  isContentResponse,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { BrowserTool } from "../enum";
 import type { BrowserT } from "../i18n";
 import type { MCPContentBlock } from "../shared/repository";
 import { BrowserSharedRepository } from "../shared/repository";
-import { BrowserTool } from "../enum";
 import type { WaitForRequestOutput, WaitForResponseOutput } from "./definition";
 
 export class WaitForRepository {
@@ -25,6 +26,7 @@ export class WaitForRepository {
     data: WaitForRequestOutput,
     t: BrowserT,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<WaitForResponseOutput> | ContentResponse> {
     const result = await BrowserSharedRepository.executeWaitFor(
       {
@@ -36,6 +38,7 @@ export class WaitForRepository {
       },
       t,
       logger,
+      platform,
     );
 
     // When captureSnapshot is false (default), strip the a11y tree from the response

@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: hoverEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, platform }) =>
       BrowserSharedRepository.executeMCPTool(
         {
           toolName: BrowserTool.HOVER,
@@ -23,6 +23,7 @@ export const { POST, tools } = endpointsHandler({
         },
         t,
         logger,
+        platform,
       ),
   },
 });

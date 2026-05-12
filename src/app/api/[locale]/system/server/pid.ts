@@ -45,6 +45,8 @@ function isProcessRunning(pid: number): boolean {
 /**
  * Kill a previous vibe instance if still running.
  * Reads the PID file, checks if the process is alive, sends SIGTERM, waits for exit.
+ * Also kills any residual process on the old internal port (PORT + NEXT_PORT_OFFSET)
+ * that may have been orphaned (e.g. Next.js child whose parent exited before it finished).
  */
 export function killPreviousInstance(
   pidFile: string,
@@ -55,62 +57,109 @@ export function killPreviousInstance(
   }
 
   const pidStr = readFileSync(pidFile, "utf-8").trim();
+  const lines = pidStr.split("\n");
+
   // Support multi-PID files (one per line) - kill all recorded processes.
   // Skip PORT:<n> metadata lines.
-  const pids = pidStr
-    .split("\n")
+  const pids = lines
     .filter((s) => !s.startsWith("PORT:"))
     .map((s) => parseInt(s.trim(), 10))
     .filter((p) => !isNaN(p) && p > 0 && p !== process.pid);
 
-  if (pids.length === 0) {
+  // Read the old port so we can clean up the internal offset port too.
+  const oldPortLine = lines.find((l) => l.startsWith("PORT:"));
+  const oldPort = oldPortLine ? parseInt(oldPortLine.slice(5), 10) : undefined;
+
+  if (pids.length === 0 && oldPort === undefined) {
     cleanupPidFile(pidFile);
     return;
   }
 
+  // All PIDs recorded in the old file are ours - build a set for port ownership checks.
+  const oldPidSet = new Set(pids);
+
   // Filter to only running processes
   const running = pids.filter(isProcessRunning);
-  if (running.length === 0) {
+  if (running.length > 0) {
+    logger.debug("Killing previous vibe instance(s)", {
+      pids: running,
+      pidFile,
+    });
+
+    // Send SIGTERM to all
+    for (const pid of running) {
+      try {
+        process.kill(pid, "SIGTERM");
+      } catch {
+        /* already dead */
+      }
+    }
+
+    // Wait up to 5 seconds for all to exit
+    const deadline = Date.now() + 5000;
+    while (Date.now() < deadline && running.some(isProcessRunning)) {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
+    }
+
+    // Force-kill any survivors
+    for (const pid of running) {
+      if (isProcessRunning(pid)) {
+        logger.warn(
+          "Previous instance did not exit gracefully, force killing...",
+        );
+        try {
+          process.kill(pid, "SIGKILL");
+        } catch {
+          /* already dead */
+        }
+      }
+    }
+
+    logger.debug("Previous vibe instance(s) stopped", { pids: running });
+  } else if (pids.length > 0) {
     logger.debug("Stale PID file found (no processes running), cleaning up", {
       pids,
       pidFile,
     });
-    cleanupPidFile(pidFile);
-    return;
   }
 
-  logger.debug("Killing previous vibe instance(s)", { pids: running, pidFile });
-
-  // Send SIGTERM to all
-  for (const pid of running) {
-    try {
-      process.kill(pid, "SIGTERM");
-    } catch {
-      /* already dead */
-    }
-  }
-
-  // Wait up to 5 seconds for all to exit
-  const deadline = Date.now() + 5000;
-  while (Date.now() < deadline && running.some(isProcessRunning)) {
-    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
-  }
-
-  // Force-kill any survivors
-  for (const pid of running) {
-    if (isProcessRunning(pid)) {
-      logger.warn(
-        "Previous instance did not exit gracefully, force killing...",
+  // After tracked PIDs are dead, kill anything still on the old internal port
+  // (PORT + NEXT_PORT_OFFSET). If all our tracked PIDs are gone, whatever remains
+  // on that port must be an orphaned child (e.g. Nitro worker spawned by TanStack
+  // Start, or a Next.js grandchild) — it's safe to kill it because we own that port.
+  if (oldPort !== undefined && !isNaN(oldPort)) {
+    const internalPort = oldPort + NEXT_PORT_OFFSET;
+    const allTrackedDead = pids.every((p) => !isProcessRunning(p));
+    const pidOnPort = getPidOnPort(internalPort);
+    if (
+      pidOnPort !== undefined &&
+      pidOnPort !== process.pid &&
+      // On Windows, only kill if explicitly tracked - the allTrackedDead fallback
+      // would target unkillable system PIDs (Docker HNS) that happen to show on
+      // this port in netstat but don't actually block binding.
+      (oldPidSet.has(pidOnPort) ||
+        (allTrackedDead && process.platform !== "win32"))
+    ) {
+      logger.debug(
+        `Killing orphaned process on internal port ${internalPort}`,
+        { pid: pidOnPort },
       );
       try {
-        process.kill(pid, "SIGKILL");
+        process.kill(pidOnPort, "SIGTERM");
+      } catch {
+        /* already dead */
+      }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2000);
+      try {
+        if (isProcessRunning(pidOnPort)) {
+          process.kill(pidOnPort, "SIGKILL");
+        }
       } catch {
         /* already dead */
       }
     }
   }
 
-  logger.debug("Previous vibe instance(s) stopped", { pids: running });
   cleanupPidFile(pidFile);
 }
 
@@ -191,15 +240,67 @@ export function removePidFromFile(pidFile: string, pid: number): void {
 }
 
 /**
- * Remove the PID file
+ * Remove the PID file, but ONLY if the current process is the primary owner.
+ * This prevents a shutting-down process from deleting a PID file that the
+ * new server has already written (race condition: old shutdown + new writePidFile).
  */
 export function cleanupPidFile(pidFile: string): void {
   try {
-    if (existsSync(pidFile)) {
-      unlinkSync(pidFile);
+    if (!existsSync(pidFile)) {
+      return;
     }
+    // Only delete if our PID is the first entry (i.e. we own this file)
+    const firstLine =
+      readFileSync(pidFile, "utf-8").trim().split("\n")[0] ?? "";
+    const ownerPid = parseInt(firstLine, 10);
+    if (!isNaN(ownerPid) && ownerPid !== process.pid) {
+      return; // New server has already taken ownership — leave it alone
+    }
+    unlinkSync(pidFile);
   } catch {
     // Ignore cleanup errors
+  }
+}
+
+/**
+ * Get the PID of the process listening on the given TCP port, or undefined if none.
+ * Uses `fuser` on Linux/macOS and `netstat -ano` on Windows.
+ */
+export function getPidOnPort(port: number): number | undefined {
+  try {
+    if (process.platform === "win32") {
+      const output = execSync("netstat -ano -p TCP", {
+        encoding: "utf-8",
+        stdio: "pipe",
+      });
+      for (const line of output.split("\n")) {
+        // Match lines like: TCP  0.0.0.0:3100  0.0.0.0:0  LISTENING  7256
+        if (
+          !line.includes(`:${String(port)} `) &&
+          !line.includes(`:${String(port)}\t`)
+        ) {
+          continue;
+        }
+        if (!line.includes("LISTEN")) {
+          continue;
+        }
+        const parts = line.trim().split(/\s+/);
+        const pid = parseInt(parts[parts.length - 1] ?? "", 10);
+        if (!isNaN(pid) && pid > 0) {
+          return pid;
+        }
+      }
+      return undefined;
+    }
+    // Linux/macOS: fuser prints the PID(s) directly
+    const output = execSync(`fuser ${String(port)}/tcp 2>/dev/null`, {
+      encoding: "utf-8",
+      stdio: "pipe",
+    }).trim();
+    const pid = parseInt(output.split(/\s+/)[0] ?? "", 10);
+    return !isNaN(pid) && pid > 0 ? pid : undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -208,16 +309,7 @@ export function cleanupPidFile(pidFile: string): void {
  * Non-destructive - does not kill anything.
  */
 export function isPortInUse(port: number): boolean {
-  try {
-    // stdio:'pipe' prevents Windows "/dev/null not found" noise leaking to terminal.
-    execSync(`fuser ${port}/tcp 2>/dev/null`, {
-      encoding: "utf-8",
-      stdio: "pipe",
-    });
-    return true;
-  } catch {
-    return false;
-  }
+  return getPidOnPort(port) !== undefined;
 }
 
 /**
@@ -225,20 +317,7 @@ export function isPortInUse(port: number): boolean {
  * (i.e. it belongs to this project instance - we can safely kill it).
  */
 export function isPortOwnedByUs(port: number, pidFile: string): boolean {
-  let pidOnPort: number | undefined;
-  try {
-    const output = execSync(`fuser ${port}/tcp 2>/dev/null`, {
-      encoding: "utf-8",
-      stdio: "pipe",
-    }).trim();
-    const parsed = parseInt(output.split(/\s+/)[0] ?? "", 10);
-    if (!isNaN(parsed) && parsed > 0) {
-      pidOnPort = parsed;
-    }
-  } catch {
-    return false; // nothing on port
-  }
-
+  const pidOnPort = getPidOnPort(port);
   if (!pidOnPort) {
     return false;
   }
@@ -286,9 +365,13 @@ export function readPidFilePort(pidFile: string): number | null {
 }
 
 /**
- * Find the lowest available port starting from `basePort` that is either:
- * - not in use at all, or
- * - in use by our own project (so we can kill it ourselves)
+ * Find the lowest available port starting from `basePort` where BOTH the
+ * public port and the internal port (public + NEXT_PORT_OFFSET) are usable.
+ *
+ * The public port is checked only on Linux/macOS — on Windows Bun binds via
+ * reusePort so any port is available for the proxy regardless of who holds it.
+ * The internal port is always checked because Vite uses a standard bind that
+ * cannot co-exist with an existing LISTEN socket (no reusePort).
  *
  * `reservedPort` is the base port reserved for the sibling command
  * (e.g. 3001 for vibe dev, 3000 for vibe start). Both that port and its
@@ -300,7 +383,22 @@ export function findAvailablePort(
   reservedPort: number,
 ): number {
   let port = basePort;
-  while (isPortInUse(port) && !isPortOwnedByUs(port, pidFile)) {
+  while (true) {
+    // On Windows, the proxy server uses reusePort so we skip the public port check.
+    const publicBlocked =
+      process.platform !== "win32" &&
+      isPortInUse(port) &&
+      !isPortOwnedByUs(port, pidFile);
+
+    const internalPort = port + NEXT_PORT_OFFSET;
+    const internalPid = getPidOnPort(internalPort);
+    const internalBlocked =
+      internalPid !== undefined && !isPortOwnedByUs(internalPort, pidFile);
+
+    if (!publicBlocked && !internalBlocked) {
+      break;
+    }
+
     port++;
     // Skip the port pair reserved for the sibling command
     if (port === reservedPort || port === reservedPort + NEXT_PORT_OFFSET) {

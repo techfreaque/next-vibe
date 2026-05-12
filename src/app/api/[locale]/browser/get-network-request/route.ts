@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: getNetworkRequestEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
-      GetNetworkRequestRepository.getNetworkRequest(data, t, logger),
+    handler: ({ data, t, logger, platform }) =>
+      GetNetworkRequestRepository.getNetworkRequest(data, t, logger, platform),
   },
 });

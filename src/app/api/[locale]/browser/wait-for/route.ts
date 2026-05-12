@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: waitForEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
-      WaitForRepository.waitFor(data, t, logger),
+    handler: ({ data, t, logger, platform }) =>
+      WaitForRepository.waitFor(data, t, logger, platform),
   },
 });

@@ -1796,7 +1796,23 @@ export class ViteCompiler {
       process.stdout.write(`${formatted}\n`);
       devFileLog(formatted);
 
-      const closeFn = (): Promise<void> => server.close();
+      const closeFn = (): Promise<void> => {
+        // Force-terminate all keep-alive connections before closing so the TCP
+        // socket is released immediately. Without this, server.close() waits
+        // for keep-alive connections (e.g. from the Bun proxy) to drain, the
+        // 2-second timeout in the shutdown handler fires, and process.exit()
+        // leaves the socket open — which Docker/WSL2 HNS then inherits as a
+        // zombie (PID 7256 on Windows).
+        if (server.httpServer) {
+          const h = server.httpServer as NodeHttpServer & {
+            closeAllConnections?: () => void;
+            closeIdleConnections?: () => void;
+          };
+          h.closeAllConnections?.();
+          h.closeIdleConnections?.();
+        }
+        return server.close();
+      };
       if (closeRef) {
         closeRef.fn = closeFn;
       }

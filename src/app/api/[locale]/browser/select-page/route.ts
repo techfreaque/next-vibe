@@ -15,7 +15,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: selectPageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger }) =>
+    handler: ({ data, t, logger, platform }) =>
       BrowserSharedRepository.executeSelectPage<SelectPageResponseOutput>(
         {
           toolName: BrowserTool.SELECT_PAGE,
@@ -26,6 +26,7 @@ export const { POST, tools } = endpointsHandler({
         },
         t,
         logger,
+        platform,
       ),
   },
 });

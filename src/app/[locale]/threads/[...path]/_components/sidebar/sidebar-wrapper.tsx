@@ -114,7 +114,7 @@ export function SidebarWrapper({
   if (isMobile) {
     return (
       <Div className="flex flex-row h-screen h-max-screen w-full">
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {!collapsed && (
             <MotionDiv
               key="mobile-sidebar"
@@ -134,7 +134,7 @@ export function SidebarWrapper({
           )}
         </AnimatePresence>
 
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {!collapsed && (
             <MotionDiv
               key="mobile-backdrop"
@@ -165,7 +165,7 @@ export function SidebarWrapper({
         className="bg-background z-10"
         collapsed={collapsed}
       >
-        <AnimatePresence mode="sync">
+        <AnimatePresence initial={false} mode="sync">
           {!collapsed && (
             <MotionDiv
               key="sidebar"

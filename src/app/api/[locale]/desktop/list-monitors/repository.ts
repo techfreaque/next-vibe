@@ -11,7 +11,7 @@ import { success } from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { DesktopT } from "../i18n";
-import { checkLinux, listMonitors } from "../shared/repository";
+import { checkPlatformSupported, listMonitors } from "../shared/repository";
 import type { DesktopListMonitorsResponseOutput } from "./definition";
 
 export class DesktopListMonitorsRepository {
@@ -19,7 +19,7 @@ export class DesktopListMonitorsRepository {
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<DesktopListMonitorsResponseOutput>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<DesktopListMonitorsResponseOutput>;
     }

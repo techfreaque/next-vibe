@@ -1,7 +1,8 @@
 /**
  * Desktop Automation Shared Repository
- * Wayland/KDE native: spectacle, ydotool, python3-pyatspi, qdbus6, kscreen-doctor.
- * Missing deps are installed on first use via kdesu (native KDE auth dialog).
+ * Linux/KDE (Wayland): spectacle, ydotool, python3-pyatspi, qdbus6, kscreen-doctor.
+ * Windows: PowerShell + built-in .NET (System.Windows.Forms, System.Drawing, UIAutomation).
+ * Missing Linux deps are installed on first use via kdesu (native KDE auth dialog).
  * All tools use execFile (never exec) to prevent shell injection.
  */
 
@@ -34,6 +35,9 @@ const execFile = promisify(execFileCb);
 // ---------------------------------------------------------------------------
 
 function sessionEnv(): NodeJS.ProcessEnv {
+  if (process.platform === "win32") {
+    return { ...process.env };
+  }
   return {
     ...process.env,
     DISPLAY: process.env.DISPLAY ?? ":0",
@@ -44,7 +48,7 @@ function sessionEnv(): NodeJS.ProcessEnv {
 }
 
 // ---------------------------------------------------------------------------
-// Dep install via kdesu (native KDE auth dialog) → pkexec fallback
+// Dep install via kdesu (native KDE auth dialog) → pkexec fallback (Linux)
 // ---------------------------------------------------------------------------
 
 const confirmedPresent = new Set<string>();
@@ -114,7 +118,8 @@ async function checkBinary(binary: string): Promise<boolean> {
     return true;
   }
   try {
-    await execFile("which", [binary], { timeout: 3000 });
+    const whichCmd = process.platform === "win32" ? "where" : "which";
+    await execFile(whichCmd, [binary], { timeout: 3000 });
     confirmedPresent.add(binary);
     return true;
   } catch {
@@ -257,20 +262,16 @@ async function ensurePyAtspi(logger: EndpointLogger): Promise<boolean> {
 // Platform guard
 // ---------------------------------------------------------------------------
 
-export function checkLinux(t: DesktopT): ResponseType<never> | null {
-  if (process.platform === "win32") {
-    return fail({
-      message: t("repository.windowsNotSupported"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
+export function checkPlatformSupported(
+  t: DesktopT,
+): ResponseType<never> | null {
   if (process.platform === "darwin") {
     return fail({
       message: t("repository.macosNotSupported"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
-  if (process.platform !== "linux") {
+  if (process.platform !== "linux" && process.platform !== "win32") {
     return fail({
       message: t("repository.platformNotSupported"),
       messageParams: { platform: process.platform },
@@ -281,7 +282,7 @@ export function checkLinux(t: DesktopT): ResponseType<never> | null {
 }
 
 // ---------------------------------------------------------------------------
-// execFile wrapper
+// execFile wrapper (Linux paths)
 // ---------------------------------------------------------------------------
 
 export async function runCommand(
@@ -327,7 +328,227 @@ function makeExecutionId(): string {
 }
 
 // ---------------------------------------------------------------------------
-// Monitor listing - kscreen-doctor (KDE) with xrandr fallback
+// Windows: PowerShell runner
+// ---------------------------------------------------------------------------
+
+async function runPowerShell(
+  script: string,
+  t: DesktopT,
+  logger: EndpointLogger,
+  opts?: { timeout?: number },
+): Promise<{ stdout: string; stderr: string } | ResponseType<never>> {
+  const executionId = makeExecutionId();
+  const tmpDir =
+    process.env["TEMP"] ?? process.env["TMP"] ?? "C:\\Windows\\Temp";
+  const scriptPath = `${tmpDir}\\vibe-desktop-${executionId}.ps1`;
+
+  try {
+    const { writeFileSync } = await import("node:fs");
+    writeFileSync(scriptPath, script, "utf-8");
+  } catch (err) {
+    return fail({
+      message: t("repository.commandFailed"),
+      messageParams: { error: `Failed to write script: ${String(err)}` },
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
+  }
+
+  try {
+    const r = await execFile(
+      "powershell.exe",
+      [
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        scriptPath,
+      ],
+      { timeout: opts?.timeout ?? 30_000, env: { ...process.env } },
+    );
+    return { stdout: r.stdout, stderr: r.stderr };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.error("[Desktop/Windows] PowerShell script failed", { message });
+    return fail({
+      message: t("repository.commandFailed"),
+      messageParams: { error: message },
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
+  } finally {
+    try {
+      const { unlinkSync } = await import("node:fs");
+      unlinkSync(scriptPath);
+    } catch {
+      /* non-fatal */
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Windows: shared P/Invoke type definition (user32.dll)
+// Included at the top of every PowerShell script that needs Win32 APIs.
+// ---------------------------------------------------------------------------
+
+const WIN_API_TYPEDEF = `Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
+[StructLayout(LayoutKind.Sequential)]
+public struct WinRect { public int Left, Top, Right, Bottom; }
+public static class WinApi {
+  [DllImport("user32.dll")] public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, IntPtr extra);
+  [DllImport("user32.dll")] public static extern bool SetCursorPos(int X, int Y);
+  [DllImport("user32.dll")] public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, IntPtr extra);
+  [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+  [DllImport("user32.dll", CharSet = CharSet.Auto)] public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+  [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out WinRect lpRect);
+  [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
+  [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+  [DllImport("user32.dll")] public static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+  public const byte VK_LWIN = 0x5B;
+  public const byte VK_LCONTROL = 0xA2;
+  public const byte VK_LMENU = 0xA4;
+  public const byte VK_LSHIFT = 0xA0;
+  public const uint KEYEVENTF_KEYUP = 0x0002;
+  public const int MOUSEEVENTF_LEFTDOWN = 0x0002;
+  public const int MOUSEEVENTF_LEFTUP = 0x0004;
+  public const int MOUSEEVENTF_RIGHTDOWN = 0x0008;
+  public const int MOUSEEVENTF_RIGHTUP = 0x0010;
+  public const int MOUSEEVENTF_MIDDLEDOWN = 0x0020;
+  public const int MOUSEEVENTF_MIDDLEUP = 0x0040;
+  public const int MOUSEEVENTF_WHEEL = 0x0800;
+  public const int MOUSEEVENTF_HWHEEL = 0x1000;
+  public const int SW_RESTORE = 9;
+}
+"@
+`;
+
+// ---------------------------------------------------------------------------
+// Windows: Virtual Key code map for press-key
+// ---------------------------------------------------------------------------
+
+function buildWinVkMap(): Record<string, number> {
+  const m: Record<string, number> = {
+    escape: 0x1b,
+    esc: 0x1b,
+    return: 0x0d,
+    enter: 0x0d,
+    backspace: 0x08,
+    tab: 0x09,
+    space: 0x20,
+    " ": 0x20,
+    home: 0x24,
+    end: 0x23,
+    prior: 0x21,
+    pageup: 0x21,
+    next: 0x22,
+    pagedown: 0x22,
+    insert: 0x2d,
+    delete: 0x2e,
+    del: 0x2e,
+    left: 0x25,
+    arrowleft: 0x25,
+    right: 0x27,
+    arrowright: 0x27,
+    up: 0x26,
+    arrowup: 0x26,
+    down: 0x28,
+    arrowdown: 0x28,
+    // Modifiers
+    ctrl: 0xa2,
+    control: 0xa2,
+    control_l: 0xa2,
+    control_r: 0xa3,
+    alt: 0xa4,
+    alt_l: 0xa4,
+    alt_r: 0xa5,
+    shift: 0xa0,
+    shift_l: 0xa0,
+    shift_r: 0xa1,
+    super: 0x5b,
+    super_l: 0x5b,
+    win: 0x5b,
+    meta: 0x5b,
+    meta_l: 0x5b,
+    caps_lock: 0x14,
+    // Function keys
+    f1: 0x70,
+    f2: 0x71,
+    f3: 0x72,
+    f4: 0x73,
+    f5: 0x74,
+    f6: 0x75,
+    f7: 0x76,
+    f8: 0x77,
+    f9: 0x78,
+    f10: 0x79,
+    f11: 0x7a,
+    f12: 0x7b,
+    // OEM keys
+    minus: 0xbd,
+    equal: 0xbb,
+    bracketleft: 0xdb,
+    bracketright: 0xdd,
+    backslash: 0xdc,
+    semicolon: 0xba,
+    apostrophe: 0xde,
+    grave: 0xc0,
+    comma: 0xbc,
+    period: 0xbe,
+    slash: 0xbf,
+  };
+  for (let i = 0; i < 26; i++) {
+    m["abcdefghijklmnopqrstuvwxyz"[i] ?? ""] = 0x41 + i;
+  }
+  for (let i = 0; i < 10; i++) {
+    m[String(i)] = 0x30 + i;
+  }
+  return m;
+}
+
+const WIN_VK_MAP = buildWinVkMap();
+
+function buildWindowsKeyScript(keyExpr: string): string | null {
+  const parts = keyExpr.split("+").map((p) => p.trim());
+  const codes: number[] = [];
+  for (const part of parts) {
+    const vk =
+      WIN_VK_MAP[part.toLowerCase()] ??
+      WIN_VK_MAP[part] ??
+      WIN_VK_MAP[part.toUpperCase()];
+    if (vk === undefined) {
+      return null;
+    }
+    codes.push(vk);
+  }
+  if (codes.length === 0) {
+    return null;
+  }
+
+  const pressLines = codes.map(
+    (c) => `[WinApi]::keybd_event(${c}, 0, 0, [IntPtr]::Zero)`,
+  );
+  const releaseLines = [...codes]
+    .toReversed()
+    .map(
+      (c) =>
+        `[WinApi]::keybd_event(${c}, 0, [WinApi]::KEYEVENTF_KEYUP, [IntPtr]::Zero)`,
+    );
+
+  return [
+    WIN_API_TYPEDEF,
+    ...pressLines,
+    "[System.Threading.Thread]::Sleep(30)",
+    ...releaseLines,
+    'Write-Output "OK"',
+  ].join("\n");
+}
+
+// ---------------------------------------------------------------------------
+// Monitor listing - kscreen-doctor (KDE) with xrandr fallback (Linux)
+//                  PowerShell System.Windows.Forms.Screen (Windows)
 // ---------------------------------------------------------------------------
 
 export interface MonitorInfo {
@@ -343,12 +564,92 @@ export interface MonitorInfo {
 let monitorCache: { monitors: MonitorInfo[]; ts: number } | null = null;
 const MONITOR_CACHE_TTL_MS = 10_000;
 
+async function listMonitorsWindows(
+  logger: EndpointLogger,
+): Promise<MonitorInfo[]> {
+  const monitors: MonitorInfo[] = [];
+  const script = [
+    "Add-Type -AssemblyName System.Windows.Forms",
+    "$idx = 0",
+    "foreach ($s in [System.Windows.Forms.Screen]::AllScreens) {",
+    "  @{index=$idx;name=$s.DeviceName;x=$s.Bounds.X;y=$s.Bounds.Y;width=$s.Bounds.Width;height=$s.Bounds.Height;primary=[int]$s.Primary} | ConvertTo-Json -Compress",
+    "  $idx++",
+    "}",
+  ].join("\n");
+
+  try {
+    const r = await execFile(
+      "powershell.exe",
+      [
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        script,
+      ],
+      { timeout: 10_000, env: { ...process.env } },
+    );
+    for (const line of r.stdout.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith("{")) {
+        continue;
+      }
+      try {
+        const obj = JSON.parse(trimmed) as {
+          index?: number;
+          name?: string;
+          x?: number;
+          y?: number;
+          width?: number;
+          height?: number;
+          primary?: number;
+        };
+        if (obj.name && obj.width) {
+          monitors.push({
+            name: obj.name,
+            x: obj.x ?? 0,
+            y: obj.y ?? 0,
+            width: obj.width,
+            height: obj.height ?? 1080,
+            index: obj.index ?? monitors.length,
+            primary: (obj.primary ?? 0) === 1,
+          });
+        }
+      } catch {
+        /* skip non-JSON lines */
+      }
+    }
+  } catch (err) {
+    logger.warn(`[Desktop/Windows] Monitor listing failed: ${String(err)}`);
+  }
+
+  if (monitors.length === 0) {
+    monitors.push({
+      name: "\\\\.\\DISPLAY1",
+      x: 0,
+      y: 0,
+      width: 1920,
+      height: 1080,
+      index: 0,
+      primary: true,
+    });
+  }
+  return monitors;
+}
+
 export async function listMonitors(
   logger: EndpointLogger,
 ): Promise<MonitorInfo[]> {
   const now = Date.now();
   if (monitorCache && now - monitorCache.ts < MONITOR_CACHE_TTL_MS) {
     return monitorCache.monitors;
+  }
+
+  if (process.platform === "win32") {
+    const monitors = await listMonitorsWindows(logger);
+    monitorCache = { monitors, ts: now };
+    return monitors;
   }
 
   const monitors: MonitorInfo[] = [];
@@ -448,7 +749,7 @@ export function invalidateMonitorCache(): void {
 }
 
 // ---------------------------------------------------------------------------
-// AT-SPI2 bus address detection (Wayland)
+// AT-SPI2 bus address detection (Linux/Wayland)
 // ---------------------------------------------------------------------------
 
 let atSpiBusAddressCache: { addr: string | null; ts: number } | null = null;
@@ -504,12 +805,40 @@ async function getAtSpiBusAddress(): Promise<string | undefined> {
 }
 
 // ---------------------------------------------------------------------------
-// Image helpers - dimensions + downscaling via ImageMagick
+// Image helpers - dimensions + downscaling
+// Linux: ImageMagick (identify / magick)
+// Windows: System.Drawing + ImageMagick fallback
 // ---------------------------------------------------------------------------
 
 async function getImageDimensions(
   path: string,
 ): Promise<{ width: number; height: number } | null> {
+  if (process.platform === "win32") {
+    const psPath = path.replace(/'/g, "''");
+    const script = `Add-Type -AssemblyName System.Drawing; $i=[System.Drawing.Image]::FromFile('${psPath}'); Write-Output "$($i.Width)x$($i.Height)"; $i.Dispose()`;
+    try {
+      const r = await execFile(
+        "powershell.exe",
+        [
+          "-NoProfile",
+          "-NonInteractive",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-Command",
+          script,
+        ],
+        { timeout: 5000, env: { ...process.env } },
+      );
+      const m = /^(\d+)x(\d+)/.exec(r.stdout.trim());
+      if (m) {
+        return { width: parseInt(m[1], 10), height: parseInt(m[2], 10) };
+      }
+    } catch {
+      /* ignore */
+    }
+    return null;
+  }
+
   for (const [cmd, args] of [
     ["identify", ["-format", "%wx%h", path]],
     ["magick", ["identify", "-format", "%wx%h", path]],
@@ -533,6 +862,58 @@ async function downscaleImage(
   maxWidth: number,
   logger: EndpointLogger,
 ): Promise<boolean> {
+  if (process.platform === "win32") {
+    // Try ImageMagick first, fall back to System.Drawing
+    for (const [cmd, args] of [
+      ["magick", [inputPath, "-resize", `${maxWidth}x>`, outputPath]],
+      ["convert", [inputPath, "-resize", `${maxWidth}x>`, outputPath]],
+    ] as [string, string[]][]) {
+      try {
+        await execFile(cmd, args, {
+          timeout: 30_000,
+          env: { ...process.env },
+        });
+        return true;
+      } catch {
+        /* try next */
+      }
+    }
+    const psIn = inputPath.replace(/'/g, "''");
+    const psOut = outputPath.replace(/'/g, "''");
+    const script = `
+Add-Type -AssemblyName System.Drawing
+$img = [System.Drawing.Image]::FromFile('${psIn}')
+$nw = ${maxWidth}
+$nh = [int]($img.Height * $nw / $img.Width)
+$bmp = New-Object System.Drawing.Bitmap($nw, $nh)
+$g = [System.Drawing.Graphics]::FromImage($bmp)
+$g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+$g.DrawImage($img, 0, 0, $nw, $nh)
+$g.Dispose(); $img.Dispose()
+$bmp.Save('${psOut}', [System.Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+Write-Output "OK"
+`.trim();
+    try {
+      await execFile(
+        "powershell.exe",
+        [
+          "-NoProfile",
+          "-NonInteractive",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-Command",
+          script,
+        ],
+        { timeout: 30_000, env: { ...process.env } },
+      );
+      return true;
+    } catch (err) {
+      logger.warn(`[Desktop/Windows] Downscale failed: ${String(err)}`);
+      return false;
+    }
+  }
+
   // Try magick (IM7+) then convert (IM6)
   for (const [cmd, args] of [
     ["magick", [inputPath, "-resize", `${maxWidth}x>`, outputPath]],
@@ -563,7 +944,9 @@ async function downscaleImage(
 }
 
 // ---------------------------------------------------------------------------
-// Screenshot - spectacle (KDE/Wayland native), fallback grim
+// Screenshot
+// Linux:   spectacle (KDE/Wayland native), fallback grim
+// Windows: PowerShell + System.Drawing.Graphics.CopyFromScreen
 // ---------------------------------------------------------------------------
 
 export interface ScreenshotResult {
@@ -580,6 +963,156 @@ export interface ScreenshotResult {
 }
 
 export class DesktopScreenshotRepository {
+  private static async takeScreenshotWindows(
+    data: {
+      outputPath?: string;
+      screen?: number;
+      monitorName?: string;
+      maxWidth?: number;
+    },
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ScreenshotResult> | ContentResponse> {
+    const executionId = makeExecutionId();
+    const monitors = await listMonitors(logger);
+
+    let targetMonitor: MonitorInfo | undefined;
+    if (data.monitorName) {
+      targetMonitor = monitors.find(
+        (m) => m.name.toLowerCase() === data.monitorName!.toLowerCase(),
+      );
+      if (!targetMonitor) {
+        return fail({
+          message: t("repository.commandFailed"),
+          messageParams: {
+            error: `Monitor "${data.monitorName}" not found`,
+          },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+    } else if (data.screen !== undefined) {
+      targetMonitor = monitors[data.screen];
+      if (!targetMonitor) {
+        return fail({
+          message: t("repository.commandFailed"),
+          messageParams: {
+            error: `Screen index ${data.screen} out of range`,
+          },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+    } else {
+      targetMonitor = monitors.find((m) => m.primary) ?? monitors[0];
+    }
+
+    const { x, y, width, height } = targetMonitor;
+    const resolvedMonitorName = targetMonitor?.name;
+
+    const tmpDir =
+      process.env["TEMP"] ?? process.env["TMP"] ?? "C:\\Windows\\Temp";
+    const rawOutputPath =
+      data.outputPath ?? `${tmpDir}\\vibe-screenshot-${executionId}.png`;
+    const psOutputPath = rawOutputPath.replace(/'/g, "''");
+
+    const captureScript = `
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+$bmp = New-Object System.Drawing.Bitmap(${width}, ${height})
+$g = [System.Drawing.Graphics]::FromImage($bmp)
+$g.CopyFromScreen(${x}, ${y}, 0, 0, [System.Drawing.Size]::new(${width}, ${height}))
+$g.Dispose()
+$bmp.Save('${psOutputPath}', [System.Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+Write-Output "OK"
+`.trim();
+
+    const captureResult = await runPowerShell(captureScript, t, logger);
+    if (isCommandError(captureResult)) {
+      return captureResult as ResponseType<ScreenshotResult>;
+    }
+
+    try {
+      const { readFileSync } = await import("node:fs");
+
+      const origDims = await getImageDimensions(rawOutputPath);
+      let finalPath = rawOutputPath;
+      let finalDims = origDims;
+
+      if (data.maxWidth && origDims && origDims.width > data.maxWidth) {
+        const scaledPath = `${tmpDir}\\vibe-screenshot-scaled-${executionId}.png`;
+        const scaled = await downscaleImage(
+          rawOutputPath,
+          scaledPath,
+          data.maxWidth,
+          logger,
+        );
+        if (scaled) {
+          finalPath = scaledPath;
+          finalDims = await getImageDimensions(scaledPath);
+        }
+      }
+
+      const buf = readFileSync(finalPath);
+      const imageData = buf.toString("base64");
+
+      try {
+        const { unlinkSync } = await import("node:fs");
+        if (!data.outputPath) {
+          unlinkSync(rawOutputPath);
+          if (finalPath !== rawOutputPath) {
+            unlinkSync(finalPath);
+          }
+        } else if (finalPath !== rawOutputPath) {
+          unlinkSync(finalPath);
+        }
+      } catch {
+        /* non-fatal */
+      }
+
+      const monitorLabel = resolvedMonitorName ?? "all monitors";
+      const dimensionLabel = origDims
+        ? finalDims &&
+          (finalDims.width !== origDims.width ||
+            finalDims.height !== origDims.height)
+          ? `${origDims.width}×${origDims.height} → ${finalDims.width}×${finalDims.height}`
+          : `${origDims.width}×${origDims.height}`
+        : "captured";
+
+      if (data.outputPath) {
+        return success({
+          success: true,
+          imagePath: data.outputPath,
+          imageData,
+          width: finalDims?.width,
+          height: finalDims?.height,
+          originalWidth: origDims?.width,
+          originalHeight: origDims?.height,
+          capturedMonitor: resolvedMonitorName,
+          executionId,
+        });
+      }
+
+      const blocks: ContentBlock[] = [
+        {
+          type: "text",
+          text: `Screenshot: ${monitorLabel} (${dimensionLabel})`,
+        },
+        { type: "image", data: imageData, mimeType: "image/png" },
+      ];
+      return createContentResponse(blocks);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      logger.error("[Desktop/Windows] Failed to read screenshot file", {
+        rawOutputPath,
+        message,
+      });
+      return fail({
+        message: t("repository.screenshotFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
   static async takeScreenshot(
     data: {
       outputPath?: string;
@@ -591,9 +1124,13 @@ export class DesktopScreenshotRepository {
     logger: EndpointLogger,
     threadId?: string,
   ): Promise<ResponseType<ScreenshotResult> | ContentResponse> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<ScreenshotResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopScreenshotRepository.takeScreenshotWindows(data, t, logger);
     }
 
     const executionId = makeExecutionId();
@@ -874,7 +1411,9 @@ export class DesktopScreenshotRepository {
 }
 
 // ---------------------------------------------------------------------------
-// Accessibility tree - python3-pyatspi (works on Wayland via AT-SPI2)
+// Accessibility tree
+// Linux:   python3-pyatspi (works on Wayland via AT-SPI2)
+// Windows: PowerShell UIAutomationClient (.NET)
 // ---------------------------------------------------------------------------
 
 export interface AccessibilityTreeResult {
@@ -963,15 +1502,123 @@ print('NODE_COUNT:' + str(node_count[0]))
 `.trim();
 }
 
+function buildWinUiaScript(appName: string, maxDepth: number): string {
+  const safeAppName = appName.replace(/'/g, "''");
+  return `
+Add-Type -AssemblyName UIAutomationClient
+Add-Type -AssemblyName UIAutomationTypes
+$AppName = '${safeAppName}'
+$MaxDepth = ${maxDepth}
+$count = 0
+function DumpNode($node, $depth) {
+  if ($depth -gt $MaxDepth) { return }
+  $script:count++
+  $name = try { $node.Current.Name } catch { "" }
+  $role = try { $node.Current.ControlType.ProgrammaticName -replace "ControlType\\.",""} catch { "Unknown" }
+  $line = "  " * $depth + "[$role] '$name'"
+  $text = ""
+  try {
+    $vp = $node.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern)
+    $text = $vp.Current.Value
+  } catch {}
+  if ($text) { $line += " text='$text'" }
+  try {
+    $b = $node.Current.BoundingRectangle
+    if ($b.Width -gt 0) { $line += " bbox=($([int]$b.X),$([int]$b.Y),$([int]$b.Width)x$([int]$b.Height))" }
+  } catch {}
+  Write-Output $line
+  try {
+    $children = $node.FindAll(
+      [System.Windows.Automation.TreeScope]::Children,
+      [System.Windows.Automation.Condition]::TrueCondition
+    )
+    foreach ($c in $children) { DumpNode $c ($depth + 1) }
+  } catch {}
+}
+$root = [System.Windows.Automation.AutomationElement]::RootElement
+$apps = $root.FindAll(
+  [System.Windows.Automation.TreeScope]::Children,
+  [System.Windows.Automation.Condition]::TrueCondition
+)
+foreach ($app in $apps) {
+  $appNameVal = try { $app.Current.Name } catch { "" }
+  if ($AppName -and -not $appNameVal.ToLower().Contains($AppName.ToLower())) { continue }
+  Write-Output "=== APP: $appNameVal ==="
+  DumpNode $app 0
+}
+Write-Output "NODE_COUNT:$count"
+`.trim();
+}
+
 export class DesktopAccessibilityRepository {
+  private static async getAccessibilityTreeWindows(
+    data: { appName?: string; maxDepth?: number; includeActions?: boolean },
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<AccessibilityTreeResult>> {
+    const executionId = makeExecutionId();
+    const script = buildWinUiaScript(data.appName ?? "", data.maxDepth ?? 5);
+
+    let stdout = "";
+    let timedOut = false;
+
+    const result = await runPowerShell(script, t, logger, { timeout: 20_000 });
+    if (isCommandError(result)) {
+      if (
+        "message" in result &&
+        typeof result.message === "string" &&
+        (result.message.includes("ETIMEDOUT") ||
+          result.message.includes("killed"))
+      ) {
+        timedOut = true;
+      } else {
+        return result as ResponseType<AccessibilityTreeResult>;
+      }
+    } else {
+      stdout = result.stdout;
+    }
+
+    let nodeCount: number | undefined;
+    const nodeCountMatch = /NODE_COUNT:(\d+)/.exec(stdout);
+    if (nodeCountMatch) {
+      nodeCount = parseInt(nodeCountMatch[1], 10);
+      stdout = stdout.replace(/NODE_COUNT:\d+\n?/, "");
+    }
+
+    let tree = timedOut
+      ? `${stdout.trim()}\n\n[WARNING: Query timed out - output may be incomplete]`
+      : stdout.trim();
+
+    if (data.appName && (!nodeCount || nodeCount === 0) && !timedOut) {
+      tree = `[No accessibility data found for "${data.appName}"]\n\nThe app may not expose UI Automation. Try running with elevated privileges or check if the app supports UIA.`;
+    }
+
+    return success({
+      success: true,
+      tree,
+      appName: data.appName,
+      nodeCount: nodeCount ?? 0,
+      truncated: timedOut,
+      executionId,
+    });
+  }
+
   static async getAccessibilityTree(
     data: { appName?: string; maxDepth?: number; includeActions?: boolean },
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<AccessibilityTreeResult>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<AccessibilityTreeResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopAccessibilityRepository.getAccessibilityTreeWindows(
+        data,
+        t,
+        logger,
+      );
     }
 
     const executionId = makeExecutionId();
@@ -1211,7 +1858,9 @@ function resolveKeyArgs(keyExpr: string): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// Mouse / keyboard - ydotool (Wayland, /dev/uinput)
+// Mouse / keyboard
+// Linux:   ydotool (Wayland, /dev/uinput)
+// Windows: PowerShell + user32 P/Invoke (mouse_event / keybd_event)
 // ---------------------------------------------------------------------------
 
 export interface SimpleResult {
@@ -1221,6 +1870,206 @@ export interface SimpleResult {
 }
 
 export class DesktopInputRepository {
+  private static async clickWindows(
+    data: {
+      x: number;
+      y: number;
+      button?: "left" | "middle" | "right";
+      doubleClick?: boolean;
+    },
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SimpleResult>> {
+    const executionId = makeExecutionId();
+    const btnDown =
+      data.button === "right"
+        ? "[WinApi]::MOUSEEVENTF_RIGHTDOWN"
+        : data.button === "middle"
+          ? "[WinApi]::MOUSEEVENTF_MIDDLEDOWN"
+          : "[WinApi]::MOUSEEVENTF_LEFTDOWN";
+    const btnUp =
+      data.button === "right"
+        ? "[WinApi]::MOUSEEVENTF_RIGHTUP"
+        : data.button === "middle"
+          ? "[WinApi]::MOUSEEVENTF_MIDDLEUP"
+          : "[WinApi]::MOUSEEVENTF_LEFTUP";
+    const times = data.doubleClick ? 2 : 1;
+
+    const clickLines: string[] = [];
+    for (let i = 0; i < times; i++) {
+      clickLines.push(
+        `[WinApi]::mouse_event(${btnDown}, 0, 0, 0, [IntPtr]::Zero)`,
+        "[System.Threading.Thread]::Sleep(30)",
+        `[WinApi]::mouse_event(${btnUp}, 0, 0, 0, [IntPtr]::Zero)`,
+      );
+      if (data.doubleClick && i === 0) {
+        clickLines.push("[System.Threading.Thread]::Sleep(80)");
+      }
+    }
+
+    const script = [
+      WIN_API_TYPEDEF,
+      `[WinApi]::SetCursorPos(${data.x}, ${data.y})`,
+      "[System.Threading.Thread]::Sleep(50)",
+      ...clickLines,
+      'Write-Output "OK"',
+    ].join("\n");
+
+    const result = await runPowerShell(script, t, logger);
+    if (isCommandError(result)) {
+      return result as ResponseType<SimpleResult>;
+    }
+    return success({ success: true, executionId });
+  }
+
+  private static async typeTextWindows(
+    data: {
+      text: string;
+      delay?: number;
+      windowId?: string;
+      windowTitle?: string;
+    },
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SimpleResult>> {
+    const executionId = makeExecutionId();
+
+    if (data.windowId ?? data.windowTitle) {
+      await DesktopWindowRepository.focusWindow(
+        { windowId: data.windowId, title: data.windowTitle },
+        t,
+        logger,
+      );
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 300);
+      });
+    }
+
+    // Use base64 encoding to safely pass arbitrary text to PowerShell
+    const b64 = Buffer.from(data.text, "utf-8").toString("base64");
+    const script = `
+Add-Type -AssemblyName System.Windows.Forms
+$text = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('${b64}'))
+$prev = [System.Windows.Forms.Clipboard]::GetText()
+[System.Windows.Forms.Clipboard]::SetText($text)
+[System.Windows.Forms.SendKeys]::SendWait('^v')
+[System.Threading.Thread]::Sleep(300)
+if ($prev) { [System.Windows.Forms.Clipboard]::SetText($prev) } else { [System.Windows.Forms.Clipboard]::Clear() }
+Write-Output "OK"
+`.trim();
+
+    const result = await runPowerShell(script, t, logger);
+    if (isCommandError(result)) {
+      return result as ResponseType<SimpleResult>;
+    }
+    return success({ success: true, executionId });
+  }
+
+  private static async pressKeyWindows(
+    data: {
+      key: string;
+      repeat?: number;
+      delay?: number;
+      windowId?: string;
+      windowTitle?: string;
+    },
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SimpleResult>> {
+    const executionId = makeExecutionId();
+
+    if (data.windowId ?? data.windowTitle) {
+      await DesktopWindowRepository.focusWindow(
+        { windowId: data.windowId, title: data.windowTitle },
+        t,
+        logger,
+      );
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 300);
+      });
+    }
+
+    const keyScript = buildWindowsKeyScript(data.key);
+    if (!keyScript) {
+      return fail({
+        message: t("repository.commandFailed"),
+        messageParams: { error: `Unknown key name: ${data.key}` },
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+
+    const repeat = data.repeat ?? 1;
+    for (let i = 0; i < repeat; i++) {
+      const result = await runPowerShell(keyScript, t, logger);
+      if (isCommandError(result)) {
+        return result as ResponseType<SimpleResult>;
+      }
+      if (repeat > 1 && data.delay) {
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, data.delay);
+        });
+      }
+    }
+
+    return success({ success: true, executionId });
+  }
+
+  private static async moveMouseWindows(
+    data: { x: number; y: number },
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SimpleResult>> {
+    const executionId = makeExecutionId();
+    const script = [
+      WIN_API_TYPEDEF,
+      `[WinApi]::SetCursorPos(${data.x}, ${data.y}) | Out-Null`,
+      'Write-Output "OK"',
+    ].join("\n");
+    const result = await runPowerShell(script, t, logger);
+    if (isCommandError(result)) {
+      return result as ResponseType<SimpleResult>;
+    }
+    return success({ success: true, executionId });
+  }
+
+  private static async scrollWindows(
+    data: {
+      x?: number;
+      y?: number;
+      direction: "up" | "down" | "left" | "right";
+      amount?: number;
+    },
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SimpleResult>> {
+    const executionId = makeExecutionId();
+    const amount = data.amount ?? 3;
+    const isVertical = data.direction === "up" || data.direction === "down";
+    const sign = data.direction === "up" || data.direction === "left" ? 1 : -1;
+    const delta = sign * amount * 120;
+    const flag = isVertical
+      ? "[WinApi]::MOUSEEVENTF_WHEEL"
+      : "[WinApi]::MOUSEEVENTF_HWHEEL";
+
+    const lines: string[] = [WIN_API_TYPEDEF];
+    if (data.x !== undefined && data.y !== undefined) {
+      lines.push(
+        `[WinApi]::SetCursorPos(${data.x}, ${data.y}) | Out-Null`,
+        "[System.Threading.Thread]::Sleep(50)",
+      );
+    }
+    lines.push(
+      `[WinApi]::mouse_event(${flag}, 0, 0, ${delta}, [IntPtr]::Zero)`,
+      'Write-Output "OK"',
+    );
+
+    const result = await runPowerShell(lines.join("\n"), t, logger);
+    if (isCommandError(result)) {
+      return result as ResponseType<SimpleResult>;
+    }
+    return success({ success: true, executionId });
+  }
+
   static async click(
     data: {
       x: number;
@@ -1231,9 +2080,13 @@ export class DesktopInputRepository {
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SimpleResult>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<SimpleResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopInputRepository.clickWindows(data, t, logger);
     }
 
     const ok = await ensureYdotool(logger);
@@ -1285,9 +2138,13 @@ export class DesktopInputRepository {
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SimpleResult>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<SimpleResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopInputRepository.typeTextWindows(data, t, logger);
     }
 
     const ok = await ensureYdotool(logger);
@@ -1346,9 +2203,13 @@ export class DesktopInputRepository {
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SimpleResult>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<SimpleResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopInputRepository.pressKeyWindows(data, t, logger);
     }
 
     const ok = await ensureYdotool(logger);
@@ -1400,9 +2261,13 @@ export class DesktopInputRepository {
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SimpleResult>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<SimpleResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopInputRepository.moveMouseWindows(data, t, logger);
     }
 
     const ok = await ensureYdotool(logger);
@@ -1434,9 +2299,13 @@ export class DesktopInputRepository {
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SimpleResult>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<SimpleResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopInputRepository.scrollWindows(data, t, logger);
     }
 
     const ok = await ensureYdotool(logger);
@@ -1475,7 +2344,9 @@ export class DesktopInputRepository {
 }
 
 // ---------------------------------------------------------------------------
-// Window management - qdbus6 (KDE Plasma DBus, Wayland native)
+// Window management
+// Linux:   qdbus6 (KDE Plasma DBus, Wayland native)
+// Windows: PowerShell Get-Process + user32 P/Invoke
 // ---------------------------------------------------------------------------
 
 export interface FocusedWindowResult {
@@ -1517,13 +2388,300 @@ export interface MoveWindowToMonitorResult {
 }
 
 export class DesktopWindowRepository {
+  private static async getFocusedWindowWindows(
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<FocusedWindowResult>> {
+    const executionId = makeExecutionId();
+    const script = `
+${WIN_API_TYPEDEF}
+$h = [WinApi]::GetForegroundWindow()
+$sb = New-Object System.Text.StringBuilder(512)
+[WinApi]::GetWindowText($h, $sb, 512) | Out-Null
+$pid = 0u
+[WinApi]::GetWindowThreadProcessId($h, [ref]$pid) | Out-Null
+@{windowId=$h.ToInt64().ToString();title=$sb.ToString();pid=[int]$pid} | ConvertTo-Json -Compress
+`.trim();
+
+    const result = await runPowerShell(script, t, logger);
+    if (isCommandError(result)) {
+      return result as ResponseType<FocusedWindowResult>;
+    }
+
+    try {
+      const parsed = JSON.parse(result.stdout.trim()) as {
+        windowId?: string;
+        title?: string;
+        pid?: number;
+      };
+      return success({
+        success: true,
+        windowId: parsed.windowId ?? "",
+        windowTitle: parsed.title,
+        pid: parsed.pid ?? 0,
+        executionId,
+      });
+    } catch {
+      return fail({
+        message: t("repository.commandFailed", {
+          error: "Failed to parse focused window output",
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  private static async listWindowsWindows(
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ListWindowsResult>> {
+    const executionId = makeExecutionId();
+    const script = `
+${WIN_API_TYPEDEF}
+Get-Process | Where-Object { $_.MainWindowTitle -ne "" -and $_.MainWindowHandle -ne [IntPtr]::Zero } | ForEach-Object {
+  $r = New-Object WinRect
+  [WinApi]::GetWindowRect($_.MainWindowHandle, [ref]$r) | Out-Null
+  @{
+    windowId = $_.MainWindowHandle.ToInt64().ToString()
+    pid      = $_.Id
+    title    = $_.MainWindowTitle
+    x        = $r.Left
+    y        = $r.Top
+    width    = $r.Right - $r.Left
+    height   = $r.Bottom - $r.Top
+  } | ConvertTo-Json -Compress
+}
+`.trim();
+
+    const result = await runPowerShell(script, t, logger);
+    if (isCommandError(result)) {
+      return result as ResponseType<ListWindowsResult>;
+    }
+
+    const windows: WindowInfo[] = [];
+    for (const line of result.stdout.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith("{")) {
+        continue;
+      }
+      try {
+        const w = JSON.parse(trimmed) as {
+          windowId?: string;
+          pid?: number;
+          title?: string;
+          x?: number;
+          y?: number;
+          width?: number;
+          height?: number;
+        };
+        if (w.windowId) {
+          windows.push({
+            windowId: w.windowId,
+            title: w.title ?? "",
+            pid: w.pid ?? 0,
+            x: w.x ?? 0,
+            y: w.y ?? 0,
+            width: w.width ?? 0,
+            height: w.height ?? 0,
+            desktopId: "0",
+          });
+        }
+      } catch {
+        /* skip non-JSON lines */
+      }
+    }
+
+    if (windows.length > 0) {
+      const monitors = await listMonitors(logger);
+      for (const win of windows) {
+        const cx = win.x + win.width / 2;
+        const cy = win.y + win.height / 2;
+        const hit = monitors.find(
+          (m) =>
+            cx >= m.x && cx < m.x + m.width && cy >= m.y && cy < m.y + m.height,
+        );
+        win.monitor = hit?.name;
+      }
+    }
+
+    return success({ success: true, windows, executionId });
+  }
+
+  private static async focusWindowWindows(
+    data: { windowId?: string; pid?: number; title?: string },
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SimpleResult>> {
+    const executionId = makeExecutionId();
+
+    let handle = data.windowId;
+
+    if (!handle) {
+      const listResult = await DesktopWindowRepository.listWindowsWindows(
+        t,
+        logger,
+      );
+      if (!listResult.success || !listResult.data.windows) {
+        return fail({
+          message: t("repository.commandFailed"),
+          messageParams: { error: "Could not list windows" },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+      const match = listResult.data.windows.find((w: WindowInfo) =>
+        data.pid !== undefined
+          ? w.pid === data.pid
+          : w.title.toLowerCase().includes((data.title ?? "").toLowerCase()),
+      );
+      if (!match) {
+        return fail({
+          message: t("repository.commandFailed"),
+          messageParams: {
+            error: data.pid
+              ? `No window with PID ${data.pid}`
+              : `No window with title containing "${data.title}"`,
+          },
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      handle = match.windowId;
+    }
+
+    const handleLong = String(BigInt(handle));
+    const script = `
+${WIN_API_TYPEDEF}
+$h = [IntPtr]::new([long]${handleLong})
+[WinApi]::ShowWindow($h, [WinApi]::SW_RESTORE) | Out-Null
+[System.Threading.Thread]::Sleep(150)
+[WinApi]::SetForegroundWindow($h) | Out-Null
+Write-Output "OK"
+`.trim();
+
+    const result = await runPowerShell(script, t, logger);
+    if (isCommandError(result)) {
+      return result as ResponseType<SimpleResult>;
+    }
+    return success({ success: true, executionId });
+  }
+
+  private static async moveWindowToMonitorWindows(
+    data: {
+      windowId?: string;
+      pid?: number;
+      title?: string;
+      monitorName?: string;
+      monitorIndex?: number;
+    },
+    t: DesktopT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<MoveWindowToMonitorResult>> {
+    const executionId = makeExecutionId();
+
+    if (data.monitorName === undefined && data.monitorIndex === undefined) {
+      return fail({
+        message: t("repository.commandFailed", {
+          error: "Provide monitorName or monitorIndex",
+        }),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+
+    const monitors = await listMonitors(logger);
+    let targetMonitor: MonitorInfo | undefined;
+    if (data.monitorName) {
+      targetMonitor = monitors.find(
+        (m) => m.name.toLowerCase() === data.monitorName!.toLowerCase(),
+      );
+    } else if (data.monitorIndex !== undefined) {
+      targetMonitor = monitors[data.monitorIndex];
+    }
+
+    if (!targetMonitor) {
+      return fail({
+        message: t("repository.commandFailed", {
+          error: `Monitor not found: ${data.monitorName ?? data.monitorIndex}`,
+        }),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    let handle = data.windowId;
+    let windowTitle: string | undefined;
+
+    if (!handle) {
+      const listResult = await DesktopWindowRepository.listWindowsWindows(
+        t,
+        logger,
+      );
+      if (!listResult.success || !listResult.data.windows) {
+        return fail({
+          message: t("repository.commandFailed", {
+            error: "Could not list windows",
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+      const match = listResult.data.windows.find((w: WindowInfo) =>
+        data.pid !== undefined
+          ? w.pid === data.pid
+          : w.title.toLowerCase().includes((data.title ?? "").toLowerCase()),
+      );
+      if (!match) {
+        return fail({
+          message: t("repository.commandFailed", {
+            error: data.pid
+              ? `No window with PID ${data.pid}`
+              : `No window with title containing "${data.title}"`,
+          }),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      handle = match.windowId;
+      windowTitle = match.title;
+    }
+
+    const { x: mx, y: my, name: monName } = targetMonitor;
+    const targetX = mx + 40;
+    const targetY = my + 40;
+    const handleLong = String(BigInt(handle));
+
+    const script = `
+${WIN_API_TYPEDEF}
+$h = [IntPtr]::new([long]${handleLong})
+$r = New-Object WinRect
+[WinApi]::GetWindowRect($h, [ref]$r) | Out-Null
+$w = $r.Right - $r.Left
+$ht = $r.Bottom - $r.Top
+[WinApi]::ShowWindow($h, [WinApi]::SW_RESTORE) | Out-Null
+[WinApi]::MoveWindow($h, ${targetX}, ${targetY}, $w, $ht, $true) | Out-Null
+[WinApi]::SetForegroundWindow($h) | Out-Null
+Write-Output "OK"
+`.trim();
+
+    const result = await runPowerShell(script, t, logger);
+    if (isCommandError(result)) {
+      return result as ResponseType<MoveWindowToMonitorResult>;
+    }
+
+    return success({
+      success: true,
+      movedTo: monName,
+      windowTitle,
+      executionId,
+    });
+  }
+
   static async getFocusedWindow(
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<FocusedWindowResult>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<FocusedWindowResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopWindowRepository.getFocusedWindowWindows(t, logger);
     }
 
     const executionId = makeExecutionId();
@@ -1719,9 +2877,13 @@ if (w) {
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ListWindowsResult>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<ListWindowsResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopWindowRepository.listWindowsWindows(t, logger);
     }
 
     const executionId = makeExecutionId();
@@ -1875,9 +3037,13 @@ print("KWIN_LIST_END_${executionId}");
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SimpleResult>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<SimpleResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopWindowRepository.focusWindowWindows(data, t, logger);
     }
 
     const executionId = makeExecutionId();
@@ -1997,9 +3163,17 @@ for (var i = 0; i < wins.length; i++) {
     t: DesktopT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MoveWindowToMonitorResult>> {
-    const platformErr = checkLinux(t);
+    const platformErr = checkPlatformSupported(t);
     if (platformErr) {
       return platformErr as ResponseType<MoveWindowToMonitorResult>;
+    }
+
+    if (process.platform === "win32") {
+      return DesktopWindowRepository.moveWindowToMonitorWindows(
+        data,
+        t,
+        logger,
+      );
     }
 
     const executionId = makeExecutionId();

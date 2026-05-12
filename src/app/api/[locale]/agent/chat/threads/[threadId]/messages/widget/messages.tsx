@@ -727,6 +727,12 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   const touchActiveRef = useRef<boolean>(false);
   // Whether a smooth scroll-to-bottom animation is in progress (suppresses sticky snap)
   const smoothScrollingRef = useRef<boolean>(false);
+  // Prevents scroll events triggered by our own programmatic scrollTop assignments from
+  // releasing sticky. Set true before scrollTop =, cleared after the event fires (rAF).
+  const programmaticScrollRef = useRef<boolean>(false);
+  // Tracks last scrollHeight seen in handleScroll to distinguish user-scroll from
+  // content-growth-induced apparent scroll position change.
+  const lastScrollHandlerHeightRef = useRef<number>(0);
   // Whether to show the scroll-to-bottom button (user has scrolled up)
   const [showScrollButton, setShowScrollButton] = useState(false);
 
@@ -818,15 +824,34 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     const BUTTON_THRESHOLD = 800; // px - show scroll button when this far from bottom
 
     const handleScroll = (): void => {
+      // Ignore scroll events that we triggered ourselves (programmatic scrollTop assignment).
+      // Without this guard our own snaps can briefly appear as "not at bottom" if layout
+      // hasn't fully settled, which would release sticky.
+      if (programmaticScrollRef.current) {
+        return;
+      }
+
       const { scrollTop, scrollHeight, clientHeight } = container;
       const distFromBottom = scrollHeight - scrollTop - clientHeight;
       const atBottom = distFromBottom < BOTTOM_THRESHOLD;
 
+      // Detect if scrollHeight grew since last scroll event. When content expands
+      // (markdown renders, image loads) scrollHeight grows but scrollTop stays the same,
+      // making distFromBottom appear large even though the user didn't scroll. Only release
+      // sticky when the height didn't change - i.e., a genuine user upward drag.
+      const heightGrew = scrollHeight > lastScrollHandlerHeightRef.current;
+      lastScrollHandlerHeightRef.current = scrollHeight;
+
       if (atBottom) {
         // Arrived at bottom - clear smooth scroll flag and re-engage sticky
         smoothScrollingRef.current = false;
+        stickyBottomRef.current = true;
+      } else if (stickyBottomRef.current && heightGrew) {
+        // Content grew while snapped: don't release sticky.
+        // The ResizeObserver / useLayoutEffect will fire and snap us back down.
+      } else {
+        stickyBottomRef.current = false;
       }
-      stickyBottomRef.current = atBottom;
       setShowScrollButton(distFromBottom > BUTTON_THRESHOLD);
     };
 
@@ -857,6 +882,48 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     };
   }, []);
 
+  // ResizeObserver: catches height changes that don't come from React renders —
+  // image loads, code block expansion, font swap, etc. When the content div grows
+  // and we're sticky, snap to bottom immediately (same guard logic as useLayoutEffect).
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const snapIfSticky = (): void => {
+      if (
+        !stickyBottomRef.current ||
+        touchActiveRef.current ||
+        smoothScrollingRef.current ||
+        programmaticScrollRef.current
+      ) {
+        return;
+      }
+      if (container.scrollHeight <= lastSnapScrollHeightRef.current) {
+        return;
+      }
+      programmaticScrollRef.current = true;
+      container.scrollTop = container.scrollHeight;
+      lastSnapScrollHeightRef.current = container.scrollHeight;
+      lastScrollHandlerHeightRef.current = container.scrollHeight;
+      requestAnimationFrame(() => {
+        programmaticScrollRef.current = false;
+      });
+    };
+
+    // Observe the messages content div (grows as messages stream in or expand)
+    const content = document.getElementById(DOM_IDS.MESSAGES_CONTENT);
+    const observer = new ResizeObserver(snapIfSticky);
+    if (content) {
+      observer.observe(content);
+    }
+
+    return (): void => {
+      observer.disconnect();
+    };
+  }, []);
+
   // Re-evaluate button visibility whenever messages change (content height may have changed)
   useEffect(() => {
     const container = messagesContainerRef.current;
@@ -880,7 +947,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       // New thread: start sticky, clear any in-progress scroll
       stickyBottomRef.current = true;
       smoothScrollingRef.current = false;
+      programmaticScrollRef.current = false;
       lastSnapScrollHeightRef.current = 0;
+      lastScrollHandlerHeightRef.current = 0;
       setShowScrollButton(false);
     }
   }, [activeThreadId]);
@@ -909,8 +978,13 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       currentRootFolderId !== "public"
     ) {
       initialScrollDoneRef.current.add(currentThreadId);
+      programmaticScrollRef.current = true;
       container.scrollTop = container.scrollHeight;
       lastSnapScrollHeightRef.current = container.scrollHeight;
+      lastScrollHandlerHeightRef.current = container.scrollHeight;
+      requestAnimationFrame(() => {
+        programmaticScrollRef.current = false;
+      });
       return;
     }
 
@@ -926,8 +1000,13 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     if (container.scrollHeight <= lastSnapScrollHeightRef.current) {
       return;
     }
+    programmaticScrollRef.current = true;
     container.scrollTop = container.scrollHeight;
     lastSnapScrollHeightRef.current = container.scrollHeight;
+    lastScrollHandlerHeightRef.current = container.scrollHeight;
+    requestAnimationFrame(() => {
+      programmaticScrollRef.current = false;
+    });
   });
 
   // After older history inserts above (via button click): restore scroll position so the view doesn't jump.
