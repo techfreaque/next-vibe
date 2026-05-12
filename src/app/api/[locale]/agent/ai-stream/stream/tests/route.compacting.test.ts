@@ -268,9 +268,12 @@ describe("Compacting - context management", () => {
       setFetchCacheContext("compacting-mid-stream");
 
       // Build a large user prompt to fill up context quickly.
-      // tool-help schema alone is ~1-2k tokens. With a 1k+ user message and
-      // 2 tool call round-trips, total context should exceed 5k threshold.
-      const largeContext = [...Array(20).keys()]
+      // Mid-stream compacting only summarizes "middle turns" — messages between
+      // firstUserMessage and the last RECENT_TURNS_TO_KEEP (8) non-system messages.
+      // So we need at least 9 messages after the first user message (= 5 tool round-trips)
+      // to have any middleTurns to compact. The token threshold ensures compacting fires
+      // between tool calls, not just at the end.
+      const largeContext = [...Array(10).keys()]
         .map(
           (i) =>
             `Context block ${String(i + 1)}: This is padding text to increase the prompt token count for the mid-stream compacting test. The compacting mechanism should fire when the accumulated context exceeds the threshold. `,
@@ -278,13 +281,23 @@ describe("Compacting - context management", () => {
         .join("");
 
       const { result, messages } = await runTestStream({
-        prompt: `[C2-COMPACTING-TEST] ${largeContext}Now call tool-help with query='list' exactly once. After you receive the tool result, respond with ONLY the word: COMPACT_DONE. Do NOT call any other tools. Do NOT add any other text. COMPACT_DONE is the ONLY acceptable response after the tool call.`,
+        prompt:
+          `[C2-COMPACTING-TEST] ${largeContext}` +
+          `Call tool-help 5 times sequentially with these exact queries in order: ` +
+          `'list', 'search', 'chat', 'image', 'audio'. ` +
+          `Make each call one at a time, wait for the result, then make the next call. ` +
+          `After ALL 5 tool calls are complete, respond with ONLY the word: COMPACT_DONE. ` +
+          `Do NOT add any other text. COMPACT_DONE is the ONLY acceptable final response.`,
         user: testUser,
         skill: "quality-tester",
-        // Inject compactTrigger=2000 via favoriteConfig - no DB writes needed.
+        // Inject compactTrigger=5000 via favoriteConfig - no DB writes needed.
         // Pin only tool-help so the AI has exactly one tool available.
-        // Large user message + tool-help schema pushes step 0 prompt past 2k tokens.
-        // Mid-stream compacting then fires at step 1 (before the final text response).
+        // Pre-stream: system (~1400 tokens) + tool schema (~1200) + user msg (~1000) ≈ 3600.
+        // Below 5000, so pre-stream compacting will NOT fire.
+        // After 3 tool round-trips (6 messages accumulated), total crosses 5000.
+        // Mid-stream compacting fires. RECENT_TURNS_TO_KEEP=8 keeps last 8 messages verbatim,
+        // so with 10+ afterFirst messages, 2+ messages become "middle turns" (compacted).
+        // After compacting the AI continues for remaining tool calls, then produces COMPACT_DONE.
         favoriteConfig: {
           id: "test-compacting-override",
           skillId: "quality-tester",
@@ -302,7 +315,7 @@ describe("Compacting - context management", () => {
           ],
           pinnedTools: [{ toolId: "tool-help", requiresConfirmation: false }],
           deniedTools: null,
-          compactTrigger: 2000,
+          compactTrigger: 5000,
           memoryLimit: null,
           promptAppend: null,
         },

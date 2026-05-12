@@ -13,6 +13,41 @@ import {
 
 const DEFAULT_TEMPERATURE = 0.7;
 
+/**
+ * Estimate input token count from a ModelMessage[] array.
+ * Used as a fallback when the provider doesn't report real usage in streaming mode
+ * (e.g. kimi-k2.6 via Fireworks returns 0 inputTokens in SSE chunks).
+ * Uses char/3.5 approximation — consistent with MessageContextBuilder.calculateTotalTokens.
+ */
+function estimateInputTokensFromMessages(
+  messages: ModelMessage[],
+  systemPrompt: string,
+  tools: Record<string, CoreTool> | undefined,
+): number {
+  const systemTokens = Math.ceil(systemPrompt.length / 3.5);
+  const toolsTokens = tools ? Math.ceil(JSON.stringify(tools).length / 2.5) : 0;
+  const messagesTokens = messages.reduce((sum, msg) => {
+    const { content } = msg;
+    if (typeof content === "string") {
+      return sum + Math.ceil(content.length / 3.5);
+    }
+    if (Array.isArray(content)) {
+      const text = (content as Array<Record<string, string | undefined>>)
+        .map((p) =>
+          p.type === "text"
+            ? (p.text ?? "")
+            : p.type === "tool-call" || p.type === "tool-result"
+              ? JSON.stringify(p)
+              : "",
+        )
+        .join(" ");
+      return sum + Math.ceil(text.length / 2.5);
+    }
+    return sum;
+  }, 0);
+  return systemTokens + toolsTokens + messagesTokens;
+}
+
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
@@ -263,40 +298,57 @@ export class StreamExecutionHandler {
               let activeMessages = stepMessages;
               if (
                 params.midStreamCompactingThreshold &&
-                params.midStreamCompactingParams &&
-                lastStepInputTokens >= params.midStreamCompactingThreshold
+                params.midStreamCompactingParams
               ) {
-                logger.debug(
-                  "[prepareStep] Mid-stream compacting threshold reached",
-                  {
-                    stepNumber,
-                    lastStepInputTokens,
-                    threshold: params.midStreamCompactingThreshold,
-                  },
-                );
-                const { MidStreamCompactingHandler } =
-                  await import("./mid-stream-compacting-handler");
-                const compactResult = await MidStreamCompactingHandler.compact({
-                  stepMessages: activeMessages,
-                  ctx,
-                  ...params.midStreamCompactingParams,
-                  abortSignal: streamAbortController.signal,
-                  streamAbortController,
-                  logger,
-                });
-                if (compactResult) {
-                  // Reset so we don't re-compact on the very next step
-                  lastStepInputTokens = 0;
-                  activeMessages = compactResult.messages;
-                  // CRITICAL: update the parent chain so the next assistant message
-                  // is a child of the compacting message, not the last tool result.
-                  // Any wrong parentId here breaks the linked list and creates a branch.
-                  ctx.currentParentId = compactResult.compactingMessageId;
-                  ctx.lastParentId = compactResult.compactingMessageId;
-                }
-                // On failure: MidStreamCompactingHandler emitted error + aborted stream.
-                // prepareStep returning {} is a no-op — abort signal is already set.
-              }
+                // Prefer real API-reported input tokens. Fall back to an estimate
+                // from the accumulated stepMessages when the provider returns 0
+                // (e.g. kimi-k2.6 via Fireworks doesn't include usage in SSE chunks).
+                const effectiveInputTokens =
+                  lastStepInputTokens > 0
+                    ? lastStepInputTokens
+                    : estimateInputTokensFromMessages(
+                        stepMessages,
+                        systemPrompt,
+                        tools,
+                      );
+
+                if (
+                  effectiveInputTokens >= params.midStreamCompactingThreshold
+                ) {
+                  logger.debug(
+                    "[prepareStep] Mid-stream compacting threshold reached",
+                    {
+                      stepNumber,
+                      lastStepInputTokens,
+                      effectiveInputTokens,
+                      threshold: params.midStreamCompactingThreshold,
+                    },
+                  );
+                  const { MidStreamCompactingHandler } =
+                    await import("./mid-stream-compacting-handler");
+                  const compactResult =
+                    await MidStreamCompactingHandler.compact({
+                      stepMessages: activeMessages,
+                      ctx,
+                      ...params.midStreamCompactingParams,
+                      abortSignal: streamAbortController.signal,
+                      streamAbortController,
+                      logger,
+                    });
+                  if (compactResult) {
+                    // Reset so we don't re-compact on the very next step
+                    lastStepInputTokens = 0;
+                    activeMessages = compactResult.messages;
+                    // CRITICAL: update the parent chain so the next assistant message
+                    // is a child of the compacting message, not the last tool result.
+                    // Any wrong parentId here breaks the linked list and creates a branch.
+                    ctx.currentParentId = compactResult.compactingMessageId;
+                    ctx.lastParentId = compactResult.compactingMessageId;
+                  }
+                  // On failure: MidStreamCompactingHandler emitted error + aborted stream.
+                  // prepareStep returning {} is a no-op — abort signal is already set.
+                } // end inner if effectiveInputTokens >= threshold
+              } // end outer if midStreamCompactingThreshold
 
               // === QUEUED MESSAGE INJECTION ===
               // If a user message was queued while this stream is running, inject

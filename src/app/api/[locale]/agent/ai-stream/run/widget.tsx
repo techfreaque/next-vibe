@@ -841,7 +841,6 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
                   className="rounded-lg bg-background"
                   refetchInterval={isSubmitting ? 2000 : false}
                   initialData={mockMessagesInitialData}
-                  logger={logger}
                 />
               </ChatNavigationProvider>
             )}

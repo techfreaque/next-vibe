@@ -108,21 +108,24 @@ export class MidStreamCompactingHandler {
     const systemMessages = stepMessages.filter((m) => m.role === "system");
     const nonSystemMessages = stepMessages.filter((m) => m.role !== "system");
 
-    // Take the last RECENT_TURNS_TO_KEEP messages as the "recent" tail to keep verbatim.
+    // Always preserve the first non-system message (the original user task prompt) verbatim.
+    // It must never be summarized away — the AI needs the task instruction even after compacting.
+    const firstUserMessage = nonSystemMessages[0];
+    const afterFirst = nonSystemMessages.slice(1);
+
+    // Take the last RECENT_TURNS_TO_KEEP messages from afterFirst as the "recent" tail.
     // IMPORTANT: The split point must land on an `assistant` or `user` message boundary —
     // never on a `tool` result message. A `tool` result without its preceding `assistant`
     // tool-call message would cause AI SDK's AI_MissingToolResultsError on the next step.
     //
-    // Walk backward from the desired cut index to find the nearest `assistant`/`user` boundary.
-    // Floor at 1: the first non-system message is always the original user task — never compact it.
-    // This ensures the AI retains the original task instruction even after compacting.
-    let cutIndex = Math.max(1, nonSystemMessages.length - RECENT_TURNS_TO_KEEP);
-    while (cutIndex > 1 && nonSystemMessages[cutIndex]?.role === "tool") {
+    // Walk backward from the desired cut index to find the nearest boundary.
+    let cutIndex = Math.max(0, afterFirst.length - RECENT_TURNS_TO_KEEP);
+    while (cutIndex > 0 && afterFirst[cutIndex]?.role === "tool") {
       cutIndex--;
     }
 
-    const recentTurns = nonSystemMessages.slice(cutIndex);
-    const middleTurns = nonSystemMessages.slice(0, cutIndex);
+    const recentTurns = afterFirst.slice(cutIndex);
+    const middleTurns = afterFirst.slice(0, cutIndex);
 
     // Nothing to compact — token pressure comes from system messages or a single huge
     // recent turn, neither of which we can safely summarize. Continue without compacting.
@@ -319,9 +322,12 @@ export class MidStreamCompactingHandler {
       return null;
     }
 
-    // Build the compacted message array for the SDK
+    // Build the compacted message array for the SDK.
+    // Structure: system messages → original user task (always preserved) →
+    //            summary of middle turns → recent turns verbatim.
     const compacted: ModelMessage[] = [
       ...systemMessages,
+      ...(firstUserMessage ? [firstUserMessage] : []),
       {
         role: "system" as const,
         content: `Previous conversation summary:\n\n${compactedSummary}`,

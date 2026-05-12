@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: [tool:tool-help] {\"query\":\"list\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"tool-help\",\"title\":\"Tool Help - Discover Available Tools\",\"description\":\"Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific to\n\nAssistant: [tool:tool-help] {\"query\":\"search\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"brave-search\",\"title\":\"Search the Web\",\"description\":\"Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.\",\"category\":\"AI\",\"subCategory\":\"Search\",\"credits\":0.65,\"platforms\":[\"cli\",\"ai\",\"mcp\",\n\nAssistant: [tool:tool-help] {\"query\":\"chat\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"ai-run\",\"title\":\"Run AI Agent\",\"description\":\"Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credi\n\nAssistant: [tool:tool-help] {\"query\":\"image\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"agent_view-image_POST\",\"title\":\"View Image\",\"description\":\"Fetch and display a previously captured image by its storage URL. Use this to re-examine a screenshot or image from an earlier turn.\",\"category\":\"AI\",\"subCategory\":\"Tools\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc",
+    "encoding_format": "float"
+  }
+}
