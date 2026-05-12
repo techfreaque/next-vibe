@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: takeScreenshotEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform }) =>
+    handler: ({ data, t, logger, platform, streamContext }) =>
       BrowserSharedRepository.executeTakeScreenshot(
         {
           toolName: BrowserTool.TAKE_SCREENSHOT,
@@ -28,6 +28,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
+        streamContext.threadId,
       ),
   },
 });

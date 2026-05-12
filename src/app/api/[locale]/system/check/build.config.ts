@@ -12,6 +12,8 @@
  *   vibe builder --configPath="src/app/api/[locale]/system/check/build.config.ts"
  */
 
+import { resolve } from "node:path";
+
 import {
   BunBuildTypeEnum,
   BunTargetEnum,
@@ -44,7 +46,7 @@ const config: BuildConfig = {
           createCliWidgetPlugin(
             // build.config.ts lives in src/app/api/[locale]/system/check/
             // 5 levels up → src/   (packages/next-vibe-ui lives under src/)
-            new URL("../../../../../", import.meta.url).pathname,
+            resolve(import.meta.dir, "../../../../../"),
           ),
         ],
       },

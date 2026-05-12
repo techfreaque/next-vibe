@@ -30,6 +30,7 @@ export class GetNetworkRequestRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<GetNetworkRequestResponseOutput> | ContentResponse> {
     const result =
       await BrowserSharedRepository.executeGetNetworkRequest<GetNetworkRequestResponseOutput>(
@@ -44,6 +45,7 @@ export class GetNetworkRequestRepository {
         t,
         logger,
         platform,
+        threadId,
       );
 
     // Apply maxBodyLength truncation when specified and result has inline bodies

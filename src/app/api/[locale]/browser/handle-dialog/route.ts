@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: handleDialogEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform }) =>
+    handler: ({ data, t, logger, platform, streamContext }) =>
       BrowserSharedRepository.executeMCPTool(
         {
           toolName: BrowserTool.HANDLE_DIALOG,
@@ -25,6 +25,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
+        streamContext.threadId,
       ),
   },
 });

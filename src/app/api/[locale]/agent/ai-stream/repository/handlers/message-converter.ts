@@ -823,7 +823,7 @@ export class MessageConverter {
             const base64 = await fetchStorageFileAsBase64(block.url);
             if (base64) {
               contentParts.push({
-                type: "media",
+                type: "image-data",
                 data: base64,
                 mediaType: block.mimeType,
               });

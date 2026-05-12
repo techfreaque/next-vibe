@@ -48,7 +48,7 @@ function saveContentResponseImages(data: WidgetData): WidgetData {
   for (const block of data.content as ContentBlock[]) {
     if (block.type === "text") {
       lines.push(block.text);
-    } else {
+    } else if (block.type === "image") {
       const ext = block.mimeType.split("/")[1] ?? "png";
       const filename = `screenshot-${Date.now()}.${ext}`;
       const filePath = join(tmpDir, filename);

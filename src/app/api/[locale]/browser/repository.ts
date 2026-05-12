@@ -31,11 +31,8 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
-import type {
-  Platform} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import {
-  isCliPlatform
-} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { env } from "@/config/env";
 
 import { CHROME_REMOTE_DEBUG_PORT, getChromeMCPConfig } from "./config";
@@ -762,6 +759,7 @@ export class BrowserRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<MCPBridgeResponse> | ContentResponse> {
     // CLI invocations are short-lived (new PID per call). Use a single shared
     // session ID so all CLI calls reuse one stable tab instead of each creating

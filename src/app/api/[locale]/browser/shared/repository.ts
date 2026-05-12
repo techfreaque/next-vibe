@@ -77,6 +77,7 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<T> | ContentResponse> {
     try {
       const requestData: {
@@ -92,6 +93,7 @@ export class BrowserSharedRepository {
         t,
         logger,
         platform,
+        threadId,
       );
 
       if (isContentResponse(result)) {
@@ -123,12 +125,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<T> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<T>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -137,12 +141,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<T> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<T>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -151,12 +157,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<T> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<T>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -165,12 +173,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<T> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<T>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -179,8 +189,15 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
+    return BrowserSharedRepository.executeMCPTool(
+      params,
+      t,
+      logger,
+      platform,
+      threadId,
+    );
   }
 
   static executeEvaluateScript(
@@ -188,8 +205,15 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
+    return BrowserSharedRepository.executeMCPTool(
+      params,
+      t,
+      logger,
+      platform,
+      threadId,
+    );
   }
 
   static executeFillForm(
@@ -197,8 +221,15 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
+    return BrowserSharedRepository.executeMCPTool(
+      params,
+      t,
+      logger,
+      platform,
+      threadId,
+    );
   }
 
   static executeGetConsoleMessage(
@@ -206,8 +237,15 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
+    return BrowserSharedRepository.executeMCPTool(
+      params,
+      t,
+      logger,
+      platform,
+      threadId,
+    );
   }
 
   static executeGetNetworkRequest<T = BrowserToolResponse>(
@@ -215,12 +253,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<T> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<T>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -229,12 +269,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -243,12 +285,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -257,12 +301,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -271,12 +317,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -285,12 +333,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -299,12 +349,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -313,12 +365,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -327,12 +381,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -341,12 +397,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -355,12 +413,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<BrowserToolResponse>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -369,12 +429,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<T> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<T>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -383,12 +445,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<T> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<T>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -397,12 +461,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<T> | ContentResponse> {
     return BrowserSharedRepository.executeMCPTool<T>(
       params,
       t,
       logger,
       platform,
+      threadId,
     );
   }
 
@@ -411,8 +477,15 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
+    return BrowserSharedRepository.executeMCPTool(
+      params,
+      t,
+      logger,
+      platform,
+      threadId,
+    );
   }
 
   static executeTakeSnapshot(
@@ -420,8 +493,15 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
+    return BrowserSharedRepository.executeMCPTool(
+      params,
+      t,
+      logger,
+      platform,
+      threadId,
+    );
   }
 
   static executeUploadFile(
@@ -429,8 +509,15 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
+    return BrowserSharedRepository.executeMCPTool(
+      params,
+      t,
+      logger,
+      platform,
+      threadId,
+    );
   }
 
   static executeWaitFor(
@@ -438,7 +525,14 @@ export class BrowserSharedRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
-    return BrowserSharedRepository.executeMCPTool(params, t, logger, platform);
+    return BrowserSharedRepository.executeMCPTool(
+      params,
+      t,
+      logger,
+      platform,
+      threadId,
+    );
   }
 }

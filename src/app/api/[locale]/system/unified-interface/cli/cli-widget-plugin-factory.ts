@@ -30,9 +30,6 @@ export function createCliWidgetPlugin(rootDir: string): BunPlugin {
   const WEB_UI_DIR = toPosix(resolve(rootDir, "packages/next-vibe-ui/web/ui"));
   const CLI_UI_DIR = toPosix(resolve(rootDir, "packages/next-vibe-ui/cli/ui"));
 
-  // Paths that have already been served as cli overrides once.
-  const webUiAlreadyOverridden = new Set<string>();
-
   return {
     name: "cli-overrides", // eslint-disable-line i18next/no-literal-string
     target: "bun", // eslint-disable-line i18next/no-literal-string
@@ -44,10 +41,6 @@ export function createCliWidgetPlugin(rootDir: string): BunPlugin {
           const rel = posixPath.slice(WEB_UI_DIR.length + 1);
           const cliPath = resolve(CLI_UI_DIR, rel);
           if (existsSync(cliPath)) {
-            if (webUiAlreadyOverridden.has(posixPath)) {
-              return { contents: readFileSync(path, "utf-8"), loader: "tsx" }; // eslint-disable-line i18next/no-literal-string
-            }
-            webUiAlreadyOverridden.add(posixPath);
             return { contents: readFileSync(cliPath, "utf-8"), loader: "tsx" }; // eslint-disable-line i18next/no-literal-string
           }
           return { contents: readFileSync(path, "utf-8"), loader: "tsx" }; // eslint-disable-line i18next/no-literal-string

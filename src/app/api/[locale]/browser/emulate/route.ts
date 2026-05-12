@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: emulateEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform }) =>
+    handler: ({ data, t, logger, platform, streamContext }) =>
       BrowserSharedRepository.executeEmulate(
         {
           toolName: BrowserTool.EMULATE,
@@ -29,6 +29,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
+        streamContext.threadId,
       ),
   },
 });

@@ -2483,7 +2483,7 @@ Get-Process | Where-Object { $_.MainWindowTitle -ne "" -and $_.MainWindowHandle 
             y: w.y ?? 0,
             width: w.width ?? 0,
             height: w.height ?? 0,
-            desktopId: "0",
+            monitor: "",
           });
         }
       } catch {
@@ -2500,7 +2500,7 @@ Get-Process | Where-Object { $_.MainWindowTitle -ne "" -and $_.MainWindowHandle 
           (m) =>
             cx >= m.x && cx < m.x + m.width && cy >= m.y && cy < m.y + m.height,
         );
-        win.monitor = hit?.name;
+        win.monitor = hit?.name ?? "";
       }
     }
 

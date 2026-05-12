@@ -27,6 +27,7 @@ export class WaitForRepository {
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
+    threadId: string | undefined,
   ): Promise<ResponseType<WaitForResponseOutput> | ContentResponse> {
     const result = await BrowserSharedRepository.executeWaitFor(
       {
@@ -39,6 +40,7 @@ export class WaitForRepository {
       t,
       logger,
       platform,
+      threadId,
     );
 
     // When captureSnapshot is false (default), strip the a11y tree from the response

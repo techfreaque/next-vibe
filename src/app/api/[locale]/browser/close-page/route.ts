@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: closePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform }) =>
+    handler: ({ data, t, logger, platform, streamContext }) =>
       BrowserSharedRepository.executeClosePage<ClosePageResponseOutput>(
         {
           toolName: BrowserTool.CLOSE_PAGE,
@@ -24,6 +24,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
+        streamContext.threadId,
       ),
   },
 });
