@@ -78,6 +78,19 @@ export const { POST } = createEndpoint({
                 z.number(),
                 z.boolean(),
                 z.null(),
+                z.record(
+                  z.string(),
+                  z.union([
+                    z.string(),
+                    z.number(),
+                    z.boolean(),
+                    z.null(),
+                    z.record(
+                      z.string(),
+                      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+                    ),
+                  ]),
+                ),
                 z.array(
                   z.union([
                     z.string(),
@@ -86,20 +99,7 @@ export const { POST } = createEndpoint({
                     z.null(),
                     z.record(
                       z.string(),
-                      z.union([
-                        z.string(),
-                        z.number(),
-                        z.boolean(),
-                        z.null(),
-                        z.array(
-                          z.union([
-                            z.string(),
-                            z.number(),
-                            z.boolean(),
-                            z.null(),
-                          ]),
-                        ),
-                      ]),
+                      z.union([z.string(), z.number(), z.boolean(), z.null()]),
                     ),
                   ]),
                 ),
