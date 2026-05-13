@@ -421,7 +421,7 @@ export class StreamExecutionHandler {
                         ...(queuedEntry.metadata ?? {}),
                         isQueued: false,
                       },
-                      createdAt: queuedEntry.createdAt,
+                      createdAt: dequeueNow,
                       updatedAt: dequeueNow,
                       authorId: null,
                       authorName: null,
@@ -444,6 +444,10 @@ export class StreamExecutionHandler {
                 ctx.currentParentId = queuedEntry.id;
                 ctx.lastParentId = queuedEntry.id;
                 ctx.pendingQueueParentId = queuedEntry.id;
+                // Reset sequenceId so ai2 gets a new sequence, separate from
+                // ai1+tool. Without this, ai1/tool/ai2 share one sequenceId and
+                // the UI groups them into a single block rendered before queuedUser.
+                ctx.sequenceId = crypto.randomUUID();
                 // Mark that a queued message was injected mid-stream so the
                 // finally-block processNextQueuedMessage skips this thread.
                 ctx.queueInjectedInStream = true;

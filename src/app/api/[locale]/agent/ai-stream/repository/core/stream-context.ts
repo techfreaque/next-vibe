@@ -107,7 +107,10 @@ export class StreamContext {
   currentParentId: string | null;
 
   // Sequence ID (links messages in same AI response)
-  readonly sequenceId: string;
+  // Mutable: reset when a queued user message is injected mid-stream so
+  // the next assistant response gets a fresh sequence separate from the
+  // tool-loop steps that preceded it.
+  sequenceId: string;
 
   // For error handling
   lastParentId: string | null;
