@@ -53,6 +53,9 @@ import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-
 
 import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
+import favoriteByIdDefinition from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import settingsDefinition from "@/app/api/[locale]/agent/chat/settings/definition";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   useWidgetDisabled,
@@ -135,13 +138,108 @@ export function HelpToolsWidget(): JSX.Element {
   const endpointMutations = useWidgetEndpointMutations();
   const disabled = useWidgetDisabled();
 
-  // Tool configuration now lives on favorites/skills, not global settings.
-  // Help widget shows all tools as available (null = all allowed).
-  const enabledTools: EnabledTool[] | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const setEnabledTools = useCallback((_tools: EnabledTool[] | null): void => {
-    // No-op: tool config is now per-favorite, not global settings
-  }, []);
+  // ── Active favorite tool config (cascade: favorite → skill → system defaults) ──
+
+  // Load settings to get activeFavoriteId
+  const settingsState = useEndpoint(
+    settingsDefinition,
+    useMemo(
+      () => ({
+        read: {
+          queryOptions: {
+            enabled: !user?.isPublic,
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+      [user?.isPublic],
+    ),
+    logger,
+    user,
+  );
+  const activeFavoriteId = useMemo(
+    () => settingsState.read?.data?.activeFavoriteId ?? null,
+    [settingsState.read?.data],
+  );
+
+  // Load active favorite's tool config
+  const favoriteState = useEndpoint(
+    favoriteByIdDefinition,
+    useMemo(
+      () => ({
+        read: {
+          urlPathParams: activeFavoriteId
+            ? { id: activeFavoriteId }
+            : { id: "" },
+          queryOptions: {
+            enabled: !user?.isPublic && !!activeFavoriteId,
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+      [activeFavoriteId, user?.isPublic],
+    ),
+    logger,
+    user,
+  );
+  const activeFavoriteData = useMemo(
+    () => favoriteState.read?.data ?? null,
+    [favoriteState.read?.data],
+  );
+
+  // Persist updated tool config to the active favorite
+  const setEnabledTools = useCallback(
+    (tools: EnabledTool[] | null): void => {
+      if (!activeFavoriteId || user?.isPublic || !activeFavoriteData) {
+        return;
+      }
+      const pinnedTools = tools
+        ? tools
+            .filter((item) => item.pinned)
+            .map((item) => ({
+              toolId: item.id,
+              requiresConfirmation: item.requiresConfirmation,
+            }))
+        : null;
+      const availableTools = tools
+        ? tools.map((item) => ({
+            toolId: item.id,
+            requiresConfirmation: item.requiresConfirmation,
+          }))
+        : null;
+
+      // Optimistically update the favorite cache
+      apiClient.updateEndpointData(
+        favoriteByIdDefinition.GET,
+        logger,
+        (prev) => {
+          if (!prev?.success) {
+            return prev;
+          }
+          return {
+            success: true,
+            data: { ...prev.data, pinnedTools, availableTools },
+          };
+        },
+        { urlPathParams: { id: activeFavoriteId } },
+      );
+
+      // Persist to server - include modelSelection to avoid overwriting existing value
+      void apiClient.mutate(
+        favoriteByIdDefinition.PATCH,
+        logger,
+        user,
+        {
+          pinnedTools,
+          availableTools,
+          modelSelection: activeFavoriteData.modelSelection,
+        },
+        { id: activeFavoriteId },
+        locale,
+      );
+    },
+    [activeFavoriteId, activeFavoriteData, user, logger, locale],
+  );
   const { t } = scopedTranslation.scopedT(locale);
 
   const searchQuery = form.watch("query") ?? "";
@@ -211,17 +309,52 @@ export function HelpToolsWidget(): JSX.Element {
   }, [connectionsState?.read?.response]);
 
   const effectiveEnabledTools = useMemo((): EnabledTool[] => {
-    if (enabledTools !== null) {
-      return enabledTools;
+    // Cascade: active favorite → system defaults
+    const favPinned = activeFavoriteData?.pinnedTools ?? null;
+    const favAllowed = activeFavoriteData?.availableTools ?? null;
+
+    // Build requiresConfirmation lookup from favorite's config (pinned takes precedence)
+    const favConfirmMap = new Map<string, boolean>();
+    if (favPinned) {
+      for (const item of favPinned) {
+        favConfirmMap.set(item.toolId, item.requiresConfirmation ?? false);
+      }
     }
-    // null = default: all tools are allowed (enabled), only role-appropriate DEFAULT_TOOL_IDS are pinned
-    const defaultPinnedSet = new Set<string>(getDefaultToolIdsForUser(user));
-    return availableTools.map((tool) => ({
-      id: tool.id ?? tool.name,
-      requiresConfirmation: tool.requiresConfirmation ?? false,
-      pinned: defaultPinnedSet.has(tool.id ?? tool.name),
-    }));
-  }, [enabledTools, availableTools, user]);
+    if (favAllowed) {
+      for (const item of favAllowed) {
+        if (!favConfirmMap.has(item.toolId)) {
+          favConfirmMap.set(item.toolId, item.requiresConfirmation ?? false);
+        }
+      }
+    }
+
+    // Pinned set: from favorite if set, else system defaults
+    const pinnedSet: Set<string> =
+      favPinned !== null
+        ? new Set(favPinned.map((item) => item.toolId))
+        : new Set(getDefaultToolIdsForUser(user));
+
+    // Available set: from favorite if set, else all tools
+    const allowedSet: Set<string> | null =
+      favAllowed !== null
+        ? new Set(favAllowed.map((item) => item.toolId))
+        : null;
+
+    return availableTools
+      .filter((tool) => {
+        const id = tool.id ?? tool.name;
+        return allowedSet === null || allowedSet.has(id);
+      })
+      .map((tool) => {
+        const id = tool.id ?? tool.name;
+        return {
+          id,
+          requiresConfirmation:
+            favConfirmMap.get(id) ?? tool.requiresConfirmation ?? false,
+          pinned: pinnedSet.has(id),
+        };
+      });
+  }, [activeFavoriteData, availableTools, user]);
 
   // For public users, server returns all tools and we filter client-side from localStorage.
   // For authenticated users, server already applied the statsFilter.
