@@ -35,6 +35,8 @@ installFetchCache();
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { db } from "@/app/api/[locale]/system/db";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles } from "@/app/api/[locale]/user/db";
@@ -89,14 +91,19 @@ async function resolveAdminUser(): Promise<JwtPrivatePayloadType | null> {
   return { isPublic: false, id: user.id, leadId: link.leadId, roles };
 }
 
-/** Walk parent chain from leafId → root. Returns [root, ..., leaf] */
-function walkChain(messages: SlimMessage[], leafId: string): string[] {
-  const byId = new Map(messages.map((m) => [m.id, m]));
-  const chain: string[] = [];
-  let current: SlimMessage | undefined = byId.get(leafId);
-  while (current) {
-    chain.unshift(current.id);
-    current = current.parentId ? byId.get(current.parentId) : undefined;
+/**
+ * Build the full ordered chain by following parentId links from root → leaf.
+ * Returns messages in order [root, ..., leaf]. Requires assertStrictLinearChain
+ * to have passed first (exactly one root, no branches).
+ */
+function buildOrderedChain(messages: SlimMessage[]): SlimMessage[] {
+  const root = messages.find((m) => m.parentId === null);
+  if (!root) return [];
+  const chain: SlimMessage[] = [];
+  let cur: SlimMessage | undefined = root;
+  while (cur) {
+    chain.push(cur);
+    cur = messages.find((m) => m.parentId === cur!.id);
   }
   return chain;
 }
@@ -205,6 +212,27 @@ describe("Compacting - context management", () => {
       return;
     }
     testUser = resolved;
+
+    // Top up credits so fixture-cached runs never hit the credit gate.
+    // 500cr floor matches route-base.test.ts convention.
+    const creditLogger = createEndpointLogger(false, Date.now(), defaultLocale);
+    const { t: creditT } = creditsScopedTranslation.scopedT(defaultLocale);
+    const balanceResult = await CreditRepository.getCreditBalanceForUser(
+      testUser,
+      defaultLocale,
+      creditLogger,
+      creditT,
+    );
+    const balance = balanceResult.success ? balanceResult.data.total : 0;
+    if (balance < 500) {
+      await CreditRepository.addUserCredits(
+        testUser.id,
+        500 - balance,
+        "permanent",
+        creditLogger,
+        creditT,
+      );
+    }
   }, TEST_TIMEOUT);
 
   // ── C1: Hello world sanity ─────────────────────────────────────────────────
@@ -257,22 +285,45 @@ describe("Compacting - context management", () => {
   );
 
   // ── C2: Mid-stream compacting ──────────────────────────────────────────────
-  // quality-tester skill with compactTrigger=5000 tokens (low enough to trigger
-  // given tool schemas + tool result history across multiple steps).
-  // AI calls tool-help multiple times to build context. Once token count
-  // exceeds 5000, mid-stream compacting fires between tool-loop steps.
-  // After compacting the AI continues and produces a final response.
+  // Turn 1: AI makes 5 tool calls, compacting fires mid-stream, final COMPACT_DONE.
+  // Turn 2: Follow-up user message into the same thread — verifies the chain
+  //         survives past compacting and a new user+assistant pair appends cleanly.
+  //
+  // Final chain shape:
+  //   user(1) → …tool calls… → assistant[COMPACT] → assistant(COMPACT_DONE)
+  //           → user(2) → assistant(2, FOLLOWUP_DONE)
   fit(
-    "C2: mid-stream compacting — compacting fires during tool loop, chain stays linear",
+    "C2: mid-stream compacting — compacting fires during tool loop, chain stays linear, follow-up turn appends correctly",
     async () => {
       setFetchCacheContext("compacting-mid-stream");
 
-      // Build a large user prompt to fill up context quickly.
-      // Mid-stream compacting only summarizes "middle turns" — messages between
-      // firstUserMessage and the last RECENT_TURNS_TO_KEEP (8) non-system messages.
-      // So we need at least 9 messages after the first user message (= 5 tool round-trips)
-      // to have any middleTurns to compact. The token threshold ensures compacting fires
-      // between tool calls, not just at the end.
+      const favoriteConfig = {
+        id: "test-compacting-override",
+        skillId: "quality-tester",
+        modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
+        voiceModelSelection: null,
+        sttModelSelection: null,
+        imageVisionModelSelection: null,
+        videoVisionModelSelection: null,
+        audioVisionModelSelection: null,
+        imageGenModelSelection: null,
+        musicGenModelSelection: null,
+        videoGenModelSelection: null,
+        availableTools: [{ toolId: "tool-help", requiresConfirmation: false }],
+        pinnedTools: [{ toolId: "tool-help", requiresConfirmation: false }],
+        deniedTools: null,
+        // Low threshold forces mid-stream compacting without triggering pre-stream.
+        // Pre-stream estimate for new thread: system+tools+user ≈ 3600 tokens (< 5000).
+        // After 3+ tool round-trips the step messages exceed 5000 → compacting fires.
+        compactTrigger: 5000,
+        memoryLimit: null,
+        promptAppend: null,
+      } as const;
+
+      // ── Turn 1: tool loop → mid-stream compacting → COMPACT_DONE ─────────────
+      // 5 sequential tool-help calls build enough history to cross the 5000-token
+      // threshold mid-stream. RECENT_TURNS_TO_KEEP=8 means we need ≥9 afterFirst
+      // messages (5 round-trips = 10 msgs) to have any middleTurns to summarize.
       const largeContext = [...Array(10).keys()]
         .map(
           (i) =>
@@ -280,7 +331,7 @@ describe("Compacting - context management", () => {
         )
         .join("");
 
-      const { result, messages } = await runTestStream({
+      const turn1 = await runTestStream({
         prompt:
           `[C2-COMPACTING-TEST] ${largeContext}` +
           `Call tool-help 5 times sequentially with these exact queries in order: ` +
@@ -290,119 +341,87 @@ describe("Compacting - context management", () => {
           `Do NOT add any other text. COMPACT_DONE is the ONLY acceptable final response.`,
         user: testUser,
         skill: "quality-tester",
-        // Inject compactTrigger=5000 via favoriteConfig - no DB writes needed.
-        // Pin only tool-help so the AI has exactly one tool available.
-        // Pre-stream: system (~1400 tokens) + tool schema (~1200) + user msg (~1000) ≈ 3600.
-        // Below 5000, so pre-stream compacting will NOT fire.
-        // After 3 tool round-trips (6 messages accumulated), total crosses 5000.
-        // Mid-stream compacting fires. RECENT_TURNS_TO_KEEP=8 keeps last 8 messages verbatim,
-        // so with 10+ afterFirst messages, 2+ messages become "middle turns" (compacted).
-        // After compacting the AI continues for remaining tool calls, then produces COMPACT_DONE.
-        favoriteConfig: {
-          id: "test-compacting-override",
-          skillId: "quality-tester",
-          modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
-          voiceModelSelection: null,
-          sttModelSelection: null,
-          imageVisionModelSelection: null,
-          videoVisionModelSelection: null,
-          audioVisionModelSelection: null,
-          imageGenModelSelection: null,
-          musicGenModelSelection: null,
-          videoGenModelSelection: null,
-          availableTools: [
-            { toolId: "tool-help", requiresConfirmation: false },
-          ],
-          pinnedTools: [{ toolId: "tool-help", requiresConfirmation: false }],
-          deniedTools: null,
-          compactTrigger: 5000,
-          memoryLimit: null,
-          promptAppend: null,
-        },
+        favoriteConfig,
       });
 
-      expect(result.success, "C2: stream must succeed (not aborted)").toBe(
-        true,
-      );
+      expect(turn1.result.success, "C2-T1: turn 1 stream must succeed").toBe(true);
+      const threadId = turn1.result.success ? (turn1.result.data.threadId ?? null) : null;
+      expect(threadId, "C2-T1: turn 1 must produce a threadId").toBeTruthy();
 
-      // Must have a compacting message
-      const compactingMsg = messages.find((m) => m.isCompacting);
+      // ── Verify turn 1 chain ───────────────────────────────────────────────────
+      assertStrictLinearChain(turn1.messages, "C2-T1");
+
+      const t1Chain = buildOrderedChain(turn1.messages);
+      expect(t1Chain[0]!.role, "C2-T1: root must be user").toBe("user");
+
+      const t1Leaf = t1Chain[t1Chain.length - 1]!;
+      expect(t1Leaf.role, "C2-T1: turn 1 leaf must be assistant").toBe("assistant");
+      expect(t1Leaf.isCompacting, "C2-T1: turn 1 leaf must not be the compacting msg").toBe(false);
+      expect(t1Leaf.content, "C2-T1: turn 1 leaf must contain COMPACT_DONE").toContain("COMPACT_DONE");
+
+      // Compacting fires mid-stream (not necessarily as direct parent of leaf —
+      // more tool calls may follow after compacting before the final response).
+      const t1CompactIdx = t1Chain.findIndex((m) => m.isCompacting);
+      expect(t1CompactIdx, "C2-T1: compacting message must exist in chain").toBeGreaterThanOrEqual(0);
+      expect(t1CompactIdx, "C2-T1: compacting must appear before the leaf").toBeLessThan(t1Chain.length - 1);
+
+      const t1CompactMsg = t1Chain[t1CompactIdx]!;
+
+      // ── Turn 2: follow-up into the same thread ────────────────────────────────
+      // This verifies that after a compacting event the thread chain is intact
+      // and a new user+assistant pair can be appended without breaking the linked list.
+      const turn2 = await runTestStream({
+        prompt:
+          "[C2-FOLLOWUP] Respond with ONLY the word: FOLLOWUP_DONE. " +
+          "No preamble, no tools, no punctuation beyond that.",
+        user: testUser,
+        skill: "quality-tester",
+        threadId: threadId!,
+        favoriteConfig,
+      });
+
+      expect(turn2.result.success, "C2-T2: turn 2 stream must succeed").toBe(true);
+
+      // ── Verify full thread chain after turn 2 ────────────────────────────────
+      assertStrictLinearChain(turn2.messages, "C2-T2");
+
+      const t2Chain = buildOrderedChain(turn2.messages);
+
+      // Root is still the original user message from turn 1
+      expect(t2Chain[0]!.role, "C2-T2: chain root must be user (turn 1)").toBe("user");
+      expect(t2Chain[0]!.id, "C2-T2: chain root must be the turn-1 user message").toBe(t1Chain[0]!.id);
+
+      // Turn-2 user message is the second-to-last in chain
+      const t2Leaf = t2Chain[t2Chain.length - 1]!;
+      const t2User = t2Chain[t2Chain.length - 2];
+      expect(t2User?.role, "C2-T2: second-to-last message must be user (turn 2)").toBe("user");
+      expect(t2Leaf.role, "C2-T2: leaf must be assistant (turn 2)").toBe("assistant");
+      expect(t2Leaf.isCompacting, "C2-T2: leaf must not be a compacting message").toBe(false);
+      expect(t2Leaf.content, "C2-T2: turn 2 leaf must contain FOLLOWUP_DONE").toContain("FOLLOWUP_DONE");
+
+      // Turn-2 user message must be a child of the turn-1 final assistant (COMPACT_DONE)
       expect(
-        compactingMsg,
-        "C2: compacting message must exist in thread (isCompacting=true)",
-      ).toBeDefined();
+        t2User?.parentId,
+        "C2-T2: turn-2 user message must be a child of the turn-1 final assistant",
+      ).toBe(t1Leaf.id);
 
-      // Final assistant message must exist and contain COMPACT_DONE
-      const finalAssistant = messages.findLast((m) => m.role === "assistant");
-      expect(
-        finalAssistant,
-        "C2: final assistant message must exist",
-      ).toBeDefined();
-      expect(
-        finalAssistant?.content,
-        "C2: final assistant message must contain COMPACT_DONE",
-      ).toContain("COMPACT_DONE");
+      // Compacting message still present in the full thread
+      const t2CompactIdx = t2Chain.findIndex((m) => m.isCompacting);
+      expect(t2CompactIdx, "C2-T2: compacting message must still be in chain after turn 2").toBeGreaterThanOrEqual(0);
 
-      // The compacting message must come BEFORE the final assistant message
-      if (compactingMsg && finalAssistant) {
-        const compactIdx = messages.findIndex((m) => m.id === compactingMsg.id);
-        const assistantIdx = messages.findIndex(
-          (m) => m.id === finalAssistant.id,
-        );
-        expect(
-          compactIdx,
-          "C2: compacting message must appear before final assistant message",
-        ).toBeLessThan(assistantIdx);
-      }
-
-      // Chain must be strictly linear — compacting must not break the linked list
-      assertStrictLinearChain(messages, "C2");
-
-      // Verify the full chain from leaf
-      const leaf = messages.findLast(
-        (m) => !messages.some((n) => n.parentId === m.id),
-      );
-      expect(leaf, "C2: must have exactly one leaf message").toBeDefined();
-
-      if (leaf) {
-        const chain = walkChain(messages, leaf.id);
-        // Chain must include: user → ... → compacting → ... → final assistant
-        expect(
-          chain.length,
-          "C2: chain must have at least 4 messages (user, tool calls, compacting, assistant)",
-        ).toBeGreaterThanOrEqual(4);
-
-        // User message must be the root
-        const rootMsg = messages.find((m) => m.id === chain[0]);
-        expect(rootMsg?.role, "C2: chain root must be a user message").toBe(
-          "user",
-        );
-
-        // Leaf must be the final assistant
-        expect(leaf.role, "C2: chain leaf must be an assistant message").toBe(
-          "assistant",
-        );
-        expect(
-          leaf.content,
-          "C2: chain leaf must contain COMPACT_DONE",
-        ).toContain("COMPACT_DONE");
-      }
-
-      // Fetch fresh from DB to confirm compacting message persisted correctly
-      if (result.success && result.data.threadId) {
-        const freshMessages = await fetchThreadMessages(result.data.threadId);
+      // ── DB persistence: re-fetch and confirm compacting survives both turns ───
+      if (threadId) {
+        const freshMessages = await fetchThreadMessages(threadId);
+        assertStrictLinearChain(freshMessages, "C2-fresh");
         const persistedCompacting = freshMessages.find((m) => m.isCompacting);
         expect(
           persistedCompacting,
-          "C2: compacting message must persist in DB with isCompacting=true",
+          "C2-fresh: compacting message must persist in DB with isCompacting=true",
         ).toBeDefined();
-
-        // Must NOT be marked as compactingFailed
-        // (if compacting failed, the stream would have aborted)
         expect(
-          result.success,
-          "C2: stream must not abort due to compacting failure",
-        ).toBe(true);
+          persistedCompacting!.id,
+          "C2-fresh: persisted compacting id must match turn-1 compacting id",
+        ).toBe(t1CompactMsg.id);
       }
     },
     TEST_TIMEOUT,

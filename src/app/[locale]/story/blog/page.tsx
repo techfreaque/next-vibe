@@ -206,19 +206,6 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
         "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-400 dark:border-cyan-800/50",
     },
     {
-      slug: "i-got-fired",
-      titleKey: "posts.fired.title",
-      categoryKey: "posts.fired.category",
-      excerptKey: "posts.fired.excerpt",
-      readTimeKey: "posts.fired.readTime",
-      emoji: "🔥",
-      accentColor: "text-orange-600 dark:text-orange-400",
-      accentBg: "bg-orange-50 dark:bg-orange-950/30",
-      accentBorder: "border-orange-200 dark:border-orange-800/50",
-      badgeColor:
-        "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-800/50",
-    },
-    {
       slug: "referral-for-affiliate-pros",
       titleKey: "posts.referralAffiliatePros.title",
       categoryKey: "posts.referralAffiliatePros.category",

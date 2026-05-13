@@ -49,13 +49,6 @@ export const translations = {
         "I abandoned a trading bot. Years later its architecture became the most interesting part of next-vibe. The pipeline is just endpoints.",
       readTime: "14 min read",
     },
-    fired: {
-      title: "I got fired. This is what I built instead.",
-      category: "VibeFrame",
-      excerpt:
-        "A federated widget engine I built at a job I no longer have. Now any next-vibe endpoint is embeddable anywhere in two script tags.",
-      readTime: "11 min read",
-    },
     oneEndpoint: {
       title: "One endpoint. Every surface.",
       category: "Architecture",

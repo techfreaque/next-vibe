@@ -345,6 +345,7 @@ export class StreamExecutionHandler {
               // it as the next user turn so the loop continues without restarting.
               // Race safety: QueueRegistry.shift() is synchronous and atomic in
               // the single-threaded JS event loop - no double-consumption possible.
+              //
               const queuedEntry = QueueRegistry.shift(threadId);
               if (queuedEntry) {
                 logger.info(
@@ -377,6 +378,11 @@ export class StreamExecutionHandler {
                       // Merge only isQueued: false into existing metadata JSON
                       // so queuedSettings and other fields are preserved.
                       metadata: dequeuesSql`${dequeueMessages.metadata} || '{"isQueued":false}'::jsonb`,
+                      // Update createdAt to now so the UI sorts this message AFTER
+                      // the tool result, not before the assistant messages it was
+                      // created ahead of (queued message is created before stream 1
+                      // even produces its first assistant message).
+                      createdAt: dequeueNow,
                       updatedAt: dequeueNow,
                     })
                     .where(dequeueEq(dequeueMessages.id, queuedEntry.id));
@@ -431,13 +437,12 @@ export class StreamExecutionHandler {
 
                 // Advance ctx.currentParentId to the queued message so the
                 // next assistant response is a child of it, not a sibling.
-                // Without this, both the queued message and the next AI response
-                // share the same parent — creating a branch in the DB chain.
-                // Do NOT set ctx.currentParentId / ctx.lastParentId here.
-                // prepareStep is called by the AI SDK before the for-await consumer
-                // has processed all step-0 events (tool-result resets lastParentId).
-                // Instead, set pendingQueueParentId — finish-step-handler reads it
-                // and overrides currentParentId at the correct point in the event loop.
+                // prepareStep is called by the AI SDK AFTER all step-N events
+                // (tool-result, finish-step) have been fully consumed by the
+                // for-await loop. Setting currentParentId here is safe — nothing
+                // will overwrite it before the next step's text-delta fires.
+                ctx.currentParentId = queuedEntry.id;
+                ctx.lastParentId = queuedEntry.id;
                 ctx.pendingQueueParentId = queuedEntry.id;
                 // Mark that a queued message was injected mid-stream so the
                 // finally-block processNextQueuedMessage skips this thread.

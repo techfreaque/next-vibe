@@ -51,13 +51,6 @@ export const translations: typeof enTranslations = {
         "Ich hab einen Trading-Bot aufgegeben. Jahre später wurde seine Architektur zum spannendsten Teil von next-vibe. Die Pipeline besteht nur aus Endpoints.",
       readTime: "14 Min. Lesezeit",
     },
-    fired: {
-      title: "Ich wurde gefeuert. Das hier hab ich stattdessen gebaut.",
-      category: "VibeFrame",
-      excerpt:
-        "Eine föderierte Widget-Engine, die ich neben einem Job gebaut hab, den ich nicht mehr habe. Jetzt ist jeder next-vibe-Endpoint mit zwei Script-Tags einbettbar.",
-      readTime: "11 Min. Lesezeit",
-    },
     oneEndpoint: {
       title: "Ein Endpoint. Jede Oberfläche.",
       category: "Architektur",

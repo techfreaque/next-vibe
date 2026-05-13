@@ -106,12 +106,16 @@ export async function processNextQueuedMessage(
   void isQueued;
   void savedSettings;
 
+  const dequeueNow = new Date();
   await db
     .update(chatMessages)
     .set({
       parentId: resolvedParentId,
       metadata: cleanMetadata,
-      updatedAt: new Date(),
+      // Update createdAt to now so the UI (which sorts by createdAt) places this
+      // message after the last message in the chain, not at its original enqueue time.
+      createdAt: dequeueNow,
+      updatedAt: dequeueNow,
     })
     .where(eq(chatMessages.id, queuedMessage.id));
 
@@ -134,8 +138,8 @@ export async function processNextQueuedMessage(
         // Explicitly set isQueued: false so the client cache deep-merge clears
         // the flag (absent keys are not removed by the merge; false overrides true).
         metadata: { ...cleanMetadata, isQueued: false },
-        createdAt: queuedMessage.createdAt,
-        updatedAt: new Date(),
+        createdAt: dequeueNow,
+        updatedAt: dequeueNow,
         authorId: null,
         authorName: null,
         errorType: null,

@@ -195,12 +195,15 @@ function assertStrictLinearChain(messages: SlimMessage[], label: string): void {
 }
 
 /**
- * Wait until the queued message has been processed AND its AI response exists.
- * "Processed" means: the message is no longer isQueued=true in DB.
- * "AI response exists" means: there is an assistant message with parentId = queuedMessageId.
+ * Wait until:
+ *   1. The queued message is no longer isQueued=true in DB.
+ *   2. An assistant message with parentId = queuedMessageId exists in DB.
+ *   3. The thread is idle.
  *
- * This handles the race where waitForThreadIdle returns during the brief idle window
- * between stream 1 ending and stream 2 (started by processNextQueuedMessage) beginning.
+ * All three conditions must hold simultaneously to avoid the race where:
+ *   - prepareStep dequeues the message (isQueued→false) while stream 1 is still running
+ *   - thread goes idle momentarily between stream 1 ending and stream 2 starting
+ *   - ai2 hasn't been written yet when we sample
  */
 async function waitForQueueProcessed(
   threadId: string,
@@ -210,32 +213,26 @@ async function waitForQueueProcessed(
   const pollIntervalMs = 400;
   const start = Date.now();
   while (Date.now() - start < maxWaitMs) {
-    // Check if queued message is dequeued
-    const [queuedRow] = await db
-      .select({ metadata: chatMessages.metadata })
-      .from(chatMessages)
-      .where(eq(chatMessages.id, queuedMessageId));
-
-    const isStillQueued = queuedRow?.metadata?.isQueued === true;
-
-    // Check if AI response after the queued message exists
-    const [aiResponse] = await db
-      .select({ id: chatMessages.id })
-      .from(chatMessages)
-      .where(eq(chatMessages.parentId, queuedMessageId));
-
-    // Check thread is idle (not streaming)
     const [threadRow] = await db
       .select({ streamingState: chatThreads.streamingState })
       .from(chatThreads)
       .where(eq(chatThreads.id, threadId));
 
-    if (
-      !isStillQueued &&
-      aiResponse &&
-      threadRow?.streamingState === "idle"
-    ) {
-      // All conditions met - fetch and return full message list
+    const [queuedRow] = await db
+      .select({ metadata: chatMessages.metadata })
+      .from(chatMessages)
+      .where(eq(chatMessages.id, queuedMessageId));
+
+    const [ai2Row] = await db
+      .select({ id: chatMessages.id })
+      .from(chatMessages)
+      .where(eq(chatMessages.parentId, queuedMessageId));
+
+    const isIdle = threadRow?.streamingState === "idle";
+    const isStillQueued = queuedRow?.metadata?.isQueued === true;
+    const ai2Exists = ai2Row !== undefined;
+
+    if (isIdle && !isStillQueued && ai2Exists) {
       const { fetchThreadMessages } = await import(
         "../../testing/headless-test-runner"
       );
@@ -248,8 +245,8 @@ async function waitForQueueProcessed(
   }
   // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
   throw new Error(
-    `waitForQueueProcessed: thread ${threadId} did not finish processing ` +
-      `queued message ${queuedMessageId} within ${String(maxWaitMs)}ms`,
+    `waitForQueueProcessed: thread ${threadId} timed out — ` +
+      `check if ai2 (parentId=${queuedMessageId}) was ever written to DB`,
   );
 }
 
@@ -405,7 +402,10 @@ describe("Mid-Stream Queue - chain integrity", () => {
       name,
       async () => {
         if (suiteFailed) {
-          return;
+          // oxlint-disable-next-line restricted-syntax -- intentional throw to fail fast after suite-level error
+          throw new Error(
+            "Skipped: a previous test in this suite already failed. Fix that test first.",
+          );
         }
         try {
           await fn();
@@ -476,74 +476,67 @@ describe("Mid-Stream Queue - chain integrity", () => {
 
       // ── MQ1 assertions ────────────────────────────────────────────────────
 
-      // All messages belong to thread1Id
-      expect(
-        messages.length,
-        "MQ1: expected at least 4 messages (user1, ai1, queuedUser, ai2)",
-      ).toBeGreaterThanOrEqual(4);
-
-      // No branches — the entire chain must be linear
-      assertStrictLinearChain(messages, "MQ1");
-
-      // The queued user message must no longer be marked isQueued
+      await assertThreadIdle(thread1Id, "MQ1");
       await assertNotQueued(queued2MsgId, "MQ1");
 
-      // Thread is idle
-      await assertThreadIdle(thread1Id, "MQ1");
+      // 1. assistant ai1 has parentId = user1MsgId
+      const [ai1Row] = await db
+        .select({ id: chatMessages.id, role: chatMessages.role, content: chatMessages.content })
+        .from(chatMessages)
+        .where(eq(chatMessages.parentId, user1MsgId));
+      expect(ai1Row, "MQ1: no assistant after user1").toBeDefined();
+      expect(ai1Row!.role, "MQ1: child of user1 must be assistant").toBe("assistant");
+      expect(ai1Row!.content, "MQ1: ai1 must contain ECHO_DONE").toContain("ECHO_DONE");
 
-      // The queued user message must be in the chain (not orphaned, not branched)
-      const queuedMsg = messages.find((m) => m.id === queued2MsgId);
-      expect(
-        queuedMsg,
-        "MQ1: queued user message not found in thread messages",
-      ).toBeDefined();
-      expect(
-        queuedMsg?.role,
-        "MQ1: queued message must have role=user",
-      ).toBe("user");
+      // 2. queued user message exists
+      const [queuedRow] = await db
+        .select({ id: chatMessages.id, role: chatMessages.role })
+        .from(chatMessages)
+        .where(eq(chatMessages.id, queued2MsgId));
+      expect(queuedRow, "MQ1: queued user message not in DB").toBeDefined();
+      expect(queuedRow!.role, "MQ1: queued message must be user").toBe("user");
 
-      // There must be an AI response AFTER the queued user message (ai2)
-      const chain = walkChain(messages, messages.findLast((m) => !messages.some((n) => n.parentId === m.id))!.id);
-      const queuedIdx = chain.indexOf(queued2MsgId);
-      expect(
-        queuedIdx,
-        "MQ1: queued user message not found in main chain",
-      ).toBeGreaterThan(-1);
-      expect(
-        queuedIdx,
-        "MQ1: queued user message must not be the last message (ai2 must follow)",
-      ).toBeLessThan(chain.length - 1);
+      // 3. assistant ai2 has parentId = queued2MsgId — the critical assertion
+      const [ai2Row] = await db
+        .select({ id: chatMessages.id, role: chatMessages.role, content: chatMessages.content })
+        .from(chatMessages)
+        .where(eq(chatMessages.parentId, queued2MsgId));
+      expect(ai2Row, "MQ1: no assistant after queued user message").toBeDefined();
+      expect(ai2Row!.role, "MQ1: child of queued user must be assistant").toBe("assistant");
+      expect(ai2Row!.content, "MQ1: ai2 must contain QUEUED_DONE").toContain("QUEUED_DONE");
 
-      // The message immediately after queuedUser in the chain must be an assistant
-      const afterQueued = messages.find(
-        (m) => m.id === chain[queuedIdx + 1],
-      );
-      expect(
-        afterQueued?.role,
-        "MQ1: message after queuedUser must be an assistant message (ai2)",
-      ).toBe("assistant");
+      // 4. no branches — strict linear chain
+      assertStrictLinearChain(messages, "MQ1");
 
-      // ai1 content must contain ECHO_DONE
-      const ai1 = messages.find(
-        (m) => m.role === "assistant" && m.id === chain[chain.indexOf(user1MsgId) + 1],
-      );
-      expect(
-        ai1?.content,
-        "MQ1: ai1 must contain ECHO_DONE",
-      ).toContain("ECHO_DONE");
-
-      // ai2 content must contain QUEUED_DONE
-      const ai2 = afterQueued;
-      expect(
-        ai2?.content,
-        "MQ1: ai2 must contain QUEUED_DONE",
-      ).toContain("QUEUED_DONE");
-
-      // Chain order: user1 → ai1 → queuedUser → ai2
-      expect(
-        chain.indexOf(user1MsgId),
-        "MQ1: user1 must come before queuedUser",
-      ).toBeLessThan(queuedIdx);
+      // 5. exact chain order: user1 → assistant(ai1) → queuedUser → assistant(ai2)
+      // AND createdAt order must match parentId chain order (UI sorts by createdAt)
+      {
+        const roots = messages.filter((m) => m.parentId === null);
+        expect(roots.length, "MQ1: must have exactly 1 root").toBe(1);
+        const orderedChain: SlimMessage[] = [];
+        let cur: SlimMessage | undefined = roots[0];
+        while (cur) {
+          orderedChain.push(cur);
+          const next = messages.find((m) => m.parentId === cur!.id);
+          cur = next;
+        }
+        const chainDesc = orderedChain.map((m) => m.role).join(" → ");
+        expect(orderedChain.length, `MQ1: expected exactly 4 messages, got ${String(orderedChain.length)}: ${chainDesc}`).toBe(4);
+        expect(orderedChain[0]!.id, "MQ1: chain[0] must be user1").toBe(user1MsgId);
+        expect(orderedChain[0]!.role, "MQ1: chain[0] must be user").toBe("user");
+        expect(orderedChain[1]!.role, "MQ1: chain[1] must be assistant (ai1)").toBe("assistant");
+        expect(orderedChain[2]!.id, "MQ1: chain[2] must be queuedUser").toBe(queued2MsgId);
+        expect(orderedChain[2]!.role, "MQ1: chain[2] must be user").toBe("user");
+        expect(orderedChain[3]!.role, "MQ1: chain[3] must be assistant (ai2)").toBe("assistant");
+        expect(orderedChain[3]!.content, "MQ1: ai2 must contain QUEUED_DONE").toContain("QUEUED_DONE");
+        // createdAt order must match parentId chain order
+        for (let i = 1; i < orderedChain.length; i++) {
+          expect(
+            orderedChain[i]!.createdAt.getTime(),
+            `MQ1: chain[${String(i)}] createdAt must be >= chain[${String(i - 1)}] createdAt (UI order broken)`,
+          ).toBeGreaterThanOrEqual(orderedChain[i - 1]!.createdAt.getTime());
+        }
+      }
 
       // Wait for any fire-and-forget goroutines (e.g. syncThreadEmbedding) to
       // complete so their fetch calls don't contaminate MQ2's counter namespace.
@@ -599,69 +592,96 @@ describe("Mid-Stream Queue - chain integrity", () => {
 
       // ── MQ2 assertions ────────────────────────────────────────────────────
 
-      expect(
-        messages.length,
-        "MQ2: expected at least 5 messages (user1, ai1, toolMsg, toolAi, queuedUser, ai2)",
-      ).toBeGreaterThanOrEqual(5);
-
-      // No branches anywhere in the chain
-      assertStrictLinearChain(messages, "MQ2");
-
-      // Queued message must be dequeued
+      await assertThreadIdle(thread2Id, "MQ2");
       await assertNotQueued(queued2MsgId, "MQ2");
 
-      // Thread is idle
-      await assertThreadIdle(thread2Id, "MQ2");
+      // 1. user1 exists with no parent (root)
+      const [user1Row] = await db
+        .select({ id: chatMessages.id, parentId: chatMessages.parentId })
+        .from(chatMessages)
+        .where(eq(chatMessages.id, user1MsgId));
+      expect(user1Row, "MQ2: user1 not in DB").toBeDefined();
 
-      // tool-help must have been called
-      const toolMsg = messages.find(
-        (m) => m.role === "tool" && m.toolCall?.toolName === "tool-help",
-      );
-      expect(
-        toolMsg,
-        "MQ2: tool-help message not found — AI did not call the tool",
-      ).toBeDefined();
-      expect(
-        toolMsg?.toolCall?.result,
-        "MQ2: tool-help result must not be null",
-      ).toBeTruthy();
+      // 2. assistant ai1 has parentId = user1MsgId
+      const [ai1Row] = await db
+        .select({ id: chatMessages.id, role: chatMessages.role })
+        .from(chatMessages)
+        .where(eq(chatMessages.parentId, user1MsgId));
+      expect(ai1Row, "MQ2: no assistant after user1").toBeDefined();
+      expect(ai1Row!.role, "MQ2: child of user1 must be assistant").toBe("assistant");
 
-      // The queued user message must be in the chain
-      const leaf = messages.findLast((m) => !messages.some((n) => n.parentId === m.id))!;
-      const chain = walkChain(messages, leaf.id);
-      const queuedIdx = chain.indexOf(queued2MsgId);
-      expect(
-        queuedIdx,
-        "MQ2: queued user message not found in main chain — it may have branched",
-      ).toBeGreaterThan(-1);
-      expect(
-        queuedIdx,
-        "MQ2: queuedUser must not be the chain tip (ai2 must follow it)",
-      ).toBeLessThan(chain.length - 1);
+      // 3. queued user message exists
+      const [queuedRow] = await db
+        .select({ id: chatMessages.id, role: chatMessages.role, parentId: chatMessages.parentId })
+        .from(chatMessages)
+        .where(eq(chatMessages.id, queued2MsgId));
+      expect(queuedRow, "MQ2: queued user message not in DB").toBeDefined();
+      expect(queuedRow!.role, "MQ2: queued message must be user").toBe("user");
 
-      // Message after queuedUser must be an assistant (ai2)
-      const afterQueued = messages.find((m) => m.id === chain[queuedIdx + 1]);
-      expect(
-        afterQueued?.role,
-        "MQ2: message after queuedUser must be assistant (ai2)",
-      ).toBe("assistant");
+      // 4. assistant ai2 has parentId = queued2MsgId — the critical assertion
+      const [ai2Row] = await db
+        .select({ id: chatMessages.id, role: chatMessages.role, content: chatMessages.content })
+        .from(chatMessages)
+        .where(eq(chatMessages.parentId, queued2MsgId));
+      expect(ai2Row, "MQ2: no assistant after queued user message").toBeDefined();
+      expect(ai2Row!.role, "MQ2: child of queued user must be assistant").toBe("assistant");
+      expect(ai2Row!.content, "MQ2: ai2 must contain QUEUED_TOOL_DONE").toContain("QUEUED_TOOL_DONE");
 
-      // queuedUser must come AFTER the tool message in the chain
-      const toolMsgIdx = chain.indexOf(toolMsg!.id);
-      expect(
-        queuedIdx,
-        "MQ2: queuedUser must come after the tool message — it branched off before the tool",
-      ).toBeGreaterThan(toolMsgIdx);
+      // 5. no branches — strict linear chain
+      assertStrictLinearChain(messages, "MQ2");
 
-      // ai2 content must contain QUEUED_TOOL_DONE
-      expect(
-        afterQueued?.content,
-        "MQ2: ai2 must contain QUEUED_TOOL_DONE",
-      ).toContain("QUEUED_TOOL_DONE");
+      // 6. exact chain order: user1 → assistant(ai1) → tool → queuedUser → assistant(ai2)
+      // The queued message is injected after the tool result so the AI responds to it directly.
+      {
+        const roots = messages.filter((m) => m.parentId === null);
+        expect(roots.length, "MQ2: must have exactly 1 root").toBe(1);
 
-      // Chain order: user1 must come before tool, tool before queuedUser, queuedUser before ai2
-      expect(chain.indexOf(user1MsgId)).toBeLessThan(toolMsgIdx);
-      expect(toolMsgIdx).toBeLessThan(queuedIdx);
+        // Walk root→leaf
+        const orderedChain: SlimMessage[] = [];
+        let cur: SlimMessage | undefined = roots[0];
+        while (cur) {
+          orderedChain.push(cur);
+          const next = messages.find((m) => m.parentId === cur!.id);
+          cur = next;
+        }
+
+        const chainDesc = orderedChain
+          .map((m) => `${m.role}${m.toolCall?.toolName ? `:${m.toolCall.toolName}` : ""}`)
+          .join(" → ");
+
+        // Exact 5-message chain
+        expect(
+          orderedChain.length,
+          `MQ2: expected exactly 5 messages in chain, got ${String(orderedChain.length)}: ${chainDesc}`,
+        ).toBe(5);
+
+        // [0] user1
+        expect(orderedChain[0]!.id, "MQ2: chain[0] must be user1").toBe(user1MsgId);
+        expect(orderedChain[0]!.role, "MQ2: chain[0] must be user").toBe("user");
+
+        // [1] assistant (ai1, made the tool call)
+        expect(orderedChain[1]!.role, "MQ2: chain[1] must be assistant (ai1)").toBe("assistant");
+
+        // [2] tool result
+        expect(orderedChain[2]!.role, "MQ2: chain[2] must be tool").toBe("tool");
+
+        // [3] queued user message
+        expect(orderedChain[3]!.id, "MQ2: chain[3] must be queuedUser").toBe(queued2MsgId);
+        expect(orderedChain[3]!.role, "MQ2: chain[3] must be user").toBe("user");
+
+        // [4] assistant response to queued user (ai2)
+        expect(orderedChain[4]!.role, "MQ2: chain[4] must be assistant (ai2)").toBe("assistant");
+        expect(orderedChain[4]!.content, "MQ2: ai2 must contain QUEUED_TOOL_DONE").toContain("QUEUED_TOOL_DONE");
+
+        // createdAt order must match parentId chain order — the UI sorts by createdAt
+        // so a wrong createdAt causes messages to appear out of order in the UI.
+        for (let i = 1; i < orderedChain.length; i++) {
+          expect(
+            orderedChain[i]!.createdAt.getTime(),
+            `MQ2: chain[${String(i)}] createdAt must be >= chain[${String(i - 1)}] createdAt (UI sort order broken)`,
+          ).toBeGreaterThanOrEqual(orderedChain[i - 1]!.createdAt.getTime());
+        }
+      }
 
       // Drain any lingering fire-and-forget goroutines before test ends
       await waitForInflightFetches(5_000);

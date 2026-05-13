@@ -53,13 +53,6 @@ export const translations: typeof enTranslations = {
         "Porzuciłem bota tradingowego. Lata później jego architektura stała się najciekawszą częścią next-vibe. Potok to tylko endpointy.",
       readTime: "14 min czytania",
     },
-    fired: {
-      title: "Zostałem zwolniony. To jest to, co zamiast tego zbudowałem.",
-      category: "VibeFrame",
-      excerpt:
-        "Sfederowany silnik widżetów, który zbudowałem w pracy, której już nie mam. Teraz każdy endpoint next-vibe można osadzić wszędzie w dwóch tagach script.",
-      readTime: "11 min czytania",
-    },
     oneEndpoint: {
       title: "Jeden endpoint. Każda powierzchnia.",
       category: "Architektura",
