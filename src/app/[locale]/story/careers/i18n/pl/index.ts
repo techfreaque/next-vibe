@@ -2,155 +2,126 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Kariera - {{appName}}",
-    category: "Kariera",
+    title: "Buduj z next-vibe - {{appName}}",
+    category: "Deweloperzy",
     description:
-      "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
-    imageAlt: "Kariera w {{appName}}",
-    keywords: "kariera, praca, praca w AI, praca zdalna, kariera w {{appName}}",
-    ogTitle: "Kariera - {{appName}}",
+      "next-vibe zamienia każdy endpoint jednocześnie w formularz web, polecenie CLI, narzędzie MCP, ekran natywny i skill wywoływany przez AI. Zautomatyzuj wszystko, co człowiek może zrobić na komputerze.",
+    imageAlt: "Platforma deweloperska next-vibe - {{appName}}",
+    keywords:
+      "next-vibe, automatyzacja AI, platforma deweloperska, automatyzacja biznesu, integracja ERP, automatyzacja produkcji, {{appName}}",
+    ogTitle: "Buduj z next-vibe - {{appName}}",
     ogDescription:
-      "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
-    twitterTitle: "Kariera - {{appName}}",
+      "Jedna baza kodu. Każda powierzchnia. Automatyzuj linie produkcyjne, systemy ERP, przepływy pracy na pulpicie - wszystko, co człowiek robi na komputerze.",
+    twitterTitle: "Buduj z next-vibe - {{appName}}",
     twitterDescription:
-      "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
+      "Jedna baza kodu. Każda powierzchnia. Automatyzuj linie produkcyjne, systemy ERP, przepływy pracy na pulpicie - wszystko, co człowiek robi na komputerze.",
   },
-  title: "Dołącz do naszego zespołu",
-  description:
-    "Pomóż nam budować przyszłość niecenzurowanego czatu AI. Szukamy pasjonatów wierzących w wolność słowa i prywatność użytkowników.",
-  joinTeam: "Dołącz do naszego zespołu",
-  subtitle:
-    "Bądź częścią misji uczynienia AI uczciwym, dostępnym i niecenzurowanym.",
-  whyWorkWithUs: "Dlaczego warto u nas pracować",
-  workplaceDescription:
-    "Jesteśmy firmą remote-first, która ceni autonomię, kreatywność i wpływ. Dołącz do zespołu, który zmienia sposób interakcji ludzi z AI.",
-  benefits: {
-    title: "Co oferujemy",
-    growthTitle: "Rozwój i nauka",
-    growthDesc:
-      "Pracuj z najnowocześniejszą technologią AI i ucz się od ekspertów branżowych.",
-    meaningfulTitle: "Sensowna praca",
-    meaningfulDesc:
-      "Twórz produkty, które wzmacniają użytkowników i chronią ich prywatność.",
-    balanceTitle: "Równowaga praca-życie",
-    balanceDesc:
-      "Elastyczne godziny, praca zdalna i nieograniczony urlop. Ufamy, że wykonujesz świetną pracę.",
-    compensationTitle: "Konkurencyjne wynagrodzenie",
-    compensationDesc:
-      "Czołowe w branży wynagrodzenie, equity i pakiet świadczeń.",
-    innovationTitle: "Innowacja i wpływ",
-    innovationDesc:
-      "Pracuj nad najnowocześniejszą technologią AI, która ma realny wpływ.",
-    teamTitle: "Świetny zespół",
-    teamDesc:
-      "Pracuj z utalentowanymi, zaangażowanymi ludźmi, którym zależy na etyce AI.",
+
+  hero: {
+    eyebrow: "Platforma deweloperska next-vibe",
+    title:
+      "Jeśli człowiek może to zrobić na komputerze, next-vibe może to zautomatyzować.",
+    subtitle:
+      "Jedna definicja endpointu staje się formularzem web, poleceniem CLI, narzędziem MCP, ekranem natywnym i skillem AI - jednocześnie. Od małych skryptów po pełną automatyzację linii produkcyjnej.",
+    ctaPrimary: "Zacznij budować",
+    ctaSecondary: "Przeczytaj dokumentację",
   },
-  openPositions: "Otwarte stanowiska",
-  noOpenings: "Brak otwartych stanowisk w tej chwili",
-  checkBackLater: "Sprawdź ponownie później, aby zobaczyć nowe możliwości",
-  jobs: {
-    socialMediaManager: {
-      title: "Inżynier AI",
-      shortDescription:
-        "Pomóż nam integrować nowe modele AI i poprawiać wydajność platformy.",
-      longDescription:
-        "Szukamy doświadczonego inżyniera AI, który pomoże nam integrować nowe modele AI, optymalizować wydajność i budować innowacyjne funkcje dla naszej niecenzurowanej platformy czatu AI.",
-      location: "Zdalnie",
-      department: "Inżynieria",
-      type: "Pełny etat",
-      responsibilities: {
-        item1: "Integracja i optymalizacja nowych modeli AI",
-        item2: "Poprawa wydajności i skalowalności platformy",
-        item3: "Rozwijanie nowych funkcji i możliwości",
-        item4: "Współpraca z zespołem przy decyzjach technicznych",
-        item5: "Utrzymanie i ulepszanie istniejącej bazy kodu",
+
+  audience: {
+    title: "Kto buduje z next-vibe",
+    items: {
+      freelancers: {
+        title: "Freelancerzy i agencje",
+        description:
+          "Dostarczaj klientom narzędzia oparte na AI bez budowania osobnych backendów, CLI i interfejsów. Jedna baza kodu, każda powierzchnia.",
       },
-      requirements: {
-        item1: "3+ lata doświadczenia z technologiami AI/ML",
-        item2: "Silne umiejętności programowania w Python i TypeScript",
-        item3: "Doświadczenie z API LLM i integracją",
-        item4: "Doskonałe umiejętności rozwiązywania problemów",
-        item5: "Pasja do AI i prywatności użytkowników",
+      businessDevs: {
+        title: "Deweloperzy biznesowi",
+        description:
+          "Połącz ERP, CRM lub dowolny system wewnętrzny z przepływami AI. Dane wchodzą, decyzje wychodzą - bez kodu kleju.",
       },
-      qualifications: {
-        required: {
-          item1: "3+ lata doświadczenia z technologiami AI/ML",
-          item2: "Silne umiejętności programowania w Python i TypeScript",
-          item3: "Doświadczenie z API LLM i integracją",
-        },
-        preferred: {
-          item1: "Doskonałe umiejętności rozwiązywania problemów",
-          item2: "Pasja do AI i prywatności użytkowników",
-          item3: "Doświadczenie z systemami rozproszonymi",
-        },
+      industrialDevs: {
+        title: "Przemysłowi i embedded",
+        description:
+          "Automatyzuj konfigurację urządzeń na liniach produkcyjnych. Wyzwalaj skille AI gdy czujniki reagują. Mierz Vibe Sense, działaj Autopilotem.",
       },
-      experienceLevel: "Poziom średni do seniora",
-    },
-    contentCreator: {
-      title: "Community Manager",
-      shortDescription:
-        "Buduj i angażuj naszą społeczność entuzjastów AI i zaawansowanych użytkowników.",
-      longDescription:
-        "Szukamy Community Managera do budowania i pielęgnowania naszej rosnącej społeczności entuzjastów AI, tworzenia angażujących treści i wspierania znaczących dyskusji.",
-      location: "Zdalnie",
-      department: "Społeczność",
-      type: "Pełny etat",
-      responsibilities: {
-        item1: "Budowanie i angażowanie społeczności {{appName}}",
-        item2: "Tworzenie przekonujących treści dla mediów społecznościowych",
-        item3: "Moderowanie dyskusji i udzielanie wsparcia",
-        item4: "Organizowanie wydarzeń społecznościowych i inicjatyw",
-        item5: "Zbieranie i analizowanie opinii społeczności",
+      enterpriseDevs: {
+        title: "Zespoły enterprise",
+        description:
+          "Zastąp pofragmentowane narzędzia jedną ujednoliconą platformą. Web UI, CLI, MCP, aplikacja natywna - ten sam endpoint, zero duplikacji.",
       },
-      requirements: {
-        item1: "2+ lata doświadczenia w zarządzaniu społecznością",
-        item2: "Doskonałe umiejętności komunikacji i pisania",
-        item3: "Pasja do AI i technologii",
-        item4: "Doświadczenie z platformami mediów społecznościowych",
-        item5: "Umiejętność samodzielnej pracy",
-      },
-      qualifications: {
-        required: {
-          item1: "2+ lata doświadczenia w zarządzaniu społecznością",
-          item2: "Doskonałe umiejętności komunikacji i pisania",
-          item3: "Pasja do AI i technologii",
-        },
-        preferred: {
-          item1: "Doświadczenie z platformami mediów społecznościowych",
-          item2: "Umiejętność samodzielnej pracy",
-          item3: "Doświadczenie w AI lub technologii",
-        },
-      },
-      experienceLevel: "Poziom średni",
-      postedDate: "15 stycznia 2025",
-      applicationDeadline: "15 lutego 2025",
     },
   },
-  jobDetail: {
-    jobOverview: "Przegląd stanowiska",
-    responsibilities: "Obowiązki",
-    requirements: "Wymagania",
-    qualifications: "Kwalifikacje",
-    qualificationsRequired: "Wymagane kwalifikacje",
-    qualificationsPreferred: "Preferowane kwalifikacje",
-    applyNow: "Aplikuj teraz",
-    location: "Lokalizacja",
-    department: "Dział",
-    employmentType: "Rodzaj zatrudnienia",
-    experienceLevel: "Poziom doświadczenia",
-    postedDate: "Data publikacji",
-    applicationDeadline: "Termin składania aplikacji",
-    relatedPositions: "Powiązane stanowiska",
-    moreDetails: "Więcej szczegółów",
+
+  useCases: {
+    title: "Co możesz zbudować",
+    items: {
+      erpIntegration: {
+        title: "Integracja ERP i systemów biznesowych",
+        description:
+          "Przekazuj dane produkcyjne do skilla AI, który klasyfikuje defekty, aktualizuje stan magazynu lub uruchamia przepływy zamówień. Twój endpoint to most.",
+      },
+      desktopAutomation: {
+        title: "Pełna automatyzacja pulpitu",
+        description:
+          "next-vibe może przejąć cały pulpit włącznie z przeglądarką. Wypełnianie formularzy, scraping, nawigacja, operacje na plikach - raz zaskryptowane, działa wszędzie.",
+      },
+      productionLine: {
+        title: "Automatyzacja linii produkcyjnej",
+        description:
+          "Konfiguruj urządzenia zdalnie przez endpoint. Wyzwalaj kontrole jakości przez Vibe Sense. Gdy pomiar przekroczy próg, skill AI odpowiada.",
+      },
+      autopilotScheduling: {
+        title: "Zaplanowane akcje AI",
+        description:
+          "Autopilot uruchamia skille według harmonogramu. Co godzinę odpytuje źródło danych, nocą podsumowuje logi, wysyła alerty gdy pojawiają się anomalie.",
+      },
+      vibeSenseMonitoring: {
+        title: "Mierz → Decyduj → Działaj",
+        description:
+          "Vibe Sense mierzy wszystko: wydajność maszyn, stan API, głębokość kolejki. Wynik trafia do skilla. Skill decyduje. Endpoint działa.",
+      },
+      skillEconomy: {
+        title: "Zarabiaj na tym, co budujesz",
+        description:
+          "Zapakuj automatyzację jako skill. Udostępnij link. 15% prowizji cyklicznej od każdej rejestracji przez Twój URL.",
+      },
+    },
   },
-  applyNow: "Aplikuj teraz",
-  readyToJoin: "Gotowy do dołączenia?",
-  explorePositions:
-    "Zawsze szukamy utalentowanych ludzi do naszego zespołu. Sprawdź nasze otwarte stanowiska lub skontaktuj się, aby dowiedzieć się więcej o możliwościach kariery.",
-  getInTouch: "Skontaktuj się",
+
+  architecture: {
+    title: "Jedna definicja. Każda powierzchnia.",
+    subtitle: "Napisz jedną definition.ts na funkcję. Reszta jest generowana.",
+    surfaces: {
+      web: "Formularz web",
+      cli: "Polecenie CLI",
+      mcp: "Narzędzie MCP",
+      native: "Ekran natywny",
+      cron: "Zadanie cron",
+      ai: "Skill wywoływany przez AI",
+    },
+    description:
+      "Platforma jest wykrywana w czasie wykonania. Ten sam endpoint, który renderuje interfejs web dla człowieka, staje się narzędziem wywoływanym maszynowo dla agenta AI - bez dodatkowego kodu.",
+  },
+
+  referral: {
+    title: "Buduj. Udostępniaj. Zarabiaj.",
+    description:
+      "Każdy opublikowany skill niesie Twój link polecający. 10% bezpośrednio, 15% przez skill, 20% łącznie. Cyklicznie na zawsze od każdego użytkownika, który przyszedł przez Ciebie.",
+    cta: "Jak działa ekonomia skilli",
+  },
+
+  cta: {
+    title: "Zacznij od jednego endpointu.",
+    subtitle:
+      "Dodaj next-vibe do istniejącego projektu w kilka minut. Albo zacznij od szablonu i wdróż dziś pełne narzędzie na wielu powierzchniach.",
+    primary: "Zacznij",
+    secondary: "Przeglądaj posty",
+  },
+
   post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
+    title: "Buduj z next-vibe",
+    description: "Endpoint platformy deweloperskiej",
     form: {
       title: "Konfiguracja",
       description: "Skonfiguruj parametry",

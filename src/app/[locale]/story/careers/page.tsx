@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
+import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardHeader } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Link } from "next-vibe-ui/ui/link";
+import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -30,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: t("meta.ogTitle", { appName }),
         description: t("meta.ogDescription"),
-        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/careers`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/story/careers`,
         type: "website",
       },
       twitter: {
@@ -39,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description: t("meta.twitterDescription"),
       },
     },
-    path: "careers",
+    path: "story/careers",
     category: t("meta.category"),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/careers-hero.jpg`,
     imageAlt: t("meta.imageAlt", { appName }),
@@ -47,230 +50,201 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-interface JobPosition {
-  id: string;
-  title: string;
-  description: string;
-  type: string;
-  location: string;
-  department: string;
-  postedDate: string;
-  applicationDeadline: string;
-}
-
 export interface CareersPageData {
   locale: CountryLanguage;
-  openPositions: readonly JobPosition[];
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<CareersPageData> {
   const { locale } = await params;
-  const { t } = scopedTranslation.scopedT(locale);
-  const openPositions: readonly JobPosition[] = [
-    {
-      id: "socialMediaManager",
-      title: t("jobs.socialMediaManager.title"),
-      description: t("jobs.socialMediaManager.shortDescription"),
-      type: "Full-time",
-      location: t("jobs.socialMediaManager.location"),
-      department: t("jobs.socialMediaManager.department"),
-
-      // current date - 2.5 weeks
-      postedDate: new Date(
-        Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000,
-      ).toLocaleDateString(locale),
-      // current date + 1 month
-      applicationDeadline: new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000,
-      ).toLocaleDateString(locale),
-    },
-    {
-      id: "contentCreator",
-      title: t("jobs.contentCreator.title"),
-      description: t("jobs.contentCreator.shortDescription"),
-      type: "Full-time",
-      location: t("jobs.contentCreator.location"),
-      department: t("jobs.contentCreator.department"),
-      // current date - 2.5 weeks
-      postedDate: new Date(
-        Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000,
-      ).toLocaleDateString(locale),
-      // current date + 1 month
-      applicationDeadline: new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000,
-      ).toLocaleDateString(locale),
-    },
-  ];
-
-  return { locale, openPositions };
+  return { locale };
 }
 
-export function TanstackPage({
-  locale,
-  openPositions,
-}: CareersPageData): JSX.Element {
+const SURFACE_COLORS = [
+  "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800/50",
+  "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-800/50",
+  "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-400 dark:border-cyan-800/50",
+  "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/50",
+  "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/50",
+  "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/50",
+] as const;
+
+const AUDIENCE_ICONS = ["🧑‍💻", "🏭", "⚙️", "🏢"] as const;
+
+const USE_CASE_ICONS = ["🔌", "🖥️", "🏗️", "⏱️", "📡", "💸"] as const;
+
+export function TanstackPage({ locale }: CareersPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const { t: configT } = configScopedTranslation.scopedT(locale);
+
+  const audienceKeys = [
+    "freelancers",
+    "businessDevs",
+    "industrialDevs",
+    "enterpriseDevs",
+  ] as const;
+
+  const useCaseKeys = [
+    "erpIntegration",
+    "desktopAutomation",
+    "productionLine",
+    "autopilotScheduling",
+    "vibeSenseMonitoring",
+    "skillEconomy",
+  ] as const;
+
+  const surfaceKeys = ["web", "cli", "mcp", "native", "cron", "ai"] as const;
 
   return (
-    <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
-      <Div className="container max-w-6xl mx-auto py-8 px-4">
-        <Div className="max-w-4xl mx-auto">
-          <H1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
-            {t("title")}
+    <Div className="min-h-screen bg-background">
+      {/* Hero */}
+      <Div className="relative overflow-hidden border-b">
+        <Div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-background" />
+        <Div className="container relative mx-auto px-4 pt-20 pb-16 max-w-4xl">
+          <Span className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium text-muted-foreground mb-6">
+            {t("hero.eyebrow")}
+          </Span>
+          <H1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6 leading-tight">
+            {t("hero.title")}
           </H1>
-
-          <P className="text-xl text-gray-700 dark:text-gray-300 mb-8">
-            {t("description", {
-              appName: configT("appName"),
-            })}
+          <P className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-8">
+            {t("hero.subtitle")}
           </P>
-
-          {/* Hero Section with Image */}
-          <Div className="relative h-[300px] rounded-xl overflow-hidden shadow-xl mb-12">
-            <Div className="absolute inset-0 bg-blue-600/20 bg-linear-to-br from-blue-600/20 to-cyan-500/20 z-10" />
-            <Div className="absolute inset-0 bg-black/60 bg-linear-to-t from-black/60 to-transparent z-10" />
-            <Div className="absolute bottom-0 left-0 p-8 z-20 text-white">
-              <H2 className="text-3xl font-bold mb-2">{t("joinTeam")}</H2>
-              <P className="text-lg max-w-lg">{t("subtitle")}</P>
-            </Div>
-          </Div>
-
-          <Div className="mb-12">
-            <H2 className="text-2xl font-semibold mb-4">
-              {t("whyWorkWithUs")}
-            </H2>
-            <P className="text-gray-700 dark:text-gray-300 mb-6">
-              {t("workplaceDescription")}
-            </P>
-            <Div className="grid md:grid-cols-2 gap-6">
-              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("benefits.growthTitle")}
-                </H3>
-                <P className="text-gray-700 dark:text-gray-300">
-                  {t("benefits.growthDesc")}
-                </P>
-              </Div>
-              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("benefits.meaningfulTitle")}
-                </H3>
-                <P className="text-gray-700 dark:text-gray-300">
-                  {t("benefits.meaningfulDesc")}
-                </P>
-              </Div>
-              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("benefits.balanceTitle")}
-                </H3>
-                <P className="text-gray-700 dark:text-gray-300">
-                  {t("benefits.balanceDesc")}
-                </P>
-              </Div>
-              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("benefits.compensationTitle")}
-                </H3>
-                <P className="text-gray-700 dark:text-gray-300">
-                  {t("benefits.compensationDesc")}
-                </P>
-              </Div>
-              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("benefits.innovationTitle")}
-                </H3>
-                <P className="text-gray-700 dark:text-gray-300">
-                  {t("benefits.innovationDesc")}
-                </P>
-              </Div>
-              <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("benefits.teamTitle")}
-                </H3>
-                <P className="text-gray-700 dark:text-gray-300">
-                  {t("benefits.teamDesc")}
-                </P>
-              </Div>
-            </Div>
-          </Div>
-
-          <Div className="mb-12">
-            <H2 className="text-2xl font-semibold mb-6">
-              {t("openPositions")}
-            </H2>
-            <Div className="grid md:grid-cols-2 gap-8">
-              {openPositions.map((position) => (
-                <Div
-                  key={position.id}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6"
-                >
-                  <H3 className="text-xl font-bold mb-2">{position.title}</H3>
-                  <P className="text-gray-700 dark:text-gray-300 mb-4">
-                    {position.description}
-                  </P>
-                  <Div className="flex flex-col gap-2 mb-4">
-                    <Div className="flex items-center justify-between">
-                      <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("jobDetail.department")}:
-                      </Span>
-                      <Span className="text-sm font-medium">
-                        {position.department}
-                      </Span>
-                    </Div>
-                    <Div className="flex items-center justify-between">
-                      <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("jobDetail.employmentType")}:
-                      </Span>
-                      <Span className="text-sm font-medium">
-                        {position.type}
-                      </Span>
-                    </Div>
-                    <Div className="flex items-center justify-between">
-                      <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("jobDetail.location")}:
-                      </Span>
-                      <Span className="text-sm font-medium">
-                        {position.location}
-                      </Span>
-                    </Div>
-                    <Div className="flex items-center justify-between">
-                      <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("jobDetail.applicationDeadline")}:
-                      </Span>
-                      <Span className="text-sm font-medium">
-                        {position.applicationDeadline}
-                      </Span>
-                    </Div>
-                  </Div>
-                  <Div className="flex flex-row gap-3">
-                    <Button className="flex-1" asChild>
-                      <Link href={`/${locale}/story/careers/${position.id}`}>
-                        {t("jobDetail.moreDetails")}
-                      </Link>
-                    </Button>
-                    <Button variant="outline" className="flex-1" asChild>
-                      <Link
-                        href={`mailto:${contactClientRepository.getSupportEmail(locale)}?subject=Application for ${position.title}`}
-                      >
-                        {t("applyNow")}
-                      </Link>
-                    </Button>
-                  </Div>
-                </Div>
-              ))}
-            </Div>
-          </Div>
-
-          <Div className="text-center bg-blue-50 bg-linear-to-br from-blue-50 to-cyan-50 dark:bg-gray-800 dark:from-gray-800 dark:to-gray-700 p-8 rounded-xl">
-            <H2 className="text-2xl font-semibold mb-4">{t("readyToJoin")}</H2>
-            <P className="text-gray-700 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
-              {t("explorePositions")}
-            </P>
+          <Div className="flex flex-wrap gap-3">
             <Button size="lg" asChild>
-              <Link href={`/${locale}/help`}>{t("getInTouch")}</Link>
+              <Link href={`/${locale}/story/blog`}>
+                {t("hero.ctaPrimary")}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href={`/${locale}/story/blog`}>
+                {t("hero.ctaSecondary")}
+              </Link>
+            </Button>
+          </Div>
+        </Div>
+      </Div>
+
+      <Div className="container mx-auto px-4 py-16 max-w-5xl space-y-20">
+        {/* Architecture callout */}
+        <Div>
+          <Div className="text-center mb-8">
+            <H2 className="text-2xl md:text-3xl font-bold mb-3">
+              {t("architecture.title")}
+            </H2>
+            <P className="text-muted-foreground">
+              {t("architecture.subtitle")}
+            </P>
+          </Div>
+          <Div className="flex flex-wrap justify-center gap-2 mb-6">
+            {surfaceKeys.map((key, i) => (
+              <Badge
+                key={key}
+                variant="outline"
+                className={`text-sm px-3 py-1 ${SURFACE_COLORS[i % SURFACE_COLORS.length]}`}
+              >
+                {t(`architecture.surfaces.${key}`)}
+              </Badge>
+            ))}
+          </Div>
+          <P className="text-center text-sm text-muted-foreground max-w-2xl mx-auto">
+            {t("architecture.description")}
+          </P>
+        </Div>
+
+        <Separator />
+
+        {/* Who builds with next-vibe */}
+        <Div>
+          <H2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
+            {t("audience.title")}
+          </H2>
+          <Div className="grid md:grid-cols-2 gap-6">
+            {audienceKeys.map((key, i) => (
+              <Card key={key} className="border">
+                <CardHeader className="pb-2">
+                  <Div className="flex items-center gap-3">
+                    <Span className="text-2xl">{AUDIENCE_ICONS[i]}</Span>
+                    <H3 className="font-semibold text-base">
+                      {t(`audience.items.${key}.title`)}
+                    </H3>
+                  </Div>
+                </CardHeader>
+                <CardContent>
+                  <P className="text-sm text-muted-foreground leading-relaxed">
+                    {t(`audience.items.${key}.description`)}
+                  </P>
+                </CardContent>
+              </Card>
+            ))}
+          </Div>
+        </Div>
+
+        <Separator />
+
+        {/* Use cases */}
+        <Div>
+          <H2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
+            {t("useCases.title")}
+          </H2>
+          <Div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {useCaseKeys.map((key, i) => (
+              <Card
+                key={key}
+                className="border hover:shadow-md transition-shadow"
+              >
+                <CardHeader className="pb-2">
+                  <Span className="text-2xl mb-1 block">
+                    {USE_CASE_ICONS[i]}
+                  </Span>
+                  <H3 className="font-semibold text-sm leading-snug">
+                    {t(`useCases.items.${key}.title`)}
+                  </H3>
+                </CardHeader>
+                <CardContent>
+                  <P className="text-xs text-muted-foreground leading-relaxed">
+                    {t(`useCases.items.${key}.description`)}
+                  </P>
+                </CardContent>
+              </Card>
+            ))}
+          </Div>
+        </Div>
+
+        <Separator />
+
+        {/* Referral / skill economy */}
+        <Div className="rounded-xl border bg-muted/30 p-8 md:p-12 text-center">
+          <H2 className="text-2xl md:text-3xl font-bold mb-4">
+            {t("referral.title")}
+          </H2>
+          <P className="text-muted-foreground max-w-xl mx-auto mb-6">
+            {t("referral.description")}
+          </P>
+          <Button variant="outline" asChild>
+            <Link href={`/${locale}/story/referral`}>
+              {t("referral.cta")}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </Div>
+
+        {/* CTA */}
+        <Div className="text-center space-y-4">
+          <H2 className="text-2xl md:text-3xl font-bold">{t("cta.title")}</H2>
+          <P className="text-muted-foreground max-w-xl mx-auto">
+            {t("cta.subtitle")}
+          </P>
+          <Div className="flex flex-wrap justify-center gap-3 pt-2">
+            <Button size="lg" asChild>
+              <Link href={`/${locale}/chat`}>
+                {t("cta.primary")}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href={`/${locale}/story/blog`}>{t("cta.secondary")}</Link>
             </Button>
           </Div>
         </Div>

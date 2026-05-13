@@ -334,6 +334,10 @@ export class StreamExecutionHandler {
                     // Any wrong parentId here breaks the linked list and creates a branch.
                     ctx.currentParentId = compactResult.compactingMessageId;
                     ctx.lastParentId = compactResult.compactingMessageId;
+                    // Reset sequenceId so messages after compacting belong to a new
+                    // sequence block. Without this, the UI groups pre- and post-compact
+                    // messages into one block sorted before the compacting message.
+                    ctx.sequenceId = crypto.randomUUID();
                   }
                   // On failure: MidStreamCompactingHandler emitted error + aborted stream.
                   // prepareStep returning {} is a no-op — abort signal is already set.

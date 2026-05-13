@@ -2,155 +2,127 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Karriere - {{appName}}",
-    category: "Karriere",
+    title: "Mit next-vibe bauen - {{appName}}",
+    category: "Entwickler",
     description:
-      "Werden Sie Teil unseres Teams und helfen Sie, die Zukunft der unzensierten KI zu gestalten",
-    imageAlt: "Karriere bei {{appName}}",
-    keywords: "Karriere, Jobs, KI-Jobs, Remote-Arbeit, {{appName}} Karriere",
-    ogTitle: "Karriere - {{appName}}",
+      "next-vibe macht aus jedem Endpoint gleichzeitig ein Webformular, einen CLI-Befehl, ein MCP-Tool, einen nativen Screen und ein KI-aufrufbares Skill. Automatisiere alles, was ein Mensch am Computer tun kann.",
+    imageAlt: "next-vibe Entwicklerplattform - {{appName}}",
+    keywords:
+      "next-vibe, KI-Automatisierung, Entwicklerplattform, Geschäftsautomatisierung, ERP-Integration, Produktionsautomatisierung, {{appName}}",
+    ogTitle: "Mit next-vibe bauen - {{appName}}",
     ogDescription:
-      "Werden Sie Teil unseres Teams und helfen Sie, die Zukunft der unzensierten KI zu gestalten",
-    twitterTitle: "Karriere - {{appName}}",
+      "Eine Codebase. Jede Oberfläche. Produktionslinien, ERP-Systeme, Desktop-Workflows automatisieren - alles, was ein Mensch am Computer erledigt.",
+    twitterTitle: "Mit next-vibe bauen - {{appName}}",
     twitterDescription:
-      "Werden Sie Teil unseres Teams und helfen Sie, die Zukunft der unzensierten KI zu gestalten",
+      "Eine Codebase. Jede Oberfläche. Produktionslinien, ERP-Systeme, Desktop-Workflows automatisieren - alles, was ein Mensch am Computer erledigt.",
   },
-  title: "Werden Sie Teil unseres Teams",
-  description:
-    "Helfen Sie uns, die Zukunft des unzensierten KI-Chats zu gestalten. Wir suchen leidenschaftliche Menschen, die an Meinungsfreiheit und Privatsphäre der Nutzer glauben.",
-  joinTeam: "Werden Sie Teil unseres Teams",
-  subtitle:
-    "Seien Sie Teil einer Mission, KI ehrlich, zugänglich und unzensiert zu machen.",
-  whyWorkWithUs: "Warum bei uns arbeiten",
-  workplaceDescription:
-    "Wir sind ein Remote-First-Unternehmen, das Autonomie, Kreativität und Wirkung schätzt. Werden Sie Teil eines Teams, das verändert, wie Menschen mit KI interagieren.",
-  benefits: {
-    title: "Was wir bieten",
-    growthTitle: "Wachstum & Lernen",
-    growthDesc:
-      "Arbeiten Sie mit modernster KI-Technologie und lernen Sie von Branchenexperten.",
-    meaningfulTitle: "Bedeutungsvolle Arbeit",
-    meaningfulDesc:
-      "Entwickeln Sie Produkte, die Nutzer stärken und ihre Privatsphäre schützen.",
-    balanceTitle: "Work-Life-Balance",
-    balanceDesc:
-      "Flexible Arbeitszeiten, Remote-Arbeit und unbegrenzte Urlaubstage. Wir vertrauen darauf, dass Sie hervorragende Arbeit leisten.",
-    compensationTitle: "Wettbewerbsfähige Vergütung",
-    compensationDesc:
-      "Branchenführendes Gehalt, Eigenkapital und Leistungspaket.",
-    innovationTitle: "Innovation & Wirkung",
-    innovationDesc:
-      "Arbeiten Sie an modernster KI-Technologie, die einen echten Unterschied macht.",
-    teamTitle: "Großartiges Team",
-    teamDesc:
-      "Arbeiten Sie mit talentierten, leidenschaftlichen Menschen zusammen, die sich um KI-Ethik kümmern.",
+
+  hero: {
+    eyebrow: "next-vibe Entwicklerplattform",
+    title:
+      "Wenn ein Mensch es am Computer tun kann, kann next-vibe es automatisieren.",
+    subtitle:
+      "Eine Endpoint-Definition wird gleichzeitig zu Webformular, CLI-Befehl, MCP-Tool, nativem Screen und KI-Skill. Von kleinen Skripten bis zur vollständigen Produktionslinienautomatisierung.",
+    ctaPrimary: "Jetzt starten",
+    ctaSecondary: "Dokumentation lesen",
   },
-  openPositions: "Offene Stellen",
-  noOpenings: "Derzeit keine offenen Stellen",
-  checkBackLater: "Schauen Sie später für neue Möglichkeiten vorbei",
-  jobs: {
-    socialMediaManager: {
-      title: "KI-Ingenieur",
-      shortDescription:
-        "Helfen Sie uns, neue KI-Modelle zu integrieren und die Leistung unserer Plattform zu verbessern.",
-      longDescription:
-        "Wir suchen einen erfahrenen KI-Ingenieur, der uns hilft, neue KI-Modelle zu integrieren, die Leistung zu optimieren und innovative Funktionen für unsere unzensierte KI-Chat-Plattform zu entwickeln.",
-      location: "Remote",
-      department: "Engineering",
-      type: "Vollzeit",
-      responsibilities: {
-        item1: "Integration und Optimierung neuer KI-Modelle",
-        item2: "Verbesserung der Plattformleistung und Skalierbarkeit",
-        item3: "Entwicklung neuer Funktionen und Fähigkeiten",
-        item4: "Zusammenarbeit mit dem Team bei technischen Entscheidungen",
-        item5: "Wartung und Verbesserung der bestehenden Codebasis",
+
+  audience: {
+    title: "Wer mit next-vibe baut",
+    items: {
+      freelancers: {
+        title: "Freelancer & Agenturen",
+        description:
+          "KI-gestützte Tools für Kunden liefern, ohne separate Backends, CLIs und UIs zu bauen. Eine Codebase, jede Oberfläche.",
       },
-      requirements: {
-        item1: "3+ Jahre Erfahrung mit KI/ML-Technologien",
-        item2: "Starke Programmierkenntnisse in Python und TypeScript",
-        item3: "Erfahrung mit LLM-APIs und Integration",
-        item4: "Ausgezeichnete Problemlösungsfähigkeiten",
-        item5: "Leidenschaft für KI und Datenschutz",
+      businessDevs: {
+        title: "Business-Entwickler",
+        description:
+          "ERP, CRM oder beliebige interne Systeme mit KI-Workflows verbinden. Daten rein, Entscheidungen raus - kein Klebe-Code.",
       },
-      qualifications: {
-        required: {
-          item1: "3+ Jahre Erfahrung mit KI/ML-Technologien",
-          item2: "Starke Programmierkenntnisse in Python und TypeScript",
-          item3: "Erfahrung mit LLM-APIs und Integration",
-        },
-        preferred: {
-          item1: "Ausgezeichnete Problemlösungsfähigkeiten",
-          item2: "Leidenschaft für KI und Datenschutz",
-          item3: "Erfahrung mit verteilten Systemen",
-        },
+      industrialDevs: {
+        title: "Industrie & Embedded",
+        description:
+          "Gerätekonfiguration auf Produktionslinien automatisieren. KI-Skills auslösen, wenn Sensoren anschlagen. Mit Vibe Sense messen, mit Autopilot handeln.",
       },
-      experienceLevel: "Mittel bis Senior Level",
-    },
-    contentCreator: {
-      title: "Community Manager",
-      shortDescription:
-        "Aufbau und Engagement unserer Community von KI-Enthusiasten und Power-Usern.",
-      longDescription:
-        "Wir suchen einen Community Manager, um unsere wachsende Community von KI-Enthusiasten aufzubauen und zu pflegen, ansprechende Inhalte zu erstellen und bedeutungsvolle Diskussionen zu fördern.",
-      location: "Remote",
-      department: "Community",
-      type: "Vollzeit",
-      responsibilities: {
-        item1: "Aufbau und Engagement der {{appName}}-Community",
-        item2: "Erstellung überzeugender Inhalte für soziale Medien",
-        item3: "Moderation von Diskussionen und Bereitstellung von Support",
-        item4: "Organisation von Community-Events und Initiativen",
-        item5: "Sammlung und Analyse von Community-Feedback",
+      enterpriseDevs: {
+        title: "Enterprise-Teams",
+        description:
+          "Fragmentiertes Tooling durch eine einheitliche Plattform ersetzen. Web-UI, CLI, MCP, Native App - selber Endpoint, null Duplizierung.",
       },
-      requirements: {
-        item1: "2+ Jahre Erfahrung im Community-Management",
-        item2: "Ausgezeichnete Kommunikations- und Schreibfähigkeiten",
-        item3: "Leidenschaft für KI und Technologie",
-        item4: "Erfahrung mit Social-Media-Plattformen",
-        item5: "Fähigkeit, selbstständig zu arbeiten",
-      },
-      qualifications: {
-        required: {
-          item1: "2+ Jahre Erfahrung im Community-Management",
-          item2: "Ausgezeichnete Kommunikations- und Schreibfähigkeiten",
-          item3: "Leidenschaft für KI und Technologie",
-        },
-        preferred: {
-          item1: "Erfahrung mit Social-Media-Plattformen",
-          item2: "Fähigkeit, selbstständig zu arbeiten",
-          item3: "Hintergrund in KI oder Technologie",
-        },
-      },
-      experienceLevel: "Mittleres Level",
-      postedDate: "15. Januar 2025",
-      applicationDeadline: "15. Februar 2025",
     },
   },
-  jobDetail: {
-    jobOverview: "Jobübersicht",
-    responsibilities: "Verantwortlichkeiten",
-    requirements: "Anforderungen",
-    qualifications: "Qualifikationen",
-    qualificationsRequired: "Erforderliche Qualifikationen",
-    qualificationsPreferred: "Bevorzugte Qualifikationen",
-    applyNow: "Jetzt bewerben",
-    location: "Standort",
-    department: "Abteilung",
-    employmentType: "Beschäftigungsart",
-    experienceLevel: "Erfahrungsstufe",
-    postedDate: "Veröffentlichungsdatum",
-    applicationDeadline: "Bewerbungsschluss",
-    relatedPositions: "Verwandte Stellen",
-    moreDetails: "Mehr Details",
+
+  useCases: {
+    title: "Was du bauen kannst",
+    items: {
+      erpIntegration: {
+        title: "ERP- & Geschäftssystem-Integration",
+        description:
+          "Produktionsdaten in einen KI-Skill einspeisen, der Fehler klassifiziert, den Bestand aktualisiert oder Nachbestellworkflows auslöst. Dein Endpoint ist die Brücke.",
+      },
+      desktopAutomation: {
+        title: "Vollständige Desktop-Automatisierung",
+        description:
+          "next-vibe kann den gesamten Desktop übernehmen, einschließlich Browser. Formulare ausfüllen, scrapen, navigieren, Dateioperationen - einmal geskriptet, läuft überall.",
+      },
+      productionLine: {
+        title: "Produktionslinien-Automatisierung",
+        description:
+          "Geräte remote per Endpoint konfigurieren. Qualitätsprüfungen via Vibe Sense auslösen. Wenn eine Messung einen Schwellenwert überschreitet, reagiert ein KI-Skill.",
+      },
+      autopilotScheduling: {
+        title: "Geplante KI-Aktionen",
+        description:
+          "Autopilot führt deine Skills nach Zeitplan aus. Stündlich eine Datenquelle abfragen, nächtliche Logs zusammenfassen, Alarme bei Anomalien ausgeben.",
+      },
+      vibeSenseMonitoring: {
+        title: "Messen → Entscheiden → Handeln",
+        description:
+          "Vibe Sense misst alles: Maschinenoutput, API-Gesundheit, Queue-Tiefe. Den Messwert in einen Skill einspeisen. Der Skill entscheidet. Ein Endpoint handelt.",
+      },
+      skillEconomy: {
+        title: "Verkaufe, was du baust",
+        description:
+          "Automatisierung als Skill verpacken. Link teilen. 15% wiederkehrende Provision von jedem Signup über deine URL.",
+      },
+    },
   },
-  applyNow: "Jetzt bewerben",
-  readyToJoin: "Bereit beizutreten?",
-  explorePositions:
-    "Wir suchen immer nach talentierten Menschen, die unserem Team beitreten möchten. Schauen Sie sich unsere offenen Stellen an oder nehmen Sie Kontakt auf, um mehr über Karrieremöglichkeiten zu erfahren.",
-  getInTouch: "Kontakt aufnehmen",
+
+  architecture: {
+    title: "Eine Definition. Jede Oberfläche.",
+    subtitle:
+      "Eine definition.ts pro Feature schreiben. Alles andere wird generiert.",
+    surfaces: {
+      web: "Webformular",
+      cli: "CLI-Befehl",
+      mcp: "MCP-Tool",
+      native: "Nativer Screen",
+      cron: "Cron-Job",
+      ai: "KI-aufrufbarer Skill",
+    },
+    description:
+      "Plattform wird zur Laufzeit erkannt. Derselbe Endpoint, der für einen Menschen eine Web-UI rendert, wird für einen KI-Agenten zum maschinell aufrufbaren Tool - kein zusätzlicher Code.",
+  },
+
+  referral: {
+    title: "Bauen. Teilen. Daran verdienen.",
+    description:
+      "Jeder veröffentlichte Skill trägt deinen Referral-Link. 10% direkt, 15% via Skill, 20% gestapelt. Wiederkehrend für immer von jedem User, der über dich kommt.",
+    cta: "So funktioniert die Skill Economy",
+  },
+
+  cta: {
+    title: "Mit einem Endpoint anfangen.",
+    subtitle:
+      "next-vibe in Minuten zu einem bestehenden Projekt hinzufügen. Oder vom Scaffold starten und heute ein vollständiges Multi-Surface-Tool deployen.",
+    primary: "Loslegen",
+    secondary: "Story-Posts erkunden",
+  },
+
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
+    title: "Mit next-vibe bauen",
+    description: "Entwicklerplattform-Endpoint",
     form: {
       title: "Konfiguration",
       description: "Parameter konfigurieren",

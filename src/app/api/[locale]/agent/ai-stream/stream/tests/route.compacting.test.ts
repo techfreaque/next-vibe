@@ -235,51 +235,125 @@ describe("Compacting - context management", () => {
     }
   }, TEST_TIMEOUT);
 
-  // ── C1: Hello world sanity ─────────────────────────────────────────────────
-  // Simple prompt, no tools, no compacting. Verifies baseline: model responds
-  // normally, no compacting message, 2-message thread.
+  // ── C1: Mid-stream compacting — large initial context, fires after 5 tools ─
+  // Single stream. The user message contains enough filler context that the
+  // accumulated token count crosses compactTrigger=5_000 after 5 tool call
+  // round-trips. This is the "initial-context-heavy" variant of mid-stream
+  // compacting (C2 uses a much larger largeContext block for a heavier scenario).
+  //
+  // Architecture: RECENT_TURNS_TO_KEEP=8 means compacting can only fire after
+  // ≥5 complete [ai, tool] pairs (producing afterFirst.length=10 > 8).
+  //
+  // After compacting the model must call tool-help once more (proves tools still
+  // work post-compact) and respond with C1_PASS.
+  //
+  // sequenceId: messages after compacting get a new sequenceId so the UI renders
+  // them as a separate block AFTER the compacting message.
+  //
+  // Chain shape:
+  //   user → ai(tool-1) → tool(1) → … → ai(tool-5) → tool(5) → [COMPACT]
+  //     → ai(tool-6) → tool(6) → ai(C1_PASS)
   fit(
-    "C1: hello world — model responds normally, no compacting, clean 2-message thread",
+    "C1: mid-stream compacting — large initial context, fires after 5 tools, tools still work after, model responds C1_PASS",
     async () => {
-      setFetchCacheContext("compacting-hello-world");
+      setFetchCacheContext("compacting-first-tool");
+
+      // Moderate padding to ensure the context is heavy enough for compacting
+      // to fire (same mechanism as C2 but with less padding to distinguish).
+      const contextPadding = [...Array(3).keys()]
+        .map(
+          (i) =>
+            `Context block ${String(i + 1)}: This is filler text to increase the prompt token count for the C1 mid-stream compacting test. The compacting mechanism fires when accumulated context exceeds the threshold after multiple tool call round-trips. `,
+        )
+        .join("");
+
+      const favoriteConfig = {
+        id: "test-c1-mid-stream-compacting",
+        skillId: "quality-tester",
+        modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
+        voiceModelSelection: null,
+        sttModelSelection: null,
+        imageVisionModelSelection: null,
+        videoVisionModelSelection: null,
+        audioVisionModelSelection: null,
+        imageGenModelSelection: null,
+        musicGenModelSelection: null,
+        videoGenModelSelection: null,
+        availableTools: [{ toolId: "tool-help", requiresConfirmation: false }],
+        pinnedTools: [{ toolId: "tool-help", requiresConfirmation: false }],
+        deniedTools: null,
+        // Same threshold as C2 (proven to work). Lower padding than C2 so the
+        // initial context is lighter — compacting still fires at step 5 (minimum
+        // eligible step given RECENT_TURNS_TO_KEEP=8) but with less history compacted.
+        compactTrigger: 5_000,
+        memoryLimit: null,
+        promptAppend: null,
+      } as const;
 
       const { result, messages } = await runTestStream({
         prompt:
-          "[C1] Respond with ONLY the word: HELLO_DONE. " +
-          "No preamble, no explanation, no punctuation beyond that. " +
-          "Do NOT call any tools. " +
-          "If you add anything else, the test FAILS.",
+          `[C1-COMPACTING-TEST] ${contextPadding}` +
+          `Call tool-help 5 times sequentially with these exact queries in order: ` +
+          `'list', 'search', 'chat', 'image', 'audio'. ` +
+          `Make each call one at a time, wait for the result, then make the next call. ` +
+          `After ALL 5 tool calls are complete, respond with ONLY the word: C1_PASS if all tools returned results, or C1_FAIL:<reason> if anything went wrong. ` +
+          `Do NOT add any other text.`,
         user: testUser,
-        // Use quality-tester skill so model resolves correctly.
-        // High default compactTrigger (32k) won't fire for a simple 1-turn response.
         skill: "quality-tester",
+        favoriteConfig,
       });
 
       expect(result.success, "C1: stream must succeed").toBe(true);
-      expect(
-        messages.length,
-        "C1: expected at least 2 messages (user + assistant)",
-      ).toBeGreaterThanOrEqual(2);
 
-      const userMsg = messages[0];
-      expect(userMsg?.role, "C1: first message must be user").toBe("user");
+      // ── Chain integrity ────────────────────────────────────────────────────
+      assertStrictLinearChain(messages, "C1");
 
-      const finalAssistant = messages.findLast((m) => m.role === "assistant");
-      expect(
-        finalAssistant,
-        "C1: must have a final assistant message",
-      ).toBeDefined();
-      expect(
-        finalAssistant?.content,
-        "C1: assistant must contain HELLO_DONE",
-      ).toContain("HELLO_DONE");
+      const c1Chain = buildOrderedChain(messages);
 
-      // No compacting at default 32k threshold in a simple 1-turn stream
-      const compactingMsg = messages.find((m) => m.isCompacting);
+      // Root must be user
+      expect(c1Chain[0]!.role, "C1: chain root must be user").toBe("user");
+
+      // Leaf must be assistant with C1_PASS
+      const c1Leaf = c1Chain[c1Chain.length - 1]!;
+      expect(c1Leaf.role, "C1: chain leaf must be assistant").toBe("assistant");
+      expect(c1Leaf.isCompacting, "C1: leaf must not be the compacting message").toBe(false);
+      expect(c1Leaf.content, "C1: final response must contain C1_PASS").toContain("C1_PASS");
+
+      // Compacting must exist in chain
+      const c1CompactIdx = c1Chain.findIndex((m) => m.isCompacting);
+      expect(c1CompactIdx, "C1: compacting message must exist in chain").toBeGreaterThanOrEqual(0);
+      expect(c1CompactIdx, "C1: compacting must appear before the leaf").toBeLessThan(c1Chain.length - 1);
+
+      // At least one tool result must appear BEFORE the compacting message
+      const toolBeforeCompact = c1Chain.slice(0, c1CompactIdx).some((m) => m.role === "tool");
+      expect(toolBeforeCompact, "C1: at least one tool result must precede the compacting message").toBe(true);
+
+      // At least one tool result must appear AFTER the compacting message (tools still work)
+      const toolAfterCompact = c1Chain.slice(c1CompactIdx + 1).some((m) => m.role === "tool");
+      expect(toolAfterCompact, "C1: at least one tool result must follow the compacting message (tools still work after compact)").toBe(true);
+
+      // ── sequenceId separation ──────────────────────────────────────────────
+      // Messages after compacting must have a different sequenceId than messages
+      // before compacting. Without this, the UI renders pre- and post-compact
+      // messages as one block sorted before the compacting message.
+      const preCompactAssistant = c1Chain.slice(0, c1CompactIdx).findLast((m) => m.role === "assistant");
+      expect(preCompactAssistant, "C1: must have an assistant message before compacting").toBeDefined();
       expect(
-        compactingMsg,
-        "C1: no compacting message should exist at default threshold",
-      ).toBeUndefined();
+        c1Leaf.sequenceId,
+        "C1: post-compact assistant must have a sequenceId",
+      ).toBeTruthy();
+      expect(
+        c1Leaf.sequenceId,
+        "C1: post-compact assistant must have a DIFFERENT sequenceId than pre-compact assistant",
+      ).not.toBe(preCompactAssistant!.sequenceId);
+
+      // ── createdAt monotonicity ─────────────────────────────────────────────
+      for (let i = 1; i < c1Chain.length; i++) {
+        expect(
+          c1Chain[i]!.createdAt.getTime(),
+          `C1: chain[${String(i)}] createdAt must be >= chain[${String(i - 1)}] createdAt (UI sort order broken)`,
+        ).toBeGreaterThanOrEqual(c1Chain[i - 1]!.createdAt.getTime());
+      }
     },
     TEST_TIMEOUT,
   );
@@ -408,6 +482,30 @@ describe("Compacting - context management", () => {
       // Compacting message still present in the full thread
       const t2CompactIdx = t2Chain.findIndex((m) => m.isCompacting);
       expect(t2CompactIdx, "C2-T2: compacting message must still be in chain after turn 2").toBeGreaterThanOrEqual(0);
+
+      // ── createdAt monotonicity ─────────────────────────────────────────────
+      // UI sorts messages by createdAt; chain order must match parentId order.
+      for (let i = 1; i < t2Chain.length; i++) {
+        expect(
+          t2Chain[i]!.createdAt.getTime(),
+          `C2-T2: chain[${String(i)}] createdAt must be >= chain[${String(i - 1)}] createdAt (UI sort order broken)`,
+        ).toBeGreaterThanOrEqual(t2Chain[i - 1]!.createdAt.getTime());
+      }
+
+      // ── sequenceId separation ──────────────────────────────────────────────
+      // turn-2 assistant (ai2) must have a DIFFERENT sequenceId than turn-1 assistant
+      // messages so that the UI renders them as separate blocks with the turn-2 user
+      // message visually in between (not buried inside the turn-1 block).
+      const t1AssistantMsg = t1Chain.find((m) => m.role === "assistant");
+      expect(t1AssistantMsg, "C2-T2: turn-1 must have an assistant message").toBeDefined();
+      expect(
+        t2Leaf.sequenceId,
+        "C2-T2: turn-2 assistant must have a sequenceId",
+      ).toBeTruthy();
+      expect(
+        t2Leaf.sequenceId,
+        "C2-T2: turn-2 assistant must have a DIFFERENT sequenceId than turn-1 assistant (otherwise UI renders them as one block)",
+      ).not.toBe(t1AssistantMsg!.sequenceId);
 
       // ── DB persistence: re-fetch and confirm compacting survives both turns ───
       if (threadId) {
