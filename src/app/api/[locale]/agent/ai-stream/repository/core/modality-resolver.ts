@@ -113,6 +113,7 @@ export interface MessageVariant {
     | AudioVisionModelId;
   creditCost?: number;
   createdAt: string; // ISO timestamp
+  bridgeType?: BridgeType; // set for gap-fill variants so the UI can pick the right label/icon
 }
 
 export interface MessageAttachment {

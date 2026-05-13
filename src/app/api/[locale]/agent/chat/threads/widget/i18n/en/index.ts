@@ -46,6 +46,9 @@ export const translations = {
     incognitoTitle: "Anonymous AI Chat",
     incognitoDescription:
       "Stored only in your browser. Never saved to your account or synced.",
+    backgroundTitle: "Your AI Agents Are Working",
+    backgroundDescription:
+      "Sub-agents and autonomous background agents run tasks here while you focus elsewhere. Results drop in automatically.",
   },
   config: {
     appName: "unbottled.ai",

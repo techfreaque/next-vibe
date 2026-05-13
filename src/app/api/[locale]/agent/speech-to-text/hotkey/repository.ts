@@ -199,7 +199,7 @@ export class SttHotkeyRepository {
       });
 
       const result = await SpeechToTextRepository.transcribeAudio(
-        audioFile,
+        [audioFile],
         user,
         locale,
         logger,

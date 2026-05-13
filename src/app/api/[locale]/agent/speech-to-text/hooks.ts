@@ -12,6 +12,7 @@ import {
   type ChatT,
   scopedTranslation as chatScopedTranslation,
 } from "@/app/api/[locale]/agent/chat/i18n";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -49,6 +50,8 @@ interface UseEdenAISpeechReturn {
   hasSavedAudio: boolean;
   /** Retry transcription using the saved audio file from the last failed attempt */
   retryTranscription: () => Promise<void>;
+  /** Download the saved audio file from the last failed attempt */
+  downloadSavedAudio: () => void;
 }
 
 /**
@@ -120,6 +123,12 @@ function getMicrophoneErrorMessage(
   }
 }
 
+// Silence detection thresholds (module-level constants, stable across renders)
+const SILENCE_THRESHOLD_RMS = 0.015; // RMS below this = silence
+const SILENCE_DURATION_MS = 1500; // seal chunk after 1.5s of silence
+const MIN_CHUNK_MS = 3000; // never seal a chunk shorter than 3s
+const MAX_CHUNK_MS = 4 * 60 * 1000; // force-seal at 4 minutes
+
 export function useEdenAISpeech({
   onTranscript,
   onError,
@@ -136,10 +145,18 @@ export function useEdenAISpeech({
   const [hasSavedAudio, setHasSavedAudio] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  // Raw MediaRecorder blobs for the current in-progress chunk
   const audioChunksRef = useRef<Blob[]>([]);
+  // Completed silence-sealed chunks ready for submission
+  const sealedChunksRef = useRef<File[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
-  // Saved audio file retained on failure so the user can retry without re-recording
-  const savedAudioFileRef = useRef<File | null>(null);
+  // AnalyserNode for silence detection
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const silenceRafRef = useRef<number | null>(null);
+  const silenceStartRef = useRef<number | null>(null);
+  // Saved chunks retained on failure so the user can retry without re-recording
+  const savedAudioFilesRef = useRef<File[] | null>(null);
 
   // Use endpoint for type-safe API calls
   // Use a ref so processRecording doesn't need endpoint in its dep array
@@ -163,6 +180,17 @@ export function useEdenAISpeech({
 
   // Cleanup function
   const cleanup = useCallback((): void => {
+    // Stop silence detection
+    if (silenceRafRef.current !== null) {
+      cancelAnimationFrame(silenceRafRef.current);
+      silenceRafRef.current = null;
+    }
+    analyserRef.current?.disconnect();
+    analyserRef.current = null;
+    void audioContextRef.current?.close();
+    audioContextRef.current = null;
+    silenceStartRef.current = null;
+
     // Stop media recorder if active
     if (
       mediaRecorderRef.current &&
@@ -180,14 +208,15 @@ export function useEdenAISpeech({
 
     // Clear audio chunks
     audioChunksRef.current = [];
+    sealedChunksRef.current = [];
   }, []);
 
   /**
-   * Submit a specific audio file for transcription.
-   * Shared by processRecording (fresh recording) and retryTranscription (saved file).
+   * Submit audio chunks for transcription.
+   * Shared by processRecording (fresh recording) and retryTranscription (saved files).
    */
-  const submitAudioFile = useCallback(
-    async (audioFile: File): Promise<void> => {
+  const submitAudioFiles = useCallback(
+    async (audioFiles: File[]): Promise<void> => {
       const currentEndpoint = endpointRef.current;
       if (!currentEndpoint?.create) {
         const errorMsg = t("hooks.stt.endpoint-not-available");
@@ -198,10 +227,8 @@ export function useEdenAISpeech({
         return;
       }
 
-      // Validate file is still a valid File before submitting
-      if (!(audioFile instanceof File) || audioFile.size === 0) {
-        const errorMsg = `STT: Invalid audio file (type=${typeof audioFile}, size=${audioFile instanceof File ? audioFile.size : "N/A"})`;
-        logger.error(errorMsg);
+      if (audioFiles.every((f) => f.size === 0)) {
+        logger.error("STT: No valid audio files to submit");
         setError(t("hooks.stt.transcription-failed"));
         onError?.(t("hooks.stt.transcription-failed"));
         setIsProcessing(false);
@@ -209,13 +236,12 @@ export function useEdenAISpeech({
       }
 
       logger.debug("STT: Submitting to endpoint", {
-        fileName: audioFile.name,
-        fileSize: audioFile.size,
-        fileType: audioFile.type,
+        chunkCount: audioFiles.length,
+        totalSize: audioFiles.reduce((s, f) => s + f.size, 0),
       });
 
-      // Set form values - set the nested object structure directly
-      currentEndpoint.create.form.setValue("fileUpload", { file: audioFile });
+      // Set form values
+      currentEndpoint.create.form.setValue("fileUpload", { files: audioFiles });
 
       // Submit form with callbacks
       await currentEndpoint.create.submitForm({
@@ -233,7 +259,7 @@ export function useEdenAISpeech({
             });
 
             // Success: discard saved audio
-            savedAudioFileRef.current = null;
+            savedAudioFilesRef.current = null;
             setHasSavedAudio(false);
             setTranscript(transcribedText);
             onTranscript?.(transcribedText);
@@ -250,15 +276,24 @@ export function useEdenAISpeech({
         },
         onError: ({ error: apiError }) => {
           // Use the error message directly (already human-readable from server)
-          const errorMessage =
+          // Apply messageParams to interpolate {{placeholders}} in the translated string
+          const rawMessage =
             apiError.message ?? t("hooks.stt.transcription-failed");
+          const errorMessage = (
+            apiError.messageParams
+              ? Object.entries(apiError.messageParams).reduce(
+                  (msg, [key, val]) =>
+                    msg.replaceAll(`{{${key}}}`, String(val)),
+                  rawMessage as string,
+                )
+              : rawMessage
+          ) as TranslatedKeyType;
           logger.error("STT: API returned error", {
             errorType: apiError.errorType,
             errorMessage: apiError.message,
-            audioFileSize: audioFile.size,
-            audioFileType: audioFile.type,
+            chunkCount: audioFiles.length,
           });
-          // Keep savedAudioFileRef so user can retry
+          // Keep savedAudioFilesRef so user can retry
           setError(errorMessage);
           onError?.(errorMessage);
           setIsProcessing(false);
@@ -268,24 +303,52 @@ export function useEdenAISpeech({
     [logger, t, onTranscript, onError, cleanup],
   );
 
+  /**
+   * Seal the current in-progress audioChunksRef into a File and push to sealedChunksRef.
+   * Called on silence boundary and on stop.
+   */
+  const sealCurrentChunk = useCallback((): void => {
+    if (audioChunksRef.current.length === 0) {
+      return;
+    }
+    const mimeType = mediaRecorderRef.current?.mimeType ?? "audio/webm";
+    const blob = new Blob(audioChunksRef.current, { type: mimeType });
+    if (blob.size < 500) {
+      audioChunksRef.current = [];
+      return; // too small, discard
+    }
+    const ext = mimeType.includes("ogg")
+      ? "ogg"
+      : mimeType.includes("mp4") || mimeType.includes("mpeg")
+        ? "mp4"
+        : "webm";
+    const idx = sealedChunksRef.current.length;
+    sealedChunksRef.current.push(
+      new File([blob], `chunk-${idx}.${ext}`, { type: mimeType }),
+    );
+    audioChunksRef.current = [];
+    logger.debug("STT: Chunk sealed", { idx, size: blob.size });
+  }, [logger]);
+
   const processRecording = useCallback(async (): Promise<void> => {
     logger.debug("STT: Processing recording");
 
     try {
       setIsProcessing(true);
       setError(null);
-      logger.debug("STT: Starting processing");
 
-      // Create audio blob
-      const audioBlob = new Blob(audioChunksRef.current, {
-        type: mediaRecorderRef.current?.mimeType || "audio/webm",
-      });
+      // Stop VAD loop
+      if (silenceRafRef.current !== null) {
+        cancelAnimationFrame(silenceRafRef.current);
+        silenceRafRef.current = null;
+      }
 
-      // Bail out if blob is too small (silent/empty recording) - show error so user knows
-      if (audioBlob.size < 1000) {
-        logger.debug("STT: Audio too short/silent", {
-          blobSize: audioBlob.size,
-        });
+      // Seal any remaining audio as the final chunk
+      sealCurrentChunk();
+
+      const allChunks = sealedChunksRef.current;
+
+      if (allChunks.every((f) => f.size < 500)) {
         const errorMsg = t("hooks.stt.audio-too-short");
         setError(errorMsg);
         onError?.(errorMsg);
@@ -294,21 +357,16 @@ export function useEdenAISpeech({
         return;
       }
 
-      // Create a File object from the blob
-      const audioFile = new File([audioBlob], "recording.webm", {
-        type: audioBlob.type,
+      logger.debug("STT: Submitting chunks", {
+        chunkCount: allChunks.length,
+        totalSize: allChunks.reduce((s, f) => s + f.size, 0),
       });
 
-      // Save the file so we can retry on failure
-      savedAudioFileRef.current = audioFile;
+      // Save chunks so user can retry on failure
+      savedAudioFilesRef.current = allChunks;
       setHasSavedAudio(true);
 
-      logger.debug("STT: Submitting audio", {
-        fileSize: audioFile.size,
-        provider: "openai",
-      });
-
-      await submitAudioFile(audioFile);
+      await submitAudioFiles(allChunks);
     } catch (err) {
       const errorMsg =
         err instanceof Error
@@ -318,43 +376,84 @@ export function useEdenAISpeech({
       setError(errorMsg);
       onError?.(errorMsg);
       setIsProcessing(false);
-      // Don't cleanup so savedAudioFileRef is preserved for retry
+      // Don't cleanup so savedAudioFilesRef is preserved for retry
     }
-  }, [logger, t, onError, cleanup, submitAudioFile]);
+  }, [logger, t, onError, cleanup, submitAudioFiles, sealCurrentChunk]);
 
-  /** Retry transcription using the saved audio file from the last failed attempt */
+  /** Retry transcription using the saved chunks from the last failed attempt */
   const retryTranscription = useCallback(async (): Promise<void> => {
-    const audioFile = savedAudioFileRef.current;
-    if (!audioFile) {
+    const audioFiles = savedAudioFilesRef.current;
+    if (!audioFiles?.length) {
       logger.warn("STT: retryTranscription called but no saved audio");
       return;
     }
-    logger.debug("STT: Retrying transcription", { fileSize: audioFile.size });
+    logger.debug("STT: Retrying transcription", {
+      chunkCount: audioFiles.length,
+      totalSize: audioFiles.reduce((s, f) => s + f.size, 0),
+    });
     setIsProcessing(true);
     setError(null);
-    await submitAudioFile(audioFile);
-  }, [logger, submitAudioFile]);
+    await submitAudioFiles(audioFiles);
+  }, [logger, submitAudioFiles]);
+
+  /** Download all saved chunks concatenated as a single file */
+  const downloadSavedAudio = useCallback((): void => {
+    const audioFiles = savedAudioFilesRef.current;
+    if (!audioFiles?.length) {
+      logger.warn("STT: downloadSavedAudio called but no saved audio");
+      return;
+    }
+    const mimeType = audioFiles[0].type || "audio/webm";
+    const ext = mimeType.includes("ogg")
+      ? "ogg"
+      : mimeType.includes("mp4") || mimeType.includes("mpeg")
+        ? "mp4"
+        : mimeType.includes("wav")
+          ? "wav"
+          : "webm";
+    const blob = new Blob(audioFiles, { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `recording-${Date.now()}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    logger.debug("STT: Audio downloaded", {
+      fileName: a.download,
+      chunks: audioFiles.length,
+      size: blob.size,
+    });
+  }, [logger]);
 
   const startRecording = useCallback(async (): Promise<void> => {
     try {
-      // Clear any previous errors when starting a new recording
+      // Clear any previous errors and chunk state
       setError(null);
+      sealedChunksRef.current = [];
+      audioChunksRef.current = [];
+      silenceStartRef.current = null;
 
       logger.debug("STT: Requesting microphone access");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
+      // Set up AnalyserNode for RMS-based silence detection
+      const audioContext = new AudioContext();
+      audioContextRef.current = audioContext;
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
       logger.debug("STT: Creating MediaRecorder");
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
+      const chunkStartTime = { value: Date.now() };
 
       mediaRecorder.ondataavailable = (event): void => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
-          logger.debug("STT: Audio chunk received", {
-            size: event.data.size,
-          });
         }
       };
 
@@ -363,9 +462,64 @@ export function useEdenAISpeech({
         void processRecording();
       };
 
-      mediaRecorder.start();
+      // Start with 500ms timeslice so ondataavailable fires frequently
+      mediaRecorder.start(500);
       setIsRecording(true);
       logger.debug("STT: Recording started");
+
+      // VAD loop using requestAnimationFrame
+      const dataArray = new Float32Array(analyser.fftSize);
+      const tick = (): void => {
+        if (
+          !mediaRecorderRef.current ||
+          mediaRecorderRef.current.state === "inactive"
+        ) {
+          return;
+        }
+
+        analyser.getFloatTimeDomainData(dataArray);
+        let sum = 0;
+        for (const s of dataArray) {
+          sum += s * s;
+        }
+        const rms = Math.sqrt(sum / dataArray.length);
+        const now = Date.now();
+        const chunkAge = now - chunkStartTime.value;
+
+        if (mediaRecorderRef.current.state === "paused") {
+          // Don't detect silence while paused
+          silenceStartRef.current = null;
+          silenceRafRef.current = requestAnimationFrame(tick);
+          return;
+        }
+
+        if (rms < SILENCE_THRESHOLD_RMS) {
+          if (silenceStartRef.current === null) {
+            silenceStartRef.current = now;
+          }
+          const silenceDuration = now - silenceStartRef.current;
+          const shouldSeal =
+            (silenceDuration >= SILENCE_DURATION_MS &&
+              chunkAge >= MIN_CHUNK_MS) ||
+            chunkAge >= MAX_CHUNK_MS;
+
+          if (shouldSeal) {
+            logger.debug("STT: Silence detected, sealing chunk", {
+              silenceDuration,
+              chunkAge,
+            });
+            sealCurrentChunk();
+            chunkStartTime.value = Date.now();
+            silenceStartRef.current = null;
+          }
+        } else {
+          silenceStartRef.current = null;
+        }
+
+        silenceRafRef.current = requestAnimationFrame(tick);
+      };
+
+      silenceRafRef.current = requestAnimationFrame(tick);
     } catch (err) {
       const errorMsg =
         err instanceof DOMException || err instanceof Error
@@ -378,7 +532,7 @@ export function useEdenAISpeech({
       onError?.(errorMsg);
       cleanup();
     }
-  }, [logger, t, onError, cleanup, processRecording]);
+  }, [logger, t, onError, cleanup, processRecording, sealCurrentChunk]);
 
   const stopRecording = useCallback((): void => {
     logger.debug("STT: Stop recording called");
@@ -421,10 +575,13 @@ export function useEdenAISpeech({
             type: mimeType,
           });
 
-          // Create File object - always set an explicit audio MIME type so
-          // server-side validation (file.type.startsWith("audio/")) passes even
-          // when the browser doesn't propagate the codec string through FormData.
-          const audioFile = new File([audioBlob], "recording.webm", {
+          // Create File object with correct extension for the actual container
+          const blobExt = mimeType.includes("ogg")
+            ? "ogg"
+            : mimeType.includes("mp4") || mimeType.includes("mpeg")
+              ? "mp4"
+              : "webm";
+          const audioFile = new File([audioBlob], `recording.${blobExt}`, {
             type: mimeType,
           });
 
@@ -493,7 +650,7 @@ export function useEdenAISpeech({
     }
 
     // Discard saved audio too
-    savedAudioFileRef.current = null;
+    savedAudioFilesRef.current = null;
     setHasSavedAudio(false);
 
     // Clean up everything
@@ -533,5 +690,6 @@ export function useEdenAISpeech({
     clearError,
     hasSavedAudio,
     retryTranscription,
+    downloadSavedAudio,
   };
 }

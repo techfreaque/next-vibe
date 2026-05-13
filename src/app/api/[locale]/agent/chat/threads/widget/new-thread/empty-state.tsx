@@ -70,6 +70,12 @@ export function ChatEmptyState({
         text: "text-primary",
         "hover-bg": "hover:bg-blue-500/10",
       },
+      green: {
+        bg: "bg-green-500/20",
+        border: "border-green-500/50",
+        text: "text-green-500",
+        "hover-bg": "hover:bg-green-500/10",
+      },
     };
 
     return colorMap[color]?.[variant] || colorMap.blue[variant];
@@ -85,6 +91,8 @@ export function ChatEmptyState({
         return t("widget.suggestedPrompts.incognitoTitle");
       case "public":
         return t("widget.suggestedPrompts.publicTitle");
+      case "cron":
+        return t("widget.suggestedPrompts.backgroundTitle");
       default:
         return t("widget.suggestedPrompts.title");
     }
@@ -100,6 +108,8 @@ export function ChatEmptyState({
         return t("widget.suggestedPrompts.incognitoDescription");
       case "public":
         return t("widget.suggestedPrompts.publicDescription");
+      case "cron":
+        return t("widget.suggestedPrompts.backgroundDescription");
       default:
         return "";
     }

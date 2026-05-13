@@ -507,7 +507,19 @@ export class GapFillExecutor {
               imageContent,
               {
                 type: "text" as const,
-                text: "Describe this image in detail. Be comprehensive - include colors, objects, text, layout, and any notable features. This description will be used by another AI model that cannot see images.",
+                text: `You are a vision bridge. Your output will be the ONLY representation of this image that another AI model will ever receive - it cannot see the image itself.
+
+Describe everything you observe with maximum fidelity and detail:
+- **Subject & composition**: What is the main subject? How is it framed and positioned?
+- **Objects & elements**: List every significant object, person, animal, text, symbol, or UI element present.
+- **Text & typography**: Transcribe ALL text visible in the image exactly as written, including signs, labels, captions, watermarks, UI text.
+- **Colors**: Describe colors precisely (e.g. "deep burgundy", "muted sage green") - not just "red" or "green".
+- **Spatial layout**: Where are things relative to each other? Foreground/background, left/right, overlapping?
+- **Style & medium**: Is it a photograph, illustration, screenshot, chart, diagram, painting? What visual style?
+- **Mood & lighting**: What is the atmosphere, lighting condition, time of day if relevant?
+- **Fine details**: Expressions, textures, patterns, any small but potentially meaningful details.
+
+Write in flowing prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this image from your description alone.`,
               },
             ],
           },
@@ -528,6 +540,7 @@ export class GapFillExecutor {
           modelId: visionModel.id,
           creditCost,
           createdAt: new Date().toISOString(),
+          bridgeType,
         };
 
         await dbWriter.emitGapFillCompleted({
@@ -640,7 +653,31 @@ export class GapFillExecutor {
               fileData,
               {
                 type: "text" as const,
-                text: "Describe what you hear in this audio file in 1-3 sentences. If it contains speech, transcribe the spoken words. If it contains music, describe the instruments, genre, and mood. Be specific and concise.",
+                text: `You are an audio bridge. Your output will be the ONLY representation of this audio that another AI model will ever receive - it cannot hear the audio itself.
+
+Transcribe and describe everything you hear with maximum fidelity and detail:
+
+**If speech is present:**
+- Transcribe ALL spoken words verbatim, exactly as said, including filler words, hesitations, repetitions
+- Note speaker characteristics: accent, gender, age estimate, emotional tone, speaking pace
+- Note any background voices or overlapping speech
+
+**If music is present:**
+- Genre, subgenre, and closest reference artists or songs
+- Tempo (BPM estimate), key/scale if discernible, time signature
+- All instruments heard and how they interact (e.g. "driving 808 bass under a sparse piano melody")
+- Vocals: lyrics verbatim if present, vocal style, harmonies
+- Song structure: intro, verse, chorus, bridge - what happens when
+- Production style: raw/lo-fi vs polished, reverb, effects notable characteristics
+- Mood and emotional arc over the duration
+
+**For any audio:**
+- Duration impression (short clip, full track, extended)
+- Sound quality, recording environment (studio, room, outdoor, phone mic)
+- Any notable sound effects, ambient sounds, or non-musical audio events
+- If silence or near-silence: note that explicitly
+
+Write in structured prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this audio from your description alone.`,
               },
             ],
           },
@@ -661,6 +698,7 @@ export class GapFillExecutor {
           modelId: audioVisionModel.id,
           creditCost,
           createdAt: new Date().toISOString(),
+          bridgeType,
         };
 
         await dbWriter.emitGapFillCompleted({
@@ -775,7 +813,35 @@ export class GapFillExecutor {
               fileData,
               {
                 type: "text" as const,
-                text: "Describe this video in detail. Include the visual content, actions, scene, style, any text visible, and any notable elements. This description will be used by another AI model that cannot see video.",
+                text: `You are a video bridge. Your output will be the ONLY representation of this video that another AI model will ever receive - it cannot see or hear it.
+
+Describe everything with maximum fidelity and detail:
+
+**Visual content (frame by frame if needed):**
+- What happens over time: describe the sequence of scenes, actions, or changes
+- Every significant person, object, animal, text, or UI element visible
+- Setting/environment: indoor/outdoor, location cues, time of day, era
+- Camera work: cuts, pans, zooms, angles, shot types (close-up, wide, POV)
+- Text on screen: transcribe ALL text exactly - titles, captions, subtitles, UI labels, watermarks
+
+**Audio (if present):**
+- Transcribe ALL speech verbatim, including who is speaking if identifiable
+- Background music: genre, tempo, mood, instruments
+- Sound effects, ambient audio, notable audio events
+
+**Style & production:**
+- Is it a movie, TV show, social media clip, screen recording, animation, news broadcast, tutorial?
+- Visual style: realistic, animated, stylized, filtered, documentary?
+- Production quality: professional, amateur, lo-fi?
+
+**Mood & arc:**
+- What is the emotional tone at the start vs end?
+- Is there a narrative, argument, or demonstration being made?
+
+**Duration & pacing:**
+- Approximate length, pacing (slow/fast cuts, talking speed)
+
+Write in structured prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this video from your description alone.`,
               },
             ],
           },
@@ -796,6 +862,7 @@ export class GapFillExecutor {
           modelId: videoVisionModel.id,
           creditCost,
           createdAt: new Date().toISOString(),
+          bridgeType,
         };
 
         await dbWriter.emitGapFillCompleted({
@@ -875,10 +942,74 @@ export class GapFillExecutor {
 
     const promptText =
       modality === "image"
-        ? "Describe this generated image in detail. Include subject, style, colors, composition, and any notable elements. This description will be shown to another AI model that cannot see images."
+        ? `You are a vision bridge. Your output will be the ONLY representation of this image that another AI model will ever receive - it cannot see the image itself.
+
+Describe everything you observe with maximum fidelity and detail:
+- **Subject & composition**: What is the main subject? How is it framed and positioned?
+- **Objects & elements**: List every significant object, person, animal, text, symbol, or UI element present.
+- **Text & typography**: Transcribe ALL text visible in the image exactly as written, including signs, labels, captions, watermarks, UI text.
+- **Colors**: Describe colors precisely (e.g. "deep burgundy", "muted sage green") - not just "red" or "green".
+- **Spatial layout**: Where are things relative to each other? Foreground/background, left/right, overlapping?
+- **Style & medium**: Is it a photograph, illustration, screenshot, chart, diagram, painting? What visual style?
+- **Mood & lighting**: What is the atmosphere, lighting condition, time of day if relevant?
+- **Fine details**: Expressions, textures, patterns, any small but potentially meaningful details.
+
+Write in flowing prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this image from your description alone.`
         : modality === "video"
-          ? "Describe this video in detail. Include the visual content, actions, scene, style, and any notable elements. This description will be shown to another AI model that cannot see video."
-          : "Describe this audio in detail. Include the content, instruments, mood, tempo, and any notable elements. This description will be shown to another AI model that cannot hear audio.";
+          ? `You are a video bridge. Your output will be the ONLY representation of this video that another AI model will ever receive - it cannot see or hear it.
+
+Describe everything with maximum fidelity and detail:
+
+**Visual content (frame by frame if needed):**
+- What happens over time: describe the sequence of scenes, actions, or changes
+- Every significant person, object, animal, text, or UI element visible
+- Setting/environment: indoor/outdoor, location cues, time of day, era
+- Camera work: cuts, pans, zooms, angles, shot types (close-up, wide, POV)
+- Text on screen: transcribe ALL text exactly - titles, captions, subtitles, UI labels, watermarks
+
+**Audio (if present):**
+- Transcribe ALL speech verbatim, including who is speaking if identifiable
+- Background music: genre, tempo, mood, instruments
+- Sound effects, ambient audio, notable audio events
+
+**Style & production:**
+- Is it a movie, TV show, social media clip, screen recording, animation, news broadcast, tutorial?
+- Visual style: realistic, animated, stylized, filtered, documentary?
+- Production quality: professional, amateur, lo-fi?
+
+**Mood & arc:**
+- What is the emotional tone at the start vs end?
+- Is there a narrative, argument, or demonstration being made?
+
+**Duration & pacing:**
+- Approximate length, pacing (slow/fast cuts, talking speed)
+
+Write in structured prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this video from your description alone.`
+          : `You are an audio bridge. Your output will be the ONLY representation of this audio that another AI model will ever receive - it cannot hear the audio itself.
+
+Transcribe and describe everything you hear with maximum fidelity and detail:
+
+**If speech is present:**
+- Transcribe ALL spoken words verbatim, exactly as said, including filler words, hesitations, repetitions
+- Note speaker characteristics: accent, gender, age estimate, emotional tone, speaking pace
+- Note any background voices or overlapping speech
+
+**If music is present:**
+- Genre, subgenre, and closest reference artists or songs
+- Tempo (BPM estimate), key/scale if discernible, time signature
+- All instruments heard and how they interact (e.g. "driving 808 bass under a sparse piano melody")
+- Vocals: lyrics verbatim if present, vocal style, harmonies
+- Song structure: intro, verse, chorus, bridge - what happens when
+- Production style: raw/lo-fi vs polished, reverb, effects, notable characteristics
+- Mood and emotional arc over the duration
+
+**For any audio:**
+- Duration impression (short clip, full track, extended)
+- Sound quality, recording environment (studio, room, outdoor, phone mic)
+- Any notable sound effects, ambient sounds, or non-musical audio events
+- If silence or near-silence: note that explicitly
+
+Write in structured prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this audio from your description alone.`;
 
     // Resolve media bytes via direct storage access (bypasses HTTP auth) or HTTP fetch.
     // Direct storage is preferred because:
@@ -957,6 +1088,7 @@ export class GapFillExecutor {
           modelId: visionModel.id,
           creditCost,
           createdAt: new Date().toISOString(),
+          bridgeType: "vision" as const,
         };
 
         await dbWriter.emitGapFillCompleted({

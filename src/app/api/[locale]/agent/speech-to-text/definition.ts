@@ -62,33 +62,39 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { request: "data" },
         children: {
-          file: requestField(scopedTranslation, {
+          files: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.FILE,
             label: "post.audio.label",
             description: "post.audio.description",
             columns: 12,
             schema: z
-              .instanceof(File)
-              .refine((file) => file.size <= 25 * 1024 * 1024, {
-                message: "post.audio.validation.maxSize",
-              })
-              .refine(
-                (file) => {
-                  // Note: Bun reports audio/webm recordings as "video/webm" (strips codecs param)
-                  const allowedTypes = [
-                    "audio/",
-                    "video/webm",
-                    "application/octet-stream",
-                  ];
-                  return allowedTypes.some((type) =>
-                    file.type.startsWith(type),
-                  );
-                },
-                {
-                  message: "post.audio.validation.audioOnly",
-                },
-              ),
+              .array(
+                z
+                  .instanceof(File)
+                  .refine((file) => file.size <= 25 * 1024 * 1024, {
+                    message: "post.audio.validation.maxSize",
+                  })
+                  .refine(
+                    (file) => {
+                      // Note: Bun reports audio/webm recordings as "video/webm" (strips codecs param)
+                      // Firefox records Opus as audio/ogg or video/ogg
+                      const allowedTypes = [
+                        "audio/",
+                        "video/webm",
+                        "video/ogg",
+                        "application/ogg",
+                        "application/octet-stream",
+                      ];
+                      return allowedTypes.some((type) =>
+                        file.type.startsWith(type),
+                      );
+                    },
+                    { message: "post.audio.validation.audioOnly" },
+                  ),
+              )
+              .min(1)
+              .max(20),
           }),
         },
       }),
@@ -191,7 +197,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         fileUpload: {
-          file: new File([""], "audio.mp3", { type: "audio/mpeg" }),
+          files: [new File([""], "audio.mp3", { type: "audio/mpeg" })],
         },
       },
     },

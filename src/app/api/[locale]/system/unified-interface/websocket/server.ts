@@ -563,6 +563,21 @@ export function startWebSocketServer(
       let lastProxyError = "Unknown error";
       const proxyStartMs = Date.now();
 
+      // For multipart/form-data (file uploads), Bun's internal idle timeout can
+      // fire mid-stream and truncate the body before all bytes reach the proxy.
+      // Buffer the entire body upfront so Bun fully receives it before we open
+      // the proxy connection. This is safe for non-idempotent POSTs (no retry).
+      let bufferedBody: Buffer | null = null;
+      const contentType = req.headers.get("content-type") ?? "";
+      const isMultipart = contentType.includes("multipart/form-data");
+      if (!isIdempotent && isMultipart && req.body) {
+        try {
+          bufferedBody = Buffer.from(await req.arrayBuffer());
+        } catch {
+          return new Response("Request body read failed", { status: 400 });
+        }
+      }
+
       for (let attempt = 0; attempt <= PROXY_RETRY_DELAYS.length; attempt++) {
         const proxyResult = await new Promise<Response | null>((resolve) => {
           let settled = false;
@@ -665,10 +680,14 @@ export function startWebSocketServer(
             settle(new Response("Bad Gateway", { status: 502 }));
           });
 
-          // Pipe the request body directly from the original request - no buffering.
-          // For idempotent methods there is no body. For non-idempotent methods we
-          // pipe the stream once (no retry means single-use is safe).
-          if (req.body && !isIdempotent) {
+          // Send the request body to the upstream proxy.
+          // Multipart uploads are pre-buffered above to avoid Bun's idle timeout
+          // truncating large bodies mid-stream. All other non-idempotent requests
+          // are streamed directly (no retry means single-use is safe).
+          if (bufferedBody !== null) {
+            // Pre-buffered multipart body - write all at once
+            proxyReq.end(bufferedBody);
+          } else if (req.body && !isIdempotent) {
             const reader = req.body.getReader();
             const pumpBody = (): void => {
               reader

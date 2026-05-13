@@ -48,6 +48,9 @@ export const translations: typeof enTranslations = {
     incognitoTitle: "Anonymer KI-Chat",
     incognitoDescription:
       "Nur in Ihrem Browser gespeichert. Nie in Ihrem Konto gespeichert oder synchronisiert.",
+    backgroundTitle: "Deine KI-Agenten arbeiten",
+    backgroundDescription:
+      "Subagenten und autonome Hintergrundagenten erledigen Aufgaben hier, während du dich um anderes kümmern kannst. Ergebnisse landen automatisch hier.",
   },
   config: {
     appName: "unbottled.ai",

@@ -28,7 +28,7 @@
  *   T7  → approve: phase1 pending confirmation, phase2 confirms + executes
  *   T8  → parallel tools: tool-help + generate_image in same batch
  *   T9  → preCalls injection: synthetic tool result in DB before AI runs
- *   T10 → file attachments: image, multi (image+audio), voice (attach+STT), video
+ *   T10 → file attachments: image, multi (image+audio), voice (attach+STT), video, voice WAV gap-fill
  *   T11 → Native image generation via Gemini 3.1 Flash Image Preview (file part output, empty args.prompt)
  *   T11b→ gap-fill Pass 2: non-image model sees vision-bridge description of T11 image
  *   T12 → invalid explicitParentMessageId - graceful error handling
@@ -2929,12 +2929,23 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const added = newMessages(phase1Msgs, t6cInitialCount);
           const toolMsg = findToolMsg(added, "generate_image", cfg);
-          expect(toolMsg, "T6c: generate_image tool message not found").toBeDefined();
+          expect(
+            toolMsg,
+            "T6c: generate_image tool message not found",
+          ).toBeDefined();
           if (toolMsg) {
-            assertToolMessageComplete(toolMsg, "generate_image", "T6c", cfg, "pending");
+            assertToolMessageComplete(
+              toolMsg,
+              "generate_image",
+              "T6c",
+              cfg,
+              "pending",
+            );
           }
 
-          const lastAi = phase1Msgs.find((m) => m.id === result.data.lastAiMessageId);
+          const lastAi = phase1Msgs.find(
+            (m) => m.id === result.data.lastAiMessageId,
+          );
           expect(lastAi, "T6c: no AI response found").toBeDefined();
           assertStepOk(lastAi?.content, "T6c");
           lastMainAiMsgId = result.data.lastAiMessageId!;
@@ -2960,7 +2971,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 m.toolCall?.isDeferred === true &&
                 (m.toolCall.toolName === "generate_image" ||
                   (m.toolCall.toolName === "execute-tool" &&
-                    toolResultRecord(m.toolCall.args)?.["toolName"] === "generate_image")),
+                    toolResultRecord(m.toolCall.args)?.["toolName"] ===
+                      "generate_image")),
             );
             if (deferredTool) {
               revivalAi = messages.find(
@@ -2991,10 +3003,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               m.role === "tool" &&
               (m.toolCall?.toolName === "generate_image" ||
                 (m.toolCall?.toolName === "execute-tool" &&
-                  toolResultRecord(m.toolCall.args)?.["toolName"] === "generate_image")),
+                  toolResultRecord(m.toolCall.args)?.["toolName"] ===
+                    "generate_image")),
           );
-          const originals = allGenImgToolMsgs.filter((m) => !m.toolCall?.isDeferred);
-          const deferreds = allGenImgToolMsgs.filter((m) => m.toolCall?.isDeferred === true);
+          const originals = allGenImgToolMsgs.filter(
+            (m) => !m.toolCall?.isDeferred,
+          );
+          const deferreds = allGenImgToolMsgs.filter(
+            (m) => m.toolCall?.isDeferred === true,
+          );
           expect(
             originals.length,
             `T6c: expected at least 1 original generate_image tool msg. Got ${String(originals.length)}`,
@@ -3028,10 +3045,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Walk to the actual leaf — model may have called generate_image multiple times,
           // creating multiple deferred + revival pairs in a linear chain.
           messages = await fetchThreadMessages(threadId);
-          const t6cMsgsSorted = [...newMessages(messages, t6cInitialCount)].toSorted(
-            (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-          );
-          const t6cLeaf = t6cMsgsSorted.find((m) => m.role === "assistant") ?? deferredTool;
+          const t6cMsgsSorted = [
+            ...newMessages(messages, t6cInitialCount),
+          ].toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+          const t6cLeaf =
+            t6cMsgsSorted.find((m) => m.role === "assistant") ?? deferredTool;
           if (t6cLeaf) {
             lastMainAiMsgId = t6cLeaf.id;
           }
@@ -3076,12 +3094,23 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const added = newMessages(phase1Msgs, t6dInitialCount);
           const toolMsg = findToolMsg(added, "generate_image", cfg);
-          expect(toolMsg, "T6d: generate_image tool message not found").toBeDefined();
+          expect(
+            toolMsg,
+            "T6d: generate_image tool message not found",
+          ).toBeDefined();
           if (toolMsg) {
-            assertToolMessageComplete(toolMsg, "generate_image", "T6d", cfg, "pending");
+            assertToolMessageComplete(
+              toolMsg,
+              "generate_image",
+              "T6d",
+              cfg,
+              "pending",
+            );
           }
 
-          const lastAi = phase1Msgs.find((m) => m.id === result.data.lastAiMessageId);
+          const lastAi = phase1Msgs.find(
+            (m) => m.id === result.data.lastAiMessageId,
+          );
           expect(lastAi, "T6d: no AI response found").toBeDefined();
           assertStepOk(lastAi?.content, "T6d");
           lastMainAiMsgId = result.data.lastAiMessageId!;
@@ -3106,7 +3135,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 m.toolCall?.isDeferred === true &&
                 (m.toolCall.toolName === "generate_image" ||
                   (m.toolCall.toolName === "execute-tool" &&
-                    toolResultRecord(m.toolCall.args)?.["toolName"] === "generate_image")),
+                    toolResultRecord(m.toolCall.args)?.["toolName"] ===
+                      "generate_image")),
             );
             if (deferredTool) {
               revivalAi = messages.find(
@@ -3138,10 +3168,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               m.role === "tool" &&
               (m.toolCall?.toolName === "generate_image" ||
                 (m.toolCall?.toolName === "execute-tool" &&
-                  toolResultRecord(m.toolCall.args)?.["toolName"] === "generate_image")),
+                  toolResultRecord(m.toolCall.args)?.["toolName"] ===
+                    "generate_image")),
           );
-          const originals = allGenImgToolMsgs.filter((m) => !m.toolCall?.isDeferred);
-          const deferreds = allGenImgToolMsgs.filter((m) => m.toolCall?.isDeferred === true);
+          const originals = allGenImgToolMsgs.filter(
+            (m) => !m.toolCall?.isDeferred,
+          );
+          const deferreds = allGenImgToolMsgs.filter(
+            (m) => m.toolCall?.isDeferred === true,
+          );
           expect(
             originals.length,
             `T6d: expected at least 1 original generate_image tool msg. Got ${String(originals.length)}`,
@@ -3172,10 +3207,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Walk to the actual leaf — model may have called generate_image multiple times,
           // creating multiple deferred + revival pairs in a linear chain.
           messages = await fetchThreadMessages(threadId);
-          const t6dMsgsSorted = [...newMessages(messages, t6dInitialCount)].toSorted(
-            (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-          );
-          const t6dLeaf = t6dMsgsSorted.find((m) => m.role === "assistant") ?? deferredTool;
+          const t6dMsgsSorted = [
+            ...newMessages(messages, t6dInitialCount),
+          ].toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+          const t6dLeaf =
+            t6dMsgsSorted.find((m) => m.role === "assistant") ?? deferredTool;
           if (t6dLeaf) {
             lastMainAiMsgId = t6dLeaf.id;
           }
@@ -3494,13 +3530,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // with no follow-up AI response. Find the actual chain leaf for tracking.
             const t7bNewMsgs = newMessages(messages, prevMessages.length);
             const t7bLeaf = [...t7bNewMsgs]
-              .toSorted(
-                (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-              )
-              .find(
-                (m) =>
-                  !messages.some((other) => other.parentId === m.id),
-              );
+              .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+              .find((m) => !messages.some((other) => other.parentId === m.id));
             lastMainAiMsgId = t7bLeaf?.id ?? effectiveLastAiMsgId;
             // T6c/T6d chain linearly from T6b via E2E runStream calls.
             // Only T2's branch point remains as a known multi-child node.
@@ -4110,6 +4141,78 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const afterVideo = await getBalance(testUser, creditLogger, creditT);
           assertDeducted(beforeVideo, afterVideo, 0, 30);
+
+          // ── Part E: Voice WAV attachment → gap-fill audioVisionModel bridge ──
+          // quality-tester skill uses DEFAULT_CHAT_MODEL_ID which does NOT support audio input.
+          // Attaching a WAV file triggers GapFillExecutor.bridgeStt() → audioVisionModel (Gemini Flash).
+          // The gap-fill produces a text transcription/description stored as a variant.
+          // The main model then receives the text description instead of the raw file.
+          setFetchCacheContext(`${cfg.cachePrefix}attachment-voice-wav`);
+          await pinBalance(testUser.id, 50, creditLogger, creditT);
+          const beforeWav = await getBalance(testUser, creditLogger, creditT);
+
+          const voiceWavFile = await loadFixture("test-voice.wav", "audio/wav");
+          const { result: wavResult, messages: wavMsgs } = await runStream({
+            user: testUser,
+            prompt:
+              "[T10e voice-wav-attach] A WAV audio recording is attached. Repeat back the exact word(s) you heard in the audio. End your reply with STEP_OK if the transcription contained the word 'banana', or FAILED: <reason> if you could not hear it or got something else.",
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
+            attachments: [voiceWavFile],
+          });
+
+          expect(wavResult.success).toBe(true);
+          if (!wavResult.success) {
+            return;
+          }
+          expect(wavResult.data.threadId).toBe(threadId);
+
+          const wavSorted = [...wavMsgs].toSorted(
+            (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+          );
+          const wavUserMsg = wavSorted.find((m) => m.role === "user");
+          expect(wavUserMsg!.attachments![0]!.mimeType).toBe("audio/wav");
+
+          // Gap-fill MUST have run: audioVisionModel bridge writes a variant
+          const wavVariants = wavUserMsg!.variants ?? [];
+          expect(
+            wavVariants.length > 0,
+            "[T10e] No gap-fill variant found - audioVisionModel bridge did not run for WAV attachment. The quality-tester skill's chat model should not natively support audio, triggering the bridge.",
+          ).toBe(true);
+          const wavVariant = wavVariants[0];
+          expect(
+            typeof wavVariant?.content === "string" &&
+              wavVariant.content.length > 10,
+            `[T10e] Gap-fill variant content too short - bridge did not produce a real transcription: ${JSON.stringify(wavVariant?.content)}`,
+          ).toBe(true);
+
+          // The recording says "banana banana" - the bridge must have understood it exactly.
+          expect(
+            typeof wavVariant?.content === "string" &&
+              wavVariant.content.toLowerCase().includes("banana"),
+            `[T10e] Gap-fill variant must contain "banana" - the audio says "banana banana" and the bridge failed to transcribe it correctly. Got: ${JSON.stringify(wavVariant?.content)}`,
+          ).toBe(true);
+
+          expect(wavResult.data.lastAiMessageContent!.length).toBeGreaterThan(
+            10,
+          );
+          assertStepOk(wavResult.data.lastAiMessageContent, "T10e");
+          lastMainAiMsgId = wavResult.data.lastAiMessageId!;
+
+          assertNoOrphans(
+            wavMsgs,
+            new Set([t2BranchParentId].filter(Boolean)),
+            {
+              expectedLeafId: lastMainAiMsgId,
+              knownDeadEndLeaves: deadEndLeaves,
+            },
+          );
+          await assertThreadIdle(threadId);
+          await assertNoPendingTasks(threadId);
+
+          const afterWav = await getBalance(testUser, creditLogger, creditT);
+          assertDeducted(beforeWav, afterWav, 0, 30);
         },
         effectiveTestTimeout,
       );
@@ -4271,8 +4374,14 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // Verify tool result structure: file URL, empty text, creditCost
           const toolRes = toolResultRecord(nativeImgToolMsg!.toolCall?.result);
-          expect(typeof toolRes!["file"], "[T11b] tool result must have file URL").toBe("string");
-          expect(toolRes!["text"], "[T11b] tool result text should be empty for native gen").toBe("");
+          expect(
+            typeof toolRes!["file"],
+            "[T11b] tool result must have file URL",
+          ).toBe("string");
+          expect(
+            toolRes!["text"],
+            "[T11b] tool result text should be empty for native gen",
+          ).toBe("");
 
           // Send follow-up with image-capable model (Kimi K2.6)
           const { result, messages } = await runStream({
@@ -4349,7 +4458,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const videoToolMsg = findToolMsg(added, "generate_video", cfg);
           expect(videoToolMsg).toBeDefined();
           if (videoToolMsg) {
-            assertToolMessageComplete(videoToolMsg, "generate_video", "T11c", cfg);
+            assertToolMessageComplete(
+              videoToolMsg,
+              "generate_video",
+              "T11c",
+              cfg,
+            );
           }
 
           // Args: inputMediaUrl must be the image URL passed in
@@ -4371,18 +4485,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect((videoRes!["durationSeconds"] as number) > 0).toBe(true);
           expect((videoRes!["durationSeconds"] as number) <= 60).toBe(true);
 
-
           // Find actual leaf for chain tracking (model may call extra tools after video gen)
           const t11cAdded = newMessages(messages, prevCount);
           const t11cLeaf = [...t11cAdded]
-            .toSorted(
-              (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-            )
-            .find(
-              (m) => !messages.some((other) => other.parentId === m.id),
-            );
-          lastMainAiMsgId =
-            t11cLeaf?.id ?? result.data.lastAiMessageId!;
+            .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .find((m) => !messages.some((other) => other.parentId === m.id));
+          lastMainAiMsgId = t11cLeaf?.id ?? result.data.lastAiMessageId!;
 
           assertNoOrphans(
             messages,
@@ -4435,7 +4543,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           const videoToolMsg = findToolMsg(added, "generate_video", cfg);
           expect(videoToolMsg).toBeDefined();
           if (videoToolMsg) {
-            assertToolMessageComplete(videoToolMsg, "generate_video", "T11d", cfg);
+            assertToolMessageComplete(
+              videoToolMsg,
+              "generate_video",
+              "T11d",
+              cfg,
+            );
           }
 
           // Args: inputMediaUrl must be the image URL passed in the prompt as text
@@ -4458,14 +4571,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const t11dAdded = newMessages(messages, prevCount);
           const t11dLeaf = [...t11dAdded]
-            .toSorted(
-              (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-            )
-            .find(
-              (m) => !messages.some((other) => other.parentId === m.id),
-            );
-          lastMainAiMsgId =
-            t11dLeaf?.id ?? result.data.lastAiMessageId!;
+            .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .find((m) => !messages.some((other) => other.parentId === m.id));
+          lastMainAiMsgId = t11dLeaf?.id ?? result.data.lastAiMessageId!;
 
           assertNoOrphans(
             messages,
@@ -4554,14 +4662,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const t11eAdded = newMessages(messages, prevCount);
           const t11eLeaf = [...t11eAdded]
-            .toSorted(
-              (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-            )
-            .find(
-              (m) => !messages.some((other) => other.parentId === m.id),
-            );
-          lastMainAiMsgId =
-            t11eLeaf?.id ?? result.data.lastAiMessageId!;
+            .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .find((m) => !messages.some((other) => other.parentId === m.id));
+          lastMainAiMsgId = t11eLeaf?.id ?? result.data.lastAiMessageId!;
 
           assertNoOrphans(
             messages,
@@ -4641,14 +4744,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const t11fAdded = newMessages(messages, prevCount);
           const t11fLeaf = [...t11fAdded]
-            .toSorted(
-              (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-            )
-            .find(
-              (m) => !messages.some((other) => other.parentId === m.id),
-            );
-          lastMainAiMsgId =
-            t11fLeaf?.id ?? result.data.lastAiMessageId!;
+            .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .find((m) => !messages.some((other) => other.parentId === m.id));
+          lastMainAiMsgId = t11fLeaf?.id ?? result.data.lastAiMessageId!;
 
           assertNoOrphans(
             messages,
@@ -4677,9 +4775,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11f-verify: vision model can see the generated image in tool result",
         async () => {
-          setFetchCacheContext(
-            `${cfg.cachePrefix}image-to-image-kimi-verify`,
-          );
+          setFetchCacheContext(`${cfg.cachePrefix}image-to-image-kimi-verify`);
           await pinBalance(testUser.id, 30, creditLogger, creditT);
           const before = await getBalance(testUser, creditLogger, creditT);
 
@@ -4805,14 +4901,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const t11gAdded = newMessages(messages, prevCount);
           const t11gLeaf = [...t11gAdded]
-            .toSorted(
-              (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-            )
-            .find(
-              (m) => !messages.some((other) => other.parentId === m.id),
-            );
-          lastMainAiMsgId =
-            t11gLeaf?.id ?? result.data.lastAiMessageId!;
+            .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .find((m) => !messages.some((other) => other.parentId === m.id));
+          lastMainAiMsgId = t11gLeaf?.id ?? result.data.lastAiMessageId!;
 
           assertNoOrphans(
             messages,

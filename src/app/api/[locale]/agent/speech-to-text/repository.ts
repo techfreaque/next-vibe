@@ -53,11 +53,79 @@ export class SpeechToTextRepository {
   private static readonly MAX_POLLING_ATTEMPTS = 30;
   private static readonly POLLING_INTERVAL_MS = 1000;
 
+  /** Max parallel transcription requests per user request */
+  private static readonly CHUNK_CONCURRENCY = 4;
+
   /**
-   * Transcribe audio to text using model-based provider routing
+   * Transcribe one chunk using the resolved provider
+   */
+  private static async transcribeChunk(
+    file: File,
+    modelOption: ReturnType<typeof getBestSttModel>,
+    language: string,
+    logger: EndpointLogger,
+    t: SpeechToTextT,
+  ): Promise<
+    ResponseType<{
+      text: string;
+      confidence: number | undefined;
+      duration: number;
+      edenAiCostUsd: number | undefined;
+    }>
+  > {
+    if (!modelOption) {
+      return fail({
+        message: t("post.errors.transcriptionFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: {
+          error: "No STT provider available",
+        },
+      });
+    }
+
+    switch (modelOption.apiProvider) {
+      case ApiProvider.OPENAI_STT:
+        return SpeechToTextRepository.transcribeWithOpenAI(
+          file,
+          modelOption.providerModel,
+          language,
+          logger,
+          t,
+        );
+      case ApiProvider.EDEN_AI_STT:
+        return SpeechToTextRepository.transcribeWithEdenAI(
+          file,
+          modelOption.providerModel,
+          language,
+          logger,
+          t,
+        );
+      case ApiProvider.DEEPGRAM:
+        return SpeechToTextRepository.transcribeWithDeepgram(
+          file,
+          modelOption.providerModel,
+          language,
+          logger,
+          t,
+        );
+      default:
+        logger.error("[STT] Unsupported STT provider", {
+          apiProvider: modelOption.apiProvider,
+          sttModelId: modelOption.id,
+        });
+        return fail({
+          message: t("post.errors.transcriptionFailed"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+    }
+  }
+
+  /**
+   * Transcribe audio to text using model-based provider routing.
+   * Accepts one or more chunks - fans out up to 4 in parallel, concatenates in order.
    */
   static async transcribeAudio(
-    file: File,
+    files: File[],
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -94,9 +162,8 @@ export class SpeechToTextRepository {
       apiProvider: modelOption.apiProvider,
       providerModel: modelOption.providerModel,
       language,
-      fileSize: file.size,
-      fileName: file.name,
-      mimeType: file.type,
+      chunkCount: files.length,
+      totalSize: files.reduce((s, f) => s + f.size, 0),
     });
 
     const tCredits = creditsScopedTranslation.scopedT(locale).t;
@@ -135,64 +202,91 @@ export class SpeechToTextRepository {
     }
 
     try {
-      let transcriptionResult: ResponseType<{
-        text: string;
-        confidence: number | undefined;
-        duration: number;
-        edenAiCostUsd: number | undefined;
-      }>;
+      // Fan out chunks up to CHUNK_CONCURRENCY in parallel, preserve order
+      const results: Array<
+        ResponseType<{
+          text: string;
+          confidence: number | undefined;
+          duration: number;
+          edenAiCostUsd: number | undefined;
+        }>
+      > = Array.from({ length: files.length });
 
-      switch (modelOption.apiProvider) {
-        case ApiProvider.OPENAI_STT:
-          transcriptionResult =
-            await SpeechToTextRepository.transcribeWithOpenAI(
-              file,
-              modelOption.providerModel,
-              language,
-              logger,
-              t,
-            );
-          break;
+      let idx = 0;
+      const runNext = async (): Promise<void> => {
+        while (idx < files.length) {
+          const i = idx++;
+          results[i] = await SpeechToTextRepository.transcribeChunk(
+            files[i],
+            modelOption,
+            language,
+            logger,
+            t,
+          );
+          if (!results[i].success) {
+            return;
+          }
+        }
+      };
 
-        case ApiProvider.EDEN_AI_STT:
-          transcriptionResult =
-            await SpeechToTextRepository.transcribeWithEdenAI(
-              file,
-              modelOption.providerModel,
-              language,
-              logger,
-              t,
-            );
-          break;
+      const workers = Array.from(
+        {
+          length: Math.min(
+            SpeechToTextRepository.CHUNK_CONCURRENCY,
+            files.length,
+          ),
+        },
+        runNext,
+      );
+      await Promise.all(workers);
 
-        case ApiProvider.DEEPGRAM:
-          transcriptionResult =
-            await SpeechToTextRepository.transcribeWithDeepgram(
-              file,
-              modelOption.providerModel,
-              language,
-              logger,
-              t,
-            );
-          break;
-
-        default:
-          logger.error("[STT] Unsupported STT provider", {
-            apiProvider: modelOption.apiProvider,
-            sttModelId: modelOption.id,
-          });
-          return fail({
-            message: t("post.errors.transcriptionFailed"),
-            errorType: ErrorResponseTypes.BAD_REQUEST,
-          });
+      // Return first error if any chunk failed
+      const failed = results.find((r) => !r.success);
+      if (failed) {
+        return failed;
       }
 
-      if (!transcriptionResult.success) {
-        return transcriptionResult;
-      }
+      // Aggregate results
+      const transcriptionResult = {
+        success: true as const,
+        text: results
+          .map((r) => (r.success ? r.data.text : ""))
+          .join(" ")
+          .trim(),
+        confidence: ((): number | undefined => {
+          const withConf = results.filter(
+            (r) =>
+              r.success &&
+              r.data.confidence !== null &&
+              r.data.confidence !== undefined,
+          );
+          if (withConf.length === 0) {
+            return undefined;
+          }
+          return (
+            withConf.reduce(
+              (sum, r) => sum + (r.success ? (r.data.confidence ?? 0) : 0),
+              0,
+            ) / withConf.length
+          );
+        })(),
+        duration: results.reduce(
+          (sum, r) => sum + (r.success ? r.data.duration : 0),
+          0,
+        ),
+        edenAiCostUsd: results.reduce(
+          (sum, r) =>
+            sum +
+            (r.success &&
+            r.data.edenAiCostUsd !== null &&
+            r.data.edenAiCostUsd !== undefined
+              ? r.data.edenAiCostUsd
+              : 0),
+          0,
+        ),
+      };
 
-      const { text, confidence, duration, edenAiCostUsd } =
-        transcriptionResult.data;
+      const { text, confidence, duration, edenAiCostUsd } = transcriptionResult;
 
       // Calculate credits
       let creditsNeeded: number;

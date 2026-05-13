@@ -1667,7 +1667,10 @@ export class MessageDbWriter {
       messages: [
         {
           id: params.messageId,
-          metadata: { variants: [params.variant] },
+          metadata: {
+            variants: [params.variant],
+            gapFillStatus: null, // clear the "transcribing/analyzing" indicator
+          },
         },
       ],
     });

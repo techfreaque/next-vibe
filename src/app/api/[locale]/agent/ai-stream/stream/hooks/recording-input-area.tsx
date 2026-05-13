@@ -15,6 +15,7 @@ import { Pause } from "next-vibe-ui/ui/icons/Pause";
 import { Play } from "next-vibe-ui/ui/icons/Play";
 import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Type } from "next-vibe-ui/ui/icons/Type";
+import { Download } from "next-vibe-ui/ui/icons/Download";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
@@ -50,6 +51,8 @@ interface RecordingModalProps {
   onSendVoice: () => void;
   /** Retry the last failed transcription */
   onRetry: () => void;
+  /** Download the saved audio file */
+  onDownloadAudio: () => void;
   /** User locale */
   locale: CountryLanguage;
 }
@@ -68,6 +71,7 @@ export function RecordingInputArea({
   onTranscribeToInput,
   onSendVoice,
   onRetry,
+  onDownloadAudio,
   locale,
 }: RecordingModalProps): JSX.Element | null {
   const { t } = aiStreamScopedTranslation.scopedT(locale);
@@ -185,7 +189,7 @@ export function RecordingInputArea({
         // Error state - show message and retry/cancel buttons
         <Div className="flex flex-col items-center gap-3 py-2">
           <Span className="text-sm text-destructive text-center">{error}</Span>
-          <Div className="flex items-center gap-2">
+          <Div className="flex items-center gap-2 flex-wrap justify-center">
             <Button
               type="button"
               size="default"
@@ -197,18 +201,35 @@ export function RecordingInputArea({
               {t("voiceMode.actions.cancel")}
             </Button>
             {hasSavedAudio && (
-              <Button
-                type="button"
-                size="default"
-                variant="outline"
-                onClick={onRetry}
-                className="gap-2"
-              >
-                <RefreshCw className="h-4 w-4" />
-                {t("voiceMode.actions.retry")}
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  size="default"
+                  variant="outline"
+                  onClick={onRetry}
+                  className="gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  {t("voiceMode.actions.retry")}
+                </Button>
+                <Button
+                  type="button"
+                  size="default"
+                  variant="outline"
+                  onClick={onDownloadAudio}
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  {t("voiceMode.actions.download")}
+                </Button>
+              </>
             )}
           </Div>
+          {hasSavedAudio && (
+            <Span className="text-xs text-muted-foreground text-center max-w-xs">
+              {t("voiceMode.actions.downloadHint")}
+            </Span>
+          )}
         </Div>
       ) : (
         // Processing state

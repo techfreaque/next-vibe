@@ -139,6 +139,15 @@ export function applyPartialToCache(
       continue;
     }
 
+    // null at an object key level is an explicit clear - set the key to null
+    if (partialVal === null) {
+      if (existingVal !== null) {
+        result[key] = null;
+        changed = true;
+      }
+      continue;
+    }
+
     const merged = applyPartialToCache(existingVal, partialVal);
 
     if (merged !== existingVal) {

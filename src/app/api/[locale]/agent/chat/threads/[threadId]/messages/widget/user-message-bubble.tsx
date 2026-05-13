@@ -276,6 +276,7 @@ interface VariantEntry {
   content: string;
   modelId?: string | null;
   creditCost?: number | null;
+  bridgeType?: string | null;
 }
 
 function GapFillVariants({
@@ -291,11 +292,13 @@ function GapFillVariants({
 }): JSX.Element {
   const first = variants[0];
   const label =
-    first?.modality === "audio"
+    first?.bridgeType === "stt"
       ? t("gapFill.transcription")
-      : first?.modality === "video"
-        ? t("gapFill.videoDescription")
-        : t("gapFill.imageDescription");
+      : first?.bridgeType === "vision" || first?.modality === "image"
+        ? t("gapFill.imageDescription")
+        : first?.modality === "video"
+          ? t("gapFill.videoDescription")
+          : t("gapFill.imageDescription");
 
   return (
     <Div className="mt-2">
@@ -307,7 +310,7 @@ function GapFillVariants({
       >
         <GapFillIcon
           modality={first?.modality ?? "image"}
-          bridgeType=""
+          bridgeType={first?.bridgeType ?? ""}
           className="opacity-60"
         />
         <Span>{showVariant ? t("gapFill.hideAnalysis") : label}</Span>

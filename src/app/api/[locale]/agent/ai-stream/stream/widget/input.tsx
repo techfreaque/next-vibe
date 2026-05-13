@@ -559,6 +559,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
         onTranscribeToInput={voice.transcribeToInput}
         onSendVoice={handleSendVoice}
         onRetry={voice.retryTranscription}
+        onDownloadAudio={voice.downloadSavedAudio}
         locale={locale}
       />
 

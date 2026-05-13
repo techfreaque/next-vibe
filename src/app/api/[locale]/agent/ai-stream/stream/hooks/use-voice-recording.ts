@@ -65,6 +65,8 @@ export interface UseVoiceRecordingReturn {
   hasSavedAudio: boolean;
   /** Retry the last failed transcription */
   retryTranscription: () => Promise<void>;
+  /** Download the saved audio file from the last failed attempt */
+  downloadSavedAudio: () => void;
 }
 
 /**
@@ -130,6 +132,7 @@ export function useVoiceRecording({
     startRecording: startSTT,
     hasSavedAudio,
     retryTranscription,
+    downloadSavedAudio,
   } = useEdenAISpeech({
     onTranscript,
     onError,
@@ -217,6 +220,7 @@ export function useVoiceRecording({
       hasExistingInput,
       hasSavedAudio,
       retryTranscription,
+      downloadSavedAudio,
     }),
     [
       isRecording,
@@ -234,6 +238,7 @@ export function useVoiceRecording({
       hasExistingInput,
       hasSavedAudio,
       retryTranscription,
+      downloadSavedAudio,
     ],
   );
 }

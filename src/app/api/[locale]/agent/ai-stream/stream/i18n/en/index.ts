@@ -783,6 +783,9 @@ export const translations = {
       toInput: "To Input",
       sendVoice: "Send Voice",
       retry: "Retry",
+      download: "Download Audio",
+      downloadHint:
+        "Download the file and attach it to your next message instead.",
     },
   },
   actions: {

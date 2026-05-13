@@ -48,6 +48,9 @@ export const translations: typeof enTranslations = {
     incognitoTitle: "Anonimowy czat AI",
     incognitoDescription:
       "Przechowywane tylko w Twojej przeglądarce. Nigdy nie zapisywane na koncie ani synchronizowane.",
+    backgroundTitle: "Twoi agenci AI pracują",
+    backgroundDescription:
+      "Subagenci i autonomiczni agenci w tle wykonują zadania tutaj, gdy Ty zajmujesz się czymś innym. Wyniki trafiają tu automatycznie.",
   },
   config: {
     appName: "unbottled.ai",

@@ -764,6 +764,8 @@ export const translations: typeof enTranslations = {
       toInput: "Do wpisywania",
       sendVoice: "Wyślij głos",
       retry: "Spróbuj ponownie",
+      download: "Pobierz audio",
+      downloadHint: "Pobierz plik i dołącz go do następnej wiadomości.",
     },
   },
   actions: {
