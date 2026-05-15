@@ -160,6 +160,7 @@ export function BaseMessageInput({
           onTranscribeToInput={voice.transcribeToInput}
           onSendVoice={() => void voice.submitAudioDirectly()}
           onRetry={() => void voice.retryTranscription()}
+          onDownloadAudio={voice.downloadSavedAudio}
           locale={locale}
         />
 

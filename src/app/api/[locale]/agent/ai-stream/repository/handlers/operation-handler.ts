@@ -68,7 +68,7 @@ export class OperationHandler {
 
           const transcriptionResult =
             await SpeechToTextRepository.transcribeAudio(
-              data.audioInput.file,
+              [data.audioInput.file],
               user,
               locale,
               logger,

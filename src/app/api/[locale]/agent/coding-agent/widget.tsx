@@ -337,6 +337,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     cancelRecording,
     togglePause,
     retryTranscription,
+    downloadSavedAudio,
   } = useVoiceRecording({
     currentValue: promptValue,
     onValueChange: handleContentChange,
@@ -570,6 +571,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
               onTranscribeToInput={transcribeToInput}
               onSendVoice={() => undefined}
               onRetry={() => void retryTranscription()}
+              onDownloadAudio={downloadSavedAudio}
               locale={locale}
             />
           )}
