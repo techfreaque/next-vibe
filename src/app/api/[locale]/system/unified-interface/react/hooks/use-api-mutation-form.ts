@@ -364,13 +364,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         logger.error("[client] Error in submitForm", parseError(error), {
           endpoint: endpoint.path.join("/"),
           fieldKeys: Object.keys(formSnapshot).join(", "),
-          hasFiles: Object.values(formSnapshot).some(
-            (v) =>
-              v instanceof File ||
-              (typeof v === "object" &&
-                v !== null &&
-                Object.values(v).some((vv) => vv instanceof File)),
-          ),
+          hasFiles: containsFile(formSnapshot),
         });
 
         // Handle any errors that occur during submission

@@ -165,12 +165,7 @@
             "properties": {
               "callbackMode": {
                 "description": "Optional. Controls post-execution behavior. 'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. 'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. 'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. 'approve': require user confirmation before executing. Omit for default synchronous execution.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "category": {

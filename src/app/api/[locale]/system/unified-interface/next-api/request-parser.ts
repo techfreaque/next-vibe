@@ -209,13 +209,48 @@ function parseFormData(
       const arrayKey = simpleBracketMatch[1];
       const index = parseInt(simpleBracketMatch[2], 10);
       if (arrayKey) {
-        if (!(arrayKey in result)) {
-          result[arrayKey] = [];
+        if (arrayKey.includes(".")) {
+          // Dot+bracket notation: navigate to nested object first, then index into array
+          // e.g. fileUpload.files[0] => result.fileUpload.files[0]
+          const parts = arrayKey.split(".");
+          let current: MergedObject = result;
+          for (let i = 0; i < parts.length - 1; i++) {
+            const part = parts[i];
+            if (part) {
+              if (
+                !(part in current) ||
+                typeof current[part] !== "object" ||
+                current[part] === null ||
+                current[part] instanceof File
+              ) {
+                current[part] = {};
+              }
+              current = current[part] as MergedObject;
+            }
+          }
+          const lastPart = parts.at(-1);
+          if (lastPart) {
+            if (!Array.isArray(current[lastPart])) {
+              current[lastPart] = [];
+            }
+            (current[lastPart] as Array<string | File | File[] | MergedObject>)[
+              index
+            ] =
+              typeof value === "string"
+                ? (tryParseValue(value) as string)
+                : value;
+          }
+        } else {
+          if (!(arrayKey in result)) {
+            result[arrayKey] = [];
+          }
+          (result[arrayKey] as Array<string | File | File[] | MergedObject>)[
+            index
+          ] =
+            typeof value === "string"
+              ? (tryParseValue(value) as string)
+              : value;
         }
-        (result[arrayKey] as Array<string | File | File[] | MergedObject>)[
-          index
-        ] =
-          typeof value === "string" ? (tryParseValue(value) as string) : value;
       }
     } else if (bracketDotMatch) {
       const arrayKey = bracketDotMatch[1];
