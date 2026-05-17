@@ -397,6 +397,14 @@ export async function parseRequestBody(
         // Parse the JSON data field
         const jsonData = JSON.parse(dataField) as MergedObject;
 
+        // Log raw FormData keys for diagnostics (helps debug file upload issues)
+        const rawFormDataKeys: string[] = [];
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility
+        for (const [key] of (formData as any).entries()) {
+          rawFormDataKeys.push(key as string);
+        }
+        logger.debug("Raw FormData keys from client", { rawFormDataKeys });
+
         // Parse remaining FormData fields (files with dot notation)
         const fileFields = parseFormData(formData);
         // Remove the "data" field from fileFields since we already parsed it
@@ -405,10 +413,23 @@ export async function parseRequestBody(
         // Merge JSON data with file fields (files override null placeholders)
         const merged = deepMerge(jsonData, fileFields);
 
+        const mergedFileUpload = merged["fileUpload"] as
+          | MergedObject
+          | null
+          | undefined;
+        const mergedFiles = mergedFileUpload?.["files"];
         logger.debug("Parsed mixed FormData + JSON request", {
           jsonDataKeys: Object.keys(jsonData),
           fileFieldKeys: Object.keys(fileFields),
           mergedKeys: Object.keys(merged),
+          mergedFileUploadFilesLength: Array.isArray(mergedFiles)
+            ? mergedFiles.length
+            : "not array",
+          mergedFileUploadFilesTypes: Array.isArray(mergedFiles)
+            ? mergedFiles.map((f) =>
+                f instanceof File ? `File(${f.name},${f.size})` : typeof f,
+              )
+            : "not array",
         });
 
         return merged as Record<

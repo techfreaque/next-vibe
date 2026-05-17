@@ -220,6 +220,7 @@ export class AiStreamRepository {
       await MessagesRepository.createUserMessage({
         messageId: data.userMessageId,
         threadId: data.threadId,
+        rootFolderId: data.rootFolderId,
         role: ChatMessageRole.USER,
         content: data.content,
         parentId: data.parentMessageId || null,

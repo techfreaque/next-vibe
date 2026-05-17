@@ -387,7 +387,9 @@ export class TaskSyncRepository {
         const parsedErr = parseError(error);
         logger.error("Failed to upsert remote cron task", {
           routeId: remoteTask.routeId,
+          name: parsedErr.name,
           error: parsedErr.message,
+          stack: parsedErr.stack,
           cause:
             parsedErr.cause instanceof Error
               ? parsedErr.cause.message

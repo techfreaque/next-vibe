@@ -143,6 +143,13 @@ export async function executeRemote<T>(
   );
   const headers = buildRemoteHeaders(token, leadId);
 
+  const REMOTE_TIMEOUT_MS = 30_000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, REMOTE_TIMEOUT_MS);
+
+  const startMs = Date.now();
   logger.debug(`[REMOTE] ${definition.method} ${url}`);
 
   try {
@@ -151,7 +158,9 @@ export async function executeRemote<T>(
       headers,
       body:
         definition.method === Methods.GET ? undefined : JSON.stringify(data),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     const { t } = sharedScopedTranslation.scopedT(locale);
     try {
@@ -173,14 +182,28 @@ export async function executeRemote<T>(
 
       return success(json.data as T);
     } catch {
-      logger.error(`[REMOTE] Failed to parse response JSON from ${url}`);
+      logger.error(`[REMOTE] Failed to parse response JSON`, {
+        url,
+        statusCode: response.status,
+        elapsedMs: Date.now() - startMs,
+      });
       return fail({
         message: t("errorTypes.internal_error"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   } catch (error) {
-    logger.error(`[REMOTE] Fetch failed: ${parseError(error).message}`);
+    clearTimeout(timeoutId);
+    const parsed = parseError(error);
+    const isTimeout = parsed.name === "AbortError";
+    logger.error(`[REMOTE] Fetch failed`, {
+      url,
+      method: definition.method,
+      error: parsed.message,
+      isTimeout,
+      elapsedMs: Date.now() - startMs,
+      timeoutMs: REMOTE_TIMEOUT_MS,
+    });
     const { t } = sharedScopedTranslation.scopedT(defaultLocale);
     return fail({
       message: t("errorTypes.internal_error"),

@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
@@ -73,6 +73,7 @@ async function ensurePulseSubFolder(
       color,
       expanded: true,
       sortOrder: 0,
+      pinned: true,
     })
     .returning({ id: chatFolders.id });
 
@@ -93,6 +94,28 @@ function dreamTaskId(userId: string): string {
 /** Generate a stable, user-scoped task ID for autopilot */
 function autopilotTaskId(userId: string): string {
   return `${AUTOPILOT_TASK_PREFIX}${userId.slice(0, 8)}`;
+}
+
+/**
+ * Find an existing user-owned pulse task by display name.
+ * Returns the task's id if found, null otherwise.
+ * Used to reuse the existing task row instead of creating duplicates.
+ */
+async function findExistingPulseTaskId(
+  userId: string,
+  displayName: string,
+): Promise<string | null> {
+  const [existing] = await db
+    .select({ id: cronTasks.id })
+    .from(cronTasks)
+    .where(
+      and(
+        eq(cronTasks.userId, userId),
+        sql`lower(${cronTasks.displayName}) = lower(${displayName})`,
+      ),
+    )
+    .limit(1);
+  return existing?.id ?? null;
 }
 
 /** Default user message to kick off a dreaming session */
@@ -119,7 +142,8 @@ export async function ensureDreamTask(
     >
   >,
 ): Promise<void> {
-  const id = dreamTaskId(userId);
+  const existingId = await findExistingPulseTaskId(userId, "Dreaming");
+  const id = existingId ?? dreamTaskId(userId);
   const enabled = settings.dreamerEnabled ?? false;
   const schedule = settings.dreamerSchedule ?? DREAM_DEFAULT_SCHEDULE;
   const favoriteId = settings.dreamerFavoriteId ?? undefined;
@@ -189,7 +213,8 @@ export async function ensureAutopilotTask(
     >
   >,
 ): Promise<void> {
-  const id = autopilotTaskId(userId);
+  const existingId = await findExistingPulseTaskId(userId, "Autopilot");
+  const id = existingId ?? autopilotTaskId(userId);
   const enabled = settings.autopilotEnabled ?? false;
   const schedule = settings.autopilotSchedule ?? AUTOPILOT_DEFAULT_SCHEDULE;
   const favoriteId = settings.autopilotFavoriteId ?? undefined;
@@ -262,6 +287,18 @@ export async function ensureMamaTask(
     Pick<ChatSettings, "mamaEnabled" | "mamaSchedule" | "mamaPrompt">
   >,
 ): Promise<void> {
+  // Mama is a global system task (userId=null) - find by displayName with null userId
+  const [existingMama] = await db
+    .select({ id: cronTasks.id })
+    .from(cronTasks)
+    .where(
+      and(
+        isNull(cronTasks.userId),
+        sql`lower(${cronTasks.displayName}) = lower('Mama Heartbeat')`,
+      ),
+    )
+    .limit(1);
+  const mamaId = existingMama?.id ?? MAMA_TASK_ID;
   const enabled = settings.mamaEnabled ?? false;
   const schedule = settings.mamaSchedule ?? MAMA_DEFAULT_SCHEDULE;
   const prompt = settings.mamaPrompt ?? MAMA_DEFAULT_PROMPT;
@@ -286,8 +323,8 @@ export async function ensureMamaTask(
   await db
     .insert(cronTasks)
     .values({
-      id: MAMA_TASK_ID,
-      shortId: MAMA_TASK_ID,
+      id: mamaId,
+      shortId: mamaId,
       routeId: AI_RUN_ALIAS,
       displayName: "Mama Heartbeat",
       description:

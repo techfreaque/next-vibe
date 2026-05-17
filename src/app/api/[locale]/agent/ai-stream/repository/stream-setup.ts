@@ -698,6 +698,7 @@ export async function setupAiStream(params: {
       hasToolConfirmations,
       isIncognito,
       threadId: threadResult.data.threadId,
+      rootFolderId: data.rootFolderId,
       effectiveRole,
       effectiveContent,
       effectiveParentMessageId,

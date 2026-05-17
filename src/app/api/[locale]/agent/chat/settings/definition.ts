@@ -185,6 +185,18 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.number().int(),
       }),
+
+      // Pulse task IDs - null if not yet created. Use these for Run Now instead of derived IDs.
+      dreamerTaskId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
+      }),
+      autopilotTaskId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
+      }),
     },
   }),
 
@@ -257,6 +269,8 @@ const { GET } = createEndpoint({
         dreamerThreadCount: 0,
         autopilotSubFolderId: null,
         autopilotThreadCount: 0,
+        dreamerTaskId: null,
+        autopilotTaskId: null,
       },
     },
   },

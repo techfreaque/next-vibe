@@ -5,6 +5,7 @@
  * Renders response data using endpoint definitions for pretty output.
  */
 
+import { QueryClientProvider } from "@tanstack/react-query";
 import { parseError } from "next-vibe/shared/utils";
 import { createElement } from "react";
 
@@ -13,6 +14,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { queryClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -73,18 +75,22 @@ export class McpResultFormatter {
       // Create component
       const createStart = performance.now();
       const component = createElement(
-        NavigationStackProvider,
-        null,
-        createElement(EndpointRenderer, {
-          endpoint,
-          locale,
-          data,
-          logger,
-          user,
-          response: { success: true, data },
-          responseOnly: true,
-          platform: Platform.MCP,
-        }),
+        QueryClientProvider,
+        { client: queryClient },
+        createElement(
+          NavigationStackProvider,
+          null,
+          createElement(EndpointRenderer, {
+            endpoint,
+            locale,
+            data,
+            logger,
+            user,
+            response: { success: true, data },
+            responseOnly: true,
+            platform: Platform.MCP,
+          }),
+        ),
       );
       const componentTime = performance.now() - createStart;
 

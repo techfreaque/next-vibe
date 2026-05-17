@@ -1225,13 +1225,27 @@ function renderWithReconciler(
 
   const container: Container = { node: null };
 
-  const root = reconciler.createContainer(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- react-reconciler types lag behind: runtime expects onUncaughtError, onCaughtError, onRecoverableError
+  const createContainer = reconciler.createContainer as (...args: any[]) => any;
+  const root = createContainer(
     container,
     LegacyRoot,
     null,
     false,
     null,
     "fast-renderer",
+    (err: Error) => {
+      logger.error(
+        "[Fast Renderer] Reconciler uncaught error:",
+        parseError(err),
+      );
+    },
+    (err: Error) => {
+      logger.error(
+        "[Fast Renderer] Reconciler caught error (boundary):",
+        parseError(err),
+      );
+    },
     (err: Error) => {
       logger.error(
         "[Fast Renderer] Reconciler recoverable error:",

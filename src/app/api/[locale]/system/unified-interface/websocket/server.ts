@@ -355,6 +355,27 @@ async function authenticateFromCookies(
 }
 
 // ============================================================================
+// RECENT REQUEST TRACKER - used to diagnose Next.js crashes
+// ============================================================================
+
+interface RecentRequest {
+  method: string;
+  path: string;
+  ts: number; // Date.now() when request arrived
+}
+
+/** Rolling log of last 20 proxied requests - dumped when Next.js first goes ECONNREFUSED */
+const recentRequests: RecentRequest[] = [];
+const RECENT_REQUESTS_MAX = 20;
+
+function trackRequest(method: string, path: string): void {
+  recentRequests.push({ method, path, ts: Date.now() });
+  if (recentRequests.length > RECENT_REQUESTS_MAX) {
+    recentRequests.shift();
+  }
+}
+
+// ============================================================================
 // SERVER FACTORY
 // ============================================================================
 
@@ -562,6 +583,7 @@ export function startWebSocketServer(
       const PROXY_REQUEST_TIMEOUT_MS = 90_000;
       let lastProxyError = "Unknown error";
       const proxyStartMs = Date.now();
+      trackRequest(req.method, url.pathname);
 
       // For multipart/form-data (file uploads), Bun's internal idle timeout can
       // fire mid-stream and truncate the body before all bytes reach the proxy.
@@ -651,12 +673,27 @@ export function startWebSocketServer(
           );
 
           proxyReq.on("error", (err) => {
-            const isConnRefused =
-              (err as NodeJS.ErrnoException).code === "ECONNREFUSED";
+            const nodeErr = err as NodeJS.ErrnoException;
+            const isConnRefused = nodeErr.code === "ECONNREFUSED";
             // On ECONNREFUSED while running - signal retry via null (idempotent only).
             // Non-idempotent methods and shutdown: return 502/503 immediately, no retry.
             if (isConnRefused && !shuttingDown && isIdempotent) {
-              lastProxyError = err.message;
+              lastProxyError = nodeErr.code ?? err.message;
+              // On first ECONNREFUSED, dump recent request history so we know what was running before crash
+              if (attempt === 0) {
+                logger.error(
+                  "[Proxy] Next.js went down - recent requests before crash",
+                  {
+                    path: url.pathname,
+                    method: req.method,
+                    recentRequests: recentRequests.map((r) => ({
+                      method: r.method,
+                      path: r.path,
+                      agoMs: Date.now() - r.ts,
+                    })),
+                  },
+                );
+              }
               settle(null); // null = retry
               return;
             }
@@ -673,8 +710,11 @@ export function startWebSocketServer(
             }
             if (!shuttingDown) {
               logger.error("[Proxy] Server unreachable", {
+                errorCode: nodeErr.code ?? "UNKNOWN",
                 error: err.message,
                 path: url.pathname,
+                method: req.method,
+                elapsedMs: Date.now() - proxyStartMs,
               });
             }
             settle(new Response("Bad Gateway", { status: 502 }));
@@ -731,7 +771,7 @@ export function startWebSocketServer(
           attempt: attempt + 1,
           delayMs: delay,
           elapsedMs: Date.now() - proxyStartMs,
-          lastError: lastProxyError,
+          lastErrorCode: lastProxyError,
           uptime: Math.floor(process.uptime()),
           heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
           rssMb: Math.round(mem.rss / 1024 / 1024),
@@ -747,7 +787,7 @@ export function startWebSocketServer(
         path: url.pathname,
         method: req.method,
         totalElapsedMs: Date.now() - proxyStartMs,
-        lastError: lastProxyError,
+        lastErrorCode: lastProxyError,
         uptime: Math.floor(process.uptime()),
         heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
         rssMb: Math.round(mem.rss / 1024 / 1024),

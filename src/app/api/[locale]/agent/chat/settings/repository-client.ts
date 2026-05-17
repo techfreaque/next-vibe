@@ -104,6 +104,8 @@ export class ChatSettingsRepositoryClient {
       dreamerThreadCount: 0,
       autopilotSubFolderId: null,
       autopilotThreadCount: 0,
+      dreamerTaskId: null,
+      autopilotTaskId: null,
     };
   }
 
@@ -178,6 +180,8 @@ export class ChatSettingsRepositoryClient {
         dreamerThreadCount: 0,
         autopilotSubFolderId: null,
         autopilotThreadCount: 0,
+        dreamerTaskId: null,
+        autopilotTaskId: null,
       };
     } catch {
       return this.getDefaults(user);
@@ -338,6 +342,8 @@ export class ChatSettingsRepositoryClient {
       dreamerThreadCount: current.dreamerThreadCount,
       autopilotSubFolderId: current.autopilotSubFolderId,
       autopilotThreadCount: current.autopilotThreadCount,
+      dreamerTaskId: current.dreamerTaskId,
+      autopilotTaskId: current.autopilotTaskId,
     };
 
     this.saveLocalSettings(updated, user);

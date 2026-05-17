@@ -47,6 +47,7 @@ import type {
   MessageListResponseOutput,
 } from "./definition";
 import { scopedTranslation, type MessagesT } from "./i18n";
+import { logger } from "react-native-reanimated/src/common";
 
 /**
  * Messages Repository Implementation
@@ -180,6 +181,7 @@ export class MessagesRepository {
   static async createUserMessage(params: {
     messageId: string;
     threadId: string;
+    rootFolderId: DefaultFolderId;
     role: (typeof ChatMessageRoleDB)[number];
     content: string;
     parentId: string | null;
@@ -196,6 +198,14 @@ export class MessagesRepository {
     /** Extra metadata to merge into the message (e.g. isQueued, queuedSettings) */
     extraMetadata?: Partial<NonNullable<ChatMessage["metadata"]>>;
   }): Promise<void> {
+    // Incognito threads live in client storage only — no DB row exists or should be created.
+    if (params.rootFolderId === DefaultFolderId.INCOGNITO) {
+      logger.error(
+        "createUserMessage should not be called for incoginto folders",
+      );
+      return;
+    }
+
     const metadata = {
       ...(params.attachments && params.attachments.length > 0
         ? { attachments: params.attachments }
@@ -218,6 +228,7 @@ export class MessagesRepository {
         {
           threadId: params.threadId,
           messageId: params.messageId,
+          rootFolderId: params.rootFolderId,
           isQueued: params.extraMetadata?.isQueued ?? false,
         },
       );

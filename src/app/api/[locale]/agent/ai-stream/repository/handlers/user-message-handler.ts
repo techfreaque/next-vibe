@@ -14,6 +14,7 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 
+import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessageRole } from "../../../chat/enum";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import type { AiStreamT } from "../../stream/i18n";
@@ -29,6 +30,7 @@ export class UserMessageHandler {
     hasToolConfirmations: boolean;
     isIncognito: boolean;
     threadId: string;
+    rootFolderId: DefaultFolderId;
     effectiveRole: ChatMessageRole;
     effectiveContent: string;
     effectiveParentMessageId: string | null | undefined;
@@ -66,6 +68,7 @@ export class UserMessageHandler {
       hasToolConfirmations,
       isIncognito,
       threadId,
+      rootFolderId,
       effectiveRole,
       effectiveContent,
       effectiveParentMessageId,
@@ -209,6 +212,7 @@ export class UserMessageHandler {
       await MessagesRepository.createUserMessage({
         messageId: userMessageId,
         threadId,
+        rootFolderId,
         role: effectiveRole,
         content: effectiveContent,
         parentId: effectiveParentMessageId || null,

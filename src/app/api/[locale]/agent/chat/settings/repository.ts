@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, eq, isNull } from "drizzle-orm";
+import { and, count, eq, isNull, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,6 +17,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
+import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
@@ -59,8 +60,13 @@ export class ChatSettingsRepository {
         .from(chatSettings)
         .where(eq(chatSettings.userId, userId));
 
-      // Query pulse subfolders and thread counts in parallel
-      const [dreamerFolderRow, autopilotFolderRow] = await Promise.all([
+      // Query pulse subfolders, thread counts, and task IDs in parallel
+      const [
+        dreamerFolderRow,
+        autopilotFolderRow,
+        dreamerTaskRow,
+        autopilotTaskRow,
+      ] = await Promise.all([
         db
           .select({ id: chatFolders.id })
           .from(chatFolders)
@@ -85,10 +91,32 @@ export class ChatSettingsRepository {
             ),
           )
           .limit(1),
+        db
+          .select({ id: cronTasks.id })
+          .from(cronTasks)
+          .where(
+            and(
+              eq(cronTasks.userId, userId),
+              sql`lower(${cronTasks.displayName}) = 'dreaming'`,
+            ),
+          )
+          .limit(1),
+        db
+          .select({ id: cronTasks.id })
+          .from(cronTasks)
+          .where(
+            and(
+              eq(cronTasks.userId, userId),
+              sql`lower(${cronTasks.displayName}) = 'autopilot'`,
+            ),
+          )
+          .limit(1),
       ]);
 
       const dreamerSubFolderId = dreamerFolderRow[0]?.id ?? null;
       const autopilotSubFolderId = autopilotFolderRow[0]?.id ?? null;
+      const dreamerTaskId = dreamerTaskRow[0]?.id ?? null;
+      const autopilotTaskId = autopilotTaskRow[0]?.id ?? null;
 
       const [dreamerCountRow, autopilotCountRow] = await Promise.all([
         dreamerSubFolderId
@@ -132,6 +160,8 @@ export class ChatSettingsRepository {
           dreamerThreadCount,
           autopilotSubFolderId,
           autopilotThreadCount,
+          dreamerTaskId,
+          autopilotTaskId,
         });
       }
 
@@ -167,6 +197,8 @@ export class ChatSettingsRepository {
         dreamerThreadCount,
         autopilotSubFolderId,
         autopilotThreadCount,
+        dreamerTaskId,
+        autopilotTaskId,
       };
 
       return success(result);

@@ -3,19 +3,6 @@
  * Centralized enum definitions for skill system using localized enum pattern
  */
 
-import type { IconComponent } from "next-vibe-ui/lib/helper";
-import { Brain } from "next-vibe-ui/ui/icons/Brain";
-import { Code } from "next-vibe-ui/ui/icons/Code";
-import { Eye } from "next-vibe-ui/ui/icons/Eye";
-import { FileText } from "next-vibe-ui/ui/icons/FileText";
-import { Image } from "next-vibe-ui/ui/icons/Image";
-import { Lightbulb } from "next-vibe-ui/ui/icons/Lightbulb";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { ShieldOff } from "next-vibe-ui/ui/icons/ShieldOff";
-import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
-import { Theater } from "next-vibe-ui/ui/icons/Theater";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
@@ -481,7 +468,7 @@ export function categoryToTask(
 export interface ModelUtilityConfig {
   id: typeof ModelUtilityValue;
   titleKey: ModelsTranslationKey;
-  icon: IconComponent;
+  icon: IconKey;
   order: number;
   /** Whether this is a content-related utility (vs core capability) */
   isContentRelated?: boolean;
@@ -496,37 +483,37 @@ export const MODEL_UTILITIES = {
   [ModelUtility.CHAT]: {
     id: ModelUtility.CHAT,
     titleKey: "modelUtilities.chat",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 0,
   },
   [ModelUtility.CODING]: {
     id: ModelUtility.CODING,
     titleKey: "modelUtilities.coding",
-    icon: Code,
+    icon: "code",
     order: 1,
   },
   [ModelUtility.CREATIVE]: {
     id: ModelUtility.CREATIVE,
     titleKey: "modelUtilities.creative",
-    icon: Sparkles,
+    icon: "sparkles",
     order: 2,
   },
   [ModelUtility.ANALYSIS]: {
     id: ModelUtility.ANALYSIS,
     titleKey: "modelUtilities.analysis",
-    icon: FileText,
+    icon: "file-text",
     order: 3,
   },
   [ModelUtility.REASONING]: {
     id: ModelUtility.REASONING,
     titleKey: "modelUtilities.reasoning",
-    icon: Brain,
+    icon: "brain",
     order: 4,
   },
   [ModelUtility.ROLEPLAY]: {
     id: ModelUtility.ROLEPLAY,
     titleKey: "modelUtilities.roleplay",
-    icon: Theater,
+    icon: "theater",
     order: 5,
   },
 
@@ -534,25 +521,25 @@ export const MODEL_UTILITIES = {
   [ModelUtility.FAST]: {
     id: ModelUtility.FAST,
     titleKey: "modelUtilities.fast",
-    icon: Zap,
+    icon: "zap",
     order: 10,
   },
   [ModelUtility.SMART]: {
     id: ModelUtility.SMART,
     titleKey: "modelUtilities.smart",
-    icon: Lightbulb,
+    icon: "lightbulb",
     order: 11,
   },
   [ModelUtility.VISION]: {
     id: ModelUtility.VISION,
     titleKey: "modelUtilities.vision",
-    icon: Eye,
+    icon: "eye",
     order: 12,
   },
   [ModelUtility.IMAGE_GEN]: {
     id: ModelUtility.IMAGE_GEN,
     titleKey: "modelUtilities.imageGen",
-    icon: Image,
+    icon: "image",
     order: 13,
   },
 
@@ -560,91 +547,91 @@ export const MODEL_UTILITIES = {
   [ModelUtility.UNCENSORED]: {
     id: ModelUtility.UNCENSORED,
     titleKey: "modelUtilities.uncensored",
-    icon: ShieldOff,
+    icon: "shield-off",
     order: 20,
     isContentRelated: true,
   },
   [ModelUtility.POLITICAL_LEFT]: {
     id: ModelUtility.POLITICAL_LEFT,
     titleKey: "modelUtilities.politicalLeft",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 21,
     isContentRelated: true,
   },
   [ModelUtility.POLITICAL_RIGHT]: {
     id: ModelUtility.POLITICAL_RIGHT,
     titleKey: "modelUtilities.politicalRight",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 22,
     isContentRelated: true,
   },
   [ModelUtility.CONTROVERSIAL]: {
     id: ModelUtility.CONTROVERSIAL,
     titleKey: "modelUtilities.controversial",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 23,
     isContentRelated: true,
   },
   [ModelUtility.ADULT_IMPLIED]: {
     id: ModelUtility.ADULT_IMPLIED,
     titleKey: "modelUtilities.adultImplied",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 24,
     isContentRelated: true,
   },
   [ModelUtility.ADULT_EXPLICIT]: {
     id: ModelUtility.ADULT_EXPLICIT,
     titleKey: "modelUtilities.adultExplicit",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 25,
     isContentRelated: true,
   },
   [ModelUtility.VIOLENCE]: {
     id: ModelUtility.VIOLENCE,
     titleKey: "modelUtilities.violence",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 26,
     isContentRelated: true,
   },
   [ModelUtility.HARMFUL]: {
     id: ModelUtility.HARMFUL,
     titleKey: "modelUtilities.harmful",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 27,
     isContentRelated: true,
   },
   [ModelUtility.ILLEGAL_INFO]: {
     id: ModelUtility.ILLEGAL_INFO,
     titleKey: "modelUtilities.illegalInfo",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 28,
     isContentRelated: true,
   },
   [ModelUtility.MEDICAL_ADVICE]: {
     id: ModelUtility.MEDICAL_ADVICE,
     titleKey: "modelUtilities.medicalAdvice",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 29,
     isContentRelated: true,
   },
   [ModelUtility.OFFENSIVE_LANGUAGE]: {
     id: ModelUtility.OFFENSIVE_LANGUAGE,
     titleKey: "modelUtilities.offensiveLanguage",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 30,
     isContentRelated: true,
   },
   [ModelUtility.ROLEPLAY_DARK]: {
     id: ModelUtility.ROLEPLAY_DARK,
     titleKey: "modelUtilities.roleplayDark",
-    icon: Theater,
+    icon: "theater",
     order: 31,
     isContentRelated: true,
   },
   [ModelUtility.CONSPIRACY]: {
     id: ModelUtility.CONSPIRACY,
     titleKey: "modelUtilities.conspiracy",
-    icon: MessageSquare,
+    icon: "message-square",
     order: 32,
     isContentRelated: true,
   },
@@ -653,7 +640,7 @@ export const MODEL_UTILITIES = {
   [ModelUtility.LEGACY]: {
     id: ModelUtility.LEGACY,
     titleKey: "modelUtilities.legacy",
-    icon: Image,
+    icon: "image",
     order: 100,
   },
 };

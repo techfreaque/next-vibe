@@ -462,6 +462,7 @@ const { POST } = createEndpoint({
   subCategory: "endpointCategories.userAuthProfile",
   tags: ["tag" as const],
   allowedRoles: [
+    UserRole.PUBLIC,
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,

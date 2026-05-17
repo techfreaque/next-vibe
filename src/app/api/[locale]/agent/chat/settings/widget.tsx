@@ -1322,7 +1322,7 @@ export function ChatSettingsWidget({
           prompt={settings.dreamerPrompt ?? null}
           subFolderId={settings.dreamerSubFolderId ?? null}
           threadCount={settings.dreamerThreadCount ?? 0}
-          taskId={`dream-${user.id.slice(0, 8)}`}
+          taskId={settings.dreamerTaskId ?? `dream-${user.id.slice(0, 8)}`}
           onToggle={(val) => void handleDreamerToggle(val)}
           onScheduleChange={(val) =>
             void handleUpdate({ dreamerSchedule: val })
@@ -1344,7 +1344,9 @@ export function ChatSettingsWidget({
           prompt={settings.autopilotPrompt ?? null}
           subFolderId={settings.autopilotSubFolderId ?? null}
           threadCount={settings.autopilotThreadCount ?? 0}
-          taskId={`autopilot-${user.id.slice(0, 8)}`}
+          taskId={
+            settings.autopilotTaskId ?? `autopilot-${user.id.slice(0, 8)}`
+          }
           onToggle={(val) => void handleAutopilotToggle(val)}
           onScheduleChange={(val) =>
             void handleUpdate({ autopilotSchedule: val })

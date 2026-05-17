@@ -481,6 +481,7 @@ export class FetchUrlContentRepository {
     if (!result.ok) {
       logger.error("Fetch URL error", {
         error: result.error,
+        isTimeout: result.isTimeout ?? false,
         url,
       });
 
