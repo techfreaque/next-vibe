@@ -456,7 +456,11 @@ export class StripeProvider implements PaymentProvider {
           hasParent: true,
           parentKeys: Object.keys(eventData.parent),
         });
-      } else if (event.type.includes("invoice")) {
+      } else if (
+        event.type.startsWith("invoice.") &&
+        !event.type.startsWith("invoice_payment.")
+      ) {
+        // invoice.* events (not invoice_payment.*) are expected to have a parent
         logger.warn("No parent in invoice event", {
           eventType: event.type,
           eventDataKeys: Object.keys(eventData),

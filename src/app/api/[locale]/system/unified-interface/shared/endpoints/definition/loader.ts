@@ -92,13 +92,31 @@ export class DefinitionLoader implements IDefinitionLoader {
 
       return success(endpoint as TEndpoint);
     } catch (error) {
+      const parsed = parseError(error);
+      // Chunk load failures happen on the client after a deployment when the old
+      // JS bundle references a chunk hash that no longer exists on the CDN.
+      // Force a full page reload so the client fetches the new bundle.
+      const isChunkLoadError =
+        parsed.message.includes("Loading chunk") ||
+        parsed.name === "ChunkLoadError";
+      if (isChunkLoadError && typeof window !== "undefined") {
+        logger.warn(
+          `[Definition Loader] Stale chunk detected - reloading page (identifier: ${identifier})`,
+        );
+        window.location.reload();
+        // Return a non-resolving promise - reload is in flight
+        return new Promise<ResponseType<TEndpoint>>((resolve) => {
+          // Never resolves - page reload is in flight
+          void resolve;
+        });
+      }
       logger.error(
-        `[Definition Loader] Failed to load definition (identifier: ${identifier}, error: ${parseError(error).message})`,
+        `[Definition Loader] Failed to load definition (identifier: ${identifier}, error: ${parsed.message})`,
       );
       return fail({
         message: t("shared.endpoints.definition.loader.errors.loadFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { identifier, error: parseError(error).message },
+        messageParams: { identifier, error: parsed.message },
       });
     }
   }

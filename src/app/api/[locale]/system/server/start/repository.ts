@@ -421,7 +421,8 @@ export class ServerStartRepository {
         const heapUsedMb = Math.round(mem.heapUsed / 1024 / 1024);
         const rssMb = Math.round(mem.rss / 1024 / 1024);
         const heapTotalMb = Math.round(mem.heapTotal / 1024 / 1024);
-        const heapPct = heapTotalMb > 0 ? (heapUsedMb / heapTotalMb) * 100 : 0;
+        const heapPct =
+          heapTotalMb > 0 ? Math.min((heapUsedMb / heapTotalMb) * 100, 100) : 0;
 
         mkdirSync(".tmp", { recursive: true });
         writeFileSync(
@@ -441,15 +442,19 @@ export class ServerStartRepository {
           "utf-8",
         );
 
-        // Memory pressure warnings - only log when crossing a new threshold
+        // Memory pressure warnings - only log when crossing a new threshold.
+        // Skip the first 30s: Node/Bun reports inflated transient heap values at startup.
+        const uptime = Math.floor(process.uptime());
         const memMeta = {
           heapUsedMb,
           rssMb,
           heapTotalMb,
           heapPct: Math.round(heapPct),
-          uptime: Math.floor(process.uptime()),
+          uptime,
         };
-        if (heapPct >= 90 && lastPressureLevel < 3) {
+        if (uptime < 30) {
+          // Suppress pressure warnings during startup - heap metrics are unreliable
+        } else if (heapPct >= 90 && lastPressureLevel < 3) {
           lastPressureLevel = 3;
           logger.error(
             "[Memory] CRITICAL: heap at ≥90% - OOM imminent, consider restarting",

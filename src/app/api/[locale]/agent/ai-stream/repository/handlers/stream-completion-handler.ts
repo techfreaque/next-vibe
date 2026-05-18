@@ -127,11 +127,12 @@ export class StreamCompletionHandler {
       });
     } else {
       logger.warn(
-        "Cannot emit TOKENS_UPDATED: no assistant message ID available",
+        "Cannot emit TOKENS_UPDATED: no assistant message ID available - provider returned empty stream",
         {
           threadId,
           model,
           totalTokens: usage.totalTokens,
+          finishReason: finishReason ?? null,
           lastAssistantMessageId: ctx.lastAssistantMessageId ?? null,
           currentAssistantMessageId: ctx.currentAssistantMessageId ?? null,
         },
