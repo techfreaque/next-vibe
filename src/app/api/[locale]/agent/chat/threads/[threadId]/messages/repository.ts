@@ -47,7 +47,6 @@ import type {
   MessageListResponseOutput,
 } from "./definition";
 import { scopedTranslation, type MessagesT } from "./i18n";
-import { logger } from "react-native-reanimated/src/common";
 
 /**
  * Messages Repository Implementation
@@ -200,7 +199,7 @@ export class MessagesRepository {
   }): Promise<void> {
     // Incognito threads live in client storage only — no DB row exists or should be created.
     if (params.rootFolderId === DefaultFolderId.INCOGNITO) {
-      logger.error(
+      params.logger.error(
         "createUserMessage should not be called for incoginto folders",
       );
       return;
