@@ -39,6 +39,7 @@ export const translations = {
       edit: "Bearbeiten",
       devices: "Geräte",
       apps: "Apps",
+      install: "App installieren",
       sections: {
         identity: "Identität",
         network: "Netzwerk",

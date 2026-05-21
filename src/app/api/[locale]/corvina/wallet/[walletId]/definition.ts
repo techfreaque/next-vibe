@@ -190,9 +190,9 @@ const { PUT } = createEndpoint({
       description: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "put.description.label" as const,
-        description: "put.description.description" as const,
-        placeholder: "put.description.placeholder" as const,
+        label: "put.walletDescription.label" as const,
+        description: "put.walletDescription.description" as const,
+        placeholder: "put.walletDescription.placeholder" as const,
         columns: 12,
         schema: z.string().optional(),
       }),

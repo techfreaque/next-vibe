@@ -57,7 +57,8 @@ export const translations = {
       },
       forbidden: {
         title: "Forbidden",
-        description: "The API key does not have access to list resource limits.",
+        description:
+          "The API key does not have access to list resource limits.",
       },
       notFound: {
         title: "Not Found",

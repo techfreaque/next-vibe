@@ -160,7 +160,8 @@ export const translations = {
     },
     orgResourceId: {
       label: "ID zasobu organizacji",
-      description: "ID zasobu organizacji identyfikujące limit do aktualizacji.",
+      description:
+        "ID zasobu organizacji identyfikujące limit do aktualizacji.",
     },
     errors: {
       validation: {

@@ -90,14 +90,15 @@ export const translations = {
       description: "Typ portfela — GENERIC lub APP.",
       placeholder: "GENERIC",
     },
-    description: {
+    walletDescription: {
       label: "Opis",
       description: "Czytelna etykieta tego portfela.",
       placeholder: "Mój portfel",
     },
     webhookUrl: {
       label: "URL webhooka",
-      description: "Adres URL do odbierania powiadomień o zdarzeniach portfela.",
+      description:
+        "Adres URL do odbierania powiadomień o zdarzeniach portfela.",
       placeholder: "https://example.com/webhook",
     },
     submitButton: {

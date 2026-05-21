@@ -218,7 +218,7 @@ const { POST } = createEndpoint({
 
   title: "post.title" as const,
   description: "post.description" as const,
-  icon: "plus-circle",
+  icon: "plus",
   category: "endpointCategories.corvina",
   subCategory: "endpointCategories.corvina",
   tags: ["tags.corvina" as const, "tags.limits" as const],
@@ -228,7 +228,7 @@ const { POST } = createEndpoint({
     render: LimitsCreateContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      resourceType: requestField(scopedTranslation, {
+      resourceType: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.resourceType.label" as const,
@@ -236,7 +236,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().optional(),
       }),
-      quantity: requestField(scopedTranslation, {
+      quantity: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.quantity.label" as const,
@@ -244,7 +244,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.coerce.number().optional(),
       }),
-      orgResourceId: requestField(scopedTranslation, {
+      orgResourceId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.orgResourceId.label" as const,
@@ -270,7 +270,7 @@ const { POST } = createEndpoint({
       submitButton: submitButton(scopedTranslation, {
         label: "post.submitButton.label" as const,
         loadingText: "post.submitButton.loadingText" as const,
-        icon: "plus-circle",
+        icon: "plus",
         variant: "primary",
         className: "w-full",
         usage: { request: "data" },
@@ -361,7 +361,7 @@ const { PUT } = createEndpoint({
     render: LimitsUpdateContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      resourceType: requestField(scopedTranslation, {
+      resourceType: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.resourceType.label" as const,
@@ -369,7 +369,7 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.string().optional(),
       }),
-      quantity: requestField(scopedTranslation, {
+      quantity: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "put.quantity.label" as const,

@@ -14,7 +14,6 @@ import React, { useCallback } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useWidgetContext,
   useWidgetForm,
   useWidgetNavigation,
   useWidgetOnSubmit,
@@ -23,10 +22,8 @@ import {
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import { WalletType } from "../enums";
 import definition from "./definition";
-import type { WalletGetResponseOutput } from "./definition";
-
-type Wallet_ = WalletGetResponseOutput;
 
 function InfoRow({
   label,
@@ -49,12 +46,11 @@ function InfoRow({
 
 export function WalletDetailContainer(): React.JSX.Element {
   const platform = useWidgetPlatform();
-  const { endpointMutations } = useWidgetContext();
   const { push: navigate, pop } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
 
-  const wallet = data as Wallet_ | undefined;
+  const wallet = data;
   const isLoading = data === undefined;
   const isCli = platform === Platform.CLI;
   const isMcp = platform === Platform.MCP;
@@ -68,10 +64,6 @@ export function WalletDetailContainer(): React.JSX.Element {
       urlPathParams: { walletId: wallet.walletId },
     });
   }, [navigate, wallet]);
-
-  const handleRefresh = useCallback((): void => {
-    endpointMutations?.read?.refetch?.();
-  }, [endpointMutations]);
 
   if (isCompact) {
     if (!wallet) {
@@ -123,7 +115,9 @@ export function WalletDetailContainer(): React.JSX.Element {
         <Span className="font-semibold text-sm mr-auto">
           {isLoading
             ? "Loading…"
-            : (wallet?.description ?? wallet?.walletId ?? t("get.widget.title"))}
+            : (wallet?.description ??
+              wallet?.walletId ??
+              t("get.widget.title"))}
         </Span>
         {wallet && (
           <Button
@@ -238,13 +232,16 @@ export function WalletUpdateContainer(): React.JSX.Element {
             </Label>
             <Input
               value={typeValue}
-              onChange={(e) =>
-                form.setValue(
-                  "type",
-                  e.target.value as "GENERIC" | "APP" | undefined,
-                  { shouldDirty: true },
-                )
-              }
+              onChange={(e) => {
+                const v = e.target.value;
+                const matched =
+                  v === WalletType.GENERIC
+                    ? WalletType.GENERIC
+                    : v === WalletType.APP
+                      ? WalletType.APP
+                      : undefined;
+                form.setValue("type", matched, { shouldDirty: true });
+              }}
               placeholder={t("put.type.placeholder")}
               className="w-full"
             />
@@ -252,9 +249,9 @@ export function WalletUpdateContainer(): React.JSX.Element {
 
           <Div>
             <Label className="block text-xs font-medium mb-1">
-              {t("put.description.label")}
+              {t("put.walletDescription.label")}
               <Span className="block text-xs text-muted-foreground font-normal mb-1">
-                {t("put.description.description")}
+                {t("put.walletDescription.description")}
               </Span>
             </Label>
             <Input
@@ -264,7 +261,7 @@ export function WalletUpdateContainer(): React.JSX.Element {
                   shouldDirty: true,
                 })
               }
-              placeholder={t("put.description.placeholder")}
+              placeholder={t("put.walletDescription.placeholder")}
               className="w-full"
             />
           </Div>

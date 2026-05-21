@@ -39,6 +39,7 @@ export const translations = {
       loadButton: "Load",
       trialBadge: "Free Trial",
       autoRenewBadge: "Auto-renew",
+      orgLabel: "org",
       orgIdPlaceholder: "Organization ID",
       appStore: "App Store",
       installApp: "Install Custom",

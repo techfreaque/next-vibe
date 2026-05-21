@@ -4,6 +4,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Download } from "next-vibe-ui/ui/icons/Download";
 import { PackageCheck } from "next-vibe-ui/ui/icons/PackageCheck";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Save } from "next-vibe-ui/ui/icons/Save";
@@ -149,7 +150,19 @@ export function OrgDetailContainer(): React.JSX.Element {
     }
     void (async (): Promise<void> => {
       const appsDef = await import("../../apps/installed/definition");
-      navigate(appsDef.default.GET, {});
+      navigate(appsDef.default.GET, { data: { organizationId: org.orgId } });
+    })();
+  }, [navigate, org]);
+
+  const handleInstall = useCallback((): void => {
+    if (!org) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const installDef = await import("../../apps/install/definition");
+      navigate(installDef.default.POST, {
+        data: { organizationId: org.orgId },
+      });
     })();
   }, [navigate, org]);
 
@@ -189,6 +202,18 @@ export function OrgDetailContainer(): React.JSX.Element {
           >
             <PackageCheck className="h-3.5 w-3.5" />
             {t("get.widget.apps")}
+          </Button>
+        )}
+        {org && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleInstall}
+            className="gap-1"
+          >
+            <Download className="h-3.5 w-3.5" />
+            {t("get.widget.install")}
           </Button>
         )}
         {org && (

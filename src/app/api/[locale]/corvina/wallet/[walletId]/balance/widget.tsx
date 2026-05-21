@@ -15,7 +15,7 @@ import {
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import definition from "./definition";
+import type definition from "./definition";
 
 export function WalletBalanceContainer(): React.JSX.Element {
   const platform = useWidgetPlatform();

@@ -3,7 +3,10 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
-import { CorvinaClient } from "@/app/api/[locale]/corvina/client";
+import {
+  CorvinaClient,
+  type CorvinaBodyObject,
+} from "@/app/api/[locale]/corvina/client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -61,7 +64,7 @@ export class WalletRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<WalletPutResponseOutput>> {
-    const body: CorvinaWalletApiData = {};
+    const body: CorvinaBodyObject = {};
     if (data.id !== undefined) {
       body.id = data.id;
     }
@@ -88,7 +91,9 @@ export class WalletRepository {
     if (!result.success) {
       return result;
     }
-    logger.info("[CORVINA] Wallet updated", { walletId: urlPathParams.walletId });
+    logger.info("[CORVINA] Wallet updated", {
+      walletId: urlPathParams.walletId,
+    });
     return success({
       walletId: urlPathParams.walletId,
       id: result.data.id,

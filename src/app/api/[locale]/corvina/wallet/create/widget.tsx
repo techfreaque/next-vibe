@@ -4,30 +4,25 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Save } from "next-vibe-ui/ui/icons/Save";
 import { Wallet } from "next-vibe-ui/ui/icons/Wallet";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useState } from "react";
+import React from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useWidgetContext,
+  useWidgetForm,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import definition from "./definition";
+import { WalletType } from "../enums";
+import type definition from "./definition";
 import type { WalletCreateResponseOutput } from "./definition";
 
 function WalletResult({
@@ -84,7 +79,9 @@ function WalletResult({
             <Span className="text-xs text-muted-foreground">
               {labels.webhookLabel}
             </Span>
-            <Div className="font-mono text-xs break-all">{result.webhookUrl}</Div>
+            <Div className="font-mono text-xs break-all">
+              {result.webhookUrl}
+            </Div>
           </Div>
         )}
       </Div>
@@ -94,34 +91,25 @@ function WalletResult({
 
 export function WalletCreateContainer(): React.JSX.Element {
   const platform = useWidgetPlatform();
-  const { endpointMutations } = useWidgetContext();
   const { pop } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const form = useWidgetForm<typeof definition.POST>();
+  const onSubmit = useWidgetOnSubmit();
   const result = useWidgetValue<typeof definition.POST>();
 
-  const [walletId, setWalletId] = useState("");
-  const [walletType, setWalletType] = useState<"GENERIC" | "APP" | "">("");
-  const [walletDescription, setWalletDescription] = useState("");
-  const [webhookUrl, setWebhookUrl] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const idValue = form.watch("id") ?? "";
+  const typeValue = form.watch("type") ?? "";
+  const descriptionValue = form.watch("description") ?? "";
+  const webhookUrlValue = form.watch("webhookUrl") ?? "";
+
+  const idError = form.formState.errors.id?.message;
+  const typeError = form.formState.errors.type?.message;
+  const descriptionError = form.formState.errors.description?.message;
+  const webhookUrlError = form.formState.errors.webhookUrl?.message;
 
   const isCli = platform === Platform.CLI;
   const isMcp = platform === Platform.MCP;
   const isCompact = isCli || isMcp;
-
-  const handleSubmit = useCallback((): void => {
-    setIsSubmitting(true);
-    void endpointMutations?.create
-      ?.submit({
-        id: walletId !== "" ? walletId : undefined,
-        type: walletType !== "" ? walletType : undefined,
-        description: walletDescription !== "" ? walletDescription : undefined,
-        webhookUrl: webhookUrl !== "" ? webhookUrl : undefined,
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
-  }, [endpointMutations, walletId, walletType, walletDescription, webhookUrl]);
 
   const resultLabels = {
     resultTitle: t("post.widget.resultTitle"),
@@ -149,7 +137,9 @@ export function WalletCreateContainer(): React.JSX.Element {
       }
       return (
         <Div className="font-mono text-sm p-2">
-          <Div className="font-semibold mb-1">{t("post.widget.resultTitle")}</Div>
+          <Div className="font-semibold mb-1">
+            {t("post.widget.resultTitle")}
+          </Div>
           <Div>{parts.join(" | ")}</Div>
         </Div>
       );
@@ -183,88 +173,104 @@ export function WalletCreateContainer(): React.JSX.Element {
           <Input
             id="wallet-id"
             type="text"
-            value={walletId}
+            value={idValue}
             onChange={(e) => {
-              setWalletId(e.target.value);
+              form.setValue("id", e.target.value || undefined, {
+                shouldDirty: true,
+              });
             }}
             placeholder={t("post.id.placeholder")}
           />
-          <Span className="text-xs text-muted-foreground">
-            {t("post.id.description")}
-          </Span>
+          {idError ? (
+            <Span className="text-xs text-destructive">{idError}</Span>
+          ) : (
+            <Span className="text-xs text-muted-foreground">
+              {t("post.id.description")}
+            </Span>
+          )}
         </Div>
 
         <Div className="space-y-1.5">
           <Label htmlFor="wallet-type">{t("post.type.label")}</Label>
-          <Select
-            value={walletType}
-            onValueChange={(val) => {
-              setWalletType(val as "GENERIC" | "APP" | "");
+          <Input
+            id="wallet-type"
+            type="text"
+            value={typeValue}
+            onChange={(e) => {
+              const v = e.target.value;
+              const matched =
+                v === WalletType.GENERIC
+                  ? WalletType.GENERIC
+                  : v === WalletType.APP
+                    ? WalletType.APP
+                    : undefined;
+              form.setValue("type", matched, { shouldDirty: true });
             }}
-          >
-            <SelectTrigger id="wallet-type">
-              <SelectValue placeholder={t("post.type.placeholder")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="GENERIC">GENERIC</SelectItem>
-              <SelectItem value="APP">APP</SelectItem>
-            </SelectContent>
-          </Select>
-          <Span className="text-xs text-muted-foreground">
-            {t("post.type.description")}
-          </Span>
+            placeholder={t("post.type.placeholder")}
+          />
+          {typeError ? (
+            <Span className="text-xs text-destructive">{typeError}</Span>
+          ) : (
+            <Span className="text-xs text-muted-foreground">
+              {t("post.type.description")}
+            </Span>
+          )}
         </Div>
 
         <Div className="space-y-1.5">
-          <Label htmlFor="wallet-description">{t("post.description.label")}</Label>
+          <Label htmlFor="wallet-description">
+            {t("post.walletDescription.label")}
+          </Label>
           <Input
             id="wallet-description"
             type="text"
-            value={walletDescription}
-            onChange={(e) => {
-              setWalletDescription(e.target.value);
-            }}
-            placeholder={t("post.description.placeholder")}
+            value={descriptionValue}
+            onChange={(e) =>
+              form.setValue("description", e.target.value || undefined, {
+                shouldDirty: true,
+              })
+            }
+            placeholder={t("post.walletDescription.placeholder")}
           />
-          <Span className="text-xs text-muted-foreground">
-            {t("post.description.description")}
-          </Span>
+          {descriptionError ? (
+            <Span className="text-xs text-destructive">{descriptionError}</Span>
+          ) : (
+            <Span className="text-xs text-muted-foreground">
+              {t("post.walletDescription.description")}
+            </Span>
+          )}
         </Div>
 
         <Div className="space-y-1.5">
           <Label htmlFor="wallet-webhook">{t("post.webhookUrl.label")}</Label>
           <Input
             id="wallet-webhook"
-            type="url"
-            value={webhookUrl}
-            onChange={(e) => {
-              setWebhookUrl(e.target.value);
-            }}
+            type="text"
+            value={webhookUrlValue}
+            onChange={(e) =>
+              form.setValue("webhookUrl", e.target.value || undefined, {
+                shouldDirty: true,
+              })
+            }
             placeholder={t("post.webhookUrl.placeholder")}
           />
-          <Span className="text-xs text-muted-foreground">
-            {t("post.webhookUrl.description")}
-          </Span>
+          {webhookUrlError ? (
+            <Span className="text-xs text-destructive">{webhookUrlError}</Span>
+          ) : (
+            <Span className="text-xs text-muted-foreground">
+              {t("post.webhookUrl.description")}
+            </Span>
+          )}
         </Div>
 
         <Button
           type="button"
           variant="default"
           className="w-full gap-2"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
+          onClick={onSubmit ?? undefined}
         >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {t("post.submitButton.loadingText")}
-            </>
-          ) : (
-            <>
-              <Wallet className="h-4 w-4" />
-              {t("post.submitButton.label")}
-            </>
-          )}
+          <Save className="h-4 w-4" />
+          {t("post.submitButton.label")}
         </Button>
 
         {result !== null && result !== undefined && (

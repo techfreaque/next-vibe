@@ -15,10 +15,11 @@ export const translations = {
     },
     type: {
       label: "Typ",
-      description: "Wallet-Typ: GENERIC für allgemeine Nutzung, APP für app-spezifische Wallets.",
+      description:
+        "Wallet-Typ: GENERIC für allgemeine Nutzung, APP für app-spezifische Wallets.",
       placeholder: "Typ auswählen",
     },
-    description: {
+    walletDescription: {
       label: "Beschreibung",
       description: "Lesbare Beschreibung für dieses Wallet.",
       placeholder: "Produktions-Zahlungs-Wallet",
@@ -63,7 +64,8 @@ export const translations = {
       },
       forbidden: {
         title: "Zugriff verweigert",
-        description: "Der API-Schlüssel hat keine Berechtigung, Wallets zu erstellen.",
+        description:
+          "Der API-Schlüssel hat keine Berechtigung, Wallets zu erstellen.",
       },
       notFound: {
         title: "Nicht gefunden",

@@ -11,6 +11,4 @@ export const scopedTranslation = createScopedTranslation({
 export type WalletHistoryTranslationKey =
   (typeof scopedTranslation)["ScopedTranslationKey"];
 
-export type WalletHistoryT = ReturnType<
-  typeof scopedTranslation.scopedT
->["t"];
+export type WalletHistoryT = ReturnType<typeof scopedTranslation.scopedT>["t"];

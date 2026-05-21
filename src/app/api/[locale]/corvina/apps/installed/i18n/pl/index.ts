@@ -40,6 +40,7 @@ export const translations = {
       loadButton: "Załaduj",
       trialBadge: "Okres próbny",
       autoRenewBadge: "Auto-odnowienie",
+      orgLabel: "Org",
       orgIdPlaceholder: "ID organizacji",
       appStore: "Sklep aplikacji",
       installApp: "Zainstaluj własną",

@@ -19,9 +19,8 @@ import {
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import definition from "./definition";
+import type definition from "./definition";
 import type { WalletHistoryResponseOutput } from "./definition";
-import type { WalletHistoryT } from "./i18n";
 
 type Transaction = WalletHistoryResponseOutput["transactions"][number];
 
@@ -62,16 +61,16 @@ function formatDateShort(date: Date | null): string {
 function TransactionRow({
   tx,
   compact,
-  t,
 }: {
   tx: Transaction;
   compact: boolean;
-  t: WalletHistoryT;
 }): React.JSX.Element {
   if (compact) {
     return (
       <Div className="py-1 text-sm font-mono">
-        <Span className={cn("font-semibold", resultColorClass(tx.executionResult))}>
+        <Span
+          className={cn("font-semibold", resultColorClass(tx.executionResult))}
+        >
           {tx.executionResult}
         </Span>
         <Span className="ml-2 text-muted-foreground">{`#${tx.id}`}</Span>
@@ -115,7 +114,9 @@ function TransactionRow({
           )}
         </Div>
         {tx.failureReason !== null && (
-          <Div className="mt-1 text-xs text-destructive">{tx.failureReason}</Div>
+          <Div className="mt-1 text-xs text-destructive">
+            {tx.failureReason}
+          </Div>
         )}
         <Div className="mt-1 flex items-center gap-3 flex-wrap">
           {tx.sourceWalletId !== null && (
@@ -140,7 +141,9 @@ function TransactionRow({
         <Span
           className={cn(
             "text-sm font-semibold font-mono",
-            tx.amount < 0 ? "text-destructive" : "text-green-600 dark:text-green-400",
+            tx.amount < 0
+              ? "text-destructive"
+              : "text-green-600 dark:text-green-400",
           )}
         >
           {tx.amount > 0 ? `+${tx.amount}` : String(tx.amount)}
@@ -187,7 +190,7 @@ export function WalletHistoryContainer(): React.JSX.Element {
           </Div>
         ) : (
           transactions.map((tx, idx) => (
-            <TransactionRow key={idx} tx={tx} compact={true} t={t} />
+            <TransactionRow key={idx} tx={tx} compact={true} />
           ))
         )}
       </Div>
@@ -240,7 +243,7 @@ export function WalletHistoryContainer(): React.JSX.Element {
           </Div>
         ) : (
           transactions.map((tx, idx) => (
-            <TransactionRow key={idx} tx={tx} compact={false} t={t} />
+            <TransactionRow key={idx} tx={tx} compact={false} />
           ))
         )}
       </Div>

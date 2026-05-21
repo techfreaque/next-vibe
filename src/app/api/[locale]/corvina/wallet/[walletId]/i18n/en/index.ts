@@ -90,7 +90,7 @@ export const translations = {
       description: "Wallet type — GENERIC or APP.",
       placeholder: "GENERIC",
     },
-    description: {
+    walletDescription: {
       label: "Description",
       description: "Human-readable label for this wallet.",
       placeholder: "My wallet",

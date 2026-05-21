@@ -64,9 +64,9 @@ const { POST } = createEndpoint({
       description: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.description.label" as const,
-        description: "post.description.description" as const,
-        placeholder: "post.description.placeholder" as const,
+        label: "post.walletDescription.label" as const,
+        description: "post.walletDescription.description" as const,
+        placeholder: "post.walletDescription.placeholder" as const,
         columns: 12,
         schema: z.string().optional(),
       }),
@@ -138,7 +138,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         id: "my-wallet-01",
-        type: WalletType[0],
+        type: WalletType.GENERIC,
         description: "Production payment wallet",
         webhookUrl: "https://example.com/webhook",
       },
@@ -146,7 +146,7 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         id: "my-wallet-01",
-        type: WalletType[0],
+        type: WalletType.GENERIC,
         description: "Production payment wallet",
         webhookUrl: "https://example.com/webhook",
       },

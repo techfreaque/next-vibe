@@ -3,7 +3,6 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Input } from "next-vibe-ui/ui/input";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Package } from "next-vibe-ui/ui/icons/Package";
@@ -11,11 +10,12 @@ import { PackageCheck } from "next-vibe-ui/ui/icons/PackageCheck";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { ShoppingBag } from "next-vibe-ui/ui/icons/ShoppingBag";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -130,9 +130,10 @@ export function InstalledAppsContainer(): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
 
-  const [orgId, setOrgId] = useState<number>(45511);
+  const orgId = form.watch("organizationId");
 
   const installs = data?.installs ?? [];
   const total = data?.total ?? 0;
@@ -140,13 +141,6 @@ export function InstalledAppsContainer(): React.JSX.Element {
 
   const trialLabel = t("get.widget.trialBadge");
   const autoRenewLabel = t("get.widget.autoRenewBadge");
-
-  const handleLoad = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const def = await import("./definition");
-      navigate(def.default.GET, { data: { organizationId: orgId } });
-    })();
-  }, [navigate, orgId]);
 
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
@@ -162,22 +156,31 @@ export function InstalledAppsContainer(): React.JSX.Element {
   const handleNavInstall = useCallback((): void => {
     void (async (): Promise<void> => {
       const def = await import("../install/definition");
-      navigate(def.default.POST, {});
+      navigate(def.default.POST, {
+        data: orgId !== undefined ? { organizationId: orgId } : {},
+      });
     })();
-  }, [navigate]);
+  }, [navigate, orgId]);
 
   return (
     <Div className="flex flex-col min-h-0">
       <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
         <PackageCheck className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-sm mr-auto">
-          {t("get.widget.title")}
-          {total > 0 && (
-            <Span className="ml-2 text-xs text-muted-foreground font-normal">
-              ({total})
+        <Div className="flex flex-col mr-auto">
+          <Span className="font-semibold text-sm">
+            {t("get.widget.title")}
+            {total > 0 && (
+              <Span className="ml-2 text-xs text-muted-foreground font-normal">
+                ({total})
+              </Span>
+            )}
+          </Span>
+          {orgId !== undefined && (
+            <Span className="text-xs text-muted-foreground font-mono">
+              {t("get.widget.orgLabel")} #{orgId}
             </Span>
           )}
-        </Span>
+        </Div>
         <Button
           type="button"
           variant="ghost"
@@ -209,22 +212,7 @@ export function InstalledAppsContainer(): React.JSX.Element {
         </Button>
       </Div>
 
-      <Div className="flex items-center gap-2 px-4 py-2 border-b bg-muted/30 shrink-0">
-        <Input
-          type="number"
-          value={orgId}
-          onChange={(e) => {
-            setOrgId(e.target.value);
-          }}
-          placeholder={t("get.widget.orgIdPlaceholder")}
-          className="flex-1 text-xs font-mono"
-        />
-        <Button type="button" size="sm" variant="outline" onClick={handleLoad}>
-          {t("get.widget.loadButton")}
-        </Button>
-      </Div>
-
-      <Div className="overflow-y-auto max-h-[min(700px,calc(100dvh-240px))]">
+      <Div className="overflow-y-auto max-h-[min(700px,calc(100dvh-200px))]">
         {isLoading ? (
           <Div className="h-48 flex items-center justify-center">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

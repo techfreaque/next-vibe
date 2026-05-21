@@ -9,18 +9,22 @@ import { Textarea } from "next-vibe-ui/ui/textarea";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Package } from "next-vibe-ui/ui/icons/Package";
 import { PackageCheck } from "next-vibe-ui/ui/icons/PackageCheck";
 import { ShoppingBag } from "next-vibe-ui/ui/icons/ShoppingBag";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
-  useWidgetContext,
+  useWidgetForm,
+  useWidgetIsSubmitting,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 
 import { CorvinaAppInstallStatus } from "../enums";
 import type definition from "./definition";
@@ -137,16 +141,38 @@ function InstallResult({
 }
 
 export function AppInstallContainer(): React.JSX.Element {
-  const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const form = useWidgetForm<typeof definition.POST>();
+  const onSubmit = useWidgetOnSubmit();
   const result = useWidgetValue<typeof definition.POST>();
+  const isSubmitting = useWidgetIsSubmitting() ?? false;
 
-  const [orgId, setOrgId] = useState<number>(45511);
-  const [manifest, setManifest] = useState("");
-  const [appId, setAppId] = useState<number | undefined>(undefined);
-  const [planId, setPlanId] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const orgId = form.watch("organizationId");
+  const manifest = form.watch("manifest") ?? "";
+  const appId = form.watch("appId");
+  const planId = form.watch("planId") ?? "";
+
+  const manifestError = form.formState.errors.manifest?.message;
+  const appIdError = form.formState.errors.appId?.message;
+  const planIdError = form.formState.errors.planId?.message;
+
+  const formRef = useRef(form);
+  formRef.current = form;
+  useEffect(() => {
+    const f = formRef.current;
+    if (f.getValues("manifest")) {
+      return;
+    }
+    void fetch("/corvina-manifest.json")
+      .then((r) => r.text())
+      .then((text) => {
+        f.setValue("manifest", text, { shouldDirty: true });
+      })
+      .catch(() => {
+        // manifest stays empty — user can paste manually
+      });
+  }, []);
 
   const handleNavStore = useCallback((): void => {
     void (async (): Promise<void> => {
@@ -158,23 +184,11 @@ export function AppInstallContainer(): React.JSX.Element {
   const handleNavInstalled = useCallback((): void => {
     void (async (): Promise<void> => {
       const def = await import("../installed/definition");
-      navigate(def.default.GET, {});
-    })();
-  }, [navigate]);
-
-  const handleSubmit = useCallback((): void => {
-    setIsSubmitting(true);
-    void endpointMutations?.create
-      ?.submit({
-        organizationId: orgId,
-        manifest,
-        appId,
-        planId: planId !== "" ? planId : undefined,
-      })
-      .finally(() => {
-        setIsSubmitting(false);
+      navigate(def.default.GET, {
+        data: orgId !== undefined ? { organizationId: orgId } : {},
       });
-  }, [endpointMutations, orgId, manifest, appId, planId]);
+    })();
+  }, [navigate, orgId]);
 
   const resultLabels = {
     resultTitle: t("post.widget.resultTitle"),
@@ -189,9 +203,16 @@ export function AppInstallContainer(): React.JSX.Element {
     <Div className="flex flex-col min-h-0">
       <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
         <Download className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-sm mr-auto">
-          {t("post.widget.title")}
-        </Span>
+        <Div className="flex flex-col mr-auto">
+          <Span className="font-semibold text-sm">
+            {t("post.widget.title")}
+          </Span>
+          {orgId !== undefined && (
+            <Span className="text-xs text-muted-foreground font-mono">
+              {t("post.widget.orgLabel")} #{orgId}
+            </Span>
+          )}
+        </Div>
         <Button
           type="button"
           variant="ghost"
@@ -215,36 +236,35 @@ export function AppInstallContainer(): React.JSX.Element {
       </Div>
 
       <Div className="overflow-y-auto max-h-[min(700px,calc(100dvh-200px))] p-4 space-y-4">
-        <Div className="space-y-1.5">
-          <Label htmlFor="install-org-id">
-            {t("post.organizationId.label")}
-          </Label>
-          <Input
-            id="install-org-id"
-            type="number"
-            value={orgId}
-            onChange={(e) => {
-              setOrgId(e.target.value);
-            }}
-            placeholder={t("post.organizationId.placeholder")}
-          />
-          <Span className="text-xs text-muted-foreground">
-            {t("post.organizationId.description")}
-          </Span>
-        </Div>
+        <FormAlertWidget field={{}} />
 
         <Div className="space-y-1.5">
-          <Label htmlFor="install-manifest">{t("post.manifest.label")}</Label>
+          <Div className="flex items-center gap-2">
+            <Package className="h-3.5 w-3.5 text-muted-foreground" />
+            <Label htmlFor="install-manifest">
+              {t("post.manifest.label")}
+              <Span className="text-destructive ml-0.5">*</Span>
+            </Label>
+          </Div>
+          {manifest === "" ? (
+            <Div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              {t("post.widget.manifestLoading")}
+            </Div>
+          ) : null}
           <Textarea
             id="install-manifest"
             value={manifest}
-            onChange={(e) => {
-              setManifest(e.target.value);
-            }}
+            onChange={(e) =>
+              form.setValue("manifest", e.target.value, { shouldDirty: true })
+            }
             placeholder={t("post.widget.jsonPlaceholder")}
             rows={12}
             className="font-mono text-xs resize-y"
           />
+          {manifestError && (
+            <Span className="text-xs text-destructive">{manifestError}</Span>
+          )}
           <Span className="text-xs text-muted-foreground">
             {t("post.manifest.description")}
           </Span>
@@ -257,11 +277,14 @@ export function AppInstallContainer(): React.JSX.Element {
               id="install-app-id"
               type="number"
               value={appId}
-              onChange={(e) => {
-                setAppId(e.target.value);
-              }}
+              onChange={(e) =>
+                form.setValue("appId", e.target.value, { shouldDirty: true })
+              }
               placeholder={t("post.appId.placeholder")}
             />
+            {appIdError && (
+              <Span className="text-xs text-destructive">{appIdError}</Span>
+            )}
           </Div>
           <Div className="space-y-1.5">
             <Label htmlFor="install-plan-id">{t("post.planId.label")}</Label>
@@ -269,11 +292,14 @@ export function AppInstallContainer(): React.JSX.Element {
               id="install-plan-id"
               type="text"
               value={planId}
-              onChange={(e) => {
-                setPlanId(e.target.value);
-              }}
+              onChange={(e) =>
+                form.setValue("planId", e.target.value, { shouldDirty: true })
+              }
               placeholder={t("post.planId.placeholder")}
             />
+            {planIdError && (
+              <Span className="text-xs text-destructive">{planIdError}</Span>
+            )}
           </Div>
         </Div>
 
@@ -281,8 +307,8 @@ export function AppInstallContainer(): React.JSX.Element {
           type="button"
           variant="default"
           className="w-full gap-2"
-          onClick={handleSubmit}
-          disabled={isSubmitting || manifest === ""}
+          onClick={onSubmit}
+          disabled={isSubmitting}
         >
           {isSubmitting ? (
             <>

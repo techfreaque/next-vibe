@@ -15,10 +15,11 @@ export const translations = {
     },
     type: {
       label: "Typ",
-      description: "Typ portfela: GENERIC do ogólnego użytku, APP dla portfeli powiązanych z aplikacją.",
+      description:
+        "Typ portfela: GENERIC do ogólnego użytku, APP dla portfeli powiązanych z aplikacją.",
       placeholder: "Wybierz typ",
     },
-    description: {
+    walletDescription: {
       label: "Opis",
       description: "Czytelny opis tego portfela.",
       placeholder: "Produkcyjny portfel płatności",

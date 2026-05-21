@@ -3,7 +3,7 @@
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { PlusCircle } from "next-vibe-ui/ui/icons/PlusCircle";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Save } from "next-vibe-ui/ui/icons/Save";
 import { Button } from "next-vibe-ui/ui/button";
@@ -24,28 +24,19 @@ import {
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 
 import definition from "./definition";
-import type {
-  LimitsCreateResponseOutput,
-  LimitsListResponseOutput,
-  LimitsUpdateResponseOutput,
-} from "./definition";
-import type { LimitsListT } from "./i18n";
+import type { LimitsListResponseOutput } from "./definition";
 
 type LimitItem = LimitsListResponseOutput["limits"][number];
 
 function LimitRow({
   limit,
   compact,
-  t,
 }: {
   limit: LimitItem;
   compact: boolean;
-  t: LimitsListT;
 }): React.JSX.Element {
   const usagePercent =
-    limit.quantity > 0
-      ? Math.round((limit.used / limit.quantity) * 100)
-      : 0;
+    limit.quantity > 0 ? Math.round((limit.used / limit.quantity) * 100) : 0;
 
   if (compact) {
     return (
@@ -68,11 +59,12 @@ function LimitRow({
       <Div className="flex-1 min-w-0">
         <Div className="flex items-center gap-2 flex-wrap">
           <Span className="font-semibold text-sm">{limit.resourceType}</Span>
-          {limit.orgResourceId !== null && limit.orgResourceId !== undefined && (
-            <Span className="text-xs text-muted-foreground font-mono">
-              {limit.orgResourceId}
-            </Span>
-          )}
+          {limit.orgResourceId !== null &&
+            limit.orgResourceId !== undefined && (
+              <Span className="text-xs text-muted-foreground font-mono">
+                {limit.orgResourceId}
+              </Span>
+            )}
         </Div>
         <Div className="mt-1 flex items-center gap-2">
           <Span
@@ -157,10 +149,12 @@ export function LimitsListContainer(): React.JSX.Element {
           {isMcp && ` — use page/pageSize to paginate`}
         </Div>
         {limits.length === 0 ? (
-          <Div className="text-muted-foreground">{t("get.widget.noItemsFound")}</Div>
+          <Div className="text-muted-foreground">
+            {t("get.widget.noItemsFound")}
+          </Div>
         ) : (
           limits.map((limit, idx) => (
-            <LimitRow key={idx} limit={limit} compact={true} t={t} />
+            <LimitRow key={idx} limit={limit} compact={true} />
           ))
         )}
       </Div>
@@ -197,7 +191,7 @@ export function LimitsListContainer(): React.JSX.Element {
           onClick={handleCreate}
           title={t("post.title")}
         >
-          <PlusCircle className="h-4 w-4" />
+          <Plus className="h-4 w-4" />
         </Button>
         <Button
           type="button"
@@ -222,7 +216,7 @@ export function LimitsListContainer(): React.JSX.Element {
           </Div>
         ) : (
           limits.map((limit, idx) => (
-            <LimitRow key={idx} limit={limit} compact={false} t={t} />
+            <LimitRow key={idx} limit={limit} compact={false} />
           ))
         )}
       </Div>
@@ -242,7 +236,7 @@ export function LimitsCreateContainer(): React.JSX.Element {
   const isCompact = isCli || isMcp;
 
   const [resourceType, setResourceType] = useState("");
-  const [quantity, setQuantity] = useState<number | undefined>(undefined);
+  const [quantityStr, setQuantityStr] = useState("");
   const [orgResourceId, setOrgResourceId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -251,21 +245,20 @@ export function LimitsCreateContainer(): React.JSX.Element {
     void endpointMutations?.create
       ?.submit({
         resourceType: resourceType !== "" ? resourceType : undefined,
-        quantity,
+        quantity: quantityStr !== "" ? Number(quantityStr) : undefined,
         orgResourceId: orgResourceId !== "" ? orgResourceId : undefined,
       })
       .finally(() => {
         setIsSubmitting(false);
       });
-  }, [endpointMutations, resourceType, quantity, orgResourceId]);
+  }, [endpointMutations, resourceType, quantityStr, orgResourceId]);
 
   if (isCompact && result) {
-    const r = result as LimitsCreateResponseOutput;
     return (
       <Div className="font-mono text-sm p-2">
-        {`created limit: ${r.resourceType} qty:${r.quantity} used:${r.used}`}
-        {r.orgResourceId !== null && r.orgResourceId !== undefined
-          ? ` org:${r.orgResourceId}`
+        {`created limit: ${result.resourceType} qty:${result.quantity} used:${result.used}`}
+        {result.orgResourceId !== undefined && result.orgResourceId !== ""
+          ? ` org:${result.orgResourceId}`
           : ""}
       </Div>
     );
@@ -285,7 +278,7 @@ export function LimitsCreateContainer(): React.JSX.Element {
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <PlusCircle className="h-4 w-4 text-muted-foreground" />
+        <Plus className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">{t("post.title")}</Span>
       </Div>
 
@@ -315,11 +308,10 @@ export function LimitsCreateContainer(): React.JSX.Element {
             <Label htmlFor="limit-quantity">{t("post.quantity.label")}</Label>
             <Input
               id="limit-quantity"
-              type="number"
-              value={quantity ?? ""}
+              type="text"
+              value={quantityStr}
               onChange={(e) => {
-                const v = e.target.value;
-                setQuantity(v !== "" ? Number(v) : undefined);
+                setQuantityStr(e.target.value);
               }}
               placeholder="100"
             />
@@ -361,13 +353,13 @@ export function LimitsCreateContainer(): React.JSX.Element {
             </>
           ) : (
             <>
-              <PlusCircle className="h-4 w-4" />
+              <Plus className="h-4 w-4" />
               {t("post.submitButton.label")}
             </>
           )}
         </Button>
 
-        {result !== null && result !== undefined && (
+        {result !== undefined && (
           <Div className="rounded-xl border bg-card p-4 space-y-3">
             <Span className="font-semibold text-sm text-success">
               {t("post.success.title")}
@@ -375,22 +367,18 @@ export function LimitsCreateContainer(): React.JSX.Element {
             <Div className="grid grid-cols-2 gap-3">
               <LimitResultRow
                 label={t("get.response.limits.resourceType")}
-                value={(result as LimitsCreateResponseOutput).resourceType}
+                value={result.resourceType}
               />
               <LimitResultRow
                 label={t("get.response.limits.quantity")}
-                value={String((result as LimitsCreateResponseOutput).quantity)}
+                value={String(result.quantity)}
               />
-              {(result as LimitsCreateResponseOutput).orgResourceId !== null &&
-                (result as LimitsCreateResponseOutput).orgResourceId !==
-                  undefined && (
-                  <LimitResultRow
-                    label={t("get.response.limits.orgResourceId")}
-                    value={
-                      (result as LimitsCreateResponseOutput).orgResourceId ?? ""
-                    }
-                  />
-                )}
+              {result.orgResourceId !== undefined && (
+                <LimitResultRow
+                  label={t("get.response.limits.orgResourceId")}
+                  value={result.orgResourceId}
+                />
+              )}
             </Div>
           </Div>
         )}
@@ -411,7 +399,7 @@ export function LimitsUpdateContainer(): React.JSX.Element {
   const isCompact = isCli || isMcp;
 
   const [resourceType, setResourceType] = useState("");
-  const [quantity, setQuantity] = useState<number | undefined>(undefined);
+  const [quantityStr, setQuantityStr] = useState("");
   const [orgResourceId, setOrgResourceId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -420,21 +408,20 @@ export function LimitsUpdateContainer(): React.JSX.Element {
     void endpointMutations?.update
       ?.submit({
         resourceType: resourceType !== "" ? resourceType : undefined,
-        quantity,
+        quantity: quantityStr !== "" ? Number(quantityStr) : undefined,
         orgResourceId: orgResourceId !== "" ? orgResourceId : undefined,
       })
       .finally(() => {
         setIsSubmitting(false);
       });
-  }, [endpointMutations, resourceType, quantity, orgResourceId]);
+  }, [endpointMutations, resourceType, quantityStr, orgResourceId]);
 
   if (isCompact && result) {
-    const r = result as LimitsUpdateResponseOutput;
     return (
       <Div className="font-mono text-sm p-2">
-        {`updated limit: ${r.resourceType} qty:${r.quantity} used:${r.used}`}
-        {r.orgResourceId !== null && r.orgResourceId !== undefined
-          ? ` org:${r.orgResourceId}`
+        {`updated limit: ${result.resourceType} qty:${result.quantity} used:${result.used}`}
+        {result.orgResourceId !== undefined && result.orgResourceId !== ""
+          ? ` org:${result.orgResourceId}`
           : ""}
       </Div>
     );
@@ -484,11 +471,10 @@ export function LimitsUpdateContainer(): React.JSX.Element {
             <Label htmlFor="update-quantity">{t("put.quantity.label")}</Label>
             <Input
               id="update-quantity"
-              type="number"
-              value={quantity ?? ""}
+              type="text"
+              value={quantityStr}
               onChange={(e) => {
-                const v = e.target.value;
-                setQuantity(v !== "" ? Number(v) : undefined);
+                setQuantityStr(e.target.value);
               }}
               placeholder="200"
             />
@@ -536,7 +522,7 @@ export function LimitsUpdateContainer(): React.JSX.Element {
           )}
         </Button>
 
-        {result !== null && result !== undefined && (
+        {result !== undefined && (
           <Div className="rounded-xl border bg-card p-4 space-y-3">
             <Span className="font-semibold text-sm text-success">
               {t("put.success.title")}
@@ -544,26 +530,22 @@ export function LimitsUpdateContainer(): React.JSX.Element {
             <Div className="grid grid-cols-2 gap-3">
               <LimitResultRow
                 label={t("get.response.limits.resourceType")}
-                value={(result as LimitsUpdateResponseOutput).resourceType}
+                value={result.resourceType}
               />
               <LimitResultRow
                 label={t("get.response.limits.quantity")}
-                value={String((result as LimitsUpdateResponseOutput).quantity)}
+                value={String(result.quantity)}
               />
               <LimitResultRow
                 label={t("get.response.limits.used")}
-                value={String((result as LimitsUpdateResponseOutput).used)}
+                value={String(result.used)}
               />
-              {(result as LimitsUpdateResponseOutput).orgResourceId !== null &&
-                (result as LimitsUpdateResponseOutput).orgResourceId !==
-                  undefined && (
-                  <LimitResultRow
-                    label={t("get.response.limits.orgResourceId")}
-                    value={
-                      (result as LimitsUpdateResponseOutput).orgResourceId ?? ""
-                    }
-                  />
-                )}
+              {result.orgResourceId !== undefined && (
+                <LimitResultRow
+                  label={t("get.response.limits.orgResourceId")}
+                  value={result.orgResourceId}
+                />
+              )}
             </Div>
           </Div>
         )}

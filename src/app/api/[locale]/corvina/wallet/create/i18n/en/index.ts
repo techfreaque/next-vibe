@@ -15,10 +15,11 @@ export const translations = {
     },
     type: {
       label: "Type",
-      description: "Wallet type: GENERIC for general use, APP for app-specific wallets.",
+      description:
+        "Wallet type: GENERIC for general use, APP for app-specific wallets.",
       placeholder: "Select type",
     },
-    description: {
+    walletDescription: {
       label: "Description",
       description: "Human-readable description for this wallet.",
       placeholder: "Production payment wallet",

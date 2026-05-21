@@ -46,7 +46,9 @@ export const translations = {
     },
     widget: {
       title: "Install Corvina App",
+      orgLabel: "Organization",
       manifestLabel: "App Manifest",
+      manifestLoading: "Loading manifest…",
       jsonPlaceholder: "Paste your corvina-manifest.json content here",
       success: "App installed successfully",
       errorDetail:

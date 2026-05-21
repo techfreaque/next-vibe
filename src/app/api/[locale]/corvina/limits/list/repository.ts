@@ -3,7 +3,10 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
-import { CorvinaClient } from "@/app/api/[locale]/corvina/client";
+import {
+  CorvinaClient,
+  type CorvinaBodyObject,
+} from "@/app/api/[locale]/corvina/client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -51,7 +54,7 @@ export class LimitsRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<LimitsListResponseOutput>> {
-    const query: Record<string, string | number | undefined> = {
+    const query: Record<string, string | number> = {
       page: data.page ?? 0,
       pageSize: data.pageSize ?? 10,
     };
@@ -88,7 +91,7 @@ export class LimitsRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<LimitsCreateResponseOutput>> {
-    const body: Record<string, string | number | undefined> = {};
+    const body: CorvinaBodyObject = {};
     if (data.resourceType !== undefined && data.resourceType !== "") {
       body.resourceType = data.resourceType;
     }
@@ -96,7 +99,7 @@ export class LimitsRepository {
       body.quantity = data.quantity;
     }
 
-    const query: Record<string, string | undefined> = {};
+    const query: Record<string, string> = {};
     if (data.orgResourceId !== undefined && data.orgResourceId !== "") {
       query.orgResourceId = data.orgResourceId;
     }
@@ -119,7 +122,14 @@ export class LimitsRepository {
       resourceType: result.data.resourceType,
       orgResourceId: result.data.orgResourceId,
     });
-    return success(mapLimit(result.data));
+    return success({
+      resourceType: result.data.resourceType,
+      quantity: result.data.quantity,
+      used: result.data.used,
+      targetOrganization: result.data.targetOrganization,
+      grantingOrganization: result.data.grantingOrganization,
+      orgResourceId: result.data.orgResourceId ?? undefined,
+    });
   }
 
   static async update(
@@ -127,7 +137,7 @@ export class LimitsRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<LimitsUpdateResponseOutput>> {
-    const body: Record<string, string | number | undefined> = {};
+    const body: CorvinaBodyObject = {};
     if (data.resourceType !== undefined && data.resourceType !== "") {
       body.resourceType = data.resourceType;
     }
@@ -135,7 +145,7 @@ export class LimitsRepository {
       body.quantity = data.quantity;
     }
 
-    const query: Record<string, string | undefined> = {};
+    const query: Record<string, string> = {};
     if (data.orgResourceId !== undefined && data.orgResourceId !== "") {
       query.orgResourceId = data.orgResourceId;
     }
@@ -158,6 +168,13 @@ export class LimitsRepository {
       resourceType: result.data.resourceType,
       orgResourceId: result.data.orgResourceId,
     });
-    return success(mapLimit(result.data));
+    return success({
+      resourceType: result.data.resourceType,
+      quantity: result.data.quantity,
+      used: result.data.used,
+      targetOrganization: result.data.targetOrganization,
+      grantingOrganization: result.data.grantingOrganization,
+      orgResourceId: result.data.orgResourceId ?? undefined,
+    });
   }
 }
