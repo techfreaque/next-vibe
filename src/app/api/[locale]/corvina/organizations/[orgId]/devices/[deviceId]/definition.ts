@@ -79,6 +79,31 @@ const { GET } = createEndpoint({
         content: "get.response.groups" as const,
         schema: z.array(z.string()),
       }),
+      connected: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        content: "get.response.connected" as const,
+        schema: z.boolean().nullable(),
+      }),
+      lastConnection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.lastConnection" as const,
+        schema: z.string().nullable(),
+      }),
+      lastDisconnection: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.lastDisconnection" as const,
+        schema: z.string().nullable(),
+      }),
+      firstRegistration: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.firstRegistration" as const,
+        schema: z.string().nullable(),
+      }),
+      lastSeenIp: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.lastSeenIp" as const,
+        schema: z.string().nullable(),
+      }),
     },
   }),
 
@@ -136,6 +161,11 @@ const { GET } = createEndpoint({
         hwId: "DEADBEEF",
         orgResourceId: "exorde.connex.connectika",
         groups: [],
+        connected: true,
+        lastConnection: "2025-01-15T10:30:00.000Z",
+        lastDisconnection: null,
+        firstRegistration: "2024-06-01T08:00:00.000Z",
+        lastSeenIp: "192.168.1.100",
       },
     },
   },

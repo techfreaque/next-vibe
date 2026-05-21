@@ -51,6 +51,8 @@ interface CorvinaOrgListItem {
 interface CorvinaOrgsPageResponse {
   content: CorvinaOrgListItem[];
   totalElements: number;
+  totalPages: number;
+  number: number;
 }
 
 export class CorvinaOrganizationsListRepository {
@@ -79,6 +81,9 @@ export class CorvinaOrganizationsListRepository {
       return result;
     }
     return success({
+      total: result.data.totalElements,
+      totalPages: result.data.totalPages,
+      currentPage: result.data.number,
       organizations: result.data.content.map((org) => ({
         id: org.id,
         name: org.name,
@@ -99,7 +104,6 @@ export class CorvinaOrganizationsListRepository {
         dataTemporarilyDisabled: org.dataTemporarilyDisabled ?? false,
         mfaRequired: org.mfaRequired ?? false,
       })),
-      total: result.data.totalElements,
     });
   }
 }

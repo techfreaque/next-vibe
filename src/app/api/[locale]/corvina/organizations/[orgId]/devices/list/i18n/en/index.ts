@@ -18,8 +18,11 @@ export const translations = {
         hwId: "Hardware ID",
         orgResourceId: "Org Resource ID",
         groups: "Groups",
+        connected: "Connected",
       },
       total: "Total",
+      totalPages: "Pages",
+      currentPage: "Current Page",
     },
     widget: {
       title: "Devices",

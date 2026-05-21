@@ -15,8 +15,11 @@ export const translations = {
         hwId: "Hardware-ID",
         orgResourceId: "Org-Ressourcen-ID",
         groups: "Gruppen",
+        connected: "Verbunden",
       },
       total: "Gesamt",
+      totalPages: "Seiten",
+      currentPage: "Aktuelle Seite",
     },
     widget: {
       title: "Geräte",

@@ -39,6 +39,8 @@ export const translations = {
         mfaRequired: "MFA",
       },
       total: "Gesamt",
+      totalPages: "Seiten",
+      currentPage: "Aktuelle Seite",
     },
     widget: {
       title: "Corvina-Organisationen",

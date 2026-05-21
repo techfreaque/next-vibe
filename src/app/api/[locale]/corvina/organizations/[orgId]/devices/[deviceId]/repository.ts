@@ -5,6 +5,7 @@ import { success } from "next-vibe/shared/types/response.schema";
 
 import {
   CORVINA_ORGS_PATH,
+  CORVINA_PLATFORM_ORGS_PATH,
   CorvinaClient,
 } from "@/app/api/[locale]/corvina/client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -26,12 +27,70 @@ interface CorvinaDeviceApiData {
   groups?: string[];
 }
 
+interface CorvinaStatusEntry {
+  deviceId: string;
+  header: string[];
+  data: (string | number | boolean | null)[][];
+}
+
+function parseLatestStatus(entries: CorvinaStatusEntry[]): {
+  connected: boolean | null;
+  lastSeenIp: string | null;
+  lastConnection: string | null;
+  lastDisconnection: string | null;
+} {
+  const entry = entries[0];
+  if (!entry?.data.length) {
+    return {
+      connected: null,
+      lastSeenIp: null,
+      lastConnection: null,
+      lastDisconnection: null,
+    };
+  }
+  const lastRow = entry.data[entry.data.length - 1];
+  const connIdx = entry.header.indexOf("connected");
+  const ipIdx = entry.header.indexOf("ip");
+  const tsIdx = entry.header.indexOf("timestamp");
+
+  const connected =
+    connIdx >= 0 ? ((lastRow[connIdx] as boolean) ?? null) : null;
+  const lastSeenIp = ipIdx >= 0 ? ((lastRow[ipIdx] as string) ?? null) : null;
+  const ts = tsIdx >= 0 ? ((lastRow[tsIdx] as number) ?? null) : null;
+  const tsStr = ts !== null ? new Date(ts).toISOString() : null;
+
+  return {
+    connected,
+    lastSeenIp,
+    lastConnection: connected === true ? tsStr : null,
+    lastDisconnection: connected === false ? tsStr : null,
+  };
+}
+
+function parseFirstRegistration(entries: CorvinaStatusEntry[]): string | null {
+  const entry = entries[0];
+  if (!entry?.data.length) {
+    return null;
+  }
+  const firstRow = entry.data[0];
+  const tsIdx = entry.header.indexOf("timestamp");
+  if (tsIdx < 0) {
+    return null;
+  }
+  const ts = firstRow[tsIdx] as number | null;
+  return ts !== null ? new Date(ts).toISOString() : null;
+}
+
 export class CorvinaDeviceByIdRepository {
   private static buildPath(
     orgId: number | string,
     deviceId: number | string,
   ): string {
     return `${CORVINA_ORGS_PATH}/${encodeURIComponent(orgId)}/devices/${encodeURIComponent(deviceId)}`;
+  }
+
+  private static buildStatusPath(orgId: number | string, hwId: string): string {
+    return `${CORVINA_PLATFORM_ORGS_PATH}/${encodeURIComponent(orgId)}/devices/${encodeURIComponent(hwId)}/status`;
   }
 
   static async getById(
@@ -51,6 +110,35 @@ export class CorvinaDeviceByIdRepository {
       return result;
     }
     const d = result.data;
+
+    const [latestResult, firstResult] = await Promise.all([
+      CorvinaClient.request<CorvinaStatusEntry[]>(
+        {
+          method: "GET",
+          path: this.buildStatusPath(urlPathParams.orgId, d.hwId),
+          usePlatformApi: true,
+        },
+        logger,
+        locale,
+      ),
+      CorvinaClient.request<CorvinaStatusEntry[]>(
+        {
+          method: "GET",
+          path: this.buildStatusPath(urlPathParams.orgId, d.hwId),
+          query: { since: 0, limit: 1 },
+          usePlatformApi: true,
+        },
+        logger,
+        locale,
+      ),
+    ]);
+
+    const { connected, lastSeenIp, lastConnection, lastDisconnection } =
+      parseLatestStatus(latestResult.success ? latestResult.data : []);
+    const firstRegistration = parseFirstRegistration(
+      firstResult.success ? firstResult.data : [],
+    );
+
     return success({
       orgId: urlPathParams.orgId,
       deviceId: urlPathParams.deviceId,
@@ -58,6 +146,11 @@ export class CorvinaDeviceByIdRepository {
       hwId: d.hwId,
       orgResourceId: d.orgResourceId ?? null,
       groups: d.groups ?? [],
+      connected,
+      lastConnection,
+      lastDisconnection,
+      firstRegistration,
+      lastSeenIp,
     });
   }
 

@@ -44,6 +44,29 @@ function InfoRow({
   );
 }
 
+function SectionHeader({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.JSX.Element {
+  return (
+    <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-2 mt-4 first:mt-0">
+      {children}
+    </Span>
+  );
+}
+
+function formatTimestamp(ts: string | null): string {
+  if (!ts) {
+    return "—";
+  }
+  try {
+    return new Date(ts).toLocaleString();
+  } catch {
+    return ts;
+  }
+}
+
 export function DeviceDetailContainer(): React.JSX.Element {
   const { push: navigate, pop: goBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -90,6 +113,19 @@ export function DeviceDetailContainer(): React.JSX.Element {
         <Span className="font-semibold text-sm mr-auto">
           {isLoading ? "Loading…" : device?.label || t("get.title")}
         </Span>
+        {device && device.connected !== null && (
+          <Span
+            className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+              device.connected
+                ? "bg-success/10 text-success"
+                : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {device.connected
+              ? t("get.widget.labels.online")
+              : t("get.widget.labels.offline")}
+          </Span>
+        )}
         {device && (
           <Button
             type="button"
@@ -122,9 +158,7 @@ export function DeviceDetailContainer(): React.JSX.Element {
         </Div>
       ) : !device ? null : (
         <Div className="px-4 py-3">
-          <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-2">
-            {t("get.widget.sections.identity")}
-          </Span>
+          <SectionHeader>{t("get.widget.sections.identity")}</SectionHeader>
           <InfoRow label={t("get.widget.labels.label")} value={device.label} />
           <InfoRow
             label={t("get.widget.labels.hwId")}
@@ -137,6 +171,54 @@ export function DeviceDetailContainer(): React.JSX.Element {
                 <Span className="font-mono text-xs">
                   {device.orgResourceId}
                 </Span>
+              }
+            />
+          )}
+          {device.groups.length > 0 && (
+            <InfoRow
+              label={t("get.widget.labels.groups")}
+              value={device.groups.join(", ")}
+            />
+          )}
+
+          <SectionHeader>{t("get.widget.sections.connectivity")}</SectionHeader>
+          <InfoRow
+            label={t("get.widget.labels.connected")}
+            value={
+              device.connected === null ? (
+                <Span className="text-muted-foreground">—</Span>
+              ) : (
+                <Span
+                  className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                    device.connected
+                      ? "bg-success/10 text-success"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {device.connected
+                    ? t("get.widget.labels.online")
+                    : t("get.widget.labels.offline")}
+                </Span>
+              )
+            }
+          />
+          <InfoRow
+            label={t("get.widget.labels.lastConnection")}
+            value={formatTimestamp(device.lastConnection)}
+          />
+          <InfoRow
+            label={t("get.widget.labels.lastDisconnection")}
+            value={formatTimestamp(device.lastDisconnection)}
+          />
+          <InfoRow
+            label={t("get.widget.labels.firstRegistration")}
+            value={formatTimestamp(device.firstRegistration)}
+          />
+          {device.lastSeenIp && (
+            <InfoRow
+              label={t("get.widget.labels.lastSeenIp")}
+              value={
+                <Span className="font-mono text-xs">{device.lastSeenIp}</Span>
               }
             />
           )}

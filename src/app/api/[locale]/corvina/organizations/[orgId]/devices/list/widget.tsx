@@ -34,8 +34,15 @@ function DeviceRow({
       className="group flex items-center gap-3 px-4 py-3 border-b last:border-b-0 hover:bg-accent cursor-pointer transition-colors"
       onClick={() => onClick(device)}
     >
-      <Div className="flex-shrink-0 w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+      <Div className="flex-shrink-0 w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center relative">
         <Server className="h-4 w-4 text-primary" />
+        {device.connected !== null && (
+          <Span
+            className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background ${
+              device.connected ? "bg-success" : "bg-muted-foreground"
+            }`}
+          />
+        )}
       </Div>
       <Div className="flex-1 min-w-0">
         <Span className="font-semibold text-sm block truncate">

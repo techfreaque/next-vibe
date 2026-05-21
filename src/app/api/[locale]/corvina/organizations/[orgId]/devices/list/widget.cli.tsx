@@ -34,7 +34,9 @@ export function DeviceListContainer({ field }: CliWidgetProps): JSX.Element {
   if (isMcp) {
     const lines = [`Devices (${total}):`];
     for (const d of devices) {
-      lines.push(`  #${d.id} ${d.label}  hwId:${d.hwId}`);
+      const status =
+        d.connected === null ? "" : d.connected ? " [online]" : " [offline]";
+      lines.push(`  #${d.id} ${d.label}  hwId:${d.hwId}${status}`);
     }
     if (devices.length === 0) {
       lines.push("  (none)");
@@ -60,6 +62,11 @@ export function DeviceListContainer({ field }: CliWidgetProps): JSX.Element {
             <Text dimColor>#{d.id}</Text>
             <Text bold>{d.label}</Text>
             <Text dimColor>{d.hwId}</Text>
+            {d.connected !== null && (
+              <Text color={d.connected ? "green" : "gray"}>
+                {d.connected ? "●" : "○"}
+              </Text>
+            )}
           </Box>
         ))
       )}

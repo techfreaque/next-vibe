@@ -150,6 +150,16 @@ const { GET } = createEndpoint({
         content: "get.response.total" as const,
         schema: z.coerce.number(),
       }),
+      totalPages: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.totalPages" as const,
+        schema: z.coerce.number(),
+      }),
+      currentPage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.currentPage" as const,
+        schema: z.coerce.number(),
+      }),
     },
   }),
 
@@ -223,6 +233,8 @@ const { GET } = createEndpoint({
           },
         ],
         total: 1,
+        totalPages: 1,
+        currentPage: 0,
       },
     },
   },
