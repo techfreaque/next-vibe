@@ -77,6 +77,7 @@ export const translations = {
       title: "Alarme",
       noAlarmsFound: "Keine Alarme gefunden.",
       filterPlaceholder: "Alarme filtern…",
+      back: "Zurück",
     },
     enums: {
       alarmStatus: {

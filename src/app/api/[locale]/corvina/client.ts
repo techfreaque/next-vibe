@@ -18,7 +18,7 @@ export const CORVINA_PLATFORM_ORGS_PATH = "/api/v1/organizations";
 
 const REQUEST_TIMEOUT_MS = 20_000;
 
-type CorvinaBodyValue =
+export type CorvinaBodyValue =
   | string
   | number
   | boolean
@@ -44,6 +44,8 @@ export interface CorvinaRequestInit<
   query?: TQuery;
   usePlatformApi?: boolean;
   service?: CorvinaService;
+  /** Use Bearer token auth instead of X-Api-Key (e.g. for user-context calls) */
+  bearerToken?: string;
 }
 
 export class CorvinaClient {
@@ -62,7 +64,7 @@ export class CorvinaClient {
     const { t } = sharedScopedTranslation.scopedT(locale);
     const apiKey = corvinaEnv.CORVINA_API_KEY;
 
-    if (!apiKey) {
+    if (!init.bearerToken && !apiKey) {
       logger.warn("[CORVINA_CLIENT] Missing API key");
       return fail({
         message: t("errorTypes.unauthorized"),
@@ -77,10 +79,12 @@ export class CorvinaClient {
       init.service,
     );
 
-    const headers: Record<string, string> = {
-      "X-Api-Key": apiKey,
-      Accept: "application/json",
-    };
+    const headers: Record<string, string> = init.bearerToken
+      ? {
+          Authorization: `Bearer ${init.bearerToken}`,
+          Accept: "application/json",
+        }
+      : { "X-Api-Key": apiKey!, Accept: "application/json" };
     let body: BodyInit | undefined;
     if (init.body !== undefined) {
       headers["Content-Type"] = "application/json";

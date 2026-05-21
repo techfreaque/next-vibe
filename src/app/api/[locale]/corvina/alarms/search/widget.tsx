@@ -4,6 +4,7 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Bell } from "next-vibe-ui/ui/icons/Bell";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
@@ -11,8 +12,11 @@ import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetContext,
+  useWidgetNavigation,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -92,9 +96,15 @@ function AlarmRow({
 }
 
 export function AlarmSearchContainer(): React.JSX.Element {
+  const platform = useWidgetPlatform();
+  const { pop } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof definition.POST>();
   const data = useWidgetValue<typeof definition.POST>();
+
+  const isMcp = platform === Platform.MCP;
+  const isCli = platform === Platform.CLI;
+  const isCompact = isCli || isMcp;
 
   const alarms = data?.alarms ?? [];
   const total = data?.totalElements ?? 0;
@@ -107,6 +117,19 @@ export function AlarmSearchContainer(): React.JSX.Element {
   return (
     <Div className="flex flex-col min-h-0">
       <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
+        {!isCompact && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              pop();
+            }}
+            title={t("post.widget.back")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        )}
         <Bell className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
           {t("post.widget.title")}

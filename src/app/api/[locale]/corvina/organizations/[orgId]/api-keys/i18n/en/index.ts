@@ -27,6 +27,7 @@ export const translations = {
       noKeysFound: "No API keys found",
       keyMasked: "Key (masked)",
       loading: "Loading…",
+      back: "Back",
     },
     errors: {
       validation: {

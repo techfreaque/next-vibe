@@ -39,6 +39,7 @@ export const translations = {
         "Masowa akcja na alarmach została pomyślnie wykonana.",
       submitButton: "Wykonaj masową akcję",
       submitLoading: "Wykonywanie…",
+      back: "Wstecz",
     },
     errors: {
       validation: {

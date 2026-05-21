@@ -76,6 +76,7 @@ export const translations = {
       title: "Alarms",
       noAlarmsFound: "No alarms found.",
       filterPlaceholder: "Filter alarms…",
+      back: "Back",
     },
     enums: {
       alarmStatus: {

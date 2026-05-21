@@ -38,4 +38,11 @@ export const {
     commented: true,
     sensitive: true,
   },
+  CORVINA_APP_BASE_URL: {
+    schema: z.string().url().optional(),
+    example: "https://your-ngrok-tunnel.ngrok-free.app",
+    comment:
+      "Public URL of this app as seen by Corvina. Overrides baseUrl in the install manifest. Required during local dev (set to your ngrok tunnel URL).",
+    commented: true,
+  },
 });

@@ -2,12 +2,16 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Key } from "next-vibe-ui/ui/icons/Key";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetContext,
+  useWidgetNavigation,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -48,9 +52,15 @@ function ApiKeyRow({ apiKey }: { apiKey: ApiKey }): React.JSX.Element {
 }
 
 export function ApiKeysListContainer(): React.JSX.Element {
+  const platform = useWidgetPlatform();
+  const { pop } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
+
+  const isMcp = platform === Platform.MCP;
+  const isCli = platform === Platform.CLI;
+  const isCompact = isCli || isMcp;
 
   const keys = data?.keys ?? [];
   const isLoading = data === undefined;
@@ -62,6 +72,19 @@ export function ApiKeysListContainer(): React.JSX.Element {
   return (
     <Div className="flex flex-col min-h-0">
       <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
+        {!isCompact && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              pop();
+            }}
+            title={t("get.widget.back")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        )}
         <Key className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
           {t("get.widget.title")}

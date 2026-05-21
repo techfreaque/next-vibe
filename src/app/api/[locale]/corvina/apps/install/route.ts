@@ -8,7 +8,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger, locale }) =>
-      CorvinaAppInstallRepository.install(data, logger, locale),
+    handler: ({ data, logger, locale, request }) =>
+      CorvinaAppInstallRepository.install(data, logger, locale, request),
   },
 });

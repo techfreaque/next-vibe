@@ -1,10 +1,10 @@
 {
   "key": "unbottled-ai",
-  "name": "Unbottled AI",
-  "description": "Control your Corvina installation through AI chat. Manage devices, users, data, and automations using natural language.",
+  "name": { "value": "Unbottled AI" },
+  "description": { "value": "Control your Corvina installation through AI chat. Manage devices, users, data, and automations using natural language." },
   "type": "APP",
   "status": "ACTIVE",
-  "baseUrl": "http://localhost:3000",
+  "baseUrl": "https://bath-evidence-upward.ngrok-free.dev",
   "apiVersion": "1.0.0",
   "authentication": {
     "type": "JWT"
@@ -16,21 +16,28 @@
   ],
   "hooks": {
     "globalPage": {
+      "id": "unbottled-ai-globalPage",
+      "title": { "value": "AI Chat" },
       "url": "/",
-      "label": "AI Chat",
-      "icon": "/images/corvina-icon.svg"
+      "iconUrl": "/images/corvina-icon.svg"
     },
     "navigationDrawerPages": [
       {
+        "title": { "value": "AI Chat" },
         "url": "/",
-        "label": "AI Chat",
-        "icon": "/images/corvina-icon.svg"
+        "iconUrl": "/images/corvina-icon.svg"
       }
     ]
   },
   "scopes": {
-    "devices": ["*"],
-    "userImpersonation": true
+    "userImpersonation": true,
+    "devices": [
+      {
+        "deviceGroups": ["*"],
+        "generalPermission": "REGULAR_USER",
+        "modelPermissions": ["**"]
+      }
+    ]
   },
   "lifecycle": {
     "installed": "/api/corvina/lifecycle/installed",
@@ -38,10 +45,11 @@
   },
   "vendor": {
     "name": "Unbottled AI",
+    "website": "https://unbottled.ai",
     "email": "contact@unbottled.ai"
   },
   "coverImageUrl": "/images/unbottled-icon.png",
   "images": [
-    "/images/unbottled-icon.png"
+    { "url": "/images/unbottled-icon.png" }
   ]
 }

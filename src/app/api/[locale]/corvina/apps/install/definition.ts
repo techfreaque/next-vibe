@@ -16,6 +16,8 @@ import {
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { manifestObjectSchema } from "@/app/api/[locale]/corvina/manifest-schema";
+
 import { CorvinaAppInstallStatus } from "../enums";
 import { scopedTranslation } from "./i18n";
 
@@ -61,16 +63,17 @@ const { POST } = createEndpoint({
           .string()
           .min(2)
           .refine(
-            (val) => {
+            (v) => {
               try {
-                JSON.parse(val);
-                return true;
+                const p = JSON.parse(v);
+                return p !== null && typeof p === "object" && !Array.isArray(p);
               } catch {
                 return false;
               }
             },
-            { message: "Manifest must be valid JSON" },
-          ),
+            { message: "Manifest must be a valid JSON object" },
+          )
+          .or(manifestObjectSchema),
       }),
       appId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -179,8 +182,22 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         organizationId: 45511,
-        manifest:
-          '{"key":"unbottled-ai","name":{"value":"Unbottled AI"},"description":{"value":"AI chat for Corvina"},"type":"APP","status":"ACTIVE","baseUrl":"https://bath-evidence-upward.ngrok-free.dev","apiVersion":"1.0.0","authentication":{"type":"JWT"},"vendor":{"name":"Unbottled AI","website":"https://unbottled.ai","email":"contact@unbottled.ai"},"hooks":{"globalPage":{"id":"unbottled-ai-globalPage","title":{"value":"AI Chat"},"url":"/","iconUrl":"/images/corvina-icon.svg"},"navigationDrawerPages":[{"title":{"value":"AI Chat"},"url":"/","iconUrl":"/images/corvina-icon.svg"}]},"scopes":{"userImpersonation":true},"lifecycle":{"installed":"/api/corvina/lifecycle/installed","uninstalled":"/api/corvina/lifecycle/uninstalled"}}',
+        manifest: {
+          key: "unbottled-ai",
+          name: { value: "Unbottled AI" },
+          description: { value: "AI chat for Corvina" },
+          type: "APP",
+          status: "ACTIVE",
+          baseUrl: "https://your-app.example.com",
+          apiVersion: "1.0.0",
+          authentication: { type: "JWT" },
+          vendor: {
+            name: "Unbottled AI",
+            website: "https://unbottled.ai",
+            email: "contact@unbottled.ai",
+          },
+          scopes: { userImpersonation: true },
+        },
         appId: undefined,
         planId: undefined,
       },

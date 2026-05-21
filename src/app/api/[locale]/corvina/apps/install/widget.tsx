@@ -9,18 +9,19 @@ import { Textarea } from "next-vibe-ui/ui/textarea";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Package } from "next-vibe-ui/ui/icons/Package";
 import { PackageCheck } from "next-vibe-ui/ui/icons/PackageCheck";
 import { ShoppingBag } from "next-vibe-ui/ui/icons/ShoppingBag";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetNavigation,
   useWidgetOnSubmit,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -141,6 +142,7 @@ function InstallResult({
 }
 
 export function AppInstallContainer(): React.JSX.Element {
+  const platform = useWidgetPlatform();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm<typeof definition.POST>();
@@ -149,7 +151,13 @@ export function AppInstallContainer(): React.JSX.Element {
   const isSubmitting = useWidgetIsSubmitting() ?? false;
 
   const orgId = form.watch("organizationId");
-  const manifest = form.watch("manifest") ?? "";
+  const manifestValue = form.watch("manifest");
+  const manifest =
+    manifestValue === null || manifestValue === undefined
+      ? ""
+      : typeof manifestValue === "string"
+        ? manifestValue
+        : JSON.stringify(manifestValue, null, 2);
   const appId = form.watch("appId");
   const planId = form.watch("planId") ?? "";
 
@@ -157,22 +165,9 @@ export function AppInstallContainer(): React.JSX.Element {
   const appIdError = form.formState.errors.appId?.message;
   const planIdError = form.formState.errors.planId?.message;
 
-  const formRef = useRef(form);
-  formRef.current = form;
-  useEffect(() => {
-    const f = formRef.current;
-    if (f.getValues("manifest")) {
-      return;
-    }
-    void fetch("/corvina-manifest.json")
-      .then((r) => r.text())
-      .then((text) => {
-        f.setValue("manifest", text, { shouldDirty: true });
-      })
-      .catch(() => {
-        // manifest stays empty — user can paste manually
-      });
-  }, []);
+  const isCli = platform === Platform.CLI;
+  const isMcp = platform === Platform.MCP;
+  const isCompact = isCli || isMcp;
 
   const handleNavStore = useCallback((): void => {
     void (async (): Promise<void> => {
@@ -198,6 +193,36 @@ export function AppInstallContainer(): React.JSX.Element {
     installIdLabel: t("post.widget.installIdLabel"),
     installedAtLabel: t("post.widget.installedAtLabel"),
   };
+
+  if (isCompact) {
+    if (!result) {
+      return <Div />;
+    }
+    const parts: string[] = [];
+    if (result.id !== null && result.id !== undefined) {
+      parts.push(`id:${result.id}`);
+    }
+    if (result.appName !== null && result.appName !== undefined) {
+      parts.push(`app:${result.appName}`);
+    } else if (result.appKey !== null && result.appKey !== undefined) {
+      parts.push(`key:${result.appKey}`);
+    }
+    if (result.status !== null && result.status !== undefined) {
+      parts.push(`status:${result.status}`);
+    }
+    if (
+      result.serviceAccountUsername !== null &&
+      result.serviceAccountUsername !== undefined
+    ) {
+      parts.push(`svc:${result.serviceAccountUsername}`);
+    }
+    return (
+      <Div className="font-mono text-sm p-2">
+        <Div className="font-semibold mb-1">{t("post.widget.resultTitle")}</Div>
+        <Div>{parts.join(" | ")}</Div>
+      </Div>
+    );
+  }
 
   return (
     <Div className="flex flex-col min-h-0">
@@ -239,19 +264,10 @@ export function AppInstallContainer(): React.JSX.Element {
         <FormAlertWidget field={{}} />
 
         <Div className="space-y-1.5">
-          <Div className="flex items-center gap-2">
-            <Package className="h-3.5 w-3.5 text-muted-foreground" />
-            <Label htmlFor="install-manifest">
-              {t("post.manifest.label")}
-              <Span className="text-destructive ml-0.5">*</Span>
-            </Label>
-          </Div>
-          {manifest === "" ? (
-            <Div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              {t("post.widget.manifestLoading")}
-            </Div>
-          ) : null}
+          <Label htmlFor="install-manifest">
+            {t("post.manifest.label")}
+            <Span className="text-destructive ml-0.5">*</Span>
+          </Label>
           <Textarea
             id="install-manifest"
             value={manifest}

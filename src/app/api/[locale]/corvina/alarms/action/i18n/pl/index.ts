@@ -27,6 +27,7 @@ export const translations = {
       successDescription: "Akcja na alarmie została pomyślnie wykonana.",
       submitButton: "Wykonaj",
       submitLoading: "Wykonywanie…",
+      back: "Wstecz",
     },
     errors: {
       validation: {

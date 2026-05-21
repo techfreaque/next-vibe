@@ -42,6 +42,7 @@ export const translations = {
       timing: "Zeitstempel",
       metadata: "Metadaten",
       noData: "—",
+      back: "Zurück",
     },
     errors: {
       validation: {

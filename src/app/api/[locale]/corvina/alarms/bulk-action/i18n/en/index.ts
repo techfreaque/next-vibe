@@ -38,6 +38,7 @@ export const translations = {
       successDescription: "The bulk alarm action was executed successfully.",
       submitButton: "Execute Bulk Action",
       submitLoading: "Executing…",
+      back: "Back",
     },
     errors: {
       validation: {

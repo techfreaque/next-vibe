@@ -1,14 +1,19 @@
 "use client";
 
 import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
+  useWidgetNavigation,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -59,9 +64,15 @@ function SectionHeader({ title }: { title: string }): React.JSX.Element {
 }
 
 export function AlarmDetailContainer(): React.JSX.Element {
+  const platform = useWidgetPlatform();
+  const { pop } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
   const isLoading = data === undefined;
+
+  const isMcp = platform === Platform.MCP;
+  const isCli = platform === Platform.CLI;
+  const isCompact = isCli || isMcp;
 
   if (isLoading) {
     return (
@@ -89,6 +100,19 @@ export function AlarmDetailContainer(): React.JSX.Element {
     <Div className="flex flex-col min-h-0">
       {/* Header */}
       <Div className="flex items-center gap-3 px-4 py-3 border-b">
+        {!isCompact && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              pop();
+            }}
+            title={t("get.widget.back")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        )}
         <Div
           className={cn(
             "w-10 h-10 rounded-lg flex items-center justify-center font-mono font-bold text-base shrink-0",

@@ -40,6 +40,7 @@ export const translations = {
         "Die Massenalarm-Aktion wurde erfolgreich ausgeführt.",
       submitButton: "Massenaktion ausführen",
       submitLoading: "Wird ausgeführt…",
+      back: "Zurück",
     },
     errors: {
       validation: {
