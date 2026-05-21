@@ -30,7 +30,7 @@ interface NotificationConfigApiData {
 
 function mapConfig(
   raw: NotificationConfigApiData,
-): NotificationUpdateResponseOutput {
+): NotificationDeleteResponseOutput {
   return {
     id: raw.id,
     organizationId: raw.organizationId,

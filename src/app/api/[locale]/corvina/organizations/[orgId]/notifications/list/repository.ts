@@ -37,7 +37,7 @@ interface NotificationConfigsPageApiData {
 
 function mapConfig(
   raw: NotificationConfigApiData,
-): NotificationCreateResponseOutput {
+): NotificationListResponseOutput["configs"][number] {
   return {
     id: raw.id,
     organizationId: raw.organizationId,

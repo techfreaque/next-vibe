@@ -203,6 +203,7 @@ const { GET } = createEndpoint({
 
   examples: {
     urlPathParams: { default: { orgId: 45511 } },
+    requests: { default: { page: 0, pageSize: 20 } },
     responses: {
       default: {
         roles: [

@@ -198,6 +198,7 @@ const { GET } = createEndpoint({
 
   examples: {
     urlPathParams: { default: { orgId: 45511 } },
+    requests: { default: { page: 0, pageSize: 10 } },
     responses: {
       default: {
         configs: [
@@ -227,7 +228,7 @@ const { POST } = createEndpoint({
 
   title: "post.title" as const,
   description: "post.description" as const,
-  icon: "bell-ring",
+  icon: "bell",
   category: "endpointCategories.corvina",
   subCategory: "endpointCategories.corvinaOrganizations",
   tags: ["tags.corvina" as const, "tags.notifications" as const],
@@ -282,7 +283,7 @@ const { POST } = createEndpoint({
       submitButton: submitButton(scopedTranslation, {
         label: "post.submitButton.label" as const,
         loadingText: "post.submitButton.loadingText" as const,
-        icon: "bell-ring",
+        icon: "bell",
         variant: "primary",
         className: "w-full",
         usage: { request: "data" },
