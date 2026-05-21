@@ -4,11 +4,21 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import definitions from "./definition";
 import { CorvinaDeviceTagsRepository } from "./repository";
 
-export const { GET, tools } = endpointsHandler({
+export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: ({ urlPathParams, logger, locale }) =>
       CorvinaDeviceTagsRepository.getTags(urlPathParams, logger, locale),
+  },
+  [Methods.POST]: {
+    email: undefined,
+    handler: ({ data, urlPathParams, logger, locale }) =>
+      CorvinaDeviceTagsRepository.setTagValue(
+        urlPathParams,
+        data,
+        logger,
+        locale,
+      ),
   },
 });

@@ -16,7 +16,7 @@ export function Logo({
   pathName = "",
   className,
   linkClassName,
-  size = "h-7",
+  size = "h-15",
   disabled,
 }: {
   locale: CountryLanguage;
@@ -44,7 +44,7 @@ export function Logo({
             className,
           )}
           // width={32}
-          height={32}
+          height={64}
           priority
         />
         <Image
@@ -56,7 +56,7 @@ export function Logo({
             className,
           )}
           // width={32}
-          height={32}
+          height={64}
           priority
         />
       </Div>

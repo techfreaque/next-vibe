@@ -4,13 +4,11 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -19,21 +17,10 @@ import {
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import type { CorvinaDeviceStatusValue } from "../enums";
-import { CorvinaDeviceStatus } from "../enums";
 import type definition from "./definition";
 import type { CorvinaDevicesListResponseOutput } from "./definition";
 
 type Device = CorvinaDevicesListResponseOutput["devices"][number];
-
-const SEP = "·";
-
-const STATUS_COLORS: Record<typeof CorvinaDeviceStatusValue, string> = {
-  [CorvinaDeviceStatus.ACTIVE]: "bg-success/10 text-success",
-  [CorvinaDeviceStatus.INACTIVE]: "bg-muted text-muted-foreground",
-  [CorvinaDeviceStatus.ERROR]: "bg-destructive/10 text-destructive",
-  [CorvinaDeviceStatus.UNKNOWN]: "bg-muted text-muted-foreground",
-};
 
 function DeviceRow({
   device,
@@ -53,40 +40,11 @@ function DeviceRow({
         <Server className="h-4 w-4 text-primary" />
       </Div>
       <Div className="flex-1 min-w-0">
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Span className="font-semibold text-sm">
-            {device.label || device.name}
-          </Span>
-          <Span
-            className={cn(
-              "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-              STATUS_COLORS[device.status],
-            )}
-          >
-            {t(device.status)}
-          </Span>
-        </Div>
-        <Div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-          <Span className="font-mono">{device.name}</Span>
-          {device.serialNumber && (
-            <>
-              <Span>{SEP}</Span>
-              <Span>{device.serialNumber}</Span>
-            </>
-          )}
-        </Div>
-      </Div>
-      <Div className="flex items-center gap-2 shrink-0">
-        <Span
-          className={cn(
-            "inline-flex w-2 h-2 rounded-full",
-            device.connected ? "bg-success" : "bg-muted-foreground/30",
-          )}
-        />
-        <Span className="text-xs text-muted-foreground">
-          {device.connected
-            ? t("get.widget.connected")
-            : t("get.widget.disconnected")}
+        <Span className="font-semibold text-sm block truncate">
+          {device.label}
+        </Span>
+        <Span className="font-mono text-xs text-muted-foreground block truncate">
+          {device.hwId}
         </Span>
       </Div>
     </Div>
@@ -121,13 +79,6 @@ export function DeviceListContainer(): React.JSX.Element {
     [navigate, orgId],
   );
 
-  const handleCreate = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const create = await import("../create/definition");
-      navigate(create.default.POST, { urlPathParams: { orgId } });
-    })();
-  }, [navigate, orgId]);
-
   return (
     <Div className="flex flex-col min-h-0">
       <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
@@ -148,15 +99,6 @@ export function DeviceListContainer(): React.JSX.Element {
             </Span>
           )}
         </Span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleCreate}
-          title="Add device"
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
         <Button
           type="button"
           variant="ghost"

@@ -13,10 +13,18 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type {
   CorvinaDeviceGetResponseOutput,
   CorvinaDeviceGetUrlVariablesOutput,
-  CorvinaDevicePutRequestOutput,
-  CorvinaDevicePutResponseOutput,
-  CorvinaDevicePutUrlVariablesOutput,
+  CorvinaDevicePatchRequestOutput,
+  CorvinaDevicePatchResponseOutput,
+  CorvinaDevicePatchUrlVariablesOutput,
 } from "./definition";
+
+interface CorvinaDeviceApiData {
+  id: number;
+  label: string;
+  hwId: string;
+  orgResourceId?: string;
+  groups?: string[];
+}
 
 export class CorvinaDeviceByIdRepository {
   private static buildPath(
@@ -31,7 +39,7 @@ export class CorvinaDeviceByIdRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<CorvinaDeviceGetResponseOutput>> {
-    const result = await CorvinaClient.request<CorvinaDeviceGetResponseOutput>(
+    const result = await CorvinaClient.request<CorvinaDeviceApiData>(
       {
         method: "GET",
         path: this.buildPath(urlPathParams.orgId, urlPathParams.deviceId),
@@ -42,28 +50,38 @@ export class CorvinaDeviceByIdRepository {
     if (!result.success) {
       return result;
     }
+    const d = result.data;
     return success({
-      ...result.data,
       orgId: urlPathParams.orgId,
       deviceId: urlPathParams.deviceId,
+      label: d.label,
+      hwId: d.hwId,
+      orgResourceId: d.orgResourceId ?? null,
     });
   }
 
   static async update(
-    urlPathParams: CorvinaDevicePutUrlVariablesOutput,
-    data: CorvinaDevicePutRequestOutput,
+    urlPathParams: CorvinaDevicePatchUrlVariablesOutput,
+    data: CorvinaDevicePatchRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<CorvinaDevicePutResponseOutput>> {
-    const result = await CorvinaClient.request<CorvinaDevicePutResponseOutput>(
+  ): Promise<ResponseType<CorvinaDevicePatchResponseOutput>> {
+    const body: Record<string, string> = {};
+    if (data.label) {
+      body.label = data.label;
+    }
+    if (data.description) {
+      body.description = data.description;
+    }
+    if (data.serialNumber) {
+      body.serialNumber = data.serialNumber;
+    }
+
+    const result = await CorvinaClient.request<CorvinaDeviceApiData>(
       {
-        method: "PUT",
+        method: "PATCH",
         path: this.buildPath(urlPathParams.orgId, urlPathParams.deviceId),
-        body: {
-          label: data.label,
-          vpnEnabled: data.vpnEnabled,
-          dataEnabled: data.dataEnabled,
-        },
+        body,
       },
       logger,
       locale,
@@ -75,10 +93,13 @@ export class CorvinaDeviceByIdRepository {
       orgId: urlPathParams.orgId,
       deviceId: urlPathParams.deviceId,
     });
+    const d = result.data;
     return success({
-      ...result.data,
       orgId: urlPathParams.orgId,
       deviceId: urlPathParams.deviceId,
+      label: d.label,
+      hwId: d.hwId,
+      orgResourceId: d.orgResourceId ?? null,
     });
   }
 }

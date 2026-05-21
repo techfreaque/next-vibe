@@ -35,10 +35,11 @@ export const translations = {
     },
     enums: {
       orgStatus: {
-        done: "Gotowe",
-        pending: "Oczekujące",
-        failed: "Nieudane",
-        disabled: "Wyłączone",
+        new: "Nowa",
+        provisioning: "Konfigurowanie",
+        done: "Aktywna",
+        deleting: "Usuwanie",
+        deleted: "Usunięta",
       },
     },
     errors: {

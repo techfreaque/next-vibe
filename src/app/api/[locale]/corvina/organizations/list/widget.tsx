@@ -3,8 +3,8 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Building } from "next-vibe-ui/ui/icons/Building";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
@@ -33,24 +33,6 @@ const STATUS_COLORS: Record<typeof CorvinaOrgStatusValue, string> = {
   [CorvinaOrgStatus.DISABLED]:
     "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
 };
-
-function getStatusStyle(status: string): string {
-  const key = status.toUpperCase() as keyof typeof CorvinaOrgStatus;
-  if (!Object.hasOwn(CorvinaOrgStatus, key)) {
-    return "bg-muted text-muted-foreground";
-  }
-  return (
-    STATUS_COLORS[CorvinaOrgStatus[key]] ?? "bg-muted text-muted-foreground"
-  );
-}
-
-function getStatusLabel(status: string, t: CorvinaOrganizationsListT): string {
-  const key = status.toUpperCase() as keyof typeof CorvinaOrgStatus;
-  if (!Object.hasOwn(CorvinaOrgStatus, key)) {
-    return status;
-  }
-  return t(CorvinaOrgStatus[key]);
-}
 
 function ToggleDot({ on }: { on: boolean }): React.JSX.Element {
   return (
@@ -87,10 +69,10 @@ function OrgRow({
           <Span
             className={cn(
               "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-              getStatusStyle(org.status),
+              STATUS_COLORS[org.status],
             )}
           >
-            {getStatusLabel(org.status, t)}
+            {t(org.status)}
           </Span>
         </Div>
         <Div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">

@@ -14,18 +14,44 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { corvinaEnv } from "./env";
 
 export const CORVINA_ORGS_PATH = "/api/v1/organizations";
+export const CORVINA_PLATFORM_ORGS_PATH = "/api/v1/organizations";
 
 const REQUEST_TIMEOUT_MS = 20_000;
 
-export interface CorvinaRequestInit<TBody, TQuery> {
+type CorvinaBodyValue =
+  | string
+  | number
+  | boolean
+  | null
+  | CorvinaBodyObject
+  | CorvinaBodyValue[];
+interface CorvinaBodyObject {
+  [key: string]: CorvinaBodyValue;
+}
+
+export interface CorvinaRequestInit<
+  TBody extends CorvinaBodyObject = CorvinaBodyObject,
+  TQuery extends Record<string, string | number | undefined> = Record<
+    string,
+    string | number | undefined
+  >,
+> {
   method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   path: string;
   body?: TBody;
   query?: TQuery;
+  usePlatformApi?: boolean;
 }
 
 export class CorvinaClient {
-  static async request<TResponse, TBody, TQuery>(
+  static async request<
+    TResponse,
+    TBody extends CorvinaBodyObject = CorvinaBodyObject,
+    TQuery extends Record<string, string | number | undefined> = Record<
+      string,
+      string | number | undefined
+    >,
+  >(
     init: CorvinaRequestInit<TBody, TQuery>,
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -41,7 +67,7 @@ export class CorvinaClient {
       });
     }
 
-    const url = this.buildUrl(init.path, init.query);
+    const url = this.buildUrl(init.path, init.query, init.usePlatformApi);
 
     const headers: Record<string, string> = {
       "X-Api-Key": apiKey,
@@ -88,31 +114,33 @@ export class CorvinaClient {
       return success(undefined as TResponse);
     }
 
+    const contentType = response.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/json")) {
+      return success(undefined as TResponse);
+    }
+
     let raw: TResponse;
     try {
       raw = (await response.json()) as TResponse;
-    } catch (error) {
-      logger.error("[CORVINA_CLIENT] JSON parse error", {
-        method: init.method,
-        url,
-        error: String(error),
-      });
-      return fail({
-        message: t("errorTypes.external_service_error"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      });
+    } catch {
+      return success(undefined as TResponse);
     }
 
     return success(raw);
   }
 
-  private static buildUrl<TQuery>(path: string, query?: TQuery): string {
-    const base = corvinaEnv.CORVINA_API_BASE_URL.replace(/\/$/, "");
+  private static buildUrl<
+    TQuery extends Record<string, string | number | undefined>,
+  >(path: string, query?: TQuery, usePlatformApi = false): string {
+    const rawBase = usePlatformApi
+      ? corvinaEnv.CORVINA_PLATFORM_API_BASE_URL
+      : corvinaEnv.CORVINA_API_BASE_URL;
+    const base = rawBase.replace(/\/$/, "");
     const suffix = path.startsWith("/") ? path : `/${path}`;
     const url = new URL(`${base}${suffix}`);
     if (query) {
       for (const [key, value] of Object.entries(query)) {
-        if (value === undefined || value === null) {
+        if (value === undefined) {
           continue;
         }
         url.searchParams.set(key, String(value));

@@ -735,6 +735,10 @@ export async function getRouteHandler(
     case "cortex-write":
       return (await import("@/app/api/[locale]/agent/cortex/write/route")).tools
         .POST as GenericHandlerBase;
+    case "corvina_devices_list":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/list/route")
+      ).tools.GET as GenericHandlerBase;
     case "corvina_list":
       return (
         await import("@/app/api/[locale]/corvina/organizations/list/route")
@@ -763,10 +767,10 @@ export async function getRouteHandler(
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/route")
       ).tools.GET as GenericHandlerBase;
-    case "corvina_organizations_orgId_devices_deviceId_PUT":
+    case "corvina_organizations_orgId_devices_deviceId_PATCH":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/route")
-      ).tools.PUT as GenericHandlerBase;
+      ).tools.PATCH as GenericHandlerBase;
     case "corvina_organizations_orgId_devices_deviceId_delete_DELETE":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/delete/route")
@@ -775,6 +779,10 @@ export async function getRouteHandler(
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags/route")
       ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_tags_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags/route")
+      ).tools.POST as GenericHandlerBase;
     case "corvina_organizations_orgId_devices_list_GET":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/list/route")

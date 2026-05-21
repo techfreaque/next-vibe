@@ -7,8 +7,9 @@ export const {
   options: CorvinaOrgStatusOptions,
   Value: CorvinaOrgStatusValue,
 } = createEnumOptions(scopedTranslation, {
+  NEW: "get.enums.orgStatus.new" as const,
+  PROVISIONING: "get.enums.orgStatus.provisioning" as const,
   DONE: "get.enums.orgStatus.done" as const,
-  PENDING: "get.enums.orgStatus.pending" as const,
-  FAILED: "get.enums.orgStatus.failed" as const,
-  DISABLED: "get.enums.orgStatus.disabled" as const,
+  DELETING: "get.enums.orgStatus.deleting" as const,
+  DELETED: "get.enums.orgStatus.deleted" as const,
 });

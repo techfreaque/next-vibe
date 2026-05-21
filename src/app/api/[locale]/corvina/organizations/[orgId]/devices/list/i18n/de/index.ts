@@ -11,29 +11,15 @@ export const translations = {
     response: {
       devices: {
         id: "ID",
-        name: "Name",
         label: "Bezeichnung",
-        status: "Status",
-        serialNumber: "Seriennummer",
-        firmwareVersion: "Firmware",
-        connected: "Verbunden",
-        lastSeen: "Zuletzt gesehen",
+        hwId: "Hardware-ID",
+        orgResourceId: "Org-Ressourcen-ID",
       },
       total: "Gesamt",
     },
     widget: {
       title: "Geräte",
       noDevicesFound: "Keine Geräte gefunden.",
-      connected: "Online",
-      disconnected: "Offline",
-    },
-    enums: {
-      deviceStatus: {
-        active: "Aktiv",
-        inactive: "Inaktiv",
-        error: "Fehler",
-        unknown: "Unbekannt",
-      },
     },
     errors: {
       validation: {

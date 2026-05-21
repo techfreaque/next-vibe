@@ -18,9 +18,7 @@ interface CliWidgetProps {
   };
 }
 
-export function DeviceCreateCliContainer({
-  field,
-}: CliWidgetProps): JSX.Element {
+export function DeviceCreateContainer({ field }: CliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
   const t = useWidgetTranslation<typeof endpoints.POST>();
@@ -59,4 +57,4 @@ export function DeviceCreateCliContainer({
   );
 }
 
-DeviceCreateCliContainer.cliWidget = true as const;
+DeviceCreateContainer.cliWidget = true as const;

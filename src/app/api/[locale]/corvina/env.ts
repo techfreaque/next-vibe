@@ -20,7 +20,14 @@ export const {
     schema: z.string().url().default("https://app.corvina-de.io/svc/core"),
     example: "https://app.corvina-de.io/svc/core",
     comment:
-      "Corvina API base URL including service prefix. Default is the /svc/core service.",
+      "Corvina IAM/management API base URL (/svc/core). Used for org and device management.",
+    commented: true,
+  },
+  CORVINA_PLATFORM_API_BASE_URL: {
+    schema: z.string().url().default("https://app.corvina-de.io/svc/platform"),
+    example: "https://app.corvina-de.io/svc/platform",
+    comment:
+      "Corvina Platform API base URL (/svc/platform). Used for device data, tags, and telemetry.",
     commented: true,
   },
   CORVINA_API_KEY: {

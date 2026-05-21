@@ -109,6 +109,15 @@ export const translations = {
         description: "Wystąpił nieznany błąd.",
       },
     },
+    enums: {
+      orgStatus: {
+        new: "Nowa",
+        provisioning: "Konfigurowanie",
+        done: "Aktywna",
+        deleting: "Usuwanie",
+        deleted: "Usunięta",
+      },
+    },
     success: {
       title: "Sukces",
       description: "Organizacja pobrana pomyślnie.",

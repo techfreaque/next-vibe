@@ -147,7 +147,7 @@ const { GET } = createEndpoint({
             id: 45511,
             name: "connectika",
             label: "Connectika",
-            status: "DONE",
+            status: CorvinaOrgStatus.DONE,
             resourceId: "exorde.connex.connectika",
             dataEnabled: true,
             vpnEnabled: true,

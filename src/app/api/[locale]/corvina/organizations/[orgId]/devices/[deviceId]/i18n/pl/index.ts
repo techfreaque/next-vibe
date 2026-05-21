@@ -15,38 +15,18 @@ export const translations = {
     response: {
       orgId: "ID Organizacji",
       deviceId: "ID Urządzenia",
-      name: "Nazwa",
       label: "Etykieta",
-      status: "Status",
-      serialNumber: "Numer seryjny",
-      firmwareVersion: "Firmware",
-      connected: "Połączone",
-      lastSeen: "Ostatnio widziano",
-      vpnEnabled: "VPN włączony",
-      dataEnabled: "Dane włączone",
+      hwId: "ID sprzętowe",
+      orgResourceId: "ID zasobu org",
     },
     widget: {
       edit: "Edytuj",
       tags: "Tagi",
-      sections: { identity: "Tożsamość", network: "Sieć" },
+      sections: { identity: "Tożsamość" },
       labels: {
-        name: "Nazwa",
         label: "Etykieta",
-        serialNumber: "Numer seryjny",
-        firmwareVersion: "Firmware",
-        lastSeen: "Ostatnio widziano",
-      },
-      badges: {
-        connected: "Online",
-        disconnected: "Offline",
-        vpnOn: "VPN włączone",
-        vpnOff: "VPN wyłączone",
-        dataOn: "Dane włączone",
-        dataOff: "Dane wyłączone",
-      },
-      cli: {
-        firmwarePrefix: " · fw ",
-        lastSeenPrefix: "ostatnio widziano ",
+        hwId: "ID sprzętowe",
+        orgResourceId: "ID zasobu org",
       },
     },
     errors: {
@@ -89,9 +69,9 @@ export const translations = {
     },
     success: { title: "Sukces", description: "Urządzenie pobrane." },
   },
-  put: {
+  patch: {
     title: "Edytuj urządzenie",
-    description: "Aktualizuje urządzenie Corvina.",
+    info: "Aktualizuje etykietę, opis i numer seryjny urządzenia Corvina.",
     orgId: {
       label: "ID Organizacji",
       description: "Numeryczne ID organizacji Corvina.",
@@ -105,13 +85,15 @@ export const translations = {
       description: "Wyświetlana nazwa urządzenia.",
       placeholder: "Moje urządzenie",
     },
-    vpnEnabled: {
-      label: "VPN włączony",
-      description: "Włącz VPN dla tego urządzenia.",
+    description: {
+      label: "Opis",
+      description: "Opcjonalny opis urządzenia.",
+      placeholder: "Krótki opis",
     },
-    dataEnabled: {
-      label: "Dane włączone",
-      description: "Włącz usługi danych dla tego urządzenia.",
+    serialNumber: {
+      label: "Numer seryjny",
+      description: "Fizyczny numer seryjny urządzenia.",
+      placeholder: "SN-123456",
     },
     submitButton: { label: "Zapisz zmiany", loadingText: "Zapisywanie…" },
     errors: {

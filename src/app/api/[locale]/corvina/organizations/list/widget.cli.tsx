@@ -9,6 +9,7 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import { CorvinaOrgStatus } from "../enums";
 import type endpoints from "./definition";
 import type { CorvinaOrganizationsListResponseOutput } from "./definition";
 
@@ -38,7 +39,7 @@ export function OrgListContainer({ field }: CliWidgetProps): JSX.Element {
       const data = org.dataEnabled ? "data:on" : "data:off";
       const vpn = org.vpnEnabled ? "vpn:on" : "vpn:off";
       lines.push(
-        `  #${org.id} ${org.label} (${org.name}) [${org.status}] ${data} ${vpn}`,
+        `  #${org.id} ${org.label} (${org.name}) [${t(org.status)}] ${data} ${vpn}`,
       );
     }
     if (orgs.length === 0) {
@@ -63,11 +64,11 @@ export function OrgListContainer({ field }: CliWidgetProps): JSX.Element {
       ) : (
         orgs.map((org) => {
           const statusColor =
-            org.status === "DONE"
+            org.status === CorvinaOrgStatus.DONE
               ? "green"
-              : org.status === "PENDING"
+              : org.status === CorvinaOrgStatus.PENDING
                 ? "yellow"
-                : org.status === "FAILED"
+                : org.status === CorvinaOrgStatus.FAILED
                   ? "red"
                   : undefined;
           return (
@@ -75,7 +76,7 @@ export function OrgListContainer({ field }: CliWidgetProps): JSX.Element {
               <Text dimColor>#{org.id}</Text>
               <Text bold>{org.label}</Text>
               <Text dimColor>({org.name})</Text>
-              <Text color={statusColor}>{org.status}</Text>
+              <Text color={statusColor}>{t(org.status)}</Text>
               <Text>
                 {org.dataEnabled ? chalk.green("DATA") : chalk.dim("data")}
               </Text>

@@ -10,6 +10,7 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { CorvinaOrgStatus } from "../enums";
 import type {
   CorvinaOrganizationGetResponseOutput,
   CorvinaOrganizationGetUrlVariablesOutput,
@@ -17,6 +18,25 @@ import type {
   CorvinaOrganizationPutResponseOutput,
   CorvinaOrganizationPutUrlVariablesOutput,
 } from "./definition";
+
+const TERMINAL_STATUSES = new Set(["NEW", "DONE", "DELETING", "DELETED"]);
+
+function mapOrgStatus(
+  raw: string,
+): (typeof CorvinaOrgStatus)[keyof typeof CorvinaOrgStatus] {
+  if (TERMINAL_STATUSES.has(raw)) {
+    return CorvinaOrgStatus[raw as "NEW" | "DONE" | "DELETING" | "DELETED"];
+  }
+  return CorvinaOrgStatus.PROVISIONING;
+}
+
+type CorvinaOrgApiData = Omit<
+  CorvinaOrganizationGetResponseOutput,
+  "orgId" | "status" | "ipAddressesWhitelist"
+> & {
+  status: string;
+  ipAddressesWhitelist: string[];
+};
 
 export class CorvinaOrganizationByIdRepository {
   private static buildPath(orgId: number | string): string {
@@ -28,16 +48,20 @@ export class CorvinaOrganizationByIdRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<CorvinaOrganizationGetResponseOutput>> {
-    const result =
-      await CorvinaClient.request<CorvinaOrganizationGetResponseOutput>(
-        { method: "GET", path: this.buildPath(urlPathParams.orgId) },
-        logger,
-        locale,
-      );
+    const result = await CorvinaClient.request<CorvinaOrgApiData>(
+      { method: "GET", path: this.buildPath(urlPathParams.orgId) },
+      logger,
+      locale,
+    );
     if (!result.success) {
       return result;
     }
-    return success({ ...result.data, orgId: urlPathParams.orgId });
+    return success({
+      ...result.data,
+      orgId: urlPathParams.orgId,
+      status: mapOrgStatus(result.data.status),
+      ipAddressesWhitelist: result.data.ipAddressesWhitelist,
+    });
   }
 
   static async update(
@@ -46,35 +70,39 @@ export class CorvinaOrganizationByIdRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<CorvinaOrganizationPutResponseOutput>> {
-    const result =
-      await CorvinaClient.request<CorvinaOrganizationPutResponseOutput>(
-        {
-          method: "PUT",
-          path: this.buildPath(urlPathParams.orgId),
-          body: {
-            label: data.label,
-            privateAccess: data.privateAccess,
-            allowDisablePrivateAccess: data.allowDisablePrivateAccess,
-            allowHostname: data.allowHostname,
-            dataEnabled: data.dataEnabled,
-            vpnEnabled: data.vpnEnabled,
-            storeEnabled: data.storeEnabled,
-            mfaRequired: data.mfaRequired,
-            ...(data.hostname ? { hostname: data.hostname } : {}),
-            ...(data.ipAddressesWhitelist
-              ? { ipAddressesWhitelist: data.ipAddressesWhitelist }
-              : {}),
-          },
+    const result = await CorvinaClient.request<CorvinaOrgApiData>(
+      {
+        method: "PUT",
+        path: this.buildPath(urlPathParams.orgId),
+        body: {
+          label: data.label,
+          privateAccess: data.privateAccess,
+          allowDisablePrivateAccess: data.allowDisablePrivateAccess,
+          allowHostname: data.allowHostname,
+          dataEnabled: data.dataEnabled,
+          vpnEnabled: data.vpnEnabled,
+          storeEnabled: data.storeEnabled,
+          mfaRequired: data.mfaRequired,
+          ...(data.hostname ? { hostname: data.hostname } : {}),
+          ...(data.ipAddressesWhitelist
+            ? { ipAddressesWhitelist: data.ipAddressesWhitelist }
+            : {}),
         },
-        logger,
-        locale,
-      );
+      },
+      logger,
+      locale,
+    );
     if (!result.success) {
       return result;
     }
     logger.info("[CORVINA] Organization updated", {
       orgId: urlPathParams.orgId,
     });
-    return success({ ...result.data, orgId: urlPathParams.orgId });
+    return success({
+      ...result.data,
+      orgId: urlPathParams.orgId,
+      status: mapOrgStatus(result.data.status),
+      ipAddressesWhitelist: result.data.ipAddressesWhitelist.join(",") || null,
+    });
   }
 }

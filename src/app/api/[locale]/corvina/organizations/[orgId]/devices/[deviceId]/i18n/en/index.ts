@@ -12,41 +12,20 @@ export const translations = {
     response: {
       orgId: "Organization ID",
       deviceId: "Device ID",
-      name: "Name",
       label: "Label",
-      status: "Status",
-      serialNumber: "Serial Number",
-      firmwareVersion: "Firmware",
-      connected: "Connected",
-      lastSeen: "Last Seen",
-      vpnEnabled: "VPN Enabled",
-      dataEnabled: "Data Enabled",
+      hwId: "Hardware ID",
+      orgResourceId: "Org Resource ID",
     },
     widget: {
       edit: "Edit",
       tags: "Tags",
       sections: {
         identity: "Identity",
-        network: "Network",
       },
       labels: {
-        name: "Name",
         label: "Label",
-        serialNumber: "Serial Number",
-        firmwareVersion: "Firmware",
-        lastSeen: "Last Seen",
-      },
-      badges: {
-        connected: "Online",
-        disconnected: "Offline",
-        vpnOn: "VPN On",
-        vpnOff: "VPN Off",
-        dataOn: "Data On",
-        dataOff: "Data Off",
-      },
-      cli: {
-        firmwarePrefix: " · fw ",
-        lastSeenPrefix: "last seen ",
+        hwId: "Hardware ID",
+        orgResourceId: "Org Resource ID",
       },
     },
     errors: {
@@ -86,9 +65,9 @@ export const translations = {
     },
     success: { title: "Success", description: "Device fetched." },
   },
-  put: {
+  patch: {
     title: "Edit Device",
-    description: "Updates a Corvina device.",
+    info: "Updates label, description and serial number of a Corvina device.",
     orgId: {
       label: "Organization ID",
       description: "Numeric Corvina organization ID.",
@@ -99,13 +78,15 @@ export const translations = {
       description: "Display label for this device.",
       placeholder: "My Device",
     },
-    vpnEnabled: {
-      label: "VPN Enabled",
-      description: "Enable VPN for this device.",
+    description: {
+      label: "Description",
+      description: "Optional description for this device.",
+      placeholder: "A short description",
     },
-    dataEnabled: {
-      label: "Data Enabled",
-      description: "Enable data services for this device.",
+    serialNumber: {
+      label: "Serial Number",
+      description: "Physical serial number of this device.",
+      placeholder: "SN-123456",
     },
     submitButton: { label: "Save changes", loadingText: "Saving…" },
     errors: {

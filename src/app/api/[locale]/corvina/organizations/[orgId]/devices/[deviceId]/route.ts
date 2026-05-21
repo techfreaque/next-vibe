@@ -4,14 +4,14 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import definitions from "./definition";
 import { CorvinaDeviceByIdRepository } from "./repository";
 
-export const { GET, PUT, tools } = endpointsHandler({
+export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: ({ urlPathParams, logger, locale }) =>
       CorvinaDeviceByIdRepository.getById(urlPathParams, logger, locale),
   },
-  [Methods.PUT]: {
+  [Methods.PATCH]: {
     email: undefined,
     handler: ({ data, urlPathParams, logger, locale }) =>
       CorvinaDeviceByIdRepository.update(urlPathParams, data, logger, locale),

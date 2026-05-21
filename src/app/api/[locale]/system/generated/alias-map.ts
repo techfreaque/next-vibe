@@ -221,6 +221,7 @@ export const pathToAliasMap = {
   "cortex-search": "cortex-search",
   "cortex-tree": "cortex-tree",
   "cortex-write": "cortex-write",
+  corvina_devices_list: "corvina_devices_list",
   corvina_list: "corvina_list",
   corvina_organizations_create_POST: "corvina_organizations_create_POST",
   corvina_organizations_list_GET: "corvina_list",
@@ -230,12 +231,13 @@ export const pathToAliasMap = {
     "corvina_organizations_orgId_devices_deviceId_delete_DELETE",
   corvina_organizations_orgId_devices_deviceId_GET:
     "corvina_organizations_orgId_devices_deviceId_GET",
-  corvina_organizations_orgId_devices_deviceId_PUT:
-    "corvina_organizations_orgId_devices_deviceId_PUT",
+  corvina_organizations_orgId_devices_deviceId_PATCH:
+    "corvina_organizations_orgId_devices_deviceId_PATCH",
   corvina_organizations_orgId_devices_deviceId_tags_GET:
     "corvina_organizations_orgId_devices_deviceId_tags_GET",
-  corvina_organizations_orgId_devices_list_GET:
-    "corvina_organizations_orgId_devices_list_GET",
+  corvina_organizations_orgId_devices_deviceId_tags_POST:
+    "corvina_organizations_orgId_devices_deviceId_tags_POST",
+  corvina_organizations_orgId_devices_list_GET: "corvina_devices_list",
   corvina_organizations_orgId_GET: "corvina_organizations_orgId_GET",
   corvina_organizations_orgId_PUT: "corvina_organizations_orgId_PUT",
   "create-config": "config",

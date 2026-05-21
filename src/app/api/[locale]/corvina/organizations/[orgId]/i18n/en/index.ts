@@ -110,6 +110,15 @@ export const translations = {
         description: "An unknown error occurred.",
       },
     },
+    enums: {
+      orgStatus: {
+        new: "New",
+        provisioning: "Provisioning",
+        done: "Active",
+        deleting: "Deleting",
+        deleted: "Deleted",
+      },
+    },
     success: {
       title: "Success",
       description: "Organization fetched successfully.",

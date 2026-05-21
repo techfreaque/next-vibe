@@ -8,7 +8,6 @@ import {
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -16,9 +15,9 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { CorvinaDeviceStatus } from "../enums";
 import { scopedTranslation } from "./i18n";
 
 const DeviceListContainer = lazyWidget(() =>
@@ -37,7 +36,8 @@ const { GET } = createEndpoint({
   category: "endpointCategories.corvina",
   subCategory: "endpointCategories.corvinaOrganizations",
   tags: ["tags.corvina" as const, "tags.devices" as const],
-
+  aliases: ["corvina_devices_list"],
+  cli: { firstCliArgKey: "orgId" },
   fields: customWidgetObject({
     render: DeviceListContainer,
     usage: { request: "urlPathParams", response: true } as const,
@@ -63,39 +63,19 @@ const { GET } = createEndpoint({
               content: "get.response.devices.id" as const,
               schema: z.coerce.number(),
             }),
-            name: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              content: "get.response.devices.name" as const,
-              schema: z.string(),
-            }),
             label: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.devices.label" as const,
               schema: z.string(),
             }),
-            status: responseField(scopedTranslation, {
-              type: WidgetType.BADGE,
-              content: "get.response.devices.status" as const,
-              schema: z.enum(CorvinaDeviceStatus),
-            }),
-            serialNumber: responseField(scopedTranslation, {
+            hwId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.devices.serialNumber" as const,
-              schema: z.string().nullable(),
+              content: "get.response.devices.hwId" as const,
+              schema: z.string(),
             }),
-            firmwareVersion: responseField(scopedTranslation, {
+            orgResourceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.devices.firmwareVersion" as const,
-              schema: z.string().nullable(),
-            }),
-            connected: responseField(scopedTranslation, {
-              type: WidgetType.BADGE,
-              content: "get.response.devices.connected" as const,
-              schema: z.boolean(),
-            }),
-            lastSeen: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              content: "get.response.devices.lastSeen" as const,
+              content: "get.response.devices.orgResourceId" as const,
               schema: z.string().nullable(),
             }),
           },
@@ -160,13 +140,9 @@ const { GET } = createEndpoint({
         devices: [
           {
             id: 1001,
-            name: "device-001",
             label: "Device 001",
-            status: "ACTIVE",
-            serialNumber: "SN-001",
-            firmwareVersion: "1.2.3",
-            connected: true,
-            lastSeen: "2025-01-15T09:30:00.000Z",
+            hwId: "DEADBEEF",
+            orgResourceId: "exorde.connex.connectika",
           },
         ],
         total: 1,

@@ -680,6 +680,10 @@ export async function getEndpoint(
     case "cortex-write":
       return (await import("@/app/api/[locale]/agent/cortex/write/definition"))
         .default.POST;
+    case "corvina_devices_list":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/list/definition")
+      ).default.GET;
     case "corvina_list":
       return (
         await import("@/app/api/[locale]/corvina/organizations/list/definition")
@@ -708,10 +712,10 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/definition")
       ).default.GET;
-    case "corvina_organizations_orgId_devices_deviceId_PUT":
+    case "corvina_organizations_orgId_devices_deviceId_PATCH":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/definition")
-      ).default.PUT;
+      ).default.PATCH;
     case "corvina_organizations_orgId_devices_deviceId_delete_DELETE":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/delete/definition")
@@ -720,6 +724,10 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags/definition")
       ).default.GET;
+    case "corvina_organizations_orgId_devices_deviceId_tags_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags/definition")
+      ).default.POST;
     case "corvina_organizations_orgId_devices_list_GET":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/list/definition")

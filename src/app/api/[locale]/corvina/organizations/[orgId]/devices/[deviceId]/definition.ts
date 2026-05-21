@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestResponseField,
+  requestField,
   requestUrlPathParamsResponseField,
   responseField,
   submitButton,
@@ -17,7 +17,6 @@ import {
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { CorvinaDeviceStatus } from "../enums";
 import { scopedTranslation } from "./i18n";
 
 const DeviceDetailContainer = lazyWidget(() =>
@@ -59,50 +58,20 @@ const { GET } = createEndpoint({
         description: "get.deviceId.description" as const,
         schema: z.coerce.number(),
       }),
-      name: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.name" as const,
-        schema: z.string(),
-      }),
       label: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.label" as const,
         schema: z.string(),
       }),
-      status: responseField(scopedTranslation, {
-        type: WidgetType.BADGE,
-        content: "get.response.status" as const,
-        schema: z.enum(CorvinaDeviceStatus),
-      }),
-      serialNumber: responseField(scopedTranslation, {
+      hwId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.serialNumber" as const,
-        schema: z.string().nullable(),
+        content: "get.response.hwId" as const,
+        schema: z.string(),
       }),
-      firmwareVersion: responseField(scopedTranslation, {
+      orgResourceId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.firmwareVersion" as const,
+        content: "get.response.orgResourceId" as const,
         schema: z.string().nullable(),
-      }),
-      connected: responseField(scopedTranslation, {
-        type: WidgetType.BADGE,
-        content: "get.response.connected" as const,
-        schema: z.boolean(),
-      }),
-      lastSeen: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.lastSeen" as const,
-        schema: z.string().nullable(),
-      }),
-      vpnEnabled: responseField(scopedTranslation, {
-        type: WidgetType.BADGE,
-        content: "get.response.vpnEnabled" as const,
-        schema: z.boolean(),
-      }),
-      dataEnabled: responseField(scopedTranslation, {
-        type: WidgetType.BADGE,
-        content: "get.response.dataEnabled" as const,
-        schema: z.boolean(),
       }),
     },
   }),
@@ -157,28 +126,22 @@ const { GET } = createEndpoint({
       default: {
         orgId: 45511,
         deviceId: 1001,
-        name: "device-001",
         label: "Device 001",
-        status: "ACTIVE",
-        serialNumber: "SN-001",
-        firmwareVersion: "1.2.3",
-        connected: true,
-        lastSeen: "2025-01-15T09:30:00.000Z",
-        vpnEnabled: true,
-        dataEnabled: true,
+        hwId: "DEADBEEF",
+        orgResourceId: "exorde.connex.connectika",
       },
     },
   },
 });
 
-const { PUT } = createEndpoint({
+const { PATCH } = createEndpoint({
   scopedTranslation,
-  method: Methods.PUT,
+  method: Methods.PATCH,
   path: ["corvina", "organizations", "[orgId]", "devices", "[deviceId]"],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  title: "put.title" as const,
-  description: "put.description" as const,
+  title: "patch.title" as const,
+  description: "patch.info" as const,
   icon: "edit",
   category: "endpointCategories.corvina",
   subCategory: "endpointCategories.corvinaOrganizations",
@@ -191,75 +154,57 @@ const { PUT } = createEndpoint({
       orgId: requestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "put.orgId.label" as const,
-        description: "put.orgId.description" as const,
+        label: "patch.orgId.label" as const,
+        description: "patch.orgId.description" as const,
         schema: z.coerce.number(),
       }),
       deviceId: requestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "put.deviceId.label" as const,
-        description: "put.deviceId.description" as const,
+        label: "patch.deviceId.label" as const,
+        description: "patch.deviceId.description" as const,
         schema: z.coerce.number(),
       }),
-      label: requestResponseField(scopedTranslation, {
+      label: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "put.label.label" as const,
-        description: "put.label.description" as const,
-        placeholder: "put.label.placeholder" as const,
+        label: "patch.label.label" as const,
+        description: "patch.label.description" as const,
+        placeholder: "patch.label.placeholder" as const,
         columns: 12,
-        schema: z.string().min(1).max(200),
+        schema: z.string().min(1).max(200).optional(),
       }),
-      vpnEnabled: requestResponseField(scopedTranslation, {
+      description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "put.vpnEnabled.label" as const,
-        description: "put.vpnEnabled.description" as const,
-        columns: 6,
-        schema: z.boolean().default(true),
+        fieldType: FieldDataType.TEXT,
+        label: "patch.description.label" as const,
+        description: "patch.description.description" as const,
+        placeholder: "patch.description.placeholder" as const,
+        columns: 12,
+        schema: z.string().max(500).optional(),
       }),
-      dataEnabled: requestResponseField(scopedTranslation, {
+      serialNumber: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "put.dataEnabled.label" as const,
-        description: "put.dataEnabled.description" as const,
-        columns: 6,
-        schema: z.boolean().default(true),
+        fieldType: FieldDataType.TEXT,
+        label: "patch.serialNumber.label" as const,
+        description: "patch.serialNumber.description" as const,
+        placeholder: "patch.serialNumber.placeholder" as const,
+        columns: 12,
+        schema: z.string().max(200).optional(),
       }),
-      name: responseField(scopedTranslation, {
+      hwId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.name" as const,
+        content: "get.response.hwId" as const,
         schema: z.string(),
       }),
-      status: responseField(scopedTranslation, {
-        type: WidgetType.BADGE,
-        content: "get.response.status" as const,
-        schema: z.enum(CorvinaDeviceStatus),
-      }),
-      serialNumber: responseField(scopedTranslation, {
+      orgResourceId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.serialNumber" as const,
-        schema: z.string().nullable(),
-      }),
-      firmwareVersion: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.firmwareVersion" as const,
-        schema: z.string().nullable(),
-      }),
-      connected: responseField(scopedTranslation, {
-        type: WidgetType.BADGE,
-        content: "get.response.connected" as const,
-        schema: z.boolean(),
-      }),
-      lastSeen: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.lastSeen" as const,
+        content: "get.response.orgResourceId" as const,
         schema: z.string().nullable(),
       }),
       submitButton: submitButton(scopedTranslation, {
-        label: "put.submitButton.label" as const,
-        loadingText: "put.submitButton.loadingText" as const,
+        label: "patch.submitButton.label" as const,
+        loadingText: "patch.submitButton.loadingText" as const,
         icon: "save",
         variant: "primary",
         className: "w-full",
@@ -270,66 +215,64 @@ const { PUT } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "put.errors.unauthorized.title" as const,
-      description: "put.errors.unauthorized.description" as const,
+      title: "patch.errors.unauthorized.title" as const,
+      description: "patch.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "put.errors.validation.title" as const,
-      description: "put.errors.validation.description" as const,
+      title: "patch.errors.validation.title" as const,
+      description: "patch.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "put.errors.forbidden.title" as const,
-      description: "put.errors.forbidden.description" as const,
+      title: "patch.errors.forbidden.title" as const,
+      description: "patch.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "put.errors.notFound.title" as const,
-      description: "put.errors.notFound.description" as const,
+      title: "patch.errors.notFound.title" as const,
+      description: "patch.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "put.errors.conflict.title" as const,
-      description: "put.errors.conflict.description" as const,
+      title: "patch.errors.conflict.title" as const,
+      description: "patch.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "put.errors.server.title" as const,
-      description: "put.errors.server.description" as const,
+      title: "patch.errors.server.title" as const,
+      description: "patch.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "put.errors.network.title" as const,
-      description: "put.errors.network.description" as const,
+      title: "patch.errors.network.title" as const,
+      description: "patch.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "put.errors.unsavedChanges.title" as const,
-      description: "put.errors.unsavedChanges.description" as const,
+      title: "patch.errors.unsavedChanges.title" as const,
+      description: "patch.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "put.errors.unknown.title" as const,
-      description: "put.errors.unknown.description" as const,
+      title: "patch.errors.unknown.title" as const,
+      description: "patch.errors.unknown.description" as const,
     },
   },
 
   successTypes: {
-    title: "put.success.title" as const,
-    description: "put.success.description" as const,
+    title: "patch.success.title" as const,
+    description: "patch.success.description" as const,
   },
 
   examples: {
     urlPathParams: { default: { orgId: 45511, deviceId: 1001 } },
     requests: {
-      default: { label: "Device 001", vpnEnabled: true, dataEnabled: true },
+      default: {
+        label: "Device 001",
+        description: "My device",
+        serialNumber: "SN-001",
+      },
     },
     responses: {
       default: {
         orgId: 45511,
         deviceId: 1001,
-        name: "device-001",
         label: "Device 001",
-        status: "ACTIVE",
-        serialNumber: "SN-001",
-        firmwareVersion: "1.2.3",
-        connected: true,
-        lastSeen: "2025-01-15T09:30:00.000Z",
-        vpnEnabled: true,
-        dataEnabled: true,
+        hwId: "DEADBEEF",
+        orgResourceId: "exorde.connex.connectika",
       },
     },
   },
@@ -338,10 +281,11 @@ const { PUT } = createEndpoint({
 export type CorvinaDeviceGetUrlVariablesOutput =
   typeof GET.types.UrlVariablesOutput;
 export type CorvinaDeviceGetResponseOutput = typeof GET.types.ResponseOutput;
-export type CorvinaDevicePutUrlVariablesOutput =
-  typeof PUT.types.UrlVariablesOutput;
-export type CorvinaDevicePutRequestOutput = typeof PUT.types.RequestOutput;
-export type CorvinaDevicePutResponseOutput = typeof PUT.types.ResponseOutput;
+export type CorvinaDevicePatchUrlVariablesOutput =
+  typeof PATCH.types.UrlVariablesOutput;
+export type CorvinaDevicePatchRequestOutput = typeof PATCH.types.RequestOutput;
+export type CorvinaDevicePatchResponseOutput =
+  typeof PATCH.types.ResponseOutput;
 
-const definitions = { GET, PUT } as const;
+const definitions = { GET, PATCH } as const;
 export default definitions;

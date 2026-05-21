@@ -9,6 +9,7 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import { CorvinaOrgStatus } from "../enums";
 import type endpoints from "./definition";
 import type { CorvinaOrganizationGetResponseOutput } from "./definition";
 
@@ -18,7 +19,7 @@ interface CliWidgetProps {
   };
 }
 
-export function OrgDetailCliContainer({ field }: CliWidgetProps): JSX.Element {
+export function OrgDetailContainer({ field }: CliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
   const t = useWidgetTranslation<typeof endpoints.GET>();
@@ -32,7 +33,7 @@ export function OrgDetailCliContainer({ field }: CliWidgetProps): JSX.Element {
   if (isMcp) {
     const lines = [
       `Organization #${org.orgId}: ${org.label} (${org.name})`,
-      `  status: ${org.status}  resource: ${org.resourceId}`,
+      `  status: ${t(org.status)}  resource: ${org.resourceId}`,
       `  data:${org.dataEnabled ? "on" : "off"}  vpn:${org.vpnEnabled ? "on" : "off"}  store:${org.storeEnabled ? "on" : "off"}  mfa:${org.mfaRequired ? "on" : "off"}`,
       `  private:${org.privateAccess ? "yes" : "no"}  userAccess:${org.userCanAccess ? "yes" : "no"}`,
     ];
@@ -50,11 +51,11 @@ export function OrgDetailCliContainer({ field }: CliWidgetProps): JSX.Element {
   }
 
   const statusColor =
-    org.status === "DONE"
+    org.status === CorvinaOrgStatus.DONE
       ? "green"
-      : org.status === "PENDING"
+      : org.status === CorvinaOrgStatus.PENDING
         ? "yellow"
-        : org.status === "FAILED"
+        : org.status === CorvinaOrgStatus.FAILED
           ? "red"
           : undefined;
 
@@ -64,7 +65,7 @@ export function OrgDetailCliContainer({ field }: CliWidgetProps): JSX.Element {
         <Text dimColor>#{org.orgId}</Text>
         <Text bold>{org.label}</Text>
         <Text dimColor>({org.name})</Text>
-        <Text color={statusColor}>{org.status}</Text>
+        <Text color={statusColor}>{t(org.status)}</Text>
       </Box>
       <Box gap={1}>
         <Text dimColor>{org.resourceId}</Text>
@@ -90,4 +91,4 @@ export function OrgDetailCliContainer({ field }: CliWidgetProps): JSX.Element {
   );
 }
 
-OrgDetailCliContainer.cliWidget = true as const;
+OrgDetailContainer.cliWidget = true as const;

@@ -15,6 +15,19 @@ import type {
   CorvinaDevicesListUrlVariablesOutput,
 } from "./definition";
 
+interface CorvinaDeviceApiItem {
+  id: number;
+  label: string;
+  hwId: string;
+  orgResourceId?: string;
+  groups?: string[];
+}
+
+interface CorvinaDevicesPageResponse {
+  content: CorvinaDeviceApiItem[];
+  totalElements: number;
+}
+
 export class CorvinaDevicesListRepository {
   private static buildPath(orgId: number | string): string {
     return `${CORVINA_ORGS_PATH}/${encodeURIComponent(orgId)}/devices`;
@@ -25,15 +38,22 @@ export class CorvinaDevicesListRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<CorvinaDevicesListResponseOutput>> {
-    const result =
-      await CorvinaClient.request<CorvinaDevicesListResponseOutput>(
-        { method: "GET", path: this.buildPath(urlPathParams.orgId) },
-        logger,
-        locale,
-      );
+    const result = await CorvinaClient.request<CorvinaDevicesPageResponse>(
+      { method: "GET", path: this.buildPath(urlPathParams.orgId) },
+      logger,
+      locale,
+    );
     if (!result.success) {
       return result;
     }
-    return success(result.data);
+    return success({
+      devices: result.data.content.map((d) => ({
+        id: d.id,
+        label: d.label,
+        hwId: d.hwId,
+        orgResourceId: d.orgResourceId ?? null,
+      })),
+      total: result.data.totalElements,
+    });
   }
 }

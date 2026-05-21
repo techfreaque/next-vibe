@@ -18,7 +18,7 @@ interface CliWidgetProps {
   };
 }
 
-export function OrgCreateCliContainer({ field }: CliWidgetProps): JSX.Element {
+export function OrgCreateContainer({ field }: CliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
   const t = useWidgetTranslation<typeof endpoints.POST>();
@@ -67,4 +67,4 @@ export function OrgCreateCliContainer({ field }: CliWidgetProps): JSX.Element {
   );
 }
 
-OrgCreateCliContainer.cliWidget = true as const;
+OrgCreateContainer.cliWidget = true as const;

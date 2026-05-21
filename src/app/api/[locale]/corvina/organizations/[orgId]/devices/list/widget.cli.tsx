@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
@@ -18,7 +17,7 @@ interface CliWidgetProps {
   };
 }
 
-export function DeviceListCliContainer({ field }: CliWidgetProps): JSX.Element {
+export function DeviceListContainer({ field }: CliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
   const t = useWidgetTranslation<typeof endpoints.GET>();
@@ -35,8 +34,7 @@ export function DeviceListCliContainer({ field }: CliWidgetProps): JSX.Element {
   if (isMcp) {
     const lines = [`Devices (${total}):`];
     for (const d of devices) {
-      const conn = d.connected ? "online" : "offline";
-      lines.push(`  #${d.id} ${d.label || d.name} [${d.status}] ${conn}`);
+      lines.push(`  #${d.id} ${d.label}  hwId:${d.hwId}`);
     }
     if (devices.length === 0) {
       lines.push("  (none)");
@@ -57,26 +55,16 @@ export function DeviceListCliContainer({ field }: CliWidgetProps): JSX.Element {
       {devices.length === 0 ? (
         <Text dimColor>{t("get.widget.noDevicesFound")}</Text>
       ) : (
-        devices.map((d) => {
-          const statusColor =
-            d.status === "ACTIVE"
-              ? "green"
-              : d.status === "ERROR"
-                ? "red"
-                : undefined;
-          return (
-            <Box key={d.id} gap={2} marginBottom={0}>
-              <Text dimColor>#{d.id}</Text>
-              <Text bold>{d.label || d.name}</Text>
-              <Text color={statusColor}>{d.status}</Text>
-              <Text>{d.connected ? chalk.green("●") : chalk.dim("○")}</Text>
-              {d.serialNumber && <Text dimColor>{d.serialNumber}</Text>}
-            </Box>
-          );
-        })
+        devices.map((d) => (
+          <Box key={d.id} gap={2} marginBottom={0}>
+            <Text dimColor>#{d.id}</Text>
+            <Text bold>{d.label}</Text>
+            <Text dimColor>{d.hwId}</Text>
+          </Box>
+        ))
       )}
     </Box>
   );
 }
 
-DeviceListCliContainer.cliWidget = true as const;
+DeviceListContainer.cliWidget = true as const;

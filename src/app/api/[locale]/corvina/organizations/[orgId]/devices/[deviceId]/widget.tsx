@@ -12,7 +12,6 @@ import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetNavigation,
   useWidgetOnSubmit,
@@ -26,12 +25,6 @@ import type { CorvinaDeviceGetResponseOutput } from "./definition";
 
 type Device = CorvinaDeviceGetResponseOutput;
 
-const statusColors: Record<string, string> = {
-  ACTIVE: "bg-success/10 text-success",
-  INACTIVE: "bg-muted text-muted-foreground",
-  ERROR: "bg-destructive/10 text-destructive",
-};
-
 function InfoRow({
   label,
   value,
@@ -41,50 +34,12 @@ function InfoRow({
 }): React.JSX.Element {
   return (
     <Div className="flex items-start justify-between py-2 border-b last:border-b-0">
-      <Span className="text-xs text-muted-foreground w-40 shrink-0">
+      <Span className="text-xs text-muted-foreground w-36 shrink-0">
         {label}
       </Span>
       <Span className="text-sm font-medium text-right flex-1 break-all">
         {value}
       </Span>
-    </Div>
-  );
-}
-
-function BoolToggle({
-  value,
-  onToggle,
-  label,
-  description,
-}: {
-  value: boolean;
-  onToggle: () => void;
-  label: string;
-  description: string;
-}): React.JSX.Element {
-  return (
-    <Div className="flex items-center justify-between py-2">
-      <Div>
-        <Span className="text-sm font-medium">{label}</Span>
-        <Span className="block text-xs text-muted-foreground">
-          {description}
-        </Span>
-      </Div>
-      <Button
-        type="button"
-        onClick={onToggle}
-        className={cn(
-          "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors p-0 min-h-0 shadow-none",
-          value ? "bg-primary" : "bg-input",
-        )}
-      >
-        <Span
-          className={cn(
-            "pointer-events-none inline-block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform",
-            value ? "translate-x-4" : "translate-x-0",
-          )}
-        />
-      </Button>
     </Div>
   );
 }
@@ -103,7 +58,7 @@ export function DeviceDetailContainer(): React.JSX.Element {
     }
     void (async (): Promise<void> => {
       const def = await import("./definition");
-      navigate(def.default.PUT, {
+      navigate(def.default.PATCH, {
         urlPathParams: { orgId: device.orgId, deviceId: device.deviceId },
       });
     })();
@@ -116,7 +71,7 @@ export function DeviceDetailContainer(): React.JSX.Element {
     void (async (): Promise<void> => {
       const def = await import("../[deviceId]/tags/definition");
       navigate(def.default.GET, {
-        urlPathParams: { orgId: device.orgId, deviceId: device.deviceId },
+        urlPathParams: { orgId: device.orgId, deviceId: device.hwId },
       });
     })();
   }, [navigate, device]);
@@ -133,9 +88,7 @@ export function DeviceDetailContainer(): React.JSX.Element {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <Span className="font-semibold text-sm mr-auto">
-          {isLoading
-            ? "Loading…"
-            : device?.label || device?.name || t("get.title")}
+          {isLoading ? "Loading…" : device?.label || t("get.title")}
         </Span>
         {device && (
           <Button
@@ -168,101 +121,25 @@ export function DeviceDetailContainer(): React.JSX.Element {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </Div>
       ) : !device ? null : (
-        <Div className="px-4 py-3 flex flex-col gap-4">
-          <Div>
-            <Div className="flex items-center gap-2 mb-2">
-              <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                {t("get.widget.sections.identity")}
-              </Span>
-              <Span
-                className={cn(
-                  "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                  statusColors[device.status.toUpperCase()] ??
-                    "bg-muted text-muted-foreground",
-                )}
-              >
-                {device.status}
-              </Span>
-              <Span
-                className={cn(
-                  "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                  device.connected
-                    ? "bg-success/10 text-success"
-                    : "bg-muted text-muted-foreground",
-                )}
-              >
-                {device.connected
-                  ? t("get.widget.badges.connected")
-                  : t("get.widget.badges.disconnected")}
-              </Span>
-            </Div>
+        <Div className="px-4 py-3">
+          <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-2">
+            {t("get.widget.sections.identity")}
+          </Span>
+          <InfoRow label={t("get.widget.labels.label")} value={device.label} />
+          <InfoRow
+            label={t("get.widget.labels.hwId")}
+            value={<Span className="font-mono text-xs">{device.hwId}</Span>}
+          />
+          {device.orgResourceId && (
             <InfoRow
-              label={t("get.widget.labels.name")}
-              value={<Span className="font-mono">{device.name}</Span>}
+              label={t("get.widget.labels.orgResourceId")}
+              value={
+                <Span className="font-mono text-xs">
+                  {device.orgResourceId}
+                </Span>
+              }
             />
-            <InfoRow
-              label={t("get.widget.labels.label")}
-              value={device.label}
-            />
-            {device.serialNumber && (
-              <InfoRow
-                label={t("get.widget.labels.serialNumber")}
-                value={
-                  <Span className="font-mono text-xs">
-                    {device.serialNumber}
-                  </Span>
-                }
-              />
-            )}
-            {device.firmwareVersion && (
-              <InfoRow
-                label={t("get.widget.labels.firmwareVersion")}
-                value={
-                  <Span className="font-mono text-xs">
-                    {device.firmwareVersion}
-                  </Span>
-                }
-              />
-            )}
-            {device.lastSeen && (
-              <InfoRow
-                label={t("get.widget.labels.lastSeen")}
-                value={<Span className="text-xs">{device.lastSeen}</Span>}
-              />
-            )}
-          </Div>
-
-          <Div>
-            <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-2">
-              {t("get.widget.sections.network")}
-            </Span>
-            <Div className="flex flex-wrap gap-2">
-              <Span
-                className={cn(
-                  "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                  device.vpnEnabled
-                    ? "bg-success/10 text-success"
-                    : "bg-muted text-muted-foreground",
-                )}
-              >
-                {device.vpnEnabled
-                  ? t("get.widget.badges.vpnOn")
-                  : t("get.widget.badges.vpnOff")}
-              </Span>
-              <Span
-                className={cn(
-                  "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                  device.dataEnabled
-                    ? "bg-success/10 text-success"
-                    : "bg-muted text-muted-foreground",
-                )}
-              >
-                {device.dataEnabled
-                  ? t("get.widget.badges.dataOn")
-                  : t("get.widget.badges.dataOff")}
-              </Span>
-            </Div>
-          </Div>
+          )}
         </Div>
       )}
     </Div>
@@ -271,17 +148,15 @@ export function DeviceDetailContainer(): React.JSX.Element {
 
 export function DeviceUpdateContainer(): React.JSX.Element {
   const { pop: goBack } = useWidgetNavigation();
-  const t = useWidgetTranslation<typeof definition.PUT>();
-  const form = useWidgetForm<typeof definition.PUT>();
+  const t = useWidgetTranslation<typeof definition.PATCH>();
+  const form = useWidgetForm<typeof definition.PATCH>();
   const onSubmit = useWidgetOnSubmit();
-  const data = useWidgetValue<typeof definition.PUT>();
+  const data = useWidgetValue<typeof definition.PATCH>();
 
-  const isLoading = data === undefined;
   const device = data;
-
-  const vpnEnabled = form.watch("vpnEnabled") ?? false;
-  const dataEnabled = form.watch("dataEnabled") ?? false;
   const labelValue = form.watch("label") ?? "";
+  const descriptionValue = form.watch("description") ?? "";
+  const serialNumberValue = form.watch("serialNumber") ?? "";
 
   return (
     <Div className="flex flex-col gap-0">
@@ -295,70 +170,81 @@ export function DeviceUpdateContainer(): React.JSX.Element {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <Span className="font-semibold text-sm mr-auto">
-          {t("put.title")}
+          {t("patch.title")}
           {device && (
             <Span className="ml-1 text-muted-foreground font-normal">
-              — {device.label || device.name}
+              — {device.label}
             </Span>
           )}
         </Span>
       </Div>
 
-      {isLoading ? (
-        <Div className="h-48 flex items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <Div className="px-4 py-3 flex flex-col gap-4">
+        <Div>
+          <Label className="block text-xs font-medium mb-1">
+            {t("patch.label.label")}
+            <Span className="block text-xs text-muted-foreground font-normal mb-1">
+              {t("patch.label.description")}
+            </Span>
+          </Label>
+          <Input
+            value={labelValue}
+            onChange={(e) =>
+              form.setValue("label", e.target.value, { shouldDirty: true })
+            }
+            placeholder={t("patch.label.placeholder")}
+            className="w-full"
+          />
         </Div>
-      ) : (
-        <Div className="px-4 py-3 flex flex-col gap-4">
-          <Div>
-            <Label className="block text-xs font-medium mb-1">
-              {t("put.label.label")}
-              <Span className="block text-xs text-muted-foreground font-normal mb-1">
-                {t("put.label.description")}
-              </Span>
-            </Label>
-            <Input
-              value={labelValue}
-              onChange={(e) =>
-                form.setValue("label", e.target.value, { shouldDirty: true })
-              }
-              placeholder={t("put.label.placeholder")}
-              className="w-full"
-            />
-          </Div>
 
-          <Div className="divide-y border rounded-lg px-3">
-            <BoolToggle
-              value={vpnEnabled}
-              onToggle={() =>
-                form.setValue("vpnEnabled", !vpnEnabled, { shouldDirty: true })
-              }
-              label={t("put.vpnEnabled.label")}
-              description={t("put.vpnEnabled.description")}
-            />
-            <BoolToggle
-              value={dataEnabled}
-              onToggle={() =>
-                form.setValue("dataEnabled", !dataEnabled, {
-                  shouldDirty: true,
-                })
-              }
-              label={t("put.dataEnabled.label")}
-              description={t("put.dataEnabled.description")}
-            />
-          </Div>
-
-          <Button
-            type="button"
-            variant="default"
-            className="w-full gap-2"
-            onClick={onSubmit ?? undefined}
-          >
-            <Save className="h-4 w-4" />
-            {t("put.submitButton.label")}
-          </Button>
+        <Div>
+          <Label className="block text-xs font-medium mb-1">
+            {t("patch.description.label")}
+            <Span className="block text-xs text-muted-foreground font-normal mb-1">
+              {t("patch.description.description")}
+            </Span>
+          </Label>
+          <Input
+            value={descriptionValue}
+            onChange={(e) =>
+              form.setValue("description", e.target.value, {
+                shouldDirty: true,
+              })
+            }
+            placeholder={t("patch.description.placeholder")}
+            className="w-full"
+          />
         </Div>
-      )}
+
+        <Div>
+          <Label className="block text-xs font-medium mb-1">
+            {t("patch.serialNumber.label")}
+            <Span className="block text-xs text-muted-foreground font-normal mb-1">
+              {t("patch.serialNumber.description")}
+            </Span>
+          </Label>
+          <Input
+            value={serialNumberValue}
+            onChange={(e) =>
+              form.setValue("serialNumber", e.target.value, {
+                shouldDirty: true,
+              })
+            }
+            placeholder={t("patch.serialNumber.placeholder")}
+            className="w-full"
+          />
+        </Div>
+
+        <Button
+          type="button"
+          variant="default"
+          className="w-full gap-2"
+          onClick={onSubmit ?? undefined}
+        >
+          <Save className="h-4 w-4" />
+          {t("patch.submitButton.label")}
+        </Button>
+      </Div>
     </Div>
   );
 }
