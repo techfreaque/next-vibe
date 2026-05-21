@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -87,17 +88,17 @@ const { GET } = createEndpoint({
       lastConnection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.lastConnection" as const,
-        schema: z.string().nullable(),
+        schema: dateSchema.nullable(),
       }),
       lastDisconnection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.lastDisconnection" as const,
-        schema: z.string().nullable(),
+        schema: dateSchema.nullable(),
       }),
       firstRegistration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.firstRegistration" as const,
-        schema: z.string().nullable(),
+        schema: dateSchema.nullable(),
       }),
       lastSeenIp: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

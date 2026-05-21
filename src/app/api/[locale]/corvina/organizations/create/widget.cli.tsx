@@ -35,7 +35,7 @@ export function OrgCreateContainer({ field }: CliWidgetProps): JSX.Element {
       lines.push(`  display: ${value.displayNameResult}`);
     }
     if (value.createdAt) {
-      lines.push(`  created: ${value.createdAt}`);
+      lines.push(`  created: ${new Date(value.createdAt).toISOString()}`);
     }
     return (
       <Box flexDirection="column">
@@ -60,7 +60,8 @@ export function OrgCreateContainer({ field }: CliWidgetProps): JSX.Element {
       </Box>
       {value.createdAt && (
         <Text dimColor>
-          {t("post.widget.createdAt")} {value.createdAt}
+          {t("post.widget.createdAt")}{" "}
+          {new Date(value.createdAt).toLocaleString()}
         </Text>
       )}
     </Box>

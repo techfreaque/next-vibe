@@ -1,0 +1,24 @@
+import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
+import definitions from "./definition";
+import { UserGroupDetailRepository } from "./repository";
+
+export const { GET, PUT, DELETE, tools } = endpointsHandler({
+  endpoint: definitions,
+  [Methods.GET]: {
+    email: undefined,
+    handler: ({ urlPathParams, logger, locale }) =>
+      UserGroupDetailRepository.getById(urlPathParams, logger, locale),
+  },
+  [Methods.PUT]: {
+    email: undefined,
+    handler: ({ data, urlPathParams, logger, locale }) =>
+      UserGroupDetailRepository.update(urlPathParams, data, logger, locale),
+  },
+  [Methods.DELETE]: {
+    email: undefined,
+    handler: ({ urlPathParams, logger, locale }) =>
+      UserGroupDetailRepository.deleteById(urlPathParams, logger, locale),
+  },
+});

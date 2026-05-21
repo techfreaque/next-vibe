@@ -680,6 +680,46 @@ export async function getEndpoint(
     case "cortex-write":
       return (await import("@/app/api/[locale]/agent/cortex/write/definition"))
         .default.POST;
+    case "corvina_alarm_action":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/action/definition")
+      ).default.POST;
+    case "corvina_alarm_detail":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/[alarmId]/definition")
+      ).default.GET;
+    case "corvina_alarms_action_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/action/definition")
+      ).default.POST;
+    case "corvina_alarms_alarmId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/[alarmId]/definition")
+      ).default.GET;
+    case "corvina_alarms_bulk-action_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/bulk-action/definition")
+      ).default.POST;
+    case "corvina_alarms_bulk_action":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/bulk-action/definition")
+      ).default.POST;
+    case "corvina_alarms_search":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/search/definition")
+      ).default.POST;
+    case "corvina_alarms_search_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/search/definition")
+      ).default.POST;
+    case "corvina_alarms_severity":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/severity/definition")
+      ).default.POST;
+    case "corvina_alarms_severity_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/severity/definition")
+      ).default.POST;
     case "corvina_devices_list":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/list/definition")
@@ -688,6 +728,26 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/corvina/organizations/list/definition")
       ).default.GET;
+    case "corvina_notification_config_create":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/list/definition")
+      ).default.POST;
+    case "corvina_notification_config_delete":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/[configId]/definition")
+      ).default.DELETE;
+    case "corvina_notification_config_update":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/[configId]/definition")
+      ).default.POST;
+    case "corvina_notification_configs_list":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/list/definition")
+      ).default.GET;
+    case "corvina_notification_test":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/test/definition")
+      ).default.POST;
     case "corvina_organizations_create_POST":
       return (
         await import("@/app/api/[locale]/corvina/organizations/create/definition")
@@ -704,6 +764,18 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/definition")
       ).default.PUT;
+    case "corvina_organizations_orgId_api-keys_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/api-keys/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_api-keys_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/api-keys/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_delete_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/delete/definition")
+      ).default.DELETE;
     case "corvina_organizations_orgId_devices_create_POST":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/create/definition")
@@ -716,10 +788,42 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/definition")
       ).default.PATCH;
+    case "corvina_organizations_orgId_devices_deviceId_available-tags_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/available-tags/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_devices_deviceId_configuration_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/configuration/definition")
+      ).default.GET;
     case "corvina_organizations_orgId_devices_deviceId_delete_DELETE":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/delete/definition")
       ).default.DELETE;
+    case "corvina_organizations_orgId_devices_deviceId_move_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/move/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_devices_deviceId_status-sync_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/status-sync/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_devices_deviceId_status_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/status/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_devices_deviceId_tags-delete_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags-delete/definition")
+      ).default.DELETE;
+    case "corvina_organizations_orgId_devices_deviceId_tags-query_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags-query/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_devices_deviceId_tags-undelete_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags-undelete/definition")
+      ).default.POST;
     case "corvina_organizations_orgId_devices_deviceId_tags_GET":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags/definition")
@@ -728,9 +832,133 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags/definition")
       ).default.POST;
+    case "corvina_organizations_orgId_devices_deviceId_update_PATCH":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/update/definition")
+      ).default.PATCH;
     case "corvina_organizations_orgId_devices_list_GET":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/list/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_notifications_configId_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/[configId]/definition")
+      ).default.DELETE;
+    case "corvina_organizations_orgId_notifications_configId_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/[configId]/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_notifications_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/list/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_notifications_list_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/list/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_notifications_test_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/test/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_realm-settings_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/realm-settings/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_realm-settings_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/realm-settings/definition")
+      ).default.PUT;
+    case "corvina_organizations_orgId_roles_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/create/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_roles_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/list/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_roles_roleId_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/[roleId]/definition")
+      ).default.DELETE;
+    case "corvina_organizations_orgId_roles_roleId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/[roleId]/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_roles_roleId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/[roleId]/definition")
+      ).default.PUT;
+    case "corvina_organizations_orgId_security-policies_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/security-policies/create/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_security-policies_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/security-policies/list/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_security-policies_policyId_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/security-policies/[policyId]/definition")
+      ).default.DELETE;
+    case "corvina_organizations_orgId_security-policies_policyId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/security-policies/[policyId]/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_security-policies_policyId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/security-policies/[policyId]/definition")
+      ).default.PUT;
+    case "corvina_organizations_orgId_sub-org_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/sub-org/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_user-groups_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/user-groups/create/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_user-groups_groupId_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/user-groups/[groupId]/definition")
+      ).default.DELETE;
+    case "corvina_organizations_orgId_user-groups_groupId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/user-groups/[groupId]/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_user-groups_groupId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/user-groups/[groupId]/definition")
+      ).default.PUT;
+    case "corvina_organizations_orgId_user-groups_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/user-groups/list/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_users_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/create/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_users_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/list/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_users_userId_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/[userId]/definition")
+      ).default.DELETE;
+    case "corvina_organizations_orgId_users_userId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/[userId]/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_users_userId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/[userId]/definition")
+      ).default.PUT;
+    case "corvina_roles_list":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/list/definition")
+      ).default.GET;
+    case "corvina_users_list":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/list/definition")
       ).default.GET;
     case "create-config":
       return (

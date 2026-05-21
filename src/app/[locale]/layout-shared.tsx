@@ -13,6 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { LoggerProvider } from "@/hooks/use-logger";
 
+import { CorvinaProvider } from "./_components/corvina-provider";
 import { ErrorBoundary } from "./_components/error-boundary";
 import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
 /**
@@ -37,9 +38,11 @@ export function RootProviders({
       >
         <TranslationProvider currentLocale={locale}>
           <LoggerProvider locale={locale}>
-            <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
-            <LeadTrackingProvider />
-            <Toaster />
+            <CorvinaProvider>
+              <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
+              <LeadTrackingProvider />
+              <Toaster />
+            </CorvinaProvider>
           </LoggerProvider>
         </TranslationProvider>
       </ThemeProvider>

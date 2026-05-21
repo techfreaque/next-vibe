@@ -89,7 +89,7 @@ export function OrgCreateContainer(): React.JSX.Element {
                   {t("post.response.organization.createdAt")}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
-                  {created.createdAt}
+                  {new Date(created.createdAt).toLocaleString()}
                 </Span>
               </Div>
             )}

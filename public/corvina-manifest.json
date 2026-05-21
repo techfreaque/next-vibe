@@ -1,0 +1,47 @@
+{
+  "key": "unbottled-ai",
+  "name": "Unbottled AI",
+  "description": "Control your Corvina installation through AI chat. Manage devices, users, data, and automations using natural language.",
+  "type": "APP",
+  "status": "ACTIVE",
+  "baseUrl": "http://localhost:3000",
+  "apiVersion": "1.0.0",
+  "authentication": {
+    "type": "JWT"
+  },
+  "enableDeviceAccess": true,
+  "trustedOrigins": [
+    "https://corvina.cloud",
+    "https://*.corvina.cloud"
+  ],
+  "hooks": {
+    "globalPage": {
+      "url": "/",
+      "label": "AI Chat",
+      "icon": "/images/corvina-icon.svg"
+    },
+    "navigationDrawerPages": [
+      {
+        "url": "/",
+        "label": "AI Chat",
+        "icon": "/images/corvina-icon.svg"
+      }
+    ]
+  },
+  "scopes": {
+    "devices": ["*"],
+    "userImpersonation": true
+  },
+  "lifecycle": {
+    "installed": "/api/corvina/lifecycle/installed",
+    "uninstalled": "/api/corvina/lifecycle/uninstalled"
+  },
+  "vendor": {
+    "name": "Unbottled AI",
+    "email": "contact@unbottled.ai"
+  },
+  "coverImageUrl": "/images/unbottled-icon.png",
+  "images": [
+    "/images/unbottled-icon.png"
+  ]
+}

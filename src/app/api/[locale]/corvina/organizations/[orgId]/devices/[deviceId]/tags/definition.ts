@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -89,7 +90,7 @@ const { GET } = createEndpoint({
             latestTimestamp: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.tags.latestTimestamp" as const,
-              schema: z.number().nullable(),
+              schema: dateSchema.nullable(),
             }),
           },
         }),

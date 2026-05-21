@@ -56,14 +56,14 @@ function SectionHeader({
   );
 }
 
-function formatTimestamp(ts: string | null): string {
+function formatTimestamp(ts: Date | string | null | undefined): string {
   if (!ts) {
     return "—";
   }
   try {
     return new Date(ts).toLocaleString();
   } catch {
-    return ts;
+    return String(ts);
   }
 }
 

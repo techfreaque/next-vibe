@@ -17,14 +17,14 @@ interface CliWidgetProps {
   };
 }
 
-function formatTs(ts: string | null | undefined): string {
+function formatTs(ts: Date | string | null | undefined): string {
   if (!ts) {
     return "—";
   }
   try {
     return new Date(ts).toISOString().replace("T", " ").slice(0, 19);
   } catch {
-    return ts;
+    return String(ts);
   }
 }
 

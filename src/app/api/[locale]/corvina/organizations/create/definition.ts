@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -94,7 +95,7 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         fieldType: FieldDataType.DATETIME,
         content: "post.response.organization.createdAt" as const,
-        schema: z.string().nullable(),
+        schema: dateSchema.nullable(),
       }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,

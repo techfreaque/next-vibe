@@ -221,25 +221,120 @@ export const pathToAliasMap = {
   "cortex-search": "cortex-search",
   "cortex-tree": "cortex-tree",
   "cortex-write": "cortex-write",
+  corvina_alarm_action: "corvina_alarm_action",
+  corvina_alarm_detail: "corvina_alarm_detail",
+  corvina_alarms_action_POST: "corvina_alarm_action",
+  corvina_alarms_alarmId_GET: "corvina_alarm_detail",
+  corvina_alarms_bulk_action: "corvina_alarms_bulk_action",
+  "corvina_alarms_bulk-action_POST": "corvina_alarms_bulk_action",
+  corvina_alarms_search: "corvina_alarms_search",
+  corvina_alarms_search_POST: "corvina_alarms_search",
+  corvina_alarms_severity: "corvina_alarms_severity",
+  corvina_alarms_severity_POST: "corvina_alarms_severity",
   corvina_devices_list: "corvina_devices_list",
   corvina_list: "corvina_list",
+  corvina_notification_config_create: "corvina_notification_config_create",
+  corvina_notification_config_delete: "corvina_notification_config_delete",
+  corvina_notification_config_update: "corvina_notification_config_update",
+  corvina_notification_configs_list: "corvina_notification_configs_list",
+  corvina_notification_test: "corvina_notification_test",
   corvina_organizations_create_POST: "corvina_organizations_create_POST",
   corvina_organizations_list_GET: "corvina_list",
+  "corvina_organizations_orgId_api-keys_GET":
+    "corvina_organizations_orgId_api-keys_GET",
+  "corvina_organizations_orgId_api-keys_POST":
+    "corvina_organizations_orgId_api-keys_POST",
+  corvina_organizations_orgId_delete_DELETE:
+    "corvina_organizations_orgId_delete_DELETE",
   corvina_organizations_orgId_devices_create_POST:
     "corvina_organizations_orgId_devices_create_POST",
+  "corvina_organizations_orgId_devices_deviceId_available-tags_GET":
+    "corvina_organizations_orgId_devices_deviceId_available-tags_GET",
+  corvina_organizations_orgId_devices_deviceId_configuration_GET:
+    "corvina_organizations_orgId_devices_deviceId_configuration_GET",
   corvina_organizations_orgId_devices_deviceId_delete_DELETE:
     "corvina_organizations_orgId_devices_deviceId_delete_DELETE",
   corvina_organizations_orgId_devices_deviceId_GET:
     "corvina_organizations_orgId_devices_deviceId_GET",
+  corvina_organizations_orgId_devices_deviceId_move_POST:
+    "corvina_organizations_orgId_devices_deviceId_move_POST",
   corvina_organizations_orgId_devices_deviceId_PATCH:
     "corvina_organizations_orgId_devices_deviceId_PATCH",
+  corvina_organizations_orgId_devices_deviceId_status_GET:
+    "corvina_organizations_orgId_devices_deviceId_status_GET",
+  "corvina_organizations_orgId_devices_deviceId_status-sync_GET":
+    "corvina_organizations_orgId_devices_deviceId_status-sync_GET",
   corvina_organizations_orgId_devices_deviceId_tags_GET:
     "corvina_organizations_orgId_devices_deviceId_tags_GET",
   corvina_organizations_orgId_devices_deviceId_tags_POST:
     "corvina_organizations_orgId_devices_deviceId_tags_POST",
+  "corvina_organizations_orgId_devices_deviceId_tags-delete_DELETE":
+    "corvina_organizations_orgId_devices_deviceId_tags-delete_DELETE",
+  "corvina_organizations_orgId_devices_deviceId_tags-query_POST":
+    "corvina_organizations_orgId_devices_deviceId_tags-query_POST",
+  "corvina_organizations_orgId_devices_deviceId_tags-undelete_POST":
+    "corvina_organizations_orgId_devices_deviceId_tags-undelete_POST",
+  corvina_organizations_orgId_devices_deviceId_update_PATCH:
+    "corvina_organizations_orgId_devices_deviceId_update_PATCH",
   corvina_organizations_orgId_devices_list_GET: "corvina_devices_list",
   corvina_organizations_orgId_GET: "corvina_organizations_orgId_GET",
+  corvina_organizations_orgId_notifications_configId_DELETE:
+    "corvina_notification_config_delete",
+  corvina_organizations_orgId_notifications_configId_POST:
+    "corvina_notification_config_update",
+  corvina_organizations_orgId_notifications_list_GET:
+    "corvina_notification_configs_list",
+  corvina_organizations_orgId_notifications_list_POST:
+    "corvina_notification_config_create",
+  corvina_organizations_orgId_notifications_test_POST:
+    "corvina_notification_test",
   corvina_organizations_orgId_PUT: "corvina_organizations_orgId_PUT",
+  "corvina_organizations_orgId_realm-settings_GET":
+    "corvina_organizations_orgId_realm-settings_GET",
+  "corvina_organizations_orgId_realm-settings_PUT":
+    "corvina_organizations_orgId_realm-settings_PUT",
+  corvina_organizations_orgId_roles_create_POST:
+    "corvina_organizations_orgId_roles_create_POST",
+  corvina_organizations_orgId_roles_list_GET: "corvina_roles_list",
+  corvina_organizations_orgId_roles_roleId_DELETE:
+    "corvina_organizations_orgId_roles_roleId_DELETE",
+  corvina_organizations_orgId_roles_roleId_GET:
+    "corvina_organizations_orgId_roles_roleId_GET",
+  corvina_organizations_orgId_roles_roleId_PUT:
+    "corvina_organizations_orgId_roles_roleId_PUT",
+  "corvina_organizations_orgId_security-policies_create_POST":
+    "corvina_organizations_orgId_security-policies_create_POST",
+  "corvina_organizations_orgId_security-policies_list_GET":
+    "corvina_organizations_orgId_security-policies_list_GET",
+  "corvina_organizations_orgId_security-policies_policyId_DELETE":
+    "corvina_organizations_orgId_security-policies_policyId_DELETE",
+  "corvina_organizations_orgId_security-policies_policyId_GET":
+    "corvina_organizations_orgId_security-policies_policyId_GET",
+  "corvina_organizations_orgId_security-policies_policyId_PUT":
+    "corvina_organizations_orgId_security-policies_policyId_PUT",
+  "corvina_organizations_orgId_sub-org_POST":
+    "corvina_organizations_orgId_sub-org_POST",
+  "corvina_organizations_orgId_user-groups_create_POST":
+    "corvina_organizations_orgId_user-groups_create_POST",
+  "corvina_organizations_orgId_user-groups_groupId_DELETE":
+    "corvina_organizations_orgId_user-groups_groupId_DELETE",
+  "corvina_organizations_orgId_user-groups_groupId_GET":
+    "corvina_organizations_orgId_user-groups_groupId_GET",
+  "corvina_organizations_orgId_user-groups_groupId_PUT":
+    "corvina_organizations_orgId_user-groups_groupId_PUT",
+  "corvina_organizations_orgId_user-groups_list_GET":
+    "corvina_organizations_orgId_user-groups_list_GET",
+  corvina_organizations_orgId_users_create_POST:
+    "corvina_organizations_orgId_users_create_POST",
+  corvina_organizations_orgId_users_list_GET: "corvina_users_list",
+  corvina_organizations_orgId_users_userId_DELETE:
+    "corvina_organizations_orgId_users_userId_DELETE",
+  corvina_organizations_orgId_users_userId_GET:
+    "corvina_organizations_orgId_users_userId_GET",
+  corvina_organizations_orgId_users_userId_PUT:
+    "corvina_organizations_orgId_users_userId_PUT",
+  corvina_roles_list: "corvina_roles_list",
+  corvina_users_list: "corvina_users_list",
   "create-config": "config",
   "credits_admin-add_POST": "credits_admin-add_POST",
   "credits_data-sources_credits-avg-transaction_POST":

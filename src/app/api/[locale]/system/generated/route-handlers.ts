@@ -735,6 +735,38 @@ export async function getRouteHandler(
     case "cortex-write":
       return (await import("@/app/api/[locale]/agent/cortex/write/route")).tools
         .POST as GenericHandlerBase;
+    case "corvina_alarm_action":
+      return (await import("@/app/api/[locale]/corvina/alarms/action/route"))
+        .tools.POST as GenericHandlerBase;
+    case "corvina_alarm_detail":
+      return (await import("@/app/api/[locale]/corvina/alarms/[alarmId]/route"))
+        .tools.GET as GenericHandlerBase;
+    case "corvina_alarms_action_POST":
+      return (await import("@/app/api/[locale]/corvina/alarms/action/route"))
+        .tools.POST as GenericHandlerBase;
+    case "corvina_alarms_alarmId_GET":
+      return (await import("@/app/api/[locale]/corvina/alarms/[alarmId]/route"))
+        .tools.GET as GenericHandlerBase;
+    case "corvina_alarms_bulk-action_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/bulk-action/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_alarms_bulk_action":
+      return (
+        await import("@/app/api/[locale]/corvina/alarms/bulk-action/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_alarms_search":
+      return (await import("@/app/api/[locale]/corvina/alarms/search/route"))
+        .tools.POST as GenericHandlerBase;
+    case "corvina_alarms_search_POST":
+      return (await import("@/app/api/[locale]/corvina/alarms/search/route"))
+        .tools.POST as GenericHandlerBase;
+    case "corvina_alarms_severity":
+      return (await import("@/app/api/[locale]/corvina/alarms/severity/route"))
+        .tools.POST as GenericHandlerBase;
+    case "corvina_alarms_severity_POST":
+      return (await import("@/app/api/[locale]/corvina/alarms/severity/route"))
+        .tools.POST as GenericHandlerBase;
     case "corvina_devices_list":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/list/route")
@@ -743,6 +775,26 @@ export async function getRouteHandler(
       return (
         await import("@/app/api/[locale]/corvina/organizations/list/route")
       ).tools.GET as GenericHandlerBase;
+    case "corvina_notification_config_create":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/list/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_notification_config_delete":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/[configId]/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "corvina_notification_config_update":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/[configId]/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_notification_configs_list":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/list/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_notification_test":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/test/route")
+      ).tools.POST as GenericHandlerBase;
     case "corvina_organizations_create_POST":
       return (
         await import("@/app/api/[locale]/corvina/organizations/create/route")
@@ -759,6 +811,18 @@ export async function getRouteHandler(
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/route")
       ).tools.PUT as GenericHandlerBase;
+    case "corvina_organizations_orgId_api-keys_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/api-keys/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_api-keys_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/api-keys/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_delete_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/delete/route")
+      ).tools.DELETE as GenericHandlerBase;
     case "corvina_organizations_orgId_devices_create_POST":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/create/route")
@@ -771,10 +835,42 @@ export async function getRouteHandler(
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/route")
       ).tools.PATCH as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_available-tags_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/available-tags/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_configuration_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/configuration/route")
+      ).tools.GET as GenericHandlerBase;
     case "corvina_organizations_orgId_devices_deviceId_delete_DELETE":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/delete/route")
       ).tools.DELETE as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_move_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/move/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_status-sync_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/status-sync/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_status_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/status/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_tags-delete_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags-delete/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_tags-query_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags-query/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_tags-undelete_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags-undelete/route")
+      ).tools.POST as GenericHandlerBase;
     case "corvina_organizations_orgId_devices_deviceId_tags_GET":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags/route")
@@ -783,9 +879,133 @@ export async function getRouteHandler(
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags/route")
       ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_update_PATCH":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/update/route")
+      ).tools.PATCH as GenericHandlerBase;
     case "corvina_organizations_orgId_devices_list_GET":
       return (
         await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/list/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_notifications_configId_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/[configId]/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "corvina_organizations_orgId_notifications_configId_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/[configId]/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_notifications_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/list/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_notifications_list_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/list/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_notifications_test_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/notifications/test/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_realm-settings_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/realm-settings/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_realm-settings_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/realm-settings/route")
+      ).tools.PUT as GenericHandlerBase;
+    case "corvina_organizations_orgId_roles_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/create/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_roles_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/list/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_roles_roleId_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/[roleId]/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "corvina_organizations_orgId_roles_roleId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/[roleId]/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_roles_roleId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/[roleId]/route")
+      ).tools.PUT as GenericHandlerBase;
+    case "corvina_organizations_orgId_security-policies_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/security-policies/create/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_security-policies_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/security-policies/list/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_security-policies_policyId_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/security-policies/[policyId]/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "corvina_organizations_orgId_security-policies_policyId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/security-policies/[policyId]/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_security-policies_policyId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/security-policies/[policyId]/route")
+      ).tools.PUT as GenericHandlerBase;
+    case "corvina_organizations_orgId_sub-org_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/sub-org/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_user-groups_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/user-groups/create/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_user-groups_groupId_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/user-groups/[groupId]/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "corvina_organizations_orgId_user-groups_groupId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/user-groups/[groupId]/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_user-groups_groupId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/user-groups/[groupId]/route")
+      ).tools.PUT as GenericHandlerBase;
+    case "corvina_organizations_orgId_user-groups_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/user-groups/list/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_users_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/create/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_users_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/list/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_users_userId_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/[userId]/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "corvina_organizations_orgId_users_userId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/[userId]/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_users_userId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/[userId]/route")
+      ).tools.PUT as GenericHandlerBase;
+    case "corvina_roles_list":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/roles/list/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_users_list":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/users/list/route")
       ).tools.GET as GenericHandlerBase;
     case "create-config":
       return (

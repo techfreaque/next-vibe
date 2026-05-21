@@ -1,6 +1,24 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self' https://*.corvina.cloud",
+          },
+          // Override Next.js default SAMEORIGIN to allow Corvina iframe embedding
+          {
+            key: "X-Frame-Options",
+            value: "ALLOWALL",
+          },
+        ],
+      },
+    ];
+  },
   typedRoutes: true,
   productionBrowserSourceMaps: false,
   experimental: {
