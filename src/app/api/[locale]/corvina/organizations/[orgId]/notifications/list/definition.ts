@@ -6,6 +6,7 @@ import {
   customWidgetObject,
   objectField,
   requestField,
+  requestResponseField,
   requestUrlPathParamsField,
   responseArrayField,
   responseField,
@@ -21,7 +22,7 @@ import {
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { NotificationEvent, NotificationEventOptions } from "../enums";
+import { NotificationEventOptions } from "../enums";
 import { scopedTranslation } from "./i18n";
 
 const NotificationListContainer = lazyWidget(() =>
@@ -74,6 +75,12 @@ const notificationConfigResponseFields = {
   }),
 } as const;
 
+const notificationConfigCoreResponseFields = {
+  id: notificationConfigResponseFields.id,
+  organizationId: notificationConfigResponseFields.organizationId,
+  lastCheck: notificationConfigResponseFields.lastCheck,
+} as const;
+
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -91,7 +98,7 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: NotificationListContainer,
-    usage: { request: "urlPathParams", response: true } as const,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       orgId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -220,7 +227,7 @@ const { POST } = createEndpoint({
 
   title: "post.title" as const,
   description: "post.description" as const,
-  icon: "bell-plus",
+  icon: "bell-ring",
   category: "endpointCategories.corvina",
   subCategory: "endpointCategories.corvinaOrganizations",
   tags: ["tags.corvina" as const, "tags.notifications" as const],
@@ -237,45 +244,45 @@ const { POST } = createEndpoint({
         description: "post.orgId.description" as const,
         schema: z.coerce.number(),
       }),
-      event: requestField(scopedTranslation, {
+      event: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.event.label" as const,
         description: "post.event.description" as const,
         columns: 12,
-        schema: z.enum(NotificationEvent),
+        schema: z.string(),
         options: NotificationEventOptions,
       }),
-      beforeDays: requestField(scopedTranslation, {
+      beforeDays: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.beforeDays.label" as const,
         description: "post.beforeDays.description" as const,
         columns: 6,
-        schema: z.coerce.number().optional(),
+        schema: z.coerce.number().nullable().optional(),
       }),
-      afterDays: requestField(scopedTranslation, {
+      afterDays: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.afterDays.label" as const,
         description: "post.afterDays.description" as const,
         columns: 6,
-        schema: z.coerce.number().optional(),
+        schema: z.coerce.number().nullable().optional(),
       }),
-      emailBcc: requestField(scopedTranslation, {
+      emailBcc: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.emailBcc.label" as const,
         description: "post.emailBcc.description" as const,
         placeholder: "post.emailBcc.placeholder" as const,
         columns: 12,
-        schema: z.string().email().optional(),
+        schema: z.string().nullable().optional(),
       }),
-      ...notificationConfigResponseFields,
+      ...notificationConfigCoreResponseFields,
       submitButton: submitButton(scopedTranslation, {
         label: "post.submitButton.label" as const,
         loadingText: "post.submitButton.loadingText" as const,
-        icon: "bell-plus",
+        icon: "bell-ring",
         variant: "primary",
         className: "w-full",
         usage: { request: "data" },

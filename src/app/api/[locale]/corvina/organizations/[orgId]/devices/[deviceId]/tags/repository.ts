@@ -57,10 +57,12 @@ export class CorvinaDeviceTagsRepository {
         lastRow !== null && lastRow !== undefined && valueIndex >= 0
           ? String(lastRow[valueIndex] ?? "")
           : null;
-      const latestTimestamp =
+      const latestTimestampRaw =
         lastRow !== null && lastRow !== undefined && tsIndex >= 0
           ? (lastRow[tsIndex] as number | null)
           : null;
+      const latestTimestamp =
+        latestTimestampRaw !== null ? new Date(latestTimestampRaw) : null;
       return { modelPath: tv.modelPath, latestValue, latestTimestamp };
     });
     return success({ tags: tagRows, total: tagRows.length });

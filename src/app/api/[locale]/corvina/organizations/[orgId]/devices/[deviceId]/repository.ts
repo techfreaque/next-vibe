@@ -36,8 +36,8 @@ interface CorvinaStatusEntry {
 function parseLatestStatus(entries: CorvinaStatusEntry[]): {
   connected: boolean | null;
   lastSeenIp: string | null;
-  lastConnection: string | null;
-  lastDisconnection: string | null;
+  lastConnection: Date | null;
+  lastDisconnection: Date | null;
 } {
   const entry = entries[0];
   if (!entry?.data.length) {
@@ -57,17 +57,17 @@ function parseLatestStatus(entries: CorvinaStatusEntry[]): {
     connIdx >= 0 ? ((lastRow[connIdx] as boolean) ?? null) : null;
   const lastSeenIp = ipIdx >= 0 ? ((lastRow[ipIdx] as string) ?? null) : null;
   const ts = tsIdx >= 0 ? ((lastRow[tsIdx] as number) ?? null) : null;
-  const tsStr = ts !== null ? new Date(ts).toISOString() : null;
+  const tsDate = ts !== null ? new Date(ts) : null;
 
   return {
     connected,
     lastSeenIp,
-    lastConnection: connected === true ? tsStr : null,
-    lastDisconnection: connected === false ? tsStr : null,
+    lastConnection: connected === true ? tsDate : null,
+    lastDisconnection: connected === false ? tsDate : null,
   };
 }
 
-function parseFirstRegistration(entries: CorvinaStatusEntry[]): string | null {
+function parseFirstRegistration(entries: CorvinaStatusEntry[]): Date | null {
   const entry = entries[0];
   if (!entry?.data.length) {
     return null;
@@ -78,7 +78,7 @@ function parseFirstRegistration(entries: CorvinaStatusEntry[]): string | null {
     return null;
   }
   const ts = firstRow[tsIdx] as number | null;
-  return ts !== null ? new Date(ts).toISOString() : null;
+  return ts !== null ? new Date(ts) : null;
 }
 
 export class CorvinaDeviceByIdRepository {

@@ -14,6 +14,7 @@ import {
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import { CorvinaRoleType } from "../enums";
 import type definition from "./definition";
 import type { CorvinaRolesListResponseOutput } from "./definition";
 
@@ -21,11 +22,11 @@ type RoleItem = CorvinaRolesListResponseOutput["roles"][number];
 
 function TypeBadge({ type }: { type: RoleItem["type"] }): React.JSX.Element {
   const colorMap: Record<RoleItem["type"], string> = {
-    APPLICATION:
+    [CorvinaRoleType.APPLICATION]:
       "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-    DEVICE:
+    [CorvinaRoleType.DEVICE]:
       "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-    UNDEFINED: "bg-muted text-muted-foreground",
+    [CorvinaRoleType.UNDEFINED]: "bg-muted text-muted-foreground",
   };
   return (
     <Span
@@ -49,7 +50,7 @@ export function RolesListContainer(): React.JSX.Element {
 
   const handleRoleClick = (roleId: number, orgId: number): void => {
     void (async (): Promise<void> => {
-      const roleDetail = await import("../../[roleId]/definition");
+      const roleDetail = await import("../[roleId]/definition");
       navigate(roleDetail.default.GET, {
         urlPathParams: { orgId, roleId },
       });

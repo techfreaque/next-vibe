@@ -10,10 +10,19 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { CorvinaUserOwner } from "../enums";
 import type {
   CorvinaUserCreateRequestOutput,
   CorvinaUserCreateResponseOutput,
 } from "./definition";
+
+const USER_OWNER_MAP: Record<
+  string,
+  (typeof CorvinaUserOwner)[keyof typeof CorvinaUserOwner]
+> = {
+  ORGANIZATION: CorvinaUserOwner.ORGANIZATION,
+  APP: CorvinaUserOwner.APP,
+};
 
 interface CorvinaUserApiData {
   id: number;
@@ -74,7 +83,7 @@ export class CorvinaUserCreateRepository {
       lastNameResult: result.data.lastName,
       serviceAccountResult: result.data.serviceAccount,
       mfaEnabled: result.data.mfaEnabled,
-      owner: result.data.owner as "ORGANIZATION" | "APP",
+      owner: USER_OWNER_MAP[result.data.owner] ?? CorvinaUserOwner.ORGANIZATION,
     });
   }
 }

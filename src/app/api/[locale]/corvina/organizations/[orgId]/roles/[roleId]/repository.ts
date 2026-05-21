@@ -10,6 +10,11 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import {
+  CorvinaPermissionLevel,
+  CorvinaRoleOwner,
+  CorvinaRoleType,
+} from "../enums";
 import type {
   CorvinaRoleDeleteResponseOutput,
   CorvinaRoleDeleteUrlVariablesOutput,
@@ -19,6 +24,51 @@ import type {
   CorvinaRolePutResponseOutput,
   CorvinaRolePutUrlVariablesOutput,
 } from "./definition";
+
+const ROLE_TYPE_MAP: Record<
+  string,
+  (typeof CorvinaRoleType)[keyof typeof CorvinaRoleType]
+> = {
+  APPLICATION: CorvinaRoleType.APPLICATION,
+  DEVICE: CorvinaRoleType.DEVICE,
+  UNDEFINED: CorvinaRoleType.UNDEFINED,
+};
+
+const ROLE_OWNER_MAP: Record<
+  string,
+  (typeof CorvinaRoleOwner)[keyof typeof CorvinaRoleOwner]
+> = {
+  SYSTEM: CorvinaRoleOwner.SYSTEM,
+  ORGANIZATION: CorvinaRoleOwner.ORGANIZATION,
+  APPLICATION: CorvinaRoleOwner.APPLICATION,
+};
+
+const PERMISSION_LEVEL_MAP: Record<
+  string,
+  (typeof CorvinaPermissionLevel)[keyof typeof CorvinaPermissionLevel]
+> = {
+  NONE: CorvinaPermissionLevel.NONE,
+  REGULAR_USER: CorvinaPermissionLevel.REGULAR_USER,
+  ADMINISTRATOR: CorvinaPermissionLevel.ADMINISTRATOR,
+};
+
+const ROLE_TYPE_TO_API: Record<
+  (typeof CorvinaRoleType)[keyof typeof CorvinaRoleType],
+  string
+> = {
+  [CorvinaRoleType.APPLICATION]: "APPLICATION",
+  [CorvinaRoleType.DEVICE]: "DEVICE",
+  [CorvinaRoleType.UNDEFINED]: "UNDEFINED",
+};
+
+const PERMISSION_LEVEL_TO_API: Record<
+  (typeof CorvinaPermissionLevel)[keyof typeof CorvinaPermissionLevel],
+  string
+> = {
+  [CorvinaPermissionLevel.NONE]: "NONE",
+  [CorvinaPermissionLevel.REGULAR_USER]: "REGULAR_USER",
+  [CorvinaPermissionLevel.ADMINISTRATOR]: "ADMINISTRATOR",
+};
 
 interface CorvinaRoleApiData {
   id: number;
@@ -41,18 +91,16 @@ function mapRole(raw: CorvinaRoleApiData): CorvinaRoleGetResponseOutput {
     label: raw.label,
     resourceId: raw.resourceId,
     description: raw.description,
-    type: raw.type as "APPLICATION" | "DEVICE" | "UNDEFINED",
-    owner: raw.owner as "SYSTEM" | "ORGANIZATION" | "APPLICATION",
+    type: ROLE_TYPE_MAP[raw.type] ?? CorvinaRoleType.UNDEFINED,
+    owner: ROLE_OWNER_MAP[raw.owner] ?? CorvinaRoleOwner.ORGANIZATION,
     enabled: raw.enabled,
     defaultStar: raw.defaultStar,
-    deviceGeneralPermission: raw.deviceGeneralPermission as
-      | "NONE"
-      | "REGULAR_USER"
-      | "ADMINISTRATOR",
-    vpnGeneralPermission: raw.vpnGeneralPermission as
-      | "NONE"
-      | "REGULAR_USER"
-      | "ADMINISTRATOR",
+    deviceGeneralPermission:
+      PERMISSION_LEVEL_MAP[raw.deviceGeneralPermission] ??
+      CorvinaPermissionLevel.NONE,
+    vpnGeneralPermission:
+      PERMISSION_LEVEL_MAP[raw.vpnGeneralPermission] ??
+      CorvinaPermissionLevel.NONE,
   };
 }
 
@@ -95,10 +143,12 @@ export class CorvinaRoleByIdRepository {
           ...(data.description !== undefined
             ? { description: data.description }
             : {}),
-          type: data.type,
+          type: ROLE_TYPE_TO_API[data.type] ?? "UNDEFINED",
           defaultStar: data.defaultStar,
-          deviceGeneralPermission: data.deviceGeneralPermission,
-          vpnGeneralPermission: data.vpnGeneralPermission,
+          deviceGeneralPermission:
+            PERMISSION_LEVEL_TO_API[data.deviceGeneralPermission] ?? "NONE",
+          vpnGeneralPermission:
+            PERMISSION_LEVEL_TO_API[data.vpnGeneralPermission] ?? "NONE",
           modelPathPermissions: [],
         },
       },

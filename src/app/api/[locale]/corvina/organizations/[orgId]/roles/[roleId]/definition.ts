@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
+  requestResponseField,
   requestUrlPathParamsField,
   responseField,
   submitButton,
@@ -96,6 +96,14 @@ const roleResponseFields = {
   }),
 } as const;
 
+const roleResponseOnlyFields = {
+  id: roleResponseFields.id,
+  name: roleResponseFields.name,
+  resourceId: roleResponseFields.resourceId,
+  owner: roleResponseFields.owner,
+  enabled: roleResponseFields.enabled,
+} as const;
+
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -184,12 +192,12 @@ const { GET } = createEndpoint({
         label: "Administrator",
         resourceId: "exorde.connex.connectika.admin",
         description: "Full admin access",
-        type: "APPLICATION" as const,
-        owner: "ORGANIZATION" as const,
+        type: CorvinaRoleType.APPLICATION,
+        owner: CorvinaRoleOwner.ORGANIZATION,
         enabled: true,
         defaultStar: false,
-        deviceGeneralPermission: "ADMINISTRATOR" as const,
-        vpnGeneralPermission: "ADMINISTRATOR" as const,
+        deviceGeneralPermission: CorvinaPermissionLevel.ADMINISTRATOR,
+        vpnGeneralPermission: CorvinaPermissionLevel.ADMINISTRATOR,
       },
     },
   },
@@ -226,25 +234,25 @@ const { PUT } = createEndpoint({
         description: "put.roleId.description" as const,
         schema: z.coerce.number(),
       }),
-      label: requestField(scopedTranslation, {
+      label: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.label.label" as const,
         description: "put.label.description" as const,
         placeholder: "put.label.placeholder" as const,
         columns: 6,
-        schema: z.string().max(200).optional(),
+        schema: z.string().max(200).nullable().optional(),
       }),
-      description: requestField(scopedTranslation, {
+      description: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.descriptionField.label" as const,
         description: "put.descriptionField.description" as const,
         placeholder: "put.descriptionField.placeholder" as const,
         columns: 6,
-        schema: z.string().optional(),
+        schema: z.string().nullable().optional(),
       }),
-      type: requestField(scopedTranslation, {
+      type: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "put.type.label" as const,
@@ -253,7 +261,7 @@ const { PUT } = createEndpoint({
         schema: z.enum(CorvinaRoleType),
         options: CorvinaRoleTypeOptions,
       }),
-      defaultStar: requestField(scopedTranslation, {
+      defaultStar: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "put.defaultStar.label" as const,
@@ -261,25 +269,29 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(false),
       }),
-      deviceGeneralPermission: requestField(scopedTranslation, {
+      deviceGeneralPermission: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "put.deviceGeneralPermission.label" as const,
         description: "put.deviceGeneralPermission.description" as const,
         columns: 6,
-        schema: z.enum(CorvinaPermissionLevel).default("NONE"),
+        schema: z
+          .enum(CorvinaPermissionLevel)
+          .default(CorvinaPermissionLevel.NONE),
         options: CorvinaPermissionLevelOptions,
       }),
-      vpnGeneralPermission: requestField(scopedTranslation, {
+      vpnGeneralPermission: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "put.vpnGeneralPermission.label" as const,
         description: "put.vpnGeneralPermission.description" as const,
         columns: 6,
-        schema: z.enum(CorvinaPermissionLevel).default("NONE"),
+        schema: z
+          .enum(CorvinaPermissionLevel)
+          .default(CorvinaPermissionLevel.NONE),
         options: CorvinaPermissionLevelOptions,
       }),
-      ...roleResponseFields,
+      ...roleResponseOnlyFields,
       submitButton: submitButton(scopedTranslation, {
         label: "put.submitButton.label" as const,
         loadingText: "put.submitButton.loadingText" as const,
@@ -340,10 +352,10 @@ const { PUT } = createEndpoint({
     requests: {
       default: {
         label: "Administrator",
-        type: "APPLICATION" as const,
+        type: CorvinaRoleType.APPLICATION,
         defaultStar: false,
-        deviceGeneralPermission: "ADMINISTRATOR" as const,
-        vpnGeneralPermission: "ADMINISTRATOR" as const,
+        deviceGeneralPermission: CorvinaPermissionLevel.ADMINISTRATOR,
+        vpnGeneralPermission: CorvinaPermissionLevel.ADMINISTRATOR,
       },
     },
     responses: {
@@ -353,12 +365,12 @@ const { PUT } = createEndpoint({
         label: "Administrator",
         resourceId: "exorde.connex.connectika.admin",
         description: "Full admin access",
-        type: "APPLICATION" as const,
-        owner: "ORGANIZATION" as const,
+        type: CorvinaRoleType.APPLICATION,
+        owner: CorvinaRoleOwner.ORGANIZATION,
         enabled: true,
         defaultStar: false,
-        deviceGeneralPermission: "ADMINISTRATOR" as const,
-        vpnGeneralPermission: "ADMINISTRATOR" as const,
+        deviceGeneralPermission: CorvinaPermissionLevel.ADMINISTRATOR,
+        vpnGeneralPermission: CorvinaPermissionLevel.ADMINISTRATOR,
       },
     },
   },

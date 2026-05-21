@@ -9,6 +9,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { AlarmStatus } from "../enums";
+import type searchDef from "../search/definition";
 import type endpoints from "./definition";
 import type { AlarmDetailResponseOutput } from "./definition";
 
@@ -20,6 +21,7 @@ export function AlarmDetailContainer({ field }: CliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
   const t = useWidgetTranslation<typeof endpoints.GET>();
+  const tEnum = useWidgetTranslation<typeof searchDef.POST>();
   const isMcp = platform === Platform.MCP;
   const value = field.value;
 
@@ -37,13 +39,13 @@ export function AlarmDetailContainer({ field }: CliWidgetProps): JSX.Element {
       [
         "status",
         value.status !== null && value.status !== undefined
-          ? t(value.status)
+          ? tEnum(value.status)
           : "unknown",
       ],
       [
         "action",
         value.action !== null && value.action !== undefined
-          ? t(value.action)
+          ? tEnum(value.action)
           : null,
       ],
       ["device", value.deviceLabel ?? value.deviceId],
@@ -91,7 +93,7 @@ export function AlarmDetailContainer({ field }: CliWidgetProps): JSX.Element {
           {t("get.response.status")}:{" "}
           <Text color={isActive ? "red" : "green"}>
             {value.status !== null && value.status !== undefined
-              ? t(value.status)
+              ? tEnum(value.status)
               : t("get.widget.noData")}
           </Text>
         </Text>

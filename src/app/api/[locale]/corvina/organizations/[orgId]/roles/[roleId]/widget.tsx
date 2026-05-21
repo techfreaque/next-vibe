@@ -296,7 +296,7 @@ export function RoleUpdateContainer(): React.JSX.Element {
             </Div>
             <Div>
               <Label className="block text-xs font-medium mb-1">
-                {t("put.description.label")}
+                {t("put.descriptionField.label")}
               </Label>
               <Input
                 value={descriptionValue}
@@ -305,7 +305,7 @@ export function RoleUpdateContainer(): React.JSX.Element {
                     shouldDirty: true,
                   })
                 }
-                placeholder={t("put.description.placeholder")}
+                placeholder={t("put.descriptionField.placeholder")}
                 className="w-full"
               />
             </Div>

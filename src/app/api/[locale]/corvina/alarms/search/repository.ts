@@ -153,8 +153,8 @@ export class AlarmSearchRepository {
         raw.action !== null && raw.action !== undefined
           ? (ALARM_ACTION_MAP[raw.action] ?? null)
           : null,
-      eventTimestamp: raw.eventTimestamp ?? null,
-      updatedAt: raw.updatedAt ?? null,
+      eventTimestamp: raw.eventTimestamp ? new Date(raw.eventTimestamp) : null,
+      updatedAt: raw.updatedAt ? new Date(raw.updatedAt) : null,
       orgResourceId: raw.orgResourceId ?? null,
     }));
 

@@ -4,6 +4,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   customWidgetObject,
   requestField,
+  requestResponseField,
   requestUrlPathParamsField,
   responseField,
   submitButton,
@@ -178,7 +179,7 @@ const { GET } = createEndpoint({
         country: "US",
         serviceAccount: false,
         mfaEnabled: true,
-        owner: "ORGANIZATION" as const,
+        owner: CorvinaUserOwner.ORGANIZATION,
         groupPoliciesEnabled: false,
         userImpersonation: false,
       },
@@ -217,7 +218,7 @@ const { PUT } = createEndpoint({
         description: "put.userId.description" as const,
         schema: z.coerce.number(),
       }),
-      email: requestField(scopedTranslation, {
+      email: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "put.email.label" as const,
@@ -226,32 +227,32 @@ const { PUT } = createEndpoint({
         columns: 12,
         schema: z.string().email(),
       }),
-      firstName: requestField(scopedTranslation, {
+      firstName: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.firstName.label" as const,
         description: "put.firstName.description" as const,
         placeholder: "put.firstName.placeholder" as const,
         columns: 6,
-        schema: z.string().optional(),
+        schema: z.string().nullable().optional(),
       }),
-      lastName: requestField(scopedTranslation, {
+      lastName: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.lastName.label" as const,
         description: "put.lastName.description" as const,
         placeholder: "put.lastName.placeholder" as const,
         columns: 6,
-        schema: z.string().optional(),
+        schema: z.string().nullable().optional(),
       }),
-      country: requestField(scopedTranslation, {
+      country: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.country.label" as const,
         description: "put.country.description" as const,
         placeholder: "put.country.placeholder" as const,
         columns: 6,
-        schema: z.string().optional(),
+        schema: z.string().nullable().optional(),
       }),
       defaultHomePage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -262,7 +263,7 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.string().optional(),
       }),
-      groupPoliciesEnabled: requestField(scopedTranslation, {
+      groupPoliciesEnabled: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "put.groupPoliciesEnabled.label" as const,
@@ -270,7 +271,7 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      userImpersonation: requestField(scopedTranslation, {
+      userImpersonation: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "put.userImpersonation.label" as const,
@@ -289,26 +290,6 @@ const { PUT } = createEndpoint({
         content: "get.response.username" as const,
         schema: z.string(),
       }),
-      email: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.email" as const,
-        schema: z.string(),
-      }),
-      firstName: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.firstName" as const,
-        schema: z.string().nullable(),
-      }),
-      lastName: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.lastName" as const,
-        schema: z.string().nullable(),
-      }),
-      country: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.country" as const,
-        schema: z.string().nullable(),
-      }),
       serviceAccount: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         content: "get.response.serviceAccount" as const,
@@ -323,16 +304,6 @@ const { PUT } = createEndpoint({
         type: WidgetType.BADGE,
         content: "get.response.owner" as const,
         schema: z.enum(CorvinaUserOwner),
-      }),
-      groupPoliciesEnabled: responseField(scopedTranslation, {
-        type: WidgetType.BADGE,
-        content: "get.response.groupPoliciesEnabled" as const,
-        schema: z.boolean(),
-      }),
-      userImpersonation: responseField(scopedTranslation, {
-        type: WidgetType.BADGE,
-        content: "get.response.userImpersonation" as const,
-        schema: z.boolean(),
       }),
       submitButton: submitButton(scopedTranslation, {
         label: "put.submitButton.label" as const,
@@ -411,7 +382,7 @@ const { PUT } = createEndpoint({
         country: "US",
         serviceAccount: false,
         mfaEnabled: true,
-        owner: "ORGANIZATION" as const,
+        owner: CorvinaUserOwner.ORGANIZATION,
         groupPoliciesEnabled: false,
         userImpersonation: false,
       },
@@ -565,7 +536,7 @@ const { DELETE } = createEndpoint({
         country: "US",
         serviceAccount: false,
         mfaEnabled: false,
-        owner: "ORGANIZATION" as const,
+        owner: CorvinaUserOwner.ORGANIZATION,
         groupPoliciesEnabled: false,
         userImpersonation: false,
       },

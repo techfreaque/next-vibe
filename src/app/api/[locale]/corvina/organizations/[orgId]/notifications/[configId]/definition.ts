@@ -4,7 +4,7 @@ import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
+  requestResponseField,
   requestUrlPathParamsField,
   responseField,
   submitButton,
@@ -18,7 +18,7 @@ import {
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { NotificationEvent, NotificationEventOptions } from "../enums";
+import { NotificationEventOptions } from "../enums";
 import { scopedTranslation } from "./i18n";
 
 const NotificationUpdateContainer = lazyWidget(() =>
@@ -43,26 +43,6 @@ const notificationConfigResponseFields = {
     type: WidgetType.TEXT,
     content: "post.response.organizationId" as const,
     schema: z.number(),
-  }),
-  event: responseField(scopedTranslation, {
-    type: WidgetType.BADGE,
-    content: "post.response.event" as const,
-    schema: z.string(),
-  }),
-  beforeDays: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.beforeDays" as const,
-    schema: z.number().nullable(),
-  }),
-  afterDays: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.afterDays" as const,
-    schema: z.number().nullable(),
-  }),
-  emailBcc: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.emailBcc" as const,
-    schema: z.string().nullable(),
   }),
   lastCheck: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
@@ -103,39 +83,39 @@ const { POST } = createEndpoint({
         description: "post.configId.description" as const,
         schema: z.coerce.number(),
       }),
-      event: requestField(scopedTranslation, {
+      event: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.event.label" as const,
         description: "post.event.description" as const,
         columns: 12,
-        schema: z.enum(NotificationEvent).optional(),
+        schema: z.string().optional(),
         options: NotificationEventOptions,
       }),
-      beforeDays: requestField(scopedTranslation, {
+      beforeDays: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.beforeDays.label" as const,
         description: "post.beforeDays.description" as const,
         columns: 6,
-        schema: z.coerce.number().optional(),
+        schema: z.coerce.number().nullable().optional(),
       }),
-      afterDays: requestField(scopedTranslation, {
+      afterDays: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.afterDays.label" as const,
         description: "post.afterDays.description" as const,
         columns: 6,
-        schema: z.coerce.number().optional(),
+        schema: z.coerce.number().nullable().optional(),
       }),
-      emailBcc: requestField(scopedTranslation, {
+      emailBcc: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.emailBcc.label" as const,
         description: "post.emailBcc.description" as const,
         placeholder: "post.emailBcc.placeholder" as const,
         columns: 12,
-        schema: z.string().email().optional(),
+        schema: z.string().nullable().optional(),
       }),
       ...notificationConfigResponseFields,
       submitButton: submitButton(scopedTranslation, {

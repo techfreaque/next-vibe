@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: RolesListContainer,
-    usage: { request: "urlPathParams", response: true } as const,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       orgId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -212,12 +212,12 @@ const { GET } = createEndpoint({
             label: "Administrator",
             resourceId: "exorde.connex.connectika.admin",
             description: "Full admin access",
-            type: "APPLICATION" as const,
-            owner: "ORGANIZATION" as const,
+            type: CorvinaRoleType.APPLICATION,
+            owner: CorvinaRoleOwner.ORGANIZATION,
             enabled: true,
             defaultStar: false,
-            deviceGeneralPermission: "ADMINISTRATOR" as const,
-            vpnGeneralPermission: "ADMINISTRATOR" as const,
+            deviceGeneralPermission: CorvinaPermissionLevel.ADMINISTRATOR,
+            vpnGeneralPermission: CorvinaPermissionLevel.ADMINISTRATOR,
           },
         ],
         totalElements: 1,

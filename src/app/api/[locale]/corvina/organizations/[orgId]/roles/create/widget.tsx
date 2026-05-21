@@ -144,7 +144,7 @@ export function RoleCreateContainer(): React.JSX.Element {
 
           <Div>
             <Label className="block text-xs font-medium mb-1">
-              {t("post.description.label")}
+              {t("post.descriptionField.label")}
             </Label>
             <Input
               value={descriptionValue}
@@ -153,7 +153,7 @@ export function RoleCreateContainer(): React.JSX.Element {
                   shouldDirty: true,
                 })
               }
-              placeholder={t("post.description.placeholder")}
+              placeholder={t("post.descriptionField.placeholder")}
               className="w-full"
             />
           </Div>

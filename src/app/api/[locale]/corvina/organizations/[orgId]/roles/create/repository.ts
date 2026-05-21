@@ -10,10 +10,38 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { CorvinaPermissionLevel, CorvinaRoleType } from "../enums";
 import type {
   CorvinaRoleCreateRequestOutput,
   CorvinaRoleCreateResponseOutput,
 } from "./definition";
+
+const ROLE_TYPE_MAP: Record<
+  string,
+  (typeof CorvinaRoleType)[keyof typeof CorvinaRoleType]
+> = {
+  APPLICATION: CorvinaRoleType.APPLICATION,
+  DEVICE: CorvinaRoleType.DEVICE,
+  UNDEFINED: CorvinaRoleType.UNDEFINED,
+};
+
+const ROLE_TYPE_TO_API: Record<
+  (typeof CorvinaRoleType)[keyof typeof CorvinaRoleType],
+  string
+> = {
+  [CorvinaRoleType.APPLICATION]: "APPLICATION",
+  [CorvinaRoleType.DEVICE]: "DEVICE",
+  [CorvinaRoleType.UNDEFINED]: "UNDEFINED",
+};
+
+const PERMISSION_LEVEL_TO_API: Record<
+  (typeof CorvinaPermissionLevel)[keyof typeof CorvinaPermissionLevel],
+  string
+> = {
+  [CorvinaPermissionLevel.NONE]: "NONE",
+  [CorvinaPermissionLevel.REGULAR_USER]: "REGULAR_USER",
+  [CorvinaPermissionLevel.ADMINISTRATOR]: "ADMINISTRATOR",
+};
 
 interface CorvinaRoleApiData {
   id: number;
@@ -45,11 +73,13 @@ export class CorvinaRoleCreateRepository {
           ...(data.description !== undefined
             ? { description: data.description }
             : {}),
-          type: data.type,
+          type: ROLE_TYPE_TO_API[data.type] ?? "UNDEFINED",
           enabled: data.enabled,
           defaultStar: data.defaultStar,
-          deviceGeneralPermission: data.deviceGeneralPermission,
-          vpnGeneralPermission: data.vpnGeneralPermission,
+          deviceGeneralPermission:
+            PERMISSION_LEVEL_TO_API[data.deviceGeneralPermission] ?? "NONE",
+          vpnGeneralPermission:
+            PERMISSION_LEVEL_TO_API[data.vpnGeneralPermission] ?? "NONE",
           modelPathPermissions: [],
         },
       },
@@ -67,7 +97,7 @@ export class CorvinaRoleCreateRepository {
       id: result.data.id,
       nameResult: result.data.name,
       labelResult: result.data.label,
-      typeResult: result.data.type as "APPLICATION" | "DEVICE" | "UNDEFINED",
+      typeResult: ROLE_TYPE_MAP[result.data.type] ?? CorvinaRoleType.UNDEFINED,
       enabledResult: result.data.enabled,
     });
   }

@@ -43,7 +43,7 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: SecurityPolicyListContainer,
-    usage: { request: "urlPathParams", response: true } as const,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       orgId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

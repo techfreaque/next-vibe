@@ -43,7 +43,7 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: UsersListContainer,
-    usage: { request: "urlPathParams", response: true } as const,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       orgId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -211,7 +211,7 @@ const { GET } = createEndpoint({
             country: "US",
             serviceAccount: false,
             mfaEnabled: true,
-            owner: "ORGANIZATION" as const,
+            owner: CorvinaUserOwner.ORGANIZATION,
             groupPoliciesEnabled: false,
             userImpersonation: false,
           },

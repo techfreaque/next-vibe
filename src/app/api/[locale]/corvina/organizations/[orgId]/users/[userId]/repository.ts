@@ -10,6 +10,7 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { CorvinaUserOwner } from "../enums";
 import type {
   CorvinaUserDeleteResponseOutput,
   CorvinaUserDeleteUrlVariablesOutput,
@@ -19,6 +20,14 @@ import type {
   CorvinaUserPutResponseOutput,
   CorvinaUserPutUrlVariablesOutput,
 } from "./definition";
+
+const USER_OWNER_MAP: Record<
+  string,
+  (typeof CorvinaUserOwner)[keyof typeof CorvinaUserOwner]
+> = {
+  ORGANIZATION: CorvinaUserOwner.ORGANIZATION,
+  APP: CorvinaUserOwner.APP,
+};
 
 interface CorvinaUserApiData {
   id: number;
@@ -44,7 +53,7 @@ function mapUser(raw: CorvinaUserApiData): CorvinaUserGetResponseOutput {
     country: raw.country,
     serviceAccount: raw.serviceAccount,
     mfaEnabled: raw.mfaEnabled,
-    owner: raw.owner as "ORGANIZATION" | "APP",
+    owner: USER_OWNER_MAP[raw.owner] ?? CorvinaUserOwner.ORGANIZATION,
     groupPoliciesEnabled: raw.groupPoliciesEnabled,
     userImpersonation: raw.userImpersonation,
   };

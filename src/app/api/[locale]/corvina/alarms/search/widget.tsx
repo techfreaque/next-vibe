@@ -101,8 +101,7 @@ export function AlarmSearchContainer(): React.JSX.Element {
   const isLoading = data === undefined;
 
   const handleRefresh = useCallback((): void => {
-    endpointMutations?.write?.reset?.();
-    endpointMutations?.write?.mutate?.();
+    void endpointMutations?.create?.submit?.({});
   }, [endpointMutations]);
 
   return (

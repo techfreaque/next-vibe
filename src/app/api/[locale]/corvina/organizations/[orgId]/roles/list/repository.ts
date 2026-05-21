@@ -10,10 +10,42 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import {
+  CorvinaPermissionLevel,
+  CorvinaRoleOwner,
+  CorvinaRoleType,
+} from "../enums";
 import type {
   CorvinaRolesListResponseOutput,
   CorvinaRolesListUrlVariablesOutput,
 } from "./definition";
+
+const ROLE_TYPE_MAP: Record<
+  string,
+  (typeof CorvinaRoleType)[keyof typeof CorvinaRoleType]
+> = {
+  APPLICATION: CorvinaRoleType.APPLICATION,
+  DEVICE: CorvinaRoleType.DEVICE,
+  UNDEFINED: CorvinaRoleType.UNDEFINED,
+};
+
+const ROLE_OWNER_MAP: Record<
+  string,
+  (typeof CorvinaRoleOwner)[keyof typeof CorvinaRoleOwner]
+> = {
+  SYSTEM: CorvinaRoleOwner.SYSTEM,
+  ORGANIZATION: CorvinaRoleOwner.ORGANIZATION,
+  APPLICATION: CorvinaRoleOwner.APPLICATION,
+};
+
+const PERMISSION_LEVEL_MAP: Record<
+  string,
+  (typeof CorvinaPermissionLevel)[keyof typeof CorvinaPermissionLevel]
+> = {
+  NONE: CorvinaPermissionLevel.NONE,
+  REGULAR_USER: CorvinaPermissionLevel.REGULAR_USER,
+  ADMINISTRATOR: CorvinaPermissionLevel.ADMINISTRATOR,
+};
 
 interface CorvinaRoleApiData {
   id: number;
@@ -76,18 +108,16 @@ export class CorvinaRolesListRepository {
         label: r.label,
         resourceId: r.resourceId,
         description: r.description,
-        type: r.type as "APPLICATION" | "DEVICE" | "UNDEFINED",
-        owner: r.owner as "SYSTEM" | "ORGANIZATION" | "APPLICATION",
+        type: ROLE_TYPE_MAP[r.type] ?? CorvinaRoleType.UNDEFINED,
+        owner: ROLE_OWNER_MAP[r.owner] ?? CorvinaRoleOwner.ORGANIZATION,
         enabled: r.enabled,
         defaultStar: r.defaultStar,
-        deviceGeneralPermission: r.deviceGeneralPermission as
-          | "NONE"
-          | "REGULAR_USER"
-          | "ADMINISTRATOR",
-        vpnGeneralPermission: r.vpnGeneralPermission as
-          | "NONE"
-          | "REGULAR_USER"
-          | "ADMINISTRATOR",
+        deviceGeneralPermission:
+          PERMISSION_LEVEL_MAP[r.deviceGeneralPermission] ??
+          CorvinaPermissionLevel.NONE,
+        vpnGeneralPermission:
+          PERMISSION_LEVEL_MAP[r.vpnGeneralPermission] ??
+          CorvinaPermissionLevel.NONE,
       })),
       totalElements: result.data.totalElements,
       totalPages: result.data.totalPages,

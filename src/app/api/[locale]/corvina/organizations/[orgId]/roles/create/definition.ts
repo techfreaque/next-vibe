@@ -111,7 +111,9 @@ const { POST } = createEndpoint({
         label: "post.deviceGeneralPermission.label" as const,
         description: "post.deviceGeneralPermission.description" as const,
         columns: 6,
-        schema: z.enum(CorvinaPermissionLevel).default("NONE"),
+        schema: z
+          .enum(CorvinaPermissionLevel)
+          .default(CorvinaPermissionLevel.NONE),
         options: CorvinaPermissionLevelOptions,
       }),
       vpnGeneralPermission: requestField(scopedTranslation, {
@@ -120,7 +122,9 @@ const { POST } = createEndpoint({
         label: "post.vpnGeneralPermission.label" as const,
         description: "post.vpnGeneralPermission.description" as const,
         columns: 6,
-        schema: z.enum(CorvinaPermissionLevel).default("NONE"),
+        schema: z
+          .enum(CorvinaPermissionLevel)
+          .default(CorvinaPermissionLevel.NONE),
         options: CorvinaPermissionLevelOptions,
       }),
       id: responseField(scopedTranslation, {
@@ -209,11 +213,11 @@ const { POST } = createEndpoint({
       default: {
         name: "viewer",
         label: "Viewer",
-        type: "DEVICE" as const,
+        type: CorvinaRoleType.DEVICE,
         enabled: true,
         defaultStar: false,
-        deviceGeneralPermission: "REGULAR_USER" as const,
-        vpnGeneralPermission: "NONE" as const,
+        deviceGeneralPermission: CorvinaPermissionLevel.REGULAR_USER,
+        vpnGeneralPermission: CorvinaPermissionLevel.NONE,
       },
     },
     responses: {
@@ -221,7 +225,7 @@ const { POST } = createEndpoint({
         id: 10,
         nameResult: "viewer",
         labelResult: "Viewer",
-        typeResult: "DEVICE" as const,
+        typeResult: CorvinaRoleType.DEVICE,
         enabledResult: true,
       },
     },

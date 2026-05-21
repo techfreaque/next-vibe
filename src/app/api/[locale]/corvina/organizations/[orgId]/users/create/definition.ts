@@ -243,7 +243,7 @@ const { POST } = createEndpoint({
         lastNameResult: "Doe",
         serviceAccountResult: false,
         mfaEnabled: false,
-        owner: "ORGANIZATION" as const,
+        owner: CorvinaUserOwner.ORGANIZATION,
       },
     },
   },

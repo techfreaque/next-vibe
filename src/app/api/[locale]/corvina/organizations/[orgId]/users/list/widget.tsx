@@ -45,7 +45,7 @@ export function UsersListContainer(): React.JSX.Element {
 
   const handleUserClick = (userId: number, orgId: number): void => {
     void (async (): Promise<void> => {
-      const userDetail = await import("../../[userId]/definition");
+      const userDetail = await import("../[userId]/definition");
       navigate(userDetail.default.GET, {
         urlPathParams: { orgId, userId },
       });

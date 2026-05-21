@@ -97,9 +97,11 @@ export class AlarmDetailRepository {
       alarmEnabled: raw.alarmEnabled ?? null,
       ack: raw.ack ?? null,
       reset: raw.reset ?? null,
-      eventTimestamp: raw.eventTimestamp ?? null,
-      updatedAt: raw.updatedAt ?? null,
-      acknowledgedDate: raw.acknowledgedDate ?? null,
+      eventTimestamp: raw.eventTimestamp ? new Date(raw.eventTimestamp) : null,
+      updatedAt: raw.updatedAt ? new Date(raw.updatedAt) : null,
+      acknowledgedDate: raw.acknowledgedDate
+        ? new Date(raw.acknowledgedDate)
+        : null,
       orgResourceId: raw.orgResourceId ?? null,
       user: raw.user ?? null,
       comment: raw.comment ?? null,
