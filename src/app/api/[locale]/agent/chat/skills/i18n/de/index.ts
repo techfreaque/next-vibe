@@ -1200,6 +1200,43 @@ export const translations: typeof enTranslations = {
         budget: "Budget",
       },
     },
+    firewallConfigurator: {
+      name: "Firewall-Konfigurator",
+      description:
+        "pfSense-Experte für Regeln, NAT, VPN, HA, Traffic Shaping, IDS/IPS und alle Pakete im Ökosystem.",
+      tagline: "Netzwerk absichern",
+      shortDesc: "pfSense-Konfiguration und Fehlersuche",
+      suggestedPrompts: {
+        0: "Site-to-Site IPsec VPN zwischen zwei pfSense-Boxen einrichten",
+        1: "pfBlockerNG mit DNSBL konfigurieren um Werbung und Malware zu blockieren",
+        2: "Firewall-Regeln erstellen um mein IoT-VLAN vom Haupt-LAN zu isolieren",
+        3: "OpenVPN-Fernzugriff mit Zertifikatsauthentifizierung einrichten",
+      },
+      variants: {
+        cheapAndSmart: "Günstig & Smart",
+        cheapAndBrilliant: "Günstig & Brillant",
+        brilliant: "Brillant",
+      },
+    },
+    phoenixPlcController: {
+      name: "Phoenix PLC Controller",
+      description:
+        "PLCnext-Experte für IP-Konfiguration, Firmware-Updates, Dienstverwaltung und Benutzerverwaltung auf AXC F Geräten.",
+      tagline: "PLCnext von Grund auf konfigurieren",
+      shortDesc: "PLCnext Geräteeinrichtung und Konfiguration",
+      suggestedPrompts: {
+        0: "Neue PLCnext-Box einrichten: IP ändern, Store aktivieren, Dienste konfigurieren",
+        1: "Firmware meines AXC F 2152 auf die neueste Version aktualisieren",
+        2: "Systemdienste für den Codesys-Modus konfigurieren",
+        3: "Benutzer advance mit Admin-Rolle anlegen",
+      },
+      variants: {
+        cheapAndFast: "Günstig & Schnell",
+        cheapAndSmart: "Günstig & Smart",
+        cheapAndBrilliant: "Günstig & Brillant",
+        brilliant: "Brillant",
+      },
+    },
   },
   get: {
     title: "Charaktere auflisten",

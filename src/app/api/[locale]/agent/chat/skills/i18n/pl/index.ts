@@ -1202,6 +1202,43 @@ export const translations: typeof enTranslations = {
         budget: "Budżetowy",
       },
     },
+    firewallConfigurator: {
+      name: "Konfigurator Zapory",
+      description:
+        "Ekspert pfSense od reguł, NAT, VPN, HA, kształtowania ruchu, IDS/IPS i całego ekosystemu pakietów.",
+      tagline: "Zabezpiecz sieć",
+      shortDesc: "Konfiguracja i diagnostyka pfSense",
+      suggestedPrompts: {
+        0: "Skonfiguruj IPsec VPN site-to-site między dwoma urządzeniami pfSense",
+        1: "Ustaw pfBlockerNG z DNSBL do blokowania reklam i złośliwego oprogramowania",
+        2: "Stwórz reguły firewall izolujące sieć IoT od głównego LAN",
+        3: "Skonfiguruj OpenVPN z uwierzytelnianiem certyfikatowym",
+      },
+      variants: {
+        cheapAndSmart: "Tani i Sprytny",
+        cheapAndBrilliant: "Tani i Błyskotliwy",
+        brilliant: "Błyskotliwy",
+      },
+    },
+    phoenixPlcController: {
+      name: "Phoenix PLC Controller",
+      description:
+        "Ekspert PLCnext do konfiguracji IP, aktualizacji firmware, zarządzania usługami i użytkownikami na urządzeniach AXC F.",
+      tagline: "Konfiguruj PLCnext od zera",
+      shortDesc: "Konfiguracja i zarządzanie urządzeniami PLCnext",
+      suggestedPrompts: {
+        0: "Skonfiguruj nowy PLCnext: zmień IP, włącz Store, ustaw usługi",
+        1: "Zaktualizuj firmware AXC F 2152 do najnowszej wersji",
+        2: "Skonfiguruj usługi systemowe dla trybu Codesys",
+        3: "Dodaj użytkownika advance z rolą administratora",
+      },
+      variants: {
+        cheapAndFast: "Tani i Szybki",
+        cheapAndSmart: "Tani i Sprytny",
+        cheapAndBrilliant: "Tani i Błyskotliwy",
+        brilliant: "Błyskotliwy",
+      },
+    },
   },
   get: {
     title: "Lista postaci",

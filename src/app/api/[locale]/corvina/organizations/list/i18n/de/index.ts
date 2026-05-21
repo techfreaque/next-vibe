@@ -45,6 +45,13 @@ export const translations = {
     widget: {
       title: "Corvina-Organisationen",
       noOrgsFound: "Keine Organisationen gefunden",
+      nav: {
+        appStore: "App-Store",
+        installedApps: "Installierte Apps",
+        alarms: "Alarme",
+        licenses: "Lizenzen",
+        createOrg: "Neue Org",
+      },
     },
     enums: {
       orgStatus: {

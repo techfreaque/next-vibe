@@ -2,9 +2,14 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Bell } from "next-vibe-ui/ui/icons/Bell";
 import { Building } from "next-vibe-ui/ui/icons/Building";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { PackageCheck } from "next-vibe-ui/ui/icons/PackageCheck";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { ShoppingBag } from "next-vibe-ui/ui/icons/ShoppingBag";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
@@ -123,6 +128,42 @@ export function OrgListContainer(): React.JSX.Element {
     [navigate],
   );
 
+  const handleNavAppStore = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../../apps/list/definition");
+      navigate(def.default.GET, {});
+    })();
+  }, [navigate]);
+
+  const handleNavInstalledApps = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../../apps/installed/definition");
+      navigate(def.default.GET, {});
+    })();
+  }, [navigate]);
+
+  const handleNavAlarms = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../../alarms/search/definition");
+      navigate(def.default.POST, {});
+    })();
+  }, [navigate]);
+
+  const handleNavLicenses = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../../licenses/list/definition");
+      navigate(def.default.GET, {});
+    })();
+  }, [navigate]);
+
+  const handleNavCreateOrg = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../create/definition");
+      navigate(def.default.POST, {});
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]);
+
   return (
     <Div className="flex flex-col min-h-0">
       <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
@@ -143,6 +184,59 @@ export function OrgListContainer(): React.JSX.Element {
           title="Refresh"
         >
           <RefreshCw className="h-4 w-4" />
+        </Button>
+      </Div>
+
+      <Div className="flex items-center gap-1 px-3 py-2 border-b bg-muted/20 shrink-0 flex-wrap">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 gap-1.5 text-xs"
+          onClick={handleNavAppStore}
+        >
+          <ShoppingBag className="h-3.5 w-3.5" />
+          {t("get.widget.nav.appStore")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 gap-1.5 text-xs"
+          onClick={handleNavInstalledApps}
+        >
+          <PackageCheck className="h-3.5 w-3.5" />
+          {t("get.widget.nav.installedApps")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 gap-1.5 text-xs"
+          onClick={handleNavAlarms}
+        >
+          <Bell className="h-3.5 w-3.5" />
+          {t("get.widget.nav.alarms")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 gap-1.5 text-xs"
+          onClick={handleNavLicenses}
+        >
+          <FileText className="h-3.5 w-3.5" />
+          {t("get.widget.nav.licenses")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 gap-1.5 text-xs ml-auto"
+          onClick={handleNavCreateOrg}
+        >
+          <Plus className="h-3.5 w-3.5" />
+          {t("get.widget.nav.createOrg")}
         </Button>
       </Div>
 

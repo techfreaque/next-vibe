@@ -1196,6 +1196,43 @@ export const translations = {
         budget: "Budget",
       },
     },
+    firewallConfigurator: {
+      name: "Firewall Configurator",
+      description:
+        "pfSense expert covering rules, NAT, VPN, HA, traffic shaping, IDS/IPS, and every package in the ecosystem.",
+      tagline: "Lock Down Your Network",
+      shortDesc: "pfSense firewall configuration and troubleshooting",
+      suggestedPrompts: {
+        0: "Set up a site-to-site IPsec VPN between two pfSense boxes",
+        1: "Configure pfBlockerNG with DNSBL to block ads and malware",
+        2: "Create firewall rules to isolate my IoT VLAN from the main LAN",
+        3: "Set up OpenVPN remote access with certificate auth",
+      },
+      variants: {
+        cheapAndSmart: "Cheap & Smart",
+        cheapAndBrilliant: "Cheap & Brilliant",
+        brilliant: "Brilliant",
+      },
+    },
+    phoenixPlcController: {
+      name: "Phoenix PLC Controller",
+      description:
+        "PLCnext expert for IP setup, firmware updates, service configuration, and user management across multiple AXC F devices.",
+      tagline: "Configure PLCnext from Zero",
+      shortDesc: "PLCnext device setup and configuration",
+      suggestedPrompts: {
+        0: "Set up a new PLCnext box: change IP, enable store, configure services",
+        1: "Update firmware on my AXC F 2152 to the latest version",
+        2: "Configure system services for Codesys mode",
+        3: "Add the advance user with admin role",
+      },
+      variants: {
+        cheapAndFast: "Cheap & Fast",
+        cheapAndSmart: "Cheap & Smart",
+        cheapAndBrilliant: "Cheap & Brilliant",
+        brilliant: "Brilliant",
+      },
+    },
   },
   get: {
     title: "List Skills",

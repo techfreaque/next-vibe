@@ -205,10 +205,7 @@ export class EndpointsMetaGeneratorRepository {
       // ── 4. Generate one file per locale ─────────────────────────────────
       let filesWritten = 0;
 
-      for (const [
-        localeIndex,
-        locale,
-      ] of EndpointsMetaGeneratorRepository.GENERATE_LOCALES.entries()) {
+      for (const locale of EndpointsMetaGeneratorRepository.GENERATE_LOCALES) {
         const fileName =
           EndpointsMetaGeneratorRepository.LOCALE_FILE_NAMES[locale] ?? locale;
         const outputFile = join(data.outputDir, `${fileName}.ts`);

@@ -25,9 +25,11 @@ type CorvinaBodyValue =
   | null
   | CorvinaBodyObject
   | CorvinaBodyValue[];
-interface CorvinaBodyObject {
+export interface CorvinaBodyObject {
   [key: string]: CorvinaBodyValue;
 }
+
+export type CorvinaService = "core" | "platform" | "license";
 
 export interface CorvinaRequestInit<
   TBody extends CorvinaBodyObject = CorvinaBodyObject,
@@ -41,6 +43,7 @@ export interface CorvinaRequestInit<
   body?: TBody;
   query?: TQuery;
   usePlatformApi?: boolean;
+  service?: CorvinaService;
 }
 
 export class CorvinaClient {
@@ -67,7 +70,12 @@ export class CorvinaClient {
       });
     }
 
-    const url = this.buildUrl(init.path, init.query, init.usePlatformApi);
+    const url = this.buildUrl(
+      init.path,
+      init.query,
+      init.usePlatformApi,
+      init.service,
+    );
 
     const headers: Record<string, string> = {
       "X-Api-Key": apiKey,
@@ -131,10 +139,23 @@ export class CorvinaClient {
 
   private static buildUrl<
     TQuery extends Record<string, string | number | undefined>,
-  >(path: string, query?: TQuery, usePlatformApi = false): string {
-    const rawBase = usePlatformApi
-      ? corvinaEnv.CORVINA_PLATFORM_API_BASE_URL
-      : corvinaEnv.CORVINA_API_BASE_URL;
+  >(
+    path: string,
+    query?: TQuery,
+    usePlatformApi = false,
+    service?: CorvinaService,
+  ): string {
+    let rawBase: string;
+    if (service === "license") {
+      rawBase = corvinaEnv.CORVINA_API_BASE_URL.replace(
+        /\/svc\/[^/]+$/,
+        "/svc/license",
+      );
+    } else if (service === "platform" || usePlatformApi) {
+      rawBase = corvinaEnv.CORVINA_PLATFORM_API_BASE_URL;
+    } else {
+      rawBase = corvinaEnv.CORVINA_API_BASE_URL;
+    }
     const base = rawBase.replace(/\/$/, "");
     const suffix = path.startsWith("/") ? path : `/${path}`;
     const url = new URL(`${base}${suffix}`);

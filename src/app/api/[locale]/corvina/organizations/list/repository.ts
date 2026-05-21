@@ -14,7 +14,7 @@ import { CorvinaOrgStatus } from "../enums";
 import type { CorvinaOrganizationsListResponseOutput } from "./definition";
 
 // TODO: replace with dynamic org selection
-const ROOT_ORG_ID = 45564;
+const ROOT_ORG_ID = 45511;
 
 const TERMINAL_STATUSES = new Set(["NEW", "DONE", "DELETING", "DELETED"]);
 

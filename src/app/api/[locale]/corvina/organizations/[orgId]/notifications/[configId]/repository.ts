@@ -28,20 +28,6 @@ interface NotificationConfigApiData {
   lastCheck: number | null;
 }
 
-function mapConfig(
-  raw: NotificationConfigApiData,
-): NotificationDeleteResponseOutput {
-  return {
-    id: raw.id,
-    organizationId: raw.organizationId,
-    event: raw.event,
-    beforeDays: raw.beforeDays,
-    afterDays: raw.afterDays,
-    emailBcc: raw.emailBcc,
-    lastCheck: raw.lastCheck !== null ? new Date(raw.lastCheck) : null,
-  };
-}
-
 export class NotificationConfigByIdRepository {
   private static buildPath(orgId: number, configId: number): string {
     return `${CORVINA_ORGS_PATH}/${encodeURIComponent(orgId)}/notifications/configurations/${encodeURIComponent(configId)}`;
@@ -78,7 +64,16 @@ export class NotificationConfigByIdRepository {
       orgId: urlPathParams.orgId,
       configId: urlPathParams.configId,
     });
-    return success(mapConfig(result.data));
+    return success({
+      id: result.data.id,
+      organizationId: result.data.organizationId,
+      event: result.data.event,
+      beforeDays: result.data.beforeDays,
+      afterDays: result.data.afterDays,
+      emailBcc: result.data.emailBcc,
+      lastCheck:
+        result.data.lastCheck !== null ? new Date(result.data.lastCheck) : null,
+    });
   }
 
   static async deleteConfig(
@@ -101,6 +96,15 @@ export class NotificationConfigByIdRepository {
       orgId: urlPathParams.orgId,
       configId: urlPathParams.configId,
     });
-    return success(mapConfig(result.data));
+    return success({
+      id: result.data.id,
+      organizationId: result.data.organizationId,
+      event: result.data.event,
+      beforeDays: result.data.beforeDays,
+      afterDays: result.data.afterDays,
+      emailBcc: result.data.emailBcc,
+      lastCheck:
+        result.data.lastCheck !== null ? new Date(result.data.lastCheck) : null,
+    });
   }
 }

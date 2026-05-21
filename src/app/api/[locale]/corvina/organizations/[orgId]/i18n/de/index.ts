@@ -38,6 +38,7 @@ export const translations = {
     widget: {
       edit: "Bearbeiten",
       devices: "Geräte",
+      apps: "Apps",
       sections: {
         identity: "Identität",
         network: "Netzwerk",

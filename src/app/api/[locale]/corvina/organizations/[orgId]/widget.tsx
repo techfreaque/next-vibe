@@ -4,6 +4,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { PackageCheck } from "next-vibe-ui/ui/icons/PackageCheck";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Save } from "next-vibe-ui/ui/icons/Save";
 import { Server } from "next-vibe-ui/ui/icons/Server";
@@ -142,6 +143,16 @@ export function OrgDetailContainer(): React.JSX.Element {
     })();
   }, [navigate, org]);
 
+  const handleApps = useCallback((): void => {
+    if (!org) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const appsDef = await import("../../apps/installed/definition");
+      navigate(appsDef.default.GET, {});
+    })();
+  }, [navigate, org]);
+
   return (
     <Div className="flex flex-col gap-0">
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
@@ -166,6 +177,18 @@ export function OrgDetailContainer(): React.JSX.Element {
           >
             <Server className="h-3.5 w-3.5" />
             {t("get.widget.devices")}
+          </Button>
+        )}
+        {org && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleApps}
+            className="gap-1"
+          >
+            <PackageCheck className="h-3.5 w-3.5" />
+            {t("get.widget.apps")}
           </Button>
         )}
         {org && (

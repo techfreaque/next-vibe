@@ -35,20 +35,6 @@ interface NotificationConfigsPageApiData {
   last: boolean;
 }
 
-function mapConfig(
-  raw: NotificationConfigApiData,
-): NotificationListResponseOutput["configs"][number] {
-  return {
-    id: raw.id,
-    organizationId: raw.organizationId,
-    event: raw.event,
-    beforeDays: raw.beforeDays,
-    afterDays: raw.afterDays,
-    emailBcc: raw.emailBcc,
-    lastCheck: raw.lastCheck !== null ? new Date(raw.lastCheck) : null,
-  };
-}
-
 export class NotificationConfigListRepository {
   private static buildBasePath(orgId: number): string {
     return `${CORVINA_ORGS_PATH}/${encodeURIComponent(orgId)}/notifications/configurations`;
@@ -76,7 +62,15 @@ export class NotificationConfigListRepository {
       return result;
     }
     return success({
-      configs: result.data.content.map(mapConfig),
+      configs: result.data.content.map((c) => ({
+        id: c.id,
+        organizationId: c.organizationId,
+        event: c.event,
+        beforeDays: c.beforeDays,
+        afterDays: c.afterDays,
+        emailBcc: c.emailBcc,
+        lastCheck: c.lastCheck !== null ? new Date(c.lastCheck) : null,
+      })),
       totalElements: result.data.totalElements,
       totalPages: result.data.totalPages,
       last: result.data.last,
@@ -114,6 +108,15 @@ export class NotificationConfigListRepository {
       orgId: urlPathParams.orgId,
       event: data.event,
     });
-    return success(mapConfig(result.data));
+    return success({
+      id: result.data.id,
+      organizationId: result.data.organizationId,
+      event: result.data.event,
+      beforeDays: result.data.beforeDays,
+      afterDays: result.data.afterDays,
+      emailBcc: result.data.emailBcc,
+      lastCheck:
+        result.data.lastCheck !== null ? new Date(result.data.lastCheck) : null,
+    });
   }
 }
