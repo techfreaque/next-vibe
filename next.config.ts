@@ -228,6 +228,11 @@ const nextConfig: NextConfig = {
     "node:util",
     // argon2 uses native .node binary - webpack minifier crashes on it
     "argon2",
+    // pdf-parse bundles pdfjs-dist which tries to load pdf.worker.mjs via a relative
+    // path that doesn't exist in the webpack chunk output. Keeping it external means
+    // Node.js loads it from node_modules at runtime where the worker file is present.
+    "pdf-parse",
+    "pdfjs-dist",
   ],
 
   images: {
