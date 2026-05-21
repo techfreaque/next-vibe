@@ -15,18 +15,31 @@ export const translations = {
     },
     response: {
       title: "Organisationen",
-      description:
-        "Vom Corvina-API zurückgegebene Kunden­organisationen.",
+      description: "Vom Corvina-API zurückgegebene Kunden­organisationen.",
       organizations: {
         title: "Organisationen",
         description: "Jede Zeile entspricht einer Kunden­organisation.",
         id: "ID",
         name: "Name",
-        displayName: "Anzeigename",
-        enabled: "Aktiv",
-        createdAt: "Erstellt",
+        label: "Bezeichnung",
+        status: "Status",
+        resourceId: "Ressourcen-ID",
+        dataEnabled: "Daten",
+        vpnEnabled: "VPN",
       },
       total: "Gesamt",
+    },
+    widget: {
+      title: "Corvina-Organisationen",
+      noOrgsFound: "Keine Organisationen gefunden",
+    },
+    enums: {
+      orgStatus: {
+        done: "Erledigt",
+        pending: "Ausstehend",
+        failed: "Fehlgeschlagen",
+        disabled: "Deaktiviert",
+      },
     },
     errors: {
       validation: {
@@ -40,17 +53,16 @@ export const translations = {
       unauthorized: {
         title: "Nicht autorisiert",
         description:
-          "Corvina hat die Service-Account-Anmeldedaten abgelehnt. CORVINA_CLIENT_ID und CORVINA_CLIENT_SECRET prüfen.",
+          "Corvina hat den API-Schlüssel abgelehnt. CORVINA_API_KEY prüfen.",
       },
       forbidden: {
         title: "Zugriff verweigert",
         description:
-          "Dem Service-Account fehlt der nötige Scope, um Organisationen zu lesen.",
+          "Dem API-Schlüssel fehlt der nötige Scope zum Auflisten von Organisationen.",
       },
       notFound: {
         title: "Nicht gefunden",
-        description:
-          "Corvina liefert 404 für den konfigurierten Pfad. CORVINA_ORGANIZATIONS_PATH anpassen.",
+        description: "Corvina liefert 404 für den Organisationspfad.",
       },
       conflict: {
         title: "Konflikt",
@@ -59,7 +71,8 @@ export const translations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Das Corvina-API hat einen internen Serverfehler gemeldet.",
+        description:
+          "Das Corvina-API hat einen internen Serverfehler gemeldet.",
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",

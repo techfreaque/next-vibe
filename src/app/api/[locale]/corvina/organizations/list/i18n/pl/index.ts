@@ -21,11 +21,25 @@ export const translations = {
         description: "Każdy wiersz to jedna organizacja klienta.",
         id: "ID",
         name: "Nazwa",
-        displayName: "Nazwa wyświetlana",
-        enabled: "Aktywna",
-        createdAt: "Utworzono",
+        label: "Etykieta",
+        status: "Status",
+        resourceId: "ID zasobu",
+        dataEnabled: "Dane",
+        vpnEnabled: "VPN",
       },
       total: "Łącznie",
+    },
+    widget: {
+      title: "Organizacje Corvina",
+      noOrgsFound: "Nie znaleziono organizacji",
+    },
+    enums: {
+      orgStatus: {
+        done: "Gotowe",
+        pending: "Oczekujące",
+        failed: "Nieudane",
+        disabled: "Wyłączone",
+      },
     },
     errors: {
       validation: {
@@ -38,18 +52,16 @@ export const translations = {
       },
       unauthorized: {
         title: "Brak autoryzacji",
-        description:
-          "Corvina odrzuciła dane konta serwisowego. Sprawdź CORVINA_CLIENT_ID i CORVINA_CLIENT_SECRET.",
+        description: "Corvina odrzuciła klucz API. Sprawdź CORVINA_API_KEY.",
       },
       forbidden: {
         title: "Zabronione",
         description:
-          "Konto serwisowe nie ma wymaganego zakresu, aby listować organizacje.",
+          "Klucz API nie ma wymaganego zakresu do listowania organizacji.",
       },
       notFound: {
         title: "Nie znaleziono",
-        description:
-          "Corvina zwraca 404 dla skonfigurowanej ścieżki. Dostosuj CORVINA_ORGANIZATIONS_PATH.",
+        description: "Corvina zwraca 404 dla ścieżki organizacji.",
       },
       conflict: {
         title: "Konflikt",

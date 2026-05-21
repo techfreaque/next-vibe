@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
     memories: "Wspomnienia",
     errorMonitor: "Monitor błędów",
     skillsModeration: "Moderacja umiejętności",
+    corvina: "Corvina",
     subscriptions: "Subskrypcje",
     support: "Kolejka wsparcia",
     settings: "Ustawienia",

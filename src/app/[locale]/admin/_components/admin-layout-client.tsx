@@ -9,19 +9,16 @@ import type { Route } from "next";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-
+import { Building } from "next-vibe-ui/ui/icons/Building";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
-import { Frame } from "next-vibe-ui/ui/icons/Frame";
 import { Home } from "next-vibe-ui/ui/icons/Home";
-import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Menu } from "next-vibe-ui/ui/icons/Menu";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { PanelLeft } from "next-vibe-ui/ui/icons/PanelLeft";
-import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
@@ -39,10 +36,9 @@ import { useState } from "react";
 
 import CountrySelector from "@/app/[locale]/_components/country-selector";
 import { ThemeToggle } from "@/app/[locale]/_components/theme-toggle";
+import { scopedTranslation } from "@/app/[locale]/admin/_components/i18n";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserGetResponseOutput } from "@/app/api/[locale]/users/user/[id]/definition";
-import { scopedTranslation } from "@/app/[locale]/admin/_components/i18n";
-import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -81,20 +77,20 @@ export function AdminLayoutClient({
       current: pathname === `/${locale}/admin`,
       hidden: false,
     },
-    {
-      name: t("navigation.leadManagement"),
-      href: `/${locale}/admin/leads` as const,
-      icon: Users,
-      current: pathname.startsWith(`/${locale}/admin/leads`),
-      hidden: envClient.NEXT_PUBLIC_LOCAL_MODE,
-    },
-    {
-      name: t("navigation.emailCampaigns"),
-      href: `/${locale}/admin/messenger/campaigns` as const,
-      icon: Send,
-      current: pathname.startsWith(`/${locale}/admin/messenger/campaigns`),
-      hidden: envClient.NEXT_PUBLIC_LOCAL_MODE,
-    },
+    // {
+    //   name: t("navigation.leadManagement"),
+    //   href: `/${locale}/admin/leads` as const,
+    //   icon: Users,
+    //   current: pathname.startsWith(`/${locale}/admin/leads`),
+    //   hidden: envClient.NEXT_PUBLIC_LOCAL_MODE,
+    // },
+    // {
+    //   name: t("navigation.emailCampaigns"),
+    //   href: `/${locale}/admin/messenger/campaigns` as const,
+    //   icon: Send,
+    //   current: pathname.startsWith(`/${locale}/admin/messenger/campaigns`),
+    //   hidden: envClient.NEXT_PUBLIC_LOCAL_MODE,
+    // },
     {
       name: t("navigation.users"),
       href: `/${locale}/admin/users` as const,
@@ -123,20 +119,20 @@ export function AdminLayoutClient({
       current: pathname.startsWith(`/${locale}/admin/ssh`),
       hidden: false,
     },
-    {
-      name: t("navigation.remoteConnections"),
-      href: `/${locale}/admin/remote` as const,
-      icon: Link2,
-      current: pathname.startsWith(`/${locale}/admin/remote`),
-      hidden: false,
-    },
-    {
-      name: t("navigation.support"),
-      href: `/${locale}/admin/support` as const,
-      icon: MessageSquare,
-      current: pathname.startsWith(`/${locale}/admin/support`),
-      hidden: false,
-    },
+    // {
+    //   name: t("navigation.remoteConnections"),
+    //   href: `/${locale}/admin/remote` as const,
+    //   icon: Link2,
+    //   current: pathname.startsWith(`/${locale}/admin/remote`),
+    //   hidden: false,
+    // },
+    // {
+    //   name: t("navigation.support"),
+    //   href: `/${locale}/admin/support` as const,
+    //   icon: MessageSquare,
+    //   current: pathname.startsWith(`/${locale}/admin/support`),
+    //   hidden: false,
+    // },
     {
       name: t("navigation.vibeSense"),
       href: `/${locale}/admin/vibe-sense` as const,
@@ -151,13 +147,13 @@ export function AdminLayoutClient({
       current: pathname.startsWith(`/${locale}/admin/endpoints`),
       hidden: false,
     },
-    {
-      name: t("navigation.vibeFrame"),
-      href: `/${locale}/admin/vibe-frame` as const,
-      icon: Frame,
-      current: pathname.startsWith(`/${locale}/admin/vibe-frame`),
-      hidden: false,
-    },
+    // {
+    //   name: t("navigation.vibeFrame"),
+    //   href: `/${locale}/admin/vibe-frame` as const,
+    //   icon: Frame,
+    //   current: pathname.startsWith(`/${locale}/admin/vibe-frame`),
+    //   hidden: false,
+    // },
     {
       name: t("navigation.errorMonitor"),
       href: `/${locale}/admin/error-monitor` as const,
@@ -165,11 +161,18 @@ export function AdminLayoutClient({
       current: pathname.startsWith(`/${locale}/admin/error-monitor`),
       hidden: false,
     },
+    // {
+    //   name: t("navigation.skillsModeration"),
+    //   href: `/${locale}/admin/skills-moderation` as const,
+    //   icon: Shield,
+    //   current: pathname.startsWith(`/${locale}/admin/skills-moderation`),
+    //   hidden: false,
+    // },
     {
-      name: t("navigation.skillsModeration"),
-      href: `/${locale}/admin/skills-moderation` as const,
-      icon: Shield,
-      current: pathname.startsWith(`/${locale}/admin/skills-moderation`),
+      name: t("navigation.corvina"),
+      href: `/${locale}/admin/corvina` as const,
+      icon: Building,
+      current: pathname.startsWith(`/${locale}/admin/corvina`),
       hidden: false,
     },
     {

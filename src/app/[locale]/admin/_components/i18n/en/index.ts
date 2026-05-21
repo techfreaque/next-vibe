@@ -14,6 +14,7 @@ export const translations = {
     memories: "Memories",
     errorMonitor: "Error Monitor",
     skillsModeration: "Skills Moderation",
+    corvina: "Corvina",
     subscriptions: "Subscriptions",
     support: "Support Queue",
     settings: "Settings",

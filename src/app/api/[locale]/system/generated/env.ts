@@ -27,6 +27,11 @@ import {
   browserEnvExamples,
 } from "../../browser/env";
 import {
+  corvinaEnv,
+  corvinaEnvSchema,
+  corvinaEnvExamples,
+} from "../../corvina/env";
+import {
   leadsCampaignsEnv,
   leadsCampaignsEnvSchema,
   leadsCampaignsEnvExamples,
@@ -65,6 +70,7 @@ export const envModules: Record<string, { env: Record<string, unknown>; schema: 
   env: { env: env_env, schema: env_envSchema, examples: envExamples },
   agent: { env: agentEnv, schema: agentEnvSchema, examples: agentEnvExamples },
   browser: { env: browserEnv, schema: browserEnvSchema, examples: browserEnvExamples },
+  corvina: { env: corvinaEnv, schema: corvinaEnvSchema, examples: corvinaEnvExamples },
   leadsCampaigns: { env: leadsCampaignsEnv, schema: leadsCampaignsEnvSchema, examples: leadsCampaignsEnvExamples },
   messenger: { env: messengerEnv, schema: messengerEnvSchema, examples: messengerEnvExamples },
   imap: { env: imapClientEnv, schema: imapClientEnvSchema, examples: imapClientEnvExamples },
@@ -77,6 +83,7 @@ export const envModules: Record<string, { env: Record<string, unknown>; schema: 
 export const envSchema = env_envSchema
   .merge(agentEnvSchema)
   .merge(browserEnvSchema)
+  .merge(corvinaEnvSchema)
   .merge(leadsCampaignsEnvSchema)
   .merge(messengerEnvSchema)
   .merge(imapClientEnvSchema)

@@ -21,11 +21,25 @@ export const translations = {
         description: "Each row is one customer organization.",
         id: "ID",
         name: "Name",
-        displayName: "Display Name",
-        enabled: "Enabled",
-        createdAt: "Created",
+        label: "Label",
+        status: "Status",
+        resourceId: "Resource ID",
+        dataEnabled: "Data",
+        vpnEnabled: "VPN",
       },
       total: "Total",
+    },
+    widget: {
+      title: "Corvina Organizations",
+      noOrgsFound: "No organizations found",
+    },
+    enums: {
+      orgStatus: {
+        done: "Done",
+        pending: "Pending",
+        failed: "Failed",
+        disabled: "Disabled",
+      },
     },
     errors: {
       validation: {
@@ -38,18 +52,16 @@ export const translations = {
       },
       unauthorized: {
         title: "Unauthorized",
-        description:
-          "Corvina rejected the service-account credentials. Check CORVINA_CLIENT_ID and CORVINA_CLIENT_SECRET.",
+        description: "Corvina rejected the API key. Check CORVINA_API_KEY.",
       },
       forbidden: {
         title: "Forbidden",
         description:
-          "The service account does not have the required scope to list organizations.",
+          "The API key does not have the required scope to list organizations.",
       },
       notFound: {
         title: "Not Found",
-        description:
-          "Corvina returned 404 for the configured organizations path. Adjust CORVINA_ORGANIZATIONS_PATH.",
+        description: "Corvina returned 404 for the organizations path.",
       },
       conflict: {
         title: "Conflict",

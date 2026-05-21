@@ -1,0 +1,39 @@
+"use client";
+
+import type { JSX } from "react";
+import { useMemo } from "react";
+
+import corvinaOrgsListDefinition from "@/app/api/[locale]/corvina/organizations/list/definition";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+export function CorvinaOrganizationsPageClient({
+  locale,
+  user,
+}: {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+}): JSX.Element {
+  const endpointOptions = useMemo(
+    () => ({
+      read: {
+        formOptions: {
+          autoSubmit: true,
+          debounceMs: 300,
+          persistForm: false,
+        },
+      },
+    }),
+    [],
+  );
+
+  return (
+    <EndpointsPage
+      endpoint={corvinaOrgsListDefinition}
+      locale={locale}
+      user={user}
+      endpointOptions={endpointOptions}
+    />
+  );
+}

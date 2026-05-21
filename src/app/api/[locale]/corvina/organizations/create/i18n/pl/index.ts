@@ -61,8 +61,7 @@ export const translations = {
       },
       forbidden: {
         title: "Zabronione",
-        description:
-          "Konto serwisowe nie ma zakresu do tworzenia organizacji.",
+        description: "Konto serwisowe nie ma zakresu do tworzenia organizacji.",
       },
       notFound: {
         title: "Nie znaleziono",
@@ -84,6 +83,10 @@ export const translations = {
         title: "Nieznany błąd",
         description: "Wystąpił nieznany błąd.",
       },
+    },
+    widget: {
+      created: "Organizacja utworzona",
+      createdAt: "Utworzono",
     },
     success: {
       title: "Utworzono",

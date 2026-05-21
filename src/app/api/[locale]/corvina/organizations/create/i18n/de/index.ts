@@ -85,6 +85,10 @@ export const translations = {
         description: "Ein unbekannter Fehler ist aufgetreten.",
       },
     },
+    widget: {
+      created: "Organisation angelegt",
+      createdAt: "Erstellt",
+    },
     success: {
       title: "Angelegt",
       description: "Organisation erfolgreich angelegt.",

@@ -2,20 +2,26 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { CorvinaOrgStatus } from "../enums";
 import { scopedTranslation } from "./i18n";
+
+const OrgListContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.OrgListContainer })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -25,17 +31,14 @@ const { GET } = createEndpoint({
 
   title: "get.title" as const,
   description: "get.description" as const,
-  icon: "building-2",
+  icon: "building",
   category: "endpointCategories.corvina",
   subCategory: "endpointCategories.corvinaOrganizations",
   tags: ["tags.corvina" as const, "tags.organizations" as const],
-
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "get.container.title" as const,
-    description: "get.container.description" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { response: true },
+  aliases: ["corvina_list"],
+  fields: customWidgetObject({
+    render: OrgListContainer,
+    usage: { response: true } as const,
     children: {
       organizations: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -49,28 +52,37 @@ const { GET } = createEndpoint({
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.organizations.id" as const,
-              schema: z.string(),
+              schema: z.number(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.organizations.name" as const,
               schema: z.string(),
             }),
-            displayName: responseField(scopedTranslation, {
+            label: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.organizations.displayName" as const,
-              schema: z.string().nullable(),
+              content: "get.response.organizations.label" as const,
+              schema: z.string(),
             }),
-            enabled: responseField(scopedTranslation, {
+            status: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              content: "get.response.organizations.enabled" as const,
-              schema: z.boolean().nullable(),
+              content: "get.response.organizations.status" as const,
+              schema: z.enum(CorvinaOrgStatus),
             }),
-            createdAt: responseField(scopedTranslation, {
+            resourceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              fieldType: FieldDataType.DATETIME,
-              content: "get.response.organizations.createdAt" as const,
-              schema: z.string().nullable(),
+              content: "get.response.organizations.resourceId" as const,
+              schema: z.string(),
+            }),
+            dataEnabled: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content: "get.response.organizations.dataEnabled" as const,
+              schema: z.boolean(),
+            }),
+            vpnEnabled: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content: "get.response.organizations.vpnEnabled" as const,
+              schema: z.boolean(),
             }),
           },
         }),
@@ -132,11 +144,13 @@ const { GET } = createEndpoint({
       default: {
         organizations: [
           {
-            id: "org_abc123",
-            name: "acme",
-            displayName: "Acme Corp",
-            enabled: true,
-            createdAt: "2025-01-15T09:30:00.000Z",
+            id: 45511,
+            name: "connectika",
+            label: "Connectika",
+            status: "DONE",
+            resourceId: "exorde.connex.connectika",
+            dataEnabled: true,
+            vpnEnabled: true,
           },
         ],
         total: 1,

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
   submitButton,
@@ -11,13 +11,17 @@ import {
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+
+const OrgCreateContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.OrgCreateContainer })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -27,17 +31,14 @@ const { POST } = createEndpoint({
 
   title: "post.title" as const,
   description: "post.description" as const,
-  icon: "plus-circle",
+  icon: "plus",
   category: "endpointCategories.corvina",
   subCategory: "endpointCategories.corvinaOrganizations",
   tags: ["tags.corvina" as const, "tags.organizations" as const],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.container.title" as const,
-    description: "post.container.description" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: OrgCreateContainer,
+    usage: { request: "data", response: true } as const,
     children: {
       name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -104,7 +105,7 @@ const { POST } = createEndpoint({
       submitButton: submitButton(scopedTranslation, {
         label: "post.submitButton.label" as const,
         loadingText: "post.submitButton.loadingText" as const,
-        icon: "plus-circle",
+        icon: "plus",
         variant: "primary",
         className: "w-full",
         usage: { request: "data" },

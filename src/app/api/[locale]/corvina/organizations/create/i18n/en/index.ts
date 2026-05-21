@@ -85,6 +85,10 @@ export const translations = {
         description: "An unknown error occurred.",
       },
     },
+    widget: {
+      created: "Organization created",
+      createdAt: "Created",
+    },
     success: {
       title: "Created",
       description: "Organization created successfully.",

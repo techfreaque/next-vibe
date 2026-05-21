@@ -680,6 +680,50 @@ export async function getEndpoint(
     case "cortex-write":
       return (await import("@/app/api/[locale]/agent/cortex/write/definition"))
         .default.POST;
+    case "corvina_list":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/list/definition")
+      ).default.GET;
+    case "corvina_organizations_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/create/definition")
+      ).default.POST;
+    case "corvina_organizations_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/list/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/definition")
+      ).default.PUT;
+    case "corvina_organizations_orgId_devices_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/create/definition")
+      ).default.POST;
+    case "corvina_organizations_orgId_devices_deviceId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_devices_deviceId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/definition")
+      ).default.PUT;
+    case "corvina_organizations_orgId_devices_deviceId_delete_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/delete/definition")
+      ).default.DELETE;
+    case "corvina_organizations_orgId_devices_deviceId_tags_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags/definition")
+      ).default.GET;
+    case "corvina_organizations_orgId_devices_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/list/definition")
+      ).default.GET;
     case "create-config":
       return (
         await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/config/create/definition")

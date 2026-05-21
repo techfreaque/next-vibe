@@ -4,7 +4,6 @@ import type { Route } from "next";
 import { Div } from "next-vibe-ui/ui/div";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
@@ -35,7 +34,7 @@ export function Logo({
   );
   const inner = (
     <>
-      <Div className={cn("shrink-0", size)}>
+      <Div className={size}>
         <Image
           fetchPriority="high"
           src={`${platform.isReactNative ? envClient.NEXT_PUBLIC_APP_URL : ""}/images/unbottled-icon-white.png`}
@@ -44,7 +43,7 @@ export function Logo({
             "hidden dark:block h-full w-auto object-contain",
             className,
           )}
-          width={32}
+          // width={32}
           height={32}
           priority
         />
@@ -56,19 +55,11 @@ export function Logo({
             "hidden light:block h-full w-auto object-contain",
             className,
           )}
-          width={32}
+          // width={32}
           height={32}
           priority
         />
       </Div>
-      <Span
-        className={cn(
-          "font-inter text-base font-bold tracking-tight whitespace-nowrap",
-          "text-gray-900 dark:text-white",
-        )}
-      >
-        {configT("appName")}
-      </Span>
     </>
   );
   if (disabled) {

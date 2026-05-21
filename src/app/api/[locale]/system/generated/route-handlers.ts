@@ -735,6 +735,50 @@ export async function getRouteHandler(
     case "cortex-write":
       return (await import("@/app/api/[locale]/agent/cortex/write/route")).tools
         .POST as GenericHandlerBase;
+    case "corvina_list":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/list/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/create/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/list/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/route")
+      ).tools.PUT as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_create_POST":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/create/route")
+      ).tools.POST as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_PUT":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/route")
+      ).tools.PUT as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_delete_DELETE":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/delete/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_deviceId_tags_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/[deviceId]/tags/route")
+      ).tools.GET as GenericHandlerBase;
+    case "corvina_organizations_orgId_devices_list_GET":
+      return (
+        await import("@/app/api/[locale]/corvina/organizations/[orgId]/devices/list/route")
+      ).tools.GET as GenericHandlerBase;
     case "create-config":
       return (
         await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/config/create/route")
