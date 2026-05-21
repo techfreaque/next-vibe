@@ -44,6 +44,7 @@ export enum ChatModelId {
   GPT_5_NANO = "gpt-5-nano",
   GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS = "gemini-3.1-pro-preview-customtools",
   GEMINI_3_1_FLASH_LITE_PREVIEW = "gemini-3.1-flash-lite-preview",
+  GEMINI_3_5_FLASH = "gemini-3.5-flash",
   GEMINI_3_FLASH = "gemini-3-flash",
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",
@@ -2358,6 +2359,47 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       toolCalling: true,
     },
   },
+  [ChatModelId.GEMINI_3_5_FLASH]: {
+    name: "Gemini 3.5 Flash",
+    by: "google",
+    description: "chat.models.descriptions.gemini35Flash",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-googlegemini",
+    inputs: ["text", "image", "video", "audio"], // updated: 2026-05-21 from openrouter-api (also supports pdf)
+    outputs: ["text"], // updated: 2026-05-21 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.GEMINI_3_5_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-3.5-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.5, // updated: 2026-05-21 from openrouter-api
+        outputTokenCost: 3, // updated: 2026-05-21 from openrouter-api
+        cacheReadTokenCost: 0.05, // updated: 2026-05-21 from openrouter-api
+        cacheWriteTokenCost: 0.08, // updated: 2026-05-21 from openrouter-api
+      },
+      {
+        id: ChatModelId.GEMINI_3_5_FLASH,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gemini-3.5-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.65, // updated: 2026-05-21 from unbottled.ai
+        outputTokenCost: 3.9, // updated: 2026-05-21 from unbottled.ai
+        cacheReadTokenCost: 0.065, // updated: 2026-05-21 from unbottled.ai
+        cacheWriteTokenCost: 0.104, // updated: 2026-05-21 from unbottled.ai
+      },
+    ],
+
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.FAST],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      toolCalling: true,
+    },
+  },
   [ChatModelId.GEMINI_3_FLASH]: {
     name: "Gemini 3 Flash",
     by: "google",
@@ -2390,7 +2432,12 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
 
-    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.FAST],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.FAST,
+      ModelUtility.LEGACY,
+    ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.MAINSTREAM,

@@ -34,6 +34,7 @@ import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-inter
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetDisabled,
@@ -42,6 +43,8 @@ import {
   useWidgetLogger,
   useWidgetOnCancel,
   useWidgetOnSubmit,
+  useWidgetPlatform,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
@@ -68,6 +71,8 @@ export function ExecuteToolWidget(): JSX.Element {
   const logger = useWidgetLogger();
   const t = useWidgetTranslation<typeof definition.POST>();
   const disabled = useWidgetDisabled();
+  const responseOnly = useWidgetResponseOnly();
+  const platform = useWidgetPlatform();
   const onSubmit = useWidgetOnSubmit();
   const onCancel = useWidgetOnCancel();
   const { theme } = useThemeToggle();
@@ -75,7 +80,7 @@ export function ExecuteToolWidget(): JSX.Element {
   // Get values from form (interactive mode) or widget value (read-only tool call display)
   const fieldValue = useWidgetValue<typeof definition.POST>();
 
-  const rawToolName = form.watch("toolName");
+  const rawToolName = form.watch("toolName") ?? "";
 
   // In disabled mode, form is pre-filled with merged args+result data from the tool call.
   // Use all form values as-is - the inner endpoint's widget knows what to render.
@@ -298,7 +303,7 @@ export function ExecuteToolWidget(): JSX.Element {
     <Div
       className={disabled ? "flex flex-col gap-0" : "flex flex-col gap-4 p-4"}
     >
-      {form && !disabled && (
+      {form && !disabled && !responseOnly && (
         <Form form={form} onSubmit={handleSubmit}>
           <FormField
             control={form.control}
@@ -340,6 +345,7 @@ export function ExecuteToolWidget(): JSX.Element {
       )}
 
       {!disabled &&
+        !responseOnly &&
         toolName &&
         !isRemoteTool &&
         !resolvedEndpoint &&
@@ -420,38 +426,54 @@ export function ExecuteToolWidget(): JSX.Element {
       )}
 
       {/* Response mode: render the target endpoint with merged input+result data (read-only) */}
-      {!isRemoteTool && resolvedEndpoint && method && Boolean(resultData) && (
-        <EndpointsPage
-          endpoint={{ [method]: resolvedEndpoint }}
-          locale={locale}
-          user={user}
-          disabled={true}
-          endpointOptions={(() => {
-            const mergedResult =
-              inputData &&
-              resultData &&
-              typeof resultData === "object" &&
-              !Array.isArray(resultData)
-                ? { ...inputData, ...resultData }
-                : resultData;
-            if (method === "GET") {
-              return { read: { initialData: mergedResult as never } };
-            }
-            if (method === "DELETE") {
-              return {
-                delete: {
-                  urlPathParams: mergedResult as never,
-                  autoPrefillData: mergedResult as never,
-                },
-              };
-            }
-            if (method === "PATCH") {
-              return { update: { autoPrefillData: mergedResult as never } };
-            }
-            return { create: { autoPrefillData: mergedResult as never } };
-          })()}
-        />
-      )}
+      {!isRemoteTool &&
+        resolvedEndpoint &&
+        method &&
+        Boolean(resultData) &&
+        (responseOnly ? (
+          // CLI/MCP responseOnly: use EndpointRenderer directly to avoid async query fetching
+          <EndpointRenderer
+            endpoint={resolvedEndpoint}
+            locale={locale}
+            user={user}
+            logger={logger}
+            data={resultData as never}
+            response={{ success: true, data: resultData as never }}
+            responseOnly={true}
+            platform={platform}
+          />
+        ) : (
+          <EndpointsPage
+            endpoint={{ [method]: resolvedEndpoint }}
+            locale={locale}
+            user={user}
+            disabled={true}
+            endpointOptions={(() => {
+              const mergedResult =
+                inputData &&
+                resultData &&
+                typeof resultData === "object" &&
+                !Array.isArray(resultData)
+                  ? { ...inputData, ...resultData }
+                  : resultData;
+              if (method === "GET") {
+                return { read: { initialData: mergedResult as never } };
+              }
+              if (method === "DELETE") {
+                return {
+                  delete: {
+                    urlPathParams: mergedResult as never,
+                    autoPrefillData: mergedResult as never,
+                  },
+                };
+              }
+              if (method === "PATCH") {
+                return { update: { autoPrefillData: mergedResult as never } };
+              }
+              return { create: { autoPrefillData: mergedResult as never } };
+            })()}
+          />
+        ))}
 
       {/* Remote tool response: render raw result data */}
       {isRemoteTool && Boolean(resultData) && (

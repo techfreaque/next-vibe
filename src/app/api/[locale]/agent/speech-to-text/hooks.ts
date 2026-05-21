@@ -311,11 +311,12 @@ export function useEdenAISpeech({
     if (audioChunksRef.current.length === 0) {
       return;
     }
-    const mimeType = mediaRecorderRef.current?.mimeType ?? "audio/webm";
+    const mimeType = mediaRecorderRef.current?.mimeType || "audio/webm";
     const blob = new Blob(audioChunksRef.current, { type: mimeType });
-    if (blob.size < 500) {
+    // Discard chunks too small to contain real audio (just container headers)
+    if (blob.size < 5000) {
       audioChunksRef.current = [];
-      return; // too small, discard
+      return;
     }
     const ext = mimeType.includes("ogg")
       ? "ogg"

@@ -68,6 +68,7 @@ import {
   FAVORITE_UPDATE_ALIAS,
 } from "../constants";
 
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import { ChatModelId } from "../../../ai-stream/models";
 import { scopedTranslation } from "./i18n";
 
@@ -842,7 +843,7 @@ const { PATCH } = createEndpoint({
         },
         compactTrigger: null,
         availableTools: [
-          { toolId: "execute-tool", requiresConfirmation: false },
+          { toolId: EXECUTE_TOOL_ALIAS, requiresConfirmation: false },
         ],
         pinnedTools: null,
       },

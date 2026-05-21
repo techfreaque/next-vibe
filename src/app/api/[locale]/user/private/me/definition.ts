@@ -19,6 +19,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   customWidgetObject,
   objectField,
+  objectOptionalField,
   objectUnionField,
   requestField,
   responseArrayField,
@@ -474,7 +475,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === BASIC INFORMATION ===
-      basicInfo: objectField(scopedTranslation, {
+      basicInfo: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "update.groups.basicInfo.title" as const,
         description: "update.groups.basicInfo.description" as const,
@@ -536,7 +537,7 @@ const { POST } = createEndpoint({
       }),
 
       // === CREATOR / PROFILE INFO ===
-      profileInfo: objectField(scopedTranslation, {
+      profileInfo: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "update.groups.profileInfo.title" as const,
         description: "update.groups.profileInfo.description" as const,
@@ -717,7 +718,7 @@ const { POST } = createEndpoint({
       }),
 
       // === PRIVACY AND PREFERENCES ===
-      privacySettings: objectField(scopedTranslation, {
+      privacySettings: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "update.groups.privacySettings.title" as const,
         description: "update.groups.privacySettings.description" as const,

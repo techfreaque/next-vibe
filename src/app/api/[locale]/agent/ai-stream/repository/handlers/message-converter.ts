@@ -25,6 +25,7 @@ import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { DefaultFolderId } from "../../../chat/config";
 
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { ChatMessage } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import type { ChatModelOption } from "../../models";
@@ -87,7 +88,9 @@ export class MessageConverter {
             } else if (attachment.url) {
               // Message from history: fetch from URL and convert to base64
               try {
-                const response = await fetch(attachment.url);
+                const response = await fetch(attachment.url, {
+                  signal: AbortSignal.timeout(15_000),
+                });
                 if (response.ok) {
                   const buffer = await response.arrayBuffer();
                   base64Data = Buffer.from(buffer).toString("base64");
@@ -908,7 +911,7 @@ export class MessageConverter {
     // Unwrap execute-tool wrapper: { result: { imageUrl, ... } } → { imageUrl, ... }
     let effectiveResult = result;
     if (
-      toolName === "execute-tool" &&
+      toolName === EXECUTE_TOOL_ALIAS &&
       result &&
       typeof result === "object" &&
       !Array.isArray(result) &&

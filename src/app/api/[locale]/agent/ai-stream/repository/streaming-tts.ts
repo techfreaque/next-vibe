@@ -60,6 +60,9 @@ const NATURAL_BREAKS = /[,;:\n]+\s*$/;
  * the moment the client finishes playing the current one.
  */
 export class StreamingTTSHandler {
+  // TTS synthesis can take several minutes for long messages - do not lower this
+  private static readonly TTS_FETCH_TIMEOUT_MS = 300_000; // 5 min
+
   private buffer = "";
   private chunkIndex = 0;
   private isInsideThinkTag = false;
@@ -444,6 +447,7 @@ export class StreamingTTSHandler {
         input: text,
         voice: modelOption.providerModel,
       }),
+      signal: AbortSignal.timeout(StreamingTTSHandler.TTS_FETCH_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -497,6 +501,7 @@ export class StreamingTTSHandler {
           language: language.toLowerCase(),
           option: voiceGender,
         }),
+        signal: AbortSignal.timeout(StreamingTTSHandler.TTS_FETCH_TIMEOUT_MS),
       },
     );
 
@@ -526,7 +531,9 @@ export class StreamingTTSHandler {
       return null;
     }
 
-    const audioResponse = await fetch(audioResourceUrl);
+    const audioResponse = await fetch(audioResourceUrl, {
+      signal: AbortSignal.timeout(StreamingTTSHandler.TTS_FETCH_TIMEOUT_MS),
+    });
     if (!audioResponse.ok) {
       this.logger.error("[Streaming TTS] Failed to fetch audio from URL", {
         status: audioResponse.status,
@@ -572,6 +579,7 @@ export class StreamingTTSHandler {
           text,
           model_id: "eleven_monolingual_v1",
         }),
+        signal: AbortSignal.timeout(StreamingTTSHandler.TTS_FETCH_TIMEOUT_MS),
       },
     );
 

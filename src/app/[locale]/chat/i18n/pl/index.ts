@@ -1281,6 +1281,8 @@ export const translations: typeof enTranslations = {
         "Claude Sonnet 4.6 - Najbardziej zaawansowany model Sonnet firmy Anthropic z najwyższą wydajnością w kodowaniu, agentach i pracy zawodowej",
       gemini3Pro:
         "Google Gemini 3 Pro - Zaawansowany multimodalny model AI z dużym oknem kontekstu i potężnymi możliwościami rozumowania",
+      gemini35Flash:
+        "Gemini 3.5 Flash - Możliwości bliskie Pro przy koszcie Flash. Obsługuje tekst, obrazy, wideo, audio i PDF. Wbudowane równoległe pętle agentów. Poziomy myślenia od minimalnego do wysokiego dla precyzyjnej kontroli kosztów i wydajności.",
       gemini3Flash:
         "Google Gemini 3 Flash - Szybki, wydajny multimodalny model AI zoptymalizowany pod kątem szybkich odpowiedzi",
       deepseekV32:

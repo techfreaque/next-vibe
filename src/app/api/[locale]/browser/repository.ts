@@ -494,8 +494,8 @@ async function findMCPPageForTarget(
     return null;
   }
 
-  // Match by URL - works as long as each tab has a unique URL.
-  // For about:blank tabs, match by open count order as fallback.
+  // Match by URL. Sessions are created with a unique data: URL (see
+  // createSessionTab) so this is always an exact 1:1 match.
   const match = mcpPages.find((p) => p.url === target.url);
   return match?.id ?? null;
 }
@@ -688,10 +688,23 @@ async function ensureSession(
       saveSessions(sessions);
       state = undefined;
     } else if (!knownTargetId.startsWith("unknown-")) {
-      // Target is alive - re-resolve MCP integer ID in case chrome-devtools-mcp restarted.
-      const mcpId = await findMCPPageForTarget(mcp, knownTargetId, cdpTargets);
-      if (mcpId !== null) {
-        state.mcpPageId = mcpId;
+      // Re-resolve MCP integer ID only if the stored ID is no longer valid
+      // (chrome-devtools-mcp restarted and reassigned IDs). Avoid re-resolving
+      // on every call: URL matching breaks when multiple tabs share the same URL
+      // (e.g. about:blank) and would map every session to the same page.
+      const mcpPages = await listMCPPages(mcp);
+      const storedIdStillValid = mcpPages.some(
+        (p) => p.id === state!.mcpPageId,
+      );
+      if (!storedIdStillValid) {
+        const mcpId = await findMCPPageForTarget(
+          mcp,
+          knownTargetId,
+          cdpTargets,
+        );
+        if (mcpId !== null) {
+          state.mcpPageId = mcpId;
+        }
       }
     }
   }
@@ -813,11 +826,19 @@ export class BrowserRepository {
           });
         }
 
+        // For close_page and select_page, inject the session's page ID when not
+        // explicitly provided so callers don't need to manage page IDs manually.
+        const finalArgs =
+          (mcpToolName === "close_page" || mcpToolName === "select_page") &&
+          parsedArgs["pageId"] === undefined
+            ? { ...parsedArgs, pageId: state.mcpPageId }
+            : parsedArgs;
+
         const resp = await sendRaw(mcp, {
           jsonrpc: "2.0",
           id: mcp.nextId++,
           method: "tools/call",
-          params: { name: mcpToolName, arguments: parsedArgs },
+          params: { name: mcpToolName, arguments: finalArgs },
         });
 
         const executionId = `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;

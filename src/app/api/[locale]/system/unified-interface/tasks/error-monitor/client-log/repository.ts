@@ -25,7 +25,15 @@ function extractTabId(
     return undefined;
   }
   for (const m of metadata) {
-    if (typeof m["tabId"] === "string") {
+    if (
+      m !== null &&
+      m !== undefined &&
+      typeof m === "object" &&
+      !Array.isArray(m) &&
+      !(m instanceof Date) &&
+      "tabId" in m &&
+      typeof m["tabId"] === "string"
+    ) {
       return m["tabId"];
     }
   }

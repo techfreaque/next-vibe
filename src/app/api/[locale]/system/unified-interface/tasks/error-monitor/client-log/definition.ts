@@ -7,6 +7,7 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   objectField,
   requestField,
@@ -69,44 +70,7 @@ export const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "post.fields.metadata.label" as const,
         description: "post.fields.metadata.description" as const,
-        schema: z
-          .array(
-            z.record(
-              z.string(),
-              z.union([
-                z.string(),
-                z.number(),
-                z.boolean(),
-                z.null(),
-                z.record(
-                  z.string(),
-                  z.union([
-                    z.string(),
-                    z.number(),
-                    z.boolean(),
-                    z.null(),
-                    z.record(
-                      z.string(),
-                      z.union([z.string(), z.number(), z.boolean(), z.null()]),
-                    ),
-                  ]),
-                ),
-                z.array(
-                  z.union([
-                    z.string(),
-                    z.number(),
-                    z.boolean(),
-                    z.null(),
-                    z.record(
-                      z.string(),
-                      z.union([z.string(), z.number(), z.boolean(), z.null()]),
-                    ),
-                  ]),
-                ),
-              ]),
-            ),
-          )
-          .optional(),
+        schema: z.array(WidgetDataSchema).optional(),
       }),
       ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

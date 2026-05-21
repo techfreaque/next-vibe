@@ -97,7 +97,7 @@ export const translations = {
       instanceId: {
         label: "Instance ID",
         description:
-          "Filter to tools from a specific remote instance. Returns tools from the stored capability snapshot for that instance.",
+          "Optional. Filter to tools from a specific remote instance only. Omit to search local tools.",
       },
       pinnedToolIds: {
         label: "Pinned Tool IDs",

@@ -16,18 +16,20 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export class McpResultFormatter {
-  static formatSuccess(
+  static async formatSuccess(
     data: WidgetData,
     endpoint: CreateApiEndpointAny | null,
     locale: CountryLanguage,
     logger: EndpointLogger,
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
-  ): string {
+    requestInput?: Record<string, WidgetData>,
+  ): Promise<string> {
     void data;
     void endpoint;
     void locale;
     void logger;
     void user;
+    void requestInput;
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     throw new Error("McpResultFormatter.formatSuccess not implemented");
   }

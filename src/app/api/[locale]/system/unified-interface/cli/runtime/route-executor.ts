@@ -434,6 +434,7 @@ export class RouteDelegationHandler {
           logger,
           endpoint,
           cliUser,
+          inputData.data,
         );
 
         return { ...routeResult, formattedOutput, renderMs };
@@ -527,6 +528,7 @@ export class RouteDelegationHandler {
         logger,
         endpoint,
         cliUser,
+        inputData.data,
       );
 
       // Return result with formatted output and render timing

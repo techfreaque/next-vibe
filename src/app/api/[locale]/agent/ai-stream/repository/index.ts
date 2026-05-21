@@ -21,6 +21,7 @@ import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../chat/db";
+import { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
 import { buildFavoriteConfig } from "../../chat/favorites/repository";
 import { parseSkillId } from "../../chat/slugify";
@@ -211,6 +212,7 @@ export class AiStreamRepository {
       data.operation === "send" &&
       data.threadId &&
       data.userMessageId &&
+      data.rootFolderId !== DefaultFolderId.INCOGNITO &&
       StreamRegistry.isActive(data.threadId)
     ) {
       const authorName = userId

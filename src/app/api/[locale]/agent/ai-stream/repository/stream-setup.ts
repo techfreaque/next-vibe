@@ -1627,13 +1627,9 @@ export async function setupAiStream(params: {
       userMessageMetadata,
       fileUploadPromise,
       modelConfig,
-      // Revival streams (WAIT/wakeUp after async task completes) must not call tools.
-      // The AI's only job is to acknowledge the result in the context. Passing no tools
-      // prevents the AI from re-executing tool calls it sees in the message history,
-      // which would create duplicate tool messages and corrupt the thread branch.
-      tools: params.isRevival ? undefined : tools,
+      tools,
       toolsConfig,
-      activeToolNames: params.isRevival ? null : activeToolNames,
+      activeToolNames,
       provider,
       streamAbortController,
       effectiveCompactTrigger,

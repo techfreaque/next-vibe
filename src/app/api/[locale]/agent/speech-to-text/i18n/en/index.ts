@@ -188,6 +188,8 @@ export const translations = {
       },
       apiKeyMissing: "Eden AI API key is not configured",
       transcriptionFailed: "Transcription failed: {{error}}",
+      audioTooShort:
+        "Recording too short. Hold the button longer and speak clearly.",
       noAudioFile: "No audio file provided",
       internalError: "Internal server error",
       noPublicId: "No public ID received",

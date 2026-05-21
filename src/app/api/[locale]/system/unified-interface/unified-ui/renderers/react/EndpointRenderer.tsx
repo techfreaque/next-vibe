@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
-import { Suspense, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import type {
   DefaultValues,
   Path,
@@ -296,12 +296,14 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
    */
   if (isRootContainer) {
     // CUSTOM_WIDGET with render: render directly without WidgetRenderer.
+    // CONTAINER with render: also use custom rendering (e.g. browser tools).
     // This avoids loading all widget dependencies when a custom component
     // handles its own rendering (e.g. chat messages widget).
     const isCustomWidget =
       "type" in endpoint.fields &&
-      endpoint.fields.type === WidgetType.CUSTOM_WIDGET;
-    const CustomRender = isCustomWidget
+      (endpoint.fields.type === WidgetType.CUSTOM_WIDGET ||
+        endpoint.fields.type === WidgetType.CONTAINER);
+    const lazyRender = isCustomWidget
       ? (
           endpoint.fields as typeof endpoint.fields & {
             // oxlint-disable-next-line typescript/no-explicit-any
@@ -309,15 +311,39 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
           }
         ).render
       : undefined;
+    // If the lazy has been pre-warmed (_status === 1), use the resolved component directly
+    // so the fast sync reconciler doesn't have to handle React.lazy internals.
+    const resolved =
+      lazyRender &&
+      typeof lazyRender === "object" &&
+      "_payload" in lazyRender &&
+      (
+        lazyRender as {
+          _payload: {
+            _status: number;
+            _result: { default: React.ComponentType };
+          };
+        }
+      )._payload._status === 1
+        ? (
+            lazyRender as {
+              _payload: {
+                _status: number;
+                _result: { default: React.ComponentType };
+              };
+            }
+          )._payload._result.default
+        : undefined;
+    // oxlint-disable-next-line typescript/no-explicit-any
+    const CustomRender: React.ComponentType<any> | undefined =
+      resolved ?? lazyRender;
 
     const rootWidget = CustomRender ? (
-      <Suspense fallback={null}>
-        <CustomRender
-          fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
-          field={withValueNonStrict(endpoint.fields, data, null)}
-          inlineButtonInfo={inlineButtonInfo}
-        />
-      </Suspense>
+      <CustomRender
+        fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
+        field={withValueNonStrict(endpoint.fields, data, null)}
+        inlineButtonInfo={inlineButtonInfo}
+      />
     ) : (
       <LazyWidgetRenderer
         fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}

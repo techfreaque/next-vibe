@@ -31,7 +31,7 @@ import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
-import { CallbackMode } from "./execute-tool/constants";
+import { CallbackMode, EXECUTE_TOOL_ALIAS } from "./execute-tool/constants";
 
 /**
  * CoreTool type from AI SDK
@@ -97,8 +97,8 @@ function createToolFromEndpoint(
   const schemaObj = jsonSchemaObject as JSONSchema7 & {
     properties?: Record<string, JSONSchema7>;
   };
-  if (toolName !== "wait-for-task" && toolName !== "execute-tool") {
-    // Filter out callback modes blocked for this folder type
+  if (toolName !== "wait-for-task" && toolName !== EXECUTE_TOOL_ALIAS) {
+    // Filter out callback modes blocked for this folder type.
     const blockedModes = new Set(
       FOLDER_BLOCKED_CALLBACK_MODES[context.streamContext.rootFolderId] ?? [],
     );
@@ -107,18 +107,17 @@ function createToolFromEndpoint(
     if (!schemaObj.properties) {
       schemaObj.properties = {};
     }
-    // Only inject callbackMode property if at least one mode is available
     if (allowedModes.length > 0) {
       schemaObj.properties.callbackMode = {
         type: "string",
         enum: allowedModes,
         description:
-          "Optional. Controls post-execution behavior. " +
-          "'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. " +
-          "'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. " +
-          "'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. " +
-          "'approve': require user confirmation before executing. " +
-          "Omit for default synchronous execution.",
+          "OMIT for normal tool calls - result is returned synchronously, loop continues. " +
+          "Only set when you need async: " +
+          "'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. " +
+          "'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. " +
+          "'endLoop' - stops entire AI turn after this batch, use ONLY as final action. " +
+          "'approve' - requires user confirmation before executing.",
       };
     }
   }
@@ -168,7 +167,7 @@ function createToolFromEndpoint(
       const { callbackMode: callbackModeParam, ...strippedParams } = (params ??
         {}) as Record<string, WidgetData>;
       const baseParams =
-        toolName === "execute-tool" && callbackModeParam !== undefined
+        toolName === EXECUTE_TOOL_ALIAS && callbackModeParam !== undefined
           ? { ...strippedParams, callbackMode: callbackModeParam }
           : strippedParams;
 
@@ -215,7 +214,6 @@ function createToolFromEndpoint(
         aiMessageId: context.streamContext.aiMessageId,
         streamContextRef: !!context.streamContext,
       });
-
       // Defense in depth: reject callback modes blocked for this folder type
       // even if the AI bypassed the schema enum restriction.
       const folderBlockedModes =
@@ -262,7 +260,7 @@ function createToolFromEndpoint(
         if (
           callbackMode === CallbackMode.DETACH ||
           callbackMode === CallbackMode.WAKE_UP ||
-          toolName === "execute-tool"
+          toolName === EXECUTE_TOOL_ALIAS
         ) {
           // For WAIT/END_LOOP modes: eagerly mark waitingForRemoteResult on the SHARED
           // streamContext SYNCHRONOUSLY (before any await). The AI SDK can emit finish-step
@@ -272,7 +270,7 @@ function createToolFromEndpoint(
           // We eagerly set it now, then reset it after execute() if no WAIT task was created.
           // For execute-tool: effective callbackMode is in restParams.callbackMode.
           const earlyCallbackMode =
-            toolName === "execute-tool"
+            toolName === EXECUTE_TOOL_ALIAS
               ? restParams.callbackMode
               : callbackMode;
           const didEagerlySetWaiting =
@@ -329,7 +327,7 @@ function createToolFromEndpoint(
           // execute-tool: restParams already has the correct shape ({ toolName, input, callbackMode, instanceId? })
           // Other tools: wrap in { toolName, input: restParams, callbackMode }
           const executeData = (
-            toolName === "execute-tool"
+            toolName === EXECUTE_TOOL_ALIAS
               ? restParams
               : { toolName, input: restParams, callbackMode }
           ) as Parameters<typeof RouteExecuteRepository.execute>[0];

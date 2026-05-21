@@ -464,6 +464,8 @@ export const translations = {
         "Gemini 3.1 Flash Lite Preview - Google's high-efficiency model optimized for high-volume use cases, outperforming Gemini 2.5 Flash Lite with improvements in audio, RAG ranking, translation, and code completion",
       gemini3Pro:
         "Google Gemini 3 Pro - Advanced multimodal AI model with large context window and powerful reasoning capabilities",
+      gemini35Flash:
+        "Gemini 3.5 Flash - Near-Pro coding and reasoning at Flash cost. Handles text, images, video, audio, and PDFs. Parallel agentic loops built-in. Thinking levels from minimal to high for precise cost/performance control.",
       gemini3Flash:
         "Google Gemini 3 Flash - Fast, efficient multimodal AI model optimized for quick responses",
       deepseekV32:

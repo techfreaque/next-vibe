@@ -13,7 +13,10 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import {
+  CallbackMode,
+  EXECUTE_TOOL_ALIAS,
+} from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
@@ -123,7 +126,7 @@ export class ToolConfirmationHandler {
 
       // Detect original callbackMode BEFORE overriding (needed for wakeUp fire-and-forget path).
       const originalCallbackMode =
-        toolCall.toolName === "execute-tool" &&
+        toolCall.toolName === EXECUTE_TOOL_ALIAS &&
         typeof baseArgs === "object" &&
         baseArgs !== null &&
         !Array.isArray(baseArgs) &&
@@ -134,7 +137,7 @@ export class ToolConfirmationHandler {
       const isWakeUpConfirm = originalCallbackMode === CallbackMode.WAKE_UP;
 
       const finalArgs =
-        toolCall.toolName === "execute-tool" &&
+        toolCall.toolName === EXECUTE_TOOL_ALIAS &&
         typeof baseArgs === "object" &&
         baseArgs !== null &&
         !Array.isArray(baseArgs) &&

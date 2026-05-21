@@ -52,8 +52,8 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-frame/VibeFrameHost";
 
 import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
-import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import favoriteByIdDefinition from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import settingsDefinition from "@/app/api/[locale]/agent/chat/settings/definition";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
@@ -71,6 +71,7 @@ import {
 import remoteConnectionListDefinition from "@/app/api/[locale]/user/remote-connection/list/definition";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { EXECUTE_TOOL_ALIAS } from "../unified-interface/ai/execute-tool/constants";
 import { Platform } from "../unified-interface/shared/types/platform";
 import type definition from "./definition";
 import type { HelpToolMetadataSerialized } from "./definition";
@@ -552,7 +553,7 @@ export function HelpToolsWidget(): JSX.Element {
         // Fallback: no server URL known - navigate to execute-tool
         const { getEndpoint } =
           await import("@/app/api/[locale]/system/generated/endpoint");
-        const executeTool = await getEndpoint("execute-tool");
+        const executeTool = await getEndpoint(EXECUTE_TOOL_ALIAS);
         if (executeTool) {
           navigate(executeTool, { data: { toolName } });
         }

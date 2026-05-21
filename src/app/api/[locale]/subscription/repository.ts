@@ -43,6 +43,7 @@ import type {
   BillingIntervalDB,
   SubscriptionPlanDB,
   SubscriptionStatusValue,
+  SubscriptionPlanValue,
 } from "./enum";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
@@ -90,6 +91,16 @@ export class SubscriptionRepository {
       planId === SubscriptionPlan.SUBSCRIPTION ||
       planId.endsWith(`.${SubscriptionPlan.SUBSCRIPTION}`)
     );
+  }
+
+  /**
+   * Normalize legacy plan IDs stored in the DB to their canonical short form.
+   * Old values like 'app.api.subscription.enums.plan.subscription' are normalized
+   * to 'enums.plan.subscription' so response validation passes.
+   */
+  private static normalizePlanId(): typeof SubscriptionPlanValue {
+    // Only one plan type exists. Legacy DB values with long prefix are normalized here.
+    return SubscriptionPlan.SUBSCRIPTION;
   }
 
   /**
@@ -456,7 +467,7 @@ export class SubscriptionRepository {
 
       return success({
         id: subscription.id,
-        plan: subscription.planId,
+        plan: SubscriptionRepository.normalizePlanId(),
         billingInterval: subscription.billingInterval,
         status: subscription.status,
         currentPeriodStart:
@@ -567,7 +578,7 @@ export class SubscriptionRepository {
       const updatedSubscription = results[0];
       return success({
         id: updatedSubscription.id,
-        plan: updatedSubscription.planId,
+        plan: SubscriptionRepository.normalizePlanId(),
         billingInterval: updatedSubscription.billingInterval,
         status: updatedSubscription.status,
         currentPeriodStart:

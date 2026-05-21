@@ -5,22 +5,22 @@
  * Renders response data using endpoint definitions for pretty output.
  */
 
-import { QueryClientProvider } from "@tanstack/react-query";
 import { parseError } from "next-vibe/shared/utils";
-import { createElement } from "react";
+import React from "react";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { queryClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { EndpointRenderer } from "../react/EndpointRenderer";
-import { NavigationStackProvider } from "../../../react/hooks/use-navigation-stack";
+import { EXECUTE_TOOL_ALIAS } from "../../../ai/execute-tool/constants";
 import { renderToString as fastRenderToString } from "../cli/response/fast-ink-renderer/renderer";
+import { prewarmLazyWidgets } from "../cli/response/result-formatter";
+import { McpRenderTree } from "./render-tree";
 
 /**
  * Static class for formatting MCP results with fast rendering
@@ -29,17 +29,49 @@ export class McpResultFormatter {
   /**
    * Format a successful response for MCP display
    */
-  static formatSuccess(
+  static async formatSuccess(
     data: WidgetData,
     endpoint: CreateApiEndpointAny | null,
     locale: CountryLanguage,
     logger: EndpointLogger,
     user: JwtPayloadType,
-  ): string {
+    requestInput?: Record<string, WidgetData>,
+  ): Promise<string> {
     if (!endpoint || !data) {
       // Fallback to JSON if no endpoint definition
       logger.info("[MCP Result Formatter] Fallback to JSON");
       return JSON.stringify(data, null, 2);
+    }
+
+    // execute-tool response: render the inner endpoint's widget directly.
+    // Detect by endpoint alias + { result } wrapper in response data.
+    // Use requestInput.toolName (passed by the MCP registry) to resolve the inner endpoint.
+    const isExecuteTool =
+      endpoint.aliases?.includes(EXECUTE_TOOL_ALIAS) ?? false;
+    const rawInnerToolName =
+      isExecuteTool && requestInput ? requestInput["toolName"] : undefined;
+    const innerToolName =
+      typeof rawInnerToolName === "string" ? rawInnerToolName : undefined;
+    if (
+      isExecuteTool &&
+      innerToolName &&
+      typeof data === "object" &&
+      data !== null &&
+      !Array.isArray(data) &&
+      !(data instanceof Date) &&
+      "result" in data
+    ) {
+      const canonicalId = getFullPath(innerToolName) ?? innerToolName;
+      const innerEndpoint = await getEndpoint(canonicalId);
+      if (innerEndpoint) {
+        return McpResultFormatter.renderWithEndpoint(
+          data["result"],
+          innerEndpoint,
+          locale,
+          logger,
+          user,
+        );
+      }
     }
 
     return McpResultFormatter.renderWithEndpoint(
@@ -62,36 +94,28 @@ export class McpResultFormatter {
   /**
    * Render data using endpoint definition with fast renderer
    */
-  private static renderWithEndpoint(
+  private static async renderWithEndpoint(
     data: WidgetData,
     endpoint: CreateApiEndpointAny,
     locale: CountryLanguage,
     logger: EndpointLogger,
     user: JwtPayloadType,
-  ): string {
+  ): Promise<string> {
     try {
       const perfStart = performance.now();
 
+      // Pre-warm lazy widgets
+      await prewarmLazyWidgets(endpoint);
+
       // Create component
       const createStart = performance.now();
-      const component = createElement(
-        QueryClientProvider,
-        { client: queryClient },
-        createElement(
-          NavigationStackProvider,
-          null,
-          createElement(EndpointRenderer, {
-            endpoint,
-            locale,
-            data,
-            logger,
-            user,
-            response: { success: true, data },
-            responseOnly: true,
-            platform: Platform.MCP,
-          }),
-        ),
-      );
+      const component = React.createElement(McpRenderTree, {
+        endpoint,
+        locale,
+        data,
+        logger,
+        user,
+      });
       const componentTime = performance.now() - createStart;
 
       // Use fast renderer for performance

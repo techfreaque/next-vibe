@@ -142,7 +142,7 @@ Format: "As a [user type], I want to [action] so that [benefit]"
       variantName: "skills.productManager.variants.fast" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GEMINI_3_FLASH,
+        manualModelId: ChatModelId.GEMINI_3_5_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

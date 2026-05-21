@@ -155,7 +155,6 @@ export class UserProfileRepository {
     t: MeT,
   ): Promise<ResponseType<MeGetResponseOutput>> {
     try {
-      // Handle public users - return JWT payload only
       if (user.isPublic) {
         logger.debug("Getting public user JWT payload", {
           leadId: user.leadId,

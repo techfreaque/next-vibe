@@ -7,20 +7,24 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+
+const BrowserWidget = lazyWidget(() =>
+  import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -44,13 +48,9 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "hover.form.label",
-    description: "hover.form.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
     usage: { request: "data", response: true },
+    render: BrowserWidget,
     children: {
       uid: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -69,12 +69,10 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "hover.response.success",
         schema: z.boolean().describe("Whether the hover operation succeeded"),
       }),
       result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "hover.response.result",
         schema: z
           .array(
             z.object({
@@ -89,7 +87,6 @@ const { POST } = createEndpoint({
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "hover.response.error",
         schema: z
           .string()
           .optional()
@@ -97,7 +94,6 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "hover.response.executionId",
         schema: z
           .string()
           .optional()

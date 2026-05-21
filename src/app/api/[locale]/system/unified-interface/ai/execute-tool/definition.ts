@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "ai", "execute-tool"],
-  aliases: [EXECUTE_TOOL_ALIAS, "execute", "route-execute", "tool-execute"],
+  aliases: [EXECUTE_TOOL_ALIAS],
   title: "executeTool.post.title" as const,
   description: "executeTool.post.description" as const,
   dynamicTitle: ({ request }) => {
@@ -128,6 +128,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── Response fields ───────────────────────────────────────────────────
+
       result: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,

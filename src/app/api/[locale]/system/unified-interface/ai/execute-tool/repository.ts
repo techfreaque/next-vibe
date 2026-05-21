@@ -1399,7 +1399,7 @@ export class RouteExecuteRepository {
         return result;
       }
 
-      // Wrap target's .data in `result` so MCP/UI renders it
+      // Wrap target's .data in `result` so MCP/UI renders it.
       return success({ result: result.data });
     } catch (error) {
       const msg = parseError(error).message;

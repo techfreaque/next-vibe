@@ -4,7 +4,6 @@
  */
 
 import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
-import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import {
   CORTEX_DELETE_ALIAS,
   CORTEX_EDIT_ALIAS,
@@ -16,12 +15,16 @@ import {
   CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "@/app/api/[locale]/agent/cortex/constants";
-import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import {
+  EXECUTE_TOOL_ALIAS,
+  type CallbackModeValue,
+} from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
-  type UserPermissionRoleValue,
   UserRole,
+  type UserPermissionRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
 /**
@@ -61,7 +64,7 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
     // Task infrastructure - results can't route back to localStorage-only threads
     "coding-agent",
     "ssh-exec",
-    "execute-tool",
+    EXECUTE_TOOL_ALIAS,
     "wait-for-task",
     "complete-task",
     "cron-create",
@@ -81,7 +84,7 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
   [DefaultFolderId.PUBLIC]: [
     "coding-agent",
     "ssh-exec",
-    "execute-tool",
+    EXECUTE_TOOL_ALIAS,
     "wait-for-task",
     "complete-task",
     "cron-create",

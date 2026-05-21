@@ -8,14 +8,14 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
 import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
-import type { MCPContent } from "./types";
+import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { McpResultFormatter } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { MCPContent } from "./types";
 
 import { VIBE_CHECK_TOOL_NAMES } from "@/app/api/[locale]/system/check/vibe-check/constants";
 import { DefaultFolderId } from "../../../agent/chat/config";
@@ -30,6 +30,7 @@ import {
 import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
+import type { WidgetData } from "../shared/types/json";
 import { Platform } from "../shared/types/platform";
 import { formatValidationErrorCompact } from "../shared/utils/format-validation-error";
 import { scopedTranslation as mcpScopedTranslation } from "./i18n";
@@ -262,7 +263,9 @@ export class MCPRegistry {
       });
 
       let result =
-        await RouteExecutionExecutor.executeGenericHandler(executeArgs);
+        await RouteExecutionExecutor.executeGenericHandler<WidgetData>(
+          executeArgs,
+        );
 
       // Bun TDZ race: dynamic imports can throw "Cannot access 'X' before initialization"
       // on first load. Retry once after 10ms to let the module settle.
@@ -277,7 +280,9 @@ export class MCPRegistry {
           setTimeout(resolve, 10);
         });
         result =
-          await RouteExecutionExecutor.executeGenericHandler(executeArgs);
+          await RouteExecutionExecutor.executeGenericHandler<WidgetData>(
+            executeArgs,
+          );
       }
 
       logger.debug("[MCP Registry] Tool execution complete", {
@@ -339,6 +344,7 @@ export class MCPRegistry {
         logger,
         endpoint,
         context.user,
+        context.data,
       );
     } catch (error) {
       const parsedError = parseError(error);
@@ -354,7 +360,9 @@ export class MCPRegistry {
         });
         try {
           const retryResult =
-            await RouteExecutionExecutor.executeGenericHandler(executeArgs);
+            await RouteExecutionExecutor.executeGenericHandler<WidgetData>(
+              executeArgs,
+            );
           return await this.convertToMCPResult(
             retryResult,
             context.toolName,
@@ -362,6 +370,7 @@ export class MCPRegistry {
             logger,
             null,
             context.user,
+            context.data,
           );
         } catch (retryError) {
           const retryParsed = parseError(retryError);
@@ -430,13 +439,14 @@ export class MCPRegistry {
   /**
    * Convert route execution result to MCP format
    */
-  private async convertToMCPResult<TData>(
+  private async convertToMCPResult<TData extends WidgetData>(
     result: ResponseType<TData>,
     toolName: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
     endpoint: CreateApiEndpointAny | null,
     user: JwtPayloadType,
+    requestInput: Record<string, WidgetData>,
   ): Promise<MCPToolCallResult> {
     const { t } = mcpScopedTranslation.scopedT(locale);
 
@@ -494,12 +504,13 @@ export class MCPRegistry {
       }
 
       // Format successful response using endpoint renderer if available
-      const formattedData = McpResultFormatter.formatSuccess(
-        data as Parameters<typeof McpResultFormatter.formatSuccess>[0],
+      const formattedData = await McpResultFormatter.formatSuccess(
+        data,
         endpoint,
         locale,
         logger,
         user,
+        requestInput,
       );
       logger.debug("[MCP Registry] Tool execution successful", {
         toolName,

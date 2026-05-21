@@ -14,17 +14,13 @@ import { cn } from "next-vibe/shared/utils";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import type {
-  JwtPayloadType,
-  JWTPublicPayloadType,
-} from "@/app/api/[locale]/user/auth/types";
+import { executeMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/mutation-executor";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import meEndpoints from "@/app/api/[locale]/user/private/me/definition";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
 import { useLogger } from "@/hooks/use-logger";
 import { useTranslation } from "@/i18n/core/client";
-import type { Countries, Languages } from "@/i18n/core/config";
+import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import { getUniqueLanguages } from "@/i18n/core/language-utils";
 
 interface CountrySelectorProps {
@@ -51,30 +47,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
-
-  // Logger for locale sync mutation
   const logger = useLogger();
-
-  // Mutation to sync locale to DB (users and leads)
-  const localeSyncMutation = useApiMutation(
-    meEndpoints.POST,
-    logger,
-    user ??
-      ({
-        isPublic: true,
-        leadId: "00000000-0000-0000-0000-000000000000",
-        roles: [UserPermissionRole.PUBLIC],
-      } satisfies JWTPublicPayloadType),
-    {},
-  );
-
-  // Sync locale to DB for both logged-in users and leads (fire-and-forget)
-  const syncUserLocale = useCallback(() => {
-    // Submit empty body - the repository picks up locale from URL path
-    localeSyncMutation.mutate({
-      requestData: {} as typeof meEndpoints.POST.types.RequestOutput,
-    });
-  }, [localeSyncMutation]);
 
   // Memoize the tab change handler
   const handleTabChange = useCallback((value: string) => {
@@ -83,24 +56,41 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
     }
   }, []);
 
-  // Memoize the language change handler to prevent infinite loops
-  const handleLanguageChange = useCallback(
-    (langCode: Languages) => {
-      setLanguage(langCode);
-      syncUserLocale();
-      setIsOpen(false);
+  const syncLocale = useCallback(
+    (newLocale: CountryLanguage) => {
+      // Fire-and-forget: sync the new locale to the backend via POST /me.
+      // Non-fatal - locale will re-sync on next explicit profile update.
+      void executeMutation({
+        endpoint: meEndpoints.POST,
+        logger,
+        requestData: {},
+        pathParams: undefined,
+        locale: newLocale,
+        user,
+      }).catch(() => undefined);
     },
-    [setLanguage, syncUserLocale],
+    [user, logger],
   );
 
-  // Memoize the country change handler
-  const handleCountryChange = useCallback(
-    (countryCode: Countries) => {
-      changeLocale(countryCode);
-      syncUserLocale();
+  const handleLanguageChange = useCallback(
+    (langCode: Languages) => {
+      const newLocale: CountryLanguage = `${langCode}-${country}`;
+      syncLocale(newLocale);
+      setLanguage(langCode);
       setIsOpen(false);
     },
-    [changeLocale, syncUserLocale],
+    [setLanguage, syncLocale, country],
+  );
+
+  const handleCountryChange = useCallback(
+    (countryCode: Countries) => {
+      const countryItem = countries.find((c) => c.code === countryCode);
+      const newLocale: CountryLanguage = `${countryItem?.language ?? language}-${countryCode}`;
+      syncLocale(newLocale);
+      changeLocale(countryCode);
+      setIsOpen(false);
+    },
+    [changeLocale, syncLocale, countries, language],
   );
 
   const currentLanguageFlag = countries.find(

@@ -22,6 +22,7 @@ import type {
 } from "../../widgets/_shared/types";
 import {
   useWidgetForm,
+  useWidgetResponseOnly,
   useWidgetUser,
 } from "../../widgets/_shared/use-widget-context";
 import {
@@ -173,6 +174,7 @@ export function ObjectChildrenRenderer<
 }: ObjectChildrenRendererProps<TKey, TUsage, TChildren>): JSX.Element {
   const form = useWidgetForm();
   const user = useWidgetUser();
+  const responseOnly = useWidgetResponseOnly();
 
   // Check if any child has a hidden function (request fields need form data)
   const hasRequestFields =
@@ -181,19 +183,36 @@ export function ObjectChildrenRenderer<
       (field) => field && "usage" in field && field.usage?.request,
     );
 
-  // Watch entire form root to get all form data
+  // Watch entire form root to get all form data.
+  // Disabled in responseOnly mode: the value prop already has all response data,
+  // and form state does not track response fields (they aren't in requestSchema).
   const formDataRoot = useWatch({
     control: form.control,
-    disabled: !form || !hasRequestFields,
+    disabled: !form || !hasRequestFields || responseOnly,
   });
 
-  // Merge form data with response data
-  const mergedValue = useMemo(() => {
+  // Merge form data with response data.
+  // Form data takes precedence for request fields, but undefined form values
+  // must NOT overwrite defined response values (response fields are not in
+  // the request schema so useWatch returns undefined for them).
+  const mergedValue = useMemo(():
+    | Record<string, WidgetData>
+    | null
+    | undefined => {
     if (!formDataRoot) {
-      return value;
+      return value as Record<string, WidgetData> | null | undefined;
     }
-    // Deep merge: form data takes precedence over response data
-    return { ...value, ...formDataRoot };
+    const merged: Record<string, WidgetData> = {
+      ...(value as Record<string, WidgetData>),
+    };
+    for (const [k, v] of Object.entries(
+      formDataRoot as Record<string, WidgetData>,
+    )) {
+      if (v !== undefined) {
+        merged[k] = v;
+      }
+    }
+    return merged;
   }, [formDataRoot, value]);
 
   const processed = useMemo(() => {

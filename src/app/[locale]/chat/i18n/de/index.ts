@@ -1294,6 +1294,8 @@ export const translations: typeof enTranslations = {
         "Claude Sonnet 4.6 - Anthropics leistungsfähigstes Sonnet-Modell mit Frontier-Leistung in Coding, Agenten und professioneller Arbeit",
       gemini3Pro:
         "Google Gemini 3 Pro - Fortschrittliches multimodales KI-Modell mit großem Kontextfenster und leistungsstarken Reasoning-Fähigkeiten",
+      gemini35Flash:
+        "Gemini 3.5 Flash - Pro-nahe Coding- und Reasoning-Leistung zum Flash-Preis. Text, Bild, Video, Audio und PDF. Parallele Agentenausführung integriert. Denktiefe von minimal bis hoch für präzise Kosten-/Leistungssteuerung.",
       gemini3Flash:
         "Google Gemini 3 Flash - Schnelles, effizientes multimodales KI-Modell für schnelle Antworten",
       deepseekV32:

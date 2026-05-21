@@ -129,8 +129,9 @@ export function useAIStream(): UseAIStreamReturn {
       }
 
       if (!result.success) {
+        const resultMessage = result.message;
         logger.error("Stream request failed", {
-          message: result.message,
+          message: resultMessage,
         });
 
         const activeThreadId = data.threadId;
@@ -148,7 +149,7 @@ export function useAIStream(): UseAIStreamReturn {
 
         toast({
           title: t("error.title"),
-          description: result.message,
+          description: resultMessage,
           variant: "destructive",
           duration: Infinity,
         });

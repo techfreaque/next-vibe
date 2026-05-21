@@ -53,6 +53,11 @@ export class SpeechToTextRepository {
   private static readonly MAX_POLLING_ATTEMPTS = 30;
   private static readonly POLLING_INTERVAL_MS = 1000;
 
+  /** Timeout for a single external fetch (ms) */
+  private static readonly FETCH_TIMEOUT_MS = 120_000;
+  /** Timeout for each Eden AI poll fetch (ms) */
+  private static readonly POLL_FETCH_TIMEOUT_MS = 15_000;
+
   /** Max parallel transcription requests per user request */
   private static readonly CHUNK_CONCURRENCY = 4;
 
@@ -75,11 +80,10 @@ export class SpeechToTextRepository {
   > {
     if (!modelOption) {
       return fail({
-        message: t("post.errors.transcriptionFailed"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: {
+        message: t("post.errors.transcriptionFailed", {
           error: "No STT provider available",
-        },
+        }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
 
@@ -114,7 +118,9 @@ export class SpeechToTextRepository {
           sttModelId: modelOption.id,
         });
         return fail({
-          message: t("post.errors.transcriptionFailed"),
+          message: t("post.errors.transcriptionFailed", {
+            error: `Unsupported provider: ${modelOption.apiProvider}`,
+          }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
     }
@@ -148,12 +154,11 @@ export class SpeechToTextRepository {
         sttModelId: sttModelId ?? DEFAULT_STT_MODEL_ID,
       });
       return fail({
-        message: t("post.errors.transcriptionFailed"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: {
+        message: t("post.errors.transcriptionFailed", {
           error:
             "No speech-to-text provider is configured. Add OPENAI_API_KEY, EDEN_AI_API_KEY, DEEPGRAM_API_KEY, or UNBOTTLED_CLOUD_CREDENTIALS.",
-        },
+        }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
 
@@ -192,12 +197,11 @@ export class SpeechToTextRepository {
         minimum: STT_MINIMUM_BALANCE,
       });
       return fail({
-        message: t("post.errors.insufficientCredits"),
-        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
-        messageParams: {
+        message: t("post.errors.insufficientCredits", {
           balance: balanceResult.data.total.toString(),
           minimum: STT_MINIMUM_BALANCE.toString(),
-        },
+        }),
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });
     }
 
@@ -334,7 +338,9 @@ export class SpeechToTextRepository {
           duration,
         });
         return fail({
-          message: t("post.errors.creditsFailed"),
+          message: t("post.errors.creditsFailed", {
+            error: deductResult.message,
+          }),
           errorType: ErrorResponseTypes.PAYMENT_ERROR,
         });
       }
@@ -364,11 +370,8 @@ export class SpeechToTextRepository {
       });
 
       return fail({
-        message: t("post.errors.transcriptionFailed"),
+        message: t("post.errors.transcriptionFailed", { error: errorMessage }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: {
-          error: errorMessage,
-        },
       });
     }
   }
@@ -394,11 +397,10 @@ export class SpeechToTextRepository {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiImages;
       logger.error("[STT] OpenAI API key not configured");
       return fail({
-        message: t("post.errors.transcriptionFailed"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: {
+        message: t("post.errors.transcriptionFailed", {
           error: `${label} key (${envKey}) not configured. Get yours at ${url}`,
-        },
+        }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
 
@@ -423,6 +425,7 @@ export class SpeechToTextRepository {
           Authorization: `Bearer ${agentEnv.OPENAI_API_KEY}`,
         },
         body: formData,
+        signal: AbortSignal.timeout(SpeechToTextRepository.FETCH_TIMEOUT_MS),
       },
     );
 
@@ -433,9 +436,8 @@ export class SpeechToTextRepository {
         error: errorText,
       });
       return fail({
-        message: t("post.errors.transcriptionFailed"),
+        message: t("post.errors.transcriptionFailed", { error: errorText }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: errorText },
       });
     }
 
@@ -488,11 +490,33 @@ export class SpeechToTextRepository {
       });
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    // Reject files too small to contain real audio (just container headers, no audio clusters).
+    // Browser MediaRecorder fragments under ~5KB are initialization segments only.
+    if (file.size < 5000) {
+      logger.error("[STT] File too small to contain audio", {
+        fileSize: file.size,
+        fileName: file.name,
+      });
+      return fail({
+        message: t("post.errors.audioTooShort"),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    // Browsers report WebM audio as "video/webm" (codecs param stripped by Bun/Chrome).
+    // Eden AI rejects video/* MIME types - remap to the audio equivalent.
+    const mimeType =
+      file.type === "video/webm"
+        ? "audio/webm"
+        : file.type === "video/ogg"
+          ? "audio/ogg"
+          : file.type;
 
     const formData = new FormData();
-    const blob = new Blob([buffer], { type: file.type });
+    const blob =
+      mimeType === file.type
+        ? file
+        : new Blob([await file.arrayBuffer()], { type: mimeType });
     formData.append("file", blob, file.name);
     formData.append("providers", providerModel);
     formData.append("language", language);
@@ -501,6 +525,9 @@ export class SpeechToTextRepository {
       provider: providerModel,
       language,
       fileSize: file.size,
+      fileType: file.type,
+      mimeType,
+      fileName: file.name,
     });
 
     const response = await fetch(
@@ -512,6 +539,7 @@ export class SpeechToTextRepository {
           Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
         },
         body: formData,
+        signal: AbortSignal.timeout(SpeechToTextRepository.FETCH_TIMEOUT_MS),
       },
     );
 
@@ -524,9 +552,8 @@ export class SpeechToTextRepository {
         language,
       });
       return fail({
-        message: t("post.errors.transcriptionFailed"),
+        message: t("post.errors.transcriptionFailed", { error: errorText }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: errorText },
       });
     }
 
@@ -571,12 +598,11 @@ export class SpeechToTextRepository {
     if (!agentEnv.DEEPGRAM_API_KEY) {
       logger.error("[STT] Deepgram API key not configured");
       return fail({
-        message: t("post.errors.transcriptionFailed"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: {
+        message: t("post.errors.transcriptionFailed", {
           error:
             "DEEPGRAM_API_KEY not configured. Get yours at https://console.deepgram.com",
-        },
+        }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
 
@@ -600,6 +626,7 @@ export class SpeechToTextRepository {
         "Content-Type": file.type || "audio/mpeg",
       },
       body: arrayBuffer,
+      signal: AbortSignal.timeout(SpeechToTextRepository.FETCH_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -609,9 +636,8 @@ export class SpeechToTextRepository {
         error: errorText,
       });
       return fail({
-        message: t("post.errors.transcriptionFailed"),
+        message: t("post.errors.transcriptionFailed", { error: errorText }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: errorText },
       });
     }
 
@@ -668,6 +694,9 @@ export class SpeechToTextRepository {
               // eslint-disable-next-line i18next/no-literal-string
               Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
             },
+            signal: AbortSignal.timeout(
+              SpeechToTextRepository.POLL_FETCH_TIMEOUT_MS,
+            ),
           },
         );
 
@@ -716,11 +745,10 @@ export class SpeechToTextRepository {
               availableProviders: Object.keys(resultData.results || {}),
             });
             return fail({
-              message: t("post.errors.transcriptionFailed"),
-              errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-              messageParams: {
+              message: t("post.errors.transcriptionFailed", {
                 error: `Provider ${provider} not found in results`,
-              },
+              }),
+              errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
             });
           }
 
@@ -789,9 +817,10 @@ export class SpeechToTextRepository {
           attempts,
         });
         return fail({
-          message: t("post.errors.transcriptionFailed"),
+          message: t("post.errors.transcriptionFailed", {
+            error: errorMessage,
+          }),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { error: errorMessage },
         });
       }
     }

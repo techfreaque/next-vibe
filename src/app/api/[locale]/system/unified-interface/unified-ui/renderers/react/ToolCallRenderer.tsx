@@ -55,6 +55,7 @@ import {
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { EXECUTE_TOOL_ALIAS } from "../../../ai/execute-tool/constants";
 import { NavigationStackProvider } from "../../../react/hooks/use-navigation-stack";
 import {
   type ReactTranslationKey,
@@ -348,7 +349,7 @@ export function ToolCallRenderer({
 
   // When the outer tool is execute-tool, load the inner tool's definition for its display title
   const innerToolArgs =
-    definition?.aliases?.includes("execute-tool") &&
+    definition?.aliases?.includes(EXECUTE_TOOL_ALIAS) &&
     toolCall.args &&
     typeof toolCall.args === "object" &&
     !Array.isArray(toolCall.args)

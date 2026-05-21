@@ -7,21 +7,22 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { parseError } from "next-vibe/shared/utils";
-import React, { createElement } from "react";
+import React from "react";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
-import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import { EXECUTE_TOOL_ALIAS } from "../../../../ai/execute-tool/constants";
 import type { RouteExecutionResult } from "../../../../cli/runtime/route-executor";
 import type { EndpointLogger } from "../../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
-import { Platform } from "../../../../shared/types/platform";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { CliErrorFormatter } from "./error-formatter";
 import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
+import { CliRenderTree } from "./render-tree";
 
 /**
  * Save image blocks from a ContentResponse to .tmp/screenshots/ and replace
@@ -97,7 +98,7 @@ async function prewarmLazy(render: ReactLazyRef): Promise<void> {
   }
 }
 
-async function prewarmLazyWidgets(
+export async function prewarmLazyWidgets(
   endpoint: CreateApiEndpointAny,
 ): Promise<void> {
   const fields = endpoint.fields;
@@ -132,6 +133,7 @@ export class CliResultFormatter {
     logger: EndpointLogger,
     endpoint: CreateApiEndpointAny | null,
     user: JwtPayloadType,
+    requestInput?: Record<string, WidgetData>,
   ): Promise<{ output: string; renderMs: number }> {
     if (!result.success) {
       return {
@@ -172,12 +174,42 @@ export class CliResultFormatter {
           output += JSON.stringify(result.data, null, 2);
           break;
         case "pretty":
-        default:
+        default: {
+          // execute-tool response: render the inner endpoint's widget directly.
+          // Detect by endpoint alias + { result } wrapper in response data.
+          // Use requestInput.toolName (passed by the CLI executor) to resolve the inner endpoint.
+          let renderEndpoint = endpoint;
+          let renderData: WidgetData = result.data;
+          const isExecuteTool =
+            endpoint?.aliases?.includes(EXECUTE_TOOL_ALIAS) ?? false;
+          const rawInnerToolName =
+            isExecuteTool && requestInput
+              ? requestInput["toolName"]
+              : undefined;
+          const innerToolName =
+            typeof rawInnerToolName === "string" ? rawInnerToolName : undefined;
+          if (
+            isExecuteTool &&
+            innerToolName &&
+            typeof result.data === "object" &&
+            result.data !== null &&
+            !Array.isArray(result.data) &&
+            !(result.data instanceof Date) &&
+            "result" in result.data
+          ) {
+            const canonicalId = getFullPath(innerToolName) ?? innerToolName;
+            const innerEndpoint = await getEndpoint(canonicalId);
+            if (innerEndpoint) {
+              renderEndpoint = innerEndpoint;
+              renderData = result.data["result"];
+            }
+          }
+
           // Render with Ink if endpoint available, else JSON fallback
-          if (endpoint) {
+          if (renderEndpoint) {
             output += await CliResultFormatter.renderWithEndpoint(
-              result.data,
-              endpoint,
+              renderData,
+              renderEndpoint,
               locale,
               logger,
               user,
@@ -191,6 +223,7 @@ export class CliResultFormatter {
             }
           }
           break;
+        }
       }
     }
 
@@ -219,20 +252,13 @@ export class CliResultFormatter {
 
       // Create component
       const createStart = performance.now();
-      const component = createElement(
-        NavigationStackProvider,
-        null,
-        createElement(EndpointRenderer, {
-          endpoint,
-          locale,
-          data: processedData,
-          logger,
-          user,
-          response: { success: true, data: processedData },
-          responseOnly: true,
-          platform: Platform.CLI,
-        }),
-      );
+      const component = React.createElement(CliRenderTree, {
+        endpoint,
+        locale,
+        data: processedData,
+        logger,
+        user,
+      });
       const componentTime = performance.now() - createStart;
 
       // Use fast renderer (supports hooks via renderToStaticMarkup internally for function components)

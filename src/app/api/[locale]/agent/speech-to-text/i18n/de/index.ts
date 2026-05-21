@@ -192,6 +192,8 @@ export const translations: typeof enTranslations = {
       },
       apiKeyMissing: "Eden AI API-Schlüssel ist nicht konfiguriert",
       transcriptionFailed: "Transkription fehlgeschlagen: {{error}}",
+      audioTooShort:
+        "Aufnahme zu kurz. Halte die Taste länger gedrückt und sprich deutlich.",
       noAudioFile: "Keine Audiodatei bereitgestellt",
       internalError: "Interner Serverfehler",
       noPublicId: "Keine öffentliche ID erhalten",

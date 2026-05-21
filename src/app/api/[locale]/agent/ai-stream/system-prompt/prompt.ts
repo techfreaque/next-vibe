@@ -264,15 +264,18 @@ export const toolExecutionControlFragment: SystemPromptFragment<PromptContextDat
     priority: 70,
     build: () => `## Tool Execution Control
 
-Every tool accepts an optional \`callbackMode\` parameter:
+Every tool accepts an optional \`callbackMode\` parameter. **Default: omit it entirely.** Omitting means synchronous execution - result returned immediately, loop continues, you call more tools normally.
 
-- **\`"detach"\`** - Fire and forget. Returns \`{taskId}\` immediately. Tool runs in background. Use \`wait-for-task\` with that taskId later if you need the result.
-- **\`"wakeUp"\`** - Fire and forget. Returns \`{taskId}\` immediately. The result is automatically injected into this thread when ready - the stream revives and you will see the tool result as a new message. You can call wait-for-task for wakeUp optionally.
-- **\`"endLoop"\`** - Execute normally, return result, but stop the tool loop. No more tool calls this turn.
-- **\`"approve"\`** - Require user confirmation before executing.
-- Omit for default synchronous execution.
+**Only use callbackMode when you have a specific reason - most tool calls should omit it:**
+- **\`"detach"\`** - Fire and forget for long-running tasks you don't need to wait for. Returns \`{taskId}\`. Use \`wait-for-task\` if you need the result later.
+- **\`"wakeUp"\`** - Fire and forget for long-running tasks. Result auto-injected when ready, revives the thread. Do NOT call \`wait-for-task\`.
+- **\`"wait"\`** - Block until a remote task completes.
+- **\`"endLoop"\`** - End the ENTIRE turn after this batch. Use ONLY when completely done - no more tools will run after this.
+- **\`"approve"\`** - Pause for user confirmation before executing.
 
-**\`wait-for-task\`** - Call with a taskId from a detached or wakeup tool. Stops the stream and blocks until the task completes. The stream resumes automatically with the result - zero extra messages. Never pass callbackMode on wait-for-task.`,
+**Rule: if a tool returns its result in under 10 seconds (discovery, search, lookup, schema fetch), omit callbackMode. Async modes are for genuinely long-running operations (minutes, not seconds).**
+
+**\`wait-for-task\`** - Blocks until a detach/wakeUp task completes. Never pass callbackMode on it.`,
   };
 
 export const formattingFragment: SystemPromptFragment<PromptContextData> = {

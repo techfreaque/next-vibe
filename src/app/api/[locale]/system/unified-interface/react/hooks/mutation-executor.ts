@@ -72,8 +72,12 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
 }: {
   endpoint: TEndpoint;
   logger: EndpointLogger;
-  requestData: TEndpoint["types"]["RequestOutput"];
-  pathParams: TEndpoint["types"]["UrlVariablesOutput"];
+  requestData: TEndpoint["types"]["RequestOutput"] extends never
+    ? undefined
+    : TEndpoint["types"]["RequestOutput"];
+  pathParams: TEndpoint["types"]["UrlVariablesOutput"] extends never
+    ? undefined
+    : TEndpoint["types"]["UrlVariablesOutput"];
   locale: CountryLanguage;
   user: JwtPayloadType;
   options?: MutationExecutorOptions<

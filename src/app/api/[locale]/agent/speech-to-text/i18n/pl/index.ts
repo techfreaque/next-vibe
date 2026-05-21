@@ -191,6 +191,8 @@ export const translations: typeof enTranslations = {
       },
       apiKeyMissing: "Klucz API Eden AI nie jest skonfigurowany",
       transcriptionFailed: "Transkrypcja nie powiodła się: {{error}}",
+      audioTooShort:
+        "Nagranie zbyt krótkie. Przytrzymaj przycisk dłużej i mów wyraźnie.",
       noAudioFile: "Nie podano pliku audio",
       internalError: "Wewnętrzny błąd serwera",
       noPublicId: "Nie otrzymano publicznego ID",
