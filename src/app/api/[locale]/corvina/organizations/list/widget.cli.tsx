@@ -66,11 +66,10 @@ export function OrgListContainer({ field }: CliWidgetProps): JSX.Element {
           const statusColor =
             org.status === CorvinaOrgStatus.DONE
               ? "green"
-              : org.status === CorvinaOrgStatus.PENDING
+              : org.status === CorvinaOrgStatus.PROVISIONING ||
+                  org.status === CorvinaOrgStatus.DELETING
                 ? "yellow"
-                : org.status === CorvinaOrgStatus.FAILED
-                  ? "red"
-                  : undefined;
+                : undefined;
           return (
             <Box key={org.id} gap={2} marginBottom={0}>
               <Text dimColor>#{org.id}</Text>

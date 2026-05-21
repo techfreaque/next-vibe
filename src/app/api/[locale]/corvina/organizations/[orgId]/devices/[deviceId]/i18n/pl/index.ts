@@ -18,6 +18,7 @@ export const translations = {
       label: "Etykieta",
       hwId: "ID sprzętowe",
       orgResourceId: "ID zasobu org",
+      groups: "Grupy",
     },
     widget: {
       edit: "Edytuj",

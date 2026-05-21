@@ -15,6 +15,7 @@ export const translations = {
       label: "Label",
       hwId: "Hardware ID",
       orgResourceId: "Org Resource ID",
+      groups: "Groups",
     },
     widget: {
       edit: "Edit",

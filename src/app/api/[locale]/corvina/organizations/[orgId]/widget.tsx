@@ -30,10 +30,10 @@ type Org = CorvinaOrganizationGetResponseOutput;
 
 const STATUS_COLORS: Record<typeof CorvinaOrgStatusValue, string> = {
   [CorvinaOrgStatus.DONE]: "bg-success/10 text-success",
-  [CorvinaOrgStatus.PENDING]: "bg-warning/10 text-warning",
-  [CorvinaOrgStatus.FAILED]: "bg-destructive/10 text-destructive",
-  [CorvinaOrgStatus.DISABLED]:
-    "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
+  [CorvinaOrgStatus.NEW]: "bg-muted text-muted-foreground",
+  [CorvinaOrgStatus.PROVISIONING]: "bg-warning/10 text-warning",
+  [CorvinaOrgStatus.DELETING]: "bg-warning/10 text-warning",
+  [CorvinaOrgStatus.DELETED]: "bg-muted text-muted-foreground",
 };
 
 function Badge({

@@ -57,6 +57,7 @@ export const translations = {
         description: "Wystąpił nieznany błąd.",
       },
     },
+    response: { message: "Wynik" },
     success: {
       title: "Usunięto",
       description: "Urządzenie zostało pomyślnie usunięte.",

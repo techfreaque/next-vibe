@@ -57,6 +57,7 @@ export class CorvinaDeviceByIdRepository {
       label: d.label,
       hwId: d.hwId,
       orgResourceId: d.orgResourceId ?? null,
+      groups: d.groups ?? [],
     });
   }
 
@@ -100,6 +101,7 @@ export class CorvinaDeviceByIdRepository {
       label: d.label,
       hwId: d.hwId,
       orgResourceId: d.orgResourceId ?? null,
+      groups: d.groups ?? [],
     });
   }
 }

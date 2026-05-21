@@ -4,6 +4,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   customWidgetObject,
   requestUrlPathParamsField,
+  responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import {
@@ -58,6 +59,10 @@ const { DELETE } = createEndpoint({
         description: "delete.deviceId.description" as const,
         schema: z.coerce.number(),
       }),
+      message: responseField(scopedTranslation, {
+        type: WidgetType.ALERT,
+        schema: z.string(),
+      }),
     },
   }),
 
@@ -107,11 +112,14 @@ const { DELETE } = createEndpoint({
 
   examples: {
     urlPathParams: { default: { orgId: 45511, deviceId: 1001 } },
+    responses: { default: { message: "Device deleted." } },
   },
 });
 
 export type CorvinaDeviceDeleteUrlVariablesOutput =
   typeof DELETE.types.UrlVariablesOutput;
+export type CorvinaDeviceDeleteResponseOutput =
+  typeof DELETE.types.ResponseOutput;
 
 const definitions = { DELETE } as const;
 export default definitions;

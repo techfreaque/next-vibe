@@ -53,11 +53,10 @@ export function OrgDetailContainer({ field }: CliWidgetProps): JSX.Element {
   const statusColor =
     org.status === CorvinaOrgStatus.DONE
       ? "green"
-      : org.status === CorvinaOrgStatus.PENDING
+      : org.status === CorvinaOrgStatus.PROVISIONING ||
+          org.status === CorvinaOrgStatus.DELETING
         ? "yellow"
-        : org.status === CorvinaOrgStatus.FAILED
-          ? "red"
-          : undefined;
+        : undefined;
 
   return (
     <Box flexDirection="column" marginTop={1}>

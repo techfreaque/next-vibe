@@ -14,6 +14,7 @@ export const translations = {
         label: "Bezeichnung",
         hwId: "Hardware-ID",
         orgResourceId: "Org-Ressourcen-ID",
+        groups: "Gruppen",
       },
       total: "Gesamt",
     },

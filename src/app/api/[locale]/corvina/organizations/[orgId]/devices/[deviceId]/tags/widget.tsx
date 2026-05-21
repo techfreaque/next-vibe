@@ -31,9 +31,11 @@ type DeviceTag = CorvinaDeviceTagsResponseOutput["tags"][number];
 
 function TagRow({
   tag,
+  t,
   onEdit,
 }: {
   tag: DeviceTag;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
   onEdit: (tag: DeviceTag) => void;
 }): React.JSX.Element {
   const ts =
@@ -51,7 +53,7 @@ function TagRow({
           <Span className="text-sm font-medium font-mono">
             {tag.latestValue ?? (
               <Span className="text-muted-foreground italic text-xs">
-                no data
+                {t("get.widget.noData")}
               </Span>
             )}
           </Span>
@@ -135,7 +137,7 @@ export function DeviceTagsContainer(): React.JSX.Element {
           </Div>
         ) : (
           tags.map((tag) => (
-            <TagRow key={tag.modelPath} tag={tag} onEdit={handleEdit} />
+            <TagRow key={tag.modelPath} tag={tag} t={t} onEdit={handleEdit} />
           ))
         )}
       </Div>

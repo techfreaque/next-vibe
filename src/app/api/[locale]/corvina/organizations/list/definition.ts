@@ -84,6 +84,64 @@ const { GET } = createEndpoint({
               content: "get.response.organizations.vpnEnabled" as const,
               schema: z.boolean(),
             }),
+            privateAccess: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content: "get.response.organizations.privateAccess" as const,
+              schema: z.boolean(),
+            }),
+            allowDisablePrivateAccess: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content:
+                "get.response.organizations.allowDisablePrivateAccess" as const,
+              schema: z.boolean(),
+            }),
+            hostname: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.organizations.hostname" as const,
+              schema: z.string().nullable(),
+            }),
+            hostnameAllowed: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content: "get.response.organizations.hostnameAllowed" as const,
+              schema: z.boolean(),
+            }),
+            vpnPairingMode: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.organizations.vpnPairingMode" as const,
+              schema: z.string().nullable(),
+            }),
+            vpnOtpRequired: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content: "get.response.organizations.vpnOtpRequired" as const,
+              schema: z.boolean(),
+            }),
+            ipAddressesWhitelist: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.organizations.ipAddressesWhitelist" as const,
+              schema: z.array(z.string()),
+            }),
+            userCanAccess: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content: "get.response.organizations.userCanAccess" as const,
+              schema: z.boolean(),
+            }),
+            storeEnabled: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content: "get.response.organizations.storeEnabled" as const,
+              schema: z.boolean(),
+            }),
+            dataTemporarilyDisabled: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content:
+                "get.response.organizations.dataTemporarilyDisabled" as const,
+              schema: z.boolean(),
+            }),
+            mfaRequired: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content: "get.response.organizations.mfaRequired" as const,
+              schema: z.boolean(),
+            }),
           },
         }),
       }),
@@ -151,6 +209,17 @@ const { GET } = createEndpoint({
             resourceId: "exorde.connex.connectika",
             dataEnabled: true,
             vpnEnabled: true,
+            privateAccess: false,
+            allowDisablePrivateAccess: false,
+            hostname: null,
+            hostnameAllowed: false,
+            vpnPairingMode: null,
+            vpnOtpRequired: false,
+            ipAddressesWhitelist: [],
+            userCanAccess: true,
+            storeEnabled: false,
+            dataTemporarilyDisabled: false,
+            mfaRequired: false,
           },
         ],
         total: 1,

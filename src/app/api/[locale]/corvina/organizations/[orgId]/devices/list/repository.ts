@@ -52,6 +52,7 @@ export class CorvinaDevicesListRepository {
         label: d.label,
         hwId: d.hwId,
         orgResourceId: d.orgResourceId ?? null,
+        groups: d.groups ?? [],
       })),
       total: result.data.totalElements,
     });

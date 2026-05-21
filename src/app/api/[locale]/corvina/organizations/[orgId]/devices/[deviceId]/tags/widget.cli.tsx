@@ -43,10 +43,13 @@ export function DeviceTagsContainer({
     const lines = [`Tags (${total}):`];
     for (const tag of tags) {
       const ts =
-        tag.latestTimestamp != null
+        tag.latestTimestamp !== null && tag.latestTimestamp !== undefined
           ? new Date(tag.latestTimestamp).toISOString()
           : null;
-      const valuePart = tag.latestValue != null ? ` = ${tag.latestValue}` : "";
+      const valuePart =
+        tag.latestValue !== null && tag.latestValue !== undefined
+          ? ` = ${tag.latestValue}`
+          : "";
       const tsPart = ts ? ` [${ts}]` : "";
       lines.push(`  ${tag.modelPath}${valuePart}${tsPart}`);
     }
@@ -71,7 +74,7 @@ export function DeviceTagsContainer({
       ) : (
         tags.map((tag) => {
           const ts =
-            tag.latestTimestamp != null
+            tag.latestTimestamp !== null && tag.latestTimestamp !== undefined
               ? new Date(tag.latestTimestamp).toLocaleString()
               : null;
           return (
@@ -80,7 +83,7 @@ export function DeviceTagsContainer({
                 <Text bold color="cyan">
                   {tag.modelPath}
                 </Text>
-                {tag.latestValue != null ? (
+                {tag.latestValue !== null && tag.latestValue !== undefined ? (
                   <Text>
                     {chalk.dim("=")} {tag.latestValue}
                   </Text>
@@ -104,6 +107,7 @@ export function TagUpdateContainer({
 }: UpdateCliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
+  const t = useWidgetTranslation<typeof endpoints.POST>();
   const isMcp = platform === Platform.MCP;
   const value = field.value;
 
@@ -114,7 +118,7 @@ export function TagUpdateContainer({
   if (isMcp) {
     return (
       <Box>
-        <Text>Tag value updated successfully.</Text>
+        <Text>{t("post.widget.successDescription")}</Text>
       </Box>
     );
   }
@@ -122,7 +126,7 @@ export function TagUpdateContainer({
   return (
     <Box flexDirection="column" marginTop={1}>
       <Text bold color="green">
-        ✓ Tag value written
+        {t("post.widget.successTitle")}
       </Text>
     </Box>
   );

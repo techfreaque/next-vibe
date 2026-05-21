@@ -51,6 +51,7 @@ export const translations = {
         description: "An unknown error occurred.",
       },
     },
+    response: { message: "Result" },
     success: { title: "Deleted", description: "Device removed successfully." },
   },
 };

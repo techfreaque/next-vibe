@@ -35,6 +35,17 @@ interface CorvinaOrgListItem {
   resourceId: string;
   dataEnabled: boolean;
   vpnEnabled: boolean;
+  privateAccess?: boolean;
+  allowDisablePrivateAccess?: boolean;
+  hostname?: string | null;
+  hostnameAllowed?: boolean;
+  vpnPairingMode?: string | null;
+  vpnOtpRequired?: boolean;
+  ipAddressesWhitelist?: string[];
+  userCanAccess?: boolean;
+  storeEnabled?: boolean;
+  dataTemporarilyDisabled?: boolean;
+  mfaRequired?: boolean;
 }
 
 interface CorvinaOrgsPageResponse {
@@ -53,8 +64,8 @@ export class CorvinaOrganizationsListRepository {
         method: "GET",
         path,
         query: {
-          includePrivateAccess: false,
-          onlyFirstLevel: false,
+          includePrivateAccess: "false",
+          onlyFirstLevel: "false",
           page: 0,
           pageSize: 10,
           orderBy: "id",
@@ -76,6 +87,17 @@ export class CorvinaOrganizationsListRepository {
         resourceId: org.resourceId,
         dataEnabled: org.dataEnabled,
         vpnEnabled: org.vpnEnabled,
+        privateAccess: org.privateAccess ?? false,
+        allowDisablePrivateAccess: org.allowDisablePrivateAccess ?? false,
+        hostname: org.hostname ?? null,
+        hostnameAllowed: org.hostnameAllowed ?? false,
+        vpnPairingMode: org.vpnPairingMode ?? null,
+        vpnOtpRequired: org.vpnOtpRequired ?? false,
+        ipAddressesWhitelist: org.ipAddressesWhitelist ?? [],
+        userCanAccess: org.userCanAccess ?? false,
+        storeEnabled: org.storeEnabled ?? false,
+        dataTemporarilyDisabled: org.dataTemporarilyDisabled ?? false,
+        mfaRequired: org.mfaRequired ?? false,
       })),
       total: result.data.totalElements,
     });

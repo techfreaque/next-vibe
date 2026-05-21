@@ -4,6 +4,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   customWidgetObject,
   requestField,
+  requestResponseField,
   requestUrlPathParamsResponseField,
   responseField,
   submitButton,
@@ -73,6 +74,11 @@ const { GET } = createEndpoint({
         content: "get.response.orgResourceId" as const,
         schema: z.string().nullable(),
       }),
+      groups: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.groups" as const,
+        schema: z.array(z.string()),
+      }),
     },
   }),
 
@@ -129,6 +135,7 @@ const { GET } = createEndpoint({
         label: "Device 001",
         hwId: "DEADBEEF",
         orgResourceId: "exorde.connex.connectika",
+        groups: [],
       },
     },
   },
@@ -165,7 +172,7 @@ const { PATCH } = createEndpoint({
         description: "patch.deviceId.description" as const,
         schema: z.coerce.number(),
       }),
-      label: requestField(scopedTranslation, {
+      label: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.label.label" as const,
@@ -201,6 +208,11 @@ const { PATCH } = createEndpoint({
         type: WidgetType.TEXT,
         content: "get.response.orgResourceId" as const,
         schema: z.string().nullable(),
+      }),
+      groups: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.groups" as const,
+        schema: z.array(z.string()),
       }),
       submitButton: submitButton(scopedTranslation, {
         label: "patch.submitButton.label" as const,
@@ -273,6 +285,7 @@ const { PATCH } = createEndpoint({
         label: "Device 001",
         hwId: "DEADBEEF",
         orgResourceId: "exorde.connex.connectika",
+        groups: [],
       },
     },
   },

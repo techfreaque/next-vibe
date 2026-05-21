@@ -57,6 +57,7 @@ export const translations = {
         description: "Ein unbekannter Fehler ist aufgetreten.",
       },
     },
+    response: { message: "Ergebnis" },
     success: { title: "Gelöscht", description: "Gerät erfolgreich entfernt." },
   },
 };

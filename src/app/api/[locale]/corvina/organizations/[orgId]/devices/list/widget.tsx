@@ -24,11 +24,9 @@ type Device = CorvinaDevicesListResponseOutput["devices"][number];
 
 function DeviceRow({
   device,
-  t,
   onClick,
 }: {
   device: Device;
-  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
   onClick: (device: Device) => void;
 }): React.JSX.Element {
   return (
@@ -125,7 +123,6 @@ export function DeviceListContainer(): React.JSX.Element {
             <DeviceRow
               key={device.id}
               device={device}
-              t={t}
               onClick={handleDeviceClick}
             />
           ))
