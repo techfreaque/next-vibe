@@ -48,7 +48,7 @@ const { DELETE } = createEndpoint({
   description: "delete.description" as const,
   icon: "trash",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaLicenses",
   tags: ["tags.corvina" as const, "tags.licenses" as const],
   aliases: ["corvina_licenses_trial_delete"],
   fields: customWidgetObject({

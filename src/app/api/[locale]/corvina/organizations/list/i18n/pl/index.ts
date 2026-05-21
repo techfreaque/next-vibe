@@ -43,13 +43,21 @@ export const translations = {
       currentPage: "Bieżąca strona",
     },
     widget: {
-      title: "Organizacje Corvina",
+      title: "Organizacje",
       noOrgsFound: "Nie znaleziono organizacji",
+      noOrgsHint: "Brak organizacji zarejestrowanych w tym tenancie.",
+      loading: "Ładowanie organizacji…",
+      badges: {
+        vpnOn: "VPN",
+        dataOn: "Dane",
+        mfaRequired: "MFA",
+        private: "Prywatna",
+      },
       nav: {
         appStore: "Sklep aplikacji",
         installedApps: "Zainstalowane aplikacje",
         alarms: "Alarmy",
-        licenses: "Licencje",
+        deviceLicenses: "Subskrypcje",
         createOrg: "Nowa org",
       },
     },

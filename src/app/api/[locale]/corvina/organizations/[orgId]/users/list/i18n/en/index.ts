@@ -41,11 +41,16 @@ export const translations = {
     },
     widget: {
       title: "Users",
-      emptyState: "No users found.",
+      loading: "Loading users…",
+      emptyState: "No users in this organization.",
+      createButton: "Add user",
+      prev: "Prev",
+      next: "Next",
       badges: {
-        serviceAccount: "Service Account",
+        serviceAccount: "Service",
         mfaEnabled: "MFA",
         mfaDisabled: "No MFA",
+        groupPolicies: "Policies",
         impersonation: "Impersonation",
       },
     },

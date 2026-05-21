@@ -18,6 +18,7 @@ export const translations = {
       warning: "Dies kann nicht rückgängig gemacht werden.",
       deleted: "Gerät gelöscht.",
       deletedMcp: "Gerät erfolgreich gelöscht.",
+      back: "Zurück",
     },
     errors: {
       validation: {

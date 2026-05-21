@@ -19,7 +19,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 const TagsUndeleteContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.TagsUndeleteContainer })),
+  import("./widget").then((m) => ({ default: m.TagsUndeleteContainer })),
 );
 
 const { POST } = createEndpoint({

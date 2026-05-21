@@ -41,11 +41,16 @@ export const translations = {
     },
     widget: {
       title: "Benutzer",
-      emptyState: "Keine Benutzer gefunden.",
+      loading: "Benutzer werden geladen…",
+      emptyState: "Keine Benutzer in dieser Organisation.",
+      createButton: "Benutzer anlegen",
+      prev: "Zurück",
+      next: "Weiter",
       badges: {
-        serviceAccount: "Dienstkonto",
+        serviceAccount: "Dienst",
         mfaEnabled: "MFA aktiv",
         mfaDisabled: "Kein MFA",
+        groupPolicies: "Richtlinien",
         impersonation: "Identitätswechsel",
       },
     },

@@ -18,6 +18,7 @@ export const translations = {
       warning: "Tej operacji nie można cofnąć.",
       deleted: "Urządzenie usunięte.",
       deletedMcp: "Urządzenie zostało pomyślnie usunięte.",
+      back: "Wstecz",
     },
     errors: {
       validation: {

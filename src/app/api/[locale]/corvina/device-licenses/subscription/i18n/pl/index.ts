@@ -2,26 +2,27 @@ export const translations = {
   category: "Corvina",
   tags: {
     corvina: "Corvina",
-    deviceLicenses: "Licencje urządzeń",
+    deviceLicenses: "Subskrypcje urządzeń",
     subscription: "Subskrypcja",
   },
   get: {
-    title: "Subskrypcja urządzenia",
-    description: "Pobierz szczegóły subskrypcji dla konkretnego urządzenia.",
+    title: "Status subskrypcji urządzenia",
+    description:
+      "Daty okresu próbnego i płatnej subskrypcji urządzenia Corvina. Pokazuje aktualny status, pozostałe dni i e-mail kontaktowy do przypomnień o odnowieniu.",
     logicalId: {
       label: "ID urządzenia",
       description: "Logiczne ID urządzenia w systemie Corvina.",
     },
     response: {
       logicalId: "ID urządzenia",
-      orgResourceId: "ID zasobu organizacji",
-      clientEmail: "E-mail klienta",
-      trialStartDate: "Data rozpoczęcia okresu próbnego",
-      subscriptionEndDate: "Data końca subskrypcji",
-      effectiveStartDate: "Efektywny start",
-      effectiveEndDate: "Efektywny koniec",
+      orgResourceId: "Organizacja",
+      clientEmail: "E-mail kontaktowy",
+      trialStartDate: "Start okresu próbnego",
+      subscriptionEndDate: "Koniec subskrypcji",
+      effectiveStartDate: "Aktywna od",
+      effectiveEndDate: "Aktywna do",
       status: "Status",
-      daysUntilExpiry: "Dni do wygaśnięcia",
+      daysUntilExpiry: "Pozostałe dni",
     },
     status: {
       trial: "Okres próbny",
@@ -31,11 +32,26 @@ export const translations = {
       noSubscription: "Brak subskrypcji",
     },
     widget: {
-      title: "Subskrypcja",
+      title: "Subskrypcja urządzenia",
       editButton: "Edytuj",
-      requestLicense: "Zapytaj o licencję",
+      requestRenewal: "Zapytaj o odnowienie",
       notFound:
-        "Brak wpisu subskrypcji. Domyślnie obowiązuje 30-dniowy okres próbny od daty aktywacji.",
+        "Brak wpisu subskrypcji. Domyślnie 30-dniowy okres próbny od daty aktywacji.",
+      daysLeft: "dni pozostało",
+      daysAgo: "dni temu",
+      loading: "Ładowanie subskrypcji…",
+      noSubscription: "Brak subskrypcji",
+      noSubscriptionHint:
+        "Domyślnie 30-dniowy okres próbny od daty aktywacji urządzenia.",
+      sections: {
+        subscription: "Subskrypcja",
+      },
+      effectiveFrom: "Aktywna od",
+      effectiveUntil: "Aktywna do",
+      trialStart: "Start próby",
+      subscriptionEnd: "Koniec subskrypcji",
+      clientEmail: "E-mail kontaktowy",
+      organization: "Organizacja",
     },
     errors: {
       validation: {
@@ -58,7 +74,10 @@ export const translations = {
         title: "Nie znaleziono",
         description: "Brak wpisu subskrypcji dla tego urządzenia.",
       },
-      conflict: { title: "Konflikt", description: "Wystąpił konflikt." },
+      conflict: {
+        title: "Konflikt",
+        description: "Wystąpił konflikt.",
+      },
       server: {
         title: "Błąd serwera",
         description: "Wewnętrzny błąd serwera.",
@@ -72,40 +91,50 @@ export const translations = {
         description: "Wystąpił nieznany błąd.",
       },
     },
-    success: { title: "Sukces", description: "Dane subskrypcji pobrane." },
+    success: {
+      title: "Sukces",
+      description: "Status subskrypcji załadowany.",
+    },
   },
   post: {
-    title: "Aktualizuj subskrypcję urządzenia",
+    title: "Ustaw subskrypcję urządzenia",
     description:
-      "Ustaw lub zaktualizuj okres subskrypcji i e-mail klienta dla urządzenia.",
+      "Ustaw lub nadpisz daty okresu próbnego i końca subskrypcji urządzenia. Przypisz e-mail kontaktowy do przypomnień o wygaśnięciu.",
     logicalId: {
       label: "ID urządzenia",
       description: "Logiczne ID urządzenia w systemie Corvina.",
     },
     orgResourceId: {
-      label: "ID zasobu organizacji",
+      label: "Organizacja",
       description: "ID zasobu organizacji dla tego urządzenia.",
     },
     clientEmail: {
-      label: "E-mail klienta",
-      description: "Adres e-mail do wysyłania przypomnień.",
+      label: "E-mail kontaktowy",
+      description: "Adres e-mail do przypomnień o wygaśnięciu subskrypcji.",
     },
     trialStartDate: {
-      label: "Data rozpoczęcia próby",
+      label: "Start próby",
       description:
         "Nadpisz datę startu próby. Zostaw puste, aby użyć daty aktywacji.",
     },
     subscriptionEndDate: {
-      label: "Data końca subskrypcji",
-      description: "Nadpisz datę końca. Zostaw puste, aby użyć start + 30 dni.",
+      label: "Koniec subskrypcji",
+      description:
+        "Ustaw datę końca płatnej subskrypcji. Zostaw puste dla trybu próbnego (start + 30 dni).",
     },
     widget: {
       title: "Edytuj subskrypcję",
       back: "Wróć",
-      result: { title: "Subskrypcja zaktualizowana" },
+      result: {
+        title: "Subskrypcja zapisana",
+      },
+      sections: {
+        identity: "Urządzenie",
+        subscription: "Daty subskrypcji",
+      },
     },
     submitButton: {
-      label: "Zapisz subskrypcję",
+      label: "Zapisz",
       loadingText: "Zapisywanie...",
     },
     errors: {
@@ -129,7 +158,10 @@ export const translations = {
         title: "Nie znaleziono",
         description: "Urządzenie nie zostało znalezione.",
       },
-      conflict: { title: "Konflikt", description: "Wystąpił konflikt." },
+      conflict: {
+        title: "Konflikt",
+        description: "Wystąpił konflikt.",
+      },
       server: {
         title: "Błąd serwera",
         description: "Wewnętrzny błąd serwera.",
@@ -144,8 +176,8 @@ export const translations = {
       },
     },
     success: {
-      title: "Zaktualizowano",
-      description: "Subskrypcja zaktualizowana pomyślnie.",
+      title: "Zapisano",
+      description: "Subskrypcja zaktualizowana.",
     },
   },
 };

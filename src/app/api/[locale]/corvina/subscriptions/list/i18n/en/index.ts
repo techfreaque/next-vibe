@@ -44,8 +44,17 @@ export const translations = {
       title: "Subscriptions",
       noItemsFound: "No subscriptions found.",
       back: "Back",
+      refresh: "Refresh",
       expired: "Expired",
       expiringSoon: "Expiring soon",
+      prevPage: "Previous",
+      nextPage: "Next",
+      nav: {
+        orgs: "Organizations",
+        aggregated: "Aggregated",
+        summary: "Summary",
+        history: "History",
+      },
       compact: {
         exp: "exp:",
         qty: "qty:",

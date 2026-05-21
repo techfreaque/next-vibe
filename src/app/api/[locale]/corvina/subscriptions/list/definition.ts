@@ -34,7 +34,7 @@ const { GET } = createEndpoint({
   description: "get.description" as const,
   icon: "layers",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaSubscriptions",
   tags: ["tags.corvina" as const, "tags.subscriptions" as const],
   aliases: ["corvina_subscriptions_list"],
 
@@ -153,6 +153,13 @@ const { GET } = createEndpoint({
       }),
     },
   }),
+
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 300,
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {

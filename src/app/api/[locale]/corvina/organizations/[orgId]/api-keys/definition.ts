@@ -23,11 +23,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 const ApiKeysListContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.ApiKeysListContainer })),
+  import("./widget").then((m) => ({ default: m.ApiKeysListContainer })),
 );
 
 const ApiKeyCreateContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.ApiKeyCreateContainer })),
+  import("./widget").then((m) => ({ default: m.ApiKeyCreateContainer })),
 );
 
 const { GET } = createEndpoint({

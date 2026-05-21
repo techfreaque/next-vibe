@@ -18,7 +18,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 const StatusSyncContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.StatusSyncContainer })),
+  import("./widget").then((m) => ({ default: m.StatusSyncContainer })),
 );
 
 const { GET } = createEndpoint({

@@ -18,7 +18,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 const DeviceStatusContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.DeviceStatusContainer })),
+  import("./widget").then((m) => ({ default: m.DeviceStatusContainer })),
 );
 
 const { GET } = createEndpoint({
@@ -57,7 +57,7 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "get.deviceId.label" as const,
         description: "get.deviceId.description" as const,
-        schema: z.coerce.number(),
+        schema: z.string().min(1),
       }),
       connected: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
@@ -122,7 +122,9 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathParams: { default: { orgId: 45511, deviceId: 1001 } },
+    urlPathParams: {
+      default: { orgId: 45511, deviceId: "sNgo2bZFPt6IgNEGFpOrrw" },
+    },
     responses: {
       default: {
         connected: true,

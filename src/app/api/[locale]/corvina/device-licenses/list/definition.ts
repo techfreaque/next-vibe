@@ -157,7 +157,7 @@ const { GET } = createEndpoint({
   description: "get.description" as const,
   icon: "shield",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaDeviceLicenses",
   tags: ["tags.corvina" as const, "tags.deviceLicenses" as const],
   aliases: ["corvina_device_licenses_list"],
 
@@ -217,6 +217,13 @@ const { GET } = createEndpoint({
       }),
     },
   }),
+
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 300,
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
@@ -307,7 +314,7 @@ const { POST } = createEndpoint({
   description: "post.description" as const,
   icon: "plus",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaDeviceLicenses",
   tags: ["tags.corvina" as const, "tags.deviceLicenses" as const],
   aliases: ["corvina_device_licenses_create"],
 

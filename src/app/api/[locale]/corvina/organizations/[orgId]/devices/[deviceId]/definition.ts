@@ -59,7 +59,7 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "get.deviceId.label" as const,
         description: "get.deviceId.description" as const,
-        schema: z.coerce.number(),
+        schema: z.string().min(1),
       }),
       label: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -179,11 +179,13 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathParams: { default: { orgId: 45511, deviceId: 1001 } },
+    urlPathParams: {
+      default: { orgId: 45511, deviceId: "sNgo2bZFPt6IgNEGFpOrrw" },
+    },
     responses: {
       default: {
         orgId: 45511,
-        deviceId: 1001,
+        deviceId: "sNgo2bZFPt6IgNEGFpOrrw",
         label: "Device 001",
         hwId: "DEADBEEF",
         orgResourceId: "exorde.connex.connectika",
@@ -232,7 +234,7 @@ const { PATCH } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "patch.deviceId.label" as const,
         description: "patch.deviceId.description" as const,
-        schema: z.coerce.number(),
+        schema: z.string().min(1),
       }),
       label: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -357,7 +359,9 @@ const { PATCH } = createEndpoint({
   },
 
   examples: {
-    urlPathParams: { default: { orgId: 45511, deviceId: 1001 } },
+    urlPathParams: {
+      default: { orgId: 45511, deviceId: "sNgo2bZFPt6IgNEGFpOrrw" },
+    },
     requests: {
       default: {
         label: "Device 001",
@@ -368,7 +372,7 @@ const { PATCH } = createEndpoint({
     responses: {
       default: {
         orgId: 45511,
-        deviceId: 1001,
+        deviceId: "sNgo2bZFPt6IgNEGFpOrrw",
         label: "Device 001",
         hwId: "DEADBEEF",
         orgResourceId: "exorde.connex.connectika",

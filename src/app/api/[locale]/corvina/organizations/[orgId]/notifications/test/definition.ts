@@ -24,7 +24,7 @@ import {
 import { scopedTranslation } from "./i18n";
 
 const NotificationTestContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.NotificationTestContainer,
   })),
 );

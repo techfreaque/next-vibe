@@ -21,6 +21,8 @@ export const translations = {
         connected: "Connected",
         subscriptionStatus: "Subscription",
         daysUntilExpiry: "Days Left",
+        trialStartDate: "Trial Start",
+        subscriptionEndDate: "Sub End",
       },
       total: "Total",
       totalPages: "Pages",
@@ -29,6 +31,14 @@ export const translations = {
     widget: {
       title: "Devices",
       noDevicesFound: "No devices found.",
+      noDevicesHint: "No devices registered for this organization.",
+      add: "Add",
+      registerDevice: "Register a device",
+      loading: "Loading devices…",
+      onlineCount: "online",
+      subscribedCount: "subscribed",
+      noSub: "no sub",
+      manageSubscription: "Subscription",
     },
     errors: {
       validation: {

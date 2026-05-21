@@ -21,7 +21,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 const AvailableTagsContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.AvailableTagsContainer })),
+  import("./widget").then((m) => ({ default: m.AvailableTagsContainer })),
 );
 
 const { GET } = createEndpoint({

@@ -38,18 +38,34 @@ export const translations = {
     widget: {
       edit: "Edytuj",
       devices: "Urządzenia",
+      devicesSubtitle: "Zarządzaj urządzeniami i subskrypcjami",
+      deviceAdd: "Dodaj",
+      deviceView: "Podgląd",
+      deviceEdit: "Edytuj",
+      deviceSubscription: "Subskrypcja",
+      deviceBuy: "Kup",
+      deviceNoSub: "brak sub",
+      deviceNone: "Brak zarejestrowanych urządzeń",
+      users: "Użytkownicy",
+      roles: "Role",
+      deviceLicenses: "Subskrypcje",
       apps: "Aplikacje",
       install: "Zainstaluj aplikację",
+      loading: "Ładowanie organizacji…",
       sections: {
         identity: "Tożsamość",
         network: "Sieć",
         securityServices: "Bezpieczeństwo i usługi",
+        settings: "Ustawienia",
       },
       labels: {
         name: "Nazwa",
         label: "Etykieta",
         resourceId: "ID zasobu",
         hostname: "Hostname",
+        id: "ID",
+        vpnMode: "Tryb VPN",
+        ipWhitelist: "Whitelist IP",
       },
       cli: {
         hostnameLabel: "hostname: ",
@@ -207,6 +223,7 @@ export const translations = {
       mfaRequired: "Wymagane MFA",
     },
     submitButton: { label: "Zapisz zmiany", loadingText: "Zapisywanie…" },
+    widget: { back: "Wstecz" },
     errors: {
       validation: {
         title: "Nieprawidłowa aktualizacja",

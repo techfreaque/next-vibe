@@ -27,12 +27,21 @@ export const translations = {
     },
     widget: {
       edit: "Edytuj",
+      delete: "Usuń",
       tags: "Tagi",
       subscription: "Subskrypcja",
+      loading: "Ładowanie urządzenia…",
+      groups: "Grupy",
+      noSubscription: "Brak aktywnej subskrypcji",
+      noSubscriptionHint: "Aktywuj licencję, aby włączyć funkcje.",
+      trialStart: "Początek okresu próbnego",
+      subscriptionEnd: "Koniec subskrypcji",
+      clientEmail: "E-mail klienta",
       sections: {
         identity: "Tożsamość",
         connectivity: "Połączenie",
         subscription: "Subskrypcja",
+        device: "Urządzenie",
       },
       labels: {
         label: "Etykieta",
@@ -47,6 +56,10 @@ export const translations = {
         firstRegistration: "Pierwsza rejestracja",
         lastSeenIp: "Ostatni IP",
         subscriptionStatus: "Status",
+        hwIdLabel: "ID sprzętowe",
+        orgResourceLabel: "Zasób org",
+        backToDevice: "Wróć do urządzenia",
+        changesSaved: "Zapisano",
       },
     },
     errors: {
@@ -117,6 +130,22 @@ export const translations = {
     },
     submitButton: { label: "Zapisz zmiany", loadingText: "Zapisywanie…" },
     editSubscription: "Edytuj subskrypcję",
+    trialStartDate: {
+      label: "Początek okresu próbnego",
+      description: "Data rozpoczęcia okresu próbnego.",
+    },
+    subscriptionEndDate: {
+      label: "Koniec subskrypcji",
+      description: "Data wygaśnięcia subskrypcji.",
+    },
+    clientEmail: {
+      label: "E-mail klienta",
+      description: "Adres e-mail klienta tego urządzenia.",
+      placeholder: "klient@przyklad.pl",
+    },
+    subscription: {
+      sectionTitle: "Subskrypcja",
+    },
     errors: {
       validation: {
         title: "Nieprawidłowa aktualizacja",

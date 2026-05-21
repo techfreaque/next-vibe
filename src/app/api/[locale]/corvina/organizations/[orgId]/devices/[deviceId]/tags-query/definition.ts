@@ -23,7 +23,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 const TagQueryContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.TagQueryContainer })),
+  import("./widget").then((m) => ({ default: m.TagQueryContainer })),
 );
 
 const { POST } = createEndpoint({

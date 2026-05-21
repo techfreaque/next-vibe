@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -106,6 +107,16 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content: "get.response.devices.daysUntilExpiry" as const,
               schema: z.number().nullable().optional(),
+            }),
+            trialStartDate: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.devices.trialStartDate" as const,
+              schema: dateSchema.nullable().optional(),
+            }),
+            subscriptionEndDate: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.devices.subscriptionEndDate" as const,
+              schema: dateSchema.nullable().optional(),
             }),
           },
         }),

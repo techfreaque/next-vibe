@@ -31,6 +31,17 @@ export const translations = {
     widget: {
       title: "Lizenzdetails",
       expiringWarning: "Läuft in weniger als 30 Tagen ab",
+      expiringSoon: "Läuft bald ab",
+      expired: "Abgelaufen",
+      active: "Aktiv",
+      trial: "Testversion",
+      noExpiry: "Kein Ablaufdatum",
+      actions: {
+        update: "Bearbeiten",
+        renew: "Verlängern",
+        delete: "Löschen",
+        back: "Zurück",
+      },
     },
     errors: {
       validation: {

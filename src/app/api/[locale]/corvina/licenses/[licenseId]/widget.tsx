@@ -2,6 +2,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Key } from "next-vibe-ui/ui/icons/Key";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
@@ -110,7 +111,7 @@ function LicenseField({
 
 export function LicenseDetailContainer(): React.JSX.Element {
   const platform = useWidgetPlatform();
-  const { push: navigate } = useWidgetNavigation();
+  const { push: navigate, pop } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
 
@@ -172,93 +173,115 @@ export function LicenseDetailContainer(): React.JSX.Element {
   const expiringSoon = isExpiringSoon(data.expirationDate);
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      <Div className="flex items-center gap-3">
-        <Div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-          <Key className="h-5 w-5 text-primary" />
-        </Div>
-        <Div className="flex-1 min-w-0">
-          <Div className="flex items-center gap-2 flex-wrap">
-            <Span className="font-semibold">{data.productLabel}</Span>
-            {data.productTrial && (
-              <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-warning/10 text-warning">
-                {t("get.widget.trial")}
-              </Span>
-            )}
-            <LicenseStatusBadge license={data} t={t} />
+    <Div className="flex flex-col min-h-0">
+      <Div className="flex items-center gap-2 px-4 py-2.5 border-b shrink-0">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
+          onClick={() => pop()}
+          title={t("get.widget.actions.back")}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <Key className="h-4 w-4 text-muted-foreground" />
+        <Span className="font-semibold text-sm mr-auto">
+          {data.productLabel}
+        </Span>
+      </Div>
+
+      <Div className="flex flex-col gap-4 p-4">
+        <Div className="flex items-center gap-3">
+          <Div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <Key className="h-5 w-5 text-primary" />
           </Div>
-          <Span className="text-xs text-muted-foreground font-mono">
-            {data.productCode}
-          </Span>
-        </Div>
-      </Div>
-
-      <Div className="grid grid-cols-2 gap-3">
-        <LicenseField label={t("get.response.code")} value={data.code} mono />
-        <LicenseField
-          label={t("get.response.orgResourceId")}
-          value={data.orgResourceId ?? "—"}
-          mono
-        />
-        <LicenseField
-          label={t("get.response.expirationDate")}
-          value={
-            <Span className={cn(expiringSoon && "text-warning font-semibold")}>
-              {data.expirationDate !== null && data.expirationDate !== undefined
-                ? formatDate(data.expirationDate)
-                : t("get.widget.noExpiry")}
+          <Div className="flex-1 min-w-0">
+            <Div className="flex items-center gap-2 flex-wrap">
+              <Span className="font-semibold">{data.productLabel}</Span>
+              {data.productTrial && (
+                <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-warning/10 text-warning">
+                  {t("get.widget.trial")}
+                </Span>
+              )}
+              <LicenseStatusBadge license={data} t={t} />
+            </Div>
+            <Span className="text-xs text-muted-foreground font-mono">
+              {data.productCode}
             </Span>
-          }
-        />
-        <LicenseField
-          label={t("get.response.activationDate")}
-          value={formatDate(data.activationDate)}
-        />
-        <LicenseField
-          label={t("get.response.creationDate")}
-          value={formatDate(data.creationDate)}
-        />
-        <LicenseField
-          label={t("get.response.price")}
-          value={
-            data.price !== null && data.price !== undefined
-              ? `${data.price} ${data.currency ?? ""}`
-              : "—"
-          }
-        />
-      </Div>
-
-      {!isCli && (
-        <Div className="flex gap-2 pt-2 border-t">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleUpdate}
-          >
-            {t("get.widget.actions.update")}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleRenew}
-          >
-            <RefreshCw className="h-3.5 w-3.5 mr-1" />
-            {t("get.widget.actions.renew")}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="text-destructive hover:bg-destructive/10 ml-auto"
-            onClick={handleDelete}
-          >
-            <Trash2 className="h-3.5 w-3.5 mr-1" />
-            {t("get.widget.actions.delete")}
-          </Button>
+          </Div>
         </Div>
-      )}
+
+        <Div className="grid grid-cols-2 gap-3">
+          <LicenseField label={t("get.response.code")} value={data.code} mono />
+          <LicenseField
+            label={t("get.response.orgResourceId")}
+            value={data.orgResourceId ?? "—"}
+            mono
+          />
+          <LicenseField
+            label={t("get.response.expirationDate")}
+            value={
+              <Span
+                className={cn(expiringSoon && "text-warning font-semibold")}
+              >
+                {data.expirationDate !== null &&
+                data.expirationDate !== undefined
+                  ? formatDate(data.expirationDate)
+                  : t("get.widget.noExpiry")}
+              </Span>
+            }
+          />
+          <LicenseField
+            label={t("get.response.activationDate")}
+            value={formatDate(data.activationDate)}
+          />
+          <LicenseField
+            label={t("get.response.creationDate")}
+            value={formatDate(data.creationDate)}
+          />
+          <LicenseField
+            label={t("get.response.price")}
+            value={
+              data.price !== null && data.price !== undefined
+                ? `${data.price} ${data.currency ?? ""}`
+                : "—"
+            }
+          />
+        </Div>
+
+        {!isCli && (
+          <Div className="flex gap-2 pt-2 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleUpdate}
+            >
+              {t("get.widget.actions.update")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleRenew}
+            >
+              <RefreshCw className="h-3.5 w-3.5 mr-1" />
+              {t("get.widget.actions.renew")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-destructive hover:bg-destructive/10 ml-auto"
+              onClick={handleDelete}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1" />
+              {t("get.widget.actions.delete")}
+            </Button>
+          </Div>
+        )}
+      </Div>
     </Div>
   );
 }

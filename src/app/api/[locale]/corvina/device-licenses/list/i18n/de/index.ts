@@ -6,7 +6,8 @@ export const translations = {
   },
   get: {
     title: "Gerätelizenzen auflisten",
-    description: "Lädt paginierte Gerätelizenzen aus der Corvina-Plattform.",
+    description:
+      "Listet lokal gespeicherte Gerätlizenzdatensätze auf. Admin-Werkzeug zur Verwaltung von Corvina-Geräteaktivierungen.",
     page: {
       label: "Seite",
       description: "Nullbasierte Seitennummer.",
@@ -53,6 +54,20 @@ export const translations = {
       noItemsFound: "Keine Gerätelizenzen gefunden.",
       back: "Zurück",
       refresh: "Aktualisieren",
+      prevPage: "Zurück",
+      nextPage: "Weiter",
+      nav: {
+        orgs: "Organisationen",
+        activate: "Aktivieren",
+        vpnActivate: "VPN aktivieren",
+      },
+      subscription: {
+        trial: "Probe",
+        active: "aktiv",
+        expiringSoon: "läuft ab",
+        expired: "abgelaufen",
+        noSubscription: "kein Abo",
+      },
     },
     errors: {
       validation: {
@@ -101,7 +116,8 @@ export const translations = {
   },
   post: {
     title: "Gerätelizenz erstellen",
-    description: "Legt eine neue Gerätelizenz in der Corvina-Plattform an.",
+    description:
+      "Legt einen neuen Gerätlizenzeintrag lokal an und provisioniert ihn in Corvina. Nur für Admins.",
     serialNumber: {
       label: "Seriennummer",
       description: "Seriennummer des Geräts für diese Lizenz.",

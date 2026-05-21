@@ -1,8 +1,14 @@
 "use client";
 
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
+import { Building } from "next-vibe-ui/ui/icons/Building";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Layers } from "next-vibe-ui/ui/icons/Layers";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { PieChart } from "next-vibe-ui/ui/icons/PieChart";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -13,6 +19,7 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetContext,
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetPlatform,
   useWidgetTranslation,
@@ -143,20 +150,66 @@ function SubscriptionRow({
 export function SubscriptionsListContainer(): React.JSX.Element {
   const platform = useWidgetPlatform();
   const { endpointMutations } = useWidgetContext();
-  const { pop } = useWidgetNavigation();
+  const { pop, push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
 
   const subscriptions = data?.subscriptions ?? [];
   const total = data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 1;
   const isLoading = data === undefined;
   const isCli = platform === Platform.CLI;
   const isMcp = platform === Platform.MCP;
   const isCompact = isCli || isMcp;
 
+  const currentPage = (form.watch("page") ?? 0) + 1;
+
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
   }, [endpointMutations]);
+
+  const handleNavOrgs = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../../organizations/list/definition");
+      navigate(def.default.GET, {});
+    })();
+  }, [navigate]);
+
+  const handleNavAggregated = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../aggregated/definition");
+      navigate(def.default.GET, {});
+    })();
+  }, [navigate]);
+
+  const handleNavSummary = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../summary/definition");
+      navigate(def.default.GET, {});
+    })();
+  }, [navigate]);
+
+  const handleNavHistory = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../history/definition");
+      navigate(def.default.GET, {});
+    })();
+  }, [navigate]);
+
+  const handlePrev = useCallback((): void => {
+    const p = form.getValues("page") ?? 0;
+    if (p > 0) {
+      form.setValue("page", p - 1);
+    }
+  }, [form]);
+
+  const handleNext = useCallback((): void => {
+    const p = form.getValues("page") ?? 0;
+    if (p + 1 < totalPages) {
+      form.setValue("page", p + 1);
+    }
+  }, [form, totalPages]);
 
   if (isCompact) {
     if (!data) {
@@ -166,7 +219,7 @@ export function SubscriptionsListContainer(): React.JSX.Element {
       <Div className="font-mono text-sm p-2">
         <Div className="font-semibold mb-1">
           {t("get.widget.title")} ({subscriptions.length}/{total})
-          {isMcp && ` — use page/pageSize to paginate`}
+          {isMcp && ` p:${currentPage}/${totalPages}`}
         </Div>
         {subscriptions.length === 0 ? (
           <Div className="text-muted-foreground">
@@ -188,6 +241,7 @@ export function SubscriptionsListContainer(): React.JSX.Element {
           type="button"
           variant="ghost"
           size="sm"
+          className="h-7 w-7 p-0"
           onClick={() => {
             pop();
           }}
@@ -209,9 +263,52 @@ export function SubscriptionsListContainer(): React.JSX.Element {
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title="Refresh"
+          title={t("get.widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
+        </Button>
+      </Div>
+
+      <Div className="flex items-center gap-1 px-3 py-1.5 border-b bg-muted/20 shrink-0 flex-wrap">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-6 gap-1 text-[11px] px-2"
+          onClick={handleNavOrgs}
+        >
+          <Building className="h-3 w-3" />
+          {t("get.widget.nav.orgs")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-6 gap-1 text-[11px] px-2"
+          onClick={handleNavAggregated}
+        >
+          <BarChart2 className="h-3 w-3" />
+          {t("get.widget.nav.aggregated")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-6 gap-1 text-[11px] px-2"
+          onClick={handleNavSummary}
+        >
+          <PieChart className="h-3 w-3" />
+          {t("get.widget.nav.summary")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-6 gap-1 text-[11px] px-2"
+          onClick={handleNavHistory}
+        >
+          <Clock className="h-3 w-3" />
+          {t("get.widget.nav.history")}
         </Button>
       </Div>
 
@@ -231,6 +328,36 @@ export function SubscriptionsListContainer(): React.JSX.Element {
           ))
         )}
       </Div>
+
+      {totalPages > 1 && (
+        <Div className="flex items-center justify-between px-4 py-2 border-t shrink-0">
+          <Span className="text-xs text-muted-foreground">
+            {currentPage} / {totalPages}
+          </Span>
+          <Div className="flex gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={currentPage <= 1}
+              onClick={handlePrev}
+              title={t("get.widget.prevPage")}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={currentPage >= totalPages}
+              onClick={handleNext}
+              title={t("get.widget.nextPage")}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </Div>
+        </Div>
+      )}
     </Div>
   );
 }

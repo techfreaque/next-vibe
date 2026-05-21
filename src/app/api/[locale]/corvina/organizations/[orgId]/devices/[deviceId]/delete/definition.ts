@@ -57,7 +57,7 @@ const { DELETE } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "delete.deviceId.label" as const,
         description: "delete.deviceId.description" as const,
-        schema: z.coerce.number(),
+        schema: z.string().min(1),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
@@ -111,7 +111,9 @@ const { DELETE } = createEndpoint({
   },
 
   examples: {
-    urlPathParams: { default: { orgId: 45511, deviceId: 1001 } },
+    urlPathParams: {
+      default: { orgId: 45511, deviceId: "sNgo2bZFPt6IgNEGFpOrrw" },
+    },
     responses: { default: { message: "Device deleted." } },
   },
 });

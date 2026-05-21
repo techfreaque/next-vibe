@@ -38,18 +38,34 @@ export const translations = {
     widget: {
       edit: "Bearbeiten",
       devices: "Geräte",
+      devicesSubtitle: "Geräte & Abonnements verwalten",
+      deviceAdd: "Hinzufügen",
+      deviceView: "Anzeigen",
+      deviceEdit: "Bearbeiten",
+      deviceSubscription: "Abonnement",
+      deviceBuy: "Kaufen",
+      deviceNoSub: "kein Abo",
+      deviceNone: "Keine Geräte registriert",
+      users: "Benutzer",
+      roles: "Rollen",
+      deviceLicenses: "Abonnements",
       apps: "Apps",
       install: "App installieren",
+      loading: "Organisation wird geladen…",
       sections: {
         identity: "Identität",
         network: "Netzwerk",
         securityServices: "Sicherheit & Dienste",
+        settings: "Einstellungen",
       },
       labels: {
         name: "Name",
         label: "Bezeichnung",
         resourceId: "Ressourcen-ID",
         hostname: "Hostname",
+        id: "ID",
+        vpnMode: "VPN-Modus",
+        ipWhitelist: "IP-Whitelist",
       },
       cli: {
         hostnameLabel: "Hostname: ",
@@ -207,6 +223,7 @@ export const translations = {
       mfaRequired: "MFA erforderlich",
     },
     submitButton: { label: "Änderungen speichern", loadingText: "Speichern…" },
+    widget: { back: "Zurück" },
     errors: {
       validation: {
         title: "Ungültige Aktualisierung",

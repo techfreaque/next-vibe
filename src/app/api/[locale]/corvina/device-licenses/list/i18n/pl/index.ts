@@ -7,7 +7,7 @@ export const translations = {
   get: {
     title: "Lista licencji urządzeń",
     description:
-      "Pobiera stronicowaną listę licencji urządzeń z platformy Corvina.",
+      "Wyświetla lokalnie przechowywane rekordy licencji urządzeń. Narzędzie administracyjne do zarządzania aktywacjami urządzeń Corvina.",
     page: {
       label: "Strona",
       description: "Numer strony (od zera).",
@@ -54,6 +54,20 @@ export const translations = {
       noItemsFound: "Nie znaleziono licencji urządzeń.",
       back: "Wstecz",
       refresh: "Odśwież",
+      prevPage: "Poprzednia",
+      nextPage: "Następna",
+      nav: {
+        orgs: "Organizacje",
+        activate: "Aktywuj",
+        vpnActivate: "Aktywuj VPN",
+      },
+      subscription: {
+        trial: "trial",
+        active: "aktywna",
+        expiringSoon: "wygasa",
+        expired: "wygasła",
+        noSubscription: "brak sub",
+      },
     },
     errors: {
       validation: {
@@ -102,7 +116,8 @@ export const translations = {
   },
   post: {
     title: "Utwórz licencję urządzenia",
-    description: "Tworzy nową licencję urządzenia w platformie Corvina.",
+    description:
+      "Rejestruje nowy rekord licencji urządzenia lokalnie i provisionuje go w Corvina. Tylko dla administratorów.",
     serialNumber: {
       label: "Numer seryjny",
       description: "Numer seryjny urządzenia powiązanego z licencją.",

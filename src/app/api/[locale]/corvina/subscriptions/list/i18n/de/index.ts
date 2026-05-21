@@ -44,8 +44,17 @@ export const translations = {
       title: "Abonnements",
       noItemsFound: "Keine Abonnements gefunden.",
       back: "Zurück",
+      refresh: "Aktualisieren",
       expired: "Abgelaufen",
       expiringSoon: "Läuft bald ab",
+      prevPage: "Zurück",
+      nextPage: "Weiter",
+      nav: {
+        orgs: "Organisationen",
+        aggregated: "Aggregiert",
+        summary: "Zusammenfassung",
+        history: "Verlauf",
+      },
       compact: {
         exp: "Abl.:",
         qty: "Anz.:",

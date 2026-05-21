@@ -479,6 +479,10 @@ export const translations: typeof enTranslations = {
     support: "Support",
     corvina: "Corvina",
     corvinaOrganizations: "Organisationen",
+    corvinaSubscriptions: "Abonnements",
+    corvinaLicenses: "Lizenzen",
+    corvinaDeviceLicenses: "Abonnements",
+    corvinaDeviceSubscriptions: "Geräte-Abonnements",
   },
   ui: {
     iconPicker: {

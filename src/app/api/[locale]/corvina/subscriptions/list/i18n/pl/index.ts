@@ -44,8 +44,17 @@ export const translations = {
       title: "Subskrypcje",
       noItemsFound: "Nie znaleziono subskrypcji.",
       back: "Wstecz",
+      refresh: "Odśwież",
       expired: "Wygasła",
       expiringSoon: "Wygasa wkrótce",
+      prevPage: "Poprzednia",
+      nextPage: "Następna",
+      nav: {
+        orgs: "Organizacje",
+        aggregated: "Zagregowane",
+        summary: "Podsumowanie",
+        history: "Historia",
+      },
       compact: {
         exp: "wyg.:",
         qty: "il.:",

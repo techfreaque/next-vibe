@@ -2,26 +2,27 @@ export const translations = {
   category: "Corvina",
   tags: {
     corvina: "Corvina",
-    deviceLicenses: "Gerätelizenzen",
+    deviceLicenses: "Geräte-Abonnements",
     subscription: "Abonnement",
   },
   get: {
-    title: "Geräte-Abonnement",
-    description: "Abonnementdetails für ein bestimmtes Gerät abrufen.",
+    title: "Abonnementstatus Gerät",
+    description:
+      "Test- und Bezahlzeitraum eines Corvina-Geräts. Zeigt aktuellen Status, verbleibende Tage und Kontakt-E-Mail für Verlängerungserinnerungen.",
     logicalId: {
       label: "Geräte-ID",
       description: "Logische Corvina-ID des Geräts.",
     },
     response: {
       logicalId: "Geräte-ID",
-      orgResourceId: "Org-Ressourcen-ID",
-      clientEmail: "Kunden-E-Mail",
+      orgResourceId: "Organisation",
+      clientEmail: "Kontakt-E-Mail",
       trialStartDate: "Teststart",
       subscriptionEndDate: "Abonnementende",
-      effectiveStartDate: "Effektiver Start",
-      effectiveEndDate: "Effektives Ende",
+      effectiveStartDate: "Aktiv ab",
+      effectiveEndDate: "Aktiv bis",
       status: "Status",
-      daysUntilExpiry: "Tage bis Ablauf",
+      daysUntilExpiry: "Verbleibende Tage",
     },
     status: {
       trial: "Testphase",
@@ -31,16 +32,31 @@ export const translations = {
       noSubscription: "Kein Abonnement",
     },
     widget: {
-      title: "Abonnement",
+      title: "Geräte-Abonnement",
       editButton: "Bearbeiten",
-      requestLicense: "Lizenz anfragen",
+      requestRenewal: "Verlängerung anfragen",
       notFound:
-        "Kein Abonnementeintrag gefunden. Standardmäßig gilt eine 30-tägige Testphase ab dem Aktivierungsdatum.",
+        "Kein Abonnementeintrag. Standard: 30-tägige Testphase ab Aktivierungsdatum.",
+      daysLeft: "T verbleibend",
+      daysAgo: "T abgelaufen",
+      loading: "Abonnement wird geladen…",
+      noSubscription: "Kein Abonnement",
+      noSubscriptionHint:
+        "Standard: 30-tägige Testphase ab Aktivierungsdatum des Geräts.",
+      sections: {
+        subscription: "Abonnement",
+      },
+      effectiveFrom: "Aktiv ab",
+      effectiveUntil: "Aktiv bis",
+      trialStart: "Teststart",
+      subscriptionEnd: "Abonnementende",
+      clientEmail: "Kontakt-E-Mail",
+      organization: "Organisation",
     },
     errors: {
       validation: {
         title: "Ungültige Anfrage",
-        description: "Die Geräte-ID ist erforderlich.",
+        description: "Geräte-ID ist erforderlich.",
       },
       network: {
         title: "Netzwerkfehler",
@@ -51,7 +67,7 @@ export const translations = {
         description: "Authentifizierung erforderlich.",
       },
       forbidden: {
-        title: "Verboten",
+        title: "Zugriff verweigert",
         description: "Keine Berechtigung für Abonnementdaten.",
       },
       notFound: {
@@ -62,52 +78,64 @@ export const translations = {
         title: "Konflikt",
         description: "Ein Konflikt ist aufgetreten.",
       },
-      server: { title: "Serverfehler", description: "Interner Serverfehler." },
+      server: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler.",
+      },
       unsavedChanges: {
-        title: "Ungespeicherte Änderungen",
-        description: "Es gibt ungespeicherte Änderungen.",
+        title: "Nicht gespeicherte Änderungen",
+        description: "Es liegen nicht gespeicherte Änderungen vor.",
       },
       unknown: {
         title: "Unbekannter Fehler",
         description: "Ein unbekannter Fehler ist aufgetreten.",
       },
     },
-    success: { title: "Erfolg", description: "Abonnementdetails abgerufen." },
+    success: {
+      title: "Erfolg",
+      description: "Abonnementstatus geladen.",
+    },
   },
   post: {
-    title: "Geräte-Abonnement aktualisieren",
+    title: "Geräte-Abonnement setzen",
     description:
-      "Abonnementzeitraum und Kunden-E-Mail für ein Gerät festlegen oder aktualisieren.",
+      "Teststart und Abonnementende für ein Gerät festlegen oder überschreiben. Kontakt-E-Mail für Ablauferinnerungen hinterlegen.",
     logicalId: {
       label: "Geräte-ID",
       description: "Logische Corvina-ID des Geräts.",
     },
     orgResourceId: {
-      label: "Org-Ressourcen-ID",
-      description: "Org-Ressourcen-ID des Geräts.",
+      label: "Organisation",
+      description: "Organisations-Ressourcen-ID des Geräts.",
     },
     clientEmail: {
-      label: "Kunden-E-Mail",
-      description: "E-Mail-Adresse für Erinnerungen.",
+      label: "Kontakt-E-Mail",
+      description: "E-Mail-Adresse für Ablauferinnerungen.",
     },
     trialStartDate: {
-      label: "Teststart-Datum",
+      label: "Teststart",
       description:
         "Teststart überschreiben. Leer lassen für Aktivierungsdatum.",
     },
     subscriptionEndDate: {
-      label: "Abonnementend-Datum",
+      label: "Abonnementende",
       description:
-        "Abonnementende überschreiben. Leer lassen für Start + 30 Tage.",
+        "Bezahltes Abonnementende setzen. Leer lassen für Testphase (Start + 30 Tage).",
     },
     widget: {
       title: "Abonnement bearbeiten",
       back: "Zurück",
-      result: { title: "Abonnement aktualisiert" },
+      result: {
+        title: "Abonnement gespeichert",
+      },
+      sections: {
+        identity: "Gerät",
+        subscription: "Abonnementdaten",
+      },
     },
     submitButton: {
-      label: "Abonnement speichern",
-      loadingText: "Wird gespeichert...",
+      label: "Speichern",
+      loadingText: "Wird gespeichert…",
     },
     errors: {
       validation: {
@@ -123,7 +151,7 @@ export const translations = {
         description: "Authentifizierung erforderlich.",
       },
       forbidden: {
-        title: "Verboten",
+        title: "Zugriff verweigert",
         description: "Keine Berechtigung zum Aktualisieren.",
       },
       notFound: {
@@ -134,10 +162,13 @@ export const translations = {
         title: "Konflikt",
         description: "Ein Konflikt ist aufgetreten.",
       },
-      server: { title: "Serverfehler", description: "Interner Serverfehler." },
+      server: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler.",
+      },
       unsavedChanges: {
-        title: "Ungespeicherte Änderungen",
-        description: "Es gibt ungespeicherte Änderungen.",
+        title: "Nicht gespeicherte Änderungen",
+        description: "Es liegen nicht gespeicherte Änderungen vor.",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -145,8 +176,8 @@ export const translations = {
       },
     },
     success: {
-      title: "Aktualisiert",
-      description: "Abonnement erfolgreich aktualisiert.",
+      title: "Gespeichert",
+      description: "Abonnement aktualisiert.",
     },
   },
 };

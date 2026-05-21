@@ -24,12 +24,21 @@ export const translations = {
     },
     widget: {
       edit: "Edit",
+      delete: "Delete",
       tags: "Tags",
       subscription: "Subscription",
+      loading: "Loading device…",
+      groups: "Groups",
+      noSubscription: "No active subscription",
+      noSubscriptionHint: "Activate a license to enable features.",
+      trialStart: "Trial start",
+      subscriptionEnd: "Subscription end",
+      clientEmail: "Client email",
       sections: {
         identity: "Identity",
         connectivity: "Connectivity",
         subscription: "Subscription",
+        device: "Device",
       },
       labels: {
         label: "Label",
@@ -44,6 +53,10 @@ export const translations = {
         firstRegistration: "First Registration",
         lastSeenIp: "Last IP",
         subscriptionStatus: "Status",
+        hwIdLabel: "Hardware ID",
+        orgResourceLabel: "Org Resource",
+        backToDevice: "Back to device",
+        changesSaved: "Changes saved",
       },
     },
     errors: {
@@ -108,6 +121,22 @@ export const translations = {
     },
     submitButton: { label: "Save changes", loadingText: "Saving…" },
     editSubscription: "Edit Subscription",
+    trialStartDate: {
+      label: "Trial start",
+      description: "Date when the trial period started.",
+    },
+    subscriptionEndDate: {
+      label: "Subscription end",
+      description: "Date when the subscription expires.",
+    },
+    clientEmail: {
+      label: "Client email",
+      description: "Email address of the client for this device.",
+      placeholder: "client@example.com",
+    },
+    subscription: {
+      sectionTitle: "Subscription",
+    },
     errors: {
       validation: {
         title: "Invalid Update",

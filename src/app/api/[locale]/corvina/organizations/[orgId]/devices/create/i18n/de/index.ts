@@ -64,6 +64,9 @@ export const translations = {
     },
     widget: {
       added: "Gerät hinzugefügt",
+      registeredSuccessfully: "Gerät erfolgreich registriert.",
+      backToDevices: "Zurück zu den Geräten",
+      deviceInfo: "Gerätedaten",
     },
     success: {
       title: "Gerät hinzugefügt",

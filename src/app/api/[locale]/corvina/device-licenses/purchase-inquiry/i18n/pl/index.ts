@@ -2,13 +2,13 @@ export const translations = {
   category: "Corvina",
   tags: {
     corvina: "Corvina",
-    deviceLicenses: "Licencje urządzeń",
+    deviceLicenses: "Subskrypcje urządzeń",
     purchaseInquiry: "Zapytanie o zakup",
   },
   post: {
-    title: "Zapytaj o licencję urządzenia",
+    title: "Zapytaj o odnowienie subskrypcji",
     description:
-      "Wyślij zapytanie o zakup licencji dla urządzenia bez aktywnej subskrypcji.",
+      "Wyślij zapytanie o odnowienie dla urządzenia bez aktywnej subskrypcji. Skontaktujemy się w ciągu 1 dnia roboczego.",
     logicalId: {
       label: "ID urządzenia",
       description: "Unikalny identyfikator urządzenia.",
@@ -46,13 +46,21 @@ export const translations = {
       confirmationMessage: "Potwierdzenie",
     },
     widget: {
-      title: "Zapytaj o licencję",
+      title: "Zapytaj o odnowienie subskrypcji",
       back: "Wstecz",
       description:
-        "Podaj swoje dane kontaktowe, a my skontaktujemy się z Tobą w ciągu 1 dnia roboczego.",
+        "Podaj swoje dane kontaktowe, a my odezwiemy się w ciągu 1 dnia roboczego w sprawie opcji subskrypcji.",
       submit: "Wyślij zapytanie",
       submitAnother: "Wyślij kolejne zapytanie",
       submittedLabel: "Zapytanie wysłane",
+      sections: {
+        device: "Urządzenia",
+        contact: "Dane kontaktowe",
+      },
+      selected: "wybrano",
+      selectAll: "Zaznacz wszystkie",
+      deselectAll: "Odznacz wszystkie",
+      noSub: "Brak sub",
     },
     errors: {
       validation: {
@@ -89,7 +97,7 @@ export const translations = {
     },
   },
   email: {
-    subject: "Nowe zapytanie o licencję: {deviceId}",
+    subject: "Nowe zapytanie o subskrypcję: {deviceId}",
     heading: "Nowe zapytanie o zakup",
     device: "Urządzenie",
     org: "Organizacja",

@@ -2,13 +2,13 @@ export const translations = {
   category: "Corvina",
   tags: {
     corvina: "Corvina",
-    deviceLicenses: "Device Licenses",
+    deviceLicenses: "Device Subscriptions",
     purchaseInquiry: "Purchase Inquiry",
   },
   post: {
-    title: "Request Device License",
+    title: "Request Subscription Renewal",
     description:
-      "Submit a purchase inquiry for a device that has no active subscription.",
+      "Submit a renewal inquiry for a device with no active subscription. We'll follow up within 1 business day.",
     logicalId: {
       label: "Device ID",
       description: "The unique identifier of the device.",
@@ -46,13 +46,21 @@ export const translations = {
       confirmationMessage: "Confirmation",
     },
     widget: {
-      title: "Request Device License",
+      title: "Request Subscription Renewal",
       back: "Back",
       description:
-        "Fill in your contact details and we'll follow up within 1 business day to discuss licensing options.",
+        "Fill in your contact details and we'll follow up within 1 business day to discuss subscription options.",
       submit: "Submit Inquiry",
       submitAnother: "Submit Another Inquiry",
       submittedLabel: "Inquiry submitted",
+      sections: {
+        device: "Devices",
+        contact: "Contact details",
+      },
+      selected: "selected",
+      selectAll: "Select all",
+      deselectAll: "Deselect all",
+      noSub: "No sub",
     },
     errors: {
       validation: {
@@ -83,8 +91,8 @@ export const translations = {
     },
   },
   email: {
-    subject: "New license inquiry: {deviceId}",
-    heading: "New Purchase Inquiry",
+    subject: "New subscription inquiry: {deviceId}",
+    heading: "New Subscription Inquiry",
     device: "Device",
     org: "Organization",
     contact: "Contact",

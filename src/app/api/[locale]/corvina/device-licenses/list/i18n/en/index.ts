@@ -2,11 +2,12 @@ export const translations = {
   category: "Corvina",
   tags: {
     corvina: "Corvina",
-    deviceLicenses: "Device Licenses",
+    deviceLicenses: "Device Subscriptions",
   },
   get: {
-    title: "List Device Licenses",
-    description: "Fetches paginated device licenses from the Corvina platform.",
+    title: "List Device Subscriptions",
+    description:
+      "Lists device license records stored locally. Admin tool for provisioning and tracking Corvina device activations.",
     page: {
       label: "Page",
       description: "Zero-based page number.",
@@ -49,10 +50,24 @@ export const translations = {
       },
     },
     widget: {
-      title: "Device Licenses",
+      title: "Device Subscriptions",
       noItemsFound: "No device licenses found.",
       back: "Back",
       refresh: "Refresh",
+      prevPage: "Previous",
+      nextPage: "Next",
+      nav: {
+        orgs: "Organizations",
+        activate: "Activate",
+        vpnActivate: "VPN Activate",
+      },
+      subscription: {
+        trial: "trial",
+        active: "active",
+        expiringSoon: "exp",
+        expired: "expired",
+        noSubscription: "no sub",
+      },
     },
     errors: {
       validation: {
@@ -99,8 +114,9 @@ export const translations = {
     },
   },
   post: {
-    title: "Create Device License",
-    description: "Creates a new device license in the Corvina platform.",
+    title: "Create Device Subscription",
+    description:
+      "Registers a new device license record locally and provisions it in Corvina. Admin use only.",
     serialNumber: {
       label: "Serial Number",
       description: "Device serial number to associate with this license.",
@@ -142,7 +158,7 @@ export const translations = {
       description: "Disable VPN usage accounting for this device.",
     },
     widget: {
-      title: "Create Device License",
+      title: "Create Device Subscription",
       back: "Back",
       result: {
         title: "License Created",

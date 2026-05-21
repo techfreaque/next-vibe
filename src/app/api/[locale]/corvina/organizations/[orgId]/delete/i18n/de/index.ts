@@ -26,6 +26,7 @@ export const translations = {
       cancelButton: "Abbrechen",
       deletedTitle: "Organisation gelöscht",
       deletedDescription: "Die Organisation wurde dauerhaft entfernt.",
+      backButton: "Zurück",
     },
     errors: {
       validation: {

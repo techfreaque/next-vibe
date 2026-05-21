@@ -45,6 +45,14 @@ export const translations = {
       title: "Lizenzen",
       noLicensesFound: "Keine Lizenzen gefunden.",
       back: "Zurück",
+      refresh: "Aktualisieren",
+      prevPage: "Zurück",
+      nextPage: "Weiter",
+      nav: {
+        orgs: "Organisationen",
+        create: "Neue Lizenz",
+        trial: "Testlizenz",
+      },
       compact: {
         exp: "Abl.:",
         autorenew: "Autoverlängerung:",

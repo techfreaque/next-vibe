@@ -11,6 +11,7 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import {
   useWidgetContext,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
@@ -116,6 +117,87 @@ export function ApiKeysListContainer(): React.JSX.Element {
         ) : (
           keys.map((k) => <ApiKeyRow key={k.id} apiKey={k} />)
         )}
+      </Div>
+    </Div>
+  );
+}
+
+export function ApiKeyCreateContainer(): React.JSX.Element {
+  const platform = useWidgetPlatform();
+  const { pop: goBack } = useWidgetNavigation();
+  const t = useWidgetTranslation<typeof definition.POST>();
+  const onSubmit = useWidgetOnSubmit();
+  const data = useWidgetValue<typeof definition.POST>();
+
+  const isMcp = platform === Platform.MCP;
+  const isCli = platform === Platform.CLI;
+  const isCompact = isCli || isMcp;
+
+  if (isCompact) {
+    if (data) {
+      return (
+        <Div>
+          {`${t("post.success.title")}: ${data.key ? `****${String(data.key).slice(-4)}` : ""}`}
+        </Div>
+      );
+    }
+    return <Div>{t("post.title")}</Div>;
+  }
+
+  if (data) {
+    return (
+      <Div className="flex flex-col min-h-0">
+        <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              goBack();
+            }}
+            title={t("get.widget.back")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <Key className="h-4 w-4 text-muted-foreground" />
+          <Span className="font-semibold text-sm mr-auto">
+            {t("post.success.title")}
+          </Span>
+        </Div>
+        <Div className="p-4 flex flex-col gap-3">
+          <Span className="text-xs text-muted-foreground font-mono break-all bg-muted px-3 py-2 rounded-lg">
+            {data.key}
+          </Span>
+        </Div>
+      </Div>
+    );
+  }
+
+  return (
+    <Div className="flex flex-col min-h-0">
+      <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            goBack();
+          }}
+          title={t("get.widget.back")}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <Key className="h-4 w-4 text-muted-foreground" />
+        <Span className="font-semibold text-sm mr-auto">{t("post.title")}</Span>
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          className="h-7 gap-1.5 px-3"
+          onClick={onSubmit}
+        >
+          {t("post.submitButton.label")}
+        </Button>
       </Div>
     </Div>
   );

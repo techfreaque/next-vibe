@@ -40,7 +40,7 @@ const { GET } = createEndpoint({
   description: "get.description" as const,
   icon: "cpu",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaDeviceLicenses",
   tags: ["tags.corvina" as const, "tags.deviceLicenses" as const],
   aliases: ["corvina_device_licenses_device_get"],
 
@@ -223,7 +223,7 @@ const { POST } = createEndpoint({
   description: "post.description" as const,
   icon: "cpu",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaDeviceLicenses",
   tags: ["tags.corvina" as const, "tags.deviceLicenses" as const],
   aliases: ["corvina_device_licenses_device"],
 

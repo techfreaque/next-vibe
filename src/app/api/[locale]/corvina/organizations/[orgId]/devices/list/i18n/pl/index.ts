@@ -18,6 +18,8 @@ export const translations = {
         connected: "Połączony",
         subscriptionStatus: "Subskrypcja",
         daysUntilExpiry: "Pozostałe dni",
+        trialStartDate: "Start próbny",
+        subscriptionEndDate: "Koniec sub",
       },
       total: "Łącznie",
       totalPages: "Strony",
@@ -26,6 +28,14 @@ export const translations = {
     widget: {
       title: "Urządzenia",
       noDevicesFound: "Nie znaleziono urządzeń.",
+      noDevicesHint: "Brak urządzeń zarejestrowanych w tej organizacji.",
+      add: "Dodaj",
+      registerDevice: "Zarejestruj urządzenie",
+      loading: "Ładowanie urządzeń…",
+      onlineCount: "online",
+      subscribedCount: "z subskrypcją",
+      noSub: "brak sub",
+      manageSubscription: "Subskrypcja",
     },
     errors: {
       validation: {

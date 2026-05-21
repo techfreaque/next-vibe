@@ -59,7 +59,7 @@ const { GET } = createEndpoint({
   description: "get.description" as const,
   icon: "key",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaLicenses",
   tags: ["tags.corvina" as const, "tags.licenses" as const],
   fields: customWidgetObject({
     render: LicenseDetailContainer,
@@ -201,7 +201,7 @@ const { PUT } = createEndpoint({
   description: "put.description" as const,
   icon: "edit",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaLicenses",
   tags: ["tags.corvina" as const, "tags.licenses" as const],
   fields: customWidgetObject({
     render: LicenseUpdateContainer,
@@ -358,7 +358,7 @@ const { DELETE } = createEndpoint({
   description: "delete.description" as const,
   icon: "trash",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaLicenses",
   tags: ["tags.corvina" as const, "tags.licenses" as const],
   fields: customWidgetObject({
     render: LicenseDeleteContainer,
@@ -500,7 +500,7 @@ const { POST } = createEndpoint({
   description: "post.description" as const,
   icon: "refresh-cw",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaLicenses",
   tags: ["tags.corvina" as const, "tags.licenses" as const],
   fields: customWidgetObject({
     render: LicenseRenewContainer,

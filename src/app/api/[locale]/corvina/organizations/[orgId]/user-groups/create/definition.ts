@@ -21,7 +21,7 @@ import { MembershipRole, UserGroupOwner, UserGroupType } from "../enums";
 import { scopedTranslation } from "./i18n";
 
 const UserGroupCreateContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.UserGroupCreateContainer,
   })),
 );

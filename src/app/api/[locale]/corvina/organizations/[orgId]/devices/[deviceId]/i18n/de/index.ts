@@ -27,12 +27,21 @@ export const translations = {
     },
     widget: {
       edit: "Bearbeiten",
+      delete: "Löschen",
       tags: "Tags",
       subscription: "Abonnement",
+      loading: "Gerät wird geladen…",
+      groups: "Gruppen",
+      noSubscription: "Kein aktives Abonnement",
+      noSubscriptionHint: "Lizenz aktivieren, um Funktionen freizuschalten.",
+      trialStart: "Testbeginn",
+      subscriptionEnd: "Abonnementende",
+      clientEmail: "Kunden-E-Mail",
       sections: {
         identity: "Identität",
         connectivity: "Verbindung",
         subscription: "Abonnement",
+        device: "Gerät",
       },
       labels: {
         label: "Bezeichnung",
@@ -47,6 +56,10 @@ export const translations = {
         firstRegistration: "Erstregistrierung",
         lastSeenIp: "Letzte IP",
         subscriptionStatus: "Status",
+        hwIdLabel: "Hardware-ID",
+        orgResourceLabel: "Org-Ressource",
+        backToDevice: "Zurück zum Gerät",
+        changesSaved: "Gespeichert",
       },
     },
     errors: {
@@ -117,6 +130,22 @@ export const translations = {
     },
     submitButton: { label: "Speichern", loadingText: "Wird gespeichert…" },
     editSubscription: "Abonnement bearbeiten",
+    trialStartDate: {
+      label: "Testbeginn",
+      description: "Datum des Beginns der Testphase.",
+    },
+    subscriptionEndDate: {
+      label: "Abonnementende",
+      description: "Datum des Ablaufs des Abonnements.",
+    },
+    clientEmail: {
+      label: "Kunden-E-Mail",
+      description: "E-Mail-Adresse des Kunden für dieses Gerät.",
+      placeholder: "kunde@beispiel.de",
+    },
+    subscription: {
+      sectionTitle: "Abonnement",
+    },
     errors: {
       validation: {
         title: "Ungültige Aktualisierung",

@@ -20,13 +20,13 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 const RealmSettingsGetContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.RealmSettingsGetContainer,
   })),
 );
 
 const RealmSettingsPutContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.RealmSettingsPutContainer,
   })),
 );

@@ -34,7 +34,7 @@ const { GET } = createEndpoint({
   description: "get.description" as const,
   icon: "refresh-cw",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaSubscriptions",
   tags: ["tags.corvina" as const, "tags.subscriptions" as const],
   aliases: ["corvina_subscriptions_jobs_autorenew"],
 

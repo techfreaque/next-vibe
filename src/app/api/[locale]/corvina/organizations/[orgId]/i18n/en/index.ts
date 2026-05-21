@@ -1,3 +1,4 @@
+// updated
 export const translations = {
   category: "Corvina",
   tags: {
@@ -38,18 +39,34 @@ export const translations = {
     widget: {
       edit: "Edit",
       devices: "Devices",
+      devicesSubtitle: "View & manage device subscriptions",
+      deviceAdd: "Add",
+      deviceView: "View",
+      deviceEdit: "Edit",
+      deviceSubscription: "Subscription",
+      deviceBuy: "Buy",
+      deviceNoSub: "no sub",
+      deviceNone: "No devices registered",
+      users: "Users",
+      roles: "Roles",
+      deviceLicenses: "Subscriptions",
       apps: "Apps",
       install: "Install App",
+      loading: "Loading organization…",
       sections: {
         identity: "Identity",
         network: "Network",
         securityServices: "Security & Services",
+        settings: "Settings",
       },
       labels: {
         name: "Name",
         label: "Label",
         resourceId: "Resource ID",
         hostname: "Hostname",
+        id: "ID",
+        vpnMode: "VPN Mode",
+        ipWhitelist: "IP Whitelist",
       },
       cli: {
         hostnameLabel: "hostname: ",
@@ -204,6 +221,7 @@ export const translations = {
       mfaRequired: "MFA Required",
     },
     submitButton: { label: "Save changes", loadingText: "Saving…" },
+    widget: { back: "Back" },
     errors: {
       validation: {
         title: "Invalid Update",

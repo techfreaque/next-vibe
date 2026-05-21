@@ -21,7 +21,7 @@ import { SecurityPolicyType } from "../enums";
 import { scopedTranslation } from "./i18n";
 
 const SecurityPolicyCreateContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.SecurityPolicyCreateContainer,
   })),
 );

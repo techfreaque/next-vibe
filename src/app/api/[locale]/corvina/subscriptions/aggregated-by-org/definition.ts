@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
   description: "post.description" as const,
   icon: "bar-chart-2",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaSubscriptions",
   tags: ["tags.corvina" as const, "tags.subscriptions" as const],
   aliases: ["corvina_subscriptions_aggregated_by_org"],
 

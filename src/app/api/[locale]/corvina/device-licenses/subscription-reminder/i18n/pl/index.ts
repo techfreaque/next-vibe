@@ -2,24 +2,35 @@ export const translations = {
   category: "Corvina",
   tags: {
     corvina: "Corvina",
-    deviceLicenses: "Licencje urządzeń",
-    reminder: "Przypomnienie o subskrypcji",
+    deviceLicenses: "Subskrypcje urządzeń",
+    reminder: "Przypomnienia o wygaśnięciu",
   },
   post: {
-    title: "Wyślij przypomnienia o subskrypcji",
+    title: "Wyślij przypomnienia o wygaśnięciu",
     description:
-      "Sprawdza wszystkie urządzenia wygasające w ciągu 30 dni i wysyła przypomnienie. Raz na cykl wygaśnięcia dla każdego urządzenia.",
+      "Skanuje wszystkie urządzenia wygasające w ciągu 30 dni i wysyła przypomnienie na zapisany adres e-mail. Każde urządzenie jest powiadamiane raz na cykl wygaśnięcia.",
     response: {
       checked: "Sprawdzone urządzenia",
       reminded: "Wysłane przypomnienia",
       errors: { item: "Błąd" },
     },
     widget: {
-      title: "Przypomnienia o subskrypcji",
+      title: "Wyślij przypomnienia o wygaśnięciu",
+      back: "Wróć",
+      description:
+        "Sprawdza wszystkie aktywne subskrypcje urządzeń. Dla każdego urządzenia wygasającego w ciągu 30 dni wysyła e-mail na adres kontaktowy. Można uruchamiać wielokrotnie — każde urządzenie dostaje jedno powiadomienie na cykl.",
       run: "Uruchom teraz",
       runAgain: "Uruchom ponownie",
-      loading: "Wysyłanie przypomnień…",
-      result: "Przebieg przypomnień zakończony.",
+      loading: "Skanowanie urządzeń i wysyłanie przypomnień…",
+      result: "Przebieg zakończony.",
+      noErrors: "Brak błędów.",
+      sections: {
+        about: "Co robi to zadanie",
+        results: "Wyniki",
+      },
+      scanNote: "Sprawdza wszystkie urządzenia wygasające w ciągu 30 dni",
+      safeNote:
+        "Można uruchamiać wielokrotnie — jeden e-mail na urządzenie na cykl",
     },
     errors: {
       validation: {
@@ -34,9 +45,18 @@ export const translations = {
         title: "Brak autoryzacji",
         description: "Wymagane uwierzytelnienie.",
       },
-      forbidden: { title: "Brak dostępu", description: "Niedozwolone." },
-      notFound: { title: "Nie znaleziono", description: "Nie znaleziono." },
-      conflict: { title: "Konflikt", description: "Konflikt." },
+      forbidden: {
+        title: "Brak dostępu",
+        description: "Wymagany dostęp administratora.",
+      },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Nie znaleziono.",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Konflikt.",
+      },
       server: {
         title: "Błąd serwera",
         description: "Wewnętrzny błąd serwera.",
@@ -45,7 +65,10 @@ export const translations = {
         title: "Niezapisane zmiany",
         description: "Niezapisane zmiany.",
       },
-      unknown: { title: "Nieznany błąd", description: "Nieznany błąd." },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Nieznany błąd.",
+      },
     },
     success: {
       title: "Gotowe",

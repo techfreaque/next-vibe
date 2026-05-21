@@ -2,8 +2,13 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Key } from "next-vibe-ui/ui/icons/Key";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
@@ -12,6 +17,7 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetContext,
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetPlatform,
   useWidgetTranslation,
@@ -144,20 +150,45 @@ function LicenseRow({
 export function LicenseListContainer(): React.JSX.Element {
   const platform = useWidgetPlatform();
   const { endpointMutations } = useWidgetContext();
-  const { push: navigate } = useWidgetNavigation();
+  const { push: navigate, pop: goBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
 
   const licenses = data?.licenses ?? [];
   const total = data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 1;
   const isLoading = data === undefined;
   const isCli = platform === Platform.CLI;
   const isMcp = platform === Platform.MCP;
   const isCompact = isCli || isMcp;
 
+  const currentPage = (form.watch("page") ?? 0) + 1;
+
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
   }, [endpointMutations]);
+
+  const handleNavOrgs = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../../organizations/list/definition");
+      navigate(def.default.GET, {});
+    })();
+  }, [navigate]);
+
+  const handleNavCreate = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../create/definition");
+      navigate(def.default.POST, {});
+    })();
+  }, [navigate]);
+
+  const handleNavTrial = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../trial/definition");
+      navigate(def.default.POST, {});
+    })();
+  }, [navigate]);
 
   const handleLicenseClick = useCallback(
     (license: License): void => {
@@ -171,6 +202,20 @@ export function LicenseListContainer(): React.JSX.Element {
     [navigate],
   );
 
+  const handlePrev = useCallback((): void => {
+    const p = form.getValues("page") ?? 0;
+    if (p > 0) {
+      form.setValue("page", p - 1);
+    }
+  }, [form]);
+
+  const handleNext = useCallback((): void => {
+    const p = form.getValues("page") ?? 0;
+    if (p + 1 < totalPages) {
+      form.setValue("page", p + 1);
+    }
+  }, [form, totalPages]);
+
   if (isCompact) {
     if (!data) {
       return <Div />;
@@ -179,7 +224,7 @@ export function LicenseListContainer(): React.JSX.Element {
       <Div className="font-mono text-sm p-2">
         <Div className="font-semibold mb-1">
           {t("get.widget.title")} ({licenses.length}/{total})
-          {isMcp && ` — use page/pageSize to paginate`}
+          {isMcp && ` p:${currentPage}/${totalPages}`}
         </Div>
         {licenses.length === 0 ? (
           <Div className="text-muted-foreground">
@@ -203,6 +248,16 @@ export function LicenseListContainer(): React.JSX.Element {
   return (
     <Div className="flex flex-col min-h-0">
       <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
+          onClick={() => goBack()}
+          title={t("get.widget.back")}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <Key className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
           {t("get.widget.title")}
@@ -217,9 +272,42 @@ export function LicenseListContainer(): React.JSX.Element {
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title="Refresh"
+          title={t("get.widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
+        </Button>
+      </Div>
+
+      <Div className="flex items-center gap-1 px-3 py-1.5 border-b bg-muted/20 shrink-0 flex-wrap">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-6 gap-1 text-[11px] px-2"
+          onClick={handleNavOrgs}
+        >
+          <ArrowLeft className="h-3 w-3" />
+          {t("get.widget.nav.orgs")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-6 gap-1 text-[11px] px-2"
+          onClick={handleNavCreate}
+        >
+          <Plus className="h-3 w-3" />
+          {t("get.widget.nav.create")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-6 gap-1 text-[11px] px-2"
+          onClick={handleNavTrial}
+        >
+          <FileText className="h-3 w-3" />
+          {t("get.widget.nav.trial")}
         </Button>
       </Div>
 
@@ -245,6 +333,36 @@ export function LicenseListContainer(): React.JSX.Element {
           ))
         )}
       </Div>
+
+      {totalPages > 1 && (
+        <Div className="flex items-center justify-between px-4 py-2 border-t shrink-0">
+          <Span className="text-xs text-muted-foreground">
+            {currentPage} / {totalPages}
+          </Span>
+          <Div className="flex gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={currentPage <= 1}
+              onClick={handlePrev}
+              title={t("get.widget.prevPage")}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={currentPage >= totalPages}
+              onClick={handleNext}
+              title={t("get.widget.nextPage")}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </Div>
+        </Div>
+      )}
     </Div>
   );
 }

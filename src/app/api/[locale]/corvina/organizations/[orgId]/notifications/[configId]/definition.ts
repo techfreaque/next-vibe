@@ -22,13 +22,13 @@ import { NotificationEventOptions } from "../enums";
 import { scopedTranslation } from "./i18n";
 
 const NotificationUpdateContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.NotificationUpdateContainer,
   })),
 );
 
 const NotificationDeleteContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.NotificationDeleteContainer,
   })),
 );

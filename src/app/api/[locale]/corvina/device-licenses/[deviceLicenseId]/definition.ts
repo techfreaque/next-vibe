@@ -185,7 +185,7 @@ const { PUT } = createEndpoint({
   description: "put.description" as const,
   icon: "edit",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaDeviceLicenses",
   tags: ["tags.corvina" as const, "tags.deviceLicenses" as const],
   aliases: ["corvina_device_licenses_update"],
   fields: customWidgetObject({
@@ -336,7 +336,7 @@ const { DELETE } = createEndpoint({
   description: "delete.description" as const,
   icon: "trash",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaDeviceLicenses",
   tags: ["tags.corvina" as const, "tags.deviceLicenses" as const],
   aliases: ["corvina_device_licenses_delete"],
   fields: customWidgetObject({

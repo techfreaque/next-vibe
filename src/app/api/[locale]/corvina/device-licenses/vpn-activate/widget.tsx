@@ -3,13 +3,15 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
-import { Input } from "next-vibe-ui/ui/input";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
-import React from "react";
+import React, { useCallback } from "react";
 
+import { cn } from "@/app/api/[locale]/shared/utils";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetForm,
@@ -32,6 +34,100 @@ function formatDate(val: string | Date | null | undefined): string {
   return new Date(val).toLocaleDateString();
 }
 
+function TopBar({
+  onBack,
+  icon,
+  title,
+}: {
+  onBack: () => void;
+  icon: React.ReactNode;
+  title: string;
+}): React.JSX.Element {
+  return (
+    <Div className="flex items-center gap-2 px-3 py-2.5 border-b shrink-0">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="h-7 w-7 p-0 shrink-0"
+        onClick={onBack}
+      >
+        <ArrowLeft className="h-4 w-4" />
+      </Button>
+      <Span className="text-muted-foreground shrink-0">{icon}</Span>
+      <Span className="font-bold text-sm mr-auto truncate">{title}</Span>
+    </Div>
+  );
+}
+
+function SectionCard({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
+  return (
+    <Div className="rounded-2xl border bg-card overflow-hidden">
+      <Div className="flex items-center gap-2 px-4 py-2.5 border-b bg-muted/20">
+        <Span className="text-muted-foreground">{icon}</Span>
+        <Span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          {title}
+        </Span>
+      </Div>
+      <Div className="p-4">{children}</Div>
+    </Div>
+  );
+}
+
+function DataRow({
+  label,
+  value,
+  mono,
+}: {
+  label: string;
+  value: React.ReactNode;
+  mono?: boolean;
+}): React.JSX.Element {
+  return (
+    <Div className="flex items-start gap-3 py-2 border-b last:border-b-0">
+      <Span className="w-32 shrink-0 text-xs text-muted-foreground pt-0.5">
+        {label}
+      </Span>
+      <Span
+        className={cn(
+          "flex-1 text-xs font-medium break-all",
+          mono === true && "font-mono",
+        )}
+      >
+        {value ?? "—"}
+      </Span>
+    </Div>
+  );
+}
+
+function FormField({
+  label,
+  description,
+  children,
+}: {
+  label: string;
+  description?: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
+  return (
+    <Div className="flex flex-col gap-1.5">
+      <Label className="text-xs font-semibold">{label}</Label>
+      {children}
+      {description && (
+        <Span className="text-[11px] text-muted-foreground">{description}</Span>
+      )}
+    </Div>
+  );
+}
+
 export function DeviceLicenseVpnActivateContainer(): React.JSX.Element {
   const platform = useWidgetPlatform();
   const { pop } = useWidgetNavigation();
@@ -40,19 +136,21 @@ export function DeviceLicenseVpnActivateContainer(): React.JSX.Element {
   const onSubmit = useWidgetOnSubmit();
   const result = useWidgetValue<typeof definition.POST>();
 
-  const isMcp = platform === Platform.MCP;
-  const isCli = platform === Platform.CLI;
-  const isCompact = isCli || isMcp;
+  const isCompact = platform === Platform.CLI || platform === Platform.MCP;
 
-  const logicalIdValue = form.watch("logicalId") ?? "";
-  const numOfSecondsValue = form.watch("numOfSeconds");
-  const orgResourceIdValue = form.watch("orgResourceId") ?? "";
-  const autorenewValue = form.watch("autorenew") ?? false;
+  const handleBack = useCallback((): void => {
+    pop();
+  }, [pop]);
+
+  const logicalId = form.watch("logicalId") ?? "";
+  const numOfSeconds = form.watch("numOfSeconds");
+  const orgResourceId = form.watch("orgResourceId") ?? "";
+  const autorenew = form.watch("autorenew") ?? false;
 
   if (isCompact) {
     if (result !== null && result !== undefined) {
       return (
-        <Div className="font-mono text-sm p-2">
+        <Div className="font-mono text-xs p-2">
           {`vpn-activate ${result.logicalId}: from=${formatDate(result.fromDateVpn)} to=${formatDate(result.toDateVpn)}`}
         </Div>
       );
@@ -60,166 +158,166 @@ export function DeviceLicenseVpnActivateContainer(): React.JSX.Element {
     return <Div />;
   }
 
-  return (
-    <Div className="flex flex-col min-h-0">
-      <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            pop();
-          }}
-          title={t("post.widget.back")}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <Shield className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-sm mr-auto">
-          {t("post.widget.title")}
-        </Span>
+  if (result !== null && result !== undefined) {
+    return (
+      <Div className="flex flex-col min-h-0 bg-background">
+        <TopBar
+          onBack={handleBack}
+          icon={<Check className="h-3.5 w-3.5 text-success" />}
+          title={t("post.success.title")}
+        />
+        <Div className="overflow-y-auto flex-1 max-h-[min(700px,calc(100dvh-80px))] p-4 flex flex-col gap-3">
+          <SectionCard
+            icon={<Shield className="h-3.5 w-3.5" />}
+            title={t("post.success.title")}
+          >
+            <DataRow
+              label={t("post.response.logicalId")}
+              value={result.logicalId}
+              mono
+            />
+            {result.serialNumber && (
+              <DataRow
+                label={t("post.response.serialNumber")}
+                value={result.serialNumber}
+                mono
+              />
+            )}
+            {result.clientName && (
+              <DataRow
+                label={t("post.response.clientName")}
+                value={result.clientName}
+              />
+            )}
+            <DataRow
+              label={t("post.response.fromDateVpn")}
+              value={formatDate(result.fromDateVpn)}
+            />
+            <DataRow
+              label={t("post.response.toDateVpn")}
+              value={formatDate(result.toDateVpn)}
+            />
+            {result.numOfSecondsAutoRenewVpn !== null &&
+              result.numOfSecondsAutoRenewVpn !== undefined && (
+                <DataRow
+                  label={t("post.response.numOfSecondsAutoRenewVpn")}
+                  value={`${result.numOfSecondsAutoRenewVpn}s`}
+                  mono
+                />
+              )}
+            {result.vpnValidityMonths !== null &&
+              result.vpnValidityMonths !== undefined && (
+                <DataRow
+                  label={t("post.response.vpnValidityMonths")}
+                  value={`${result.vpnValidityMonths} mo`}
+                />
+              )}
+          </SectionCard>
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full h-9 gap-2 text-xs"
+            onClick={handleBack}
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            {t("post.widget.back")}
+          </Button>
+        </Div>
       </Div>
+    );
+  }
 
-      <Div className="overflow-y-auto max-h-[min(700px,calc(100dvh-200px))] p-4 space-y-4">
-        <Div className="grid grid-cols-2 gap-4">
-          <Div className="space-y-1.5">
-            <Label htmlFor="vpn-activate-logical-id">
-              {t("post.logicalId.label")}
-            </Label>
-            <Input
-              id="vpn-activate-logical-id"
-              type="text"
-              value={logicalIdValue}
-              onChange={(e) => {
-                form.setValue("logicalId", e.target.value, {
-                  shouldDirty: true,
-                });
-              }}
-              placeholder={t("post.logicalId.placeholder")}
-            />
-            <Span className="text-xs text-muted-foreground">
-              {t("post.logicalId.description")}
-            </Span>
-          </Div>
-
-          <Div className="space-y-1.5">
-            <Label htmlFor="vpn-activate-seconds">
-              {t("post.numOfSeconds.label")}
-            </Label>
-            <Input
-              id="vpn-activate-seconds"
-              type="number"
-              value={numOfSecondsValue}
-              onChange={(e) => {
-                form.setValue("numOfSeconds", e.target.value, {
-                  shouldDirty: true,
-                });
-              }}
-              placeholder={t("post.numOfSeconds.placeholder")}
-            />
-            <Span className="text-xs text-muted-foreground">
-              {t("post.numOfSeconds.description")}
-            </Span>
-          </Div>
-
-          <Div className="space-y-1.5">
-            <Label htmlFor="vpn-activate-org">
-              {t("post.orgResourceId.label")}
-            </Label>
-            <Input
-              id="vpn-activate-org"
-              type="text"
-              value={orgResourceIdValue}
-              onChange={(e) => {
-                form.setValue("orgResourceId", e.target.value, {
-                  shouldDirty: true,
-                });
-              }}
-              placeholder={t("post.orgResourceId.placeholder")}
-            />
-            <Span className="text-xs text-muted-foreground">
-              {t("post.orgResourceId.description")}
-            </Span>
-          </Div>
-
-          <Div className="flex flex-col gap-2 pt-6">
-            <Div className="flex items-center gap-2">
+  return (
+    <Div className="flex flex-col min-h-0 bg-background">
+      <TopBar
+        onBack={handleBack}
+        icon={<Shield className="h-3.5 w-3.5" />}
+        title={t("post.widget.title")}
+      />
+      <Div className="overflow-y-auto flex-1 max-h-[min(700px,calc(100dvh-80px))] p-4 flex flex-col gap-3">
+        <SectionCard
+          icon={<Shield className="h-3.5 w-3.5" />}
+          title={t("post.title")}
+        >
+          <Div className="flex flex-col gap-4">
+            <FormField
+              label={t("post.logicalId.label")}
+              description={t("post.logicalId.description")}
+            >
+              <Input
+                value={logicalId}
+                onChange={(e) =>
+                  form.setValue("logicalId", e.target.value, {
+                    shouldDirty: true,
+                  })
+                }
+                placeholder={t("post.logicalId.placeholder")}
+                className="font-mono"
+              />
+            </FormField>
+            <Div className="grid grid-cols-2 gap-3">
+              <FormField
+                label={t("post.numOfSeconds.label")}
+                description={t("post.numOfSeconds.description")}
+              >
+                <Input
+                  type="number"
+                  value={numOfSeconds}
+                  onChange={(e) =>
+                    form.setValue("numOfSeconds", Number(e.target.value), {
+                      shouldDirty: true,
+                    })
+                  }
+                  placeholder={t("post.numOfSeconds.placeholder")}
+                />
+              </FormField>
+              <FormField
+                label={t("post.orgResourceId.label")}
+                description={t("post.orgResourceId.description")}
+              >
+                <Input
+                  value={orgResourceId}
+                  onChange={(e) =>
+                    form.setValue(
+                      "orgResourceId",
+                      e.target.value || undefined,
+                      { shouldDirty: true },
+                    )
+                  }
+                  placeholder={t("post.orgResourceId.placeholder")}
+                  className="font-mono"
+                />
+              </FormField>
+            </Div>
+            <Div className="flex items-center gap-2 py-1">
               <Checkbox
                 id="vpn-activate-autorenew"
-                checked={autorenewValue}
+                checked={autorenew}
                 onCheckedChange={(checked) => {
                   form.setValue("autorenew", Boolean(checked) as never, {
                     shouldDirty: true,
                   });
                 }}
               />
-              <Label htmlFor="vpn-activate-autorenew">
+              <Label
+                htmlFor="vpn-activate-autorenew"
+                className="text-xs font-medium cursor-pointer"
+              >
                 {t("post.autorenew.label")}
               </Label>
             </Div>
-            <Span className="text-xs text-muted-foreground">
-              {t("post.autorenew.description")}
-            </Span>
           </Div>
-        </Div>
+        </SectionCard>
 
         <Button
           type="button"
           variant="default"
-          className="w-full gap-2"
+          className="w-full h-10 gap-2 text-sm font-semibold"
           onClick={onSubmit ?? undefined}
         >
           <Shield className="h-4 w-4" />
           {t("post.submitButton.label")}
         </Button>
-
-        {result !== null && result !== undefined && (
-          <Div className="rounded-xl border bg-card p-4 space-y-3">
-            <Span className="font-semibold text-sm text-success block">
-              {result.logicalId}
-            </Span>
-            <Div className="grid grid-cols-2 gap-2 text-sm">
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-xs text-muted-foreground">
-                  {t("post.response.serialNumber")}
-                </Span>
-                <Span className="font-mono">{result.serialNumber ?? "—"}</Span>
-              </Div>
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-xs text-muted-foreground">
-                  {t("post.response.clientName")}
-                </Span>
-                <Span>{result.clientName ?? "—"}</Span>
-              </Div>
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-xs text-muted-foreground">
-                  {t("post.response.fromDateVpn")}
-                </Span>
-                <Span>{formatDate(result.fromDateVpn)}</Span>
-              </Div>
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-xs text-muted-foreground">
-                  {t("post.response.toDateVpn")}
-                </Span>
-                <Span>{formatDate(result.toDateVpn)}</Span>
-              </Div>
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-xs text-muted-foreground">
-                  {t("post.response.numOfSecondsAutoRenewVpn")}
-                </Span>
-                <Span className="font-mono">
-                  {result.numOfSecondsAutoRenewVpn ?? "—"}
-                </Span>
-              </Div>
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-xs text-muted-foreground">
-                  {t("post.response.vpnValidityMonths")}
-                </Span>
-                <Span>{result.vpnValidityMonths ?? "—"}</Span>
-              </Div>
-            </Div>
-          </Div>
-        )}
       </Div>
     </Div>
   );

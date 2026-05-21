@@ -61,6 +61,9 @@ export const translations = {
     },
     widget: {
       added: "Urządzenie dodane",
+      registeredSuccessfully: "Urządzenie zostało zarejestrowane.",
+      backToDevices: "Wróć do urządzeń",
+      deviceInfo: "Dane urządzenia",
     },
     success: {
       title: "Urządzenie dodane",

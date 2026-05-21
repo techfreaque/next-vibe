@@ -22,15 +22,15 @@ import { MembershipRole, UserGroupOwner, UserGroupType } from "../enums";
 import { scopedTranslation } from "./i18n";
 
 const UserGroupDetailContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.UserGroupDetailContainer })),
+  import("./widget").then((m) => ({ default: m.UserGroupDetailContainer })),
 );
 
 const UserGroupUpdateContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.UserGroupUpdateContainer })),
+  import("./widget").then((m) => ({ default: m.UserGroupUpdateContainer })),
 );
 
 const UserGroupDeleteContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.UserGroupDeleteContainer })),
+  import("./widget").then((m) => ({ default: m.UserGroupDeleteContainer })),
 );
 
 const { GET } = createEndpoint({

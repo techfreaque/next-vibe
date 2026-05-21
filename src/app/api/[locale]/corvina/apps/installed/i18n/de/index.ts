@@ -36,6 +36,7 @@ export const translations = {
     widget: {
       title: "Installierte Apps",
       noInstallsFound: "Keine Apps in dieser Organisation installiert",
+      back: "Zurück",
       uninstall: "Deinstallieren",
       loadButton: "Laden",
       trialBadge: "Testphase",

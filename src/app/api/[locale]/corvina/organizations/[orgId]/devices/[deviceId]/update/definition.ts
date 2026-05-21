@@ -19,7 +19,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 const DeviceUpdateContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.DeviceUpdateContainer })),
+  import("./widget").then((m) => ({ default: m.DeviceUpdateContainer })),
 );
 
 const { PATCH } = createEndpoint({

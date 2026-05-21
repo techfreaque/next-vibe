@@ -474,6 +474,10 @@ export const translations = {
     support: "Support",
     corvina: "Corvina",
     corvinaOrganizations: "Organizations",
+    corvinaSubscriptions: "Subscriptions",
+    corvinaLicenses: "Licenses",
+    corvinaDeviceLicenses: "Subscriptions",
+    corvinaDeviceSubscriptions: "Device Subscriptions",
   },
   ui: {
     iconPicker: {

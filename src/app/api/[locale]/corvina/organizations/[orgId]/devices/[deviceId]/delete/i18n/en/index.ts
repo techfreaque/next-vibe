@@ -15,6 +15,7 @@ export const translations = {
       warning: "This cannot be undone.",
       deleted: "Device deleted.",
       deletedMcp: "Device deleted successfully.",
+      back: "Back",
     },
     errors: {
       validation: {

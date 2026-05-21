@@ -30,6 +30,7 @@ export const translations = {
     widget: {
       title: "Corvina App Marketplace",
       noAppsFound: "No apps found in the marketplace",
+      back: "Back",
       install: "Install",
       search: "Search apps...",
       installedApps: "Installed Apps",

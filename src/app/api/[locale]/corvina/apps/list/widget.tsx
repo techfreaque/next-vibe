@@ -3,6 +3,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Image } from "next-vibe-ui/ui/image";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Package } from "next-vibe-ui/ui/icons/Package";
@@ -112,7 +113,7 @@ function AppCard({
 
 export function AppListContainer(): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
-  const { push: navigate } = useWidgetNavigation();
+  const { push: navigate, pop } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
 
@@ -143,6 +144,16 @@ export function AppListContainer(): React.JSX.Element {
   return (
     <Div className="flex flex-col min-h-0">
       <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
+          onClick={() => pop()}
+          title={t("get.widget.back")}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <ShoppingBag className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
           {t("get.widget.title")}

@@ -2,26 +2,27 @@ export const translations = {
   category: "Corvina",
   tags: {
     corvina: "Corvina",
-    deviceLicenses: "Device Licenses",
+    deviceLicenses: "Device Subscriptions",
     subscription: "Subscription",
   },
   get: {
-    title: "Device Subscription",
-    description: "Fetch subscription details for a specific device.",
+    title: "Device Subscription Status",
+    description:
+      "Trial and paid subscription dates for a Corvina device. Shows current status, days remaining, and contact email for renewal reminders.",
     logicalId: {
       label: "Device ID",
       description: "Corvina logical ID of the device.",
     },
     response: {
       logicalId: "Device ID",
-      orgResourceId: "Org Resource ID",
-      clientEmail: "Client Email",
-      trialStartDate: "Trial Start Date",
-      subscriptionEndDate: "Subscription End Date",
-      effectiveStartDate: "Effective Start",
-      effectiveEndDate: "Effective End",
+      orgResourceId: "Organization",
+      clientEmail: "Contact Email",
+      trialStartDate: "Trial Start",
+      subscriptionEndDate: "Subscription End",
+      effectiveStartDate: "Active From",
+      effectiveEndDate: "Active Until",
       status: "Status",
-      daysUntilExpiry: "Days Until Expiry",
+      daysUntilExpiry: "Days Remaining",
     },
     status: {
       trial: "Trial",
@@ -31,16 +32,31 @@ export const translations = {
       noSubscription: "No Subscription",
     },
     widget: {
-      title: "Subscription",
+      title: "Device Subscription",
       editButton: "Edit",
-      requestLicense: "Request License",
+      requestRenewal: "Request Renewal",
       notFound:
-        "No subscription record found. Default 30-day trial applies from activation date.",
+        "No subscription record. Default 30-day trial runs from activation date.",
+      daysLeft: "d left",
+      daysAgo: "d ago",
+      loading: "Loading subscription…",
+      noSubscription: "No subscription",
+      noSubscriptionHint:
+        "Default 30-day trial runs from device activation date.",
+      sections: {
+        subscription: "Subscription",
+      },
+      effectiveFrom: "Active from",
+      effectiveUntil: "Active until",
+      trialStart: "Trial start",
+      subscriptionEnd: "Subscription end",
+      clientEmail: "Contact email",
+      organization: "Organization",
     },
     errors: {
       validation: {
         title: "Invalid Request",
-        description: "The device ID is required.",
+        description: "Device ID is required.",
       },
       network: {
         title: "Network Error",
@@ -52,11 +68,11 @@ export const translations = {
       },
       forbidden: {
         title: "Forbidden",
-        description: "You do not have permission to view subscription data.",
+        description: "No permission to view subscription data.",
       },
       notFound: {
         title: "Not Found",
-        description: "No subscription record found for this device.",
+        description: "No subscription record for this device.",
       },
       conflict: {
         title: "Conflict",
@@ -77,44 +93,47 @@ export const translations = {
     },
     success: {
       title: "Success",
-      description: "Subscription details fetched.",
+      description: "Subscription status loaded.",
     },
   },
   post: {
-    title: "Update Device Subscription",
+    title: "Set Device Subscription",
     description:
-      "Set or update the subscription period and client email for a device.",
+      "Set or override trial start and subscription end dates for a device. Assign a contact email for expiry reminders.",
     logicalId: {
       label: "Device ID",
       description: "Corvina logical ID of the device.",
     },
     orgResourceId: {
-      label: "Org Resource ID",
+      label: "Organization",
       description: "Organization resource ID for this device.",
     },
     clientEmail: {
-      label: "Client Email",
-      description: "Email address to send subscription reminders to.",
+      label: "Contact Email",
+      description: "Email address for subscription expiry reminders.",
     },
     trialStartDate: {
-      label: "Trial Start Date",
-      description:
-        "Override the trial start date. Leave blank to use device activation date.",
+      label: "Trial Start",
+      description: "Override trial start. Leave blank to use activation date.",
     },
     subscriptionEndDate: {
-      label: "Subscription End Date",
+      label: "Subscription End",
       description:
-        "Override the subscription end date. Leave blank to use start date + 30 days.",
+        "Set paid subscription end date. Leave blank for trial-only (start + 30 days).",
     },
     widget: {
       title: "Edit Subscription",
       back: "Back",
       result: {
-        title: "Subscription Updated",
+        title: "Subscription Saved",
+      },
+      sections: {
+        identity: "Device",
+        subscription: "Subscription dates",
       },
     },
     submitButton: {
-      label: "Save Subscription",
+      label: "Save",
       loadingText: "Saving...",
     },
     errors: {
@@ -132,7 +151,7 @@ export const translations = {
       },
       forbidden: {
         title: "Forbidden",
-        description: "You do not have permission to update subscription data.",
+        description: "No permission to update subscription data.",
       },
       notFound: {
         title: "Not Found",
@@ -156,8 +175,8 @@ export const translations = {
       },
     },
     success: {
-      title: "Updated",
-      description: "Subscription updated successfully.",
+      title: "Saved",
+      description: "Subscription updated.",
     },
   },
 };

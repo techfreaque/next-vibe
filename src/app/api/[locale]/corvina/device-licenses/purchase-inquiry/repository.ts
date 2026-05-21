@@ -35,35 +35,43 @@ export class PurchaseInquiryRepository {
     t: PurchaseInquiryT,
   ): Promise<ResponseType<PurchaseInquiryPostResponseOutput>> {
     try {
-      const [row] = await db
+      const rows = await db
         .insert(corvinaPurchaseInquiries)
-        .values({
-          logicalId: data.logicalId,
-          orgResourceId: data.orgResourceId,
-          deviceLabel: data.deviceLabel ?? null,
-          contactName: data.contactName,
-          contactEmail: data.contactEmail,
-          contactPhone: data.contactPhone ?? null,
-          message: data.inquiryMessage ?? null,
-          requestedMonths: data.requestedMonths ?? null,
-          status: "new",
-        })
+        .values(
+          data.logicalId.map((id, idx) => ({
+            logicalId: id,
+            orgResourceId: data.orgResourceId,
+            deviceLabel: data.deviceLabel?.[idx] ?? null,
+            contactName: data.contactName,
+            contactEmail: data.contactEmail,
+            contactPhone: data.contactPhone ?? null,
+            message: data.inquiryMessage ?? null,
+            requestedMonths: data.requestedMonths ?? null,
+            status: "new" as const,
+          })),
+        )
         .returning({ id: corvinaPurchaseInquiries.id });
 
-      if (!row) {
+      if (!rows.length) {
         return fail({
           message: t("post.errors.server.description"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
 
-      const inquiryId = row.id;
+      const inquiryId = rows[0].id;
 
       if (ADMIN_EMAIL) {
+        const deviceSummary = data.logicalId
+          .map((id, idx) =>
+            data.deviceLabel?.[idx] ? `${data.deviceLabel[idx]} (${id})` : id,
+          )
+          .join(", ");
+
         const jsx = React.createElement(PurchaseInquiryEmailContent, {
-          logicalId: data.logicalId,
+          logicalId: deviceSummary,
           orgResourceId: data.orgResourceId,
-          deviceLabel: data.deviceLabel,
+          deviceLabel: deviceSummary,
           contactName: data.contactName,
           contactEmail: data.contactEmail,
           contactPhone: data.contactPhone,
@@ -75,7 +83,7 @@ export class PurchaseInquiryRepository {
         const emailResult = await EmailSendingRepository.sendEmail(
           {
             jsx,
-            subject: `New license inquiry #${inquiryId}: ${data.logicalId}`,
+            subject: `New license inquiry #${inquiryId}: ${data.logicalId.join(", ")}`,
             toEmail: ADMIN_EMAIL,
             toName: "Admin",
             locale,
@@ -99,7 +107,8 @@ export class PurchaseInquiryRepository {
 
       logger.info("Purchase inquiry created", {
         inquiryId,
-        logicalId: data.logicalId,
+        count: data.logicalId.length,
+        logicalIds: data.logicalId,
       });
 
       return success({

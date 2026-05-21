@@ -62,6 +62,9 @@ export const translations = {
     },
     widget: {
       added: "Device added",
+      registeredSuccessfully: "Device registered successfully.",
+      backToDevices: "Back to devices",
+      deviceInfo: "Device info",
     },
     success: {
       title: "Device added",

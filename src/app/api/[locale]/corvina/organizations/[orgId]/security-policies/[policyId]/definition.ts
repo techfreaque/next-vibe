@@ -22,19 +22,19 @@ import { SecurityPolicyType } from "../enums";
 import { scopedTranslation } from "./i18n";
 
 const SecurityPolicyDetailContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.SecurityPolicyDetailContainer,
   })),
 );
 
 const SecurityPolicyUpdateContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.SecurityPolicyUpdateContainer,
   })),
 );
 
 const SecurityPolicyDeleteContainer = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({
+  import("./widget").then((m) => ({
     default: m.SecurityPolicyDeleteContainer,
   })),
 );

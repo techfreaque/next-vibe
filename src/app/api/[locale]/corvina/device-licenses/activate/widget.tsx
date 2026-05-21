@@ -4,17 +4,19 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 
+import { cn } from "@/app/api/[locale]/shared/utils";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-  useWidgetContext,
+  useWidgetForm,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
@@ -22,316 +24,379 @@ import {
 
 import type definition from "./definition";
 
-function ResultRow({
-  label,
-  value,
+// ── Shared helpers ────────────────────────────────────────────────────────────
+
+function formatDate(val: Date | string | null | undefined): string {
+  if (!val) {
+    return "—";
+  }
+  if (val instanceof Date) {
+    return val.toLocaleDateString();
+  }
+  return new Date(val).toLocaleDateString();
+}
+
+function TopBar({
+  onBack,
+  icon,
+  title,
+  children,
 }: {
-  label: string;
-  value: React.ReactNode;
+  onBack: () => void;
+  icon: React.ReactNode;
+  title: string;
+  children?: React.ReactNode;
 }): React.JSX.Element {
   return (
-    <Div className="flex flex-col gap-0.5">
-      <Span className="text-xs text-muted-foreground">{label}</Span>
-      <Span className="text-sm font-medium font-mono">{value}</Span>
+    <Div className="flex items-center gap-2 px-3 py-2.5 border-b shrink-0">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="h-7 w-7 p-0 shrink-0"
+        onClick={onBack}
+      >
+        <ArrowLeft className="h-4 w-4" />
+      </Button>
+      <Span className="text-muted-foreground shrink-0">{icon}</Span>
+      <Span className="font-bold text-sm mr-auto truncate">{title}</Span>
+      {children}
     </Div>
   );
 }
 
+function SectionCard({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
+  return (
+    <Div className="rounded-2xl border bg-card overflow-hidden">
+      <Div className="flex items-center gap-2 px-4 py-2.5 border-b bg-muted/20">
+        <Span className="text-muted-foreground">{icon}</Span>
+        <Span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          {title}
+        </Span>
+      </Div>
+      <Div className="p-4">{children}</Div>
+    </Div>
+  );
+}
+
+function DataRow({
+  label,
+  value,
+  mono,
+}: {
+  label: string;
+  value: React.ReactNode;
+  mono?: boolean;
+}): React.JSX.Element {
+  return (
+    <Div className="flex items-start gap-3 py-2 border-b last:border-b-0">
+      <Span className="w-32 shrink-0 text-xs text-muted-foreground pt-0.5">
+        {label}
+      </Span>
+      <Span
+        className={cn(
+          "flex-1 text-xs font-medium break-all",
+          mono === true && "font-mono",
+        )}
+      >
+        {value ?? "—"}
+      </Span>
+    </Div>
+  );
+}
+
+function FormField({
+  label,
+  description,
+  children,
+}: {
+  label: string;
+  description?: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
+  return (
+    <Div className="flex flex-col gap-1.5">
+      <Label className="text-xs font-semibold">{label}</Label>
+      {children}
+      {description && (
+        <Span className="text-[11px] text-muted-foreground">{description}</Span>
+      )}
+    </Div>
+  );
+}
+
+// ── Container ─────────────────────────────────────────────────────────────────
+
 export function DeviceLicenseActivateContainer(): React.JSX.Element {
   const platform = useWidgetPlatform();
-  const { endpointMutations } = useWidgetContext();
   const { pop } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const form = useWidgetForm<typeof definition.POST>();
+  const onSubmit = useWidgetOnSubmit();
   const result = useWidgetValue<typeof definition.POST>();
 
-  const isCli = platform === Platform.CLI;
-  const isMcp = platform === Platform.MCP;
-  const isCompact = isCli || isMcp;
+  const isCompact = platform === Platform.CLI || platform === Platform.MCP;
 
-  const [activationKey, setActivationKey] = useState("");
-  const [alias, setAlias] = useState("");
-  const [deviceSerialNumber, setDeviceSerialNumber] = useState("");
-  const [activateDescription, setActivateDescription] = useState("");
-  const [orgResourceId, setOrgResourceId] = useState("");
-  const [logicalId, setLogicalId] = useState("");
-  const [numOfSecondsVpn, setNumOfSecondsVpn] = useState<number | undefined>(
-    undefined,
-  );
-  const [autorenewVpn, setAutorenewVpn] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const handleBack = useCallback((): void => {
+    pop();
+  }, [pop]);
 
-  const handleSubmit = useCallback((): void => {
-    setIsSubmitting(true);
-    void endpointMutations?.create
-      ?.submit({
-        activationKey,
-        alias: alias !== "" ? alias : undefined,
-        deviceSerialNumber:
-          deviceSerialNumber !== "" ? deviceSerialNumber : undefined,
-        activateDescription:
-          activateDescription !== "" ? activateDescription : undefined,
-        orgResourceId: orgResourceId !== "" ? orgResourceId : undefined,
-        logicalId: logicalId !== "" ? logicalId : undefined,
-        numOfSecondsVpn: numOfSecondsVpn,
-        autorenewVpn: autorenewVpn,
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
-  }, [
-    endpointMutations,
-    activationKey,
-    alias,
-    deviceSerialNumber,
-    activateDescription,
-    orgResourceId,
-    logicalId,
-    numOfSecondsVpn,
-    autorenewVpn,
-  ]);
+  const activationKey = form.watch("activationKey") ?? "";
+  const alias = form.watch("alias") ?? "";
+  const deviceSerialNumber = form.watch("deviceSerialNumber") ?? "";
+  const activateDescription = form.watch("activateDescription") ?? "";
+  const orgResourceId = form.watch("orgResourceId") ?? "";
+  const logicalId = form.watch("logicalId") ?? "";
+  const numOfSecondsVpn = form.watch("numOfSecondsVpn");
+  const autorenewVpn = form.watch("autorenewVpn") ?? false;
 
-  if (isCompact && result !== null && result !== undefined) {
+  if (isCompact) {
+    if (result !== null && result !== undefined) {
+      return (
+        <Div className="font-mono text-xs p-2">
+          {`activated:#${result.id} key:${result.activationKeyOut} used:${String(result.used)}`}
+        </Div>
+      );
+    }
+    return <Div />;
+  }
+
+  if (result !== null && result !== undefined) {
     return (
-      <Div className="font-mono text-sm p-2">
-        {`activated #${result.id} key:${result.activationKeyOut} used:${result.used}`}
+      <Div className="flex flex-col min-h-0 bg-background">
+        <TopBar
+          onBack={handleBack}
+          icon={<Shield className="h-3.5 w-3.5 text-success" />}
+          title={t("post.success.title")}
+        />
+        <Div className="overflow-y-auto flex-1 max-h-[min(700px,calc(100dvh-80px))] p-4 flex flex-col gap-3">
+          <Div className="flex flex-col items-center gap-4 py-4">
+            <Div className="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center">
+              <Check className="h-7 w-7 text-success" />
+            </Div>
+            <Span className="font-bold text-base font-mono">
+              {result.activationKeyOut}
+            </Span>
+            <Span className="text-xs text-muted-foreground text-center">
+              {t("post.success.description")}
+            </Span>
+          </Div>
+          <SectionCard
+            icon={<Shield className="h-3.5 w-3.5" />}
+            title={t("post.widget.result")}
+          >
+            <DataRow
+              label={t("post.response.id")}
+              value={String(result.id)}
+              mono
+            />
+            <DataRow
+              label={t("post.response.activationKey")}
+              value={result.activationKeyOut}
+              mono
+            />
+            {result.serialNumber && (
+              <DataRow
+                label={t("post.response.serialNumber")}
+                value={result.serialNumber}
+                mono
+              />
+            )}
+            {result.realm && (
+              <DataRow
+                label={t("post.response.realm")}
+                value={result.realm}
+                mono
+              />
+            )}
+            {result.orgResourceIdOut && (
+              <DataRow
+                label={t("post.response.orgResourceId")}
+                value={result.orgResourceIdOut}
+                mono
+              />
+            )}
+            {result.activationDate && (
+              <DataRow
+                label={t("post.response.activationDate")}
+                value={formatDate(result.activationDate)}
+              />
+            )}
+          </SectionCard>
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full h-9 gap-2 text-xs"
+            onClick={handleBack}
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            {t("post.widget.back")}
+          </Button>
+        </Div>
       </Div>
     );
   }
 
   return (
-    <Div className="flex flex-col min-h-0">
-      <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            pop();
-          }}
-          title={t("post.widget.back")}
+    <Div className="flex flex-col min-h-0 bg-background">
+      <TopBar
+        onBack={handleBack}
+        icon={<Shield className="h-3.5 w-3.5" />}
+        title={t("post.widget.title")}
+      />
+      <Div className="overflow-y-auto flex-1 max-h-[min(700px,calc(100dvh-80px))] p-4 flex flex-col gap-3">
+        <SectionCard
+          icon={<Shield className="h-3.5 w-3.5" />}
+          title={t("post.title")}
         >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <Shield className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-sm mr-auto">
-          {t("post.widget.title")}
-        </Span>
-      </Div>
-
-      <Div className="overflow-y-auto max-h-[min(700px,calc(100dvh-200px))] p-4">
-        <Div className="grid grid-cols-2 gap-3">
-          <Div className="col-span-2 space-y-1.5">
-            <Label htmlFor="act-activation-key">
-              {t("post.activationKey.label")}
-            </Label>
-            <Input
-              id="act-activation-key"
-              type="text"
-              value={activationKey}
-              onChange={(e) => {
-                setActivationKey(e.target.value);
-              }}
-              placeholder="ACT-KEY-001"
-            />
-            <Span className="text-xs text-muted-foreground">
-              {t("post.activationKey.description")}
-            </Span>
+          <Div className="flex flex-col gap-4">
+            <FormField
+              label={t("post.activationKey.label")}
+              description={t("post.activationKey.description")}
+            >
+              <Input
+                value={activationKey}
+                onChange={(e) =>
+                  form.setValue("activationKey", e.target.value, {
+                    shouldDirty: true,
+                  })
+                }
+                placeholder="ACT-KEY-001"
+                className="font-mono"
+              />
+            </FormField>
+            <Div className="grid grid-cols-2 gap-3">
+              <FormField
+                label={t("post.alias.label")}
+                description={t("post.alias.description")}
+              >
+                <Input
+                  value={alias}
+                  onChange={(e) =>
+                    form.setValue("alias", e.target.value || undefined, {
+                      shouldDirty: true,
+                    })
+                  }
+                />
+              </FormField>
+              <FormField
+                label={t("post.deviceSerialNumber.label")}
+                description={t("post.deviceSerialNumber.description")}
+              >
+                <Input
+                  value={deviceSerialNumber}
+                  onChange={(e) =>
+                    form.setValue(
+                      "deviceSerialNumber",
+                      e.target.value || undefined,
+                      { shouldDirty: true },
+                    )
+                  }
+                  placeholder="SN-ABC-001"
+                  className="font-mono"
+                />
+              </FormField>
+              <FormField
+                label={t("post.orgResourceId.label")}
+                description={t("post.orgResourceId.description")}
+              >
+                <Input
+                  value={orgResourceId}
+                  onChange={(e) =>
+                    form.setValue(
+                      "orgResourceId",
+                      e.target.value || undefined,
+                      { shouldDirty: true },
+                    )
+                  }
+                  className="font-mono"
+                />
+              </FormField>
+              <FormField
+                label={t("post.logicalId.label")}
+                description={t("post.logicalId.description")}
+              >
+                <Input
+                  value={logicalId}
+                  onChange={(e) =>
+                    form.setValue("logicalId", e.target.value || undefined, {
+                      shouldDirty: true,
+                    })
+                  }
+                  className="font-mono"
+                />
+              </FormField>
+            </Div>
+            <FormField
+              label={t("post.activateDescription.label")}
+              description={t("post.activateDescription.description")}
+            >
+              <Input
+                value={activateDescription}
+                onChange={(e) =>
+                  form.setValue(
+                    "activateDescription",
+                    e.target.value || undefined,
+                    { shouldDirty: true },
+                  )
+                }
+              />
+            </FormField>
+            <FormField
+              label={t("post.numOfSecondsVpn.label")}
+              description={t("post.numOfSecondsVpn.description")}
+            >
+              <Input
+                type="number"
+                value={numOfSecondsVpn}
+                onChange={(e) =>
+                  form.setValue(
+                    "numOfSecondsVpn",
+                    e.target.value ? Number(e.target.value) : undefined,
+                    { shouldDirty: true },
+                  )
+                }
+                placeholder="3600"
+              />
+            </FormField>
+            <Div className="flex items-center gap-2 py-1">
+              <Checkbox
+                id="act-autorenew-vpn"
+                checked={autorenewVpn}
+                onCheckedChange={(checked) => {
+                  form.setValue("autorenewVpn", Boolean(checked), {
+                    shouldDirty: true,
+                  });
+                }}
+              />
+              <Label
+                htmlFor="act-autorenew-vpn"
+                className="text-xs font-medium cursor-pointer"
+              >
+                {t("post.autorenewVpn.label")}
+              </Label>
+            </Div>
           </Div>
-
-          <Div className="space-y-1.5">
-            <Label htmlFor="act-alias">{t("post.alias.label")}</Label>
-            <Input
-              id="act-alias"
-              type="text"
-              value={alias}
-              onChange={(e) => {
-                setAlias(e.target.value);
-              }}
-              placeholder=""
-            />
-            <Span className="text-xs text-muted-foreground">
-              {t("post.alias.description")}
-            </Span>
-          </Div>
-
-          <Div className="space-y-1.5">
-            <Label htmlFor="act-serial">
-              {t("post.deviceSerialNumber.label")}
-            </Label>
-            <Input
-              id="act-serial"
-              type="text"
-              value={deviceSerialNumber}
-              onChange={(e) => {
-                setDeviceSerialNumber(e.target.value);
-              }}
-              placeholder="SN-ABC-001"
-            />
-            <Span className="text-xs text-muted-foreground">
-              {t("post.deviceSerialNumber.description")}
-            </Span>
-          </Div>
-
-          <Div className="col-span-2 space-y-1.5">
-            <Label htmlFor="act-description">
-              {t("post.activateDescription.label")}
-            </Label>
-            <Input
-              id="act-description"
-              type="text"
-              value={activateDescription}
-              onChange={(e) => {
-                setActivateDescription(e.target.value);
-              }}
-              placeholder=""
-            />
-            <Span className="text-xs text-muted-foreground">
-              {t("post.activateDescription.description")}
-            </Span>
-          </Div>
-
-          <Div className="space-y-1.5">
-            <Label htmlFor="act-org-resource-id">
-              {t("post.orgResourceId.label")}
-            </Label>
-            <Input
-              id="act-org-resource-id"
-              type="text"
-              value={orgResourceId}
-              onChange={(e) => {
-                setOrgResourceId(e.target.value);
-              }}
-              placeholder=""
-            />
-            <Span className="text-xs text-muted-foreground">
-              {t("post.orgResourceId.description")}
-            </Span>
-          </Div>
-
-          <Div className="space-y-1.5">
-            <Label htmlFor="act-logical-id">{t("post.logicalId.label")}</Label>
-            <Input
-              id="act-logical-id"
-              type="text"
-              value={logicalId}
-              onChange={(e) => {
-                setLogicalId(e.target.value);
-              }}
-              placeholder=""
-            />
-            <Span className="text-xs text-muted-foreground">
-              {t("post.logicalId.description")}
-            </Span>
-          </Div>
-
-          <Div className="space-y-1.5">
-            <Label htmlFor="act-vpn-seconds">
-              {t("post.numOfSecondsVpn.label")}
-            </Label>
-            <Input
-              id="act-vpn-seconds"
-              type="number"
-              value={numOfSecondsVpn}
-              onChange={(e) => {
-                setNumOfSecondsVpn(e.target.value);
-              }}
-              placeholder="3600"
-            />
-            <Span className="text-xs text-muted-foreground">
-              {t("post.numOfSecondsVpn.description")}
-            </Span>
-          </Div>
-
-          <Div className="flex items-center gap-2 pt-6">
-            <Checkbox
-              id="act-autorenew-vpn"
-              checked={autorenewVpn}
-              onCheckedChange={(checked) => {
-                setAutorenewVpn(checked === true);
-              }}
-            />
-            <Label htmlFor="act-autorenew-vpn">
-              {t("post.autorenewVpn.label")}
-            </Label>
-          </Div>
-        </Div>
+        </SectionCard>
 
         <Button
           type="button"
           variant="default"
-          className="w-full gap-2 mt-4"
-          onClick={handleSubmit}
-          disabled={isSubmitting || activationKey === ""}
+          className="w-full h-10 gap-2 text-sm font-semibold"
+          onClick={onSubmit ?? undefined}
+          disabled={activationKey === ""}
         >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {t("post.submitButton.loadingText")}
-            </>
-          ) : (
-            <>
-              <Shield className="h-4 w-4" />
-              {t("post.submitButton.label")}
-            </>
-          )}
+          <Shield className="h-4 w-4" />
+          {t("post.submitButton.label")}
         </Button>
-
-        {result !== null && result !== undefined && (
-          <Div className="mt-4 rounded-xl border bg-card p-4 space-y-3">
-            <Span className="font-semibold text-sm text-success">
-              {t("post.widget.result")}
-            </Span>
-            <Div className="grid grid-cols-2 gap-3">
-              <ResultRow
-                label={t("post.response.id")}
-                value={String(result.id)}
-              />
-              <ResultRow
-                label={t("post.response.activationKey")}
-                value={result.activationKeyOut}
-              />
-              {result.serialNumber !== null &&
-                result.serialNumber !== undefined && (
-                  <ResultRow
-                    label={t("post.response.serialNumber")}
-                    value={result.serialNumber}
-                  />
-                )}
-              {result.realm !== null && result.realm !== undefined && (
-                <ResultRow
-                  label={t("post.response.realm")}
-                  value={result.realm}
-                />
-              )}
-              {result.orgResourceIdOut !== null &&
-                result.orgResourceIdOut !== undefined && (
-                  <ResultRow
-                    label={t("post.response.orgResourceId")}
-                    value={result.orgResourceIdOut}
-                  />
-                )}
-              <ResultRow
-                label={t("post.response.used")}
-                value={result.used ? "Yes" : "No"}
-              />
-              <ResultRow
-                label={t("post.response.deleted")}
-                value={result.deleted ? "Yes" : "No"}
-              />
-              {result.activationDate !== null &&
-                result.activationDate !== undefined && (
-                  <ResultRow
-                    label={t("post.response.activationDate")}
-                    value={
-                      result.activationDate instanceof Date
-                        ? result.activationDate.toLocaleDateString()
-                        : String(result.activationDate)
-                    }
-                  />
-                )}
-            </Div>
-          </Div>
-        )}
       </Div>
     </Div>
   );

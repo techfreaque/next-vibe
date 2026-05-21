@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   description: "post.description" as const,
   icon: "shopping-cart",
   category: "endpointCategories.corvina",
-  subCategory: "endpointCategories.corvina",
+  subCategory: "endpointCategories.corvinaDeviceSubscriptions",
   tags: ["tags.corvina" as const, "tags.deviceLicenses" as const],
   aliases: ["corvina_purchase_inquiry"],
 
@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
         label: "post.logicalId.label" as const,
         description: "post.logicalId.description" as const,
         columns: 12,
-        schema: z.string().min(1),
+        schema: z.array(z.string().min(1)).min(1),
       }),
       orgResourceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -63,7 +63,7 @@ const { POST } = createEndpoint({
         label: "post.deviceLabel.label" as const,
         description: "post.deviceLabel.description" as const,
         columns: 12,
-        schema: z.string().optional(),
+        schema: z.array(z.string()).optional(),
       }),
       contactName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -165,9 +165,9 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        logicalId: "device-abc-123",
+        logicalId: ["device-abc-123"],
         orgResourceId: "org-xyz-456",
-        deviceLabel: "Building A - Gateway",
+        deviceLabel: ["Building A - Gateway"],
         contactName: "John Smith",
         contactEmail: "john@example.com",
         contactPhone: "+1 555-0100",

@@ -124,6 +124,8 @@ export class CorvinaDevicesListRepository {
           connected,
           subscriptionStatus: sub ? status : undefined,
           daysUntilExpiry: sub ? daysUntilExpiry : undefined,
+          trialStartDate: sub?.trialStartDate ?? undefined,
+          subscriptionEndDate: sub?.subscriptionEndDate ?? undefined,
         };
       }),
       total: result.data.totalElements,
