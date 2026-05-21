@@ -88,6 +88,25 @@ const { GET } = createEndpoint({
               content: "get.response.devices.connected" as const,
               schema: z.boolean().nullable(),
             }),
+            subscriptionStatus: responseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              content: "get.response.devices.subscriptionStatus" as const,
+              schema: z
+                .enum([
+                  "trial",
+                  "active",
+                  "expiring_soon",
+                  "expired",
+                  "no_subscription",
+                ])
+                .nullable()
+                .optional(),
+            }),
+            daysUntilExpiry: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.devices.daysUntilExpiry" as const,
+              schema: z.number().nullable().optional(),
+            }),
           },
         }),
       }),
@@ -165,6 +184,8 @@ const { GET } = createEndpoint({
             orgResourceId: "exorde.connex.connectika",
             groups: [],
             connected: true,
+            subscriptionStatus: null,
+            daysUntilExpiry: null,
           },
         ],
         total: 1,

@@ -96,7 +96,6 @@ const { POST } = createEndpoint({
     description: "post.success.description" as const,
   },
   examples: {
-    requests: { default: {} },
     responses: { default: { synchronized: true } },
   },
 });

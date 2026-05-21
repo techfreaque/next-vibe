@@ -10,7 +10,7 @@ import {
   type CorvinaBodyObject,
   type CorvinaBodyValue,
 } from "@/app/api/[locale]/corvina/client";
-import { corvinaEnv } from "@/app/api/[locale]/corvina/env";
+import { env } from "@/config/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -55,7 +55,7 @@ export class CorvinaAppInstallRepository {
   ): Promise<ResponseType<CorvinaAppInstallResponseOutput>> {
     const resolvedManifest = resolveManifest(data.manifest);
     const appBaseUrl =
-      corvinaEnv.CORVINA_APP_BASE_URL ??
+      env.NEXT_PUBLIC_APP_URL ??
       (typeof resolvedManifest.baseUrl === "string"
         ? resolvedManifest.baseUrl
         : undefined);
@@ -93,10 +93,7 @@ export class CorvinaAppInstallRepository {
       body.planId = data.planId;
     }
 
-    const authHeader = request?.headers.get("authorization") ?? "";
-    const bearerToken = authHeader.startsWith("Bearer ")
-      ? authHeader.slice(7)
-      : undefined;
+    const bearerToken = undefined;
 
     const path = `/api/v1/organizations/${data.organizationId}/apps`;
     logger.info("[CORVINA] Sending install request", {

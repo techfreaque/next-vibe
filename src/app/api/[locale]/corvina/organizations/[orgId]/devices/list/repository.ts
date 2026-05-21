@@ -1,5 +1,6 @@
 import "server-only";
 
+import { inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
@@ -8,6 +9,12 @@ import {
   CORVINA_PLATFORM_ORGS_PATH,
   CorvinaClient,
 } from "@/app/api/[locale]/corvina/client";
+import { corvinaDeviceSubscriptions } from "@/app/api/[locale]/corvina/device-licenses/db";
+import {
+  computeEffectiveDates,
+  computeSubscriptionStatus,
+} from "@/app/api/[locale]/corvina/device-licenses/subscription/repository";
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -61,6 +68,16 @@ export class CorvinaDevicesListRepository {
     }
     const devices = result.data.content;
 
+    const hwIds = devices.map((d) => d.hwId);
+    const subRows =
+      hwIds.length > 0
+        ? await db
+            .select()
+            .from(corvinaDeviceSubscriptions)
+            .where(inArray(corvinaDeviceSubscriptions.logicalId, hwIds))
+        : [];
+    const subMap = new Map(subRows.map((r) => [r.logicalId, r]));
+
     const statusResults = await Promise.all(
       devices.map((d) =>
         CorvinaClient.request<CorvinaStatusEntry[]>(
@@ -86,6 +103,18 @@ export class CorvinaDevicesListRepository {
           lastRow !== undefined && connIdx >= 0
             ? ((lastRow[connIdx] as boolean) ?? null)
             : null;
+        const sub = subMap.get(d.hwId) ?? null;
+        const { effectiveStartDate, effectiveEndDate } = computeEffectiveDates(
+          sub?.trialStartDate ?? null,
+          sub?.subscriptionEndDate ?? null,
+        );
+        const { status, daysUntilExpiry } = computeSubscriptionStatus(
+          effectiveStartDate,
+          effectiveEndDate,
+          !!sub,
+          sub?.subscriptionEndDate !== null &&
+            sub?.subscriptionEndDate !== undefined,
+        );
         return {
           id: d.id,
           label: d.label,
@@ -93,6 +122,8 @@ export class CorvinaDevicesListRepository {
           orgResourceId: d.orgResourceId ?? null,
           groups: d.groups ?? [],
           connected,
+          subscriptionStatus: sub ? status : undefined,
+          daysUntilExpiry: sub ? daysUntilExpiry : undefined,
         };
       }),
       total: result.data.totalElements,

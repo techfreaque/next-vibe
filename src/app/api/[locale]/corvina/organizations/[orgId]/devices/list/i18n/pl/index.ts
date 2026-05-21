@@ -16,6 +16,8 @@ export const translations = {
         orgResourceId: "ID zasobu org",
         groups: "Grupy",
         connected: "Połączony",
+        subscriptionStatus: "Subskrypcja",
+        daysUntilExpiry: "Pozostałe dni",
       },
       total: "Łącznie",
       totalPages: "Strony",

@@ -43,6 +43,9 @@ export const translations = {
         notes: "Notes",
         vpnEnabled: "VPN Enabled",
         vpnValidityMonths: "VPN Validity (months)",
+        subscriptionStatus: "Subscription Status",
+        subscriptionEndDate: "Subscription Ends",
+        daysUntilExpiry: "Days Until Expiry",
       },
     },
     widget: {

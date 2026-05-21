@@ -120,7 +120,6 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    requests: { default: {} },
     responses: {
       default: {
         items: [

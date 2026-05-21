@@ -33,7 +33,7 @@ export function SubscriptionsJobsAutorenewContainer(): React.JSX.Element {
   const isCli = platform === Platform.CLI;
   const isCompact = isCli || isMcp;
 
-  const nowValue = form.watch("now") ?? "";
+  const nowValue = form.watch("now");
 
   if (isCompact) {
     if (result !== null && result !== undefined) {
@@ -72,14 +72,12 @@ export function SubscriptionsJobsAutorenewContainer(): React.JSX.Element {
           <Input
             id="jobs-autorenew-now"
             type="number"
-            value={String(nowValue)}
+            value={nowValue}
             onChange={(e) => {
               const val = e.target.value;
-              form.setValue(
-                "now",
-                val === "" ? undefined : (Number(val) as never),
-                { shouldDirty: true },
-              );
+              form.setValue("now", Number.isNaN(val) ? undefined : val, {
+                shouldDirty: true,
+              });
             }}
             placeholder={t("get.now.placeholder")}
           />

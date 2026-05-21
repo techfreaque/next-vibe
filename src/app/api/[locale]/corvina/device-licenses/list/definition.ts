@@ -121,7 +121,24 @@ const deviceLicenseItemChildren = {
   vpnEnabled: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
     content: "get.response.deviceLicenses.vpnEnabled" as const,
-    schema: z.boolean().nullable(),
+    schema: z.boolean().nullish(),
+  }),
+  subscriptionStatus: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "get.response.deviceLicenses.subscriptionStatus" as const,
+    schema: z
+      .enum(["trial", "active", "expiring_soon", "expired", "no_subscription"])
+      .optional(),
+  }),
+  subscriptionEndDate: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "get.response.deviceLicenses.subscriptionEndDate" as const,
+    schema: dateSchema.nullable().optional(),
+  }),
+  daysUntilExpiry: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "get.response.deviceLicenses.daysUntilExpiry" as const,
+    schema: z.number().nullable().optional(),
   }),
   vpnValidityMonths: responseField(scopedTranslation, {
     type: WidgetType.TEXT,

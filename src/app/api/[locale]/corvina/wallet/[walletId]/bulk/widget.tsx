@@ -196,9 +196,9 @@ export function WalletBulkContainer(): React.JSX.Element {
             <Input
               id="bulk-amount"
               type="number"
-              value={String(amountValue)}
+              value={amountValue}
               onChange={(e) => {
-                form.setValue("amount", Number(e.target.value) as never, {
+                form.setValue("amount", Number(e.target.value), {
                   shouldDirty: true,
                 });
               }}

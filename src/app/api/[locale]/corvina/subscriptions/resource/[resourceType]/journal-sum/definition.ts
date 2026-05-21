@@ -181,6 +181,7 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
+        resourceType: "DEVICES",
         totalUsage: 42,
       },
     },

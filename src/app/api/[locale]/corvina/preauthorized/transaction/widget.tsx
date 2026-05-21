@@ -127,7 +127,7 @@ export function PreauthorizedTransactionCreateContainer(): React.JSX.Element {
         field={{
           text: "post.submitButton.label",
           loadingText: "post.submitButton.loadingText",
-          icon: "circle-plus",
+          icon: "plus",
           variant: "primary",
         }}
       />

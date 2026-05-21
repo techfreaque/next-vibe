@@ -11,10 +11,12 @@ export const translations = {
     fromDate: {
       label: "Von Datum",
       description: "Beginn des Zeitraums (z. B. 2024-01-01).",
+      placeholder: "2024-01-01",
     },
     toDate: {
       label: "Bis Datum",
       description: "Ende des Zeitraums (z. B. 2024-12-31).",
+      placeholder: "2024-12-31",
     },
     orgResourceId: {
       label: "Organisations-Ressourcen-ID",

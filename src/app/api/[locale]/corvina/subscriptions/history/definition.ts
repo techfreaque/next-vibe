@@ -51,7 +51,7 @@ const { GET } = createEndpoint({
         description: "get.fromDate.description" as const,
         columns: 6,
         schema: z.string().min(1),
-        placeholder: "2024-01-01",
+        placeholder: "get.fromDate.placeholder" as const,
       }),
       toDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -60,7 +60,7 @@ const { GET } = createEndpoint({
         description: "get.toDate.description" as const,
         columns: 6,
         schema: z.string().min(1),
-        placeholder: "2024-12-31",
+        placeholder: "get.toDate.placeholder" as const,
       }),
       orgResourceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

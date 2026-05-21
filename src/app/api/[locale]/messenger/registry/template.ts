@@ -171,6 +171,7 @@ export interface EmailTemplateDefinition<
     Parameters<ReturnType<TScopedTranslation["scopedT"]>["t"]>[0]
   >;
   schema: z.ZodType<TProps>;
+  exampleProps: Record<string, string | number | boolean>;
   component: (params: {
     props: TProps;
     t: ReturnType<TScopedTranslation["scopedT"]>["t"];
@@ -178,7 +179,6 @@ export interface EmailTemplateDefinition<
     recipientEmail: string;
     tracking: TrackingContext;
   }) => ReactElement;
-  exampleProps: TProps;
   /**
    * Render function - business logic that maps endpoint context to EmailResolvedData.
    * Lives here so email.tsx files only export EmailTemplateDefinition objects.

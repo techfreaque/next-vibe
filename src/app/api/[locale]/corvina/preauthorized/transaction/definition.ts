@@ -5,6 +5,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   customWidgetObject,
   requestField,
+  requestResponseField,
   responseField,
   submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -25,119 +26,6 @@ const PreauthorizedTransactionCreateContainer = lazyWidget(() =>
   })),
 );
 
-const preauthorizedTransactionResponseChildren = {
-  id: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.id" as const,
-    schema: z.number().nullable(),
-  }),
-  orderId: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.orderId" as const,
-    schema: z.string(),
-  }),
-  ordinal: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.ordinal" as const,
-    schema: z.number().nullable(),
-  }),
-  authorizedBy: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.authorizedBy" as const,
-    schema: z.string().nullable(),
-  }),
-  targetWalletId: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.targetWalletId" as const,
-    schema: z.string(),
-  }),
-  amount: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.amount" as const,
-    schema: z.number(),
-  }),
-  sourceOrgResourceId: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.sourceOrgResourceId" as const,
-    schema: z.string().nullable(),
-  }),
-  sourceWalletId: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.sourceWalletId" as const,
-    schema: z.string().nullable(),
-  }),
-  description: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.description" as const,
-    schema: z.string().nullable(),
-  }),
-  transactionSubjectType: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.transactionSubjectType" as const,
-    schema: z.string().nullable(),
-  }),
-  transactionSubjectRef: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.transactionSubjectRef" as const,
-    schema: z.string().nullable(),
-  }),
-  transactionSubjectQuantity: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.transactionSubjectQuantity" as const,
-    schema: z.number().nullable(),
-  }),
-  executionMinTime: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.executionMinTime" as const,
-    schema: dateSchema.nullable(),
-  }),
-  executionMaxTime: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.executionMaxTime" as const,
-    schema: dateSchema.nullable(),
-  }),
-  updatedAt: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.updatedAt" as const,
-    schema: dateSchema.nullable(),
-  }),
-  revokedBy: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.revokedBy" as const,
-    schema: z.string().nullable(),
-  }),
-  executionMaxOrdinal: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.executionMaxOrdinal" as const,
-    schema: z.number().nullable(),
-  }),
-  state: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.state" as const,
-    schema: z.string().nullable(),
-  }),
-  orgResourceId: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.orgResourceId" as const,
-    schema: z.string().nullable(),
-  }),
-  expectedPaymentsToDate: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.expectedPaymentsToDate" as const,
-    schema: z.number().nullable(),
-  }),
-  actualPaymentsReceived: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.actualPaymentsReceived" as const,
-    schema: z.number().nullable(),
-  }),
-  nextPaymentDate: responseField(scopedTranslation, {
-    type: WidgetType.TEXT,
-    content: "post.response.nextPaymentDate" as const,
-    schema: dateSchema.nullable(),
-  }),
-};
-
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
@@ -145,7 +33,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN] as const,
   title: "post.title" as const,
   description: "post.description" as const,
-  icon: "circle-plus",
+  icon: "plus",
   category: "endpointCategories.corvina",
   subCategory: "endpointCategories.corvina",
   tags: ["tags.corvina" as const, "tags.preauthorized" as const],
@@ -154,7 +42,7 @@ const { POST } = createEndpoint({
     render: PreauthorizedTransactionCreateContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      orderId: requestField(scopedTranslation, {
+      orderId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.orderId.label" as const,
@@ -162,7 +50,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string(),
       }),
-      targetWalletId: requestField(scopedTranslation, {
+      targetWalletId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.targetWalletId.label" as const,
@@ -170,7 +58,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string(),
       }),
-      amount: requestField(scopedTranslation, {
+      amount: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.amount.label" as const,
@@ -178,21 +66,61 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.coerce.number(),
       }),
-      ordinal: requestField(scopedTranslation, {
+      ordinal: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.ordinal.label" as const,
         description: "post.ordinal.description" as const,
         columns: 6,
-        schema: z.coerce.number().optional(),
+        schema: z.coerce.number().nullable().optional(),
       }),
-      sourceWalletId: requestField(scopedTranslation, {
+      sourceWalletId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.sourceWalletId.label" as const,
         description: "post.sourceWalletId.description" as const,
         columns: 6,
-        schema: z.string().optional(),
+        schema: z.string().nullable().optional(),
+      }),
+      transactionSubjectType: requestResponseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.transactionSubjectType.label" as const,
+        description: "post.transactionSubjectType.description" as const,
+        columns: 6,
+        schema: z.string().nullable().optional(),
+      }),
+      transactionSubjectRef: requestResponseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.transactionSubjectRef.label" as const,
+        description: "post.transactionSubjectRef.description" as const,
+        columns: 6,
+        schema: z.string().nullable().optional(),
+      }),
+      transactionSubjectQuantity: requestResponseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "post.transactionSubjectQuantity.label" as const,
+        description: "post.transactionSubjectQuantity.description" as const,
+        columns: 6,
+        schema: z.coerce.number().nullable().optional(),
+      }),
+      executionMinTime: requestResponseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "post.executionMinTime.label" as const,
+        description: "post.executionMinTime.description" as const,
+        columns: 6,
+        schema: dateSchema.nullable().optional(),
+      }),
+      executionMaxTime: requestResponseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "post.executionMaxTime.label" as const,
+        description: "post.executionMaxTime.description" as const,
+        columns: 6,
+        schema: dateSchema.nullable().optional(),
       }),
       txDescription: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -202,50 +130,70 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().optional(),
       }),
-      transactionSubjectType: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.transactionSubjectType.label" as const,
-        description: "post.transactionSubjectType.description" as const,
-        columns: 6,
-        schema: z.string().optional(),
+      id: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.id" as const,
+        schema: z.number().nullable(),
       }),
-      transactionSubjectRef: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.transactionSubjectRef.label" as const,
-        description: "post.transactionSubjectRef.description" as const,
-        columns: 6,
-        schema: z.string().optional(),
+      authorizedBy: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.authorizedBy" as const,
+        schema: z.string().nullable(),
       }),
-      transactionSubjectQuantity: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.NUMBER,
-        label: "post.transactionSubjectQuantity.label" as const,
-        description: "post.transactionSubjectQuantity.description" as const,
-        columns: 6,
-        schema: z.coerce.number().optional(),
+      sourceOrgResourceId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.sourceOrgResourceId" as const,
+        schema: z.string().nullable(),
       }),
-      executionMinTime: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.DATE,
-        label: "post.executionMinTime.label" as const,
-        description: "post.executionMinTime.description" as const,
-        columns: 6,
-        schema: dateSchema.optional(),
+      description: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.description" as const,
+        schema: z.string().nullable(),
       }),
-      executionMaxTime: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.DATE,
-        label: "post.executionMaxTime.label" as const,
-        description: "post.executionMaxTime.description" as const,
-        columns: 6,
-        schema: dateSchema.optional(),
+      updatedAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.updatedAt" as const,
+        schema: dateSchema.nullable(),
+      }),
+      revokedBy: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.revokedBy" as const,
+        schema: z.string().nullable(),
+      }),
+      executionMaxOrdinal: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.executionMaxOrdinal" as const,
+        schema: z.number().nullable(),
+      }),
+      state: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.state" as const,
+        schema: z.string().nullable(),
+      }),
+      orgResourceId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.orgResourceId" as const,
+        schema: z.string().nullable(),
+      }),
+      expectedPaymentsToDate: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.expectedPaymentsToDate" as const,
+        schema: z.number().nullable(),
+      }),
+      actualPaymentsReceived: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.actualPaymentsReceived" as const,
+        schema: z.number().nullable(),
+      }),
+      nextPaymentDate: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.response.nextPaymentDate" as const,
+        schema: dateSchema.nullable(),
       }),
       submitButton: submitButton(scopedTranslation, {
         label: "post.submitButton.label" as const,
         loadingText: "post.submitButton.loadingText" as const,
-        icon: "circle-plus",
+        icon: "plus",
         variant: "primary",
         className: "w-full",
         usage: { request: "data" },
@@ -335,8 +283,6 @@ export type PreauthorizedTransactionCreateRequestOutput =
   typeof POST.types.RequestOutput;
 export type PreauthorizedTransactionCreateResponseOutput =
   typeof POST.types.ResponseOutput;
-
-export { preauthorizedTransactionResponseChildren };
 
 const definitions = { POST } as const;
 export default definitions;

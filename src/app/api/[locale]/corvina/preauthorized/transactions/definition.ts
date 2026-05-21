@@ -330,7 +330,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN] as const,
   title: "post.title" as const,
   description: "post.description" as const,
-  icon: "circle-plus",
+  icon: "plus",
   category: "endpointCategories.corvina",
   subCategory: "endpointCategories.corvina",
   tags: ["tags.corvina" as const, "tags.preauthorized" as const],
@@ -441,7 +441,7 @@ const { POST } = createEndpoint({
       submitButton: submitButton(scopedTranslation, {
         label: "post.submitButton.label" as const,
         loadingText: "post.submitButton.loadingText" as const,
-        icon: "circle-plus",
+        icon: "plus",
         variant: "primary",
         className: "w-full",
         usage: { request: "data" },

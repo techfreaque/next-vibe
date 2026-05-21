@@ -32,7 +32,7 @@ export interface CorvinaBodyObject {
 export type CorvinaService = "core" | "platform" | "license";
 
 export interface CorvinaRequestInit<
-  TBody extends CorvinaBodyObject = CorvinaBodyObject,
+  TBody extends CorvinaBodyObject | CorvinaBodyValue[] = CorvinaBodyObject,
   TQuery extends Record<string, string | number | undefined> = Record<
     string,
     string | number | undefined
@@ -51,7 +51,7 @@ export interface CorvinaRequestInit<
 export class CorvinaClient {
   static async request<
     TResponse,
-    TBody extends CorvinaBodyObject = CorvinaBodyObject,
+    TBody extends CorvinaBodyObject | CorvinaBodyValue[] = CorvinaBodyObject,
     TQuery extends Record<string, string | number | undefined> = Record<
       string,
       string | number | undefined

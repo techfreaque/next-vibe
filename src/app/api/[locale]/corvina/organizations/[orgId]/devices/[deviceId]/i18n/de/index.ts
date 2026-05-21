@@ -28,9 +28,11 @@ export const translations = {
     widget: {
       edit: "Bearbeiten",
       tags: "Tags",
+      subscription: "Abonnement",
       sections: {
         identity: "Identität",
         connectivity: "Verbindung",
+        subscription: "Abonnement",
       },
       labels: {
         label: "Bezeichnung",
@@ -44,6 +46,7 @@ export const translations = {
         lastDisconnection: "Letzte Trennung",
         firstRegistration: "Erstregistrierung",
         lastSeenIp: "Letzte IP",
+        subscriptionStatus: "Status",
       },
     },
     errors: {
@@ -113,6 +116,7 @@ export const translations = {
       placeholder: "SN-123456",
     },
     submitButton: { label: "Speichern", loadingText: "Wird gespeichert…" },
+    editSubscription: "Abonnement bearbeiten",
     errors: {
       validation: {
         title: "Ungültige Aktualisierung",

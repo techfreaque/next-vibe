@@ -25,9 +25,11 @@ export const translations = {
     widget: {
       edit: "Edit",
       tags: "Tags",
+      subscription: "Subscription",
       sections: {
         identity: "Identity",
         connectivity: "Connectivity",
+        subscription: "Subscription",
       },
       labels: {
         label: "Label",
@@ -41,6 +43,7 @@ export const translations = {
         lastDisconnection: "Last Disconnection",
         firstRegistration: "First Registration",
         lastSeenIp: "Last IP",
+        subscriptionStatus: "Status",
       },
     },
     errors: {
@@ -104,6 +107,7 @@ export const translations = {
       placeholder: "SN-123456",
     },
     submitButton: { label: "Save changes", loadingText: "Saving…" },
+    editSubscription: "Edit Subscription",
     errors: {
       validation: {
         title: "Invalid Update",

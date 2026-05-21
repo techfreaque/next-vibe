@@ -24,7 +24,7 @@ export class SubscriptionsResourceJournalSumRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<SubscriptionsResourceJournalSumResponseOutput>> {
-    const query: Record<string, string | number | boolean> = {
+    const query: Record<string, string | number | undefined> = {
       page: data.page ?? 0,
       pageSize: data.pageSize ?? 10,
     };
@@ -41,7 +41,7 @@ export class SubscriptionsResourceJournalSumRepository {
       query.organizationFilter = data.organizationFilter;
     }
     if (data.includeSubOrgs !== undefined) {
-      query.includeSubOrgs = data.includeSubOrgs;
+      query.includeSubOrgs = String(data.includeSubOrgs);
     }
     if (data.fromDate !== undefined) {
       query.fromDate = data.fromDate;
@@ -65,6 +65,9 @@ export class SubscriptionsResourceJournalSumRepository {
     if (!result.success) {
       return result;
     }
-    return success({ totalUsage: result.data.usage });
+    return success({
+      resourceType: urlPathParams.resourceType,
+      totalUsage: result.data.usage,
+    });
   }
 }

@@ -317,7 +317,13 @@ const { PUT } = createEndpoint({
         vpnValidityMonths: 12,
       },
     },
-    responses: { default: exampleDeviceLicense },
+    responses: {
+      default: {
+        ...exampleDeviceLicense,
+        serialNumber: undefined,
+        notes: undefined,
+      },
+    },
   },
 });
 
@@ -433,7 +439,9 @@ const { DELETE } = createEndpoint({
   examples: {
     urlPathParams: { default: { deviceLicenseId: 1 } },
     requests: { default: { deleteOrgResourceId: "exorde.connex.connectika" } },
-    responses: { default: { ...exampleDeviceLicense, deleted: true } },
+    responses: {
+      default: { ...exampleDeviceLicense, deleted: true, serialNumber: null },
+    },
   },
 });
 

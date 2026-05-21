@@ -5,6 +5,7 @@ import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import type { SubscriptionStatusType } from "../subscription/definition";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
@@ -28,6 +29,48 @@ import type { DeviceLicensesListResponseOutput } from "./definition";
 type DeviceLicenseItem =
   DeviceLicensesListResponseOutput["deviceLicenses"][number];
 
+function SubscriptionBadge({
+  status,
+  daysUntilExpiry,
+}: {
+  status: SubscriptionStatusType | null | undefined;
+  daysUntilExpiry: number | null | undefined;
+}): React.JSX.Element | null {
+  if (!status) {
+    return null;
+  }
+  const labels: Record<SubscriptionStatusType, string> = {
+    trial: "trial",
+    active: "active",
+    expiring_soon: `exp ${daysUntilExpiry ?? "?"}d`,
+    expired: "expired",
+    no_subscription: "no sub",
+  };
+  const classNames: Record<SubscriptionStatusType, string> = {
+    trial: "text-xs font-semibold text-success",
+    active: "text-xs font-semibold text-success",
+    expiring_soon: "text-xs font-semibold text-warning",
+    expired: "text-xs font-semibold text-destructive",
+    no_subscription: "text-xs text-muted-foreground",
+  };
+  return <Span className={classNames[status]}>{labels[status]}</Span>;
+}
+
+function ResultRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}): React.JSX.Element {
+  return (
+    <Div className="flex flex-col gap-0.5">
+      <Span className="text-xs text-muted-foreground">{label}</Span>
+      <Span className="text-sm font-medium font-mono">{value}</Span>
+    </Div>
+  );
+}
+
 function DeviceLicenseRow({
   license,
   compact,
@@ -47,6 +90,9 @@ function DeviceLicenseRow({
           <Span className="ml-2">{`client:${license.clientName}`}</Span>
         )}
         <Span className="ml-2">{`used:${license.used ? "Y" : "N"}`}</Span>
+        {license.subscriptionStatus && (
+          <Span className="ml-2">{`sub:${license.subscriptionStatus}`}</Span>
+        )}
       </Div>
     );
   }
@@ -93,6 +139,10 @@ function DeviceLicenseRow({
           {license.vpnEnabled === true && (
             <Span className="text-xs font-mono text-primary">vpn</Span>
           )}
+          <SubscriptionBadge
+            status={license.subscriptionStatus}
+            daysUntilExpiry={license.daysUntilExpiry}
+          />
         </Div>
       </Div>
 
@@ -109,21 +159,6 @@ function DeviceLicenseRow({
           </Span>
         )}
       </Div>
-    </Div>
-  );
-}
-
-function ResultRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: React.ReactNode;
-}): React.JSX.Element {
-  return (
-    <Div className="flex flex-col gap-0.5">
-      <Span className="text-xs text-muted-foreground">{label}</Span>
-      <Span className="text-sm font-medium font-mono">{value}</Span>
     </Div>
   );
 }

@@ -3,7 +3,11 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
-import { CorvinaClient } from "@/app/api/[locale]/corvina/client";
+import {
+  CorvinaClient,
+  type CorvinaBodyObject,
+  type CorvinaBodyValue,
+} from "@/app/api/[locale]/corvina/client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -31,7 +35,7 @@ export class WalletBulkRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<WalletBulkResponseOutput>> {
-    const item: Record<string, string | number | boolean> = {
+    const item: CorvinaBodyObject = {
       orderId: data.orderId,
       targetWalletId: data.targetWalletId,
       amount: data.amount,
@@ -64,11 +68,15 @@ export class WalletBulkRepository {
       item.transactionSubjectQuantity = data.transactionSubjectQuantity;
     }
 
-    const result = await CorvinaClient.request<CorvinaCreditTransaction[]>(
+    const bulkBody: CorvinaBodyValue[] = [item];
+    const result = await CorvinaClient.request<
+      CorvinaCreditTransaction[],
+      CorvinaBodyValue[]
+    >(
       {
         method: "POST",
         path: `/api/v1/wallet/${encodeURIComponent(data.targetWalletId)}/bulk`,
-        body: [item],
+        body: bulkBody,
         service: "license",
       },
       logger,
@@ -92,7 +100,7 @@ export class WalletBulkRepository {
         sourceWalletId: tx.sourceWalletId,
         targetWalletId: tx.targetWalletId,
         amount: tx.amount,
-        createdAt: tx.createdAt,
+        createdAt: tx.createdAt !== null ? new Date(tx.createdAt) : null,
         orderId: tx.orderId,
         ordinal: tx.ordinal,
         orgResourceId: tx.orgResourceId,

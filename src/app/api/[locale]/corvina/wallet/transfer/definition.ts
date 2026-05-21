@@ -32,7 +32,7 @@ const { POST } = createEndpoint({
 
   title: "post.title" as const,
   description: "post.description" as const,
-  icon: "arrow-right-left",
+  icon: "arrow-right",
   category: "endpointCategories.corvina",
   subCategory: "endpointCategories.corvina",
   tags: ["tags.corvina" as const, "tags.wallet" as const],
@@ -147,7 +147,7 @@ const { POST } = createEndpoint({
       submitButton: submitButton(scopedTranslation, {
         label: "post.submitButton.label" as const,
         loadingText: "post.submitButton.loadingText" as const,
-        icon: "arrow-right-left",
+        icon: "arrow-right",
         variant: "primary",
         className: "w-full",
         usage: { request: "data" },

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
+import { SubscriptionStatusValues } from "@/app/api/[locale]/corvina/device-licenses/subscription/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -105,6 +106,31 @@ const { GET } = createEndpoint({
         content: "get.response.lastSeenIp" as const,
         schema: z.string().nullable(),
       }),
+      subscriptionStatus: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        content: "get.response.subscriptionStatus" as const,
+        schema: z.enum(SubscriptionStatusValues).optional(),
+      }),
+      daysUntilExpiry: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.daysUntilExpiry" as const,
+        schema: z.number().nullable().optional(),
+      }),
+      trialStartDate: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.trialStartDate" as const,
+        schema: dateSchema.nullable().optional(),
+      }),
+      subscriptionEndDate: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.subscriptionEndDate" as const,
+        schema: dateSchema.nullable().optional(),
+      }),
+      clientEmail: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.clientEmail" as const,
+        schema: z.string().nullable().optional(),
+      }),
     },
   }),
 
@@ -167,6 +193,11 @@ const { GET } = createEndpoint({
         lastDisconnection: null,
         firstRegistration: "2024-06-01T08:00:00.000Z",
         lastSeenIp: "192.168.1.100",
+        subscriptionStatus: undefined,
+        daysUntilExpiry: undefined,
+        trialStartDate: undefined,
+        subscriptionEndDate: undefined,
+        clientEmail: undefined,
       },
     },
   },
@@ -229,6 +260,31 @@ const { PATCH } = createEndpoint({
         placeholder: "patch.serialNumber.placeholder" as const,
         columns: 12,
         schema: z.string().max(200).optional(),
+      }),
+      trialStartDate: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "patch.trialStartDate.label" as const,
+        description: "patch.trialStartDate.description" as const,
+        columns: 6,
+        schema: dateSchema.optional(),
+      }),
+      subscriptionEndDate: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "patch.subscriptionEndDate.label" as const,
+        description: "patch.subscriptionEndDate.description" as const,
+        columns: 6,
+        schema: dateSchema.optional(),
+      }),
+      clientEmail: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.clientEmail.label" as const,
+        description: "patch.clientEmail.description" as const,
+        placeholder: "patch.clientEmail.placeholder" as const,
+        columns: 12,
+        schema: z.string().email().optional(),
       }),
       hwId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

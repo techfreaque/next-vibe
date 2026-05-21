@@ -115,16 +115,6 @@ function ProductCreateResult({
             </Div>
           </Div>
         )}
-
-        {result.orgResourceId !== null &&
-          result.orgResourceId !== undefined && (
-            <Div className="col-span-2 space-y-0.5">
-              <Span className="text-xs text-muted-foreground">
-                {labels.orgResourceId}
-              </Span>
-              <Div className="font-mono text-xs">{result.orgResourceId}</Div>
-            </Div>
-          )}
       </Div>
     </Div>
   );

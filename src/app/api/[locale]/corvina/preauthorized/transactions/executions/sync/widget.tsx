@@ -39,7 +39,7 @@ export function PreauthorizedTransactionsSyncContainer(): React.JSX.Element {
 
   return (
     <Div className="flex flex-col gap-4 p-4">
-      {platform === Platform.WEB && (
+      {!isMcp && (
         <Div className="flex items-center gap-2">
           <Button type="button" variant="ghost" size="sm" onClick={handleBack}>
             <ArrowLeft className="h-4 w-4 mr-1" />

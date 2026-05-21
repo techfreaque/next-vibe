@@ -9,25 +9,57 @@ import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetNavigation,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import type { SubscriptionStatusType } from "@/app/api/[locale]/corvina/device-licenses/subscription/definition";
 
 import type definition from "./definition";
 import type { CorvinaDevicesListResponseOutput } from "./definition";
 
 type Device = CorvinaDevicesListResponseOutput["devices"][number];
 
+function SubscriptionBadge({
+  status,
+  daysUntilExpiry,
+}: {
+  status: SubscriptionStatusType | null | undefined;
+  daysUntilExpiry: number | null | undefined;
+}): React.JSX.Element | null {
+  if (!status || status === "no_subscription") {
+    return null;
+  }
+  const labels: Record<SubscriptionStatusType, string> = {
+    trial: "trial",
+    active: "active",
+    expiring_soon: `exp ${daysUntilExpiry ?? "?"}d`,
+    expired: "expired",
+    no_subscription: "",
+  };
+  const classNames: Record<SubscriptionStatusType, string> = {
+    trial: "text-xs font-semibold text-success",
+    active: "text-xs font-semibold text-success",
+    expiring_soon: "text-xs font-semibold text-warning",
+    expired: "text-xs font-semibold text-destructive",
+    no_subscription: "",
+  };
+  return <Span className={classNames[status]}>{labels[status]}</Span>;
+}
+
 function DeviceRow({
   device,
   onClick,
+  onSubscription,
 }: {
   device: Device;
   onClick: (device: Device) => void;
+  onSubscription: (device: Device) => void;
 }): React.JSX.Element {
   return (
     <Div
@@ -52,16 +84,40 @@ function DeviceRow({
           {device.hwId}
         </Span>
       </Div>
+      <Span
+        onClick={(e) => {
+          e.stopPropagation();
+          onSubscription(device);
+        }}
+        className="shrink-0 cursor-pointer"
+      >
+        {device.subscriptionStatus &&
+        device.subscriptionStatus !== "no_subscription" ? (
+          <SubscriptionBadge
+            status={device.subscriptionStatus}
+            daysUntilExpiry={device.daysUntilExpiry}
+          />
+        ) : (
+          <Span className="text-xs text-muted-foreground/40 hover:text-muted-foreground transition-colors">
+            —
+          </Span>
+        )}
+      </Span>
     </Div>
   );
 }
 
 export function DeviceListContainer(): React.JSX.Element {
+  const platform = useWidgetPlatform();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate, pop: goBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
+
+  const isCli = platform === Platform.CLI;
+  const isMcp = platform === Platform.MCP;
+  const isCompact = isCli || isMcp;
 
   const orgId = form.watch("orgId") ?? 0;
   const devices = data?.devices ?? [];
@@ -84,6 +140,48 @@ export function DeviceListContainer(): React.JSX.Element {
     [navigate, orgId],
   );
 
+  const handleSubscriptionClick = useCallback(
+    (device: Device): void => {
+      void (async (): Promise<void> => {
+        const def =
+          await import("../../../../device-licenses/subscription/definition");
+        navigate(def.default.GET, { data: { logicalId: device.hwId } });
+      })();
+    },
+    [navigate],
+  );
+
+  if (isCompact) {
+    if (!data) {
+      return <Div />;
+    }
+    return (
+      <Div className="font-mono text-sm p-2">
+        <Div className="font-semibold mb-1">
+          {t("get.widget.title")} ({devices.length}/{total})
+          {isMcp && ` — pass orgId to filter`}
+        </Div>
+        {devices.length === 0 ? (
+          <Div className="text-muted-foreground">
+            {t("get.widget.noDevicesFound")}
+          </Div>
+        ) : (
+          devices.map((device) => (
+            <Div key={device.id} className="py-1 font-mono text-sm">
+              <Span className="font-semibold">{device.label}</Span>
+              <Span className="ml-2 text-muted-foreground">{device.hwId}</Span>
+              <Span className="ml-2 text-muted-foreground">
+                {device.subscriptionStatus
+                  ? `sub:${device.subscriptionStatus}`
+                  : "sub:none"}
+              </Span>
+            </Div>
+          ))
+        )}
+      </Div>
+    );
+  }
+
   return (
     <Div className="flex flex-col min-h-0">
       <Div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
@@ -97,7 +195,7 @@ export function DeviceListContainer(): React.JSX.Element {
         </Button>
         <Server className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
-          {t("get.title")}
+          {t("get.widget.title")}
           {total > 0 && (
             <Span className="ml-2 text-xs text-muted-foreground font-normal">
               ({total})
@@ -131,6 +229,7 @@ export function DeviceListContainer(): React.JSX.Element {
               key={device.id}
               device={device}
               onClick={handleDeviceClick}
+              onSubscription={handleSubscriptionClick}
             />
           ))
         )}

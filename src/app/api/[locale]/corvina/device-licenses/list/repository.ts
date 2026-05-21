@@ -1,5 +1,6 @@
 import "server-only";
 
+import { inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
@@ -7,9 +8,15 @@ import {
   CorvinaClient,
   type CorvinaBodyObject,
 } from "@/app/api/[locale]/corvina/client";
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { corvinaDeviceSubscriptions } from "../db";
+import {
+  computeEffectiveDates,
+  computeSubscriptionStatus,
+} from "../subscription/repository";
 import type {
   DeviceLicenseCreateRequestOutput,
   DeviceLicenseCreateResponseOutput,
@@ -35,7 +42,7 @@ interface CorvinaDeviceLicenseApiResponse {
   numOfSecondsAutoRenewVpn: number | null;
   activationDate: string | null;
   vpnValidityMonths: number | null;
-  vpnEnabled: boolean | null;
+  vpnEnabled: boolean | null | undefined;
   used: boolean;
   deleted: boolean;
   clientName: string | null;
@@ -51,7 +58,10 @@ interface CorvinaDeviceLicensesPageResponse {
 
 function mapDeviceLicense(
   raw: CorvinaDeviceLicenseApiResponse,
-): DeviceLicensesListResponseOutput["deviceLicenses"][number] {
+): Omit<
+  DeviceLicensesListResponseOutput["deviceLicenses"][number],
+  "subscriptionStatus" | "subscriptionEndDate" | "daysUntilExpiry"
+> {
   return {
     id: raw.id,
     serialNumber: raw.serialNumber,
@@ -71,7 +81,7 @@ function mapDeviceLicense(
     activationKey: raw.activationKey,
     clientName: raw.clientName,
     notes: raw.notes,
-    vpnEnabled: raw.vpnEnabled,
+    vpnEnabled: raw.vpnEnabled ?? null,
     vpnValidityMonths: raw.vpnValidityMonths,
   };
 }
@@ -104,11 +114,55 @@ export class DeviceLicensesRepository {
     if (!result.success) {
       return result;
     }
+
+    const devices = result.data.content;
+
+    // Batch-load subscription records for all devices with a logicalId
+    const logicalIds = devices
+      .map((d) => d.logicalId)
+      .filter((id): id is string => id !== null && id !== "");
+
+    const subscriptionMap = new Map<
+      string,
+      typeof corvinaDeviceSubscriptions.$inferSelect
+    >();
+    if (logicalIds.length > 0) {
+      const rows = await db
+        .select()
+        .from(corvinaDeviceSubscriptions)
+        .where(inArray(corvinaDeviceSubscriptions.logicalId, logicalIds));
+      for (const row of rows) {
+        subscriptionMap.set(row.logicalId, row);
+      }
+    }
+
+    const deviceLicenses = devices.map((raw) => {
+      const base = mapDeviceLicense(raw);
+      const sub = raw.logicalId ? subscriptionMap.get(raw.logicalId) : null;
+      const activationDate = base.activationDate;
+      const { effectiveStartDate, effectiveEndDate } = computeEffectiveDates(
+        sub?.trialStartDate ?? null,
+        sub?.subscriptionEndDate ?? null,
+        activationDate,
+      );
+      const { status, daysUntilExpiry } = computeSubscriptionStatus(
+        effectiveStartDate,
+        effectiveEndDate,
+        !!sub,
+      );
+      return {
+        ...base,
+        subscriptionStatus: status,
+        subscriptionEndDate: effectiveEndDate,
+        daysUntilExpiry,
+      };
+    });
+
     return success({
       total: result.data.totalElements,
       totalPages: result.data.totalPages,
       currentPage: result.data.number,
-      deviceLicenses: result.data.content.map(mapDeviceLicense),
+      deviceLicenses,
     });
   }
 

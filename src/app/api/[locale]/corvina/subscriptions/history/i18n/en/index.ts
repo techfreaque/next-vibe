@@ -11,10 +11,12 @@ export const translations = {
     fromDate: {
       label: "From Date",
       description: "Start of the date range (e.g. 2024-01-01).",
+      placeholder: "2024-01-01",
     },
     toDate: {
       label: "To Date",
       description: "End of the date range (e.g. 2024-12-31).",
+      placeholder: "2024-12-31",
     },
     orgResourceId: {
       label: "Org Resource ID",

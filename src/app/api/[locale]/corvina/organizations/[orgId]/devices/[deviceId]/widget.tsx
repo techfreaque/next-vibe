@@ -3,27 +3,55 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Save } from "next-vibe-ui/ui/icons/Save";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Tag } from "next-vibe-ui/ui/icons/Tag";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
+import type { SubscriptionStatusType } from "@/app/api/[locale]/corvina/device-licenses/subscription/definition";
 import {
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-  useWidgetForm,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
 import type { CorvinaDeviceGetResponseOutput } from "./definition";
 
 type Device = CorvinaDeviceGetResponseOutput;
+
+function SubscriptionBadge({
+  status,
+  daysUntilExpiry,
+}: {
+  status: SubscriptionStatusType;
+  daysUntilExpiry: number | null | undefined;
+}): React.JSX.Element | null {
+  if (status === "no_subscription") {
+    return null;
+  }
+  const labels: Record<SubscriptionStatusType, string> = {
+    trial: "trial",
+    active: "active",
+    expiring_soon: `exp ${daysUntilExpiry ?? "?"}d`,
+    expired: "expired",
+    no_subscription: "",
+  };
+  const classNames: Record<SubscriptionStatusType, string> = {
+    trial: "text-xs font-semibold text-success",
+    active: "text-xs font-semibold text-success",
+    expiring_soon: "text-xs font-semibold text-warning",
+    expired: "text-xs font-semibold text-destructive",
+    no_subscription: "",
+  };
+  return <Span className={classNames[status]}>{labels[status]}</Span>;
+}
 
 function InfoRow({
   label,
@@ -67,6 +95,17 @@ function formatTimestamp(ts: Date | string | null | undefined): string {
   }
 }
 
+function toDateInput(val: Date | string | null | undefined): string {
+  if (!val) {
+    return "";
+  }
+  try {
+    return new Date(val).toISOString().slice(0, 10);
+  } catch {
+    return "";
+  }
+}
+
 export function DeviceDetailContainer(): React.JSX.Element {
   const { push: navigate, pop: goBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -83,6 +122,12 @@ export function DeviceDetailContainer(): React.JSX.Element {
       const def = await import("./definition");
       navigate(def.default.PATCH, {
         urlPathParams: { orgId: device.orgId, deviceId: device.deviceId },
+        data: {
+          label: device.label,
+          trialStartDate: device.trialStartDate ?? undefined,
+          subscriptionEndDate: device.subscriptionEndDate ?? undefined,
+          clientEmail: device.clientEmail ?? undefined,
+        },
       });
     })();
   }, [navigate, device]);
@@ -92,7 +137,7 @@ export function DeviceDetailContainer(): React.JSX.Element {
       return;
     }
     void (async (): Promise<void> => {
-      const def = await import("../[deviceId]/tags/definition");
+      const def = await import("./tags/definition");
       navigate(def.default.GET, {
         urlPathParams: { orgId: device.orgId, deviceId: device.hwId },
       });
@@ -126,6 +171,13 @@ export function DeviceDetailContainer(): React.JSX.Element {
               : t("get.widget.labels.offline")}
           </Span>
         )}
+        {device?.subscriptionStatus &&
+          device.subscriptionStatus !== "no_subscription" && (
+            <SubscriptionBadge
+              status={device.subscriptionStatus}
+              daysUntilExpiry={device.daysUntilExpiry}
+            />
+          )}
         {device && (
           <Button
             type="button"
@@ -222,6 +274,42 @@ export function DeviceDetailContainer(): React.JSX.Element {
               }
             />
           )}
+
+          <SectionHeader>{t("get.widget.sections.subscription")}</SectionHeader>
+          <InfoRow
+            label={t("get.widget.labels.subscriptionStatus")}
+            value={
+              device.subscriptionStatus &&
+              device.subscriptionStatus !== "no_subscription" ? (
+                <SubscriptionBadge
+                  status={device.subscriptionStatus}
+                  daysUntilExpiry={device.daysUntilExpiry}
+                />
+              ) : (
+                <Span className="text-muted-foreground text-xs">
+                  {t("get.widget.labels.noSubscription")}
+                </Span>
+              )
+            }
+          />
+          {device.trialStartDate && (
+            <InfoRow
+              label={t("get.widget.labels.trialStartDate")}
+              value={formatTimestamp(device.trialStartDate)}
+            />
+          )}
+          {device.subscriptionEndDate && (
+            <InfoRow
+              label={t("get.widget.labels.subscriptionEndDate")}
+              value={formatTimestamp(device.subscriptionEndDate)}
+            />
+          )}
+          {device.clientEmail && (
+            <InfoRow
+              label={t("get.widget.labels.clientEmail")}
+              value={device.clientEmail}
+            />
+          )}
         </Div>
       )}
     </Div>
@@ -239,6 +327,9 @@ export function DeviceUpdateContainer(): React.JSX.Element {
   const labelValue = form.watch("label") ?? "";
   const descriptionValue = form.watch("description") ?? "";
   const serialNumberValue = form.watch("serialNumber") ?? "";
+  const trialStartDateValue = form.watch("trialStartDate");
+  const subscriptionEndDateValue = form.watch("subscriptionEndDate");
+  const clientEmailValue = form.watch("clientEmail") ?? "";
 
   return (
     <Div className="flex flex-col gap-0">
@@ -313,6 +404,74 @@ export function DeviceUpdateContainer(): React.JSX.Element {
               })
             }
             placeholder={t("patch.serialNumber.placeholder")}
+            className="w-full"
+          />
+        </Div>
+
+        <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mt-2">
+          {t("patch.subscription.sectionTitle")}
+        </Span>
+
+        <Div className="grid grid-cols-2 gap-3">
+          <Div>
+            <Label className="block text-xs font-medium mb-1">
+              {t("patch.trialStartDate.label")}
+              <Span className="block text-xs text-muted-foreground font-normal mb-1">
+                {t("patch.trialStartDate.description")}
+              </Span>
+            </Label>
+            <Input
+              type="date"
+              value={toDateInput(trialStartDateValue)}
+              onChange={(e) =>
+                form.setValue(
+                  "trialStartDate",
+                  e.target.value ? new Date(e.target.value) : undefined,
+                  { shouldDirty: true },
+                )
+              }
+              className="w-full"
+            />
+          </Div>
+
+          <Div>
+            <Label className="block text-xs font-medium mb-1">
+              {t("patch.subscriptionEndDate.label")}
+              <Span className="block text-xs text-muted-foreground font-normal mb-1">
+                {t("patch.subscriptionEndDate.description")}
+              </Span>
+            </Label>
+            <Input
+              type="date"
+              value={toDateInput(subscriptionEndDateValue)}
+              onChange={(e) =>
+                form.setValue(
+                  "subscriptionEndDate",
+                  e.target.value ? new Date(e.target.value) : undefined,
+                  { shouldDirty: true },
+                )
+              }
+              className="w-full"
+            />
+          </Div>
+        </Div>
+
+        <Div>
+          <Label className="block text-xs font-medium mb-1">
+            {t("patch.clientEmail.label")}
+            <Span className="block text-xs text-muted-foreground font-normal mb-1">
+              {t("patch.clientEmail.description")}
+            </Span>
+          </Label>
+          <Input
+            type="email"
+            value={clientEmailValue}
+            onChange={(e) =>
+              form.setValue("clientEmail", e.target.value || undefined, {
+                shouldDirty: true,
+              })
+            }
+            placeholder={t("patch.clientEmail.placeholder")}
             className="w-full"
           />
         </Div>

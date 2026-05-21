@@ -19,6 +19,8 @@ export const translations = {
         orgResourceId: "Org Resource ID",
         groups: "Groups",
         connected: "Connected",
+        subscriptionStatus: "Subscription",
+        daysUntilExpiry: "Days Left",
       },
       total: "Total",
       totalPages: "Pages",

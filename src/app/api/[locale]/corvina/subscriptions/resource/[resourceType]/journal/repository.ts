@@ -47,7 +47,7 @@ export class SubscriptionsResourceJournalRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<SubscriptionsResourceJournalResponseOutput>> {
-    const query: Record<string, string | number | boolean> = {
+    const query: Record<string, string | number | undefined> = {
       page: data.page ?? 0,
       pageSize: data.pageSize ?? 10,
     };
@@ -64,7 +64,7 @@ export class SubscriptionsResourceJournalRepository {
       query.organizationFilter = data.organizationFilter;
     }
     if (data.includeSubOrgs !== undefined) {
-      query.includeSubOrgs = data.includeSubOrgs;
+      query.includeSubOrgs = String(data.includeSubOrgs);
     }
     if (data.fromDate !== undefined) {
       query.fromDate = data.fromDate;
@@ -90,6 +90,7 @@ export class SubscriptionsResourceJournalRepository {
       return result;
     }
     return success({
+      resourceType: urlPathParams.resourceType,
       total: result.data.totalElements,
       totalPages: result.data.totalPages,
       currentPage: result.data.number,

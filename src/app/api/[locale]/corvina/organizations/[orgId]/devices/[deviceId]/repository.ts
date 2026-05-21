@@ -1,5 +1,6 @@
 import "server-only";
 
+import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
@@ -8,6 +9,12 @@ import {
   CORVINA_PLATFORM_ORGS_PATH,
   CorvinaClient,
 } from "@/app/api/[locale]/corvina/client";
+import { corvinaDeviceSubscriptions } from "@/app/api/[locale]/corvina/device-licenses/db";
+import {
+  computeEffectiveDates,
+  computeSubscriptionStatus,
+} from "@/app/api/[locale]/corvina/device-licenses/subscription/repository";
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -139,6 +146,25 @@ export class CorvinaDeviceByIdRepository {
       firstResult.success ? firstResult.data : [],
     );
 
+    const [sub] = await db
+      .select()
+      .from(corvinaDeviceSubscriptions)
+      .where(eq(corvinaDeviceSubscriptions.logicalId, d.hwId))
+      .limit(1);
+
+    const { effectiveStartDate, effectiveEndDate } = computeEffectiveDates(
+      sub?.trialStartDate ?? null,
+      sub?.subscriptionEndDate ?? null,
+    );
+    const { status: subscriptionStatus, daysUntilExpiry } =
+      computeSubscriptionStatus(
+        effectiveStartDate,
+        effectiveEndDate,
+        !!sub,
+        sub?.subscriptionEndDate !== null &&
+          sub?.subscriptionEndDate !== undefined,
+      );
+
     return success({
       orgId: urlPathParams.orgId,
       deviceId: urlPathParams.deviceId,
@@ -151,6 +177,11 @@ export class CorvinaDeviceByIdRepository {
       lastDisconnection,
       firstRegistration,
       lastSeenIp,
+      subscriptionStatus: sub ? subscriptionStatus : undefined,
+      daysUntilExpiry: sub ? daysUntilExpiry : undefined,
+      trialStartDate: sub?.trialStartDate ?? undefined,
+      subscriptionEndDate: sub?.subscriptionEndDate ?? undefined,
+      clientEmail: sub?.clientEmail ?? undefined,
     });
   }
 
@@ -188,6 +219,56 @@ export class CorvinaDeviceByIdRepository {
       deviceId: urlPathParams.deviceId,
     });
     const d = result.data;
+
+    if (
+      data.trialStartDate !== undefined ||
+      data.subscriptionEndDate !== undefined ||
+      data.clientEmail !== undefined
+    ) {
+      const [existing] = await db
+        .select()
+        .from(corvinaDeviceSubscriptions)
+        .where(eq(corvinaDeviceSubscriptions.logicalId, d.hwId))
+        .limit(1);
+
+      const newStartDate =
+        data.trialStartDate instanceof Date
+          ? data.trialStartDate
+          : data.trialStartDate !== undefined
+            ? new Date(data.trialStartDate)
+            : undefined;
+
+      const newEndDate =
+        data.subscriptionEndDate instanceof Date
+          ? data.subscriptionEndDate
+          : data.subscriptionEndDate !== undefined
+            ? new Date(data.subscriptionEndDate)
+            : undefined;
+
+      if (existing) {
+        await db
+          .update(corvinaDeviceSubscriptions)
+          .set({
+            clientEmail:
+              data.clientEmail !== undefined
+                ? data.clientEmail
+                : existing.clientEmail,
+            trialStartDate: newStartDate ?? existing.trialStartDate,
+            subscriptionEndDate: newEndDate ?? existing.subscriptionEndDate,
+            updatedAt: new Date(),
+          })
+          .where(eq(corvinaDeviceSubscriptions.logicalId, d.hwId));
+      } else {
+        await db.insert(corvinaDeviceSubscriptions).values({
+          logicalId: d.hwId,
+          orgResourceId: d.orgResourceId ?? "",
+          clientEmail: data.clientEmail,
+          trialStartDate: newStartDate,
+          subscriptionEndDate: newEndDate,
+        });
+      }
+    }
+
     return success({
       orgId: urlPathParams.orgId,
       deviceId: urlPathParams.deviceId,
