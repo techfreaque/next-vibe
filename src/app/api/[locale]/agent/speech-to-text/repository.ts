@@ -404,8 +404,23 @@ export class SpeechToTextRepository {
       });
     }
 
+    // Strip codec suffix and normalize MIME type for OpenAI Whisper compatibility
+    const baseType = file.type.split(";")[0].trim();
+    const normalizedMime =
+      baseType === "video/webm"
+        ? "audio/webm"
+        : baseType === "video/ogg"
+          ? "audio/ogg"
+          : baseType;
+    const normalizedFile =
+      normalizedMime === file.type
+        ? file
+        : new File([await file.arrayBuffer()], file.name, {
+            type: normalizedMime,
+          });
+
     const formData = new FormData();
-    formData.append("file", file, file.name);
+    formData.append("file", normalizedFile, normalizedFile.name);
     formData.append("model", providerModel);
     formData.append("language", language);
     formData.append("response_format", "verbose_json");
@@ -509,14 +524,16 @@ export class SpeechToTextRepository {
       });
     }
 
-    // Browsers report WebM audio as "video/webm" (codecs param stripped by Bun/Chrome).
-    // Eden AI rejects video/* MIME types - remap to the audio equivalent.
+    // Normalize MIME type for Eden AI:
+    // 1. Strip codec suffix (e.g. "audio/webm;codecs=opus" → "audio/webm") - Eden AI rejects codec params
+    // 2. Remap video/* to audio/* (browsers report WebM audio as "video/webm")
+    const baseType = file.type.split(";")[0].trim();
     const mimeType =
-      file.type === "video/webm"
+      baseType === "video/webm"
         ? "audio/webm"
-        : file.type === "video/ogg"
+        : baseType === "video/ogg"
           ? "audio/ogg"
-          : file.type;
+          : baseType;
 
     logger.error("[STT] Sending to Eden AI", {
       originalType: file.type,
