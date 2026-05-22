@@ -26,11 +26,11 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import {
-  DEFAULT_STT_MODEL_SELECTION,
   DEFAULT_STT_MODEL_ID,
+  DEFAULT_STT_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { CreditRepository } from "../../credits/repository";
 import {
   CREDIT_VALUE_USD,
@@ -507,12 +507,6 @@ export class SpeechToTextRepository {
 
     // Reject files too small to contain real audio (just container headers, no audio clusters).
     // Browser MediaRecorder fragments under ~5KB are initialization segments only.
-    logger.error("[STT] File received", {
-      fileSize: file.size,
-      fileName: file.name,
-      fileType: file.type,
-    });
-
     if (file.size < 5000) {
       logger.error("[STT] File too small to contain audio", {
         fileSize: file.size,
@@ -534,13 +528,6 @@ export class SpeechToTextRepository {
         : baseType === "video/ogg"
           ? "audio/ogg"
           : baseType;
-
-    logger.error("[STT] Sending to Eden AI", {
-      originalType: file.type,
-      remappedType: mimeType,
-      fileSize: file.size,
-      providerModel,
-    });
 
     const formData = new FormData();
     const blob =

@@ -411,7 +411,7 @@ const { GET } = createEndpoint({
         placeholder: "get.url.placeholder",
         helpText: "get.url.helpText",
         columns: 12,
-        schema: z.string(),
+        schema: z.string().optional(),
       }),
       ref: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -433,7 +433,7 @@ const { GET } = createEndpoint({
       redirectUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.redirectUrl",
-        schema: z.string(),
+        schema: z.string().optional(),
       }),
       responseLeadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

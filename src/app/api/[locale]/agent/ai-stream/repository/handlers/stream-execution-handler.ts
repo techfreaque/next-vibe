@@ -857,6 +857,7 @@ export class StreamExecutionHandler {
       threadId,
       locale,
       logger,
+      t,
     });
   }
 }

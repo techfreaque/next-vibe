@@ -497,13 +497,14 @@ export class StreamPartHandler {
     }
 
     if (part.type === "error") {
+      const rawError = "error" in part ? part.error : undefined;
       logger.error("[AI Stream] Provider emitted error part", {
         error:
-          "error" in part
-            ? part.error instanceof Error
-              ? part.error.message
-              : String(part.error)
-            : "unknown",
+          rawError instanceof Error
+            ? rawError.message
+            : rawError !== undefined && rawError !== null
+              ? JSON.stringify(rawError)
+              : "unknown",
         model,
         threadId,
       });

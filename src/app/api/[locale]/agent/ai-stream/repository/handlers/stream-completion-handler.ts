@@ -4,13 +4,20 @@
 
 import "server-only";
 
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { StreamContext } from "../core/stream-context";
 import { clearStreamingState } from "../core/stream-registry";
+import { StreamErrorType } from "../core/constants";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import { FinalizationHandler } from "./finalization-handler";
 
@@ -41,6 +48,7 @@ export class StreamCompletionHandler {
     threadId: string;
     locale: CountryLanguage;
     logger: EndpointLogger;
+    t: AiStreamT;
   }): Promise<void> {
     const {
       ctx,
@@ -52,6 +60,7 @@ export class StreamCompletionHandler {
       model,
       threadId,
       logger,
+      t,
     } = params;
 
     // Finalize current ASSISTANT message if exists.
@@ -126,17 +135,36 @@ export class StreamCompletionHandler {
         creditCost: modelCost,
       });
     } else {
-      logger.warn(
-        "Cannot emit TOKENS_UPDATED: no assistant message ID available - provider returned empty stream",
+      // Provider returned an empty stream - no text was generated.
+      // Emit CONTENT_DONE on the pre-generated ID so the frontend closes the pending slot,
+      // then show an error bubble so the user knows something went wrong.
+      logger.error(
+        "[AI Stream] Provider returned empty stream - no assistant message created",
         {
           threadId,
           model,
           totalTokens: usage.totalTokens,
           finishReason: finishReason ?? null,
-          lastAssistantMessageId: ctx.lastAssistantMessageId ?? null,
-          currentAssistantMessageId: ctx.currentAssistantMessageId ?? null,
         },
       );
+      ctx.dbWriter.emitContentDoneRaw({
+        messageId: ctx.preGeneratedAssistantMessageId,
+        content: "",
+        totalTokens: null,
+        finishReason: finishReason ?? null,
+      });
+      await ctx.dbWriter.emitErrorMessage({
+        threadId,
+        errorType: StreamErrorType.STREAM_ERROR,
+        error: fail({
+          message: t("errors.noResponse"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        }),
+        content: t("errors.noResponse"),
+        parentId: ctx.lastParentId,
+        sequenceId: ctx.lastSequenceId,
+        user,
+      });
     }
 
     logger.debug("[AI Stream] Stream completed", {

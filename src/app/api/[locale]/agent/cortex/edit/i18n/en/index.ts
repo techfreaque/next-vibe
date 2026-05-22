@@ -56,6 +56,8 @@ export const translations = {
       unauthorized: { title: "Not Logged In", description: "Log in first" },
       forbidden: { title: "No Access", description: "Can't edit this" },
       notFound: { title: "Not Found", description: "File doesn't exist" },
+      findNotFound: "Text not found: {{details}}",
+      invalidParams: "Invalid parameters: {{details}}",
       server: { title: "Server Error", description: "Something broke" },
       unknown: { title: "Error", description: "Something went wrong" },
       unsavedChanges: {

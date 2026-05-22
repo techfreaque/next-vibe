@@ -13,8 +13,10 @@ import {
   appendFileSync,
   mkdirSync,
   readFileSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
+import { monitorEventLoopDelay } from "node:perf_hooks";
 
 import {
   ErrorResponseTypes,
@@ -92,6 +94,21 @@ const OOM_CONSECUTIVE_THRESHOLD = 2;
 
 /** Task runner restart backoff: 5s → 10s → 30s → 60s (stays at 60s) */
 const TASK_RESTART_DELAYS_MS = [5000, 10000, 30000, 60000];
+
+/**
+ * Supervisor watchdog: max age of the health snapshot file in ms before we
+ * consider the child frozen and force-kill it. 150s = 2.5x the 60s write interval.
+ * Gives one full miss + half buffer to avoid false positives from slow I/O.
+ */
+const FREEZE_WATCHDOG_THRESHOLD_MS = 150_000;
+
+/** How often the supervisor checks the health snapshot file for staleness */
+const FREEZE_WATCHDOG_INTERVAL_MS = 30_000;
+
+/** Event loop lag thresholds for the child process (microseconds → ms conversion) */
+const EL_LAG_WARN_MS = 100;
+const EL_LAG_ERROR_MS = 500;
+const EL_LAG_CRITICAL_MS = 2000;
 
 /**
  * Supervisor heap cap in MB. The supervisor only runs the watch loop — no app code.
@@ -362,6 +379,57 @@ export class ServerStartRepository {
 
     ServerStartRepository.supervisedChild = spawnChild();
 
+    // Watchdog: detect frozen child (alive but event loop blocked, no health snapshot update).
+    // The child writes .tmp/.vibe-health.json every 60s. If the file goes stale for
+    // FREEZE_WATCHDOG_THRESHOLD_MS, we assume the child is frozen and force-kill it so the
+    // supervisor can restart it. This catches hangs that don't trigger an exit event.
+    const freezeWatchdog = setInterval(() => {
+      if (supervisorShuttingDown || !ServerStartRepository.supervisedChild) {
+        return;
+      }
+      try {
+        const stat = statSync(HEALTH_SNAPSHOT_FILE);
+        const ageMs = Date.now() - stat.mtimeMs;
+        if (ageMs > FREEZE_WATCHDOG_THRESHOLD_MS) {
+          let lastHealth: string | undefined;
+          try {
+            lastHealth = readFileSync(HEALTH_SNAPSHOT_FILE, "utf-8");
+          } catch {
+            // ignore
+          }
+          logger.error(
+            `[Supervisor] Child appears frozen: health snapshot is ${Math.round(ageMs / 1000)}s stale (threshold: ${FREEZE_WATCHDOG_THRESHOLD_MS / 1000}s). Force-killing.`,
+            {
+              snapshotAgeMs: Math.round(ageMs),
+              thresholdMs: FREEZE_WATCHDOG_THRESHOLD_MS,
+              lastHealth,
+              childPid: ServerStartRepository.supervisedChild?.pid,
+            },
+          );
+          try {
+            mkdirSync(".tmp", { recursive: true });
+            appendFileSync(
+              ".tmp/vibe-start.log",
+              `${JSON.stringify({ type: "freeze_kill", snapshotAgeMs: Math.round(ageMs), timestamp: new Date().toISOString() })}\n`,
+            );
+          } catch {
+            // ignore fs errors
+          }
+          if (
+            ServerStartRepository.supervisedChild &&
+            !ServerStartRepository.supervisedChild.killed
+          ) {
+            ServerStartRepository.supervisedChild.kill("SIGKILL");
+          }
+        }
+      } catch {
+        // Health snapshot doesn't exist yet (child still starting) - not a freeze
+      }
+    }, FREEZE_WATCHDOG_INTERVAL_MS);
+    // Supervisor exits only via signal handlers (process.exit) - no need to unref.
+    // The freezeWatchdog variable is intentionally unused after this point.
+    void freezeWatchdog;
+
     // SIGINT arrives at the whole process group (child gets it too) - just set the flag.
     process.on("SIGINT", () => {
       supervisorShuttingDown = true;
@@ -484,6 +552,64 @@ export class ServerStartRepository {
 
     // Write immediately so there is data even if the process crashes before 60s
     writeSnapshot();
+
+    // Event loop lag monitoring: detect when the event loop is blocked.
+    // Uses perf_hooks histogram which samples lag every 20ms.
+    // Thresholds: ≥100ms warn, ≥500ms error, ≥2000ms critical.
+    // Critical lag is what causes server "freezes" from the user's perspective.
+    try {
+      const histogram = monitorEventLoopDelay({ resolution: 20 });
+      histogram.enable();
+
+      let lastLagLevel = 0;
+      const lagInterval = setInterval(() => {
+        try {
+          // histogram.mean is in nanoseconds
+          const meanMs = histogram.mean / 1e6;
+          const maxMs = histogram.max / 1e6;
+          histogram.reset();
+
+          if (maxMs >= EL_LAG_CRITICAL_MS && lastLagLevel < 3) {
+            lastLagLevel = 3;
+            logger.error(
+              "[EventLoop] CRITICAL lag detected - server may appear frozen",
+              {
+                meanMs: Math.round(meanMs),
+                maxMs: Math.round(maxMs),
+                uptime: Math.floor(process.uptime()),
+                heapUsedMb: Math.round(
+                  process.memoryUsage().heapUsed / 1024 / 1024,
+                ),
+              },
+            );
+          } else if (maxMs >= EL_LAG_ERROR_MS && lastLagLevel < 2) {
+            lastLagLevel = 2;
+            logger.error("[EventLoop] High lag - requests may be timing out", {
+              meanMs: Math.round(meanMs),
+              maxMs: Math.round(maxMs),
+              uptime: Math.floor(process.uptime()),
+            });
+          } else if (maxMs >= EL_LAG_WARN_MS && lastLagLevel < 1) {
+            lastLagLevel = 1;
+            logger.warn("[EventLoop] Elevated lag", {
+              meanMs: Math.round(meanMs),
+              maxMs: Math.round(maxMs),
+            });
+          } else if (maxMs < EL_LAG_WARN_MS / 2) {
+            lastLagLevel = 0;
+          }
+        } catch {
+          // ignore
+        }
+      }, 5_000);
+      // Child exits only via process.exit() in signal handlers - no need to unref.
+      void lagInterval;
+    } catch {
+      // perf_hooks.monitorEventLoopDelay may not be available in all runtimes
+      logger.debug(
+        "[EventLoop] monitorEventLoopDelay not available in this runtime",
+      );
+    }
   }
 
   private static logStartupInfo(

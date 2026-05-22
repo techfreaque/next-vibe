@@ -144,7 +144,9 @@ export class CortexEditRepository {
       const result = applyFindReplace(content, find, replace);
       if (result.replacements === 0) {
         return fail({
-          message: t("patch.errors.notFound.title"),
+          message: t("patch.errors.findNotFound", {
+            details: `"${find.slice(0, 120)}${find.length > 120 ? "…" : ""}" in ${path}. Use cortex-read to get the current file content and retry with the exact text.`,
+          }),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -160,7 +162,9 @@ export class CortexEditRepository {
       const lineCount = content.split("\n").length;
       if (startLine > lineCount || endLine > lineCount) {
         return fail({
-          message: t("patch.errors.validation.title"),
+          message: t("patch.errors.invalidParams", {
+            details: `Line range ${startLine}-${endLine} is out of bounds. File has ${lineCount} lines.`,
+          }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -168,7 +172,9 @@ export class CortexEditRepository {
       replacements = 1;
     } else {
       return fail({
-        message: t("patch.errors.validation.title"),
+        message: t("patch.errors.invalidParams", {
+          details: `Use {find+replace} or {startLine+endLine+newContent}. Got: find=${find !== undefined ? "set" : "unset"}, replace=${replace !== undefined ? "set" : "unset"}, startLine=${startLine !== undefined ? "set" : "unset"}, endLine=${endLine !== undefined ? "set" : "unset"}, newContent=${newContent !== undefined ? "set" : "unset"}`,
+        }),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -282,7 +288,9 @@ export class CortexEditRepository {
       const result = applyFindReplace(content, find, replace);
       if (result.replacements === 0) {
         return fail({
-          message: t("patch.errors.notFound.title"),
+          message: t("patch.errors.findNotFound", {
+            details: `"${find.slice(0, 120)}${find.length > 120 ? "…" : ""}" in ${path}. Use cortex-read to get the current file content and retry with the exact text.`,
+          }),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -298,7 +306,9 @@ export class CortexEditRepository {
       const lineCount = content.split("\n").length;
       if (startLine > lineCount || endLine > lineCount) {
         return fail({
-          message: t("patch.errors.validation.title"),
+          message: t("patch.errors.invalidParams", {
+            details: `Line range ${startLine}-${endLine} is out of bounds. File has ${lineCount} lines.`,
+          }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -306,7 +316,9 @@ export class CortexEditRepository {
       replacements = 1;
     } else {
       return fail({
-        message: t("patch.errors.validation.title"),
+        message: t("patch.errors.invalidParams", {
+          details: `Use {find+replace} or {startLine+endLine+newContent}. Got: find=${find !== undefined ? "set" : "unset"}, replace=${replace !== undefined ? "set" : "unset"}, startLine=${startLine !== undefined ? "set" : "unset"}, endLine=${endLine !== undefined ? "set" : "unset"}, newContent=${newContent !== undefined ? "set" : "unset"}`,
+        }),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }

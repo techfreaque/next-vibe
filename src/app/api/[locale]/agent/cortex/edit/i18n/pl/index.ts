@@ -62,6 +62,8 @@ export const translations = {
         description: "Nie możesz tego edytować",
       },
       notFound: { title: "Nie znaleziono", description: "Plik nie istnieje" },
+      findNotFound: "Tekst nie znaleziony: {{details}}",
+      invalidParams: "Nieprawidłowe parametry: {{details}}",
       server: { title: "Błąd serwera", description: "Coś poszło nie tak" },
       unknown: { title: "Błąd", description: "Coś poszło nie tak" },
       unsavedChanges: {

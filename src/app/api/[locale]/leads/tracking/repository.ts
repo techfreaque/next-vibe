@@ -1126,7 +1126,7 @@ export class LeadTrackingRepository {
             campaignId,
             engagementType: EngagementTypes.EMAIL_CLICK,
             metadata: {
-              destinationUrl: url,
+              destinationUrl: url ?? "",
               trackingMethod: "redirect",
               isLoggedIn,
               currentLeadId,

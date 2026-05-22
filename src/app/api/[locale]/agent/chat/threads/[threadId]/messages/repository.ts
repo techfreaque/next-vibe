@@ -199,8 +199,8 @@ export class MessagesRepository {
   }): Promise<void> {
     // Incognito threads live in client storage only — no DB row exists or should be created.
     if (params.rootFolderId === DefaultFolderId.INCOGNITO) {
-      params.logger.error(
-        "createUserMessage should not be called for incoginto folders",
+      params.logger.debug(
+        "createUserMessage skipped: incognito folder (expected - no DB persistence for incognito)",
       );
       return;
     }

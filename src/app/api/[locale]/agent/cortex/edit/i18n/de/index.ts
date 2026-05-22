@@ -62,6 +62,8 @@ export const translations = {
         title: "Nicht gefunden",
         description: "Datei existiert nicht",
       },
+      findNotFound: "Text nicht gefunden: {{details}}",
+      invalidParams: "Ungültige Parameter: {{details}}",
       server: {
         title: "Serverfehler",
         description: "Etwas ist schiefgelaufen",

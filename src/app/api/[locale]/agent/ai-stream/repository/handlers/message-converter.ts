@@ -661,6 +661,21 @@ export class MessageConverter {
         continue;
       }
 
+      // Convert the message first - some messages (empty assistant with no tool calls)
+      // return null and should be fully skipped including their metadata system message.
+      // toAiSdkMessage can return a single message, an array of messages, or null
+      const converted = await MessageConverter.toAiSdkMessage(
+        msg,
+        logger,
+        locale,
+        modelConfig,
+      );
+      if (converted === null) {
+        // Message was filtered (e.g. empty assistant) - skip metadata injection too
+        // to avoid orphaned system messages that could confuse the provider.
+        continue;
+      }
+
       // Inject metadata system message before user/assistant messages.
       // Only for full ChatMessage objects (not simple { role, content } objects).
       // Only emit once per sequenceId - sequential tool calls share a sequenceId across
@@ -686,21 +701,11 @@ export class MessageConverter {
         }
       }
 
-      // Convert and add the actual message
-      // toAiSdkMessage can return a single message, an array of messages, or null
-      const converted = await MessageConverter.toAiSdkMessage(
-        msg,
-        logger,
-        locale,
-        modelConfig,
-      );
-      if (converted !== null) {
-        // If it's an array, flatten it into the result
-        if (Array.isArray(converted)) {
-          result.push(...converted);
-        } else {
-          result.push(converted);
-        }
+      // Add the converted message(s)
+      if (Array.isArray(converted)) {
+        result.push(...converted);
+      } else {
+        result.push(converted);
       }
     }
 
