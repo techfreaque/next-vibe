@@ -16,6 +16,10 @@ export const translations = {
         title: "Framework",
         description: "Target framework to build and restart",
       },
+      webpack: {
+        title: "Webpack",
+        description: "Use webpack instead of Turbopack (default: true)",
+      },
       success: {
         title: "Result",
       },

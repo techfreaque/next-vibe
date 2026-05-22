@@ -341,18 +341,26 @@ export class AiStreamRepository {
       const threadId = data.threadId;
       const isIncognito = data.rootFolderId === "incognito";
       if (threadId && !user.isPublic && "id" in user) {
-        // Chain error as child of user message (if present), else child of last AI message.
-        const setupErrorParentId =
-          data.userMessageId || data.parentMessageId || null;
+        // Chain error as child of the previous branch tip (last assistant/tool message).
+        // Do NOT use userMessageId - the user message has not been persisted to DB yet
+        // at setup time, so it cannot be a valid parent FK reference.
+        const setupErrorParentId = data.parentMessageId || null;
+        // Credit errors (FORBIDDEN / PAYMENT_REQUIRED) must never be stored in DB -
+        // they are transient validation failures, not persistent thread state.
+        const isCreditError =
+          setupResult.errorType?.errorCode ===
+            ErrorResponseTypes.FORBIDDEN.errorCode ||
+          setupResult.errorType?.errorCode ===
+            ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
         try {
           const errorMessageId = crypto.randomUUID();
           const errorContent = serializeError(setupResult);
           const errorType = setupResult.errorType
             ? `${setupResult.errorType.errorCode}`
             : "SETUP_ERROR";
-          // Persist error message to DB only for non-incognito threads (incognito has no DB row).
+          // Persist error message to DB only for non-incognito, non-credit-error threads.
           // Skip silently if the thread doesn't exist yet (new thread where setup failed before any DB write).
-          if (!isIncognito) {
+          if (!isIncognito && !isCreditError) {
             try {
               await MessagesRepository.createErrorMessage({
                 messageId: errorMessageId,
@@ -711,6 +719,10 @@ export class AiStreamRepository {
             lastCompactingMessage: compactingCheck.lastCompactingMessage?.id,
           });
 
+          // Store estimated input tokens from compacting check so streaming token
+          // pushes include promptTokens without recalculating.
+          ctx.estimatedInputTokens = compactingCheck.totalTokens;
+
           // Emit USER MESSAGE_CREATED AFTER the compacting check so ordering is always correct:
           // - Non-compacting: user message emitted here with original parentId
           // - Compacting: CompactingHandler emits it with parentId = compactingMessageId
@@ -908,6 +920,7 @@ export class AiStreamRepository {
                   message: aiStreamT("errors.compactingRebuildFailed"),
                   errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
                 }),
+                ctx.lastParentId,
               );
 
               // STOP - don't continue with broken state
@@ -1006,6 +1019,7 @@ export class AiStreamRepository {
                   message: aiStreamT("route.errors.streamCreationFailed"),
                   errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
                 }),
+                ctx.lastParentId,
               );
             } else {
               await executeUnbottledStream({

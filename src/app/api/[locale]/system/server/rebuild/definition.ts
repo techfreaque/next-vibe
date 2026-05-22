@@ -62,6 +62,14 @@ const { POST } = createEndpoint({
         schema: z.enum(ServerFramework).default(ServerFramework.NEXT),
       }),
 
+      webpack: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.webpack.title",
+        description: "post.fields.webpack.description",
+        schema: z.boolean().optional().default(true),
+      }),
+
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
@@ -157,8 +165,9 @@ const { POST } = createEndpoint({
   // === EXAMPLES ===
   examples: {
     requests: {
-      default: { framework: ServerFramework.NEXT },
+      default: { framework: ServerFramework.NEXT, webpack: true },
       tanstack: { framework: ServerFramework.TANSTACK },
+      turbopack: { framework: ServerFramework.NEXT, webpack: false },
     },
     responses: {
       default: {

@@ -453,7 +453,7 @@ export function SystemSettingsWidget(): JSX.Element {
         rebuildDef.default.POST,
         logger,
         user,
-        { framework: ServerFramework.NEXT },
+        { framework: ServerFramework.NEXT, webpack: true },
         undefined,
         locale,
       );

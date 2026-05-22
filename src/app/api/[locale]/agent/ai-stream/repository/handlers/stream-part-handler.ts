@@ -163,6 +163,7 @@ export class StreamPartHandler {
           ctx.dbWriter.emitEstimatedTokens(
             ctx.currentAssistantMessageId,
             contentLength,
+            ctx.estimatedInputTokens || undefined,
           );
         }
       }

@@ -355,7 +355,11 @@ export class MessageDbWriter {
    * live approximation before the real count arrives from the API at step finish.
    * Estimate: chars / 4 (rough GPT-style average).
    */
-  emitEstimatedTokens(messageId: string, charCount: number): void {
+  emitEstimatedTokens(
+    messageId: string,
+    charCount: number,
+    estimatedInputTokens?: number,
+  ): void {
     const estimatedTokens = Math.ceil(charCount / 4);
     this.wsEmit("tokens-updated", {
       messages: [
@@ -363,6 +367,9 @@ export class MessageDbWriter {
           id: messageId,
           metadata: {
             completionTokens: estimatedTokens,
+            ...(estimatedInputTokens
+              ? { promptTokens: estimatedInputTokens }
+              : {}),
           },
         },
       ],
@@ -1279,6 +1286,8 @@ export class MessageDbWriter {
     sequenceId: string | null;
     user: JwtPayloadType;
     content?: TranslatedKeyType;
+    /** Skip DB write regardless of incognito mode (e.g. credit errors) */
+    skipDb?: boolean;
   }): Promise<void> {
     const { threadId, errorType, error, parentId, sequenceId, user } = params;
     const errorMessageId = crypto.randomUUID();
@@ -1315,8 +1324,8 @@ export class MessageDbWriter {
       ],
     });
 
-    // DB: save error message
-    if (!this.isIncognito) {
+    // DB: save error message (skip for incognito and for errors that must not persist, e.g. credit errors)
+    if (!this.isIncognito && !params.skipDb) {
       await MessagesRepository.createErrorMessage({
         messageId: errorMessageId,
         threadId,

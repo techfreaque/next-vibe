@@ -304,6 +304,7 @@ export class CompactingHandler {
               message: userMessage,
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
             }),
+            ctx.lastParentId,
           );
 
           return { success: false, compactingMessageId };
@@ -324,6 +325,7 @@ export class CompactingHandler {
           message: t("errors.compactingException"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         }),
+        ctx.lastParentId,
       );
 
       return { success: false, compactingMessageId };

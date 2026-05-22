@@ -56,6 +56,7 @@ export class StreamErrorHandler {
 
     let translationKey: AiStreamTranslationKey;
     let errorType = ErrorResponseTypes.UNKNOWN_ERROR;
+    let skipDb = false;
 
     if (
       errorName === "AI_MissingToolResultsError" ||
@@ -72,6 +73,7 @@ export class StreamErrorHandler {
     ) {
       translationKey = "errors.insufficientCredits";
       errorType = ErrorResponseTypes.PAYMENT_REQUIRED;
+      skipDb = true;
     } else if (
       errorMessage.toLowerCase().includes("no output") ||
       errorMessage.toLowerCase().includes("no response") ||
@@ -119,6 +121,7 @@ export class StreamErrorHandler {
       parentId: lastParentId,
       sequenceId: lastSequenceId,
       user,
+      skipDb,
     });
   }
 }

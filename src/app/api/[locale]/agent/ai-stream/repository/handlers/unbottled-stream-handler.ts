@@ -79,6 +79,7 @@ export async function executeUnbottledStream(
     threadId,
     aiMessageId,
     userMessageId,
+    parentMessageId,
     model,
     skill,
     sequenceId,
@@ -157,6 +158,7 @@ export async function executeUnbottledStream(
           message: t("route.errors.streamCreationFailed"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         }),
+        parentMessageId,
       );
       return;
     }
@@ -174,6 +176,7 @@ export async function executeUnbottledStream(
         message: t("route.errors.streamCreationFailed"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       }),
+      parentMessageId,
     );
     return;
   }
@@ -187,6 +190,7 @@ export async function executeUnbottledStream(
         message: t("route.errors.streamCreationFailed"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       }),
+      parentMessageId,
     );
     return;
   }
@@ -791,7 +795,7 @@ export async function executeUnbottledStream(
           logger.error("[Unbottled] Error from cloud", {
             error: data.message,
           });
-          // Persist error as a chat message so it survives refresh
+          // Persist error as a chat message so it survives refresh (incognito: SSE-only, client stores it)
           if (!isIncognito && userId) {
             await dbWriter.emitErrorMessage({
               threadId,
@@ -802,7 +806,7 @@ export async function executeUnbottledStream(
               user,
             });
           } else {
-            dbWriter.emitError(data);
+            dbWriter.emitError(data, currentAssistantId);
           }
           break;
         }

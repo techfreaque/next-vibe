@@ -18,6 +18,10 @@ export const translations: typeof enTranslations = {
         title: "Framework",
         description: "Docelowy framework do zbudowania i restartu",
       },
+      webpack: {
+        title: "Webpack",
+        description: "Użyj webpacka zamiast Turbopacka (domyślnie: true)",
+      },
       success: { title: "Wynik" },
       errors: { title: "Błędy" },
       duration: { title: "Czas" },

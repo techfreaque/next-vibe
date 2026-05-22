@@ -103,6 +103,12 @@ export class StreamContext {
    */
   lastEstimatedTokenEmitLength = 0;
 
+  /**
+   * Pre-calculated input token estimate from compactingCheck.totalTokens.
+   * Set once after the compacting check so we don't recalculate during streaming.
+   */
+  estimatedInputTokens = 0;
+
   // Parent chain
   currentParentId: string | null;
 

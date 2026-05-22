@@ -176,7 +176,11 @@ export class RebuildRepository {
           rmSync(stagingPath, { recursive: true, force: true });
         }
 
-        const buildResult = spawnSync("bunx", ["next", "build"], {
+        const buildArgs =
+          data.webpack !== false
+            ? ["next", "build", "--webpack"]
+            : ["next", "build"];
+        const buildResult = spawnSync("bunx", buildArgs, {
           stdio: "inherit",
           cwd,
           env: {
