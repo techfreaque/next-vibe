@@ -448,7 +448,12 @@ export function useEdenAISpeech({
       analyserRef.current = analyser;
 
       logger.debug("STT: Creating MediaRecorder");
-      const mediaRecorder = new MediaRecorder(stream);
+      // Prefer audio/webm;codecs=opus - supported on Chrome/Edge (Windows/Linux/Mac).
+      // Fall back to browser default if not supported (Firefox uses audio/ogg;codecs=opus).
+      const preferredMime = "audio/webm;codecs=opus";
+      const mediaRecorder = MediaRecorder.isTypeSupported(preferredMime)
+        ? new MediaRecorder(stream, { mimeType: preferredMime })
+        : new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       const chunkStartTime = { value: Date.now() };
 

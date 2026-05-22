@@ -492,6 +492,12 @@ export class SpeechToTextRepository {
 
     // Reject files too small to contain real audio (just container headers, no audio clusters).
     // Browser MediaRecorder fragments under ~5KB are initialization segments only.
+    logger.error("[STT] File received", {
+      fileSize: file.size,
+      fileName: file.name,
+      fileType: file.type,
+    });
+
     if (file.size < 5000) {
       logger.error("[STT] File too small to contain audio", {
         fileSize: file.size,
@@ -511,6 +517,13 @@ export class SpeechToTextRepository {
         : file.type === "video/ogg"
           ? "audio/ogg"
           : file.type;
+
+    logger.error("[STT] Sending to Eden AI", {
+      originalType: file.type,
+      remappedType: mimeType,
+      fileSize: file.size,
+      providerModel,
+    });
 
     const formData = new FormData();
     const blob =
