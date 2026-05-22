@@ -125,9 +125,9 @@ function getMicrophoneErrorMessage(
 
 // Silence detection thresholds (module-level constants, stable across renders)
 const SILENCE_THRESHOLD_RMS = 0.015; // RMS below this = silence
-const SILENCE_DURATION_MS = 1500; // seal chunk after 1.5s of silence
-const MIN_CHUNK_MS = 3000; // never seal a chunk shorter than 3s
-const MAX_CHUNK_MS = 4 * 60 * 1000; // force-seal at 4 minutes
+const SILENCE_DURATION_MS = 1500; // silence duration needed to consider sealing
+const CHUNK_SEAL_THRESHOLD_MS = 3 * 60 * 1000; // only seal at silence when chunk is ≥3min
+const MAX_CHUNK_MS = 4 * 60 * 1000; // force-seal at 4 minutes regardless
 
 export function useEdenAISpeech({
   onTranscript,
@@ -454,20 +454,28 @@ export function useEdenAISpeech({
       analyserRef.current = analyser;
 
       logger.debug("STT: Creating MediaRecorder");
-      // Prefer audio/webm;codecs=opus - supported on Chrome/Edge (Windows/Linux/Mac).
-      // Fall back to browser default if not supported (Firefox uses audio/ogg;codecs=opus).
-      const preferredMime = "audio/webm;codecs=opus";
-      const mediaRecorder = MediaRecorder.isTypeSupported(preferredMime)
+      // Format priority: audio/ogg;codecs=opus (universally accepted by STT providers,
+      // supported by Firefox natively, Chrome/Edge via fallback chain).
+      // audio/mp4 for Safari which doesn't support ogg.
+      const preferredMime = ((): string => {
+        const candidates = [
+          "audio/ogg;codecs=opus",
+          "audio/mp4",
+          "audio/webm;codecs=opus",
+          "audio/webm",
+        ];
+        return candidates.find((m) => MediaRecorder.isTypeSupported(m)) ?? "";
+      })();
+      const mediaRecorder = preferredMime
         ? new MediaRecorder(stream, { mimeType: preferredMime })
         : new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       const chunkStartTime = { value: Date.now() };
 
       // startChunkRecorder: creates a fresh MediaRecorder on the existing stream.
-      // Each stop() produces one complete, self-contained WebM file (proper EBML header).
-      // Concatenating timeslice blobs produces fragmented WebM that some providers reject.
+      // Each stop() produces one complete, self-contained file (proper container header).
       const startChunkRecorder = (): void => {
-        const rec = MediaRecorder.isTypeSupported(preferredMime)
+        const rec = preferredMime
           ? new MediaRecorder(stream, { mimeType: preferredMime })
           : new MediaRecorder(stream);
         mediaRecorderRef.current = rec;
@@ -532,7 +540,7 @@ export function useEdenAISpeech({
           const silenceDuration = now - silenceStartRef.current;
           const shouldSeal =
             (silenceDuration >= SILENCE_DURATION_MS &&
-              chunkAge >= MIN_CHUNK_MS) ||
+              chunkAge >= CHUNK_SEAL_THRESHOLD_MS) ||
             chunkAge >= MAX_CHUNK_MS;
 
           if (shouldSeal && mediaRecorderRef.current?.state === "recording") {

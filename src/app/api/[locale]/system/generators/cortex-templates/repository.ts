@@ -168,7 +168,7 @@ export class CortexTemplatesEmbeddingsGeneratorRepository {
       }
 
       const duration = Date.now() - startTime;
-      const message = `${formatGenerator("Generated cortex-seeds-embeddings", "🗂️")} ${formatCount(total, "seed")} (${generated} embedded, ${skipped} cached) in ${formatDuration(duration)}`;
+      const message = `${formatGenerator("Generated cortex-seeds-embeddings", "🗂️ ")} ${formatCount(total, "seed")} (${generated} embedded, ${skipped} cached) in ${formatDuration(duration)}`;
 
       logger.info(message);
 

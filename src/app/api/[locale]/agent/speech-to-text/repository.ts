@@ -25,10 +25,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import {
-  DEFAULT_STT_MODEL_ID,
-  DEFAULT_STT_MODEL_SELECTION,
-} from "@/app/api/[locale]/agent/speech-to-text/constants";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { CreditRepository } from "../../credits/repository";
@@ -44,7 +41,27 @@ import {
   scopedTranslation as sttScopedTranslation,
   type SpeechToTextT,
 } from "./i18n";
-import type { SttModelId } from "./models";
+/**
+ * Map from MIME type to file extension for Eden AI filename hints.
+ * Eden AI uses the filename extension as an additional format signal on top of Content-Type.
+ */
+const MIME_TO_EXT: Record<string, string> = {
+  "audio/webm": "webm",
+  "audio/ogg": "ogg",
+  "audio/mp4": "mp4",
+  "audio/mpeg": "mp3",
+  "audio/mp3": "mp3",
+  "audio/wav": "wav",
+  "audio/x-wav": "wav",
+  "audio/flac": "flac",
+  "audio/x-flac": "flac",
+  "audio/aac": "aac",
+  "audio/m4a": "m4a",
+  "audio/x-m4a": "m4a",
+  "video/webm": "webm",
+  "video/ogg": "ogg",
+  "video/mp4": "mp4",
+};
 
 /**
  * Speech-to-Text Repository
@@ -135,23 +152,18 @@ export class SpeechToTextRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    sttModelId?: SttModelId,
+    sttModelSelection?: SttModelSelection | null,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
     const t = sttScopedTranslation.scopedT(locale).t;
     const language = getLanguageFromLocale(locale);
 
-    // Resolve model with env-based provider fallback (respects which keys are configured)
-    const selection: SttModelSelection = sttModelId
-      ? ({
-          ...DEFAULT_STT_MODEL_SELECTION,
-          manualModelId: sttModelId,
-        } as SttModelSelection)
-      : DEFAULT_STT_MODEL_SELECTION;
+    // Resolve model: use caller-provided selection (from active favorite/skill cascade) or default
+    const selection = sttModelSelection ?? DEFAULT_STT_MODEL_SELECTION;
     const modelOption = getBestSttModel(selection, user);
 
     if (!modelOption) {
       logger.error("[STT] No STT provider available", {
-        sttModelId: sttModelId ?? DEFAULT_STT_MODEL_ID,
+        selection,
       });
       return fail({
         message: t("post.errors.transcriptionFailed", {
@@ -168,7 +180,13 @@ export class SpeechToTextRepository {
       providerModel: modelOption.providerModel,
       language,
       chunkCount: files.length,
-      totalSize: files.reduce((s, f) => s + f.size, 0),
+      totalSizeBytes: files.reduce((s, f) => s + f.size, 0),
+      chunks: files.map((f, i) => ({
+        index: i,
+        name: f.name,
+        type: f.type,
+        sizeBytes: f.size,
+      })),
     });
 
     const tCredits = creditsScopedTranslation.scopedT(locale).t;
@@ -428,6 +446,9 @@ export class SpeechToTextRepository {
     logger.debug("[STT] Calling OpenAI Whisper API", {
       model: providerModel,
       language,
+      originalMime: file.type,
+      normalizedMime,
+      originalFileName: file.name,
       fileSize: file.size,
     });
 
@@ -449,6 +470,9 @@ export class SpeechToTextRepository {
       logger.error("[STT] OpenAI Whisper API error", {
         status: response.status,
         error: errorText,
+        normalizedMime,
+        fileSize: file.size,
+        model: providerModel,
       });
       return fail({
         message: t("post.errors.transcriptionFailed", { error: errorText }),
@@ -477,8 +501,7 @@ export class SpeechToTextRepository {
   }
 
   /**
-   * Transcribe using Eden AI (async polling flow)
-   * providerModel = Eden AI provider name, e.g. "openai"
+   * Transcribe using Eden AI (async polling flow).
    */
   private static async transcribeWithEdenAI(
     file: File,
@@ -500,13 +523,11 @@ export class SpeechToTextRepository {
         buildMissingKeyMessage("voice"),
       );
       return fail({
-        message: t("post.errors.transcriptionFailed"),
+        message: t("post.errors.apiKeyMissing"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
 
-    // Reject files too small to contain real audio (just container headers, no audio clusters).
-    // Browser MediaRecorder fragments under ~5KB are initialization segments only.
     if (file.size < 5000) {
       logger.error("[STT] File too small to contain audio", {
         fileSize: file.size,
@@ -518,9 +539,6 @@ export class SpeechToTextRepository {
       });
     }
 
-    // Normalize MIME type for Eden AI:
-    // 1. Strip codec suffix (e.g. "audio/webm;codecs=opus" → "audio/webm") - Eden AI rejects codec params
-    // 2. Remap video/* to audio/* (browsers report WebM audio as "video/webm")
     const baseType = file.type.split(";")[0].trim();
     const mimeType =
       baseType === "video/webm"
@@ -529,22 +547,69 @@ export class SpeechToTextRepository {
           ? "audio/ogg"
           : baseType;
 
+    const ext = MIME_TO_EXT[mimeType] ?? mimeType.split("/")[1] ?? "webm";
+    const normalizedFileName = `audio.${ext}`;
+    const arrayBuffer = await file.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: mimeType });
+
+    const headerBytes = new Uint8Array(arrayBuffer.slice(0, 12));
+    const fileHeader = [...headerBytes]
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join(" ");
+
+    logger.debug("[STT] Starting Eden AI transcription", {
+      originalFileName: file.name,
+      normalizedFileName,
+      originalMime: file.type,
+      normalizedMime: mimeType,
+      fileSize: file.size,
+      language,
+      edenProvider: providerModel,
+      fileHeader,
+    });
+
+    return SpeechToTextRepository.tryEdenAIProvider(
+      blob,
+      normalizedFileName,
+      mimeType,
+      providerModel,
+      language,
+      logger,
+      t,
+    );
+  }
+
+  /**
+   * Attempt transcription with a single Eden AI provider.
+   * Returns success or a typed failure - never throws.
+   */
+  private static async tryEdenAIProvider(
+    blob: Blob,
+    fileName: string,
+    mimeType: string,
+    edenProvider: string,
+    language: string,
+    logger: EndpointLogger,
+    t: SpeechToTextT,
+  ): Promise<
+    ResponseType<{
+      text: string;
+      confidence: number | undefined;
+      duration: number;
+      edenAiCostUsd: number | undefined;
+    }>
+  > {
     const formData = new FormData();
-    const blob =
-      mimeType === file.type
-        ? file
-        : new Blob([await file.arrayBuffer()], { type: mimeType });
-    formData.append("file", blob, file.name);
-    formData.append("providers", providerModel);
+    formData.append("file", blob, fileName);
+    formData.append("providers", edenProvider);
     formData.append("language", language);
 
-    logger.debug("[STT] Sending request to Eden AI", {
-      provider: providerModel,
-      language,
-      fileSize: file.size,
-      fileType: file.type,
+    logger.debug("[STT] Sending to Eden AI", {
+      edenProvider,
+      fileName,
       mimeType,
-      fileName: file.name,
+      fileSize: blob.size,
+      language,
     });
 
     const response = await fetch(
@@ -565,7 +630,8 @@ export class SpeechToTextRepository {
       logger.error("[STT] Eden AI API error", {
         status: response.status,
         error: errorText,
-        provider: providerModel,
+        edenProvider,
+        mimeType,
         language,
       });
       return fail({
@@ -579,6 +645,7 @@ export class SpeechToTextRepository {
 
     if (!publicId) {
       logger.error("[STT] No public ID from Eden AI", {
+        edenProvider,
         responseData: JSON.stringify(responseData),
       });
       return fail({
@@ -589,7 +656,7 @@ export class SpeechToTextRepository {
 
     return SpeechToTextRepository.pollForResults(
       publicId,
-      providerModel,
+      edenProvider,
       logger,
       t,
     );

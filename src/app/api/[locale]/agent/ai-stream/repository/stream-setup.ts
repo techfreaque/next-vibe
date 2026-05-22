@@ -615,6 +615,7 @@ export async function setupAiStream(params: {
     user,
     locale,
     logger,
+    sttModelSelection: resolvedFavoriteConfig?.sttModelSelection ?? null,
   });
 
   if (!operationResult.success) {
