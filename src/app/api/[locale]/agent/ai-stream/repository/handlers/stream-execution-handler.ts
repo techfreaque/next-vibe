@@ -823,7 +823,22 @@ export class StreamExecutionHandler {
       rawUsageData: JSON.stringify(usageData),
     });
 
-    const finishReason = await streamResult.finishReason;
+    const [finishReason, streamWarnings] = await Promise.all([
+      streamResult.finishReason,
+      streamResult.warnings,
+    ]);
+
+    if (finishReason === "error") {
+      logger.error("[AI Stream] Provider returned finishReason=error", {
+        model,
+        threadId,
+        totalTokens: finalTotalTokens,
+        warnings: JSON.stringify(streamWarnings ?? []),
+        messageCount: messages.length,
+        messageRoles: messages.map((m) => m.role).join(","),
+        lastMessageRole: messages[messages.length - 1]?.role,
+      });
+    }
 
     await StreamCompletionHandler.handleCompletion({
       ctx,

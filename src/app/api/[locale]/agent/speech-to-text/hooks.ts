@@ -155,6 +155,9 @@ export function useEdenAISpeech({
   const audioContextRef = useRef<AudioContext | null>(null);
   const silenceRafRef = useRef<number | null>(null);
   const silenceStartRef = useRef<number | null>(null);
+  // True while the user is actively recording (false once stopRecording is called).
+  // Used by onstop to distinguish mid-recording chunk cycles from the final stop.
+  const activeRecordingRef = useRef<boolean>(false);
   // Saved chunks retained on failure so the user can retry without re-recording
   const savedAudioFilesRef = useRef<File[] | null>(null);
 
@@ -190,6 +193,9 @@ export function useEdenAISpeech({
     void audioContextRef.current?.close();
     audioContextRef.current = null;
     silenceStartRef.current = null;
+
+    // Signal final stop so onstop doesn't cycle to a new recorder
+    activeRecordingRef.current = false;
 
     // Stop media recorder if active
     if (
@@ -457,29 +463,49 @@ export function useEdenAISpeech({
       mediaRecorderRef.current = mediaRecorder;
       const chunkStartTime = { value: Date.now() };
 
-      mediaRecorder.ondataavailable = (event): void => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
+      // startChunkRecorder: creates a fresh MediaRecorder on the existing stream.
+      // Each stop() produces one complete, self-contained WebM file (proper EBML header).
+      // Concatenating timeslice blobs produces fragmented WebM that some providers reject.
+      const startChunkRecorder = (): void => {
+        const rec = MediaRecorder.isTypeSupported(preferredMime)
+          ? new MediaRecorder(stream, { mimeType: preferredMime })
+          : new MediaRecorder(stream);
+        mediaRecorderRef.current = rec;
+        audioChunksRef.current = [];
+
+        rec.ondataavailable = (event): void => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data);
+          }
+        };
+
+        rec.onstop = (): void => {
+          // Only seal if this stop was a mid-recording chunk cycle (not the final stop).
+          // The final stop is detected via activeRecordingRef being false.
+          if (activeRecordingRef.current) {
+            sealCurrentChunk();
+            chunkStartTime.value = Date.now();
+            silenceStartRef.current = null;
+            startChunkRecorder();
+          } else {
+            logger.debug("STT: Final recording stopped, processing...");
+            void processRecording();
+          }
+        };
+
+        rec.start();
       };
 
-      mediaRecorder.onstop = (): void => {
-        logger.debug("STT: Recording stopped, processing...");
-        void processRecording();
-      };
-
-      // Start with 500ms timeslice so ondataavailable fires frequently
-      mediaRecorder.start(500);
+      activeRecordingRef.current = true;
+      startChunkRecorder();
       setIsRecording(true);
       logger.debug("STT: Recording started");
 
-      // VAD loop using requestAnimationFrame
+      // VAD loop using requestAnimationFrame - AnalyserNode stays connected to stream
+      // across recorder restarts, so silence detection continues uninterrupted.
       const dataArray = new Float32Array(analyser.fftSize);
       const tick = (): void => {
-        if (
-          !mediaRecorderRef.current ||
-          mediaRecorderRef.current.state === "inactive"
-        ) {
+        if (!activeRecordingRef.current) {
           return;
         }
 
@@ -492,7 +518,7 @@ export function useEdenAISpeech({
         const now = Date.now();
         const chunkAge = now - chunkStartTime.value;
 
-        if (mediaRecorderRef.current.state === "paused") {
+        if (mediaRecorderRef.current?.state === "paused") {
           // Don't detect silence while paused
           silenceStartRef.current = null;
           silenceRafRef.current = requestAnimationFrame(tick);
@@ -509,14 +535,13 @@ export function useEdenAISpeech({
               chunkAge >= MIN_CHUNK_MS) ||
             chunkAge >= MAX_CHUNK_MS;
 
-          if (shouldSeal) {
-            logger.debug("STT: Silence detected, sealing chunk", {
+          if (shouldSeal && mediaRecorderRef.current?.state === "recording") {
+            logger.debug("STT: Silence detected, cycling recorder for chunk", {
               silenceDuration,
               chunkAge,
             });
-            sealCurrentChunk();
-            chunkStartTime.value = Date.now();
-            silenceStartRef.current = null;
+            // Stop current recorder - onstop will seal chunk and start a new recorder
+            mediaRecorderRef.current.stop();
           }
         } else {
           silenceStartRef.current = null;
@@ -543,6 +568,8 @@ export function useEdenAISpeech({
   const stopRecording = useCallback((): void => {
     logger.debug("STT: Stop recording called");
     if (mediaRecorderRef.current && isRecording) {
+      // Signal final stop before calling stop() so onstop routes to processRecording
+      activeRecordingRef.current = false;
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setIsPaused(false);

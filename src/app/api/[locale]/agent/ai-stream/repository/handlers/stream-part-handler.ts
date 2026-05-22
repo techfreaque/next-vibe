@@ -496,6 +496,19 @@ export class StreamPartHandler {
       return { shouldAbort: false };
     }
 
+    if (part.type === "error") {
+      logger.error("[AI Stream] Provider emitted error part", {
+        error:
+          "error" in part
+            ? part.error instanceof Error
+              ? part.error.message
+              : String(part.error)
+            : "unknown",
+        model,
+        threadId,
+      });
+    }
+
     return { shouldAbort: false };
   }
 }
