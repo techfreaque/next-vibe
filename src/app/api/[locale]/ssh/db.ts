@@ -17,7 +17,7 @@ import type { z } from "zod";
 
 import { users } from "@/app/api/[locale]/user/db";
 
-import { SshAuthTypeDB } from "./enum";
+import { ClusterRole, ClusterRoleDB, SshAuthTypeDB } from "./enum";
 
 /**
  * SSH Connections Table
@@ -40,6 +40,10 @@ export const sshConnections = pgTable("ssh_connections", {
   // Stored on first successful connect, checked on every reconnect
   fingerprint: text("fingerprint"),
   isDefault: boolean("is_default").notNull().default(false),
+  // Cluster role for k8s provisioning via infra module
+  clusterRole: text("cluster_role", { enum: ClusterRoleDB })
+    .notNull()
+    .default(ClusterRole.NONE),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

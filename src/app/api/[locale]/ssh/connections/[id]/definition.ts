@@ -22,7 +22,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { SshAuthType, SshAuthTypeDB, SshAuthTypeOptions } from "../../enum";
+import {
+  ClusterRole,
+  ClusterRoleDB,
+  ClusterRoleOptions,
+  SshAuthType,
+  SshAuthTypeDB,
+  SshAuthTypeOptions,
+} from "../../enum";
 import { scopedTranslation } from "./i18n";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
@@ -248,6 +255,14 @@ export const { PATCH } = createEndpoint({
         description: "patch.fields.isDefault.description",
         schema: z.boolean().optional(),
       }),
+      clusterRole: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.fields.clusterRole.label",
+        description: "patch.fields.clusterRole.description",
+        options: ClusterRoleOptions,
+        schema: z.enum(ClusterRoleDB).optional(),
+      }),
       notes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
@@ -308,7 +323,13 @@ export const { PATCH } = createEndpoint({
 
   examples: {
     urlPathParams: { default: { id: "00000000-0000-0000-0000-000000000000" } },
-    requests: { default: { label: "prod-updated", isDefault: true } },
+    requests: {
+      default: {
+        label: "prod-updated",
+        isDefault: true,
+        clusterRole: ClusterRole.CONTROL_PLANE,
+      },
+    },
     responses: { default: { updatedAt: "2026-01-01T00:00:00Z" } },
   },
 });

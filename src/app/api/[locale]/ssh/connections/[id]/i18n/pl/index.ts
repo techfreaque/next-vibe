@@ -94,6 +94,11 @@ export const translations = {
         label: "Ustaw jako domyślne",
         description: "Użyj tego połączenia domyślnie dla sesji terminala",
       },
+      clusterRole: {
+        label: "Rola klastra",
+        description:
+          "Rola tego serwera w klastrze k8s (control-plane, worker, storage lub brak)",
+      },
       notes: {
         label: "Notatki",
         description: "Opcjonalne notatki o tym połączeniu",

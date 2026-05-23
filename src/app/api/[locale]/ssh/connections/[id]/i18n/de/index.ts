@@ -104,6 +104,11 @@ export const translations = {
         description:
           "Diese Verbindung standardmäßig für Terminal-Sitzungen verwenden",
       },
+      clusterRole: {
+        label: "Cluster-Rolle",
+        description:
+          "Rolle dieses Servers im k8s-Cluster (control-plane, worker, storage oder keine)",
+      },
       notes: {
         label: "Notizen",
         description: "Optionale Notizen zu dieser Verbindung",

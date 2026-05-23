@@ -9,6 +9,12 @@ export const translations = {
       keyAgent: "SSH Agent",
       local: "Local Machine",
     },
+    clusterRole: {
+      none: "No cluster role",
+      controlPlane: "Control Plane",
+      worker: "Worker",
+      storage: "Storage",
+    },
     shell: {
       bash: "/bin/bash",
       zsh: "/usr/bin/zsh",
@@ -945,6 +951,10 @@ export const translations = {
           isDefault: {
             label: "Default",
             description: "Set as default connection",
+          },
+          clusterRole: {
+            label: "Cluster Role",
+            description: "Role of this server in the k8s cluster",
           },
           notes: {
             label: "Notes",

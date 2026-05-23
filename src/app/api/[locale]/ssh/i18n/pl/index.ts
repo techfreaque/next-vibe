@@ -9,6 +9,12 @@ export const translations = {
       keyAgent: "Agent SSH",
       local: "Lokalny komputer",
     },
+    clusterRole: {
+      none: "Brak roli klastra",
+      controlPlane: "Control Plane",
+      worker: "Worker",
+      storage: "Storage",
+    },
     shell: {
       bash: "/bin/bash",
       zsh: "/usr/bin/zsh",

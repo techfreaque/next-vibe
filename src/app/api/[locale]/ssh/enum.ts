@@ -92,3 +92,25 @@ export enum ExecBackend {
 }
 
 export const ExecBackendDB = [ExecBackend.LOCAL, ExecBackend.SSH] as const;
+
+// ─── Cluster Role ─────────────────────────────────────────────────────────────
+
+export const {
+  enum: ClusterRole,
+  options: ClusterRoleOptions,
+  Value: ClusterRoleValue,
+} = createEnumOptions(scopedTranslation, {
+  NONE: "enums.clusterRole.none",
+  CONTROL_PLANE: "enums.clusterRole.controlPlane",
+  WORKER: "enums.clusterRole.worker",
+  STORAGE: "enums.clusterRole.storage",
+});
+
+export const ClusterRoleDB = [
+  ClusterRole.NONE,
+  ClusterRole.CONTROL_PLANE,
+  ClusterRole.WORKER,
+  ClusterRole.STORAGE,
+] as const;
+
+export type ClusterRoleType = typeof ClusterRoleValue;

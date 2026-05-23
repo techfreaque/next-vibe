@@ -1,0 +1,1 @@
+ALTER TABLE "ssh_connections" ADD COLUMN "cluster_role" text DEFAULT 'none' NOT NULL;

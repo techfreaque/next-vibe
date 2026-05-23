@@ -1,0 +1,1 @@
+ALTER TABLE "ssh_connections" ALTER COLUMN "cluster_role" SET DEFAULT 'enums.clusterRole.none';

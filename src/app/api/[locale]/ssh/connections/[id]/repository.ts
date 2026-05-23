@@ -129,6 +129,9 @@ export class ConnectionDetailRepository {
       if (data.isDefault !== undefined) {
         updates.isDefault = data.isDefault;
       }
+      if (data.clusterRole !== undefined) {
+        updates.clusterRole = data.clusterRole;
+      }
 
       if (data.secret !== undefined && data.secret !== "") {
         const enc = ConnectionCreateRepository.encryptSecret(data.secret);

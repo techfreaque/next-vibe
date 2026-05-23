@@ -89,6 +89,11 @@ export const translations = {
         label: "Set as Default",
         description: "Use this connection by default for terminal sessions",
       },
+      clusterRole: {
+        label: "Cluster Role",
+        description:
+          "Role of this server in the k8s cluster (control-plane, worker, storage, or none)",
+      },
       notes: {
         label: "Notes",
         description: "Optional notes about this connection",
