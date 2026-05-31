@@ -1,0 +1,86 @@
+export const translations = {
+  post: {
+    title: "Create Account",
+    description: "Add a custom account to the company's chart of accounts",
+    companyId: {
+      label: "Company ID",
+      description: "The company to add the account to",
+      placeholder: "Enter company UUID",
+    },
+    code: {
+      label: "Account Code",
+      description: "Unique numeric code for the account",
+      placeholder: "e.g. 1150",
+    },
+    name: {
+      label: "Account Name",
+      description: "Descriptive name for the account",
+      placeholder: "e.g. Petty Cash",
+    },
+    type: {
+      label: "Account Type",
+      description: "Top-level account classification",
+      placeholder: "Select type",
+    },
+    subtype: {
+      label: "Account Subtype",
+      description: "Detailed classification within the type",
+      placeholder: "Select subtype",
+    },
+    parentId: {
+      label: "Parent Account",
+      description: "Optional parent account for hierarchy grouping",
+      placeholder: "Parent account UUID (optional)",
+    },
+    response: {
+      id: "Account ID",
+      code: "Code",
+      name: "Name",
+    },
+    errors: {
+      unauthorized: { title: "Unauthorized", description: "Login required" },
+      validation: {
+        title: "Validation Error",
+        description: "Check all required fields",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "Insufficient permissions",
+      },
+      server: {
+        title: "Server Error",
+        description: "Could not create account",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      conflict: {
+        title: "Code Taken",
+        description: "An account with this code already exists",
+      },
+      network: {
+        title: "Network Error",
+        description: "Could not reach the server",
+      },
+      notFound: { title: "Not Found", description: "Company not found" },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+    },
+    success: {
+      title: "Account Created",
+      description: "The account has been added",
+    },
+    widget: {
+      viewButton: "View Account",
+      addAnotherButton: "Add Another",
+      back: "Back",
+    },
+  },
+  title: "Create Account",
+  description: "Add a custom account",
+  category: "Chart of Accounts",
+  tag: "Account",
+};

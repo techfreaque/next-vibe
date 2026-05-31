@@ -210,6 +210,9 @@ export const translations: typeof enTranslations = {
       neverRun: "Noch nie ausgeführt",
       runNow: "Jetzt ausführen",
     },
+    webPinnedTools: {
+      label: "In Seitenleiste angeheftete Tools",
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",

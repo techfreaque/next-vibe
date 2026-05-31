@@ -33,8 +33,8 @@ const { POST } = createEndpoint({
   path: ["desktop", "list-monitors"],
   title: "list-monitors.title",
   description: "list-monitors.description",
-  category: "endpointCategories.desktop",
-  subCategory: "endpointCategories.desktopCapture",
+  category: "desktop",
+  subCategory: "Capture",
   icon: "monitor",
   tags: [
     "list-monitors.tags.desktopAutomation",

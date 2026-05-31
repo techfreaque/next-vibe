@@ -1,0 +1,93 @@
+export const translations = {
+  tags: {
+    products: "Products",
+    catalog: "Catalog",
+    get: "Get",
+  },
+  get: {
+    title: "Get Catalog Product",
+    description: "Retrieve a single catalog product by ID.",
+    productId: {
+      label: "Product ID",
+      description: "The ID of the product to retrieve",
+    },
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "Check the product ID and try again",
+      },
+      unauthorized: {
+        title: "Not Signed In",
+        description: "Sign in to view product details",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "You do not have permission to view this product",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "A conflict occurred",
+      },
+      server: {
+        title: "Server Error",
+        description: "Something went wrong on our end — try again",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      network: {
+        title: "Network Error",
+        description: "Check your connection and try again",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "Product not found",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+    },
+    success: {
+      title: "Product Retrieved",
+      description: "Product details loaded.",
+    },
+    response: {
+      id: "Product ID",
+      companyId: "Company",
+      name: "Product Name",
+      description: "Description",
+      sku: "SKU",
+      type: "Type",
+      unit: "Unit",
+      basePrice: "Base Price",
+      currency: "Currency",
+      defaultTaxRate: "Default Tax Rate",
+      categoryId: "Category",
+      imageUrl: "Image URL",
+      isActive: "Active",
+      isSubscription: "Subscription",
+      billingInterval: "Billing Interval",
+      createdAt: "Created",
+      updatedAt: "Updated",
+    },
+    widget: {
+      edit: "Edit",
+      deactivate: "Deactivate",
+      activate: "Activate",
+      active: "Active",
+      inactive: "Inactive",
+      back: "Back",
+      loading: "Loading product...",
+      typeService: "Service",
+      typePhysical: "Physical",
+      typeDigital: "Digital",
+      recurring: "Recurring",
+      billingMonthly: "Monthly",
+      billingYearly: "Yearly",
+      addToInvoice: "Add to Invoice",
+      details: "Details",
+    },
+  },
+};

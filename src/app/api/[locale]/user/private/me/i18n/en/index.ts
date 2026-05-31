@@ -1,3 +1,4 @@
+import { translations as addressesTranslations } from "../../addresses/i18n/en";
 import { translations as avatarTranslations } from "../../avatar/i18n/en";
 import { translations as passwordTranslations } from "../../password/i18n/en";
 
@@ -487,4 +488,5 @@ export const translations = {
   // Sub-routes
   avatar: avatarTranslations,
   password: passwordTranslations,
+  addresses: addressesTranslations,
 };

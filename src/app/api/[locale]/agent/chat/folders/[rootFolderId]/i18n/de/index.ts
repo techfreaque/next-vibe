@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
         incognito: "Inkognito",
         cron: "Hintergrund",
         support: "Support",
+        remote: "Remote",
       },
     },
     folderList: {
@@ -118,6 +119,7 @@ export const translations: typeof enTranslations = {
       background: "Hintergrund",
       incognito: "Inkognito",
       support: "Support",
+      remote: "Remote",
     },
   },
   errors: {

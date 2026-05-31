@@ -546,6 +546,9 @@ export const translations: typeof enTranslations = {
       confirmDeletion: "Löschung bestätigen",
       confirmDeletionMessage:
         "Dadurch wird der Benutzer und alle zugehörigen Daten dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+      titleReferralCodes: "Referral-Codes und Statistiken",
+      titleSubscription: "Abonnement anzeigen",
+      titleCopyUserId: "Benutzer-ID kopieren",
     },
   },
 };

@@ -69,6 +69,11 @@ export const translations: typeof enTranslations = {
         description:
           "Włącz profilowanie: ustawia NEXT_TURBOPACK_TRACING=1 (plik trace pod .next/dev/trace-turbopack) i NEXT_CPU_PROF=1 (zapisuje .cpuprofile przy wyjściu)",
       },
+      fixtureMode: {
+        title: "Tryb fixture",
+        description:
+          "Włącz buforowanie HTTP fixture (VIBE_FIXTURE_MODE=true). Przechwytuje zewnętrzne wywołania API i zapisuje/odtwarza je z fixtures/http-cache/. Do testów E2E z tym serwerem jako zdalnym.",
+      },
       success: {
         title: "Sukces",
       },

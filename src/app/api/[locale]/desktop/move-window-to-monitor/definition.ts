@@ -46,8 +46,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.desktop",
-  subCategory: "endpointCategories.desktopWindows",
+  category: "desktop",
+  subCategory: "Windows",
   icon: "monitor",
   tags: [
     "move-window-to-monitor.tags.desktopAutomation",

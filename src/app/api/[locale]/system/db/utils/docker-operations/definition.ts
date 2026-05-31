@@ -30,8 +30,8 @@ const { POST } = createEndpoint({
   scopedTranslation,
   title: "title",
   description: "description",
-  category: "endpointCategories.database",
-  subCategory: "endpointCategories.databaseTools",
+  category: "database",
+  subCategory: "Tools",
   tags: ["tags.docker", "tags.utils"],
   icon: "box",
   allowedRoles: [

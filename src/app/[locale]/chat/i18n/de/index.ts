@@ -27,7 +27,7 @@ export const translations: typeof enTranslations = {
     incognitoChats: "Inkognito-Threads",
     cronChats: "Hintergrund-Threads",
     backgroundChats: "Hintergrund",
-    supportChats: "Support",
+    remoteChats: "Remote",
     search: "Suchen",
     delete: "Löschen",
     cancel: "Abbrechen",
@@ -954,7 +954,7 @@ export const translations: typeof enTranslations = {
     cronDescription: "Automatisierte Unterhaltungen durch Hintergrundaufgaben.",
     backgroundDescription:
       "KI-Aufgaben, die im Hintergrund für dich laufen. Ergebnisse erscheinen hier, sobald sie fertig sind.",
-    supportDescription: "Support-Threads mit Remote-Admins über ws-provider.",
+    remoteDescription: "Threads mit verbundenen Remote-Instanzen.",
     accessModal: {
       title: "Konto erforderlich",
       privateTitle: "Private Threads",
@@ -1289,7 +1289,9 @@ export const translations: typeof enTranslations = {
       claudeOpus46:
         "Claude Opus 4.6 - Leistungsfähiges Claude-Modell mit außergewöhnlichem Denkvermögen und kreativen Fähigkeiten",
       claudeOpus47:
-        "Claude Opus 4.7 - Neuestes und leistungsfähigstes Claude-Modell mit außergewöhnlichem Denkvermögen und kreativen Fähigkeiten",
+        "Claude Opus 4.7 - Vorherige Opus-Generation. Nachfolger: 4.8.",
+      claudeOpus48:
+        "Claude Opus 4.8 - Anthropics leistungsstärkstes allgemein verfügbares Opus-Modell. Entwickelt für autonome Langzeit-Agenten, komplexes Coding und mehrstufiges Reasoning über sehr lange Ausgaben. 1M-Token-Kontextfenster. Unterstützt Text-, Bild- und Dateieingaben.",
       claudeSonnet46:
         "Claude Sonnet 4.6 - Anthropics leistungsfähigstes Sonnet-Modell mit Frontier-Leistung in Coding, Agenten und professioneller Arbeit",
       gemini3Pro:

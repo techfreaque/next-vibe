@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The result from execute-tool with toolName='tool-help' and instanceId='hermes' returned a JSON object with a `result` field. Inside `result`, there is a `tools` array. I can see it contains many entries (74 matched tools according to `matchedCount`). The array has at least one entry (actually many). So the check passes. I should end with STEP_OK.</think>STEP_OK\n\nUser: [T7a approve-phase1] In a single response, call BOTH at the same time: (1) execute-tool with toolName='tool-help' and instanceId='hermes' to list available tools, and (2) execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'approve-test'}. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.\n\nAssistant: <think>The user wants me to call BOTH execute-tool endpoints at the same time in a single response:\n1. tool-help with instanceId='hermes'\n2. generate_image with instanceId='hermes', input={'prompt':'approve-test'}\n\nThe generate_image tool requires user confirmation - it should NOT execute yet. I need to use callbackMode='approve' for the generate_image call.\n\nLet me make both calls in parallel.</think>\n\nUser:",
+    "encoding_format": "float"
+  }
+}

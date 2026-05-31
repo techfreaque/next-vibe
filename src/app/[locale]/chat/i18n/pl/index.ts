@@ -27,7 +27,7 @@ export const translations: typeof enTranslations = {
     incognitoChats: "Czaty incognito",
     cronChats: "Wątki w tle",
     backgroundChats: "W tle",
-    supportChats: "Wsparcie",
+    remoteChats: "Zdalne",
     search: "Szukaj",
     delete: "Usuń",
     cancel: "Anuluj",
@@ -949,8 +949,7 @@ export const translations: typeof enTranslations = {
     cronDescription: "Automatyczne rozmowy tworzone przez zadania w tle.",
     backgroundDescription:
       "Zadania AI działające w tle w twoim imieniu. Wyniki pojawiają się tutaj po zakończeniu.",
-    supportDescription:
-      "Wątki wsparcia z administratorami zdalnymi przez ws-provider.",
+    remoteDescription: "Wątki z połączonymi zdalnymi instancjami.",
     accessModal: {
       title: "Wymagane konto",
       privateTitle: "Wątki prywatne",
@@ -1276,7 +1275,9 @@ export const translations: typeof enTranslations = {
       claudeOpus46:
         "Claude Opus 4.6 - Potężny model Claude z wyjątkowym rozumowaniem i zdolnościami kreatywnymi",
       claudeOpus47:
-        "Claude Opus 4.7 - Najnowszy i najpotężniejszy model Claude z wyjątkowym rozumowaniem i zdolnościami kreatywnymi",
+        "Claude Opus 4.7 - Poprzednia generacja Opus. Zastąpiony przez 4.8.",
+      claudeOpus48:
+        "Claude Opus 4.8 - Najpotężniejszy ogólnodostępny model Opus od Anthropic. Stworzony do długotrwałych zadań agentowych, złożonego programowania i wieloetapowego rozumowania przy bardzo długich wynikach. Okno kontekstu 1M tokenów. Obsługuje tekst, obrazy i pliki.",
       claudeSonnet46:
         "Claude Sonnet 4.6 - Najbardziej zaawansowany model Sonnet firmy Anthropic z najwyższą wydajnością w kodowaniu, agentach i pracy zawodowej",
       gemini3Pro:

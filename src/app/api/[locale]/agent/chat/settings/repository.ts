@@ -193,6 +193,7 @@ export class ChatSettingsRepository {
         mamaEnabled: setting.mamaEnabled ?? false,
         mamaSchedule: setting.mamaSchedule ?? MAMA_DEFAULT_SCHEDULE,
         mamaPrompt: setting.mamaPrompt ?? null,
+        webPinnedTools: setting.webPinnedTools ?? null,
         dreamerSubFolderId,
         dreamerThreadCount,
         autopilotSubFolderId,
@@ -326,6 +327,10 @@ export class ChatSettingsRepository {
               data.mamaSchedule !== undefined ? data.mamaSchedule : undefined,
             mamaPrompt:
               data.mamaPrompt !== undefined ? data.mamaPrompt : undefined,
+            webPinnedTools:
+              data.webPinnedTools !== undefined
+                ? data.webPinnedTools
+                : undefined,
           })
           .where(eq(chatSettings.userId, userId))
           .returning();
@@ -403,6 +408,8 @@ export class ChatSettingsRepository {
             mamaSchedule:
               data.mamaSchedule !== undefined ? data.mamaSchedule : null,
             mamaPrompt: data.mamaPrompt !== undefined ? data.mamaPrompt : null,
+            webPinnedTools:
+              data.webPinnedTools !== undefined ? data.webPinnedTools : null,
           })
           .returning();
       }

@@ -43,6 +43,10 @@ export const translations: typeof enTranslations = {
         label: "Pomiń TanStack",
         description: "Pomiń generowanie tras TanStack",
       },
+      force: {
+        label: "Wymuś",
+        description: "Ignoruj cache i uruchom wszystkie generatory",
+      },
       success: {
         title: "Sukces",
       },

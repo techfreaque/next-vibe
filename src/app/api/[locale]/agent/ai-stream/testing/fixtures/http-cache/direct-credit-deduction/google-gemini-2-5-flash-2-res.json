@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a0309cccf9db1f99-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Thu, 28 May 2026 22:14:30 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1780006469-mFvfnGP31RXoMbHxgB9w"
+  },
+  "body": {
+    "id": "gen-1780006469-mFvfnGP31RXoMbHxgB9w",
+    "object": "chat.completion",
+    "created": 1780006469,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short clip of an instrumental track, lasting approximately 29 seconds. The sound quality is clear and polished, suggesting a studio recording environment.\n\n**Musical Elements:**\n\n*   **Genre:** The track falls under the electronic dance music (EDM) umbrella, with strong influences from disco and funk, particularly in its rhythmic and melodic elements.\n*   **Tempo:** The tempo is upbeat, estimated around 125-130 BPM.\n*   **Instruments:**\n    *   **Drums:** A tight, punchy drum machine provides a steady 4/4 beat. It features a prominent kick drum on every beat, a subtle snare on beats 2 and 4, and a consistent hi-hat pattern that emphasizes the upbeat, contributing to the disco feel.\n    *   **Bass:** A funky, driving synth bass line plays a melodic and rhythmic role, providing a strong foundation for the track. It has a slightly rounded, warm tone.\n    *   **Keys/Synths:**\n        *   A bright, staccato synth plays a repeating melodic phrase that sounds a bit like an electric piano or clavinet, adding a classic funk/disco texture.\n        *   Another synthesizer provides chordal stabs, often in sync with the main melodic phrase, giving the track a full, harmonically rich sound. These chords have a slightly reverbed, spacious quality.\n*   **Interaction:** The instruments interact seamlessly. The drums and bass lay down a solid groove, while the synths layer melodic and harmonic content on top, creating a vibrant and energetic soundscape.\n*   **Production:** The production is clean and well-mixed. There's a noticeable use of subtle reverb on the synths, giving them a bit of space without losing their dryness. The compression seems gentle, allowing the dynamics of each instrument to come through while maintaining overall cohesion.\n*   **Mood:** The mood is distinctly upbeat, groovy, and energetic, designed for dancing. It evokes a feeling of joy and excitement.\n\n**Song Structure (within the clip):**\n\nThe clip seems to be a continuous loop or a segment of a larger track that maintains a consistent arrangement. There are no significant changes in instrumentation or melodic ideas within this short duration, suggesting it could be part of a loop or an extended intro/verse section.\n\n**Non-Musical Elements:**\n\n*   No speech, ambient sounds, or sound effects are present. The audio is purely musical.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1071,
+      "completion_tokens": 512,
+      "total_tokens": 1583,
+      "cost": 0.0021263,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0021263,
+        "upstream_inference_prompt_cost": 0.0008463,
+        "upstream_inference_completions_cost": 0.00128
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

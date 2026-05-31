@@ -66,10 +66,11 @@ const { GET } = createEndpoint({
   title: "title" as const,
   description: "description" as const,
   icon: "bar-chart-3",
-  category: "endpointCategories.userAdmin",
-  subCategory: "endpointCategories.userAdminStats",
+  category: "userAuth",
+  subCategory: "userAdminStats",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     render: UsersStatsContainer,

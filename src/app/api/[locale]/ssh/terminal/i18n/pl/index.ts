@@ -46,5 +46,11 @@ export const translations = {
     prompt: "$ ",
     inputPlaceholder: "Wpisz polecenie i naciśnij Enter...",
     sendButton: "Wyślij",
+    nav: {
+      connections: "Połączenia",
+      files: "Pliki",
+      exec: "Wykonaj",
+      users: "Użytkownicy",
+    },
   },
 };

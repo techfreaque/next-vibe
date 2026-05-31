@@ -21,6 +21,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
+import { DESKTOP_CLICK_ALIAS } from "./constants";
 
 const ClickWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ClickWidget })),
@@ -30,6 +31,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["desktop", "click"],
+  aliases: [DESKTOP_CLICK_ALIAS] as const,
   title: "click.title",
   description: "click.description",
   dynamicTitle: ({ request }) => {
@@ -41,8 +43,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.desktop",
-  subCategory: "endpointCategories.desktopInteraction",
+  category: "desktop",
+  subCategory: "Interaction",
   icon: "mouse-pointer",
   tags: ["click.tags.desktopAutomation", "click.tags.inputAutomation"],
 

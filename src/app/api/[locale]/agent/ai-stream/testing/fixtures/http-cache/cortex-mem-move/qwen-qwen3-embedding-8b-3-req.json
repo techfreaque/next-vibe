@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:0e785041 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 26, 16:02]\n\nAssistant: Edit succeeded.\n\n- **File:** `/memories/mem-test/project-notes.md`\n- **Replacements made:** 1\n- **New size:** 199 bytes (was 184)\n\nVERDICT: PASS\n\nSystem: [Context: ID:b189d10e | Posted:May 26, 16:03]\n\nUser: Use cortex-move to move /memories/mem-test/project-notes.md to /memories/mem-test/archived/project-notes.md. Confirm the move succeeded - source should be gone, destination should exist.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (61 · 5 archived)\n│   ├── project-notes.md [97%]\n│   │   · This is a test memory created to verify frontmatter is stored correctly. · Key facts: AI integration, cortex, memory system, verified edit.\n│   ├── role.md\n│   │   Solo founder & lead developer of **unbottled.ai** — free speech AI platform, full-time since **Oct 2025** (~2 years building next-vibe, started during Sovendus nights/weekends). Also the framework behind it: **next-vibe** (SaaS framework, \n\nSystem: [Context: ID:542f575d | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 26, 16:03]\n\nAssistant: [tool:cortex-move] {\"from\":\"/memories/mem-test/project-notes.md\",\"to\":\"/memories/mem-test/archived/project-notes.md\"}\n\nTool: [result:cortex-move] {\"responseFrom\":\"/memories/mem-test/project-notes.md\",\"responseTo\":\"/memories/mem-test/archived/project-notes.md\",\"nodesAffected\":1}",
+    "encoding_format": "float"
+  }
+}

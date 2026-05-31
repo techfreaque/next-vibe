@@ -50,6 +50,12 @@ export const translations: typeof enTranslations = {
     analytics: "analytics",
     pipeline: "pipeline",
   },
+  dataSourceWidget: {
+    addToGraph: "Zum Graphen hinzufügen",
+    newGraph: "Neuer Graph",
+    loading: "Daten werden geladen…",
+    noData: "Keine Daten für diesen Zeitraum",
+  },
   graphs: {
     list: {
       title: "Pipeline-Graphen",

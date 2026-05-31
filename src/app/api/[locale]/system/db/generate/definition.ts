@@ -18,6 +18,7 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
+import { DB_GENERATE_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -25,8 +26,8 @@ const { POST } = createEndpoint({
   path: ["system", "db", "generate"],
   title: "post.title",
   description: "post.description",
-  category: "endpointCategories.database",
-  subCategory: "endpointCategories.databaseMigrations",
+  category: "database",
+  subCategory: "Migrations",
   tags: ["tag"],
   icon: "file-plus",
   allowedRoles: [
@@ -35,7 +36,7 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: ["dgen", "db:generate"],
+  aliases: [DB_GENERATE_ALIAS] as const,
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

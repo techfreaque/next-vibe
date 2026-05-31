@@ -5,13 +5,16 @@
 
 "use client";
 
-import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { P } from "next-vibe-ui/ui/typography";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
+import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
+  useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -37,16 +40,67 @@ export function SubscriptionUpdateContainer({
   const t = useWidgetTranslation<typeof definition.PUT>();
   const children = field.children;
   const value = useWidgetValue<typeof definition.PUT>();
+  const { pop, canGoBack } = useWidgetNavigation();
+
+  if (value?.id) {
+    return (
+      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
+        <Div className="flex items-center gap-3">
+          <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+          <Div className="flex flex-col gap-0.5">
+            <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
+              {t("put.success.title")}
+            </Span>
+            <Span className="text-sm text-emerald-700 dark:text-emerald-300">
+              {t("put.success.description")}
+            </Span>
+          </Div>
+        </Div>
+        {canGoBack && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              pop();
+            }}
+            className="self-start gap-1.5 -ml-1"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            {t("widget.back")}
+          </Button>
+        )}
+      </Div>
+    );
+  }
 
   return (
     <Div className="flex flex-col gap-4 p-4">
+      {canGoBack && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            pop();
+          }}
+          className="self-start gap-1.5 -ml-1"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          {t("widget.back")}
+        </Button>
+      )}
+
       <FormAlertWidget field={{}} />
 
       {/* Form Fields */}
-      <SelectFieldWidget fieldName="plan" field={children.plan} />
+      <SelectFieldWidget
+        fieldName="plan"
+        field={withValue(children.plan, undefined, null)}
+      />
       <SelectFieldWidget
         fieldName="billingInterval"
-        field={children.billingInterval}
+        field={withValue(children.billingInterval, undefined, null)}
       />
 
       {/* Submit Button */}
@@ -58,25 +112,6 @@ export function SubscriptionUpdateContainer({
           variant: "primary",
         }}
       />
-
-      {/* Success Response */}
-      {value && (
-        <Card className="mt-4 border-success/30 bg-success/10">
-          <CardContent className="pt-6">
-            <Div className="flex items-center gap-3">
-              <CheckCircle className="h-5 w-5 text-success" />
-              <Div>
-                <P className="font-medium text-success-foreground">
-                  {t("put.success.title")}
-                </P>
-                <P className="text-sm text-success-foreground/80">
-                  {t("put.success.description")}
-                </P>
-              </Div>
-            </Div>
-          </CardContent>
-        </Card>
-      )}
     </Div>
   );
 }

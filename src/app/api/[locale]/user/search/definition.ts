@@ -24,6 +24,7 @@ import { dateSchema } from "../../shared/types/common.schema";
 import { UserRole, UserRoleDB, UserRoleOptions } from "../user-roles/enum";
 import { UserSearchStatus, UserSearchStatusOptions } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { USER_SEARCH_ALIAS } from "./constants";
 
 /**
  * GET endpoint for searching users
@@ -32,11 +33,12 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["user", "search"],
+  aliases: [USER_SEARCH_ALIAS] as const,
   title: "title",
   description: "description",
   icon: "search",
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthDirectory",
+  category: "userAuth",
+  subCategory: "userAuthDirectory",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN] as const,
 

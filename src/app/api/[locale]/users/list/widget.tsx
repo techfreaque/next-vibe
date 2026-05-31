@@ -22,6 +22,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { usePickerCallback } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -60,6 +61,8 @@ function UserRow({
   onEdit,
   onDelete,
   onCreditHistory,
+  onPick,
+  isPickerMode,
   t,
   isTouch,
 }: {
@@ -69,13 +72,23 @@ function UserRow({
   onEdit: (user: User) => void | Promise<void>;
   onDelete: (user: User) => void | Promise<void>;
   onCreditHistory: (userId: string) => void | Promise<void>;
+  onPick: ((user: User) => void) | undefined;
+  isPickerMode: boolean;
   isTouch: boolean;
   t: UsersListT;
 }): React.JSX.Element {
+  const handleClick = (): void => {
+    if (isPickerMode && onPick) {
+      onPick(user);
+    } else {
+      void onView(user);
+    }
+  };
+
   return (
     <Div
       className="group flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer transition-colors"
-      onClick={() => void onView(user)}
+      onClick={handleClick}
     >
       <Div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
         {((user.privateName ?? user.email) || "?").slice(0, 2).toUpperCase()}
@@ -118,53 +131,55 @@ function UserRow({
         )}
       </Div>
 
-      <Div
-        className={cn(
-          "flex-shrink-0 flex gap-0.5",
-          isTouch
-            ? "opacity-100"
-            : "opacity-0 group-hover:opacity-100 transition-opacity",
-        )}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => void onCreditHistory(user.id)}
-          title={t("widget.creditHistory")}
+      {!isPickerMode && (
+        <Div
+          className={cn(
+            "flex-shrink-0 flex gap-0.5",
+            isTouch
+              ? "opacity-100"
+              : "opacity-0 group-hover:opacity-100 transition-opacity",
+          )}
+          onClick={(e) => e.stopPropagation()}
         >
-          <CreditCard className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => void onView(user)}
-          title={t("widget.view")}
-        >
-          <Eye className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => void onEdit(user)}
-          title={t("widget.edit")}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="text-destructive hover:text-destructive"
-          onClick={() => void onDelete(user)}
-          title={t("widget.delete")}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </Div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => void onCreditHistory(user.id)}
+            title={t("widget.creditHistory")}
+          >
+            <CreditCard className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => void onView(user)}
+            title={t("widget.view")}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => void onEdit(user)}
+            title={t("widget.edit")}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-destructive hover:text-destructive"
+            onClick={() => void onDelete(user)}
+            title={t("widget.delete")}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </Div>
+      )}
     </Div>
   );
 }
@@ -180,6 +195,8 @@ export function UsersListContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
+  const onPick = usePickerCallback<User>();
+  const isPickerMode = !!onPick;
 
   const activeStatuses: (typeof UserStatusFilterValue)[] =
     form.watch("searchFilters.status") ?? [];
@@ -403,16 +420,18 @@ export function UsersListContainer({
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
-        <Button
-          type="button"
-          variant="default"
-          size="sm"
-          onClick={handleCreate}
-          className="gap-1"
-        >
-          <UserPlus className="h-4 w-4" />
-          {t("widget.newUser")}
-        </Button>
+        {!isPickerMode && (
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            onClick={handleCreate}
+            className="gap-1"
+          >
+            <UserPlus className="h-4 w-4" />
+            {t("widget.newUser")}
+          </Button>
+        )}
       </Div>
 
       {/* Search */}
@@ -513,6 +532,8 @@ export function UsersListContainer({
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onCreditHistory={handleCreditHistory}
+                onPick={onPick}
+                isPickerMode={isPickerMode}
                 t={t}
                 isTouch={isTouch}
               />

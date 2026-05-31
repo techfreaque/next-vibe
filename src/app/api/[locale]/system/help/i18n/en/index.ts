@@ -63,6 +63,9 @@ export const translations = {
       allowedCount: {
         title: "Allowed tool count",
       },
+      webPinnedCount: {
+        title: "Web-pinned tool count",
+      },
       currentPage: {
         title: "Current page",
       },
@@ -304,12 +307,14 @@ export const translations = {
   },
   aiTools: {
     modal: {
+      webPinnedLabel: "web pins",
+      webPinnedTooltip: "Tools pinned to the sidebar for quick access",
       pinnedLabel: "pinned",
       pinnedTooltip:
         "Pinned tools are always in context - the AI sees them every turn",
-      enabledLabel: "allowed",
+      enabledLabel: "AI allowed",
       enabledTooltip:
-        "Allowed tools can be called on demand when help is enabled",
+        "AI-allowed tools can be called on demand when help is enabled",
       totalLabel: "total",
       totalTooltip: "Show all tools - click to clear filter",
       searchPlaceholder: "Search tools...",
@@ -323,11 +328,24 @@ export const translations = {
       noToolsAvailable: "No AI tools available",
       legendActive: "Always in context (pinned)",
       legendConfirm: "Asks before running",
+      legendWebPin: "Pinned in sidebar",
       stats: "{{pinned}} of {{total}} tools pinned",
-      activeOn: "Pinned - always in context. Click to unpin",
-      activeOff: "Not pinned - AI can still call on demand. Click to pin",
-      confirmOn: "Asks for confirmation - click to disable",
-      confirmOff: "Runs automatically - click to require confirmation",
+      activeOn: "Always in AI context — unpin to make on-demand only",
+      activeOff: "Not in context — pin to include in every AI turn",
+      confirmOn: "AI asks you before running — click to auto-approve",
+      confirmOff: "Runs without asking — click to require your approval",
+      closeSidebar: "Close tools sidebar",
+      selectTool: "Select a tool",
+      selectToolHint: "Choose a tool from the sidebar to get started",
+      allPlatforms: "All platforms",
+      prodOnly: "Prod only",
+      aiPinsTitle: "AI Tool Pins",
+      aiPinsDescription:
+        "These tools are active in every AI conversation. The AI can call them automatically — no prompting needed.",
+      resetToDefaults: "Reset to defaults",
+      noPinnedTools: "No pinned tools yet",
+      noPinnedToolsHint:
+        "Browse all tools and pin the ones you want the AI to use",
     },
 
     platformFilter: {

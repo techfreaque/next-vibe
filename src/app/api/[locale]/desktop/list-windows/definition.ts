@@ -19,6 +19,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
+import { DESKTOP_LIST_WINDOWS_ALIAS } from "./constants";
 
 const ListWindowsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ListWindowsWidget })),
@@ -28,10 +29,11 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["desktop", "list-windows"],
+  aliases: [DESKTOP_LIST_WINDOWS_ALIAS] as const,
   title: "list-windows.title",
   description: "list-windows.description",
-  category: "endpointCategories.desktop",
-  subCategory: "endpointCategories.desktopWindows",
+  category: "desktop",
+  subCategory: "Windows",
   icon: "list",
   tags: [
     "list-windows.tags.desktopAutomation",

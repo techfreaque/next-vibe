@@ -43,6 +43,10 @@ export const translations: typeof enTranslations = {
         label: "TanStack überspringen",
         description: "TanStack-Routen-Generierung überspringen",
       },
+      force: {
+        label: "Erzwingen",
+        description: "Cache ignorieren und alle Generatoren neu ausführen",
+      },
       success: {
         title: "Erfolg",
       },

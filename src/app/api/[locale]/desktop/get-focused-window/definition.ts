@@ -30,8 +30,8 @@ const { POST } = createEndpoint({
   path: ["desktop", "get-focused-window"],
   title: "get-focused-window.title",
   description: "get-focused-window.description",
-  category: "endpointCategories.desktop",
-  subCategory: "endpointCategories.desktopWindows",
+  category: "desktop",
+  subCategory: "Windows",
   icon: "eye",
   tags: [
     "get-focused-window.tags.desktopAutomation",

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:c06ba5bf | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 29, 21:21]\n\nAssistant: STEP_OK\n\nSystem: [Context: ID:90aecdbc | Posted:May 29, 21:21]\n\nUser: [T2 image-gen] Call the generate_image tool with prompt='red circle'. Check that the result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (60 · 5 archived)\n│   ├── role.md\n│   │   Solo founder & lead developer of **unbottled.ai** — free speech AI platform, full-time since **Oct 2025** (~2 years building next-vibe, started during Sovendus nights/weekends). Also the framework behind it: **next-vibe** (SaaS framework, TypeScript monorepo). Previ\n│   ├── name.md\n│   │   **Max** — go by Max. German in real life, English with computers/internet. Prefers English for all AI interactions even if platfo\n\nSystem: [Context: ID:b73f715f | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 29, 21:21]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"prompt\":\"red circle\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"imageUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/74e406de-fa30-4d72-9e56-a03efb3a7bf8/276f52d1-b465-4b58-8068-6be1371ff021.png\",\"creditCost\":4.9}}",
+    "encoding_format": "float"
+  }
+}

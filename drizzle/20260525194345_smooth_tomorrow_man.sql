@@ -1,0 +1,1 @@
+ALTER TABLE "warehouse_transfers" ALTER COLUMN "status" SET DEFAULT 'DRAFT';

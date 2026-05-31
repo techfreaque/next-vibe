@@ -34,7 +34,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   getFolderTourAttr,
   TOUR_DATA_ATTRS,
-} from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
+} from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
 import {
   DEFAULT_FOLDER_CONFIGS,
   DefaultFolderId,
@@ -136,7 +136,7 @@ function RootFolderBar({
   const rootFolders = useMemo(
     () =>
       Object.values(DEFAULT_FOLDER_CONFIGS)
-        .filter((f) => f.id !== DefaultFolderId.SUPPORT || isAdmin)
+        .filter((f) => f.id !== DefaultFolderId.REMOTE || isAdmin)
         .filter((f) => f.id !== DefaultFolderId.BACKGROUND || isAuthenticated)
         .toSorted((a, b) => a.order - b.order),
     [isAdmin, isAuthenticated],

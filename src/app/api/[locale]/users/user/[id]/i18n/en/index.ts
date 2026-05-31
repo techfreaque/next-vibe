@@ -524,6 +524,9 @@ export const translations = {
       confirmDeletion: "Confirm Deletion",
       confirmDeletionMessage:
         "This will permanently delete the user and all associated data. This action cannot be undone.",
+      titleReferralCodes: "View referral codes and stats",
+      titleSubscription: "View subscription",
+      titleCopyUserId: "Copy User ID",
     },
   },
 };

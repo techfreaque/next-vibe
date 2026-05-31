@@ -62,6 +62,9 @@ export const translations: typeof enTranslations = {
       allowedCount: {
         title: "Dozwolone narzędzia",
       },
+      webPinnedCount: {
+        title: "Przypięte w sieci",
+      },
       currentPage: {
         title: "Bieżąca strona",
       },
@@ -304,12 +307,14 @@ export const translations: typeof enTranslations = {
   },
   aiTools: {
     modal: {
+      webPinnedLabel: "web-piny",
+      webPinnedTooltip: "Narzędzia przypięte na pasku bocznym",
       pinnedLabel: "przypięte",
       pinnedTooltip:
         "Przypięte narzędzia są zawsze w kontekście - AI widzi je przy każdym kroku",
-      enabledLabel: "dozwolone",
+      enabledLabel: "AI dozwolone",
       enabledTooltip:
-        "Dozwolone narzędzia mogą być wywoływane na żądanie, gdy pomoc jest włączona",
+        "Narzędzia dozwolone przez AI mogą być wywoływane na żądanie, gdy pomoc jest włączona",
       totalLabel: "łącznie",
       totalTooltip: "Pokaż wszystkie narzędzia - kliknij aby wyczyścić filtr",
       searchPlaceholder: "Szukaj narzędzi...",
@@ -323,12 +328,26 @@ export const translations: typeof enTranslations = {
       noToolsAvailable: "Brak dostępnych narzędzi AI",
       legendActive: "Zawsze w kontekście (przypięte)",
       legendConfirm: "Pyta przed uruchomieniem",
+      legendWebPin: "Przypięte na pasku bocznym",
       stats: "{{pinned}} z {{total}} narzędzi przypiętych",
-      activeOn: "Przypięte - zawsze w kontekście. Kliknij aby odpiąć",
+      activeOn:
+        "Zawsze w kontekście AI — odepnij, żeby wywoływać tylko na żądanie",
       activeOff:
-        "Nieprzypięte - AI może wywoływać na żądanie. Kliknij aby przypiąć",
-      confirmOn: "Prosi o potwierdzenie - kliknij aby wyłączyć",
-      confirmOff: "Uruchamia automatycznie - kliknij aby wymagać potwierdzenia",
+        "Poza kontekstem — przypnij, żeby AI widziało to przy każdej turze",
+      confirmOn: "AI pyta przed uruchomieniem — kliknij żeby auto-zatwierdzać",
+      confirmOff: "Działa bez pytania — kliknij żeby wymagać twojej zgody",
+      closeSidebar: "Zamknij panel narzędzi",
+      selectTool: "Wybierz narzędzie",
+      selectToolHint: "Wybierz narzędzie z paska bocznego",
+      allPlatforms: "Wszystkie platformy",
+      prodOnly: "Tylko prod",
+      aiPinsTitle: "Przypięte narzędzia AI",
+      aiPinsDescription:
+        "Te narzędzia są aktywne w każdej rozmowie z AI. AI może je wywoływać automatycznie — bez żadnych poleceń.",
+      resetToDefaults: "Przywróć domyślne",
+      noPinnedTools: "Brak przypiętych narzędzi",
+      noPinnedToolsHint:
+        "Przeglądaj wszystkie narzędzia i przypnij te, których chcesz używać z AI",
     },
 
     platformFilter: {

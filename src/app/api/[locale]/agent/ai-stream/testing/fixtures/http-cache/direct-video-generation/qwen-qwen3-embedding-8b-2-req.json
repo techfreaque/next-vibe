@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:094b23e2 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 23, 10:53]\n\nAssistant: BRANCH_RESPONSE STEP_OK\n\nSystem: [Context: ID:12f381e2 | Posted:May 23, 10:54]\n\nUser: [T4b video-gen] Call execute-tool with toolName='generate_video', instanceId='hermes', input={'prompt':'spinning cube'}. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (60 · 5 archived)\n│   ├── role.md\n│   │   Solo founder & lead developer of **unbottled.ai** — free speech AI platform, full-time since **Oct 2025** (~2 years building next-vibe, started during Sovendus nights/weekends). Also the framework behind it: **next-vibe** (SaaS framework, TypeScript monorepo). Previ\n│   ├── name.md\n│   │   **Max** — go by Max. German in real life, English with computers/internet. Prefers English for all AI interactions even if platfo\n\nSystem: [Context: ID:91a644c2 | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 23, 10:54]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_video\",\"input\":{\"prompt\":\"spinning cube\"},\"instanceId\":\"hermes\",\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"videoUrl\":\"https://pub-3626123a908346a7a8be8d9295f44e26.r2.dev/generations/6b56831c-aa19-4156-b986-462793733d07-0.mp4\",\"creditCost\":124.8,\"durationSeconds\":4}}",
+    "encoding_format": "float"
+  }
+}

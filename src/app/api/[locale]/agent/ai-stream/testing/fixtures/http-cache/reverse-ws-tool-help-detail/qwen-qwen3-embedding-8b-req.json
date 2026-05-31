@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T1 thread-create+tool-call] Use execute-tool with toolName='tool-help' and instanceId='hermes' to list available tools. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if everything worked, or FAILED: <reason> if anything was wrong.\n\nAssistant: <think>The user wants me to use `execute-tool` with `toolName='tool-help'` and `instanceId='hermes'` to list available tools. Then I need to check that the result contains a non-empty tools array and that each tool has a name and description. End with STEP_OK or FAILED.\n\nLet me call execute-tool with the appropriate parameters.</think>\n\nAssistant: <think>The user wants me to verify that the tool-help result from the hermes instance contains a non-empty tools array and that each tool has a name and description. Then end with STEP_OK or FAILED.\n\nLooking at the result:\n- `tools` array exists and has 25 items (non-empty) ✓\n- Each tool in the array has `name` and `description` fields ✓\n- Total count is 412, showing page 1 of 17\n\nEverything checks out. I should respond with STEP_OK.</think>Result contains a non-empty `tools` array (25 items on page 1 of 412 total). Every tool entry includes both `name` and `description` fields. STEP_OK\n\nAssistant: <think>The user wants me to use execute-tool with toolName='tool-help' and instanceId='hermes' to list available tools, then check that the result contains a non-empty tools array and that each tool has a name and description. End with STEP_OK or FAILED.\n\nI already did this in the previous turn (Context ID:19f0e566). The result showed:\n- tools array with 25 items (non-empty)\n- each tool had name and description fields\n- totalCount: 412\n\nSo everything worked. I should confirm this and end with STEP_OK.</think>The `tool-help` call to instance `hermes` returned a non-empty `tools` array (25 items on page 1 of 412 total). Every tool entry includes both `name` and `description` fields. STEP_OK\n\nUser: [T1b tool-help-detail] Call execute-tool with toolName='tool-help', instanceId='hermes', input={'toolName':'generate_image'}. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

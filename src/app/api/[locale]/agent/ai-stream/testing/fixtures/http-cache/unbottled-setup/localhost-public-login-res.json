@@ -1,0 +1,26 @@
+{
+  "type": "json",
+  "url": "http://localhost:3001/api/en-US/user/public/login",
+  "status": 200,
+  "headers": {
+    "access-control-allow-credentials": "true",
+    "access-control-allow-headers": "Content-Type, Authorization, X-CSRF-Token",
+    "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+    "access-control-allow-origin": "*",
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "date": "Tue, 26 May 2026 16:01:26 GMT",
+    "keep-alive": "timeout=5",
+    "transfer-encoding": "chunked",
+    "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "set-cookie": "token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImU2OTJkNzJmLTk4MzktNDRiYi04YTkwLTBkMWRiZjBiMGI1MyIsImxlYWRJZCI6IjQ3M2ZjMzZhLTY1YTUtNDdmNy05ZGY4LTExYTViZTE0YmQ0YiIsImlzUHVibGljIjpmYWxzZSwicm9sZXMiOlsiZW51bXMudXNlclJvbGUuYWRtaW4iXSwiaWF0IjoxNzc5ODExMjg2LCJleHAiOjQ5MzM0MTEyODZ9.TEq9xy0Mm-dP0t7R4TDMacgl_dLW64w0Jgv9XegL6AE; Path=/; Expires=Thu, 02 May 2126 16:01:26 GMT; Max-Age=3153600000; Secure; HttpOnly; SameSite=lax"
+  },
+  "body": {
+    "success": true,
+    "data": {
+      "message": "Welcome back! You have successfully logged in.",
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImU2OTJkNzJmLTk4MzktNDRiYi04YTkwLTBkMWRiZjBiMGI1MyIsImxlYWRJZCI6IjQ3M2ZjMzZhLTY1YTUtNDdmNy05ZGY4LTExYTViZTE0YmQ0YiIsImlzUHVibGljIjpmYWxzZSwicm9sZXMiOlsiZW51bXMudXNlclJvbGUuYWRtaW4iXSwiaWF0IjoxNzc5ODExMjg2LCJleHAiOjQ5MzM0MTEyODZ9.TEq9xy0Mm-dP0t7R4TDMacgl_dLW64w0Jgv9XegL6AE",
+      "leadId": "473fc36a-65a5-47f7-9df8-11a5be14bd4b"
+    }
+  }
+}

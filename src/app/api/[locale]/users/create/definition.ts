@@ -54,8 +54,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "user-plus",
-  category: "endpointCategories.userAdmin",
-  subCategory: "endpointCategories.userAdminManagement",
+  category: "userAuth",
+  subCategory: "userAdminManagement",
   tags: ["tags.create" as const, "tags.admin" as const],
 
   fields: customWidgetObject({

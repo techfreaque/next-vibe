@@ -4,12 +4,10 @@
  */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
-  WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   lookbackRequestField,
@@ -20,8 +18,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
 import { CHAT_ERRORS_TOTAL_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const ChatErrorsTotalWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ChatErrorsTotalWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -30,17 +34,16 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsDataSources",
-  subCategory: "endpointCategories.chat",
+  category: "analytics",
+  subCategory: "chatData",
   tags: ["tags.vibeSense" as const],
   aliases: [CHAT_ERRORS_TOTAL_ALIAS],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: ChatErrorsTotalWidget,
+    noFormElement: true,
+    usage: { request: "data", response: true } as const,
     children: {
       resolution: resolutionRequestField(scopedTranslation, {
         label: "post.fields.resolution.label",

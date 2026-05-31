@@ -4,6 +4,15 @@ export const translations: typeof enTranslations = {
   // Product category
   category: "Produkty",
 
+  // Enums
+  enums: {
+    productType: {
+      service: "Usługa",
+      physical: "Fizyczny",
+      digital: "Cyfrowy",
+    },
+  },
+
   // Product summary (single source of truth)
   summary:
     "Oferujemy plany Darmowy ({{freeCredits}} kredytów/miesiąc), Subskrypcja miesięczna ({{subCurrency}}{{subPrice}}/miesiąc za {{subCredits}} kredytów) i Pakiety kredytów ({{packCurrency}}{{packPrice}} za {{packCredits}} kredytów, wymaga subskrypcji).",

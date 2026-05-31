@@ -4,12 +4,10 @@
  */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
-  WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   lookbackRequestField,
@@ -23,6 +21,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { CREDITS_WALLETS_TOTAL_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+const CreditsWalletsTotalWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.CreditsWalletsTotalWidget })),
+);
+
 const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [CREDITS_WALLETS_TOTAL_ALIAS],
@@ -31,16 +34,15 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsDataSources",
-  subCategory: "endpointCategories.creditsAnalytics",
+  category: "analytics",
+  subCategory: "creditsData",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: CreditsWalletsTotalWidget,
+    noFormElement: true,
+    usage: { request: "data", response: true } as const,
     children: {
       resolution: resolutionRequestField(scopedTranslation, {
         label: "post.fields.resolution.label",

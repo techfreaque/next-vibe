@@ -536,6 +536,9 @@ export const translations: typeof enTranslations = {
       confirmDeletion: "Potwierdź usunięcie",
       confirmDeletionMessage:
         "Spowoduje to trwałe usunięcie użytkownika i wszystkich powiązanych danych. Tej akcji nie można cofnąć.",
+      titleReferralCodes: "Kody polecenia i statystyki",
+      titleSubscription: "Wyświetl subskrypcję",
+      titleCopyUserId: "Kopiuj ID użytkownika",
     },
   },
 };

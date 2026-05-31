@@ -28,6 +28,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 import { scopedTranslation } from "./i18n";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
@@ -52,8 +53,8 @@ const { GET } = createEndpoint({
   title: "id.get.title" as const,
   description: "id.get.description" as const,
   icon: "user",
-  category: "endpointCategories.userAdmin",
-  subCategory: "endpointCategories.userAdminManagement",
+  category: "userAuth",
+  subCategory: "userAdminManagement",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
@@ -67,7 +68,9 @@ const { GET } = createEndpoint({
       // === URL PARAMS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: usersListDefinitions.GET,
+        labelField: "email",
         label: "id.get.id.label" as const,
         description: "id.get.id.description" as const,
         placeholder: "id.get.id.placeholder" as const,
@@ -407,8 +410,8 @@ const { PUT } = createEndpoint({
   title: "id.put.title" as const,
   description: "id.put.description" as const,
   icon: "user-check" as const,
-  category: "endpointCategories.userAdmin",
-  subCategory: "endpointCategories.userAdminManagement",
+  category: "userAuth",
+  subCategory: "userAdminManagement",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
@@ -468,7 +471,9 @@ const { PUT } = createEndpoint({
       // === URL PARAMS ===
       id: requestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: usersListDefinitions.GET,
+        labelField: "email",
         label: "id.put.id.label" as const,
         description: "id.put.id.description" as const,
         placeholder: "id.put.id.placeholder" as const,
@@ -693,8 +698,8 @@ const { DELETE } = createEndpoint({
   title: "id.delete.title" as const,
   description: "id.delete.description" as const,
   icon: "user-x" as const,
-  category: "endpointCategories.userAdmin",
-  subCategory: "endpointCategories.userAdminManagement",
+  category: "userAuth",
+  subCategory: "userAdminManagement",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
@@ -750,7 +755,9 @@ const { DELETE } = createEndpoint({
       // === URL PARAMS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: usersListDefinitions.GET,
+        labelField: "email",
         label: "id.delete.id.label" as const,
         description: "id.delete.id.description" as const,
         placeholder: "id.delete.id.placeholder" as const,

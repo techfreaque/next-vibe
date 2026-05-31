@@ -49,8 +49,8 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "folder",
-  category: "endpointCategories.chat",
-  subCategory: "endpointCategories.chatOrganization",
+  category: "ai",
+  subCategory: "chatOrganization",
 
   tags: ["tags.folders" as const],
 
@@ -194,8 +194,8 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "folder-x",
-  category: "endpointCategories.chat",
-  subCategory: "endpointCategories.chatOrganization",
+  category: "ai",
+  subCategory: "chatOrganization",
 
   tags: ["tags.folders" as const],
 

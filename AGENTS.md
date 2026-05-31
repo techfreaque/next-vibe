@@ -2,7 +2,7 @@
 
 # Project Overview
 
-**unbottled.ai** - Free speech AI platform with 50+ models (mainstream/open/uncensored). Users choose their own filtering level. Open source, privacy-first, user-controlled censorship.
+**unbottled.ai** - Free speech AI platform with 100+ models (mainstream/open/uncensored). Users choose their own filtering level. Open source, privacy-first, user-controlled censorship.
 
 **next-vibe** - SaaS framework powering unbottled.ai. Spiritual successor to WordPress. Same codebase, unified architecture: Web UI, Native app, CLI, AI-callable tool, Cron job, MCP server - via platform markers.
 
@@ -20,8 +20,8 @@
 
 - **Server status:** `grep "^PORT:" .tmp/.vibe-dev.pid` → shows active port. Read `.tmp/vibe-dev.log` for recent logs/errors; last line `--- server offline ---` means stopped.
 - **`vibe dev`** - dev server (TanStack/Vite default). Auto-increments port if 3000 is taken. One instance per project; re-running replaces it. Use `nohup vibe dev > /dev/null 2>&1 &` for background. Hot reload - no restart needed between code changes unless explicitly broken.
-- **`vibe rebuild`** - zero-downtime update. Use for all production updates. `vibe build && vibe start` only for a fresh first start (no running instance).
-- **Rule:** `vibe dev`, `vibe rebuild` are safe to run anytime without asking.
+- **`vibe rebuild`** - zero-downtime update. Use for all local production updates. `vibe build && vibe start` only for a fresh first start (no running instance).
+- **Rule:** `vibe dev`, `vibe rebuild` are safe to run anytime without asking. Rebuild is not needed for the dev server.
 
 ## DB & Code Generation
 
@@ -93,13 +93,17 @@ All patterns in `docs/patterns/`. Key ones: `definition.md`, `repository.md`, `r
 
 A claim about functionality is worthless without verification. The user should never have to ask "did you test it?"
 
-**Mandatory sequence - all 4 steps, every time, for any user-facing change:**
+**Mandatory sequence - every time, for any user-facing change:**
 
 1. **Lint/types:** `mcp hermes-dev check` or `vibe check <path>` → must end at 0 errors project wide unless told otherwise by user
 2. **`vibe gen`** → must complete with 0 warnings for all endpoints and route count must increase. If this fails the tool is not registered and step 3 is meaningless.
 3. **Tests:** `bun test --bail <path>` → run relevant test files, all must pass.
-4. **CLI:** `vibe <alias> "<arg>"` → run it, screenshot the output mentally. Ask: would a first-time user be impressed? Every field renders, layout is intentional, colors/structure match the data. Not a raw dump. Not "good enough". A purpose-built experience for that specific tool. MCP path must be compact and parseable by AI.
-5. **Browser E2E:** use `browser_*` MCP tools (find them via `mcp hermes-dev tool-help query=browser`). Submit a real request. Take a screenshot. Ask: does this look like a finished product feature or a dev prototype? Animations, loading states, result layout - all intentional. If anything looks off, fix it before declaring done.
+4. **CLI first:** `vibe <alias> "<arg>"` → run it. Ask: every field renders, layout intentional, colors/structure match data. MCP path compact and AI-parseable. Interactive CLI (`vibe <alias> --interactive`): full Ink form renders, pickers open and close, submission works.
+5. **Browser E2E second:** use `browser_*` MCP tools (find them via `mcp hermes-dev tool-help query=browser`).
+   - **URL format:** `http://localhost:<PORT>/en-US/admin/endpoints/<alias>` — alias is first entry in `aliases[]`, or `category/subcategory/endpoint` path. Sidebar state via hash: `#cat=ai&sub=threadsManagement`
+   - Get active port from `grep "^PORT:" .tmp/.vibe-dev.pid`
+   - Submit a real request. Verify: widget renders correctly, pickers open and return selection, navigation flows work (list → detail → edit), category default endpoint navigates properly so cross-widget navigation has a landing page.
+   - Ask: does this look like a finished product feature or a dev prototype? If anything looks off, fix it.
 
 **"It works" is not done. Done means it works AND looks like it was crafted specifically for this use case.**
 

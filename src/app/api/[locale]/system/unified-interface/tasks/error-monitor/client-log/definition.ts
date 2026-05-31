@@ -32,8 +32,8 @@ export const { POST } = createEndpoint({
   aliases: ["report-client-error"],
   title: "post.title" as const,
   description: "post.description" as const,
-  category: "endpointCategories.tasks",
-  subCategory: "endpointCategories.tasksMonitoring",
+  category: "devTools",
+  subCategory: "tasksMonitoring",
   icon: "alert-triangle",
   tags: ["post.tags.monitoring" as const],
   allowedRoles: [

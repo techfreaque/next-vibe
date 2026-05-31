@@ -1,3 +1,4 @@
+import { translations as addressesTranslations } from "../../addresses/i18n/de";
 import { translations as avatarTranslations } from "../../avatar/i18n/de";
 import { translations as passwordTranslations } from "../../password/i18n/de";
 import type { translations as enTranslations } from "../en";
@@ -492,4 +493,5 @@ export const translations: typeof enTranslations = {
   // Sub-routes
   avatar: avatarTranslations,
   password: passwordTranslations,
+  addresses: addressesTranslations,
 };

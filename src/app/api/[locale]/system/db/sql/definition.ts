@@ -21,6 +21,7 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
+import { SQL_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -28,8 +29,8 @@ const { POST } = createEndpoint({
   path: ["system", "db", "sql"],
   title: "post.title",
   description: "post.description",
-  category: "endpointCategories.database",
-  subCategory: "endpointCategories.databaseTools",
+  category: "database",
+  subCategory: "Tools",
   tags: ["tag"],
   icon: "terminal",
   allowedRoles: [
@@ -38,7 +39,10 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.PRODUCTION_OFF,
   ],
-  aliases: ["sql", "db:sql", "db:query"],
+  // Local/dev mode only - generator includes ADMIN but constants.ts guards with LOCAL_MODE
+  defaultAiPinned: [UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.ADMIN] as const,
+  aliases: [SQL_ALIAS] as const,
   cli: {
     firstCliArgKey: "query",
   },

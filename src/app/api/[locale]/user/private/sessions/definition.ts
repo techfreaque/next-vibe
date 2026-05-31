@@ -22,6 +22,7 @@ import {
 
 import { UserRole } from "../../user-roles/enum";
 import { scopedTranslation } from "./i18n";
+import { USER_SESSIONS_ALIAS } from "./constants";
 
 const ALLOWED_ROLES = [
   UserRole.CUSTOMER,
@@ -76,13 +77,15 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["user", "private", "sessions"],
+  aliases: [USER_SESSIONS_ALIAS] as const,
   title: "list.title",
   description: "list.description",
   icon: "key",
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthSessions",
+  category: "userAuth",
+  subCategory: "userAuthSessions",
   tags: ["list.tag"],
   allowedRoles: ALLOWED_ROLES,
+  defaultWebPinned: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "list.title",
@@ -127,8 +130,8 @@ const { POST } = createEndpoint({
   title: "create.title",
   description: "create.description",
   icon: "key",
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthSessions",
+  category: "userAuth",
+  subCategory: "userAuthSessions",
   tags: ["create.tag"],
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {

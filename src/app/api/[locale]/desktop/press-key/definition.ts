@@ -41,8 +41,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.desktop",
-  subCategory: "endpointCategories.desktopInteraction",
+  category: "desktop",
+  subCategory: "Interaction",
   icon: "keyboard",
   tags: ["press-key.tags.desktopAutomation", "press-key.tags.inputAutomation"],
 

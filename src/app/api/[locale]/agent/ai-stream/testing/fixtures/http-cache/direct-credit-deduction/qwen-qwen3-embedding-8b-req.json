@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.\n\nAssistant: <think>The user has attached a video file and provided a detailed description of it in the prompt. The task is to describe what I see in the video. Since I cannot actually process video files directly, but the user has provided a text description of the video contents, I should use that description to fulfill the request. The prompt explicitly states: \"IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself.\"\n\nHowever, this is a video, not an image. But the same principle applies - the user has provided the description. I should summarize the video based on the provided description and end with STEP_OK.\n\nThe video description:\n- High-quality, professi\n\nUser: [T10e voice-wav-attach] A WAV audio recording is attached. Repeat back the exact word(s) you heard in the audio. End your reply with STEP_OK if the transcription contained the word 'banana', or FAILED: <reason> if you could not hear it or got something else.\n\nAssistant: <think>The user wants me to transcribe the exact words from the attached WAV audio file. The hint in the prompt says: \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword, banana banana. And I need to fill up the last few seconds and it will be\"\n\nSo the transcription should be:\n\"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword, banana banana. And I need to fill up the last few seconds and it will be\"\n\nI need to end with STEP_OK if the transcription contained the word 'banana'. It does.\n\nLet me provide the exact transcription and then STEP_OK.</think>If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword, banana banana. And I need to fil\n\nUser: [T12 invalid-parent] Say exactly: INVALID_PARENT_TEST STEP_OK\n\nAssistant: <think>The user wants me to say exactly: \"INVALID_PARENT_TEST STEP_OK\"\n\nThis appears to be a test message. I should respond with exactly that text.</think>INVALID_PARENT_TEST STEP_OK\n\nUser: [C1 credit-deduction] Reply with exactly one word: OK",
+    "encoding_format": "float"
+  }
+}

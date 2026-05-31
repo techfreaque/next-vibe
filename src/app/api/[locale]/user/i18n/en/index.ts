@@ -71,6 +71,13 @@ export const translations = {
       "This feature is not implemented on React Native",
     count_failed: "Failed to get user count: {{error}}",
   },
+  userNoteType: {
+    note: "Note",
+    call: "Call",
+    email: "Email",
+    meeting: "Meeting",
+    task: "Task",
+  },
   notifications: {
     profileUpdated: {
       title: "Profile Updated",

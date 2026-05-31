@@ -119,7 +119,10 @@ export const translations = {
       },
       success: { title: "Sukces", description: "Statystyki wygenerowane" },
     },
-    widget: { refresh: "Odśwież" },
+    widget: {
+      refresh: "Odśwież",
+      filters: "Filtry",
+    },
   },
   list: {
     get: {
@@ -234,6 +237,7 @@ export const translations = {
       noMatchingSubscriptions: "Żadne subskrypcje nie pasują do filtrów.",
       searchPlaceholder: "Szukaj po emailu lub nazwie...",
       refresh: "Odśwież",
+      viewStats: "Statystyki",
     },
   },
   purchases: {
@@ -540,6 +544,18 @@ export const translations = {
       sectionCodes: "Kody poleceń",
       sectionPayouts: "Zgłoszenia wypłat",
       refresh: "Odśwież",
+      codeActive: "Aktywny",
+      codeInactive: "Nieaktywny",
+      clicks: "kliknięć",
+      signups: "rejestracji",
+      earned: "zarobiono",
+      confirm: {
+        title: "Potwierdź akcję wypłaty",
+        description:
+          "Czy na pewno chcesz wykonać tę akcję wypłaty? Operacja jest nieodwracalna.",
+        cancel: "Anuluj",
+        proceed: "Potwierdź",
+      },
     },
   },
   enums: {

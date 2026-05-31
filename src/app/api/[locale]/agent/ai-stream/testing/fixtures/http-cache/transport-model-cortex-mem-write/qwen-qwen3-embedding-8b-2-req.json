@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The tool-help call returned a result. Let me verify:\n1. The result contains a non-empty `tools` array - yes, it has 25 tools listed on this page\n2. Each tool has a `name` - yes, I can see \"accounting-dashboard\", \"coa-account-create\", etc.\n3. Each tool has a `description` - yes, I can see descriptions like \"Overview of your accounting status...\", \"Add a custom account to the company's chart of accounts\", etc.\n\nThe result shows 545 total tools across 22 pages. The first page shows 25 tools. All visible tools have both `name` and `description` fields populated.\n\nEverything looks correct. I should end with STEP_OK.</think>STEP_OK\n\n**Verification summary:**\n- `tools` array: non-empty (25 items on page 1 of 22, 545 total)\n- Every tool has a `name` field (e.g., `accounting-dashboard`, `coa\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nAssistant: <think>The user wants me to call tool-help with toolName='generate_image' and verify that the result contains:\n1. A name\n2. A description\n3. A parameters schema\n\nLet me make the call.</think>\n\nAssistant: <think>The result contains:\n1. `name`: \"generate_image\" ✓\n2. `description`: \"Generate an image from a text prompt using AI\" ✓\n3. `parameters` schema: full JSON Schema with properties (prompt, model, aspectRatio, inputMediaUrl, quality, size) ✓\n\nAll three are present. STEP_OK.</think>STEP_OK\n\n**Verification summary:**\n- `name`: `\"generate_image\"` — present\n- `description`: `\"Generate an image from a text prompt using AI\"` — present\n- `parameters` schema: full JSON Schema with properties (`prompt`, `model`, `aspectRatio`, `inputMediaUrl`, `quality`, `size`) — present\n\nUser: [T2 cortex-write] Use cortex-write to create a memory node at path \"/memories/t2-cheap-test\" with content \"T2_CHEAP_OK\". Then use cortex-read to read it back and verify the content is exactly \"T2_CHEAP_OK\". End your reply with STEP_OK if write succeeded and read confirmed the content, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

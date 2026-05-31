@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-execute-tool----5a43aea5-0333-4360-8ead-36f176e36e2f.md\n\n# [T1 thread-create+tool-call] Use execute-tool...\nFolder: cron\n\nuser: [T1 thread-create+tool-call] Use execute-tool with toolName='tool-help' and instanceId='hermes' to list available tools. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if everything worked, or FAILED: <reason> if anything was wrong.\nassistant: <think>The user wants me to use `execute-tool` with `toolName='tool-help'` and `instanceId='hermes'` to list available tools. Then I need to check that the result contains a non-empty tools array and that each tool has a name and description. End with STEP_OK or FAILED.\n\nLet me call execute-tool with the appropriate parameters.</think>\ntool: \nassistant: <think>The user wants me to verify that the tool-help result from the hermes instance contains a non-empty tools array and that each tool has a name and description. Then end with STEP_OK or FAILED.\n\nLooking at the result:\n- `tools` array exists and has 25 items (non-empty) ✓\n- Each tool in the array has `name` and `description` fields ✓\n- Total count is 412, showing page 1 of 17\n\nEverything checks out. I should respond with STEP_OK.</think>Result contains a non-empty `tools` array (25 items on",
+    "encoding_format": "float"
+  }
+}

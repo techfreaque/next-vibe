@@ -4,6 +4,15 @@ export const translations: typeof enTranslations = {
   // Product category
   category: "Produkte",
 
+  // Enums
+  enums: {
+    productType: {
+      service: "Dienstleistung",
+      physical: "Physisch",
+      digital: "Digital",
+    },
+  },
+
   // Product summary (single source of truth)
   summary:
     "Wir bieten Kostenlos ({{freeCredits}} Credits/Monat), Monatsabonnement ({{subCurrency}}{{subPrice}}/Monat für {{subCredits}} Credits) und Credit-Pakete ({{packCurrency}}{{packPrice}} für {{packCredits}} Credits, erfordert Abonnement) an.",

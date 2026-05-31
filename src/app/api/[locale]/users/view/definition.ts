@@ -22,6 +22,7 @@ import {
 
 import { UserRole } from "../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
+import { USERS_VIEW_ALIAS } from "./constants";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
@@ -36,13 +37,15 @@ export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["users", "view"],
+  aliases: [USERS_VIEW_ALIAS] as const,
   title: "get.title",
   description: "get.description",
-  category: "endpointCategories.userAdmin",
-  subCategory: "endpointCategories.userAdminManagement",
+  category: "userAuth",
+  subCategory: "userAdminManagement",
   icon: "user" as const,
   tags: ["tags.user" as const, "tags.view" as const],
   allowedRoles: [UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     render: UserViewContainer,

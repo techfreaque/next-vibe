@@ -62,6 +62,9 @@ export const translations: typeof enTranslations = {
       allowedCount: {
         title: "Erlaubte Tools",
       },
+      webPinnedCount: {
+        title: "Web-Pins",
+      },
       currentPage: {
         title: "Aktuelle Seite",
       },
@@ -305,12 +308,14 @@ export const translations: typeof enTranslations = {
   },
   aiTools: {
     modal: {
+      webPinnedLabel: "Web-Pins",
+      webPinnedTooltip: "In der Seitenleiste angepinnte Tools",
       pinnedLabel: "angeheftet",
       pinnedTooltip:
         "Angeheftete Tools sind immer im Kontext - die KI sieht sie bei jedem Schritt",
-      enabledLabel: "erlaubt",
+      enabledLabel: "KI erlaubt",
       enabledTooltip:
-        "Erlaubte Tools können auf Anfrage aufgerufen werden, wenn Hilfe aktiviert ist",
+        "KI-erlaubte Tools können auf Anfrage aufgerufen werden, wenn Hilfe aktiviert ist",
       totalLabel: "gesamt",
       totalTooltip: "Alle Tools anzeigen - klicken um Filter zu löschen",
       searchPlaceholder: "Tools suchen...",
@@ -324,12 +329,27 @@ export const translations: typeof enTranslations = {
       noToolsAvailable: "Keine KI-Tools verfügbar",
       legendActive: "Immer im Kontext (angeheftet)",
       legendConfirm: "Fragt vor dem Ausführen",
+      legendWebPin: "In Seitenleiste angepinnt",
       stats: "{{pinned}} von {{total}} Tools angeheftet",
-      activeOn: "Angeheftet - immer im Kontext. Klicken zum Ablösen",
+      activeOn: "Immer im KI-Kontext — ablösen für Abruf auf Anfrage",
       activeOff:
-        "Nicht angeheftet - KI kann trotzdem auf Anfrage aufrufen. Klicken zum Anheften",
-      confirmOn: "Fragt nach Bestätigung - klicken zum Deaktivieren",
-      confirmOff: "Läuft automatisch - klicken um Bestätigung zu erfordern",
+        "Nicht im Kontext — anheften um es bei jedem KI-Schritt einzubinden",
+      confirmOn:
+        "KI fragt vor dem Ausführen — klicken für automatische Freigabe",
+      confirmOff:
+        "Läuft ohne Nachfrage — klicken um deine Bestätigung zu erfordern",
+      closeSidebar: "Tools-Seitenleiste schließen",
+      selectTool: "Tool auswählen",
+      selectToolHint: "Wähle ein Tool aus der Seitenleiste",
+      allPlatforms: "Alle Plattformen",
+      prodOnly: "Nur Prod",
+      aiPinsTitle: "KI-Tool-Pins",
+      aiPinsDescription:
+        "Diese Tools sind in jedem KI-Gespräch aktiv. Die KI kann sie automatisch aufrufen — ohne explizite Aufforderung.",
+      resetToDefaults: "Auf Standard zurücksetzen",
+      noPinnedTools: "Noch keine angehefteten Tools",
+      noPinnedToolsHint:
+        "Durchsuche alle Tools und hefte jene an, die die KI nutzen soll",
     },
 
     platformFilter: {

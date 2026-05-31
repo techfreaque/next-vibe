@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:d62b6d7d | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 29, 23:14]\n\nAssistant: STEP_OK\n\n**Verification summary:**\n- `tools` array: non-empty (25 items on page 1 of 22, 545 total)\n- Every tool has a `name` field (e.g., `accounting-dashboard`, `coa-account-create`, `agent_chat_public-feed_GET`)\n- Every tool has a `description` field (e.g., \"Overview of your accounting status...\", \"Add a custom account to the company's chart of accounts\", \"Public threads shared with the community\")\n\nSystem: [Context: ID:75f6aae9 | Posted:May 29, 23:15]\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (60 · 5 archived)\n│   ├── role.md\n│   │   Solo founder & lead developer of **unbottled.ai** — free speech AI platform, full-time since **Oct 2025** (~2 years building next-vibe, started during Sovendus nights/weekends). Also the framework behind it: **next-vibe** (SaaS framework, TypeScript monorepo). Previ\n│   ├── name.md\n│   │   **Max** — go by Max. German in real life, English with computers/internet. Prefers English for all AI interactions even if platfo\n\nSystem: [Context: ID:0e4363be | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 29, 23:15]\n\nAssistant: [tool:tool-help] {\"toolName\":\"generate_image\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"generate_image\",\"title\":\"Generate Image\",\"description\":\"Generate an image from a text prompt using AI\",\"category\":\"ai\",\"subCategory\":\"Generation\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"parameters\":{\"$schema\":\"http://j",
+    "encoding_format": "float"
+  }
+}

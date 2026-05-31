@@ -23,9 +23,10 @@ export const { GET } = createEndpoint({
   title: "cluster.status.get.title",
   description: "cluster.status.get.description",
   icon: "activity",
-  category: "endpointCategories.devTools",
-  subCategory: "endpointCategories.devToolsGenerators",
+  category: "devTools",
+  subCategory: "Generators",
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
   aliases: ["cluster-status", "infra-status"],
   tags: ["category" as const],
 

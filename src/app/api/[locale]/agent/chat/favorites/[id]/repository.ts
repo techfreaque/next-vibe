@@ -444,9 +444,15 @@ export class SingleFavoriteRepository {
           videoGenModelSelection: videoGenModelSelectionToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,
-          availableTools: data.availableTools ?? null,
-          pinnedTools: data.pinnedTools ?? null,
-          deniedTools: data.deniedTools ?? null,
+          ...(data.availableTools !== undefined
+            ? { availableTools: data.availableTools }
+            : {}),
+          ...(data.pinnedTools !== undefined
+            ? { pinnedTools: data.pinnedTools }
+            : {}),
+          ...(data.deniedTools !== undefined
+            ? { deniedTools: data.deniedTools }
+            : {}),
           promptAppend: data.promptAppend ?? null,
           memoryLimit: data.memoryLimit !== undefined ? data.memoryLimit : null,
           updatedAt: new Date(),

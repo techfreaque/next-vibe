@@ -100,6 +100,7 @@ export class ChatSettingsRepositoryClient {
       mamaEnabled: false,
       mamaSchedule: MAMA_DEFAULT_SCHEDULE,
       mamaPrompt: null,
+      webPinnedTools: null,
       dreamerSubFolderId: null,
       dreamerThreadCount: 0,
       autopilotSubFolderId: null,
@@ -175,6 +176,10 @@ export class ChatSettingsRepositoryClient {
           "mamaPrompt" in overrides
             ? overrides.mamaPrompt
             : defaults.mamaPrompt,
+        webPinnedTools:
+          "webPinnedTools" in overrides
+            ? overrides.webPinnedTools
+            : defaults.webPinnedTools,
         // These are server-computed, never persisted in localStorage
         dreamerSubFolderId: null,
         dreamerThreadCount: 0,
@@ -257,6 +262,9 @@ export class ChatSettingsRepositoryClient {
     if (settings.mamaPrompt !== defaults.mamaPrompt) {
       overrides.mamaPrompt = settings.mamaPrompt;
     }
+    if (settings.webPinnedTools !== defaults.webPinnedTools) {
+      overrides.webPinnedTools = settings.webPinnedTools;
+    }
 
     if (Object.keys(overrides).length === 0) {
       localStorage.removeItem(STORAGE_KEY);
@@ -337,6 +345,10 @@ export class ChatSettingsRepositoryClient {
         updates.mamaPrompt !== undefined
           ? updates.mamaPrompt
           : current.mamaPrompt,
+      webPinnedTools:
+        updates.webPinnedTools !== undefined
+          ? updates.webPinnedTools
+          : current.webPinnedTools,
       // Server-computed fields - preserved from current, never written to localStorage
       dreamerSubFolderId: current.dreamerSubFolderId,
       dreamerThreadCount: current.dreamerThreadCount,

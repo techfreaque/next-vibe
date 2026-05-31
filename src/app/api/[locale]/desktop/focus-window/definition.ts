@@ -42,8 +42,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.desktop",
-  subCategory: "endpointCategories.desktopWindows",
+  category: "desktop",
+  subCategory: "Windows",
   icon: "maximize",
   tags: [
     "focus-window.tags.desktopAutomation",

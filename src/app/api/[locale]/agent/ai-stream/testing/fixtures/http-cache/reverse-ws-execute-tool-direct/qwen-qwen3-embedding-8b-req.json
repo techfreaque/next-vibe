@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The user wants me to call generate_image with prompt='wait-for-task-test' and callbackMode='detach'. I need to use execute-tool for this. Let me check the tool schema first or just call it directly since I already know it from the previous call.\n\nActually, I need to call execute-tool with toolName='generate_image', input containing prompt='wait-for-task-test', and callbackMode='detach'. Wait, the execute-tool itself has a callbackMode parameter. Let me check the schema.\n\nFrom the tool-help result earlier, execute-tool has parameters:\n- toolName (required)\n- input (optional, default {})\n- instanceId (optional)\n- callbackMode (optional, default \"wait\", enum: [\"wait\", \"detach\", \"endLoop\", \"wakeUp\", \"approve\"])\n\nSo I should call execute-tool with callbackMode='detach'.\n\nLet me do that.<\n\nAssistant: <think>The result has:\n- `taskId`: \"local-bg-1780162631365-w3omi7\" (string)\n- `status`: \"status.pending\" (string)\n- No `imageUrl` field present\n\nEverything checks out. I need to end with STEP_OK and include the exact taskId.</think>STEP_OK taskId=local-bg-1780162631365-w3omi7\n\nUser: [T5a endLoop] Call the tool-help tool with callbackMode='endLoop'. After receiving the result, try to call the tool-help tool again. Check that only ONE tool-help call was executed (the loop should have stopped) and the result had a non-empty tools array. End your reply with STEP_OK if exactly one call ran and the result was correct, or FAILED: <reason> if the loop continued or the result was wrong.\n\nAssistant: <think>The user wants me to call tool-help with callbackMode='endLoop'. This should stop the loop after that single call. Then I need to verify that only one call ran and the result had a non-empty tools array.\n\nBut wait - if I use callbackMode='endLoop', the tool call will execute and then the loop will stop. The user is asking me to do this in a single turn. But endLoop means I can't make a second call in the same turn.\n\nLet me re-read the instructions: \"Call the tool-help tool with callbackMode='endLoop'. After receiving the result, try to call the tool-help tool again. Check that only ONE tool-help call was executed (the loop should have stopped) and the result had a non-empty tools array.\"\n\nThis is tricky. If I call with endLoop, my turn ends immediately after that call. I won't be ab\n\nUser: [T5c execute-tool-direct] Call the execute-tool endpoint with toolName='tool-help' and input={}. Check that the inner result contains a tools array with at least one entry. End your reply with STEP_OK if a tools list was returned, or FAILED: <reason> if the result was missing or malformed.",
+    "encoding_format": "float"
+  }
+}

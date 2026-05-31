@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The file was created successfully with `pinned: true` in the frontmatter, and the content matches exactly what was requested. The read confirms it.\n\nVERDICT: PASS</think> File `/memories/mem-subdir-test/critical-rule.md` created and verified. Frontmatter contains `pinned: true`, content matches exactly.\n\nVERDICT: PASS\n\nUser: Use cortex-write to create /memories/mem-subdir-test/skills.md with this content:\n\n---\npriority: 60\ntags: [expertise, skills]\n---\n\n## Technical Skills\n\n- TypeScript: expert level\n- Bun runtime: proficient\n- Drizzle ORM: intermediate\n\nConfirm it was created.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nAssistant: <think> The user wants me to create a file at `/memories/mem-subdir-test/skills.md` with specific content, then confirm it was created. Let me do that.</think>\n\nAssistant: <think>The file was created successfully. The response shows:\n- created: true\n- responsePath: /memories/mem-subdir-test/skills.md\n- size: 149\n- Content matches exactly what was requested\n\nThis is a PASS.</think>File `/memories/mem-subdir-test/skills.md` created successfully. Content matches exactly, size 149 bytes, path confirmed.\n\nVERDICT: PASS\n\nUser: Use cortex-tree on /memories/mem-subdir-test with depth=2. Count how many .md files appear and list their names.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
+    "encoding_format": "float"
+  }
+}

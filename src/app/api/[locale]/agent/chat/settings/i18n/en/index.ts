@@ -206,6 +206,9 @@ export const translations = {
       neverRun: "Never run",
       runNow: "Run now",
     },
+    webPinnedTools: {
+      label: "Web sidebar pinned tools",
+    },
     errors: {
       validation: {
         title: "Validation Error",

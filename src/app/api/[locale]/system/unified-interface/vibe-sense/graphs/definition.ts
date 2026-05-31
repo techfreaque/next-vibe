@@ -24,6 +24,7 @@ import { graphConfigSchema } from "../graph/schema";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
+import { VIBE_SENSE_GRAPHS_ALIAS } from "./constants";
 
 const GraphListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.GraphListContainer })),
@@ -35,13 +36,15 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["system", "unified-interface", "vibe-sense", "graphs"],
+  aliases: [VIBE_SENSE_GRAPHS_ALIAS] as const,
   title: "list.title",
   description: "list.description",
   icon: "git-branch",
-  category: "endpointCategories.analytics",
-  subCategory: "endpointCategories.analyticsVibeSense",
+  category: "analytics",
+  subCategory: "Vibe Sense",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: GraphListContainer,
@@ -165,8 +168,8 @@ const { POST } = createEndpoint({
   title: "create.title",
   description: "create.description",
   icon: "plus",
-  category: "endpointCategories.analytics",
-  subCategory: "endpointCategories.analyticsVibeSense",
+  category: "analytics",
+  subCategory: "Vibe Sense",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 

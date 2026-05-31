@@ -56,7 +56,7 @@ import {
   scopedTranslation as tasksScopedTranslation,
 } from "../i18n";
 import { handleTaskCompletion } from "../task-completion-handler";
-import { TaskSyncRepository } from "../task-sync/repository";
+import { TaskSyncRepository } from "@/app/api/[locale]/remote-connection/sync/repository";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -399,7 +399,7 @@ export class PulseHealthRepository {
       const now = new Date();
 
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/user/remote-connection/repository");
+        await import("@/app/api/[locale]/remote-connection/repository");
       const instanceId =
         RemoteConnectionRepository.deriveDefaultSelfInstanceId();
 

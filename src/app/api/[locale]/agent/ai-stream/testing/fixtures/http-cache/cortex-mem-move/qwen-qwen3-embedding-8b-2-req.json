@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The task is to read /memories/mem-test/project-notes.md and report:\n1. The priority value from the frontmatter\n2. The first heading in the body\n\nFrom the content returned:\n- Frontmatter: `priority: 75`, `tags: [test, project]`\n- Body starts with `## Project Notes` which is the first heading\n\nEverything succeeded correctly. I'll report the findings and end with VERDICT: PASS.</think> From `/memories/mem-test/project-notes.md`:\n\n- **Priority (frontmatter):** `75`\n- **First heading (body):** `## Project Notes`\n\nVERDICT: PASS\n\nUser: Use cortex-edit on /memories/mem-test/project-notes.md to replace \"Key facts: AI integration, cortex, memory system.\" with \"Key facts: AI integration, cortex, memory system, verified edit.\". Confirm the edit succeeded.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nAssistant: <think> The user wants me to use cortex-edit to replace \"Key facts: AI integration, cortex, memory system.\" with \"Key facts: AI integration, cortex, memory system, verified edit.\" in /memories/mem-test/project-notes.md. I need to confirm the edit succeeded.\n\nI'll use cortex-edit with find and replace parameters.</think>\n\nAssistant: <think> The edit succeeded. The response shows:\n- replacements: 1\n- responsePath: /memories/mem-test/project-notes.md\n- size: 199 (increased from 184, which makes sense since we added \", verified edit\")\n- updatedAt: 2026-05-26T16:02:48.048Z\n\nThe task asked me to confirm the edit succeeded. I should report this clearly and end with VERDICT: PASS.</think> Edit succeeded.\n\n- **File:** `/memories/mem-test/project-notes.md`\n- **Replacements made:** 1\n- **New size:** 199 bytes (was 184)\n\nVERDICT: PASS\n\nUser: Use cortex-move to move /memories/mem-test/project-notes.md to /memories/mem-test/archived/project-notes.md. Confirm the move succeeded - source should be gone, destination should exist.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
+    "encoding_format": "float"
+  }
+}

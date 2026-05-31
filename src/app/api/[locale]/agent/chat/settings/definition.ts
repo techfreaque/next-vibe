@@ -45,13 +45,14 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "settings"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const,
 
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "settings" as const,
-  category: "endpointCategories.chat",
-  subCategory: "endpointCategories.chatSettings",
+  category: "ai",
+  subCategory: "chatSettings",
   tags: ["tags.settings" as const],
 
   aliases: [CHAT_SETTINGS_GET_ALIAS],
@@ -164,6 +165,13 @@ const { GET } = createEndpoint({
         schema: z.string().nullable(),
       }),
 
+      // Web sidebar pinned tools (independent of AI pinnedTools on favorites)
+      webPinnedTools: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.array(z.string()).nullable(),
+      }),
+
       // Pulse folder UUIDs - null if the folder hasn't been created yet (task never enabled)
       dreamerSubFolderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -271,6 +279,7 @@ const { GET } = createEndpoint({
         autopilotThreadCount: 0,
         dreamerTaskId: null,
         autopilotTaskId: null,
+        webPinnedTools: null,
       },
     },
   },
@@ -290,8 +299,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "settings" as const,
-  category: "endpointCategories.chat",
-  subCategory: "endpointCategories.chatSettings",
+  category: "ai",
+  subCategory: "chatSettings",
   tags: ["tags.settings" as const],
 
   aliases: [CHAT_SETTINGS_UPDATE_ALIAS],
@@ -465,6 +474,15 @@ const { POST } = createEndpoint({
         allowedRoles: [UserRole.ADMIN],
         columns: 12,
         schema: z.string().nullable().optional(),
+      }),
+
+      // Web sidebar pinned tools (independent of AI pinnedTools on favorites)
+      webPinnedTools: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        hidden: true,
+        label: "post.webPinnedTools.label" as const,
+        schema: z.array(z.string()).nullable().optional(),
       }),
     },
   }),

@@ -117,7 +117,7 @@ export function ChatEmptyState({
 
   return (
     <Div
-      className="h-screen h-max-screen overflow-y-auto"
+      className="absolute inset-0 overflow-y-auto"
       id={DOM_IDS.MESSAGES_CONTAINER}
     >
       <Div

@@ -22,6 +22,12 @@ export async function getSeedModule(
       return (await import("../../agent/chat/skills/seeds")) as EnvironmentSeeds;
     case "cortex":
       return (await import("../../agent/cortex/seeds")) as EnvironmentSeeds;
+    case "chart-of-accounts":
+      return (await import("../../chart-of-accounts/seeds")) as EnvironmentSeeds;
+    case "companies":
+      return (await import("../../companies/seeds")) as EnvironmentSeeds;
+    case "inventory":
+      return (await import("../../inventory/seeds")) as EnvironmentSeeds;
     case "lead-magnet":
       return (await import("../../lead-magnet/seeds")) as EnvironmentSeeds;
     case "leads":
@@ -32,6 +38,12 @@ export async function getSeedModule(
       return (await import("../../messenger/providers/email/smtp-client/seeds")) as EnvironmentSeeds;
     case "newsletter":
       return (await import("../../newsletter/seeds")) as EnvironmentSeeds;
+    case "pos":
+      return (await import("../../pos/seeds")) as EnvironmentSeeds;
+    case "catalog":
+      return (await import("../../products/catalog/seeds")) as EnvironmentSeeds;
+    case "purchasing":
+      return (await import("../../purchasing/seeds")) as EnvironmentSeeds;
     case "subscription":
       return (await import("../../subscription/seeds")) as EnvironmentSeeds;
     case "pulse":
@@ -40,6 +52,8 @@ export async function getSeedModule(
       return (await import("../unified-interface/tasks/seeds")) as EnvironmentSeeds;
     case "vibe-sense":
       return (await import("../unified-interface/vibe-sense/seeds")) as EnvironmentSeeds;
+    case "tax":
+      return (await import("../../tax/seeds")) as EnvironmentSeeds;
     case "user":
       return (await import("../../user/seeds")) as EnvironmentSeeds;
     case "users":
@@ -57,15 +71,22 @@ export function getAllSeedModuleNames(): string[] {
     "[rootFolderId]",
     "skills",
     "cortex",
+    "chart-of-accounts",
+    "companies",
+    "inventory",
     "lead-magnet",
     "leads",
     "messages",
     "smtp-client",
     "newsletter",
+    "pos",
+    "catalog",
+    "purchasing",
     "subscription",
     "pulse",
     "tasks",
     "vibe-sense",
+    "tax",
     "user",
     "users",
   ];

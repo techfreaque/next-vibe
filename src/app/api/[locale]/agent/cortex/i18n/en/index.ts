@@ -188,6 +188,7 @@ export const translations = {
     search: "Search",
     favorite: "Favorite",
     gen: "Generated",
+    ssh: "SSH Connection",
   },
   button: {
     label: "Cortex",

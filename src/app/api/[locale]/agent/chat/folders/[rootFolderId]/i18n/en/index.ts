@@ -12,6 +12,7 @@ export const translations = {
         incognito: "Incognito",
         cron: "Background",
         support: "Support",
+        remote: "Remote",
       },
     },
     folderList: {
@@ -120,6 +121,7 @@ export const translations = {
       background: "Background",
       incognito: "Incognito",
       support: "Support",
+      remote: "Remote",
     },
   },
   get: {

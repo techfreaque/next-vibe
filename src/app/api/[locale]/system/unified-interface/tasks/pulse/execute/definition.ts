@@ -38,8 +38,8 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.tasks",
-  subCategory: "endpointCategories.tasksPulse",
+  category: "devTools",
+  subCategory: "tasksPulse",
   tags: ["tags.execute"],
 
   fields: objectField(scopedTranslation, {

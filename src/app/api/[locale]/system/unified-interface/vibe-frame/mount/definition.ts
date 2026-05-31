@@ -29,6 +29,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import { VIBE_FRAME_MOUNT_ALIAS } from "./constants";
 
 // ─── Endpoint definition ──────────────────────────────────────────────────────
 
@@ -36,11 +37,12 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "vibe-frame", "mount"],
+  aliases: [VIBE_FRAME_MOUNT_ALIAS] as const,
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "globe",
-  category: "endpointCategories.interfaces",
-  subCategory: "endpointCategories.interfacesFrame",
+  category: "devTools",
+  subCategory: "interfacesFrame",
 
   tags: [
     "tags.vibeFrame" as const,

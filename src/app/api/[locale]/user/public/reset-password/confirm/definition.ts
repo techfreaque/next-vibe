@@ -20,7 +20,13 @@ import {
 
 import { scopedTranslation } from "../i18n";
 import { UserRole } from "../../../user-roles/enum";
-import { ResetPasswordConfirmContainer } from "./widget/widget";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+
+const ResetPasswordConfirmContainer = lazyWidget(() =>
+  import("./widget/widget").then((m) => ({
+    default: m.ResetPasswordConfirmContainer,
+  })),
+);
 
 /**
  * POST /reset-password/confirm - Confirm password reset
@@ -32,8 +38,8 @@ const { POST } = createEndpoint({
   title: "confirm.title",
   description: "confirm.description",
   icon: "lock",
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthLogin",
+  category: "userAuth",
+  subCategory: "userAuthLogin",
   tags: ["confirm.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: customWidgetObject({

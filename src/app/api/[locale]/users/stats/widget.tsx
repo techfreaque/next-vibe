@@ -19,6 +19,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
@@ -28,6 +29,7 @@ import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/u
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type definition from "./definition";
 
 interface CustomWidgetProps {
@@ -50,11 +52,13 @@ function StatCard({
   value,
   format = "number",
   variant = "default",
+  locale,
 }: {
   label: string;
   value: number | null | undefined;
   format?: "number" | "percent" | "compact" | "currency";
   variant?: "default" | "success" | "warning" | "danger" | "info";
+  locale: CountryLanguage;
 }): React.JSX.Element {
   const variantColor = variantColorMap[variant];
 
@@ -71,8 +75,8 @@ function StatCard({
     if (format === "compact" && value >= 1000) {
       return `${(value / 1000).toFixed(1)}k`;
     }
-    return value.toLocaleString();
-  }, [value, format]);
+    return value.toLocaleString(locale);
+  }, [value, format, locale]);
 
   return (
     <Div className="rounded-lg border bg-card p-4 flex flex-col gap-1">
@@ -139,6 +143,7 @@ export function UsersStatsContainer({
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const form = useWidgetForm<typeof definition.GET>();
@@ -338,26 +343,31 @@ export function UsersStatsContainer({
         <StatCard
           label={t("widget.labelTotalUsers")}
           value={overviewStats?.totalUsers}
+          locale={locale}
         />
         <StatCard
           label={t("widget.labelActiveUsers")}
           value={overviewStats?.activeUsers}
           variant="success"
+          locale={locale}
         />
         <StatCard
           label={t("widget.labelNewToday")}
           value={growthMetrics?.timeSeriesData?.usersCreatedToday}
           variant="info"
+          locale={locale}
         />
         <StatCard
           label={t("widget.labelNewThisWeek")}
           value={growthMetrics?.timeSeriesData?.usersCreatedThisWeek}
           variant="info"
+          locale={locale}
         />
         <StatCard
           label={t("widget.labelNewThisMonth")}
           value={growthMetrics?.timeSeriesData?.usersCreatedThisMonth}
           variant="info"
+          locale={locale}
         />
       </Div>
 
@@ -368,12 +378,14 @@ export function UsersStatsContainer({
           value={paymentStats?.totalRevenue}
           format="currency"
           variant="success"
+          locale={locale}
         />
         <StatCard
           label={t("widget.labelAvgRevenuePerUser")}
           value={averageRevenuePerUser}
           format="currency"
           variant="info"
+          locale={locale}
         />
       </Div>
 
@@ -383,17 +395,20 @@ export function UsersStatsContainer({
           label={t("widget.labelEmailVerified")}
           value={emailStats?.emailVerifiedUsers}
           variant="success"
+          locale={locale}
         />
         <StatCard
           label={t("widget.labelVerificationRate")}
           value={emailStats?.verificationRate}
           format="percent"
           variant="info"
+          locale={locale}
         />
         <StatCard
           label={t("widget.labelEmailUnverified")}
           value={emailStats?.emailUnverifiedUsers}
           variant="warning"
+          locale={locale}
         />
       </Div>
 
@@ -404,18 +419,21 @@ export function UsersStatsContainer({
           value={growthMetrics?.performanceRates?.growthRate}
           format="percent"
           variant="success"
+          locale={locale}
         />
         <StatCard
           label={t("widget.labelLeadUserCvr")}
           value={growthMetrics?.performanceRates?.leadToUserConversionRate}
           format="percent"
           variant="info"
+          locale={locale}
         />
         <StatCard
           label={t("widget.labelRetentionRate")}
           value={growthMetrics?.performanceRates?.retentionRate}
           format="percent"
           variant="success"
+          locale={locale}
         />
       </Div>
 
@@ -466,7 +484,7 @@ export function UsersStatsContainer({
               <Span className="text-muted-foreground">{row.label}</Span>
               <Span className="font-medium tabular-nums">
                 {row.value !== null && row.value !== undefined
-                  ? row.value.toLocaleString()
+                  ? row.value.toLocaleString(locale)
                   : "—"}
               </Span>
             </Div>
@@ -477,7 +495,7 @@ export function UsersStatsContainer({
       {/* Generated at */}
       {generatedAt && (
         <Div className="text-xs text-muted-foreground text-right">
-          {t("widget.generatedAt")} {generatedAt.toLocaleString()}
+          {t("widget.generatedAt")} {generatedAt.toLocaleString(locale)}
         </Div>
       )}
     </Div>

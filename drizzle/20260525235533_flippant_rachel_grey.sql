@@ -1,0 +1,1 @@
+ALTER TABLE "chat_settings" ADD COLUMN "web_pinned_tools" jsonb;

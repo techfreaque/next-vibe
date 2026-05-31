@@ -87,6 +87,11 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "skills"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.PUBLIC] as const,
+  defaultWebPinned: [
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.PUBLIC,
+  ] as const,
 
   title: "get.title" as const,
   description: "get.description" as const,
@@ -104,8 +109,8 @@ const { GET } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "endpointCategories.skills",
-  subCategory: "endpointCategories.skillsManagement",
+  category: "ai",
+  subCategory: "skillsManagement",
   tags: ["tags.skills" as const],
 
   options: {

@@ -43,11 +43,16 @@ const { GET } = createEndpoint({
   path: ["credits", "history"],
   title: "history.get.title",
   description: "history.get.description",
-  category: "endpointCategories.credits",
-  subCategory: "endpointCategories.creditsAnalytics",
+  category: "credits",
+  subCategory: "Credits",
   tags: ["tags.credits", "tags.balance"],
   icon: "wallet",
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultWebPinned: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+  ] as const,
 
   fields: customWidgetObject({
     render: CreditHistoryContainer,

@@ -73,6 +73,11 @@ export const chatSettings = pgTable("chat_settings", {
   // Custom prompt for mama session. null = skill default
   mamaPrompt: jsonb("mama_prompt").$type<string | null>(),
 
+  // Web sidebar pinned tools — separate from AI pinnedTools on favorites.
+  // Stored as plain tool ID strings (no requiresConfirmation).
+  // null = no overrides (show nothing pinned in sidebar).
+  webPinnedTools: jsonb("web_pinned_tools").$type<string[] | null>(),
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

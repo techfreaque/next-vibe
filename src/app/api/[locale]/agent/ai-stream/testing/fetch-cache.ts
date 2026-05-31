@@ -662,28 +662,6 @@ function sseEventsToTickingStream(
   });
 }
 
-async function drainStream(
-  stream: ReadableStream<Uint8Array>,
-): Promise<Uint8Array> {
-  const chunks: Uint8Array[] = [];
-  const reader = stream.getReader();
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) {
-      break;
-    }
-    chunks.push(value);
-  }
-  const total = chunks.reduce((n, c) => n + c.length, 0);
-  const merged = new Uint8Array(total);
-  let offset = 0;
-  for (const c of chunks) {
-    merged.set(c, offset);
-    offset += c.length;
-  }
-  return merged;
-}
-
 // ── Cache hit replay ───────────────────────────────────────────────────────────
 
 function replayFromCache(cached: ResFile): Response {
@@ -839,7 +817,17 @@ export function installFetchCache(): void {
         );
       }
 
-      const real = await originalFetch(input, init);
+      // Use a 5-minute timeout for all live fetch calls.
+      // 30s was too short for LLM SSE streaming responses (compacting kimi calls can
+      // take 60-90s for long thread histories). Non-SSE (embedding) calls complete in
+      // seconds once the response headers arrive. SSE body consumption is bounded by
+      // the AI SDK's stream iteration, not by the AbortSignal on the fetch itself.
+      // 5 minutes is a safe upper bound that prevents indefinite hangs while allowing
+      // legitimate long-running LLM responses.
+      const real = await originalFetch(input, {
+        ...(init ?? {}),
+        signal: AbortSignal.timeout(300_000),
+      });
       const responseHeaders = headersToRecord(real.headers);
 
       mkdirSync(testCaseDir, { recursive: true });
@@ -857,35 +845,47 @@ export function installFetchCache(): void {
         "utf-8",
       );
 
-      const isStream =
-        (responseHeaders["content-type"] ?? "").includes("event-stream") ||
-        (responseHeaders["transfer-encoding"] ?? "") === "chunked";
+      // Only treat true SSE responses as streaming. chunked transfer-encoding
+      // with non-SSE content types (e.g. application/json from embedding APIs)
+      // should be buffered directly.
+      const isStream = (responseHeaders["content-type"] ?? "").includes(
+        "event-stream",
+      );
 
       if (isStream && real.body) {
         // TransformStream: pass chunks through to caller AND collect them.
         // Cache is written in flush() - after the caller has fully consumed the
         // stream - so the file is always complete before the test ends.
+        // Also written in cancel() so endLoop (which aborts early) still persists.
         const chunks: Uint8Array[] = [];
+        let written = false;
+        const writeCache = (): void => {
+          if (written) {
+            return;
+          }
+          written = true;
+          const total = chunks.reduce((n, c) => n + c.length, 0);
+          const merged = new Uint8Array(total);
+          let offset = 0;
+          for (const c of chunks) {
+            merged.set(c, offset);
+            offset += c.length;
+          }
+          const resEntry = buildResFile(
+            url,
+            real.status,
+            responseHeaders,
+            merged,
+          );
+          writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
+        };
         const transform = new TransformStream<Uint8Array, Uint8Array>({
           transform(chunk, controller): void {
             chunks.push(chunk);
             controller.enqueue(chunk);
           },
           flush(): void {
-            const total = chunks.reduce((n, c) => n + c.length, 0);
-            const merged = new Uint8Array(total);
-            let offset = 0;
-            for (const c of chunks) {
-              merged.set(c, offset);
-              offset += c.length;
-            }
-            const resEntry = buildResFile(
-              url,
-              real.status,
-              responseHeaders,
-              merged,
-            );
-            writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
+            writeCache();
           },
         });
 
@@ -895,8 +895,10 @@ export function installFetchCache(): void {
         });
       }
 
-      // Non-streaming: drain, build human-readable entry, return stream
-      const bytes = await drainStream(real.clone().body!);
+      // Non-streaming: buffer the full body.
+      // AbortSignal.timeout(300s) above ensures this won't hang indefinitely.
+      const buffer = await real.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
       const resEntry = buildResFile(url, real.status, responseHeaders, bytes);
       writeFileSync(rp, JSON.stringify(resEntry, null, 2), "utf-8");
 
@@ -908,4 +910,18 @@ export function installFetchCache(): void {
       inflightCount--;
     }
   }) as typeof globalThis.fetch;
+}
+
+/**
+ * Install the fetch cache only when VIBE_FIXTURE_MODE=true.
+ * Called by the dev server repository when starting with --fixture-mode.
+ * Also sets the initial context to "server-default" so every intercepted
+ * call gets stored under a predictable name.
+ */
+export function installFetchCacheIfEnabled(): void {
+  if (process.env["VIBE_FIXTURE_MODE"] !== "true") {
+    return;
+  }
+  installFetchCache();
+  setFetchCacheContext("server-default");
 }

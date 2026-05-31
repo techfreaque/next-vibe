@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/memories/mem-test/archived/project-notes.md\n\n---\npriority: 75\ntags: [test, project]\n---\n\n## Project Notes\n\nThis is a test memory created to verify frontmatter is stored correctly.\nKey facts: AI integration, cortex, memory system, verified edit.",
+    "encoding_format": "float"
+  }
+}

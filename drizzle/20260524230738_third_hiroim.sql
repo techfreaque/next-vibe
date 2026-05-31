@@ -1,0 +1,1 @@
+ALTER TABLE "credit_transactions" ADD COLUMN "journal_entry_id" uuid;

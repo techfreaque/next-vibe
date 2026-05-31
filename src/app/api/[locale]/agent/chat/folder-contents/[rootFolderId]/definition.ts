@@ -63,8 +63,8 @@ const { GET } = createEndpoint({
 
   tags: ["tags.folderContents" as const],
   icon: "folder" as const,
-  category: "endpointCategories.chat",
-  subCategory: "endpointCategories.chatOrganization",
+  category: "ai",
+  subCategory: "chatOrganization",
 
   fields: customWidgetObject({
     render: FolderContentsWidget,
@@ -100,8 +100,8 @@ const { GET } = createEndpoint({
             label: "config.folders.incognito" as const,
           },
           {
-            value: DefaultFolderId.SUPPORT,
-            label: "config.folders.support" as const,
+            value: DefaultFolderId.REMOTE,
+            label: "config.folders.remote" as const,
           },
         ],
         schema: z.enum([
@@ -110,7 +110,7 @@ const { GET } = createEndpoint({
           DefaultFolderId.PUBLIC,
           DefaultFolderId.BACKGROUND,
           DefaultFolderId.INCOGNITO,
-          DefaultFolderId.SUPPORT,
+          DefaultFolderId.REMOTE,
         ]),
       }),
 

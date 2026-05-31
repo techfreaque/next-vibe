@@ -286,7 +286,7 @@ export function UserDetailContainer({
                   size="sm"
                   className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
                   onClick={handleCopyUserId}
-                  title="Copy User ID"
+                  title={t("id.widget.titleCopyUserId")}
                 >
                   {copiedId ? (
                     <CheckCircle className="h-3 w-3 text-success" />
@@ -403,7 +403,7 @@ export function UserDetailContainer({
             size="sm"
             onClick={handleReferralStats}
             className="gap-1"
-            title="View referral codes and stats"
+            title={t("id.widget.titleReferralCodes")}
           >
             <Link className="h-3.5 w-3.5" />
             {t("id.widget.referrals")}
@@ -414,7 +414,7 @@ export function UserDetailContainer({
             size="sm"
             onClick={handleSubscription}
             className="gap-1"
-            title="View subscription"
+            title={t("id.widget.titleSubscription")}
           >
             <Package className="h-3.5 w-3.5" />
             {t("id.widget.subscription")}
@@ -559,7 +559,7 @@ export function UserEditContainer({
                     size="sm"
                     className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground"
                     onClick={handleCopyUserId}
-                    title="Copy User ID"
+                    title={t("id.widget.titleCopyUserId")}
                   >
                     {copiedId ? (
                       <CheckCircle className="h-3 w-3 text-success" />
@@ -712,6 +712,7 @@ export function UserDeleteContainer({
 }: DeleteWidgetProps): React.JSX.Element {
   const children = field.children;
   const data = useWidgetValue<typeof definition.DELETE>();
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.DELETE>();
 
   return (
@@ -733,7 +734,7 @@ export function UserDeleteContainer({
             {data.deletedAt && (
               <Span className="text-xs text-success">
                 {t("id.widget.deletedAt")}{" "}
-                {new Date(data.deletedAt).toLocaleString()}
+                {new Date(data.deletedAt).toLocaleString(locale)}
               </Span>
             )}
           </Div>

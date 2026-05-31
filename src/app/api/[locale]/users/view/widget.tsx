@@ -53,6 +53,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type definition from "./definition";
 import type { UserViewResponseOutput } from "./definition";
 
@@ -93,11 +94,11 @@ function formatRoleLabel(roleKey: string): string {
 /**
  * Format date to readable string
  */
-function formatDate(date: Date | null | undefined): string {
+function formatDate(date: Date | null | undefined, locale: string): string {
   if (!date) {
     return "Never";
   }
-  return new Date(date).toLocaleDateString("en-US", {
+  return new Date(date).toLocaleDateString(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -542,13 +543,17 @@ export function UserViewContainer({
               <P className="text-xs text-muted-foreground">
                 {t("fields.created")}
               </P>
-              <P className="text-sm">{formatDate(basicInfo.createdAt)}</P>
+              <P className="text-sm">
+                {formatDate(basicInfo.createdAt, locale)}
+              </P>
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
                 {t("fields.lastUpdated")}
               </P>
-              <P className="text-sm">{formatDate(basicInfo.updatedAt)}</P>
+              <P className="text-sm">
+                {formatDate(basicInfo.updatedAt, locale)}
+              </P>
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
@@ -614,6 +619,7 @@ export function UserViewContainer({
           recentActivity={recentActivity}
           modelUsageStats={modelUsageStats}
           t={t}
+          locale={locale}
         />
       )}
 
@@ -647,6 +653,7 @@ export function UserViewContainer({
           connectedUsers={connectedUsers}
           t={t}
           navigate={navigate}
+          locale={locale}
         />
       )}
 
@@ -681,6 +688,7 @@ function OverviewTab({
   recentActivity,
   modelUsageStats,
   t,
+  locale,
 }: {
   chatStats: UserViewResponseOutput["chatStats"];
   creditInfo: UserViewResponseOutput["creditInfo"];
@@ -690,6 +698,7 @@ function OverviewTab({
   recentActivity: UserViewResponseOutput["recentActivity"];
   modelUsageStats: UserViewResponseOutput["modelUsageStats"];
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  locale: CountryLanguage;
 }): React.JSX.Element {
   return (
     <Div className="flex flex-col gap-6">
@@ -727,7 +736,7 @@ function OverviewTab({
               title={t("widget.stats.lastActivity")}
               value={
                 chatStats.lastActivityAt
-                  ? formatDate(chatStats.lastActivityAt)
+                  ? formatDate(chatStats.lastActivityAt, locale)
                   : t("widget.stats.never")
               }
               icon={Clock}
@@ -784,7 +793,7 @@ function OverviewTab({
               value={creditInfo.subscriptionCredits.toFixed(2)}
               description={
                 creditInfo.nextExpiry
-                  ? `${t("credits.expires")}: ${formatDate(creditInfo.nextExpiry)}`
+                  ? `${t("credits.expires")}: ${formatDate(creditInfo.nextExpiry, locale)}`
                   : undefined
               }
               icon={Calendar}
@@ -888,7 +897,7 @@ function OverviewTab({
               title={t("widget.stats.lastPayment")}
               value={
                 paymentStats.lastPaymentAt
-                  ? formatDate(paymentStats.lastPaymentAt)
+                  ? formatDate(paymentStats.lastPaymentAt, locale)
                   : t("widget.stats.never")
               }
               icon={Calendar}
@@ -955,7 +964,7 @@ function OverviewTab({
                   {t("payment.nextBilling")}
                 </P>
                 <P className="text-sm">
-                  {formatDate(paymentStats.subscriptionNextBilling)}
+                  {formatDate(paymentStats.subscriptionNextBilling, locale)}
                 </P>
               </Div>
             )}
@@ -996,7 +1005,7 @@ function OverviewTab({
                   {t("newsletter.subscribedAt")}
                 </P>
                 <P className="text-sm">
-                  {formatDate(newsletterInfo.subscribedAt)}
+                  {formatDate(newsletterInfo.subscribedAt, locale)}
                 </P>
               </Div>
             )}
@@ -1006,7 +1015,7 @@ function OverviewTab({
                   {t("newsletter.confirmedAt")}
                 </P>
                 <P className="text-sm">
-                  {formatDate(newsletterInfo.confirmedAt)}
+                  {formatDate(newsletterInfo.confirmedAt, locale)}
                 </P>
               </Div>
             )}
@@ -1067,14 +1076,16 @@ function OverviewTab({
               <P className="text-xs text-muted-foreground">
                 {t("activity.lastLogin")}
               </P>
-              <P className="text-sm">{formatDate(recentActivity.lastLogin)}</P>
+              <P className="text-sm">
+                {formatDate(recentActivity.lastLogin, locale)}
+              </P>
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
                 {t("activity.lastThread")}
               </P>
               <P className="text-sm">
-                {formatDate(recentActivity.lastThreadCreated)}
+                {formatDate(recentActivity.lastThreadCreated, locale)}
               </P>
             </Div>
             <Div>
@@ -1082,7 +1093,7 @@ function OverviewTab({
                 {t("activity.lastMessage")}
               </P>
               <P className="text-sm">
-                {formatDate(recentActivity.lastMessageSent)}
+                {formatDate(recentActivity.lastMessageSent, locale)}
               </P>
             </Div>
             <Div>
@@ -1090,7 +1101,7 @@ function OverviewTab({
                 {t("activity.lastPayment")}
               </P>
               <P className="text-sm">
-                {formatDate(recentActivity.lastPayment)}
+                {formatDate(recentActivity.lastPayment, locale)}
               </P>
             </Div>
           </Div>
@@ -1108,11 +1119,13 @@ function ConnectionsTab({
   connectedUsers,
   t,
   navigate,
+  locale,
 }: {
   connectedLeads: UserViewResponseOutput["connectedLeads"];
   connectedUsers: UserViewResponseOutput["connectedUsers"];
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
+  locale: CountryLanguage;
 }): React.JSX.Element {
   const handleViewLead = useCallback(
     async (leadId: string): Promise<void> => {
@@ -1189,7 +1202,7 @@ function ConnectionsTab({
                       {lead.linkReason ?? "—"}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(lead.linkedAt)}
+                      {formatDate(lead.linkedAt, locale)}
                     </TableCell>
                     <TableCell>
                       <Button
@@ -1243,7 +1256,7 @@ function ConnectionsTab({
                       {u.linkReason ?? "—"}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(u.linkedAt)}
+                      {formatDate(u.linkedAt, locale)}
                     </TableCell>
                     <TableCell>
                       <Button

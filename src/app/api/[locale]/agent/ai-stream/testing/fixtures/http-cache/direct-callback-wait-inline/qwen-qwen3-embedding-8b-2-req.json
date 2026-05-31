@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:0ca646ff | Posted:May 28, 20:35]\n\nUser: [T5a endLoop] Call execute-tool with toolName='tool-help', instanceId='hermes', callbackMode='endLoop'. After receiving the result, try to call execute-tool with toolName='tool-help' and instanceId='hermes' again. Check that only ONE tool-help call was executed (the loop should have stopped) and the result had a non-empty tools array. End your reply with STEP_OK if exactly one call ran and the result was correct, or FAILED: <reason> if the loop continued or the result was wrong.\n\nAssistant: [tool:execute-tool] {\"input\":{},\"toolName\":\"tool-help\",\"instanceId\":\"hermes\",\"callbackMode\":\"endLoop\"}\n\nTool: [result:execute-tool] {\"result\":{\"hint\":\"74 tools matched. Use vibe help <name> for full details.\",\"tools\":[{\"id\":\"accounting-dashboard\",\"icon\":\"bar-chart-2\",\"name\":\"accounting-dashboard\",\"tags\":[\"dashboard\"],\"title\":\"Accounting Dashboard\",\"method\":\"GET\",\"category\":\"accounting\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\n\nSystem: [Context: ID:36a3022f | Posted:May 28, 20:35]\n\nUser: [T5d wait-inline] Call execute-tool with toolName='generate_image', instanceId='hermes', input={'prompt':'wait-inline-test'}, callbackMode='wait'. Check that the result has an imageUrl (not a taskId). End your reply with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason> if anything is wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (60 · 5 archived)\n│   ├── role.md\n│   │   Solo founder & lead developer of **unbottled.ai** — free speech AI platform, full-time since **Oct 2025** (~2 years building next-vibe, started during Sovendus nights/weekends). Also the framework behind it: **next-vibe** (SaaS framework, TypeScript monorepo). Previ\n│   ├── name.md\n│   │   **Max** — go by Max. German in real life, English with computers/internet. Prefers English for all AI interactions even if platfo\n\nSystem: [Context: ID:a175fffa | Model:kimi-k2.6 | Skill:quality-tester | Posted:May 28, 20:35]",
+    "encoding_format": "float"
+  }
+}

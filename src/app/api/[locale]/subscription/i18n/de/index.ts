@@ -253,6 +253,10 @@ export const translations: typeof enTranslations = {
         label: "Zahlungsanbieter",
         description: "Wählen Sie Ihren Zahlungsanbieter",
       },
+      catalogProductId: {
+        label: "Katalogprodukt",
+        description: "Dieses Abonnement mit einem Katalogprodukt verknüpfen",
+      },
       cancelAtPeriodEnd: {
         label: "Am Periodenende kündigen",
         description: "Abonnement am Ende der aktuellen Periode kündigen",
@@ -486,6 +490,18 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  // Widget-specific keys (cancel confirmation dialog, etc.)
+  widget: {
+    back: "Zurück",
+    confirm: {
+      title: "Abonnement wirklich kündigen?",
+      description:
+        "Der Zugriff endet am Ende des Abrechnungszeitraums. Dieser Schritt kann nicht rückgängig gemacht werden.",
+      cancel: "Abonnement behalten",
+      proceed: "Ja, kündigen",
+    },
+  },
+
   // Widget display keys
   title: "Ihr Abonnement",
   description: "Verwalten Sie Ihr Abonnement und Ihre Abrechnung",
@@ -513,6 +529,10 @@ export const translations: typeof enTranslations = {
     },
     stripe: {
       button: "Abonnement verwalten",
+    },
+    portal: {
+      error:
+        "Kundenportal konnte nicht geöffnet werden. Bitte versuchen Sie es erneut.",
     },
   },
 

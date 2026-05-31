@@ -190,6 +190,7 @@ export const translations = {
     search: "Wyszukiwanie",
     favorite: "Ulubiony",
     gen: "Wygenerowane",
+    ssh: "Połączenie SSH",
   },
   button: {
     label: "Korteks",

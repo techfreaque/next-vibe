@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----faec14ee-2fc3-4dde-ba59-539e61a37255.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\n\nuser: [T1 thread-create+tool-call] Use the tool-help tool to list available tools. Check that the result contains a non-empty tools array and that each tool has a name and description. End your reply with STEP_OK if everything worked, or FAILED: <reason> if anything was wrong.\nassistant: <think>The user wants me to use the `tool-help` tool to list available tools, then verify that the result contains a non-empty `tools` array and that each tool has a `name` and `description`. I need to end with `STEP_OK` if everything worked, or `FAILED: <reason>` if anything was wrong.\n\nLet me call `tool-help` with no parameters to list all tools.</think>\ntool: \nassistant: <think>The tool-help call returned successfully. Let me verify the requirements:\n\n1. Result contains a non-empty tools array - Yes, the response shows 545 tools total, and the tools array has 25 entries on this page.\n2. Each tool has a name - Yes, every tool object has a \"name\" field (e.g., \"accounting-dashboard\", \"coa-account-create\", etc.)\n3. Each tool has a description - Yes, every tool object has a \"description\" field.\n\nEverything checks out. I should end with STEP_OK.</think>STEP_OK\nuser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\nassistant: <think>The user wants me to call tool-help with toolName='generate_image' and verify that the result contains name, description, and parameters schema.</think>\ntool: \nassistant: <think>The result contains:\n- `name`: \"generate_image\"\n- `description`: \"Generate an image from a text prompt using AI\"\n- `parameters`: a full JSON schema with properties, required fields, etc.\n\nAll three are present. I should reply with STEP_OK.</think>Result contains `name` (\"generate_image\"), `description` (\"Generate an image from a text prompt using AI\"), and `parameters` (full JSON schema with properties, required fields, enums, etc.).\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

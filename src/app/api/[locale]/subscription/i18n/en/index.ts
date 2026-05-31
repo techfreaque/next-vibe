@@ -234,6 +234,10 @@ export const translations = {
         label: "Payment Provider",
         description: "Select your payment provider",
       },
+      catalogProductId: {
+        label: "Catalog Product",
+        description: "Link to a catalog product for this subscription",
+      },
       cancelAtPeriodEnd: {
         label: "Cancel at Period End",
         description: "Cancel subscription at the end of current period",
@@ -462,6 +466,18 @@ export const translations = {
     },
   },
 
+  // Widget-specific keys (cancel confirmation dialog, etc.)
+  widget: {
+    back: "Back",
+    confirm: {
+      title: "Cancel your subscription?",
+      description:
+        "This ends your access at the end of the billing period. There's no undo.",
+      cancel: "Keep subscription",
+      proceed: "Yes, cancel it",
+    },
+  },
+
   // Widget display keys
   title: "Your Subscription",
   description: "Manage your subscription and billing",
@@ -489,6 +505,9 @@ export const translations = {
     },
     stripe: {
       button: "Manage Subscription",
+    },
+    portal: {
+      error: "Failed to open customer portal. Please try again.",
     },
   },
 

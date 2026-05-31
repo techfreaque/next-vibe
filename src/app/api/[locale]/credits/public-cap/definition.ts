@@ -21,6 +21,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import { CREDITS_PUBLIC_CAP_ALIAS } from "./constants";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
@@ -36,8 +37,9 @@ const PublicCapUpdateContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   path: ["credits", "public-cap"],
-  category: "endpointCategories.credits",
-  subCategory: "endpointCategories.creditsManagement",
+  aliases: [CREDITS_PUBLIC_CAP_ALIAS] as const,
+  category: "credits",
+  subCategory: "Management",
   tags: ["tags.publicCap", "tags.admin"],
   icon: "shield",
   allowedRoles: [UserRole.ADMIN] as const,
@@ -146,8 +148,8 @@ const { GET } = createEndpoint({
 const { POST } = createEndpoint({
   scopedTranslation,
   path: ["credits", "public-cap"],
-  category: "endpointCategories.credits",
-  subCategory: "endpointCategories.creditsManagement",
+  category: "credits",
+  subCategory: "Management",
   tags: ["tags.publicCap", "tags.admin"],
   icon: "shield",
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,

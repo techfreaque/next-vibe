@@ -36,7 +36,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { scopedTranslation as tasksScopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
 import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler";
-import { TaskSyncRepository } from "@/app/api/[locale]/system/unified-interface/tasks/task-sync/repository";
+import { TaskSyncRepository } from "@/app/api/[locale]/remote-connection/sync/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -215,7 +215,7 @@ export class TaskExecuteRepository {
     const retryDelayMs = task.retryDelay ?? 30000;
 
     const { RemoteConnectionRepository } =
-      await import("@/app/api/[locale]/user/remote-connection/repository");
+      await import("@/app/api/[locale]/remote-connection/repository");
     const instanceId = user.id
       ? await RemoteConnectionRepository.getLocalInstanceId(user.id)
       : RemoteConnectionRepository.deriveDefaultSelfInstanceId();

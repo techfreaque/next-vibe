@@ -23,9 +23,10 @@ export const { POST } = createEndpoint({
   title: "deploy.preview.post.title",
   description: "deploy.preview.post.description",
   icon: "eye",
-  category: "endpointCategories.devTools",
-  subCategory: "endpointCategories.devToolsGenerators",
+  category: "devTools",
+  subCategory: "Generators",
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
   aliases: ["deploy-preview", "infra-preview"],
   tags: ["category" as const],
 

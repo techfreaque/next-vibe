@@ -5,8 +5,8 @@
  * Uses the real connect/disconnect HTTP endpoints for proper E2E setup.
  *
  * Two connection directions:
- *   hermes-dev → hermes  (direct HTTP, isDirectlyAccessible=true)
- *   hermes → hermes-dev  (queue path, isDirectlyAccessible=false)
+ *   hermes-dev → hermes  (direct HTTP, transportMode='direct-http')
+ *   hermes → hermes-dev  (queue path, transportMode='cloud-only' + allowTaskQueue=true)
  *
  * `connectToHermes()` calls the local connect endpoint via HTTP, which:
  *   1. Logs into the prod server with email+password
@@ -18,8 +18,10 @@
 
 import "server-only";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { existsSync, readFileSync } from "node:fs";
+
 import { and, eq, sql } from "drizzle-orm";
+import { z } from "zod";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
@@ -27,11 +29,13 @@ import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import * as userSchema from "@/app/api/[locale]/user/db";
-import * as remoteConnectionSchema from "@/app/api/[locale]/user/remote-connection/db";
-import { remoteConnections } from "@/app/api/[locale]/user/remote-connection/db";
+import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
+import {
+  remoteConnections,
+  RemoteToolCapabilitySchema,
+} from "@/app/api/[locale]/remote-connection/db";
 import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
-import { RESUME_STREAM_ALIAS } from "../resume-stream/constants";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -47,8 +51,105 @@ export const DEV_URL = "http://localhost:3000";
 /** Prod server URL (hermes, vibe start) */
 export const PROD_URL = "http://localhost:3001";
 
-/** Port for the prod PostgreSQL database */
+/** Local-dev server URL (hermes, vibe --local dev) */
+export const LOCAL_DEV_URL = "http://localhost:3002";
+
+/** PID file for vibe start (hermes prod build) */
+export const VIBE_START_PID_FILE_PATH = ".tmp/.vibe-start.pid";
+
+/** PID file for vibe --local dev (hermes local dev) */
+export const VIBE_LOCAL_PID_FILE_PATH = ".tmp/.vibe-local.pid";
+
+/** Port for the prod/preview PostgreSQL database */
 const PROD_DB_PORT = 5433;
+
+// ── Server detection ──────────────────────────────────────────────────────────
+
+/**
+ * Read the PORT:<n> line from a pid file.
+ * Returns null if the file is missing.
+ */
+export function readServerPort(pidFile: string): number | null {
+  if (!existsSync(pidFile)) {
+    return null;
+  }
+  try {
+    const content = readFileSync(pidFile, "utf-8");
+    const match = /^PORT:(\d+)$/m.exec(content);
+    if (match?.[1]) {
+      return parseInt(match[1], 10);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Returns true if a server is reachable: pid file exists with a PORT line
+ * and a GET /api/en-US/system/server/health returns 200.
+ */
+export async function isServerRunning(
+  url: string,
+  pidFile: string,
+): Promise<boolean> {
+  if (!readServerPort(pidFile)) {
+    return false;
+  }
+  try {
+    const resp = await fetch(`${url}/api/en-US/system/server/health`, {
+      signal: AbortSignal.timeout(3000),
+    });
+    // Accept any response that isn't a network error — 401/403 still means server is up.
+    return resp.status < 500;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolve the remote URL: only checks port 3002 (vibe --local dev --fixture-mode).
+ * Returns null if the server is not running.
+ *
+ * To run remote integration tests, start the local dev server in fixture mode:
+ *   vibe --local dev --fixture-mode
+ */
+export async function resolveRemoteUrl(): Promise<string | null> {
+  if (await isServerRunning(LOCAL_DEV_URL, VIBE_LOCAL_PID_FILE_PATH)) {
+    return LOCAL_DEV_URL;
+  }
+  return null;
+}
+
+/**
+ * Check whether all listed servers are reachable.
+ * Returns true if all are up, false otherwise (caller should use describe.skipIf).
+ * Prints a clear skip message to stderr listing missing servers and start commands.
+ */
+export async function checkServersReady(
+  servers: {
+    url: string;
+    pidFile: string;
+    label: string;
+    startCmd: string;
+  }[],
+): Promise<boolean> {
+  const missing: { label: string; startCmd: string }[] = [];
+  for (const server of servers) {
+    const running = await isServerRunning(server.url, server.pidFile);
+    if (!running) {
+      missing.push({ label: server.label, startCmd: server.startCmd });
+    }
+  }
+  if (missing.length > 0) {
+    const hints = missing.map((m) => `  ${m.label}: ${m.startCmd}`).join("\n");
+    process.stderr.write(
+      `[test skip] Required servers not running:\n${hints}\n`,
+    );
+    return false;
+  }
+  return true;
+}
 
 // ── Prod DB connection ────────────────────────────────────────────────────────
 
@@ -57,7 +158,7 @@ let prodDb: ReturnType<
   typeof drizzle<typeof userSchema & typeof remoteConnectionSchema>
 > | null = null;
 
-function getProdDb(): ReturnType<
+export function getProdDb(): ReturnType<
   typeof drizzle<typeof userSchema & typeof remoteConnectionSchema>
 > {
   if (!prodDb) {
@@ -90,6 +191,56 @@ export async function closeProdDb(): Promise<void> {
 }
 
 // ── Prod user resolution ──────────────────────────────────────────────────────
+
+/**
+ * Resolve the admin user's JwtPrivatePayloadType from the local (hermes-dev) DB.
+ * Used by integration tests that need a real user object.
+ */
+export async function resolveDevUser(
+  email: string,
+): Promise<JwtPrivatePayloadType | null> {
+  const { UserRepository } = await import("@/app/api/[locale]/user/repository");
+  const { UserDetailLevel } = await import("@/app/api/[locale]/user/enum");
+  const { userRoles } = await import("@/app/api/[locale]/user/db");
+  const { userLeadLinks } = await import("@/app/api/[locale]/leads/db");
+  const { eq: eqUser } = await import("drizzle-orm");
+  const { UserRoleDB } =
+    await import("@/app/api/[locale]/user/user-roles/enum");
+  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const result = await UserRepository.getUserByEmail(
+    email,
+    UserDetailLevel.STANDARD,
+    defaultLocale,
+    logger,
+  );
+  if (!result.success || !result.data) {
+    return null;
+  }
+  const user = result.data;
+  const [link, roleRows] = await Promise.all([
+    db
+      .select({ leadId: userLeadLinks.leadId })
+      .from(userLeadLinks)
+      .where(eqUser(userLeadLinks.userId, user.id))
+      .limit(1),
+    db.select().from(userRoles).where(eqUser(userRoles.userId, user.id)),
+  ]);
+  const leadId = link[0]?.leadId;
+  if (!leadId) {
+    return null;
+  }
+  const roles = roleRows
+    .map((r) => r.role)
+    .filter((r): r is (typeof UserRoleDB)[number] =>
+      (UserRoleDB as readonly string[]).includes(r),
+    );
+  return {
+    isPublic: false as const,
+    id: user.id,
+    leadId,
+    roles,
+  };
+}
 
 /**
  * Resolve userId from the prod DB for cleanup purposes only.
@@ -160,17 +311,116 @@ export async function ensureProdUserCredits(
     return;
   }
 
-  // Insert a permanent pack and bump the wallet balance
+  // Insert a permanent pack and bump the wallet balance.
+  // Type must match CreditPackType.PERMANENT = "enums.packType.permanent" (not the raw "permanent" string).
   await pdb.execute(
     sql`INSERT INTO credit_packs (id, wallet_id, original_amount, remaining, type, expires_at, source, metadata, created_at, updated_at)
-        VALUES (gen_random_uuid(), ${walletId}, ${toAdd}, ${toAdd}, 'permanent', NULL, 'test_top_up', '{}', NOW(), NOW())`,
+        VALUES (gen_random_uuid(), ${walletId}, ${toAdd}, ${toAdd}, 'enums.packType.permanent', NULL, 'test_top_up', '{}', NOW(), NOW())`,
   );
   await pdb.execute(
     sql`UPDATE credit_wallets SET balance = balance + ${toAdd}, updated_at = NOW() WHERE id = ${walletId}`,
   );
 }
 
+// ── Remote endpoint calls ─────────────────────────────────────────────────────
+
+/**
+ * Call a real endpoint on the remote server using an admin JWT.
+ * Minimal helper — only call what you need, don't expand scope.
+ *
+ * @param remoteUrl - base URL of the remote (e.g. "http://localhost:3002")
+ * @param adminToken - admin JWT obtained via resolveProdAdminToken(remoteUrl)
+ * @param path - endpoint path segments, e.g. ["credits", "admin-add"]
+ * @param body - JSON body to POST
+ * @returns parsed response body
+ */
+interface RemoteEndpointResponse {
+  success: boolean;
+  data?: Record<string, string | number | boolean | null>;
+  message?: string;
+}
+
+export async function callRemoteEndpoint(
+  remoteUrl: string,
+  adminToken: string,
+  path: string[],
+  body: Record<string, string | number | boolean | null>,
+): Promise<RemoteEndpointResponse> {
+  const url = `${remoteUrl}/api/en-US/${path.join("/")}`;
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      // eslint-disable-next-line i18next/no-literal-string
+      Authorization: `Bearer ${adminToken}`,
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10_000),
+  });
+  const text = await resp.text();
+  try {
+    return JSON.parse(text) as RemoteEndpointResponse;
+  } catch {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+    throw new Error(
+      `callRemoteEndpoint ${url}: HTTP ${String(resp.status)}, non-JSON: ${text.slice(0, 200)}`,
+    );
+  }
+}
+
+/**
+ * Ensure a user has at least `minCredits` credits on the remote server.
+ * Uses the credits/admin-add endpoint — works for any remote host and DB.
+ *
+ * Call this instead of ensureProdUserCredits when the userId comes from the
+ * local dev DB and may not exist in the remote's DB yet.
+ */
+export async function ensureRemoteUserCredits(
+  remoteUrl: string,
+  adminToken: string,
+  userId: string,
+  minCredits: number,
+): Promise<void> {
+  const result = await callRemoteEndpoint(
+    remoteUrl,
+    adminToken,
+    ["credits", "admin-add"],
+    { targetUserId: userId, amount: minCredits },
+  );
+  if (!result.success) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[ensureRemoteUserCredits] Failed to add credits for ${userId}: ${result.message ?? "unknown error"}`,
+    );
+  }
+}
+
 // ── Connection setup ──────────────────────────────────────────────────────────
+
+/** Resolve after `ms` milliseconds. */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+/**
+ * Returns true if the connectRemote failure is transient (server overloaded, timeout).
+ * These errors are safe to retry after a short wait.
+ */
+function isConnectTransientFailure(msg: string | undefined): boolean {
+  if (!msg) {
+    return false;
+  }
+  return (
+    msg.includes("Connection Failed") ||
+    msg.includes("Remote Server Error") ||
+    msg.includes("network") ||
+    msg.includes("Network") ||
+    msg.toLowerCase().includes("timeout") ||
+    msg.toLowerCase().includes("fetch")
+  );
+}
 
 /**
  * Establish hermes-dev → hermes connection in-process via connectRemote.
@@ -182,17 +432,21 @@ export async function ensureProdUserCredits(
  */
 export async function connectToHermes(
   user: JwtPrivatePayloadType,
+  remoteUrl: string = LOCAL_DEV_URL,
 ): Promise<void> {
   const { RemoteConnectionConnectRepository } =
-    await import("@/app/api/[locale]/user/remote-connection/connect/repository");
+    await import("@/app/api/[locale]/remote-connection/connect/repository");
   const { scopedTranslation } =
-    await import("@/app/api/[locale]/user/remote-connection/connect/i18n");
+    await import("@/app/api/[locale]/remote-connection/connect/i18n");
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
 
-  const result = await RemoteConnectionConnectRepository.connectRemote(
+  // connectRemote pings the remote server; if it's temporarily slow (e.g. after
+  // handling many test requests), the 10s ping timeout fires. Retry once after a
+  // short delay to give the server time to recover.
+  let result = await RemoteConnectionConnectRepository.connectRemote(
     {
-      remoteUrl: PROD_URL,
+      remoteUrl,
       email: env.VIBE_ADMIN_USER_EMAIL,
       password: env.VIBE_ADMIN_USER_PASSWORD,
     },
@@ -201,6 +455,49 @@ export async function connectToHermes(
     t,
     defaultLocale,
   );
+
+  // Transient failure: wait and retry — Vite dev server may be momentarily busy.
+  // connectRemote returns "Connection Failed" when the remote ping times out (AbortSignal).
+  // connectRemote returns "Remote Server Error" when the registration HTTP call times out.
+  if (!result.success && isConnectTransientFailure(result.message)) {
+    // eslint-disable-next-line no-console
+    console.log(
+      "[connectToHermes] Transient error — waiting 15s before retry:",
+      result.message,
+    );
+    await sleep(15000);
+    result = await RemoteConnectionConnectRepository.connectRemote(
+      {
+        remoteUrl,
+        email: env.VIBE_ADMIN_USER_EMAIL,
+        password: env.VIBE_ADMIN_USER_PASSWORD,
+      },
+      user,
+      logger,
+      t,
+      defaultLocale,
+    );
+    // Second retry if still failing
+    if (!result.success && isConnectTransientFailure(result.message)) {
+      // eslint-disable-next-line no-console
+      console.log(
+        "[connectToHermes] Still failing — waiting 15s for second retry:",
+        result.message,
+      );
+      await sleep(15000);
+      result = await RemoteConnectionConnectRepository.connectRemote(
+        {
+          remoteUrl,
+          email: env.VIBE_ADMIN_USER_EMAIL,
+          password: env.VIBE_ADMIN_USER_PASSWORD,
+        },
+        user,
+        logger,
+        t,
+        defaultLocale,
+      );
+    }
+  }
 
   if (!result.success) {
     // "Already Connected" means hermes still has the registration from a previous run
@@ -229,7 +526,7 @@ export async function connectToHermes(
       // Retry connect
       const retry = await RemoteConnectionConnectRepository.connectRemote(
         {
-          remoteUrl: PROD_URL,
+          remoteUrl,
           email: env.VIBE_ADMIN_USER_EMAIL,
           password: env.VIBE_ADMIN_USER_PASSWORD,
         },
@@ -248,12 +545,27 @@ export async function connectToHermes(
     throw new Error(`connectToHermes: ${result.message}`);
   }
 
-  // The isDirectlyAccessible field is normally set asynchronously by the remote
-  // ping when the reverse connection is registered on hermes. For tests we know
-  // hermes (localhost:3001) is directly reachable, so set it explicitly here.
+  // transportMode is normally set asynchronously by the remote ping when the
+  // reverse connection is registered on hermes. For tests we know hermes
+  // (localhost:3001) is directly reachable, so set it explicitly here.
+  // Also lock in the relay settings for E2E tests: local client always provides
+  // system prompt + tools; remote runs the AI loop; threads mirrored on both sides.
   await db
     .update(remoteConnections)
-    .set({ isDirectlyAccessible: true, updatedAt: new Date() })
+    .set({
+      transportMode: "direct-http",
+      loopLocation: "server",
+      toolSource: "local",
+      threadMirrorMode: "both",
+      // resolveTarget() checks routingRules.isDefault (JSON column), NOT the DB isDefault boolean.
+      // Without this, resolveTarget() returns null and the AI loop runs locally, defeating the relay.
+      routingRules: {
+        folderIds: [],
+        handlesModelProviders: [],
+        isDefault: true,
+      },
+      updatedAt: new Date(),
+    })
     .where(
       and(
         eq(remoteConnections.userId, user.id),
@@ -293,12 +605,96 @@ export async function unregisterDevFromHermes(
 /**
  * Trigger an immediate task-sync pull on hermes-dev without waiting the full
  * 60s pulse cycle. Calls TaskSyncRepository.pullFromRemote in-process.
+ *
+ * If the remote pull fails (e.g. TanStack dev server socket error), falls back
+ * to seeding capabilities locally from the generated JSON so tests can proceed.
  */
 export async function triggerPull(): Promise<void> {
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
   const { TaskSyncRepository } =
-    await import("@/app/api/[locale]/system/unified-interface/tasks/task-sync/repository");
+    await import("@/app/api/[locale]/remote-connection/sync/repository");
   await TaskSyncRepository.pullFromRemote(logger, defaultLocale);
+
+  // Always seed capabilities after pull — the pull succeeds even when individual
+  // connection syncs fail (e.g. TanStack dev socket error). seedCapabilities is
+  // a no-op for connections that already have a snapshot.
+  await seedCapabilitiesForAllConnections(logger);
+}
+
+/**
+ * Directly write local capability JSON into remote_connections.capabilities
+ * for every active connection that still has no capabilities snapshot.
+ *
+ * Used as a fallback when the remote sync endpoint is unreachable (e.g.
+ * TanStack dev server socket errors during test runs). The local capability
+ * JSON represents what the local instance exposes; since both sides run the
+ * same codebase in tests, this is an accurate stand-in for the remote's caps.
+ */
+async function seedCapabilitiesForAllConnections(
+  logger: ReturnType<typeof createEndpointLogger>,
+): Promise<void> {
+  const { RemoteConnectionRepository } =
+    await import("@/app/api/[locale]/remote-connection/repository");
+
+  // Load admin capabilities (tests run as admin)
+  const capFileImport =
+    await import("@/app/api/[locale]/system/generated/remote-capabilities/en/admin.json").catch(
+      () => null,
+    );
+  if (!capFileImport) {
+    logger.warn("[triggerPull] No capability JSON found — skipping seed");
+    return;
+  }
+
+  const caps = z
+    .array(RemoteToolCapabilitySchema)
+    .safeParse(capFileImport.default);
+  if (!caps.success) {
+    logger.warn("[triggerPull] Capability JSON parse failed — skipping seed");
+    return;
+  }
+
+  // Query connections that have no capabilities snapshot yet
+  const rows = await db
+    .select({
+      userId: remoteConnections.userId,
+      instanceId: remoteConnections.instanceId,
+      capabilities: remoteConnections.capabilities,
+    })
+    .from(remoteConnections)
+    .where(eq(remoteConnections.isActive, true));
+
+  // eslint-disable-next-line no-console
+  console.log(
+    "[seedCaps] active connections found:",
+    rows.length,
+    rows.map((r) => ({
+      instanceId: r.instanceId,
+      hasCaps: r.capabilities !== null && r.capabilities.length > 0,
+    })),
+  );
+
+  for (const row of rows) {
+    if (row.capabilities && row.capabilities.length > 0) {
+      continue; // already populated
+    }
+    await RemoteConnectionRepository.touchLastSynced(
+      row.userId,
+      row.instanceId,
+      { capabilities: caps.data },
+    );
+    // eslint-disable-next-line no-console
+    console.log(
+      "[seedCaps] Seeded capabilities for connection",
+      row.instanceId,
+      "count:",
+      caps.data.length,
+    );
+    logger.debug("[triggerPull] Seeded capabilities for connection", {
+      instanceId: row.instanceId,
+      count: caps.data.length,
+    });
+  }
 }
 
 // ── Prod admin token ──────────────────────────────────────────────────────────
@@ -308,14 +704,17 @@ export async function triggerPull(): Promise<void> {
  * Uses VIBE_ADMIN_USER_EMAIL + VIBE_ADMIN_USER_PASSWORD from env.
  * The stored remoteConnections token is a device token (Public role), not admin.
  */
-export async function resolveProdAdminToken(): Promise<string> {
-  const response = await fetch(`${PROD_URL}/api/en-US/user/public/login`, {
+export async function resolveProdAdminToken(
+  remoteUrl: string = LOCAL_DEV_URL,
+): Promise<string> {
+  const response = await fetch(`${remoteUrl}/api/en-US/user/public/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       email: env.VIBE_ADMIN_USER_EMAIL,
       password: env.VIBE_ADMIN_USER_PASSWORD,
     }),
+    signal: AbortSignal.timeout(10_000),
   });
   if (!response.ok) {
     const err = await response.text().catch(() => "unknown");
@@ -335,880 +734,18 @@ export async function resolveProdAdminToken(): Promise<string> {
   return json.data.token;
 }
 
-// ── Local pulse trigger ───────────────────────────────────────────────────────
+// ── Hermes pull trigger ───────────────────────────────────────────────────────
 
 /**
- * Run hermes-dev's local revival in-process by simulating what hermes would do.
- *
- * Problem: hermes (port 3001) and hermes-dev (port 3000) share the same codebase
- * and similar DB setup. The execute-tool task is created in hermes-dev's DB as
- * enabled=false (to prevent local pulse from running it). Hermes's automated cron
- * is unreliable in local dev - it may or may not pick up the task depending on
- * timing and cursor state. Polling for hermes to execute + /report back is fragile.
- *
- * Additionally: when hermes does post /report and create a resume-stream cron task,
- * hermes-dev's automated server cron races to pick it up immediately (within ~0.4s),
- * running the revival without the test's fetch-cache interceptor active → AI call
- * hits real endpoints → fails → thread stuck in 'waiting'.
- *
- * Solution: skip hermes execution entirely. Find the pending remote execute-tool
- * task in hermes-dev's DB (enabled=false, lastExecutionStatus=null), simulate
- * hermes completing it via handleTaskCompletion with directResumeUser, which:
- *   1. Backfills the tool result into the originating tool message
- *   2. Creates a resume-stream cron task (safety net)
- *   3. Fires ResumeStreamRepository.resume directly in-process (fetch-cache active)
- *
- * The atomic 'waiting'→'streaming' claim prevents double-revival if the server
- * cron also picks up the resume-stream safety-net task.
- *
- * @param threadId - the thread ID to watch; used to filter the remote task
- */
-export async function triggerLocalPulse(threadId: string): Promise<void> {
-  const { cronTasks } =
-    await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const pulseAbortController = new AbortController();
-
-  // Find ALL pending remote execute-tool tasks for this thread.
-  // For parallel tool calls, multiple tasks can be pending simultaneously.
-  // We process all WAIT tasks in one batch to avoid sequential per-task revivals
-  // which would cause branch violations (each revival creates a sibling AI child).
-  const remoteTasks = await db
-    .select({
-      id: cronTasks.id,
-      routeId: cronTasks.routeId,
-      taskInput: cronTasks.taskInput,
-      targetInstance: cronTasks.targetInstance,
-      wakeUpThreadId: cronTasks.wakeUpThreadId,
-      wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
-      wakeUpCallbackMode: cronTasks.wakeUpCallbackMode,
-      wakeUpModelId: cronTasks.wakeUpModelId,
-      wakeUpSkillId: cronTasks.wakeUpSkillId,
-      wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
-      wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
-      wakeUpSubAgentDepth: cronTasks.wakeUpSubAgentDepth,
-      userId: cronTasks.userId,
-    })
-    .from(cronTasks)
-    .where(
-      and(
-        eq(cronTasks.wakeUpThreadId, threadId),
-        sql`${cronTasks.lastExecutionStatus} IS NULL`,
-        sql`${cronTasks.enabled} = false`,
-        sql`${cronTasks.targetInstance} IS NOT NULL`,
-      ),
-    )
-    .orderBy(sql`${cronTasks.createdAt} DESC`);
-
-  const [remoteTask] = remoteTasks;
-
-  if (!remoteTask) {
-    // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
-    throw new Error(
-      `[triggerLocalPulse] No pending remote task found for thread ${threadId}`,
-    );
-  }
-
-  const userId = remoteTask.userId;
-  if (
-    !userId ||
-    !remoteTask.wakeUpToolMessageId ||
-    !remoteTask.wakeUpCallbackMode
-  ) {
-    // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
-    throw new Error(
-      `[triggerLocalPulse] Remote task ${remoteTask.id} missing wakeUp context: ` +
-        `userId=${String(userId)}, toolMsgId=${String(remoteTask.wakeUpToolMessageId)}, ` +
-        `callbackMode=${String(remoteTask.wakeUpCallbackMode)}`,
-    );
-  }
-
-  // eslint-disable-next-line no-console
-  console.log(
-    "[triggerLocalPulse] Found pending remote task(s) - simulating completion",
-    {
-      taskCount: remoteTasks.length,
-      taskIds: remoteTasks.map((t) => t.id),
-      threadId,
-      callbackModes: remoteTasks.map((t) => t.wakeUpCallbackMode),
-    },
-  );
-
-  const { CronTaskStatus } =
-    await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
-  const { CallbackMode: CM } =
-    await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
-
-  // Build the task user JWT for direct revival.
-  const { userRoles: userRolesTable } =
-    await import("@/app/api/[locale]/user/db");
-  const { UserRoleDB } =
-    await import("@/app/api/[locale]/user/user-roles/enum");
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, userId),
-    }),
-    db.select().from(userRolesTable).where(eq(userRolesTable.userId, userId)),
-  ]);
-
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-
-  const taskUser = {
-    isPublic: false as const,
-    id: userId,
-    leadId: link?.leadId ?? userId,
-    roles,
-  };
-
-  // Execute the route handler in-process to get the real tool result.
-  // Running in-process ensures external AI API calls are intercepted by the
-  // fetch-cache interceptor active in the test process (so fixtures apply).
-  // hermes-dev has the same tool registry as hermes, so all tools are available locally.
-  const { getRouteHandler } =
-    await import("@/app/api/[locale]/system/generated/route-handlers");
-  const { getFullPath } =
-    await import("@/app/api/[locale]/system/unified-interface/shared/utils/path");
-  const { splitTaskArgs } =
-    await import("@/app/api/[locale]/system/unified-interface/tasks/cron/arg-splitter");
-  const { Platform } =
-    await import("@/app/api/[locale]/system/unified-interface/shared/types/platform");
-  const { DefaultFolderId } =
-    await import("@/app/api/[locale]/agent/chat/config");
-
-  /**
-   * Execute one remote task handler in-process and return its output.
-   * Returns null if the route is missing, handler not found, or throws.
-   */
-  async function executeTaskHandler(
-    task: (typeof remoteTasks)[number],
-  ): Promise<WidgetData | null> {
-    if (!task.routeId) {
-      return null;
-    }
-    const taskPath = getFullPath(task.routeId);
-    const routeHandler = taskPath ? await getRouteHandler(taskPath) : null;
-    if (!routeHandler) {
-      return null;
-    }
-
-    const taskInput = (task.taskInput ?? {}) as Record<string, WidgetData>;
-    const { data: handlerData, urlPathParams } = await splitTaskArgs(
-      taskPath!,
-      taskInput,
-    );
-    // eslint-disable-next-line no-console
-    console.log(
-      `[triggerLocalPulse] ${task.routeId} rawTaskInput=${JSON.stringify(task.taskInput)} handlerData=${JSON.stringify(handlerData)} taskId=${task.id}`,
-    );
-    if (task.routeId === "generate_video") {
-      const { CreditRepository: CR } =
-        await import("@/app/api/[locale]/credits/repository");
-      const { t: tC } = (
-        await import("@/app/api/[locale]/credits/i18n")
-      ).scopedTranslation.scopedT(defaultLocale);
-      const bal = await CR.getBalance(taskUser, logger, tC, defaultLocale);
-      // eslint-disable-next-line no-console
-      console.log(
-        `[triggerLocalPulse] generate_video data=${JSON.stringify(handlerData)} balance=${JSON.stringify(bal)}`,
-      );
-    }
-    const abortController = new AbortController();
-    const handlerResult = await routeHandler({
-      data: handlerData,
-      urlPathParams,
-      user: taskUser,
-      locale: defaultLocale,
-      logger,
-      // Use AI platform so that fields with hiddenForPlatforms: [Platform.AI, Platform.MCP]
-      // are treated as hidden, enabling serverDefault (e.g. videoGenModelId) to be applied.
-      // Without this, model fields fall back to schema defaults (WAN_2_7_T2V) instead of
-      // the resolved model from streamContext.
-      platform: Platform.AI,
-      // Pass the task's DB id as cronTaskId so interactive tools (e.g. coding-agent) can
-      // use path 2 (goroutine/cron context) and inject the taskId into the terminal prompt.
-      cronTaskId: task.id,
-      streamContext: {
-        rootFolderId: DefaultFolderId.BACKGROUND,
-        // Pass the real wakeUp context so wait-for-task can register T5b as a waiter
-        // on the dependency task (generate_image). Without threadId/currentToolMessageId,
-        // wait-for-task skips the registration (no effectiveThreadId) and the dependency
-        // task retains the original T5 detach wakeUp context instead of T5b's WAIT context.
-        threadId: task.wakeUpThreadId ?? undefined,
-        currentToolMessageId: task.wakeUpToolMessageId ?? undefined,
-        aiMessageId: task.wakeUpToolMessageId ?? undefined,
-        callerToolCallId: undefined,
-        pendingToolMessages: undefined,
-        pendingTimeoutMs: undefined,
-        leafMessageId: task.wakeUpLeafMessageId ?? undefined,
-        favoriteId: task.wakeUpFavoriteId ?? undefined,
-        skillId: task.wakeUpSkillId ?? undefined,
-        headless: undefined,
-        subAgentDepth: task.wakeUpSubAgentDepth ?? 0,
-        waitingForRemoteResult: undefined,
-        abortSignal: abortController.signal,
-        callerCallbackMode: undefined,
-        onEscalatedTaskCancel: undefined,
-        escalateToTask: undefined,
-        isRevival: undefined,
-        providerOverride: undefined,
-      },
-    }).catch((err: Error) => {
-      logger.warn("[triggerLocalPulse] handler execution failed", {
-        routeId: task.routeId,
-        error: err.message,
-      });
-      return null;
-    });
-
-    let taskOutput: WidgetData | null = null;
-    if (
-      handlerResult &&
-      "success" in handlerResult &&
-      handlerResult.success &&
-      "data" in handlerResult
-    ) {
-      taskOutput = handlerResult.data;
-    } else if (
-      handlerResult &&
-      "success" in handlerResult &&
-      !handlerResult.success
-    ) {
-      // eslint-disable-next-line no-console
-      console.log("[triggerLocalPulse] handler FAILED", {
-        routeId: task.routeId,
-        fullResult: JSON.stringify(handlerResult).slice(0, 500),
-      });
-    }
-    // eslint-disable-next-line no-console
-    console.log("[triggerLocalPulse] handler result", {
-      routeId: task.routeId,
-      success: handlerResult
-        ? (handlerResult as { success?: boolean }).success
-        : null,
-      message:
-        handlerResult && "message" in handlerResult
-          ? (handlerResult as { message?: string }).message
-          : undefined,
-      hasFavoriteId: !!task.wakeUpFavoriteId,
-      taskOutputWaiting:
-        taskOutput &&
-        typeof taskOutput === "object" &&
-        !Array.isArray(taskOutput) &&
-        !(taskOutput instanceof Date)
-          ? taskOutput["waiting"]
-          : "n/a",
-      taskOutputKeys:
-        taskOutput &&
-        typeof taskOutput === "object" &&
-        !Array.isArray(taskOutput) &&
-        !(taskOutput instanceof Date)
-          ? Object.keys(taskOutput)
-          : "n/a",
-    });
-    return taskOutput;
-  }
-
-  // Check if all tasks are parallel WAIT tasks (all callbackMode=WAIT, multiple tasks).
-  // Batch-process: backfill all non-last tasks without revival, then fire ONE revival
-  // for the last WAIT task. This prevents branch violations from per-task sequential revivals.
-  //
-  // Use allWait (not just hasWait): mixed-mode sets like T5b (wait-for-task=WAIT +
-  // generate_image=DETACH) are sequential dependencies handled by the isWaiting recursion.
-  // Only true parallel-tools scenarios produce multiple WAIT tasks in the same pulse.
-  const allWait = remoteTasks.every((t) => t.wakeUpCallbackMode === CM.WAIT);
-  const isParallelWait = allWait && remoteTasks.length > 1;
-
-  if (isParallelWait) {
-    // eslint-disable-next-line no-console
-    console.log(
-      "[triggerLocalPulse] Parallel tasks detected - batch processing (WAIT revival)",
-      {
-        count: remoteTasks.length,
-        modes: remoteTasks.map((t) => t.wakeUpCallbackMode),
-      },
-    );
-
-    // Import DB tools for manual backfill
-    const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
-    const { handleTaskCompletion } =
-      await import("@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler");
-
-    // Reorder so the WAIT task is always last (it drives the revival).
-    // Non-WAIT tasks (wakeUp, detach) are processed first as "non-last" (no revival).
-    const waitTasks = remoteTasks.filter(
-      (t) => t.wakeUpCallbackMode === CM.WAIT,
-    );
-    const nonWaitTasks = remoteTasks.filter(
-      (t) => t.wakeUpCallbackMode !== CM.WAIT,
-    );
-    // Last WAIT task fires revival; earlier WAIT tasks are backfilled without revival.
-    const orderedTasks = [...nonWaitTasks, ...waitTasks];
-
-    // Execute tasks sequentially. For non-last tasks, mark completed + store
-    // __result IMMEDIATELY after execution so that subsequent tasks (e.g.
-    // wait-for-task checking a dependency) can find the result in the DB.
-    const taskOutputs: (WidgetData | null)[] = [];
-    for (let i = 0; i < orderedTasks.length; i++) {
-      const task = orderedTasks[i]!;
-      const isLast = i === orderedTasks.length - 1;
-      // eslint-disable-next-line no-console
-      console.log("[triggerLocalPulse] Executing parallel batch task", {
-        taskId: task.id,
-        routeId: task.routeId,
-        callbackMode: task.wakeUpCallbackMode,
-        isLast,
-      });
-      // eslint-disable-next-line no-await-in-loop
-      const output = await executeTaskHandler(task);
-      taskOutputs.push(output);
-
-      // For non-last tasks: backfill result + mark completed immediately (no revival).
-      if (!isLast) {
-        const toolMessageId = task.wakeUpToolMessageId;
-        if (toolMessageId) {
-          // eslint-disable-next-line no-await-in-loop
-          const [existing] = await db
-            .select({ metadata: chatMessages.metadata })
-            .from(chatMessages)
-            .where(eq(chatMessages.id, toolMessageId));
-
-          if (existing) {
-            const toolCall = existing.metadata?.toolCall;
-            const stableOutput =
-              output !== null && output !== undefined
-                ? (JSON.parse(JSON.stringify(output)) as WidgetData)
-                : undefined;
-            // eslint-disable-next-line no-await-in-loop
-            await db
-              .update(chatMessages)
-              .set({
-                metadata: {
-                  ...existing.metadata,
-                  toolCall: toolCall
-                    ? { ...toolCall, status: "completed", result: stableOutput }
-                    : undefined,
-                },
-                updatedAt: new Date(),
-              })
-              .where(eq(chatMessages.id, toolMessageId));
-            // eslint-disable-next-line no-console
-            console.log(
-              "[triggerLocalPulse] Backfilled non-last parallel task (no revival)",
-              {
-                taskId: task.id,
-                toolMessageId,
-                callbackMode: task.wakeUpCallbackMode,
-              },
-            );
-          }
-        }
-
-        // Mark task as completed. Store __result in taskInput so wait-for-task
-        // (which may run as a subsequent task) can find the result.
-        const existingInput = (task.taskInput ?? {}) as Record<
-          string,
-          WidgetData
-        >;
-        // eslint-disable-next-line no-await-in-loop
-        await db
-          .update(cronTasks)
-          .set({
-            lastExecutionStatus: CronTaskStatus.COMPLETED,
-            lastExecutedAt: new Date(),
-            updatedAt: new Date(),
-            ...(output !== null
-              ? {
-                  taskInput: JSON.parse(
-                    JSON.stringify({ ...existingInput, __result: output }),
-                  ) as Record<string, WidgetData>,
-                }
-              : {}),
-          })
-          .where(eq(cronTasks.id, task.id));
-      }
-    }
-
-    // For the last task (always a WAIT task): call full handleTaskCompletion with revival.
-    // By now all other parallel results are already in the DB, so the AI sees
-    // all results in one revival turn (no branch violation).
-    const lastTask = orderedTasks[orderedTasks.length - 1]!;
-    const lastOutput = taskOutputs[taskOutputs.length - 1] ?? null;
-
-    await db
-      .update(cronTasks)
-      .set({
-        lastExecutionStatus: CronTaskStatus.COMPLETED,
-        lastExecutedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(cronTasks.id, lastTask.id));
-
-    await handleTaskCompletion({
-      toolMessageId:
-        lastTask.wakeUpToolMessageId ?? remoteTask.wakeUpToolMessageId,
-      threadId,
-      callbackMode: CM.WAIT,
-      status: CronTaskStatus.COMPLETED,
-      output: lastOutput,
-      taskId: lastTask.id,
-      modelId: lastTask.wakeUpModelId ?? null,
-      skillId: lastTask.wakeUpSkillId ?? null,
-      favoriteId: lastTask.wakeUpFavoriteId ?? null,
-      leafMessageId: lastTask.wakeUpLeafMessageId ?? null,
-      subAgentDepth: lastTask.wakeUpSubAgentDepth ?? 0,
-      ownerUser: taskUser,
-      logger,
-      directResumeLocale: defaultLocale,
-      abortSignal: pulseAbortController.signal,
-    });
-
-    // Disable safety-net resume-stream cron tasks created by handleTaskCompletion
-    await db
-      .update(cronTasks)
-      .set({
-        lastExecutionStatus: CronTaskStatus.COMPLETED,
-        lastExecutedAt: new Date(),
-        enabled: false,
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(cronTasks.userId, userId),
-          eq(cronTasks.routeId, RESUME_STREAM_ALIAS),
-          sql`${cronTasks.lastExecutionStatus} IS NULL`,
-          eq(cronTasks.enabled, true),
-          eq(cronTasks.runOnce, true),
-        ),
-      );
-
-    // eslint-disable-next-line no-console
-    console.log(
-      "[triggerLocalPulse] Parallel WAIT batch complete - revival fired for last task",
-      { lastTaskId: lastTask.id, threadId },
-    );
-    return;
-  }
-
-  // Mixed-mode parallel tasks (e.g. T7a: APPROVE + WAIT).
-  // Process non-WAIT tasks first (APPROVE → just backfill confirmation result, no revival),
-  // then process WAIT tasks last (trigger revival).
-  const hasWait = remoteTasks.some((t) => t.wakeUpCallbackMode === CM.WAIT);
-  const hasNonWait = remoteTasks.some((t) => t.wakeUpCallbackMode !== CM.WAIT);
-  if (remoteTasks.length > 1 && hasWait && hasNonWait) {
-    const { handleTaskCompletion: htc } =
-      await import("@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler");
-
-    // eslint-disable-next-line no-console
-    console.log("[triggerLocalPulse] Mixed-mode parallel tasks detected", {
-      count: remoteTasks.length,
-      modes: remoteTasks.map((t) => t.wakeUpCallbackMode),
-    });
-
-    // Non-WAIT tasks: execute (to produce results that WAIT tasks may depend on)
-    // but don't fire revival. APPROVE tasks are skipped (they wait for user action).
-    const { chatMessages: chatMsgsNW } =
-      await import("@/app/api/[locale]/agent/chat/db");
-    const nonWaitTasks = remoteTasks.filter(
-      (t) => t.wakeUpCallbackMode !== CM.WAIT,
-    );
-    for (const task of nonWaitTasks) {
-      const isApprove = task.wakeUpCallbackMode === CM.APPROVE;
-      // eslint-disable-next-line no-await-in-loop
-      const output = isApprove ? null : await executeTaskHandler(task);
-
-      // Backfill tool message result if we executed the task.
-      if (output !== null && task.wakeUpToolMessageId) {
-        // eslint-disable-next-line no-await-in-loop
-        const [existing] = await db
-          .select({ metadata: chatMsgsNW.metadata })
-          .from(chatMsgsNW)
-          .where(eq(chatMsgsNW.id, task.wakeUpToolMessageId));
-        if (existing) {
-          const toolCall = existing.metadata?.toolCall;
-          const stableOutput = JSON.parse(JSON.stringify(output)) as WidgetData;
-          // eslint-disable-next-line no-await-in-loop
-          await db
-            .update(chatMsgsNW)
-            .set({
-              metadata: {
-                ...existing.metadata,
-                toolCall: toolCall
-                  ? { ...toolCall, status: "completed", result: stableOutput }
-                  : undefined,
-              },
-              updatedAt: new Date(),
-            })
-            .where(eq(chatMsgsNW.id, task.wakeUpToolMessageId));
-        }
-      }
-
-      // Store __result in taskInput for DETACH tasks (wait-for-task reads it).
-      const existingInput = (task.taskInput ?? {}) as Record<
-        string,
-        WidgetData
-      >;
-      // eslint-disable-next-line no-await-in-loop
-      await db
-        .update(cronTasks)
-        .set({
-          lastExecutionStatus: CronTaskStatus.COMPLETED,
-          lastExecutedAt: new Date(),
-          updatedAt: new Date(),
-          ...(output !== null
-            ? {
-                taskInput: JSON.parse(
-                  JSON.stringify({ ...existingInput, __result: output }),
-                ) as Record<string, WidgetData>,
-              }
-            : {}),
-        })
-        .where(eq(cronTasks.id, task.id));
-      // eslint-disable-next-line no-console
-      console.log("[triggerLocalPulse] Mixed-mode: non-WAIT task completed", {
-        taskId: task.id,
-        routeId: task.routeId,
-        callbackMode: task.wakeUpCallbackMode,
-        executed: !isApprove,
-      });
-    }
-
-    // Now process WAIT tasks with revival (same as parallel WAIT batch).
-    const { chatMessages: chatMsgs } =
-      await import("@/app/api/[locale]/agent/chat/db");
-    const waitTasks = remoteTasks.filter(
-      (t) => t.wakeUpCallbackMode === CM.WAIT,
-    );
-    // Execute and backfill all but the last WAIT task.
-    for (let i = 0; i < waitTasks.length; i++) {
-      const task = waitTasks[i]!;
-      const isLast = i === waitTasks.length - 1;
-      // eslint-disable-next-line no-await-in-loop
-      const output = await executeTaskHandler(task);
-
-      if (!isLast) {
-        const toolMessageId = task.wakeUpToolMessageId;
-        if (toolMessageId) {
-          // eslint-disable-next-line no-await-in-loop
-          const [existing] = await db
-            .select({ metadata: chatMsgs.metadata })
-            .from(chatMsgs)
-            .where(eq(chatMsgs.id, toolMessageId));
-          if (existing) {
-            const toolCall = existing.metadata?.toolCall;
-            const stableOutput =
-              output !== null && output !== undefined
-                ? (JSON.parse(JSON.stringify(output)) as WidgetData)
-                : undefined;
-            // eslint-disable-next-line no-await-in-loop
-            await db
-              .update(chatMsgs)
-              .set({
-                metadata: {
-                  ...existing.metadata,
-                  toolCall: toolCall
-                    ? { ...toolCall, status: "completed", result: stableOutput }
-                    : undefined,
-                },
-                updatedAt: new Date(),
-              })
-              .where(eq(chatMsgs.id, toolMessageId));
-          }
-        }
-        // eslint-disable-next-line no-await-in-loop
-        await db
-          .update(cronTasks)
-          .set({
-            lastExecutionStatus: CronTaskStatus.COMPLETED,
-            lastExecutedAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .where(eq(cronTasks.id, task.id));
-      } else {
-        // Last WAIT task: mark completed, then either recurse (wait-for-task dependency)
-        // or fire revival via handleTaskCompletion.
-        // eslint-disable-next-line no-await-in-loop
-        await db
-          .update(cronTasks)
-          .set({
-            lastExecutionStatus: CronTaskStatus.COMPLETED,
-            lastExecutedAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .where(eq(cronTasks.id, task.id));
-
-        // If wait-for-task registered itself as a waiter on a dependency task (waiting=true),
-        // recurse like the single-task path: run the dependency task which now has WAIT context.
-        const isWaitingOnDependency =
-          output !== null &&
-          typeof output === "object" &&
-          "waiting" in output &&
-          (output as { waiting: boolean }).waiting === true;
-
-        if (isWaitingOnDependency) {
-          // eslint-disable-next-line no-console
-          console.log(
-            "[triggerLocalPulse] Mixed-mode: wait-for-task registered waiter - recursing to run dependency task",
-            { taskId: task.id, threadId },
-          );
-          // Disable safety-net resume-stream tasks before recursing (htc may have created one).
-          await db
-            .update(cronTasks)
-            .set({
-              lastExecutionStatus: CronTaskStatus.COMPLETED,
-              lastExecutedAt: new Date(),
-              enabled: false,
-              updatedAt: new Date(),
-            })
-            .where(
-              and(
-                eq(cronTasks.userId, userId),
-                eq(cronTasks.routeId, RESUME_STREAM_ALIAS),
-                sql`${cronTasks.lastExecutionStatus} IS NULL`,
-                eq(cronTasks.enabled, true),
-                eq(cronTasks.runOnce, true),
-              ),
-            );
-          // eslint-disable-next-line no-await-in-loop
-          await triggerLocalPulse(threadId);
-        } else {
-          // Normal case: fire revival via handleTaskCompletion.
-          // eslint-disable-next-line no-await-in-loop
-          await htc({
-            toolMessageId:
-              task.wakeUpToolMessageId ?? remoteTask.wakeUpToolMessageId ?? "",
-            threadId,
-            callbackMode: CM.WAIT,
-            status: CronTaskStatus.COMPLETED,
-            output,
-            taskId: task.id,
-            modelId: task.wakeUpModelId ?? null,
-            skillId: task.wakeUpSkillId ?? null,
-            favoriteId: task.wakeUpFavoriteId ?? null,
-            leafMessageId: task.wakeUpLeafMessageId ?? null,
-            subAgentDepth: task.wakeUpSubAgentDepth ?? 0,
-            ownerUser: taskUser,
-            logger,
-            directResumeLocale: defaultLocale,
-            abortSignal: pulseAbortController.signal,
-          });
-        }
-      }
-    }
-
-    // Disable safety-net resume-stream cron tasks.
-    await db
-      .update(cronTasks)
-      .set({
-        lastExecutionStatus: CronTaskStatus.COMPLETED,
-        lastExecutedAt: new Date(),
-        enabled: false,
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(cronTasks.userId, userId),
-          eq(cronTasks.routeId, RESUME_STREAM_ALIAS),
-          sql`${cronTasks.lastExecutionStatus} IS NULL`,
-          eq(cronTasks.enabled, true),
-          eq(cronTasks.runOnce, true),
-        ),
-      );
-
-    // eslint-disable-next-line no-console
-    console.log("[triggerLocalPulse] Mixed-mode batch complete", { threadId });
-    return;
-  }
-
-  // Single-task flow (or non-WAIT parallel tasks): process just the first task.
-  let taskOutput: WidgetData | null = await executeTaskHandler(remoteTask);
-
-  // wait-for-task(detach dependency): if the handler result is waiting=true, the
-  // wait-for-task registered itself as a waiter on a detach task (e.g. generate_image).
-  // The wakeUp context is now on the dependency task. Don't handleTaskCompletion for
-  // wait-for-task now - instead recurse to run the dependency task first. The dependency's
-  // handleTaskCompletion will fire the revival with the real result.
-  const isWaiting =
-    taskOutput &&
-    typeof taskOutput === "object" &&
-    "waiting" in taskOutput &&
-    (taskOutput as { waiting: boolean }).waiting === true;
-  if (isWaiting) {
-    // Mark the wait-for-task cron task as completed (it did its job: registered waiter).
-    await db
-      .update(cronTasks)
-      .set({
-        lastExecutionStatus: CronTaskStatus.COMPLETED,
-        lastExecutedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(cronTasks.id, remoteTask.id));
-    // Now recurse to run the dependency task (generate_image / generate_video etc.)
-    // It has been updated by wait-for-task with wakeUpCallbackMode=WAIT + wakeUpToolMessageId.
-    // eslint-disable-next-line no-console
-    console.log(
-      "[triggerLocalPulse] wait-for-task registered waiter - recursing to run dependency task",
-      { waitForTaskId: remoteTask.id, threadId },
-    );
-    await triggerLocalPulse(threadId);
-    return;
-  }
-
-  // Interactive terminal pending: coding-agent spawned a real terminal, but in tests
-  // there is no real terminal. Re-run the same handler with interactiveMode=false to
-  // get the real batch output - so the result is identical to batch mode.
-  const isTerminalPending =
-    taskOutput &&
-    typeof taskOutput === "object" &&
-    "terminalPending" in taskOutput &&
-    (taskOutput as { terminalPending: boolean }).terminalPending === true;
-  if (isTerminalPending) {
-    // eslint-disable-next-line no-console
-    console.log(
-      "[triggerLocalPulse] Interactive terminal pending - re-running as batch to get real output",
-      { taskId: remoteTask.id, threadId },
-    );
-    // Re-run with interactiveMode=false so the actual CLI runs and returns real output.
-    const batchTask = {
-      ...remoteTask,
-      taskInput: { ...(remoteTask.taskInput ?? {}), interactiveMode: false },
-    };
-    taskOutput = await executeTaskHandler(batchTask);
-  }
-
-  // Re-fetch the task to pick up any DB updates made by the handler itself.
-  // wait-for-task (called inside the coding-agent goroutine context) updates
-  // wakeUpCallbackMode/wakeUpToolMessageId on the task row. We must use the
-  // updated values for handleTaskCompletion so the correct mode (WAIT vs WAKE_UP)
-  // and the correct tool message ID are used for backfill and revival.
-  const [refreshedTask] = await db
-    .select({
-      wakeUpCallbackMode: cronTasks.wakeUpCallbackMode,
-      wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
-      wakeUpModelId: cronTasks.wakeUpModelId,
-      wakeUpSkillId: cronTasks.wakeUpSkillId,
-      wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
-      wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
-      wakeUpSubAgentDepth: cronTasks.wakeUpSubAgentDepth,
-      taskInput: cronTasks.taskInput,
-    })
-    .from(cronTasks)
-    .where(eq(cronTasks.id, remoteTask.id));
-
-  const effectiveTask = refreshedTask
-    ? { ...remoteTask, ...refreshedTask }
-    : remoteTask;
-
-  // Mark task as completed in hermes-dev's DB (simulating hermes /report).
-  // For DETACH tasks: also store __result in taskInput so wait-for-task can read
-  // it if called later. (The /report endpoint doesn't set __result; only the local
-  // goroutine path does. triggerLocalPulse runs tasks in-process without /report,
-  // so we must store __result manually for detach tasks.)
-  const isDetach = effectiveTask.wakeUpCallbackMode === CM.DETACH;
-  const existingTaskInput = (remoteTask.taskInput ?? {}) as Record<
-    string,
-    WidgetData
-  >;
-  await db
-    .update(cronTasks)
-    .set({
-      lastExecutionStatus: CronTaskStatus.COMPLETED,
-      lastExecutedAt: new Date(),
-      updatedAt: new Date(),
-      ...(isDetach && taskOutput !== null
-        ? {
-            taskInput: JSON.parse(
-              JSON.stringify({ ...existingTaskInput, __result: taskOutput }),
-            ) as Record<string, WidgetData>,
-          }
-        : {}),
-    })
-    .where(eq(cronTasks.id, remoteTask.id));
-
-  // Simulate hermes completing the task: handleTaskCompletion backfills the tool
-  // result into the originating message, creates a resume-stream cron task (safety
-  // net), and fires ResumeStreamRepository.resume directly in-process.
-  // The directResumeUser ensures the revival runs here (with fetch-cache active)
-  // rather than waiting for the server cron, which would run without fetch-cache.
-  const { handleTaskCompletion } =
-    await import("@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler");
-
-  const callbackModeValue =
-    effectiveTask.wakeUpCallbackMode === CM.WAIT
-      ? CM.WAIT
-      : effectiveTask.wakeUpCallbackMode === CM.WAKE_UP
-        ? CM.WAKE_UP
-        : effectiveTask.wakeUpCallbackMode === CM.DETACH
-          ? CM.DETACH
-          : effectiveTask.wakeUpCallbackMode === CM.END_LOOP
-            ? CM.END_LOOP
-            : null;
-
-  await handleTaskCompletion({
-    toolMessageId:
-      effectiveTask.wakeUpToolMessageId ?? remoteTask.wakeUpToolMessageId ?? "",
-    threadId,
-    callbackMode: callbackModeValue,
-    status: CronTaskStatus.COMPLETED,
-    output: taskOutput,
-    taskId: remoteTask.id,
-    modelId: effectiveTask.wakeUpModelId ?? null,
-    skillId: effectiveTask.wakeUpSkillId ?? null,
-    favoriteId: effectiveTask.wakeUpFavoriteId ?? null,
-    leafMessageId: effectiveTask.wakeUpLeafMessageId ?? null,
-    subAgentDepth: effectiveTask.wakeUpSubAgentDepth ?? 0,
-    ownerUser: taskUser,
-    logger,
-    directResumeLocale: defaultLocale,
-    abortSignal: pulseAbortController.signal,
-  });
-
-  // Disable the safety-net resume-stream cron task created by handleTaskCompletion.
-  // handleTaskCompletion fires the revival directly (directResumeUser path) and creates
-  // a resume-stream cron task as a fallback. The server cron must NOT run this task too
-  // (double-revival causes branch violation). We mark it completed immediately after the
-  // direct revival succeeds, racing before the server cron can pick it up.
-  await db
-    .update(cronTasks)
-    .set({
-      lastExecutionStatus: CronTaskStatus.COMPLETED,
-      lastExecutedAt: new Date(),
-      enabled: false,
-      updatedAt: new Date(),
-    })
-    .where(
-      and(
-        eq(cronTasks.userId, userId),
-        eq(cronTasks.routeId, RESUME_STREAM_ALIAS),
-        sql`${cronTasks.lastExecutionStatus} IS NULL`,
-        eq(cronTasks.enabled, true),
-        eq(cronTasks.runOnce, true),
-      ),
-    );
-
-  // eslint-disable-next-line no-console
-  console.log("[triggerLocalPulse] handleTaskCompletion completed", {
-    taskId: remoteTask.id,
-    threadId,
-  });
-}
-
-// ── Hermes pulse trigger ──────────────────────────────────────────────────────
-
-/**
- * Trigger hermes (prod, port 3001) to pull tasks from hermes-dev via HTTP.
- * Hermes contacts hermes-dev, receives outbound tasks (targetInstance='hermes'),
- * and upserts them into hermes's own cron_tasks table as enabled=true.
- *
- * Call this BEFORE disabling tasks locally on hermes-dev to ensure hermes
- * receives the tasks in their enabled state.
+ * Trigger hermes (prod, port 3001) to pull memory/capability updates from hermes-dev.
+ * Used by cortex-sync tests to verify cross-instance memory synchronization.
  *
  * Requires an admin-role JWT for hermes (use resolveProdAdminToken).
  */
-export async function triggerHermesPull(adminToken: string): Promise<void> {
+export async function triggerHermesPull(
+  adminToken: string,
+  remoteUrl: string = LOCAL_DEV_URL,
+): Promise<void> {
   const headers = {
     "Content-Type": "application/json",
     // eslint-disable-next-line i18next/no-literal-string
@@ -1216,14 +753,11 @@ export async function triggerHermesPull(adminToken: string): Promise<void> {
   };
 
   const pullResp = await fetch(
-    `${PROD_URL}/api/en-US/system/unified-interface/tasks/task-sync/pull`,
+    `${remoteUrl}/api/en-US/system/unified-interface/tasks/task-sync/pull`,
     { method: "POST", headers, body: JSON.stringify({}) },
   );
   const pullBody = await pullResp.text().catch(() => "unknown");
   if (!pullResp.ok) {
-    // Non-fatal: hermes pull is best-effort E2E coverage.
-    // triggerLocalPulse drives the actual test - it does not depend on hermes pulling.
-    // Hermes may fail due to schema drift, missing migrations, or other env issues.
     // eslint-disable-next-line no-console
     console.warn(
       `[triggerHermesPull] pull failed (non-fatal): status=${String(pullResp.status)} body=${pullBody.slice(0, 200)}`,
@@ -1234,68 +768,6 @@ export async function triggerHermesPull(adminToken: string): Promise<void> {
   console.log(
     `[triggerHermesPull] status=${String(pullResp.status)} body=${pullBody}`,
   );
-}
-
-/**
- * Trigger hermes (prod, port 3001) to execute pulled tasks via HTTP.
- * Hermes runs the pulled tasks, POSTs /report back to hermes-dev on completion,
- * which fires the revival stream.
- *
- * Requires an admin-role JWT for hermes (use resolveProdAdminToken).
- */
-export async function triggerHermesPulseExecute(
-  adminToken: string,
-): Promise<void> {
-  const headers = {
-    "Content-Type": "application/json",
-    // eslint-disable-next-line i18next/no-literal-string
-    Authorization: `Bearer ${adminToken}`,
-  };
-
-  // 15s timeout: pulse/execute can hang if hermes has accumulated real tasks.
-  // This is best-effort E2E coverage only - triggerLocalPulse drives the actual test.
-  const signal = AbortSignal.timeout(15_000);
-  let pulseResp: Response;
-  try {
-    pulseResp = await fetch(
-      `${PROD_URL}/api/en-US/system/unified-interface/tasks/pulse/execute`,
-      { method: "POST", headers, body: JSON.stringify({}), signal },
-    );
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `[triggerHermesPulseExecute] timed out or failed (best-effort, ignoring): ${String(err)}`,
-    );
-    return;
-  }
-  const pulseBody = await pulseResp.text().catch(() => "unknown");
-  if (!pulseResp.ok) {
-    // Best-effort: log and continue rather than failing the test suite.
-    // triggerLocalPulse is the authoritative path for revival.
-    // eslint-disable-next-line no-console
-    console.log(
-      `[triggerHermesPulseExecute] non-ok response ${String(pulseResp.status)} ${pulseBody} (best-effort, ignoring)`,
-    );
-    return;
-  }
-  // eslint-disable-next-line no-console
-  console.log(
-    `[triggerHermesPulseExecute] status=${String(pulseResp.status)} body=${pulseBody}`,
-  );
-}
-
-/**
- * Trigger hermes (prod, port 3001) to run its full queue cycle via HTTP:
- *   1. task-sync/pull - hermes contacts hermes-dev to pull tasks queued with
- *      targetInstance='hermes' from hermes-dev's DB into hermes's own cron_tasks.
- *   2. pulse/execute - hermes runs the pulled tasks, POSTs /report back to
- *      hermes-dev on completion, which fires the revival stream.
- *
- * Requires an admin-role JWT for hermes (use resolveProdAdminToken).
- */
-export async function triggerHermesPulse(adminToken: string): Promise<void> {
-  await triggerHermesPull(adminToken);
-  await triggerHermesPulseExecute(adminToken);
 }
 
 // ── DB-level test assertions ─────────────────────────────────────────────────

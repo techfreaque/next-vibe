@@ -41,6 +41,10 @@ export const translations = {
         label: "Skip TanStack",
         description: "Skip TanStack route generation",
       },
+      force: {
+        label: "Force",
+        description: "Ignore cached hashes and run all generators",
+      },
       success: {
         title: "Success",
       },

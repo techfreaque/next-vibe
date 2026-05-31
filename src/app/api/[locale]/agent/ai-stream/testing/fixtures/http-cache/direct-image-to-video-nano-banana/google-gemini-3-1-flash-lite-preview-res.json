@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a03090a4d8e0a0af-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Thu, 28 May 2026 22:06:21 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1780005971-dOdXlzN1OGq8T2rwr8yG"
+  },
+  "body": {
+    "id": "gen-1780005971-dOdXlzN1OGq8T2rwr8yG",
+    "object": "chat.completion",
+    "created": 1780005971,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a 13-second, high-definition, professionally shot close-up video featuring a person solving a Rubik’s Cube. The setting appears to be a workshop or studio cluttered with dozens of other Rubik’s Cubes, which are scattered across the table in the background, creating a colorful, out-of-focus blur.\n\n**Visual Sequence and Actions:**\nThe video begins in a close-up shot focusing on the hands of a medium-skinned person holding a standard Rubik’s Cube. The cube is partially scrambled, with white, orange, green, blue, and red sides visible. A small, white, square sticker with a black icon (a stylized \"X\" or cross symbol) is placed on the center white tile of the top face.\n\nThroughout the clip, the person’s fingers manipulate the cube with precision and speed, rotating the top, middle, and side slices. As they twist the cube, the pieces align rapidly. By approximately the 04-second mark, the cube’s faces begin to form solid colors. The manipulation is fluid, rhythmic, and practiced. There are no cuts; the camera maintains a steady, fixed position in a tight shot on the hands and the cube. The background remains a static, slightly desaturated field of multi-colored cubes. The video ends at 13 seconds, with the person having nearly fully solved the cube, leaving only a few final twists required to complete the pattern.\n\n**Production and Style:**\nThe aesthetic is realistic, crisp, and high-quality, likely filmed for a social media platform like Instagram or TikTok. The lighting is bright and even, highlighting the plastic texture and vibrant colors of the cubes. The depth of field is shallow, keeping the focus entirely on the moving cube while blurring the surrounding environment.\n\n**Audio:**\n- **Speech:** There is no speech.\n- **Sound Effects:** The audio consists exclusively of the rhythmic, sharp clicking and grinding sounds of the Rubik’s Cube being manipulated. These sounds are amplified, clear, and distinct (ASMR-style).\n- **Background Music:** There is no musical accompaniment.\n\n**Mood and Pacing:**\nThe mood is focused, steady, and meditative. The pace is rapid in terms of the manual action, but the overall presentation is calm and rhythmic. The primary intent of the video is to showcase manual dexterity and the satisfying nature of puzzle-solving, bordering on ASMR. The arc is purely demonstrative—from a scrambled state to a nearly solved state within the 13-second window.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a18S+8Eor46H1Dnsgga68BTht5h7+rr1gwkfev1RFOaM/JiOq82ivUgNkJLZXRA=",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 408,
+      "completion_tokens": 531,
+      "total_tokens": 939,
+      "cost": 0.0008985,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0008985,
+        "upstream_inference_prompt_cost": 0.000102,
+        "upstream_inference_completions_cost": 0.0007965
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -26,6 +26,7 @@ import {
   UserRole,
   UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 import { scopedTranslation } from "./i18n";
 
@@ -39,8 +40,8 @@ const { POST } = createEndpoint({
   title: "roles.post.title" as const,
   description: "roles.post.description" as const,
   icon: "shield" as const,
-  category: "endpointCategories.userAdmin",
-  subCategory: "endpointCategories.userAdminManagement",
+  category: "userAuth",
+  subCategory: "userAdminManagement",
   tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
@@ -54,7 +55,9 @@ const { POST } = createEndpoint({
       // === URL PARAMS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: usersListDefinitions.GET,
+        labelField: "email",
         label: "roles.post.id.label" as const,
         description: "roles.post.id.description" as const,
         placeholder: "roles.post.id.placeholder" as const,
@@ -177,8 +180,8 @@ const { DELETE } = createEndpoint({
   title: "roles.delete.title" as const,
   description: "roles.delete.description" as const,
   icon: "shield" as const,
-  category: "endpointCategories.userAdmin",
-  subCategory: "endpointCategories.userAdminManagement",
+  category: "userAuth",
+  subCategory: "userAdminManagement",
   tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
@@ -192,12 +195,14 @@ const { DELETE } = createEndpoint({
       // === URL PARAMS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: usersListDefinitions.GET,
+        labelField: "email",
         label: "roles.delete.id.label" as const,
         description: "roles.delete.id.description" as const,
         placeholder: "roles.delete.id.placeholder" as const,
         columns: 12,
-        schema: z.string().uuid("usersErrors.validation.id.invalid"),
+        schema: z.uuid("usersErrors.validation.id.invalid"),
       }),
 
       // === REQUEST BODY ===

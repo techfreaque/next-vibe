@@ -21,6 +21,7 @@ import {
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
+import { LOGIN_ALIAS } from "./constants";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
@@ -35,11 +36,11 @@ const { POST } = createEndpoint({
   title: "title",
   description: "description",
   icon: "log-in",
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthLogin",
+  category: "userAuth",
+  subCategory: "userAuthLogin",
   tags: ["tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
-  aliases: ["login"],
+  aliases: [LOGIN_ALIAS] as const,
   fields: customWidgetObject({
     render: LoginFormContainer,
     usage: { request: "data", response: true } as const,

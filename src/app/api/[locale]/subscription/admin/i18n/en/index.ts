@@ -125,6 +125,7 @@ export const translations = {
     },
     widget: {
       refresh: "Refresh",
+      filters: "Filters",
     },
   },
   // List endpoint translations
@@ -247,6 +248,7 @@ export const translations = {
       noMatchingSubscriptions: "No subscriptions match your filters.",
       searchPlaceholder: "Search by email or name...",
       refresh: "Refresh",
+      viewStats: "Statistics",
     },
   },
   // Purchases endpoint translations
@@ -567,6 +569,18 @@ export const translations = {
       sectionCodes: "Referral Codes",
       sectionPayouts: "Payout Requests",
       refresh: "Refresh",
+      codeActive: "Active",
+      codeInactive: "Inactive",
+      clicks: "clicks",
+      signups: "signups",
+      earned: "earned",
+      confirm: {
+        title: "Confirm payout action",
+        description:
+          "Are you sure you want to proceed with this payout action? This cannot be undone.",
+        cancel: "Cancel",
+        proceed: "Proceed",
+      },
     },
   },
   // Enum translations

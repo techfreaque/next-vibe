@@ -209,6 +209,9 @@ export const translations: typeof enTranslations = {
       neverRun: "Nigdy nie uruchomiono",
       runNow: "Uruchom teraz",
     },
+    webPinnedTools: {
+      label: "Przypięte narzędzia w panelu bocznym",
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",

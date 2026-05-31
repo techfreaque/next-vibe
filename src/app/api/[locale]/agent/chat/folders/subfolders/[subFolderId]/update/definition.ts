@@ -44,8 +44,8 @@ const { PATCH } = createEndpoint({
 
   tags: ["tags.folders" as const],
   icon: "folder-pen" as const,
-  category: "endpointCategories.chat",
-  subCategory: "endpointCategories.chatOrganization",
+  category: "ai",
+  subCategory: "chatOrganization",
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

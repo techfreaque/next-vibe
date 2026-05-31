@@ -42,8 +42,8 @@ const { PATCH } = createEndpoint({
 
   tags: ["tags.folders" as const],
   icon: "folder-input" as const,
-  category: "endpointCategories.chat",
-  subCategory: "endpointCategories.chatOrganization",
+  category: "ai",
+  subCategory: "chatOrganization",
 
   fields: customWidgetObject({
     render: FolderMoveContainer,

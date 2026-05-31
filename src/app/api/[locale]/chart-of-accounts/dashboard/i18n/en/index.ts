@@ -1,0 +1,83 @@
+export const translations = {
+  dashboard: {
+    title: "Accounting Dashboard",
+    description:
+      "Overview of your accounting status — open period, entry counts, and quick navigation to all accounting tools.",
+    companyId: {
+      label: "Company ID",
+      description: "Company to load the dashboard for",
+      placeholder: "Company UUID",
+    },
+    response: {
+      currentPeriod: "Current Period",
+      accountCount: "Accounts",
+      draftEntryCount: "Draft Entries",
+      postedThisMonthCount: "Posted This Month",
+      hasSetup: "Setup",
+      currency: "Currency",
+    },
+    success: {
+      title: "Dashboard Loaded",
+      description: "Accounting overview retrieved",
+    },
+    errors: {
+      unauthorized: { title: "Unauthorized", description: "Login required" },
+      validation: {
+        title: "Validation Error",
+        description: "Check your inputs",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "No access to this company",
+      },
+      server: {
+        title: "Server Error",
+        description: "Could not load dashboard",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      conflict: { title: "Conflict", description: "Data conflict" },
+      network: {
+        title: "Network Error",
+        description: "Could not reach the server",
+      },
+      notFound: { title: "Not Found", description: "Company not found" },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+    },
+    widget: {
+      currentPeriod: "Current Period",
+      noPeriod: "No open period",
+      createPeriod: "Create Period",
+      totalAccounts: "Accounts",
+      viewAccounts: "View",
+      draftEntries: "Draft Entries",
+      viewDrafts: "View",
+      postedThisMonth: "Posted This Month",
+      configured: "Configured",
+      notSetUp: "Not Set Up",
+      runSetup: "Run Setup",
+      setupStatus: "Setup",
+      loading: "Loading dashboard…",
+      noData: "No accounting data available.",
+      navTitle: "Accounting",
+      chartOfAccounts: "Chart of Accounts",
+      journalEntries: "Journal Entries",
+      periods: "Periods",
+      balanceSheet: "Balance Sheet",
+      profitLoss: "Profit & Loss",
+      trialBalance: "Trial Balance",
+      taxReport: "Tax Report",
+      companies: "Companies",
+      invoices: "Invoices",
+      bills: "Bills",
+      selectCompany: "Enter a Company ID to load the accounting dashboard.",
+    },
+  },
+  category: "Accounting",
+  tag: "dashboard",
+};

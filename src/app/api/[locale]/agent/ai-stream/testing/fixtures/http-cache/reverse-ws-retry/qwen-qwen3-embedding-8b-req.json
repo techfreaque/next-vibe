@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The user wants me to verify that the tool-help result from the hermes instance contains a non-empty tools array and that each tool has a name and description. Then end with STEP_OK or FAILED.\n\nLooking at the result:\n- `tools` array exists and has 25 items (non-empty) ✓\n- Each tool in the array has `name` and `description` fields ✓\n- Total count is 412, showing page 1 of 17\n\nEverything checks out. I should respond with STEP_OK.</think>Result contains a non-empty `tools` array (25 items on page 1 of 412 total). Every tool entry includes both `name` and `description` fields. STEP_OK\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nAssistant: <think>The user wants me to call execute-tool with toolName='tool-help', instanceId='hermes', and input={'toolName':'generate_image'}. Then I need to check that the result contains a name, a description, and a parameters schema. End with STEP_OK or FAILED.\n\nLet me make the call.</think>\n\nAssistant: <think>The user wants me to check that the result from the previous tool call (which was already executed and returned) contains:\n1. A name\n2. A description\n3. A parameters schema\n\nLooking at the result:\n- `name`: \"generate_image\" ✓\n- `description`: \"Generate an image from a text prompt using AI\" ✓\n- `parameters`: {\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"properties\":{...},\"required\":[\"prompt\"],\"type\":\"object\"} ✓\n\nAll three are present. I should end with STEP_OK.</think>The result contains `name` (\"generate_image\"), `description` (\"Generate an image from a text prompt using AI\"), and `parameters` (a JSON Schema object with properties, required fields, and type). STEP_OK\n\nUser: [T3a retry-branch] Say exactly: RETRY_RESPONSE STEP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -27,7 +27,7 @@ export const translations: typeof enTranslations = {
       public: "Öffentlich",
       incognito: "Inkognito",
       background: "Hintergrund",
-      support: "Support",
+      remote: "Remote",
     },
     foldersShort: {
       private: "Privat",
@@ -35,7 +35,7 @@ export const translations: typeof enTranslations = {
       public: "Öffentlich",
       incognito: "Inkognito",
       background: "Hintergrund",
-      support: "Support",
+      remote: "Remote",
     },
   },
   enums: {
@@ -510,7 +510,9 @@ export const translations: typeof enTranslations = {
       claudeOpus46:
         "Claude Opus 4.6 - Leistungsstarkes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
       claudeOpus47:
-        "Claude Opus 4.7 - Neuestes und leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
+        "Claude Opus 4.7 - Vorherige Opus-Generation. Nachfolger: 4.8.",
+      claudeOpus48:
+        "Claude Opus 4.8 - Anthropics leistungsstärkstes allgemein verfügbares Opus-Modell. Entwickelt für autonome Langzeit-Agenten, komplexes Coding und mehrstufiges Reasoning über sehr lange Ausgaben. 1M-Token-Kontextfenster. Unterstützt Text-, Bild- und Dateieingaben.",
       claudeSonnet46:
         "Claude Sonnet 4.6 - Anthropics leistungsfähigstes Sonnet-Modell mit frontier-Leistung in Coding, Agenten und professioneller Arbeit",
       claudeHaiku45:

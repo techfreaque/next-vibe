@@ -2,6 +2,15 @@ export const translations = {
   // Product category
   category: "Products",
 
+  // Enums
+  enums: {
+    productType: {
+      service: "Service",
+      physical: "Physical",
+      digital: "Digital",
+    },
+  },
+
   // Product summary (single source of truth)
   summary:
     "We offer Free ({{freeCredits}} credits/month), Monthly Subscription ({{subCurrency}}{{subPrice}}/month for {{subCredits}} credits), and Credit Packs ({{packCurrency}}{{packPrice}} for {{packCredits}} credits, requires subscription).",

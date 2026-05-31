@@ -36,6 +36,16 @@ export interface TestStreamParams {
   threadId?: string;
   skill?: string;
   /**
+   * Root folder override. Defaults to DefaultFolderId.BACKGROUND.
+   * Use DefaultFolderId.REMOTE + subFolderId to test remote-folder routing and thread mirroring.
+   */
+  rootFolderId?: DefaultFolderId;
+  /**
+   * Subfolder UUID. Required when rootFolderId is REMOTE so the thread is
+   * placed in the instance subfolder and routing rules can match it.
+   */
+  subFolderId?: string;
+  /**
    * Explicit parent message ID for retry/branch tests.
    * When set, the user message is created as a child of this message
    * instead of the thread's most recent message.
@@ -312,6 +322,8 @@ export async function runTestStream(
     user,
     threadId,
     skill,
+    rootFolderId: rootFolderIdOverride,
+    subFolderId,
     explicitParentMessageId,
     attachments,
     audioInput,
@@ -347,7 +359,8 @@ export async function runTestStream(
     skill: skill ?? (favoriteId ? undefined : NO_SKILL_ID),
     threadId,
     operationOverride: resolvedOperationOverride,
-    rootFolderId: DefaultFolderId.BACKGROUND,
+    rootFolderId: rootFolderIdOverride ?? DefaultFolderId.BACKGROUND,
+    subFolderId,
     subAgentDepth: 0,
     user,
     locale: defaultLocale,

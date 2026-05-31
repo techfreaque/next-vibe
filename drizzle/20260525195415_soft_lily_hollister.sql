@@ -1,0 +1,1 @@
+ALTER TABLE "payment_bills" ALTER COLUMN "status" SET DEFAULT 'DRAFT';

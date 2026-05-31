@@ -48,8 +48,8 @@ const { GET } = createEndpoint({
       color: "bg-green-500/10 text-green-500",
     },
   },
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "ai",
+  subCategory: "Tools",
   tags: ["get.tags.debug" as const],
   defaultExpanded: false,
   options: {

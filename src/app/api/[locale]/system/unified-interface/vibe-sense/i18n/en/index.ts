@@ -838,6 +838,14 @@ export const translations = {
     },
   },
 
+  // Shared data-source chart widget UI
+  dataSourceWidget: {
+    addToGraph: "Add to graph",
+    newGraph: "New graph",
+    loading: "Loading data…",
+    noData: "No data for this period",
+  },
+
   // Cleanup task
   cleanup: {
     post: {

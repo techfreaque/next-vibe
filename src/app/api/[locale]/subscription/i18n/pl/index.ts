@@ -235,6 +235,10 @@ export const translations: typeof enTranslations = {
         label: "Dostawca płatności",
         description: "Wybierz dostawcę płatności",
       },
+      catalogProductId: {
+        label: "Produkt z katalogu",
+        description: "Powiąż tę subskrypcję z produktem z katalogu",
+      },
       cancelAtPeriodEnd: {
         label: "Anuluj na koniec okresu",
         description: "Anuluj subskrypcję na koniec bieżącego okresu",
@@ -464,6 +468,18 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  // Widget-specific keys (cancel confirmation dialog, etc.)
+  widget: {
+    back: "Wróć",
+    confirm: {
+      title: "Anulować subskrypcję?",
+      description:
+        "Dostęp zostanie zakończony na koniec okresu rozliczeniowego. Tej operacji nie można cofnąć.",
+      cancel: "Zachowaj subskrypcję",
+      proceed: "Tak, anuluj",
+    },
+  },
+
   // Widget display keys
   title: "Twoja subskrypcja",
   description: "Zarządzaj swoją subskrypcją i rozliczeniami",
@@ -491,6 +507,9 @@ export const translations: typeof enTranslations = {
     },
     stripe: {
       button: "Zarządzaj subskrypcją",
+    },
+    portal: {
+      error: "Nie udało się otworzyć portalu klienta. Spróbuj ponownie.",
     },
   },
 

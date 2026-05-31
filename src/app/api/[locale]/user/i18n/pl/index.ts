@@ -73,6 +73,13 @@ export const translations: typeof enTranslations = {
       "Ta funkcja nie jest zaimplementowana w React Native",
     count_failed: "Nie udało się pobrać liczby użytkowników: {{error}}",
   },
+  userNoteType: {
+    note: "Notatka",
+    call: "Połączenie",
+    email: "E-mail",
+    meeting: "Spotkanie",
+    task: "Zadanie",
+  },
   notifications: {
     profileUpdated: {
       title: "Profil zaktualizowany",

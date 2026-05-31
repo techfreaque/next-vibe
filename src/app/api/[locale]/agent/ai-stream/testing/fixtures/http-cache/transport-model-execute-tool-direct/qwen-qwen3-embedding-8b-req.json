@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The user wants me to call tool-help with callbackMode='endLoop', and then try to call it again. The expectation is that the first call with endLoop will stop the loop, so the second call should NOT execute. I need to verify that only one call ran and the result had a non-empty tools array.\n\nLet me call tool-help with callbackMode='endLoop' first.</think>\n\nUser: [T5d wait-inline] Call the generate_image tool with prompt='wait-inline-test' and callbackMode='wait'. Check that the result has an imageUrl (not a taskId). End your reply with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason> if anything is wrong.\n\nAssistant: <think>The user wants me to call generate_image with prompt='wait-inline-test' and callbackMode='wait'. Then check that the result has an imageUrl (not a taskId). End with STEP_OK if imageUrl is present and non-empty, or FAILED: <reason>.\n\nLet me call execute-tool with callbackMode='wait'.</think>\n\nAssistant: <think>The result has an imageUrl and a creditCost. The imageUrl is non-empty. No taskId is present. This is correct for callbackMode='wait'.</think>STEP_OK\n\n**Verification summary:**\n- `imageUrl`: `\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/58a3b443-78b2-4760-ba46-1abaea4471f1/27e2a705-c6e7-47a6-9e03-fde3995364c2.png\"` — present and non-empty\n- `taskId`: absent — correct for `wait` mode\n- `creditCost`: `4` — positive\n\nUser: [T5c execute-tool-direct] Call the execute-tool endpoint with toolName='tool-help' and input={}. Check that the inner result contains a tools array with at least one entry. End your reply with STEP_OK if a tools list was returned, or FAILED: <reason> if the result was missing or malformed.",
+    "encoding_format": "float"
+  }
+}

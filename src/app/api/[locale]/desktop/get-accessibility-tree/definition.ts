@@ -21,6 +21,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
+import { DESKTOP_ACCESSIBILITY_ALIAS } from "./constants";
 
 const GetAccessibilityTreeWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.GetAccessibilityTreeWidget })),
@@ -30,6 +31,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["desktop", "get-accessibility-tree"],
+  aliases: [DESKTOP_ACCESSIBILITY_ALIAS] as const,
   title: "get-accessibility-tree.title",
   description: "get-accessibility-tree.description",
   dynamicTitle: ({ request }) => {
@@ -41,8 +43,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.desktop",
-  subCategory: "endpointCategories.desktopInspection",
+  category: "desktop",
+  subCategory: "Inspection",
   icon: "layers",
   tags: [
     "get-accessibility-tree.tags.desktopAutomation",

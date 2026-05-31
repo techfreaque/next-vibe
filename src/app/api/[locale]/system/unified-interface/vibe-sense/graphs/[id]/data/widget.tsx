@@ -1816,17 +1816,16 @@ export function GraphChartView(): React.JSX.Element {
   const lastResolutionRef = useRef<Resolution>(GraphResolution.ONE_DAY);
   const panBackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const spacerRef = useRef<HTMLDivElement>(null);
   const [pickerAvailableWidth, setPickerAvailableWidth] = useState(9999);
 
   useEffect((): (() => void) => {
-    const el = toolbarRef.current;
+    const el = spacerRef.current;
     if (!el) {
       return (): void => undefined;
     }
     const obs = new ResizeObserver((entries) => {
-      // Subtract fixed toolbar items: back+sep+name+badge (~240px) + actions (~130px) + gaps
-      const total = entries[0]?.contentRect.width ?? 9999;
-      setPickerAvailableWidth(Math.max(0, total - 370));
+      setPickerAvailableWidth(entries[0]?.contentRect.width ?? 0);
     });
     obs.observe(el);
     return (): void => obs.disconnect();
@@ -2316,7 +2315,7 @@ export function GraphChartView(): React.JSX.Element {
   // ── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <Div className="flex flex-col h-[calc(100vh-64px)] min-h-[500px] border rounded-xl overflow-hidden bg-background shadow-sm">
+    <Div className="flex flex-col h-full min-h-[500px] border rounded-xl overflow-hidden bg-background shadow-sm">
       {/* Layout save error banner */}
       {saveLayoutError !== null && (
         <Div className="flex items-center gap-2 px-3 py-1.5 bg-destructive/10 border-b border-destructive/20 text-destructive text-xs shrink-0">
@@ -2406,7 +2405,7 @@ export function GraphChartView(): React.JSX.Element {
           </>
         )}
 
-        <Div className="flex-1" />
+        <Div ref={spacerRef} className="flex-1" />
 
         {/* Resolution picker */}
         <ResolutionPicker

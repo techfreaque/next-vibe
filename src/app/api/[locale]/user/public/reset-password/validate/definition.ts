@@ -32,8 +32,8 @@ const { GET } = createEndpoint({
   title: "validate.title",
   description: "validate.description",
   icon: "shield",
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthLogin",
+  category: "userAuth",
+  subCategory: "userAuthLogin",
   tags: ["validate.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: objectField(scopedTranslation, {

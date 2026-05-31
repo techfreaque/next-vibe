@@ -175,21 +175,26 @@ export function ChatNavigationProvider({
   );
 }
 
+// ─── Fallback store (outside provider) ───────────────────────────────────────
+
+const NULL_NAVIGATION_STORE = createChatNavigationStore();
+
+/**
+ * Returns true if rendered inside a ChatNavigationProvider.
+ */
+export function useIsInsideChatNavigationProvider(): boolean {
+  return useContext(ChatNavigationContext) !== null;
+}
+
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 /**
  * Read from the nearest ChatNavigationProvider.
- * Throws if used outside a provider.
+ * Returns null-safe defaults when used outside a provider.
  */
 export function useChatNavigationStore<T>(
   selector: (state: ChatNavigationState) => T,
 ): T {
-  const store = useContext(ChatNavigationContext);
-  if (!store) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    throw new Error(
-      "useChatNavigationStore must be used within ChatNavigationProvider",
-    );
-  }
+  const store = useContext(ChatNavigationContext) ?? NULL_NAVIGATION_STORE;
   return useStore(store, selector);
 }

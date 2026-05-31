@@ -43,7 +43,7 @@ import {
   createTrackingContext,
   type TrackingContext,
 } from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
-import { getPricingParams } from "../../../products/repository-client";
+import { getPricingParams } from "../../../products/platform-products";
 import userCreateDefinition, {
   type UserCreateRequestOutput,
   type UserCreateResponseOutput,

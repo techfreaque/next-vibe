@@ -4,12 +4,10 @@
  */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
-  WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   lookbackRequestField,
@@ -22,6 +20,13 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CRON_EXECUTIONS_SUCCEEDED_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+const CronExecutionsSucceededWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.CronExecutionsSucceededWidget,
+  })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -36,16 +41,15 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsDataSources",
-  subCategory: "endpointCategories.tasksMonitoring",
+  category: "analytics",
+  subCategory: "systemData",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: CronExecutionsSucceededWidget,
+    noFormElement: true,
+    usage: { request: "data", response: true } as const,
     children: {
       resolution: resolutionRequestField(scopedTranslation, {
         label: "post.fields.resolution.label",

@@ -53,6 +53,12 @@ export const translations: typeof enTranslations = {
     analytics: "analityka",
     pipeline: "potok",
   },
+  dataSourceWidget: {
+    addToGraph: "Dodaj do grafu",
+    newGraph: "Nowy graf",
+    loading: "Ładowanie danych…",
+    noData: "Brak danych dla tego okresu",
+  },
   graphs: {
     list: {
       title: "Grafy potoków",

@@ -46,8 +46,8 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "play",
-  category: "endpointCategories.tasks",
-  subCategory: "endpointCategories.tasksCron",
+  category: "devTools",
+  subCategory: "tasksCron",
   tags: ["tags.execute"],
 
   cli: {

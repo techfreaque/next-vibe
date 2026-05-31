@@ -46,8 +46,8 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "wind",
-  category: "endpointCategories.analytics",
-  subCategory: "endpointCategories.analyticsVibeSense",
+  category: "analytics",
+  subCategory: "Vibe Sense",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 

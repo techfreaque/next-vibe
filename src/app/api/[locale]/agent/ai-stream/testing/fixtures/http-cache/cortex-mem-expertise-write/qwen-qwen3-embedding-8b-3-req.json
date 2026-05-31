@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/memories/mem-subdir-test/skills.md\n\n---\npriority: 60\ntags: [expertise, skills]\n---\n\n## Technical Skills\n\n- TypeScript: expert level\n- Bun runtime: proficient\n- Drizzle ORM: intermediate",
+    "encoding_format": "float"
+  }
+}

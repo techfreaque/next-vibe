@@ -98,7 +98,7 @@ async function resolveAdminUser(): Promise<JwtPrivatePayloadType | null> {
  */
 function buildOrderedChain(messages: SlimMessage[]): SlimMessage[] {
   const root = messages.find((m) => m.parentId === null);
-  if (!root) return [];
+  if (!root) {return [];}
   const chain: SlimMessage[] = [];
   let cur: SlimMessage | undefined = root;
   while (cur) {

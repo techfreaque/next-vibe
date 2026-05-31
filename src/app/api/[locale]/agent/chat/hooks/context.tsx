@@ -14,7 +14,7 @@ import { createContext, useContext, useMemo } from "react";
 
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 
-import type { DefaultFolderId } from "../config";
+import { DefaultFolderId } from "../config";
 import type { FolderContentsResponseOutput } from "../folder-contents/[rootFolderId]/definition";
 import type { FolderListResponseOutput } from "../folders/[rootFolderId]/definition";
 import type { PublicFeedGetResponseOutput } from "../public-feed/definition";
@@ -159,15 +159,35 @@ export function ChatBootProvider({
   );
 }
 
+const NULL_BOOT_VALUE: ChatBootValue = {
+  initialCredits: {
+    total: 0,
+    expiring: 0,
+    permanent: 0,
+    earned: 0,
+    free: 0,
+    expiresAt: null,
+    capacity: 0,
+  },
+  rootFolderPermissions: { canCreateThread: false, canCreateFolder: false },
+  initialFoldersData: null,
+  initialThreadsData: null,
+  initialRootFolderId: DefaultFolderId.PRIVATE,
+  initialMessagesData: null,
+  initialPathData: null,
+  initialSettingsData: null,
+  initialSkillData: null,
+  initialThreadId: null,
+  initialPublicFeedData: null,
+  initialFolderContentsData: null,
+  initialSubFolderContentsData: null,
+  initialSubFolderId: null,
+};
+
 /**
  * Hook to access chat boot context.
- * Throws if used outside ChatBootProvider.
+ * Returns null-safe defaults when used outside ChatBootProvider.
  */
 export function useChatBootContext(): ChatBootValue {
-  const context = useContext(ChatBootContext);
-  if (!context) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    throw new Error("useChatBootContext must be used within ChatBootProvider.");
-  }
-  return context;
+  return useContext(ChatBootContext) ?? NULL_BOOT_VALUE;
 }

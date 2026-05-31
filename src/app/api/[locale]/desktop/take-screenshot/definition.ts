@@ -21,6 +21,7 @@ import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
+import { DESKTOP_SCREENSHOT_ALIAS } from "./constants";
 
 const TakeScreenshotWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.TakeScreenshotWidget })),
@@ -30,6 +31,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["desktop", "take-screenshot"],
+  aliases: [DESKTOP_SCREENSHOT_ALIAS] as const,
   title: "take-screenshot.title",
   description: "take-screenshot.description",
   dynamicTitle: ({ request }) => {
@@ -44,8 +46,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.desktop",
-  subCategory: "endpointCategories.desktopCapture",
+  category: "desktop",
+  subCategory: "Capture",
   icon: "monitor",
   tags: [
     "take-screenshot.tags.desktopAutomation",

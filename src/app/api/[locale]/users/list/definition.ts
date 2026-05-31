@@ -63,12 +63,13 @@ const { GET } = createEndpoint({
   path: ["users", "list"],
   aliases: [USERS_LIST_ALIAS],
   allowedRoles: [UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.ADMIN] as const,
 
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "users",
-  category: "endpointCategories.userAdmin",
-  subCategory: "endpointCategories.userAdminManagement",
+  category: "userAuth",
+  subCategory: "userAdminManagement",
   tags: ["tag" as const],
 
   fields: customWidgetObject({

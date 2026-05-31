@@ -45,6 +45,8 @@ export async function loadIconModule(name: string): Promise<IconModule> {
       return import("./ArrowUp") as Promise<IconModule>;
     case "Atom":
       return import("./Atom") as Promise<IconModule>;
+    case "AtSign":
+      return import("./AtSign") as Promise<IconModule>;
     case "Award":
       return import("./Award") as Promise<IconModule>;
     case "Banknote":
@@ -403,6 +405,8 @@ export async function loadIconModule(name: string): Promise<IconModule> {
       return import("./Rocket") as Promise<IconModule>;
     case "RotateCcw":
       return import("./RotateCcw") as Promise<IconModule>;
+    case "Repeat":
+      return import("./Repeat") as Promise<IconModule>;
     case "Save":
       return import("./Save") as Promise<IconModule>;
     case "Scale":
@@ -415,6 +419,8 @@ export async function loadIconModule(name: string): Promise<IconModule> {
       return import("./Server") as Promise<IconModule>;
     case "Settings":
       return import("./Settings") as Promise<IconModule>;
+    case "Settings2":
+      return import("./Settings2") as Promise<IconModule>;
     case "Share":
       return import("./Share") as Promise<IconModule>;
     case "Share2":
@@ -429,6 +435,8 @@ export async function loadIconModule(name: string): Promise<IconModule> {
       return import("./ShoppingBag") as Promise<IconModule>;
     case "ShoppingCart":
       return import("./ShoppingCart") as Promise<IconModule>;
+    case "Shuffle":
+      return import("./Shuffle") as Promise<IconModule>;
     case "SiAlibabadotcom":
       return import("./SiAlibabadotcom") as Promise<IconModule>;
     case "SiAndroid":

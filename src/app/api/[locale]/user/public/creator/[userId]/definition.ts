@@ -42,8 +42,8 @@ export const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "user",
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthDirectory",
+  category: "userAuth",
+  subCategory: "userAuthDirectory",
   tags: ["tags.creator" as const],
   allowedRoles: [
     UserRole.PUBLIC,

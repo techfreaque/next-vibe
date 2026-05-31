@@ -54,12 +54,17 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "public-feed"],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultWebPinned: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+  ] as const,
 
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "globe",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsManagement",
+  category: "ai",
+  subCategory: "threadsManagement",
   tags: ["tags.publicFeed" as const],
 
   fields: customWidgetObject({

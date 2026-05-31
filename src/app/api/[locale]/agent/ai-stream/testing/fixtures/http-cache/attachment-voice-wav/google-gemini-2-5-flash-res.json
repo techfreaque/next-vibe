@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a03ef5696b615d63-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 30 May 2026 16:01:44 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1780156902-6eqLppBmzMvHEyRejlr0"
+  },
+  "body": {
+    "id": "gen-1780156902-6eqLppBmzMvHEyRejlr0",
+    "object": "chat.completion",
+    "created": 1780156902,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a 27-second audio clip that features a rhythmic, upbeat tune with a retro feel. The sound quality is clear, suggesting a studio recording.\n\nThe music appears to be an instrumental, with no vocals or speech present.\nThe instrumentation includes:\n- A groovy, plucked bassline that provides a constant, rhythmic foundation.\n- A clean, plucky guitar playing a melodic, repeating riff.\n- Drums, providing a steady, driving beat with a prominent snare.\n\nThe tempo is moderately fast, around 120-130 BPM. The feel is light and groovy, with a consistent, head-nodding rhythm. The song, though short in this clip, has a repetitive structure typical of a musical loop or a small segment of a larger song. The overall mood is cheerful, lighthearted, and feel-good.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1071,
+      "completion_tokens": 176,
+      "total_tokens": 1247,
+      "cost": 0.0012863,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012863,
+        "upstream_inference_prompt_cost": 0.0008463,
+        "upstream_inference_completions_cost": 0.00044
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

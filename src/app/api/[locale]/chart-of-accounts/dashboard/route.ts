@@ -1,0 +1,20 @@
+import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
+import definitions from "./definition";
+import { AccountingDashboardRepository } from "./repository";
+
+export const { GET, tools } = endpointsHandler({
+  endpoint: definitions,
+  [Methods.GET]: {
+    email: undefined,
+    handler: async ({ data, logger, user, locale }) => {
+      return await AccountingDashboardRepository.getDashboard(
+        data,
+        logger,
+        user,
+        locale,
+      );
+    },
+  },
+});

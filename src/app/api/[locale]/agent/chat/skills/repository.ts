@@ -1179,6 +1179,24 @@ export class SkillsRepository {
         emitSkills("skill-created", { wsEvent: null });
       }
 
+      // WS-push sync: broadcast skills change to connected local instances
+      void (async (): Promise<void> => {
+        try {
+          const { serializeProviders } =
+            await import("@/app/api/[locale]/remote-connection/sync-provider");
+          const { broadcastSyncNotify } =
+            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+          const syncPayloads = await serializeProviders(
+            ["skills"],
+            userId,
+            logger,
+          );
+          broadcastSyncNotify(userId, syncPayloads, logger);
+        } catch {
+          // Best-effort
+        }
+      })();
+
       return success({
         success: t("post.success.title"),
         id: skill.slug,
@@ -1529,6 +1547,24 @@ export class SkillsRepository {
             requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
       });
+
+      // WS-push sync: broadcast skills change to connected local instances
+      void (async (): Promise<void> => {
+        try {
+          const { serializeProviders } =
+            await import("@/app/api/[locale]/remote-connection/sync-provider");
+          const { broadcastSyncNotify } =
+            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+          const syncPayloads = await serializeProviders(
+            ["skills"],
+            userId,
+            logger,
+          );
+          broadcastSyncNotify(userId, syncPayloads, logger);
+        } catch {
+          // Best-effort
+        }
+      })();
 
       // Return the full updated skill to match GET response structure
       // Transform ownershipType: PATCH response only accepts "user" | "public", not "system"

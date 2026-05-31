@@ -49,5 +49,11 @@ export const translations = {
     prompt: "$ ",
     inputPlaceholder: "Enter command and press Enter...",
     sendButton: "Send",
+    nav: {
+      connections: "Connections",
+      files: "Files",
+      exec: "Exec",
+      users: "Users",
+    },
   },
 };
