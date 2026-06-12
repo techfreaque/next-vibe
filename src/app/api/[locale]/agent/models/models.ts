@@ -1,4 +1,4 @@
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { agentEnvAvailability } from "../env-availability";
@@ -998,12 +998,9 @@ export function filterRoleModels<
       }
       // Non-admins: pick the cheapest available provider for this model ID.
       const available = candidates.find((m) => isModelProviderAvailable(m));
-      if (available) {
-        return [available];
-      }
-      // No provider available for this specific model - fall through to filter fallback.
+      // Return available provider or empty — never fall through to a random model.
+      return available ? [available] : [];
     }
-    // Fall through to filter fallback
   }
   const filtered = pool.filter((m) => {
     if (m.adminOnly && !isAdmin) {

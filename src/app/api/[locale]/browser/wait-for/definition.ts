@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,7 +31,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "wait-for"],
+  aliases: ["browser-wait-for"] as const,
   title: "wait-for.title",
+  titleShort: "wait-for.titleShort",
   description: "wait-for.description",
   dynamicTitle: ({ request }) => {
     if (request?.text) {
@@ -44,8 +47,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserInspection",
+  category: "browser",
+  subCategory: "Inspection",
   icon: "clock",
   tags: ["wait-for.tags.browserAutomation", "wait-for.tags.waitAutomation"],
 
@@ -98,6 +101,8 @@ const { POST } = createEndpoint({
             "When true, includes the full accessibility snapshot in the response. Defaults to false.",
           ),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

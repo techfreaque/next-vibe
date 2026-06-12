@@ -201,7 +201,7 @@
         ]
       },
       {
-        "content": "{\"hint\":\"Task detached. Use wait-for-task with this taskId if you need to wait for the result/return.\",\"status\":\"status.pending\",\"taskId\":\"local-bg-1780161931566-lpwrqp\"}",
+        "content": "{\"hint\":\"Task detached. Use wait-for-task with this taskId if you need to wait for the result/return.\",\"status\":\"status.pending\",\"taskId\":\"local-bg-1781204699357-llg38f\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "functions.execute-tool:3"
@@ -216,7 +216,7 @@
         "role": "system"
       },
       {
-        "content": "STEP_OK taskId=local-bg-1780161931566-lpwrqp",
+        "content": "STEP_OK taskId=local-bg-1781204699357-llg38f",
         "role": "assistant"
       },
       {
@@ -229,7 +229,7 @@
         "role": "system"
       },
       {
-        "content": "[T5b wait-for-task] Call the local wait-for-task tool (do NOT use execute-tool for this - call wait-for-task directly) with taskId='local-bg-1780161931566-lpwrqp'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
+        "content": "[T5b wait-for-task] Call the local wait-for-task tool (do NOT use execute-tool for this - call wait-for-task directly) with taskId='local-bg-1781204699357-llg38f'. Check that the result contains an imageUrl string (either directly or nested in a result field). End your reply with STEP_OK if imageUrl is present, or FAILED: <reason> if anything was wrong.",
         "role": "user"
       },
       {
@@ -238,7 +238,7 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"taskId\":\"local-bg-1780161931566-lpwrqp\"}",
+              "arguments": "{\"taskId\":\"local-bg-1781204699357-llg38f\"}",
               "name": "wait-for-task"
             },
             "id": "functions.wait-for-task:4",

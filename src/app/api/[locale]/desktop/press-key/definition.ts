@@ -18,9 +18,10 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
+import listWindowsDefinitions from "../list-windows/definition";
 
 const PressKeyWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PressKeyWidget })),
@@ -30,7 +31,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["desktop", "press-key"],
+  aliases: ["desktop-press-key"] as const,
   title: "press-key.title",
+  titleShort: "press-key.titleShort",
   description: "press-key.description",
   dynamicTitle: ({ request }) => {
     if (request?.key) {
@@ -102,10 +105,11 @@ const { POST } = createEndpoint({
       }),
       windowId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: listWindowsDefinitions.POST,
+        labelField: "title",
         label: "press-key.form.fields.windowId.label",
         description: "press-key.form.fields.windowId.description",
-        placeholder: "press-key.form.fields.windowId.placeholder",
         columns: 6,
         schema: z
           .string()

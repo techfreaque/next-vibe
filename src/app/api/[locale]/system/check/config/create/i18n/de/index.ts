@@ -1,5 +1,7 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   title: "Check-Konfiguration erstellen",
+  titleShort: "Check-Config",
   description:
     "Erstellen Sie check.config.ts mit optionaler MCP-Konfiguration, VSCode-Einstellungen und Regelkonfigurationen. Ohne Optionen für interaktives Setup ausführen.",
   category: "Entwicklungswerkzeuge",

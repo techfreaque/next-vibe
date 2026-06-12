@@ -5,6 +5,7 @@ export const translations = {
   },
   get: {
     title: "Remote Connections",
+    titleShort: "Connections",
     description: "List all remote connections for your account",
     fields: {
       activeOnly: {

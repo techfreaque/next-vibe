@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Okresy księgowe",
+    titleShort: "Okresy",
     description: "Lista wszystkich okresów księgowych firmy",
     companyId: {
       label: "ID firmy",

@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   title: "Warianty journey",
   description: "Zarządzaj rejestracjami wariantów journey e-mail",
   get: {
     title: "Warianty journey",
+    titleShort: "Warianty journey",
     description: "Lista wszystkich zarejestrowanych wariantów journey e-mail",
     response: {
       id: "ID",
@@ -55,6 +57,7 @@ export const translations = {
   },
   post: {
     title: "Zarejestruj wariant journey",
+    titleShort: "Nowy wariant",
     description: "Zarejestruj nowy wariant journey e-mail",
     fields: {
       variantKey: {
@@ -135,6 +138,7 @@ export const translations = {
   },
   patch: {
     title: "Zaktualizuj wariant journey",
+    titleShort: "Edytuj wariant",
     description: "Zaktualizuj zarejestrowany wariant journey e-mail",
     fields: {
       id: {

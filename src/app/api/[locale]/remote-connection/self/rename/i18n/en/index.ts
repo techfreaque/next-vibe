@@ -5,6 +5,7 @@ export const translations = {
   },
   patch: {
     title: "Rename This Instance",
+    titleShort: "Rename Instance",
     description: "Update the friendly name of your own instance",
     newInstanceId: {
       label: "New Instance ID",

@@ -202,6 +202,7 @@ export class UserRepository {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         userRoles: userRolesResponse.data,
+        roles: userRolesResponse.data.map((r) => r.role),
       };
 
       if (detailLevel === UserDetailLevel.STANDARD) {
@@ -443,22 +444,26 @@ export class UserRepository {
         .where(inArray(userLeadLinks.userId, userIds));
       const leadIdMap = new Map(leadLinks.map((l) => [l.userId, l.leadId]));
 
-      const mappedResults: StandardUserType[] = searchResults.map((user) => ({
-        id: user.id,
-        leadId: leadIdMap.get(user.id) ?? "",
-        isPublic: false,
-        privateName: user.privateName,
-        publicName: user.publicName,
-        email: user.email,
-        locale: user.locale,
-        isActive: user.isActive,
-        emailVerified: user.emailVerified,
-        requireTwoFactor: false,
-        marketingConsent: user.marketingConsent ?? false,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        userRoles: rolesMap.get(user.id) || [],
-      }));
+      const mappedResults: StandardUserType[] = searchResults.map((user) => {
+        const userRoles = rolesMap.get(user.id) || [];
+        return {
+          id: user.id,
+          leadId: leadIdMap.get(user.id) ?? "",
+          isPublic: false,
+          privateName: user.privateName,
+          publicName: user.publicName,
+          email: user.email,
+          locale: user.locale,
+          isActive: user.isActive,
+          emailVerified: user.emailVerified,
+          requireTwoFactor: false,
+          marketingConsent: user.marketingConsent ?? false,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          userRoles,
+          roles: userRoles.map((r) => r.role),
+        };
+      });
 
       return success(mappedResults);
     } catch (error) {
@@ -517,22 +522,26 @@ export class UserRepository {
         .where(inArray(userLeadLinks.userId, userIds));
       const leadIdMap = new Map(leadLinks.map((l) => [l.userId, l.leadId]));
 
-      const mappedResults: StandardUserType[] = allUsers.map((user) => ({
-        id: user.id,
-        leadId: leadIdMap.get(user.id) ?? user.id,
-        privateName: user.privateName,
-        publicName: user.publicName,
-        email: user.email,
-        locale: user.locale,
-        isActive: user.isActive,
-        emailVerified: user.emailVerified,
-        isPublic: false,
-        requireTwoFactor: false,
-        marketingConsent: user.marketingConsent ?? false,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        userRoles: rolesMap.get(user.id) || [],
-      }));
+      const mappedResults: StandardUserType[] = allUsers.map((user) => {
+        const userRoles = rolesMap.get(user.id) || [];
+        return {
+          id: user.id,
+          leadId: leadIdMap.get(user.id) ?? user.id,
+          privateName: user.privateName,
+          publicName: user.publicName,
+          email: user.email,
+          locale: user.locale,
+          isActive: user.isActive,
+          emailVerified: user.emailVerified,
+          isPublic: false,
+          requireTwoFactor: false,
+          marketingConsent: user.marketingConsent ?? false,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          userRoles,
+          roles: userRoles.map((r) => r.role),
+        };
+      });
 
       return success(mappedResults);
     } catch (error) {
@@ -634,6 +643,7 @@ export class UserRepository {
         createdAt: createdUser.createdAt,
         updatedAt: createdUser.updatedAt,
         userRoles: [],
+        roles: [],
       };
 
       return success(standardUser);

@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Generator Srodowiska",
+    titleShort: "Generator środowiska",
     description: "Generuje skonsolidowane pliki konfiguracji srodowiska",
     form: {
       title: "Konfiguracja Srodowiska",

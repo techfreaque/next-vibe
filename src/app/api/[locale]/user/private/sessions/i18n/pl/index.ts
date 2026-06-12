@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Użytkownicy",
 
   list: {
     title: "Moje sesje",
+    titleShort: "Moje sesje",
     description: "Wyświetl wszystkie aktywne sesje dla Twojego konta",
     tag: "Sesje",
     response: {
@@ -37,6 +39,7 @@ export const translations = {
   },
   create: {
     title: "Utwórz token sesji",
+    titleShort: "Utwórz token",
     description: "Utwórz nazwany token sesji dla programowego dostępu",
     tag: "Sesje",
     form: {
@@ -78,6 +81,7 @@ export const translations = {
   },
   revoke: {
     title: "Unieważnij sesję",
+    titleShort: "Odwołaj sesję",
     description: "Unieważnij token sesji według ID",
     tag: "Sesje",
     response: {

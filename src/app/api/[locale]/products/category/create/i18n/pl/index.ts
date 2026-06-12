@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Utwórz kategorię produktu",
+    titleShort: "Utwórz kategorię",
     description: "Dodaj kategorię do organizowania produktów w katalogu.",
     name: {
       label: "Nazwa kategorii",

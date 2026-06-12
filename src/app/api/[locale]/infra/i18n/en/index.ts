@@ -46,6 +46,7 @@ export const translations = {
     init: {
       post: {
         title: "Initialize Cluster",
+        titleShort: "Init Cluster",
         description:
           "Provision k3s on tagged SSH servers. Installs k3s, databases, Redis, MinIO, and ingress.",
         container: { title: "Cluster Init" },
@@ -149,6 +150,7 @@ export const translations = {
     status: {
       get: {
         title: "Cluster Status",
+        titleShort: "Cluster Status",
         description: "Show k8s node health, pod counts, and component status",
         container: { title: "Cluster Status" },
         response: {
@@ -204,6 +206,7 @@ export const translations = {
     push: {
       post: {
         title: "Deploy",
+        titleShort: "Deploy",
         description: "Apply infrastructure changes via Pulumi (pulumi up)",
         container: { title: "Deploy" },
         fields: {
@@ -270,6 +273,7 @@ export const translations = {
     preview: {
       post: {
         title: "Deploy Preview",
+        titleShort: "Preview",
         description:
           "Preview infrastructure changes without applying them (pulumi preview)",
         container: { title: "Deploy Preview" },
@@ -333,6 +337,7 @@ export const translations = {
     replicas: {
       post: {
         title: "Scale",
+        titleShort: "Scale",
         description: "Scale a deployment in the cluster",
         container: { title: "Scale Deployment" },
         fields: {

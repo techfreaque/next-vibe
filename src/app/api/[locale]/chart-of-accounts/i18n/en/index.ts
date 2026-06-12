@@ -94,6 +94,7 @@ export const translations = {
   },
   accountGet: {
     title: "Get Account",
+    titleShort: "Account",
     description: "Retrieve full details for a single account node.",
     accountId: {
       label: "Account ID",
@@ -135,6 +136,7 @@ export const translations = {
   },
   periodGet: {
     title: "Get Period",
+    titleShort: "Period",
     description: "Retrieve details for a single accounting period.",
     periodId: {
       label: "Period ID",
@@ -162,6 +164,7 @@ export const translations = {
   },
   journalEntryGet: {
     title: "Get Journal Entry",
+    titleShort: "Journal Entry",
     description: "Retrieve a single journal entry with all its lines.",
     entryId: {
       label: "Entry ID",
@@ -215,6 +218,7 @@ export const translations = {
         "Enter a Company ID above and apply filters to load journal entries.",
     },
     title: "Journal Entries",
+    titleShort: "Journal",
     description:
       "List journal entries with filters for company, period, status, source type, and date range",
     companyId: {
@@ -273,6 +277,7 @@ export const translations = {
       difference: "Difference",
     },
     title: "Create Journal Entry",
+    titleShort: "New Entry",
     description:
       "Create a manual double-entry journal. Total debits must equal total credits.",
     companyId: {
@@ -318,6 +323,7 @@ export const translations = {
       back: "Back",
     },
     title: "Post Journal Entry",
+    titleShort: "Post Entry",
     description:
       "Change a DRAFT entry to POSTED status. Cannot be undone — use Reverse instead.",
     entryId: {
@@ -341,6 +347,7 @@ export const translations = {
       viewReversalButton: "View Reversal Entry",
     },
     title: "Reverse Journal Entry",
+    titleShort: "Reverse",
     description:
       "Create a reversal entry that mirrors all debits and credits. Links back via reversalOfId.",
     entryId: {
@@ -371,6 +378,7 @@ export const translations = {
       totalCount: "entries",
     },
     title: "Account Ledger",
+    titleShort: "Ledger",
     description: "All journal entry lines for an account with running balance",
     accountId: {
       label: "Account ID",
@@ -414,6 +422,7 @@ export const translations = {
         "Enter a Company ID above and click Run to generate the trial balance.",
     },
     title: "Trial Balance",
+    titleShort: "Trial Balance",
     description:
       "Sum of all posted debits and credits per account as of a given date. Confirms the books balance.",
     companyId: {
@@ -500,6 +509,7 @@ export const translations = {
         "Enter a Company ID above and click Run to generate the P&L statement.",
     },
     title: "Profit & Loss",
+    titleShort: "P&L",
     description:
       "Revenue vs. expenses for a date range. Shows gross profit, operating profit, and net profit.",
     companyId: {
@@ -577,6 +587,7 @@ export const translations = {
       selectCompany: "Select a company to view the balance sheet",
     },
     title: "Balance Sheet",
+    titleShort: "Balance Sheet",
     description:
       "Assets, liabilities, and equity as of a date. Verifies the accounting equation holds.",
     companyId: {
@@ -647,6 +658,7 @@ export const translations = {
         "Enter a Company ID above and click Run to generate the aging report.",
     },
     title: "Receivables Aging",
+    titleShort: "Receivables Aging",
     description:
       "Outstanding invoices bucketed by days overdue. Shows exactly where cash is stuck.",
     companyId: {
@@ -741,6 +753,7 @@ export const translations = {
         "Enter a Company ID above and click Run to generate the tax report.",
     },
     title: "Tax Report",
+    titleShort: "Tax Report",
     description:
       "VAT collected vs. reclaimable for a period. Net VAT payable at a glance.",
     companyId: {

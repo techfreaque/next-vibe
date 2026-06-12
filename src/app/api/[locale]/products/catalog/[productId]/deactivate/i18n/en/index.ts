@@ -6,6 +6,7 @@ export const translations = {
   },
   post: {
     title: "Deactivate Product",
+    titleShort: "Deactivate",
     description:
       "Soft-delete a catalog product by marking it inactive. The product data is retained.",
     productId: {

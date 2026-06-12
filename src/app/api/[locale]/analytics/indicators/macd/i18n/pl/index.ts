@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "MACD",
+    titleShort: "MACD",
     description:
       "Zbieżność i rozbieżność średnich kroczących - wskaźnik momentum podążający za trendem",
     fields: {

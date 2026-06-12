@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "MACD",
+    titleShort: "MACD",
     description:
       "Gleitender Durchschnitt Konvergenz Divergenz - trendfolgendes Momentum-Indikator",
     fields: {

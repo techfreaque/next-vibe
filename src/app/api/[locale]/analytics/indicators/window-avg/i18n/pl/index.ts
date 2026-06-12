@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Średnia okna",
+    titleShort: "Śr. okna",
     description: "Krocząca średnia okna - wygładza wartości w stałym oknie",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },

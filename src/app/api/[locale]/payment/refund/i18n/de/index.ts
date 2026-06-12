@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Rückerstattung verarbeiten",
+  titleShort: "Erstattung",
   description: "Eine Rückerstattung für eine Zahlungstransaktion verarbeiten",
   category: "Zahlungsrückerstattungen",
 

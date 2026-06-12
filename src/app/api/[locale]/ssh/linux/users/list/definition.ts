@@ -31,11 +31,12 @@ export const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["ssh", "linux", "users", "list"],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
   icon: "users",
-  category: "endpointCategories.ssh",
-  subCategory: "endpointCategories.sshExecution",
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  category: "ssh",
+  subCategory: "Linux",
+  allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 
   fields: customWidgetObject({

@@ -1,7 +1,9 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Informacja",
   get: {
     title: "Pobierz Zawartość URL",
+    titleShort: "Pobierz URL",
     description:
       "Pobierz i wyodrębnij zawartość z dowolnego adresu URL, konwertując ją na czytelny format markdown. Użyj tego, gdy potrzebujesz przeczytać lub przeanalizować zawartość strony internetowej.",
     form: {
@@ -76,6 +78,7 @@ export const translations = {
   cleanup: {
     post: {
       title: "Czyszczenie Cache URL",
+      titleShort: "Wyczyść cache",
       description: "Usuń stare pliki cache URL starsze niż 7 dni",
       container: {
         title: "Wyniki czyszczenia",

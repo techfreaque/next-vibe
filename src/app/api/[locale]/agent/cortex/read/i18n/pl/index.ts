@@ -1,9 +1,11 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   get: {
     title: "Czytaj plik",
+    titleShort: "Odczytaj plik",
     description:
       "Otwórz dowolny plik - notatki, wątki, wspomnienia, skille czy zadania.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Odczytano: {{path}}",
     status: {
       loading: "Odczytywanie...",
       done: "Załadowano",

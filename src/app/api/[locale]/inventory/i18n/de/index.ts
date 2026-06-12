@@ -49,6 +49,7 @@ export const translations: typeof enTranslations = {
   warehouseCreate: {
     post: {
       title: "Lagerhaus erstellen",
+      titleShort: "Neues Lager",
       description: "Neues Lagerhaus für ein Unternehmen anlegen.",
       widget: {
         backToList: "Zurück zur Lagerhausliste",
@@ -139,7 +140,8 @@ export const translations: typeof enTranslations = {
 
   warehouseList: {
     get: {
-      title: "Lagerhäuser auflisten",
+      title: "Lager",
+      titleShort: "Lager",
       description: "Alle Lagerhäuser eines Unternehmens auflisten.",
       widget: {
         active: "Aktiv",
@@ -151,6 +153,7 @@ export const translations: typeof enTranslations = {
         emptyHint:
           "Erstes Lagerhaus anlegen, um mit der Bestandsverwaltung zu beginnen.",
         emptyIcon: "🏭",
+        back: "Zurück",
         loading: "Lagerhäuser werden geladen…",
         load: "Laden",
         viewStock: "Bestand anzeigen",
@@ -214,10 +217,13 @@ export const translations: typeof enTranslations = {
   warehouseGet: {
     get: {
       title: "Lagerhaus abrufen",
+      titleShort: "Lagerhaus",
       description: "Details eines bestimmten Lagerhauses abrufen.",
       widget: {
+        back: "Zurück",
         edit: "Lagerhaus bearbeiten",
         viewStock: "Bestand anzeigen",
+        select: "Lagerhaus auswählen",
       },
       warehouseId: {
         label: "Lagerhaus-ID",
@@ -279,6 +285,7 @@ export const translations: typeof enTranslations = {
   warehouseUpdate: {
     patch: {
       title: "Lagerhaus aktualisieren",
+      titleShort: "Lager bearbeiten",
       description: "Lagerhausdetails bearbeiten.",
       widget: {
         backToWarehouse: "Zurück zum Lagerhaus",
@@ -367,9 +374,11 @@ export const translations: typeof enTranslations = {
   stockList: {
     get: {
       title: "Lagerbestände",
+      titleShort: "Lagerbestände",
       description:
         "Lagerbestände eines Lagerhauses mit Verfügbarkeit und Mindestbestandsindikatoren anzeigen.",
       widget: {
+        back: "Zurück",
         lowStock: "Mindestbestand unterschritten",
         available: "Verfügbar",
         onHand: "Auf Lager",
@@ -461,6 +470,7 @@ export const translations: typeof enTranslations = {
   stockAdjust: {
     post: {
       title: "Bestand korrigieren",
+      titleShort: "Bestand korrigieren",
       description:
         "Lagerbestand manuell anpassen. Negative Werte für Abschreibungen.",
       widget: {
@@ -550,6 +560,7 @@ export const translations: typeof enTranslations = {
   stockReceive: {
     post: {
       title: "Wareneingang buchen",
+      titleShort: "Wareneingang",
       description:
         "Eingehende Ware erfassen — aktualisiert Lagerbestand und gewichteten Durchschnittspreis.",
       widget: {
@@ -627,6 +638,7 @@ export const translations: typeof enTranslations = {
   stockIssue: {
     post: {
       title: "Warenausgang buchen",
+      titleShort: "Warenausgang",
       description:
         "Ware aus einem Lagerhaus ausbuchen. Prüft ausreichende Verfügbarkeit.",
       widget: {
@@ -708,6 +720,7 @@ export const translations: typeof enTranslations = {
   transferCreate: {
     post: {
       title: "Umlagerung erstellen",
+      titleShort: "Neue Umlagerung",
       description: "Umlagerungsauftrag erstellen. Startet im Status Entwurf.",
       widget: {
         backToList: "Zurück zu Umlagerungen",
@@ -794,9 +807,11 @@ export const translations: typeof enTranslations = {
 
   transferList: {
     get: {
-      title: "Umlagerungen auflisten",
+      title: "Umlagerungen",
+      titleShort: "Umlagerungen",
       description: "Umlagerungen eines Unternehmens auflisten.",
       widget: {
+        back: "Zurück",
         newTransfer: "Neue Umlagerung",
         empty: "Noch keine Umlagerungen.",
         emptyHint:
@@ -877,11 +892,14 @@ export const translations: typeof enTranslations = {
   transferGet: {
     get: {
       title: "Umlagerung abrufen",
+      titleShort: "Umlagerung",
       description: "Umlagerung mit allen Positionen abrufen.",
       widget: {
+        back: "Zurück",
         dispatch: "Umlagerung versenden",
         receive: "Als empfangen markieren",
         status: "Status",
+        select: "Umlagerung auswählen",
       },
       transferId: {
         label: "Umlagerungs-ID",
@@ -930,7 +948,9 @@ export const translations: typeof enTranslations = {
         id: "Umlagerungs-ID",
         companyId: "Unternehmens-ID",
         fromWarehouseId: "Ausgangslager",
+        fromWarehouseName: "Ausgangslager",
         toWarehouseId: "Ziellager",
+        toWarehouseName: "Ziellager",
         status: "Status",
         reference: "Referenz",
         notes: "Hinweise",
@@ -939,6 +959,7 @@ export const translations: typeof enTranslations = {
         items: "Positionen",
         itemId: "Positions-ID",
         productId: "Produkt-ID",
+        productName: "Produkt",
         quantityRequested: "Angefordert",
         quantityReceived: "Empfangen",
       },
@@ -948,6 +969,7 @@ export const translations: typeof enTranslations = {
   transferDispatch: {
     post: {
       title: "Umlagerung versenden",
+      titleShort: "Versenden",
       description:
         "Umlagerung als unterwegs markieren. Ware verlässt das Ausgangslager.",
       widget: {
@@ -1009,6 +1031,7 @@ export const translations: typeof enTranslations = {
   transferReceive: {
     post: {
       title: "Umlagerung empfangen",
+      titleShort: "Umlagerung empfangen",
       description:
         "Umlagerung als empfangen markieren. Erstellt Lagerbewegungen und aktualisiert Bestände.",
       widget: {
@@ -1071,6 +1094,7 @@ export const translations: typeof enTranslations = {
   dashboard: {
     get: {
       title: "Lagerübersicht",
+      titleShort: "Lagerübersicht",
       description:
         "Aktueller Stand des Lagerbestands, ausstehende Transfers und Lageranzahl.",
       widget: {

@@ -13,15 +13,11 @@ import generateTrpcRouterEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: generateTrpcRouterEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, locale }) => {
-      const { GenerateTrpcRouterRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return GenerateTrpcRouterRepository.generateTrpcRouter(
-        data,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ data, logger, locale }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).GenerateTrpcRouterRepository.generateTrpcRouter(data, logger, locale),
   },
 });

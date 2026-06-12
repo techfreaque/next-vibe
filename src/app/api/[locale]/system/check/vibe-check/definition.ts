@@ -38,19 +38,20 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "check", "vibe-check"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.devTools",
-  subCategory: "endpointCategories.devToolsCheck",
+  category: "devTools",
+  subCategory: "Check",
   tags: ["tag"],
   icon: "wrench",
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
     ...(envClient.NODE_ENV !== Environment.PRODUCTION
       ? [UserRole.MCP_VISIBLE]
       : []),
-    UserRole.CLI_AUTH_BYPASS,
   ],
   aliases: [VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT],
 

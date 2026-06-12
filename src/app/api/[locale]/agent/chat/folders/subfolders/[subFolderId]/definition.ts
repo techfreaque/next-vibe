@@ -30,7 +30,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const DeleteFolderContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.DeleteFolderContainer })),
@@ -47,6 +47,7 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "folder",
   category: "ai",
@@ -192,6 +193,7 @@ const { DELETE } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "delete.title" as const,
+  titleShort: "delete.titleShort" as const,
   description: "delete.description" as const,
   icon: "folder-x",
   category: "ai",

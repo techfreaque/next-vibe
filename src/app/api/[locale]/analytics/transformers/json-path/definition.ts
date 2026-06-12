@@ -45,10 +45,11 @@ const { POST } = createEndpoint({
     "json-path",
   ],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsTransformers",
-  subCategory: "endpointCategories.analyticsTransformers",
+  category: "analytics",
+  subCategory: "Transformers",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 

@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Dev",
+    titleShort: "Dev Server",
     description: "Dev endpoint",
     form: {
       title: "Dev Configuration",

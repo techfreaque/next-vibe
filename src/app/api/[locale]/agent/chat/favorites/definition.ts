@@ -31,8 +31,9 @@ import {
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { iconSchema } from "../../../shared/types/common.schema";
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 import { FAVORITES_LIST_ALIAS } from "./constants";
 import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
@@ -51,12 +52,13 @@ const { GET } = createEndpoint({
   path: ["agent", "chat", "favorites"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
+  defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "star" as const,
   category: "ai",
-  subCategory: "chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITES_LIST_ALIAS],
@@ -71,7 +73,9 @@ const { GET } = createEndpoint({
        */
       userId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: usersListDefinitions.GET,
+        labelField: "email",
         label: "get.userId.label" as const,
         description: "get.userId.description" as const,
         schema: z.string().uuid().optional(),

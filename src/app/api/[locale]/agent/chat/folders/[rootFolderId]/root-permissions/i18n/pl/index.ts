@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Pobierz uprawnienia folderu głównego",
+    titleShort: "Dostęp do folderu",
     description: "Oblicz uprawnienia dla folderu głównego",
     container: {
       title: "Uprawnienia folderu głównego",

@@ -1,23 +1,25 @@
-/**
- * List Windows Widget
- * No form. Result: table of windows with focus action on each row.
- */
-
 "use client";
 
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Keyboard } from "next-vibe-ui/ui/icons/Keyboard";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { MousePointer } from "next-vibe-ui/ui/icons/MousePointer";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
+import { useEffect } from "react";
 
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
+import { DesktopNavHeader } from "../shared/nav-header";
 import type definition from "./definition";
 import type { DesktopListWindowsResponseOutput } from "./definition";
 
@@ -28,6 +30,7 @@ interface CustomWidgetProps {
 type WindowInfo = NonNullable<
   DesktopListWindowsResponseOutput["windows"]
 >[number];
+type T = ReturnType<typeof useWidgetTranslation>;
 
 function truncate(s: string, max: number): string {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
@@ -35,42 +38,101 @@ function truncate(s: string, max: number): string {
 
 function WindowRow({
   w,
+  isPickerMode,
+  onPick,
   onFocus,
+  onType,
+  onKey,
+  onMove,
+  onA11y,
+  t,
 }: {
   w: WindowInfo;
+  isPickerMode: boolean;
+  onPick: (() => void) | undefined;
   onFocus: () => void;
+  onType: () => void;
+  onKey: () => void;
+  onMove: () => void;
+  onA11y: () => void;
+  t: T;
 }): JSX.Element {
   return (
-    <Div className="flex items-center justify-between gap-3 py-3 px-1 border-b last:border-b-0">
-      <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
-        <Span className="text-sm font-medium truncate">
+    <Div
+      className={`group flex items-center gap-3 px-4 py-3 border-b last:border-b-0 transition-colors${
+        isPickerMode ? " hover:bg-accent cursor-pointer" : ""
+      }`}
+      onClick={isPickerMode ? onPick : undefined}
+    >
+      <Div className="shrink-0 w-8 h-8 rounded-md bg-muted flex items-center justify-center">
+        <MousePointer className="h-4 w-4 text-muted-foreground" />
+      </Div>
+      <Div className="flex-1 min-w-0">
+        <Span className="text-sm font-medium block truncate leading-tight">
           {truncate(w.title, 55)}
         </Span>
-        <Div className="flex gap-3 text-xs text-muted-foreground">
-          <Span className="font-mono">{w.windowId}</Span>
-          {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-          <Span>pid:{w.pid}</Span>
-          <Span>
-            {w.width}
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-            ×{w.height}
+        <Div className="flex items-center gap-2 mt-0.5">
+          <Span className="text-[11px] text-muted-foreground font-mono">
+            {w.windowId}
           </Span>
           {w.monitor ? (
-            <Badge variant="outline" className="text-xs py-0 h-4">
+            <Badge
+              variant="outline"
+              className="text-[10px] py-0 px-1 h-4 font-normal"
+            >
               {w.monitor}
             </Badge>
           ) : null}
+          <Span className="text-[11px] text-muted-foreground">
+            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+            {w.width}×{w.height}
+          </Span>
         </Div>
       </Div>
-      <Button
-        size="sm"
-        variant="outline"
-        className="shrink-0 text-xs h-7"
-        onClick={onFocus}
-      >
-        {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-        Focus
-      </Button>
+      {!isPickerMode ? (
+        <Div className="shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button
+            size="sm"
+            variant="default"
+            className="h-7 text-xs px-2.5"
+            onClick={onFocus}
+          >
+            {t("widget.actionFocus")}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs px-2"
+            onClick={onType}
+          >
+            {t("widget.actionType")}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs px-2"
+            onClick={onKey}
+          >
+            {t("widget.actionKey")}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs px-2"
+            onClick={onMove}
+          >
+            {t("widget.actionMove")}
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 text-xs px-2"
+            onClick={onA11y}
+          >
+            {t("widget.actionA11y")}
+          </Button>
+        </Div>
+      ) : null}
     </Div>
   );
 }
@@ -79,42 +141,143 @@ function WindowRow({
 export function ListWindowsWidget(_props: CustomWidgetProps): JSX.Element {
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
+  const { push: navigate } = navigation;
+  const t = useWidgetTranslation<typeof definition.POST>();
+  const onPickRaw = usePickerCallback<{ id: string; title: string }>();
+  const isPickerMode = !!onPickRaw;
+  const onSubmit = useWidgetOnSubmit();
+
+  useEffect((): void => {
+    if (!data && onSubmit) {
+      onSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const isLoading = !data;
+
+  const title = data?.windows
+    ? data.windows.length === 1
+      ? t("widget.windowCount_one").replace("{{count}}", "1")
+      : t("widget.windowCount_other").replace(
+          "{{count}}",
+          String(data.windows.length),
+        )
+    : t("widget.titleListWindows");
 
   const handleFocus = (windowId: string): void => {
     void (async (): Promise<void> => {
-      const focusDef = await import("../focus-window/definition");
-      navigation.push(focusDef.default.POST, {
+      const def = await import("../focus-window/definition");
+      navigate(def.default.POST, {
         data: { windowId },
         popNavigationOnSuccess: 1,
       });
     })();
   };
 
+  const handleType = (windowId: string, windowTitle: string): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../type-text/definition");
+      navigate(def.default.POST, {
+        data: { windowId, windowTitle },
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
+
+  const handleKey = (windowId: string): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../press-key/definition");
+      navigate(def.default.POST, {
+        data: { windowId },
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
+
+  const handleMove = (windowId: string): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../move-window-to-monitor/definition");
+      navigate(def.default.POST, {
+        data: { windowId },
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
+
+  const handleA11y = (windowTitle: string): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../get-accessibility-tree/definition");
+      navigate(def.default.POST, {
+        data: { appName: windowTitle },
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
+
   return (
-    <Div className="flex flex-col gap-4">
-      <FormAlertWidget field={{}} />
+    <Div className="flex flex-col h-full">
+      <DesktopNavHeader
+        title={String(title)}
+        right={
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 w-7 p-0"
+            onClick={(): void => {
+              onSubmit?.();
+            }}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="h-3.5 w-3.5" />
+            )}
+          </Button>
+        }
+      />
 
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
-
-      {data?.windows?.length ? (
-        <Div className="rounded-lg border overflow-hidden">
+      {isLoading ? (
+        <Div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+        </Div>
+      ) : data?.windows && data.windows.length > 0 ? (
+        <Div className="flex-1 overflow-y-auto">
           {data.windows.map((w) => (
             <WindowRow
               key={w.windowId}
               w={w}
+              isPickerMode={isPickerMode}
+              onPick={
+                onPickRaw
+                  ? (): void => onPickRaw({ id: w.windowId, title: w.title })
+                  : undefined
+              }
+              t={t}
               onFocus={(): void => handleFocus(w.windowId)}
+              onType={(): void => handleType(w.windowId, w.title)}
+              onKey={(): void => handleKey(w.windowId)}
+              onMove={(): void => handleMove(w.windowId)}
+              onA11y={(): void => handleA11y(w.title)}
             />
           ))}
-          <Div className="px-1 py-2 text-xs text-muted-foreground">
-            {data.windows.length} window
-            {data.windows.length === 1 ? "" : "s"}
-          </Div>
         </Div>
-      ) : data?.success && data.windows?.length === 0 ? (
-        <Span className="text-sm text-muted-foreground text-center py-6 block">
-          {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-          No open windows found
-        </Span>
+      ) : (
+        <Div className="flex flex-col items-center justify-center py-16 gap-2 text-muted-foreground">
+          <Keyboard className="h-8 w-8 opacity-30" />
+          <Span className="text-sm">{t("widget.noWindows")}</Span>
+        </Div>
+      )}
+
+      {data?.error ? (
+        <Div className="px-4 py-3 border-t">
+          <Span className="text-sm text-destructive">{data.error}</Span>
+        </Div>
       ) : null}
     </Div>
   );

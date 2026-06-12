@@ -3,6 +3,7 @@ export const translations = {
 
   get: {
     title: "Update All Model Prices",
+    titleShort: "Update Prices",
     description:
       "Fetch live pricing for all models from every provider API (OpenRouter, Replicate, etc.) and update models.ts",
     form: {

@@ -7,8 +7,7 @@
 
 import "server-only";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -43,28 +42,9 @@ const VIBE_SENSE_SYSTEM_USER: JwtPayloadType = {
 
 const VIBE_SENSE_ABORT_CONTROLLER = new AbortController();
 
-const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
-  rootFolderId: DefaultFolderId.BACKGROUND,
-  threadId: undefined,
-  aiMessageId: undefined,
-  skillId: undefined,
-  headless: undefined,
-  subAgentDepth: 0,
-  currentToolMessageId: undefined,
-  callerToolCallId: undefined,
-  pendingToolMessages: undefined,
-  pendingTimeoutMs: undefined,
-  leafMessageId: undefined,
-  waitingForRemoteResult: undefined,
-  favoriteId: undefined,
-  abortSignal: VIBE_SENSE_ABORT_CONTROLLER.signal,
-  callerCallbackMode: undefined,
-  onEscalatedTaskCancel: undefined,
-  escalateToTask: undefined,
-  isRevival: undefined,
-
-  providerOverride: undefined,
-};
+const VIBE_SENSE_STREAM_CONTEXT = makeHeadlessContext(
+  VIBE_SENSE_ABORT_CONTROLLER.signal,
+);
 
 // ─── Execution Context ────────────────────────────────────────────────────────
 

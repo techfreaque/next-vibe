@@ -3,6 +3,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   put: {
     title: "Edit Graph",
+    titleShort: "Edit Graph",
     description: "Branch and edit a graph (creates new version, never mutates)",
     fields: {
       id: { label: "Graph ID", description: "UUID of the graph" },

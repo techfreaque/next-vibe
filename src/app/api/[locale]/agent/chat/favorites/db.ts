@@ -26,7 +26,7 @@ import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
 import type { ToolConfigItem } from "../settings/definition";

@@ -51,12 +51,14 @@ const { POST } = createEndpoint({
   path: ["agent", "image-generation"],
   aliases: [IMAGE_GEN_ALIAS],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
+  defaultWebPinned: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
 
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "image",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiGeneration",
+  category: "ai",
+  subCategory: "Generation",
   tags: ["tags.image", "tags.generation", "tags.ai"],
   dynamicTitle: ({ request }) => {
     const prompt = request?.prompt as string | undefined;

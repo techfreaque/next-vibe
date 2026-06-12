@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Mitglied einladen",
+    titleShort: "Mitglied einladen",
     description: "Einen registrierten Benutzer per E-Mail einladen",
     companyId: {
       label: "Unternehmens-ID",

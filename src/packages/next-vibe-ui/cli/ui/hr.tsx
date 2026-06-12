@@ -2,7 +2,7 @@ import * as React from "react";
 import { Text } from "ink";
 
 import type { HrProps } from "../../web/ui/hr";
-import { useIsMcp } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function Hr(_props: HrProps): React.JSX.Element | null {

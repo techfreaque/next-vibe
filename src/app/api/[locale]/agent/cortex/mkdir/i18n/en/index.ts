@@ -1,8 +1,9 @@
 export const translations = {
   post: {
     title: "New Folder",
+    titleShort: "New Folder",
     description: "Create a folder.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Created {{path}}",
     status: {
       loading: "Creating...",
       done: "Created",

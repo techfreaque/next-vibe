@@ -18,6 +18,7 @@ import type { z } from "zod";
 
 import { type CountryLanguage } from "@/i18n/core/config";
 
+import { UserNoteTypeDB } from "./enum";
 import { UserRoleDB } from "./user-roles/enum";
 
 /**
@@ -182,3 +183,57 @@ export const loginAttempts = pgTable(
 
 export type LoginAttemptRow = typeof loginAttempts.$inferSelect;
 export type NewLoginAttemptRow = typeof loginAttempts.$inferInsert;
+
+/**
+ * User addresses table
+ * Stores billing and delivery addresses for users
+ */
+export const userAddresses = pgTable("user_addresses", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  fullName: text("full_name"),
+  company: text("company"),
+  phone: text("phone"),
+  vatNumber: text("vat_number"),
+  taxId: text("tax_id"),
+  addressLine1: text("address_line1").notNull(),
+  addressLine2: text("address_line2"),
+  city: text("city").notNull(),
+  region: text("region"),
+  postalCode: text("postal_code"),
+  country: text("country").notNull(),
+  isDefaultBilling: boolean("is_default_billing").notNull().default(false),
+  isDefaultDelivery: boolean("is_default_delivery").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type UserAddress = typeof userAddresses.$inferSelect;
+export type NewUserAddress = typeof userAddresses.$inferInsert;
+
+/**
+ * User notes table
+ * CRM notes about users, written by company staff
+ */
+export const userNotes = pgTable("user_notes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  authorUserId: uuid("author_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  type: text("type", {
+    enum: UserNoteTypeDB,
+  }),
+  content: text("content").notNull(),
+  isPrivate: boolean("is_private").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type UserNote = typeof userNotes.$inferSelect;
+export type NewUserNote = typeof userNotes.$inferInsert;

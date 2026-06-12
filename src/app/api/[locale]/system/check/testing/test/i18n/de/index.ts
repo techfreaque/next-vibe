@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Tests ausführen",
+  titleShort: "Tests ausführen",
   description: "Test-Suite mit optionalen Konfigurationen ausführen",
   category: "Tests",
   tag: "Test",

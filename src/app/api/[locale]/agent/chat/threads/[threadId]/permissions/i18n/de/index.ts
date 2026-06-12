@@ -11,6 +11,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Thread-Berechtigungen abrufen",
+    titleShort: "Thread-Zugriff",
     description:
       "Die Liste der Moderatoren für einen bestimmten Thread abrufen",
     container: {
@@ -102,6 +103,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Thread-Berechtigungen aktualisieren",
+    titleShort: "Threadzugriff",
     description:
       "Die Liste der Moderatoren für einen bestimmten Thread aktualisieren",
     container: {

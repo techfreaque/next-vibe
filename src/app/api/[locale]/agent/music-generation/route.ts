@@ -9,7 +9,6 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { getBestMusicGenModel } from "./models";
 import { MusicGenerationRepository } from "./repository";
 
 /**
@@ -53,6 +52,7 @@ export const { POST, tools } = endpointsHandler({
         if (!sel) {
           return undefined;
         }
+        const { getBestMusicGenModel } = await import("./models");
         return getBestMusicGenModel(
           sel,
           ctx.user,

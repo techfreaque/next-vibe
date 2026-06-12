@@ -1,5 +1,6 @@
 export const translations = {
   title: "Google Sheets",
+  titleShort: "Google Sheets",
   description:
     "Automatically add every new lead as a row in your Google Sheet. Connect your Google account - no API keys required.",
   connect: {
@@ -38,6 +39,7 @@ export const translations = {
   },
   sheetsList: {
     title: "List Spreadsheets",
+    titleShort: "Spreadsheets",
     description:
       "Returns the list of spreadsheets accessible to the connected Google account",
   },

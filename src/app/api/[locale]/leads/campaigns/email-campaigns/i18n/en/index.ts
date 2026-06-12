@@ -45,6 +45,7 @@ export const translations = {
   },
   post: {
     title: "Email Campaigns",
+    titleShort: "Send Campaigns",
     description: "Process email campaigns for leads",
     errors: {
       unauthorized: {
@@ -102,6 +103,7 @@ export const translations = {
   },
   get: {
     title: "Get Email Campaigns Config",
+    titleShort: "Email Campaign Config",
     description: "Retrieve email campaigns background task configuration",
     errors: {
       unauthorized: {

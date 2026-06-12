@@ -2,6 +2,7 @@ export const translations = {
   category: "System",
   get: {
     title: "Export Production Env",
+    titleShort: "Export Env",
     description:
       "Generate a production-ready .env file with decrypted values, deployment instructions, and a checklist",
     tags: {

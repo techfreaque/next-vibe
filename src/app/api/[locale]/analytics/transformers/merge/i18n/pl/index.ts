@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Scalanie",
+    titleShort: "Scalanie",
     description:
       "Scalanie - sumuje dwie serie czasowe wyrównane według znacznika czasu",
     fields: {

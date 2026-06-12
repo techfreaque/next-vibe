@@ -42,17 +42,17 @@ vibe cluster-init \
   --email="admin@example.com"
 ```
 
-| Param | Required | Default | Description |
-|---|---|---|---|
-| `clusterName` | yes | — | Name used in kubeconfig and labels |
-| `domain` | yes | — | Base domain for ingress rules |
-| `email` | yes | — | Let's Encrypt contact email |
-| `k3sVersion` | no | `v1.31.0+k3s1` | k3s release to install |
-| `dryRun` | no | `false` | Preview only, no changes |
-| `skipDatabase` | no | `false` | Skip CloudNativePG |
-| `skipRedis` | no | `false` | Skip Redis Sentinel |
-| `skipStorage` | no | `false` | Skip MinIO |
-| `skipIngress` | no | `false` | Skip nginx-ingress + cert-manager |
+| Param          | Required | Default        | Description                        |
+| -------------- | -------- | -------------- | ---------------------------------- |
+| `clusterName`  | yes      | —              | Name used in kubeconfig and labels |
+| `domain`       | yes      | —              | Base domain for ingress rules      |
+| `email`        | yes      | —              | Let's Encrypt contact email        |
+| `k3sVersion`   | no       | `v1.31.0+k3s1` | k3s release to install             |
+| `dryRun`       | no       | `false`        | Preview only, no changes           |
+| `skipDatabase` | no       | `false`        | Skip CloudNativePG                 |
+| `skipRedis`    | no       | `false`        | Skip Redis Sentinel                |
+| `skipStorage`  | no       | `false`        | Skip MinIO                         |
+| `skipIngress`  | no       | `false`        | Skip nginx-ingress + cert-manager  |
 
 Kubeconfig is written to `.pulumi/<clusterName>/kubeconfig.yaml`.
 
@@ -79,11 +79,11 @@ vibe scale --component=web --replicas=3
 vibe scale --component=tasks --replicas=0   # pause
 ```
 
-| Component | Deployment |
-|---|---|
-| `web` | `next-vibe-web` |
-| `tasks` | `next-vibe-tasks` |
-| `storage` | `minio-tenant` |
+| Component | Deployment        |
+| --------- | ----------------- |
+| `web`     | `next-vibe-web`   |
+| `tasks`   | `next-vibe-tasks` |
+| `storage` | `minio-tenant`    |
 
 ---
 
@@ -120,10 +120,10 @@ Replicas = `min(2, total node count)`. Single node → 1 instance. Two or more n
 
 ## Aliases
 
-| Command | Aliases |
-|---|---|
-| `vibe cluster-init` | `init-cluster`, `infra-init` |
-| `vibe cluster-status` | `infra-status` |
-| `vibe scale` | `scale-replicas`, `infra-scale` |
-| `vibe deploy` | `infra-deploy`, `push` |
-| `vibe deploy-preview` | `infra-preview` |
+| Command               | Aliases                         |
+| --------------------- | ------------------------------- |
+| `vibe cluster-init`   | `init-cluster`, `infra-init`    |
+| `vibe cluster-status` | `infra-status`                  |
+| `vibe scale`          | `scale-replicas`, `infra-scale` |
+| `vibe deploy`         | `infra-deploy`, `push`          |
+| `vibe deploy-preview` | `infra-preview`                 |

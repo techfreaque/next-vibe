@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Przebuduj i uruchom ponownie",
+    titleShort: "Przebuduj",
     description:
       "Przebuduj aplikację i uruchom ponownie serwer Next.js. Wykonuje 6 kroków sekwencyjnie: 1) generowanie kodu, 2) vibe check (bramka jakości kodu), 3) produkcyjny build Next.js, 4) migracje bazy danych, 5) seeding bazy danych, 6) hot-restart przez SIGUSR1. Vibe check blokuje build przy błędach - użyj 'vibe check' lub MCP check tool po szczegóły. UWAGA: Odpowiedź HTTP może zostać ucięta, ponieważ serwer restartuje się przed ukończeniem odpowiedzi.",
     form: {

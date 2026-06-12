@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Konto deaktivieren",
+    titleShort: "Deaktivieren",
     description:
       "Konto soft-deaktivieren. Systemkonten oder Konten mit gebuchten Buchungszeilen können nicht deaktiviert werden.",
     accountId: {

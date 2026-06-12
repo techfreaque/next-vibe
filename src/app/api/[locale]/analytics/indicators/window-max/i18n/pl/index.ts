@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Maksimum okna",
+    titleShort: "Max okna",
     description:
       "Krocząca maksymalna okna - śledzi najwyższą wartość w stałym oknie",
     fields: {

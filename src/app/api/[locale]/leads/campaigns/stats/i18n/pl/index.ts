@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   title: "Statystyki kampanii",
   description: "Statystyki wydajności kampanii e-mail",
   get: {
     title: "Statystyki kampanii",
+    titleShort: "Statystyki kampanii",
     description: "Pobierz statystyki wydajności kampanii e-mail",
     container: {
       title: "Filtry",
@@ -36,6 +38,7 @@ export const translations = {
       emailsScheduledToday: "E-maile zaplanowane na dziś",
       campaignTasks: "Zadania kampanii",
       alerts: "Alerty",
+      quotaProgress: "Postęp tygodniowego limitu",
       taskStats: "Statystyki zadań",
     },
     errors: {

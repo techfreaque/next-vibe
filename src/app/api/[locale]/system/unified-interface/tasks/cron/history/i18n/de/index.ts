@@ -15,6 +15,7 @@ export const translations: typeof enTranslations = {
       monitoring: "Überwachung",
     },
     title: "Task-Ausführungsverlauf",
+    titleShort: "Task-Verlauf",
     description:
       "Historische Ausführungsaufzeichnungen für Cron-Tasks anzeigen",
     fields: {

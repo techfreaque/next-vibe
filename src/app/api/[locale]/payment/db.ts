@@ -5,6 +5,7 @@
 
 import {
   boolean,
+  customType,
   integer,
   jsonb,
   numeric,
@@ -13,16 +14,40 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
+
+/**
+ * Custom numeric type that returns numbers instead of strings
+ * Used for monetary amounts in bill/estimate/invoice line tables
+ */
+const numericNumber = customType<{
+  data: number;
+  driverData: string;
+}>({
+  dataType() {
+    return "numeric(12, 4)";
+  },
+  toDriver(value: number): string {
+    return value.toString();
+  },
+  fromDriver(value: string): number {
+    return Number(value);
+  },
+});
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
 import { CurrenciesArr } from "@/i18n/core/config";
 
+import { companies } from "../companies/db";
 import { users } from "../user/db";
 import {
+  BillStatus,
+  BillStatusDB,
   CheckoutMode,
   CheckoutModeDB,
   DisputeStatusDB,
+  EstimateStatus,
+  EstimateStatusDB,
   InvoiceStatus,
   InvoiceStatusDB,
   PaymentMethodTypeDB,
@@ -143,8 +168,12 @@ export const paymentInvoices = pgTable("payment_invoices", {
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
+  companyId: uuid("company_id").references(() => companies.id, {
+    onDelete: "set null",
+  }),
   providerInvoiceId: text("provider_invoice_id").notNull(),
   invoiceNumber: text("invoice_number"),
+  invoiceSequenceNumber: integer("invoice_sequence_number"),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency", { enum: CurrencyDB }).notNull(),
   status: text("status", { enum: InvoiceStatusDB })
@@ -155,6 +184,8 @@ export const paymentInvoices = pgTable("payment_invoices", {
   dueDate: timestamp("due_date"),
   paidAt: timestamp("paid_at"),
   callbackToken: text("callback_token").unique(),
+  notes: text("notes"),
+  journalEntryId: uuid("journal_entry_id"),
   metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -224,3 +255,171 @@ export type NewPaymentInvoice = z.infer<typeof insertPaymentInvoiceSchema>;
 
 export type PaymentDispute = z.infer<typeof selectPaymentDisputeSchema>;
 export type NewPaymentDispute = z.infer<typeof insertPaymentDisputeSchema>;
+
+/**
+ * Payment invoice lines table
+ * Individual line items on an invoice
+ */
+export const paymentInvoiceLines = pgTable("payment_invoice_lines", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  invoiceId: uuid("invoice_id")
+    .notNull()
+    .references(() => paymentInvoices.id, { onDelete: "cascade" }),
+  description: text("description").notNull(),
+  productId: uuid("product_id"),
+  quantity: numericNumber("quantity").notNull().default(1),
+  unitPrice: numericNumber("unit_price").notNull().default(0),
+  taxRate: numericNumber("tax_rate").notNull().default(0),
+  taxAmount: numericNumber("tax_amount").notNull().default(0),
+  lineTotal: numericNumber("line_total").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/**
+ * AP Bills table
+ * Accounts Payable bills received from suppliers
+ */
+export const paymentBills = pgTable("payment_bills", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  companyId: uuid("company_id")
+    .notNull()
+    .references(() => companies.id, { onDelete: "cascade" }),
+  supplierName: text("supplier_name").notNull(),
+  supplierVatNumber: text("supplier_vat_number"),
+  billNumber: text("bill_number"),
+  billDate: timestamp("bill_date").notNull(),
+  dueDate: timestamp("due_date"),
+  currency: text("currency", { enum: CurrencyDB }).notNull().default("EUR"),
+  status: text("status", { enum: BillStatusDB })
+    .notNull()
+    .default(BillStatus.DRAFT),
+  subtotal: numericNumber("subtotal").notNull().default(0),
+  taxAmount: numericNumber("tax_amount").notNull().default(0),
+  total: numericNumber("total").notNull().default(0),
+  notes: text("notes"),
+  journalEntryId: uuid("journal_entry_id"),
+  paidAt: timestamp("paid_at"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/**
+ * AP Bill lines table
+ * Individual line items on a bill
+ */
+export const paymentBillLines = pgTable("payment_bill_lines", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  billId: uuid("bill_id")
+    .notNull()
+    .references(() => paymentBills.id, { onDelete: "cascade" }),
+  description: text("description").notNull(),
+  productId: uuid("product_id"),
+  expenseAccountId: uuid("expense_account_id"),
+  quantity: numericNumber("quantity").notNull().default(1),
+  unitPrice: numericNumber("unit_price").notNull().default(0),
+  taxRate: numericNumber("tax_rate").notNull().default(0),
+  taxAmount: numericNumber("tax_amount").notNull().default(0),
+  lineTotal: numericNumber("line_total").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/**
+ * Estimates table
+ * Sales estimates / quotes sent to customers
+ */
+export const paymentEstimates = pgTable("payment_estimates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  companyId: uuid("company_id")
+    .notNull()
+    .references(() => companies.id, { onDelete: "cascade" }),
+  estimateNumber: text("estimate_number").notNull(),
+  status: text("status", { enum: EstimateStatusDB })
+    .notNull()
+    .default(EstimateStatus.DRAFT),
+  customerId: uuid("customer_id"),
+  customerEmail: text("customer_email"),
+  customerName: text("customer_name"),
+  currency: text("currency", { enum: CurrencyDB }).notNull().default("EUR"),
+  validUntil: timestamp("valid_until"),
+  title: text("title"),
+  notes: text("notes"),
+  terms: text("terms"),
+  subtotal: numericNumber("subtotal").notNull().default(0),
+  taxAmount: numericNumber("tax_amount").notNull().default(0),
+  total: numericNumber("total").notNull().default(0),
+  sentAt: timestamp("sent_at"),
+  acceptedAt: timestamp("accepted_at"),
+  declinedAt: timestamp("declined_at"),
+  invoiceId: uuid("invoice_id"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/**
+ * Estimate lines table
+ * Individual line items on an estimate
+ */
+export const paymentEstimateLines = pgTable("payment_estimate_lines", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  estimateId: uuid("estimate_id")
+    .notNull()
+    .references(() => paymentEstimates.id, { onDelete: "cascade" }),
+  description: text("description").notNull(),
+  productId: uuid("product_id"),
+  quantity: numericNumber("quantity").notNull().default(1),
+  unitPrice: numericNumber("unit_price").notNull().default(0),
+  taxRate: numericNumber("tax_rate").notNull().default(0),
+  taxAmount: numericNumber("tax_amount").notNull().default(0),
+  lineTotal: numericNumber("line_total").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Zod schemas for new tables
+export const insertPaymentInvoiceLineSchema =
+  createInsertSchema(paymentInvoiceLines);
+export const selectPaymentInvoiceLineSchema =
+  createSelectSchema(paymentInvoiceLines);
+
+export const insertPaymentBillSchema = createInsertSchema(paymentBills);
+export const selectPaymentBillSchema = createSelectSchema(paymentBills);
+
+export const insertPaymentBillLineSchema = createInsertSchema(paymentBillLines);
+export const selectPaymentBillLineSchema = createSelectSchema(paymentBillLines);
+
+export const insertPaymentEstimateSchema = createInsertSchema(paymentEstimates);
+export const selectPaymentEstimateSchema = createSelectSchema(paymentEstimates);
+
+export const insertPaymentEstimateLineSchema =
+  createInsertSchema(paymentEstimateLines);
+export const selectPaymentEstimateLineSchema =
+  createSelectSchema(paymentEstimateLines);
+
+// Types for new tables
+export type PaymentInvoiceLine = z.infer<typeof selectPaymentInvoiceLineSchema>;
+export type NewPaymentInvoiceLine = z.infer<
+  typeof insertPaymentInvoiceLineSchema
+>;
+
+export type PaymentBill = z.infer<typeof selectPaymentBillSchema>;
+export type NewPaymentBill = z.infer<typeof insertPaymentBillSchema>;
+
+export type PaymentBillLine = z.infer<typeof selectPaymentBillLineSchema>;
+export type NewPaymentBillLine = z.infer<typeof insertPaymentBillLineSchema>;
+
+export type PaymentEstimate = z.infer<typeof selectPaymentEstimateSchema>;
+export type NewPaymentEstimate = z.infer<typeof insertPaymentEstimateSchema>;
+
+export type PaymentEstimateLine = z.infer<
+  typeof selectPaymentEstimateLineSchema
+>;
+export type NewPaymentEstimateLine = z.infer<
+  typeof insertPaymentEstimateLineSchema
+>;

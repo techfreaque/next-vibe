@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Purchase Credits",
+    titleShort: "Buy Credits",
     description: "Create Stripe checkout session for credit pack purchase",
     container: {
       title: "Purchase Credits",

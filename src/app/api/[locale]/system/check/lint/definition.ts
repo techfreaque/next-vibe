@@ -34,9 +34,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "check", "lint"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.devTools",
-  subCategory: "endpointCategories.devToolsCheck",
+  category: "devTools",
+  subCategory: "Check",
   tags: ["tag"],
   icon: "bug",
   allowedRoles: [

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "UND",
+    titleShort: "UND",
     description:
       "Feuert nur, wenn alle Eingangssignale zum gleichen Zeitstempel feuern",
     fields: {

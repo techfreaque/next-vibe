@@ -2,6 +2,7 @@ export const translations = {
   submit: {
     tag: "lead-magnet-capture",
     title: "Subscribe & Get Access",
+    titleShort: "Subscribe",
     description:
       "Submit your details to join the creator's list and get access to this skill",
     groups: {

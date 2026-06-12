@@ -27,11 +27,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { dateSchema } from "../../../shared/types/common.schema";
 import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
+import leadsListDefinitions from "@/app/api/[locale]/leads/list/definition";
+import { dateSchema } from "../../../shared/types/common.schema";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const UserDeleteContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UserDeleteContainer })),
@@ -51,10 +52,11 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["users", "user", "[id]"],
   title: "id.get.title" as const,
+  titleShort: "id.get.titleShort" as const,
   description: "id.get.description" as const,
   icon: "user",
-  category: "userAuth",
-  subCategory: "userAdminManagement",
+  category: "account",
+  subCategory: "manageUsers",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
@@ -408,10 +410,11 @@ const { PUT } = createEndpoint({
   method: Methods.PUT,
   path: ["users", "user", "[id]"],
   title: "id.put.title" as const,
+  titleShort: "id.put.titleShort" as const,
   description: "id.put.description" as const,
   icon: "user-check" as const,
-  category: "userAuth",
-  subCategory: "userAdminManagement",
+  category: "account",
+  subCategory: "manageUsers",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
@@ -541,7 +544,9 @@ const { PUT } = createEndpoint({
       }),
       leadId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: leadsListDefinitions.GET,
+        labelField: "email",
         label: "id.put.leadId.label" as const,
         description: "id.put.leadId.description" as const,
         columns: 6,
@@ -696,10 +701,11 @@ const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["users", "user", "[id]"],
   title: "id.delete.title" as const,
+  titleShort: "id.delete.titleShort" as const,
   description: "id.delete.description" as const,
   icon: "user-x" as const,
-  category: "userAuth",
-  subCategory: "userAdminManagement",
+  category: "account",
+  subCategory: "manageUsers",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 

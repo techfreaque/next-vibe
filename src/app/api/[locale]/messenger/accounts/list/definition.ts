@@ -42,8 +42,9 @@ import {
 } from "../enum";
 import { scopedTranslation } from "./i18n";
 import { MessageChannel, MessageChannelDB } from "../enum";
+import { MESSENGER_ACCOUNTS_ALIAS } from "./constants";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const MessengerAccountsListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -55,13 +56,16 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["messenger", "accounts", "list"],
+  aliases: [MESSENGER_ACCOUNTS_ALIAS] as const,
   title: "title",
+  titleShort: "titleShort",
   description: "description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.messengerAccounts",
+  category: "messenger",
+  subCategory: "Accounts",
   icon: "message-circle",
   tags: ["tags.messaging"],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: MessengerAccountsListContainer,

@@ -1,58 +1,73 @@
-export const translations = {
-  title: "Mark Read",
-  description: "Mark a message as read or unread",
-  tag: "Inbox",
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
+  title: "Als gelesen markieren",
+  titleShort: "Als gelesen",
+  description: "Eine Nachricht als gelesen oder ungelesen markieren",
+  tag: "Posteingang",
 
   container: {
-    title: "Mark Message",
-    description: "Update the read status of a message",
+    title: "Nachricht markieren",
+    description: "Lesestatus einer Nachricht aktualisieren",
   },
 
   accountId: {
-    label: "Account",
-    description: "Messenger account",
-    placeholder: "Account UUID",
+    label: "Konto",
+    description: "Messenger-Konto",
+    placeholder: "Konto-UUID",
   },
   uid: {
-    label: "Message UID",
-    description: "The UID of the message",
+    label: "Nachrichten-UID",
+    description: "UID der Nachricht",
     placeholder: "12345",
   },
   folderPath: {
-    label: "Folder",
-    description: "Folder path containing the message",
+    label: "Ordner",
+    description: "Ordnerpfad, der die Nachricht enthält",
     placeholder: "INBOX",
   },
   isRead: {
-    label: "Mark as Read",
-    description: "Set to true to mark as read, false to mark as unread",
+    label: "Als gelesen markieren",
+    description:
+      "Aktivieren zum Markieren als gelesen, deaktivieren für ungelesen",
   },
 
-  updated: { label: "Updated" },
+  updated: { label: "Aktualisiert" },
 
   errors: {
-    validation: { title: "Validation Error", description: "Check your input" },
-    unauthorized: { title: "Unauthorized", description: "Login required" },
-    server: { title: "Server Error", description: "Internal server error" },
-    unknown: { title: "Unknown Error", description: "Unexpected error" },
-    forbidden: { title: "Forbidden", description: "Access denied" },
-    network: { title: "Network Error", description: "Network error" },
+    validation: {
+      title: "Ungültige Eingabe",
+      description: "Bitte Eingaben prüfen",
+    },
+    unauthorized: {
+      title: "Nicht angemeldet",
+      description: "Anmeldung erforderlich",
+    },
+    server: { title: "Serverfehler", description: "Interner Serverfehler" },
+    unknown: {
+      title: "Unbekannter Fehler",
+      description: "Ein unerwarteter Fehler ist aufgetreten",
+    },
+    forbidden: { title: "Kein Zugriff", description: "Zugriff verweigert" },
+    network: {
+      title: "Netzwerkfehler",
+      description: "Netzwerkfehler aufgetreten",
+    },
     notFound: {
-      title: "Account Not Found",
-      description: "Messenger account not found",
+      title: "Konto nicht gefunden",
+      description: "Messenger-Konto nicht gefunden",
     },
     conflict: {
-      title: "Conflict",
-      description: "Request conflicts with existing data",
+      title: "Konflikt",
+      description: "Anfrage steht im Konflikt mit vorhandenen Daten",
     },
     unsavedChanges: {
-      title: "Unsaved Changes",
-      description: "You have unsaved changes",
+      title: "Ungespeicherte Änderungen",
+      description: "Sie haben ungespeicherte Änderungen",
     },
   },
 
   success: {
-    title: "Message Updated",
-    description: "Read status updated successfully",
+    title: "Nachricht aktualisiert",
+    description: "Lesestatus erfolgreich aktualisiert",
   },
 };

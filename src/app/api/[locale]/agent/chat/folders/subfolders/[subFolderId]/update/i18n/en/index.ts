@@ -6,6 +6,7 @@ export const translations = {
 
   patch: {
     title: "Update Folder",
+    titleShort: "Update Folder",
     description: "Update an existing folder",
     container: {
       title: "Update Folder",

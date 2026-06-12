@@ -13,11 +13,12 @@ import endpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, platform, t, locale, streamContext }) => {
-      const { OxlintRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return await OxlintRepository.execute(
+    handler: async ({ data, logger, platform, t, locale, streamContext }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).OxlintRepository.execute(
         data,
         logger,
         platform,
@@ -25,7 +26,6 @@ export const { tools } = endpointsHandler({
         streamContext.abortSignal,
         locale,
         undefined,
-      );
-    },
+      ),
   },
 });

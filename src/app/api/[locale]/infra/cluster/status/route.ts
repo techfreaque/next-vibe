@@ -8,11 +8,11 @@ import clusterStatusEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: clusterStatusEndpoints,
   [Methods.GET]: {
-    handler: async ({ logger, t }) => {
-      const { ClusterStatusRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return ClusterStatusRepository.get(logger, t);
-    },
+    handler: async ({ logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).ClusterStatusRepository.get(logger, t),
   },
 });

@@ -8,7 +8,8 @@ export const translations: typeof enTranslations = {
     count_failed: "Fehler beim Abrufen der Konversationsanzahl: {{error}}",
   },
   get: {
-    title: "Chat-Threads auflisten",
+    title: "Threads",
+    titleShort: "Threads",
     description:
       "Eine paginierte Liste von Chat-Threads mit Filteroptionen abrufen",
     container: {
@@ -176,7 +177,8 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Chat-Thread erstellen",
+    title: "Neuer Thread",
+    titleShort: "Neuer Thread",
     description: "Einen neuen Chat-Thread erstellen",
     form: {
       title: "Thread erstellen",

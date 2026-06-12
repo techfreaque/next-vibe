@@ -3,6 +3,8 @@
  * /api/agent/chat/credits
  */
 
+import "server-only";
+
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
@@ -12,14 +14,8 @@ import { CreditRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: async ({ user, locale, logger, t }) => {
-      return await CreditRepository.getCreditBalanceForUser(
-        user,
-        locale,
-        logger,
-        t,
-      );
-    },
+    handler: async ({ user, locale, logger, t }) =>
+      CreditRepository.getCreditBalanceForUser(user, locale, logger, t),
     canSubscribe: ({ user }) => !!user.id,
   },
 });

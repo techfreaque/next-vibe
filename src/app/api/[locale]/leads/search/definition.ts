@@ -32,6 +32,7 @@ import {
   LeadStatusDB,
 } from "../enum";
 import { scopedTranslation } from "./i18n";
+import { LEADS_SEARCH_ALIAS } from "./constants";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
@@ -75,13 +76,15 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["leads", "search"],
+  aliases: [LEADS_SEARCH_ALIAS] as const,
   allowedRoles: [UserRole.ADMIN],
   icon: "search",
 
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   tags: ["tags.leads", "tags.search"],
 
   fields: customWidgetObject({

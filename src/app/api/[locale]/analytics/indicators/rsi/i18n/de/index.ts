@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "RSI",
+    titleShort: "RSI",
     description:
       "Relativer-Stärke-Index - misst Momentum auf einer Skala von 0–100",
     fields: {

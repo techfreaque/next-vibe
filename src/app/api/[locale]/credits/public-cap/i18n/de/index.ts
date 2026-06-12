@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Öffentliches Gratis-Tageslimit abrufen",
+    titleShort: "Gratis-Limit",
     description: "Heutige globale Gratis-Guthaben-Ausgaben und Limit anzeigen",
     container: {
       title: "Öffentliches Gratis-Tageslimit",
@@ -75,6 +76,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Öffentliches Gratis-Tageslimit aktualisieren",
+    titleShort: "Limit ändern",
     description: "Globales Tageslimit für nicht zahlende Nutzer aktualisieren",
     capAmount: {
       label: "Tageslimit (Credits)",

@@ -11,6 +11,7 @@ export const translations = {
   },
   post: {
     title: "Execute Task",
+    titleShort: "Execute Task",
     description:
       "Trigger a single task by ID and receive the result synchronously",
     container: {

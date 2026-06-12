@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "EMA",
+    titleShort: "EMA",
     description:
       "Exponential Moving Average - weights recent prices more heavily",
     fields: {

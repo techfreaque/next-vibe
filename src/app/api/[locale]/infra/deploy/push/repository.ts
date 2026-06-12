@@ -17,7 +17,7 @@ import type {
   DeployPushRequestOutput,
   DeployPushResponseOutput,
 } from "./definition";
-import type { DeployPushT } from "./i18n";
+import type { InfraT } from "../../i18n";
 
 /**
  * Deploy infrastructure changes via Pulumi.
@@ -28,7 +28,7 @@ export class DeployPushRepository {
   static async push(
     data: DeployPushRequestOutput,
     logger: EndpointLogger,
-    t: DeployPushT,
+    t: InfraT,
   ): Promise<ResponseType<DeployPushResponseOutput>> {
     const start = Date.now();
 

@@ -5,6 +5,7 @@ export const translations = {
   },
   patch: {
     title: "Rename Thread",
+    titleShort: "Rename Thread",
     description: "Update the title and preview of a chat thread",
     container: {
       title: "Rename Thread",

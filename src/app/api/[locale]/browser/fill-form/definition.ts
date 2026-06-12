@@ -22,8 +22,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -33,10 +34,12 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "fill-form"],
+  aliases: ["browser-fill-form"] as const,
   title: "fill-form.title",
+  titleShort: "fill-form.titleShort",
   description: "fill-form.description",
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserInteraction",
+  category: "browser",
+  subCategory: "Interaction",
   icon: "pen-tool",
   tags: ["fill-form.tags.browserAutomation", "fill-form.tags.inputAutomation"],
 
@@ -76,6 +79,8 @@ const { POST } = createEndpoint({
           },
         }),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

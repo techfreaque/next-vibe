@@ -24,6 +24,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Cron-Aufgaben auflisten",
+    titleShort: "Cron-Tasks",
     description: "Liste der Cron-Aufgaben mit optionaler Filterung abrufen",
     container: {
       title: "Cron-Aufgaben Liste",
@@ -165,6 +166,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Cron-Aufgabe erstellen",
+    titleShort: "Aufgabe erstellen",
     description: "Neue Cron-Aufgabe erstellen",
     container: {
       title: "Aufgabe erstellen",

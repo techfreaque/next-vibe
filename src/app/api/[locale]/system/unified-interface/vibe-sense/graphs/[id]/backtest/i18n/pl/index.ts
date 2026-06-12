@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Uruchom backtest",
+    titleShort: "Backtest",
     description: "Uruchom backtest na historycznym zakresie (akcje symulowane)",
     fields: {
       id: { label: "ID grafu", description: "UUID grafu" },

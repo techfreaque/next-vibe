@@ -49,6 +49,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Starter kampanii",
+    titleShort: "Uruchom kampanię",
     description: "Uruchom kampanie dla nowych leadów",
     errors: {
       unauthorized: {
@@ -111,6 +112,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz konfigurację startera kampanii",
+    titleShort: "Konfiguracja kampanii",
     description: "Załaduj konfigurację startera kampanii",
     errors: {
       unauthorized: {
@@ -288,6 +290,15 @@ export const translations: typeof enTranslations = {
       advanced: "Zaawansowane",
       advancedDescription:
         "Ustawienia wykonywania zadań, takie jak priorytet, limity czasu i zachowanie ponownych prób.",
+    },
+    days: {
+      mon: "Pon",
+      tue: "Wt",
+      wed: "Śr",
+      thu: "Czw",
+      fri: "Pt",
+      sat: "Sob",
+      sun: "Nd",
     },
   },
 };

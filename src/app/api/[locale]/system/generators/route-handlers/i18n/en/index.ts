@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Route Handlers Generator",
+    titleShort: "Route Handlers",
     description: "Generate route-handlers.ts with dynamic imports",
     container: {
       title: "Route Handlers Generator Configuration",

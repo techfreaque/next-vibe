@@ -26,7 +26,7 @@ import {
   MessengerAccountStatus,
   MessengerProvider as MessengerProviderEnum,
 } from "../../accounts/enum";
-import { scopedTranslation as providerScopedTranslation } from "../i18n";
+import { scopedTranslation as providerScopedTranslation } from "../../i18n";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { SendOnlyProvider } from "../send-only-base";
 

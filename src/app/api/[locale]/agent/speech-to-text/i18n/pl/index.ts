@@ -141,6 +141,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Mowa na tekst",
+    titleShort: "Mowa na tekst",
     description:
       "Konwertuj audio na tekst za pomocą transkrypcji AI (0,013 kredytów na sekundę, 0,78 kredytów na minutę)",
     form: {
@@ -159,6 +160,10 @@ export const translations: typeof enTranslations = {
         maxSize: "Rozmiar pliku musi być mniejszy niż 25 MB",
         audioOnly: "Proszę przesłać plik audio lub wideo",
       },
+    },
+    model: {
+      label: "Model",
+      description: "Model transkrypcji",
     },
     provider: {
       label: "Dostawca",
@@ -211,6 +216,7 @@ export const translations: typeof enTranslations = {
       title: "Sukces",
       description: "Audio transkrybowane pomyślnie",
       transcriptionComplete: "Transkrypcja zakończona pomyślnie",
+      transcribing: "Transkrybowanie…",
     },
   },
   providers: {

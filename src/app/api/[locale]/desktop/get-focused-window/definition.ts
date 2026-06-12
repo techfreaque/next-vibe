@@ -16,7 +16,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
 
@@ -28,7 +28,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["desktop", "get-focused-window"],
+  aliases: ["desktop-get-focused-window"] as const,
   title: "get-focused-window.title",
+  titleShort: "get-focused-window.titleShort",
   description: "get-focused-window.description",
   category: "desktop",
   subCategory: "Windows",

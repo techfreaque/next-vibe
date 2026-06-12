@@ -46,6 +46,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Newsletter abmelden",
+    titleShort: "Abmelden",
     description: "Vom Newsletter abmelden",
     form: {
       title: "Vom Newsletter abmelden",

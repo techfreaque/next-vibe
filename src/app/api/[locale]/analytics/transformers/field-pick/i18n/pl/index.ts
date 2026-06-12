@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Wybór pola",
+    titleShort: "Wybór pola",
     description:
       "Wybór pola - wyodrębnia nazwane pole (przestarzałe, zwraca pustą tablicę)",
     fields: {

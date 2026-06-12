@@ -24,6 +24,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "db", "migrate"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   category: "database",
   subCategory: "Migrations",
@@ -31,9 +32,9 @@ const { POST } = createEndpoint({
   icon: "arrow-right",
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
-    UserRole.CLI_AUTH_BYPASS,
   ],
   aliases: ["migrate", "db:migrate", "m"],
 

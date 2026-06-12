@@ -1,6 +1,7 @@
 export const translations = {
   get: {
     title: "Chart of Accounts",
+    titleShort: "Accounts",
     description: "Full account tree for a company with hierarchical structure",
     companyId: {
       label: "Company ID",

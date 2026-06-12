@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
   tag: "migration",
   post: {
     title: "Datenbankmigration",
+    titleShort: "DB migrieren",
     description: "Datenbankmigrationen ausführen",
     form: {
       title: "Migrationskonfiguration",

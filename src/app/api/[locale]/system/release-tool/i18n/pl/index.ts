@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Narzędzie do wydań",
+  titleShort: "Narzędzie wydania",
   description:
     "Zarządzaj wydaniami pakietów z wersjonowaniem, tagowaniem Git i integracją CI/CD",
   category: "Narzędzie do wydań",

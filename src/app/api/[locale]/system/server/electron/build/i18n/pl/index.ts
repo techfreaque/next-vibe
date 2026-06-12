@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Zbuduj aplikację Electron",
+    titleShort: "Zbuduj Electron",
     description:
       "Kompiluj main/preload przez bun, uruchom vibe build, następnie spakuj przez electron-builder",
     form: {

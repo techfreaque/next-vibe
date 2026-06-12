@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Titel",
+    titleShort: "Seeds",
     description: "Endpunkt-Beschreibung",
     form: {
       title: "Konfiguration",

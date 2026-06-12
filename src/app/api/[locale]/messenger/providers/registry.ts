@@ -22,7 +22,7 @@ import {
 } from "../accounts/enum";
 import { resendProvider } from "./email/resend";
 import { smtpProvider } from "./email/smtp";
-import { scopedTranslation as providerScopedTranslation } from "./i18n";
+import { scopedTranslation as providerScopedTranslation } from "../i18n";
 import type { MessengerProvider } from "./provider";
 import { SmsMessengerProvider } from "./sms/twilio";
 import { TelegramMessengerProvider } from "./telegram/telegram-bot";

@@ -12,23 +12,23 @@ import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Tag } from "next-vibe-ui/ui/icons/Tag";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
-import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
+import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 
 import { LeadStatus } from "../enum";
@@ -103,6 +103,18 @@ export function LeadCreateContainer({
     }
     void navigator.clipboard.writeText(createdLeadId);
   }, [createdLeadId]);
+
+  // Auto-navigate to lead detail on successful creation
+  useEffect(() => {
+    if (!createdLeadId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const leadDef =
+        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      navigate(leadDef.default.GET, { urlPathParams: { id: createdLeadId } });
+    })();
+  }, [createdLeadId, navigate]);
 
   // Success state
   if (data?.lead?.summary?.id) {

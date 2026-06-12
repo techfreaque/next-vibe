@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Czyszczenie sesji",
+    titleShort: "Wyczyść sesje",
     description: "Oczyszczanie wygasłych sesji i tokenów użytkowników",
     tag: "Czyszczenie sesji",
     container: {

@@ -37,3 +37,35 @@ export function openUrl(url: string): void {
     // Silently handle URL opening failures
   });
 }
+
+/**
+ * Open URL in a new tab — on native, same as openUrl (opens in system browser)
+ */
+export function openInNewTab(url: string): void {
+  Linking.openURL(url).catch(() => {
+    // Silently handle URL opening failures
+  });
+}
+
+/**
+ * Get viewport width — returns 0 on native (use useWindowDimensions instead for reactive)
+ */
+export function getScreenWidth(): number {
+  return 0;
+}
+
+/**
+ * Push URL to history — no-op on native
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function silentPushState(_url: string): void {
+  // No browser history on native
+}
+
+/**
+ * Replace URL in history — no-op on native
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function silentReplaceState(_url: string): void {
+  // No browser history on native
+}

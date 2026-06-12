@@ -8,13 +8,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
-      return await CoaJournalCreateRepository.createEntry(
-        data,
-        user,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ data, user, logger, locale }) =>
+      CoaJournalCreateRepository.createEntry(data, user, logger, locale),
   },
 });

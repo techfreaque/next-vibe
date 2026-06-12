@@ -14,9 +14,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, logger, locale, platform }) => {
-      return SkillsRepository.getSkills(data, user, logger, locale, platform);
-    },
+    handler: ({ data, user, logger, locale, platform }) =>
+      SkillsRepository.getSkills(data, user, logger, locale, platform),
     canSubscribe: ({ user }) => !!user.leadId,
   },
 });

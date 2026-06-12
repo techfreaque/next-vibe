@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Opublikuj umiejętność",
+    titleShort: "Opublikuj skill",
     description:
       "Opublikuj lub cofnij publikację umiejętności. PUBLISHED czyni ją widoczną w sklepie społeczności.",
     dynamicTitle: "Publikuj: {{name}}",

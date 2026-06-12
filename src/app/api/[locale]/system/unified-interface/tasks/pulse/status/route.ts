@@ -11,8 +11,6 @@ import pulseStatusEndpoint from "./definition";
 export const { GET, tools } = endpointsHandler({
   endpoint: pulseStatusEndpoint,
   [Methods.GET]: {
-    handler: async ({ locale }) => {
-      return await PulseHealthRepository.getHealthStatus(locale);
-    },
+    handler: ({ locale }) => PulseHealthRepository.getHealthStatus(locale),
   },
 });

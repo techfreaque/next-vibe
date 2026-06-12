@@ -13,11 +13,11 @@ import endpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { EnvGeneratorRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return EnvGeneratorRepository.generateEnv(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).EnvGeneratorRepository.generateEnv(data, logger, t),
   },
 });

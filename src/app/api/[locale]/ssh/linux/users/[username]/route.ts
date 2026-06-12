@@ -6,14 +6,16 @@ import endpoints from "./definition";
 export const { DELETE, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.DELETE]: {
-    handler: async ({ data, logger, urlPathParams, t }) => {
-      const { LinuxUserDeleteRepository } = await import("./repository");
-      return LinuxUserDeleteRepository.delete(
+    handler: async ({ data, logger, urlPathParams, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).LinuxUserDeleteRepository.delete(
         data,
         logger,
         urlPathParams?.["username"] ?? "",
         t,
-      );
-    },
+      ),
   },
 });

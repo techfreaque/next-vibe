@@ -1,10 +1,13 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Konto",
   tags: {
     remoteConnection: "Połączenie zdalne",
   },
   widget: {
     signInDescription: "Zaloguj się, aby połączyć się ze zdalnym kontem.",
+    adminOnlyDescription:
+      "Tworzenie połączeń wychodzących wymaga uprawnień administratora. Jeśli zostałeś połączony przez zdalną instancję, twoje połączenia są widoczne powyżej.",
     benefit1:
       "Wspomnienia synchronizują się automatycznie - wszystko czego uczysz AI przenosi się",
     benefit2: "Dostęp do modeli AI w chmurze i narzędzi z lokalnej instancji",
@@ -19,6 +22,7 @@ export const translations = {
   },
   post: {
     title: "Połącz z kontem zdalnym",
+    titleShort: "Połącz zdalnie",
     description:
       "Połącz swoje konto ze zdalną instancją, aby synchronizować wspomnienia",
     remoteUrl: {
@@ -59,6 +63,28 @@ export const translations = {
       label: "ID leada",
       description: "ID leada zdalnej instancji (ustawiane automatycznie)",
     },
+    transportMode: {
+      label: "Tryb transportu",
+      description:
+        "Sposób komunikacji tej instancji ze zdalną. reverse-ws: stałe połączenie wychodzące (zalecane). ws-provider: zdalna instancja obsługuje pętlę wnioskowania AI.",
+      default: "reverse-ws (domyślny)",
+    },
+    isInferenceProvider: {
+      label: "Użyj jako dostawca wnioskowania",
+      description:
+        "Pozwala tej instancji na uruchamianie strumieni AI — zdalna instancja obsługuje pętlę AI przez odwrotny kanał WS.",
+    },
+    syncScope: {
+      label: "Zakres synchronizacji",
+      description: "Które dane są synchronizowane przez to połączenie.",
+      memories: "Wspomnienia",
+      documents: "Dokumenty",
+      skills: "Umiejętności",
+      tasks: "Zadania",
+      cortex: "Pliki Cortex",
+      defaultNote: "Wszystkie domyślnie włączone. Dostosuj po połączeniu.",
+    },
+    advancedSettings: "Ustawienia zaawansowane",
     credentialWarning:
       "Twoje dane logowania trafiają bezpośrednio z przeglądarki do serwera zdalnego. Jednak token przechowywany tutaj daje operatorowi tego serwera pełny dostęp do twojego zdalnego konta - może robić wszystko co ty. Łącz się tylko na serwerach, którym w pełni ufasz.",
     actions: {
@@ -79,8 +105,9 @@ export const translations = {
         description: "Nieprawidłowy email lub hasło do zdalnego konta",
       },
       forbidden: {
-        title: "Brak dostępu",
-        description: "Twoje konto nie ma uprawnień do połączenia",
+        title: "Połączenia niedozwolone",
+        description:
+          "Serwer zdalny nie przyjmuje połączeń przychodzących. Upewnij się, że łączysz się z instancją chmurową (np. unbottled.ai), a nie z inną lokalną instalacją.",
       },
       notFound: {
         title: "Nie znaleziono",

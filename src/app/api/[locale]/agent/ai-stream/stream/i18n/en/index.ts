@@ -14,6 +14,7 @@ export const translations = {
     },
     post: {
       title: "Run AI Agent",
+      titleShort: "Run Agent",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
         "Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.",
@@ -25,18 +26,18 @@ export const translations = {
         favoriteId: {
           label: "Favorite ID",
           description:
-            "Slug or ID of a saved favorite. Loads skill, model, and tool config as defaults. Explicit fields in this request override favorite values.",
-          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+            "Slug of a saved favorite (e.g. 'thea-cheap'). Not a skill slug — use skill field for that. Loads skill, model, and tool config in one shot. Priority when multiple set: model > favoriteId > skill.",
+          placeholder: "thea-cheap",
         },
         model: {
-          label: "Model",
+          label: "Model (CLI only)",
           description:
-            "LLM for text reasoning. Optional when favoriteId or skill is set. Fast: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.7. Free: qwen3_235b-free. Not for image/audio/video generation.",
+            "Override the LLM directly. CLI only — other platforms use favoriteId or skill instead. Fast: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.7. Free: qwen3_235b-free.",
         },
         skill: {
           label: "Skill",
           description:
-            "Skill ID or default skill name. Defines the AI persona and system prompt. Use 'skill-creator' to create/edit AI skills. Optional when favoriteId is set.",
+            "Skill slug (e.g. 'thea', 'thea__cheap-smart'). Not a favorite slug — use favoriteId for that. Defines the AI persona and system prompt. Use 'skill-creator' to create/edit skills.",
           placeholder: "default",
         },
         prompt: {
@@ -186,6 +187,10 @@ export const translations = {
           description: "Data conflict occurred",
         },
       },
+      requireFavOrSkill:
+        "Provide at least one of: favoriteId, skill, or model (CLI only). Cannot run without a resolvable model and skill.",
+      skillNotFound:
+        "Skill '{{skill}}' not found. If this is a favorite slug (e.g. 'thea-cheap'), use --favoriteId instead of --skill.",
       success: {
         title: "AI Run Complete",
         description: "The AI agent completed successfully",
@@ -219,8 +224,9 @@ export const translations = {
   },
   post: {
     title: "AI Stream Chat",
+    titleShort: "AI Chat",
     description:
-      "Stream AI-powered chat responses using {{modelCount}} models (Claude, GPT, Gemini, Llama, and more). Supports text, voice, file attachments, and agentic tool use.",
+      "Stream AI-powered chat responses using 100+ models (Claude, GPT, Gemini, Llama, and more). Supports text, voice, file attachments, and agentic tool use.",
     form: {
       title: "AI Chat Configuration",
       description: "Configure AI chat parameters and messages",
@@ -551,6 +557,7 @@ export const translations = {
   resumeStream: {
     post: {
       title: "Resume AI Stream",
+      titleShort: "Resume Stream",
       description:
         "Continue an existing thread by running a headless AI turn. Used after an async remote task completes (callbackMode=wait or wakeUp). Pass favoriteId to load model+skill in one shot, or set modelId+skillId explicitly.",
       fields: {

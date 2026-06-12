@@ -19,7 +19,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
@@ -33,9 +33,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "models", "model-prices"],
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiInference",
+  category: "ai",
+  subCategory: "Inference",
   tags: ["tags.models" as const],
   allowedRoles: [
     UserRole.ADMIN,

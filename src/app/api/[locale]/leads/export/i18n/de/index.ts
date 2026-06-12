@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Leads exportieren",
+    titleShort: "Leads exportieren",
     description: "Lead-Daten in Datei exportieren",
     form: {
       title: "Export-Konfiguration",

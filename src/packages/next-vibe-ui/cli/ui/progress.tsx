@@ -1,7 +1,7 @@
-import { Box, Text } from "ink";
+import { Text } from "ink";
 import type { JSX } from "react";
 
-import { useIsMcp } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type {
   ProgressRootProps,
   ProgressIndicatorProps,
@@ -38,14 +38,14 @@ export function Progress({ value, max = 100 }: ProgressRootProps): JSX.Element {
   const filledBar = "█".repeat(filled);
   const emptyBar = "░".repeat(empty);
 
+  // Use Text-only rendering to avoid Box-inside-Text crashes when
+  // Progress is nested inside Span/Text contexts (e.g. sidebar footer).
   return (
-    <Box>
-      <Text color="cyan">[</Text>
-      <Text color="cyan">{filledBar}</Text>
+    <Text>
+      <Text color="cyan">[{filledBar}</Text>
       <Text dimColor>{emptyBar}</Text>
-      <Text color="cyan">]</Text>
-      <Text> {pct}%</Text>
-    </Box>
+      <Text color="cyan">] {pct}%</Text>
+    </Text>
   );
 }
 Progress.displayName = "Progress";
@@ -62,10 +62,10 @@ export function ProgressIndicator({
 
   const { filled, empty } = buildBar(pct);
   return (
-    <Box>
+    <Text>
       <Text color="cyan">{"█".repeat(filled)}</Text>
       <Text dimColor>{"░".repeat(empty)}</Text>
-    </Box>
+    </Text>
   );
 }
 ProgressIndicator.displayName = "ProgressIndicator";

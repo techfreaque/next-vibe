@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Użytkownicy z włączonym 2FA",
+    titleShort: "Włączone 2FA",
     description: "Liczba użytkowników z włączonym 2FA na przedział czasu",
     fields: {
       resolution: {

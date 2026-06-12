@@ -1,10 +1,12 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Umiejętności AI",
   tags: {
     moderation: "Moderacja",
   },
   get: {
     title: "Zgłoszone umiejętności",
+    titleShort: "Moderacja",
     description:
       "Lista umiejętności ze zgłoszeniami, posortowana według liczby zgłoszeń",
     fields: {
@@ -82,6 +84,7 @@ export const translations = {
   },
   patch: {
     title: "Moderuj umiejętność",
+    titleShort: "Moderuj skill",
     description: "Ukryj zgłoszoną umiejętność lub wyczyść jej zgłoszenia",
     fields: {
       id: {

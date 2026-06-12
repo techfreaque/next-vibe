@@ -1,6 +1,8 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   post: {
     title: "Uzupełnij embeddingi",
+    titleShort: "Uzupełnij dane",
     description: "Wygeneruj embeddingi dla wszystkich węzłów bez wektorów.",
     status: {
       loading: "Osadzanie...",

@@ -7,6 +7,7 @@ export const translations = {
 
   get: {
     title: "Get Lead Details",
+    titleShort: "Lead Details",
     description: "Retrieve detailed information about a specific lead",
     backButton: {
       label: "Back to Leads",
@@ -272,6 +273,7 @@ export const translations = {
   },
   patch: {
     title: "Update Lead",
+    titleShort: "Edit Lead",
     description: "Update lead information and status",
     backButton: {
       label: "Back to Lead",
@@ -707,6 +709,7 @@ export const translations = {
   },
   delete: {
     title: "Delete Lead",
+    titleShort: "Delete Lead",
     description: "Delete a lead from the system",
     container: {
       title: "Delete Lead",

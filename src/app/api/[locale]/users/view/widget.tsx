@@ -5,32 +5,32 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { DetailField, DetailGrid } from "next-vibe-ui/ui/detail-grid";
 import { Div } from "next-vibe-ui/ui/div";
+import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
-import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
-import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
-import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
-import { Gift } from "next-vibe-ui/ui/icons/Gift";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { User } from "next-vibe-ui/ui/icons/User";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
-import { Separator } from "next-vibe-ui/ui/separator";
+import { ListItem } from "next-vibe-ui/ui/list-item";
+import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
+import { MetricCard } from "next-vibe-ui/ui/metric-card";
+import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
+import { SectionGroup } from "next-vibe-ui/ui/section-group";
 import { Span } from "next-vibe-ui/ui/span";
+import { StatusPill } from "next-vibe-ui/ui/status-pill";
 import {
   Table,
   TableBody,
@@ -40,6 +40,8 @@ import {
   TableRow,
 } from "next-vibe-ui/ui/table";
 import { P } from "next-vibe-ui/ui/typography";
+import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import { useCallback, useMemo, useState } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
@@ -50,8 +52,8 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import type definition from "./definition";
@@ -81,22 +83,11 @@ function formatCurrency(cents: number): string {
 }
 
 /**
- * Format a role enum key like "enums.userRole.partnerAdmin" to "Partner Admin"
- */
-function formatRoleLabel(roleKey: string): string {
-  const lastSegment = roleKey.split(".").pop() ?? roleKey;
-  return lastSegment
-    .replace(/([A-Z])/g, " $1")
-    .replace(/^./, (c) => c.toUpperCase())
-    .trim();
-}
-
-/**
  * Format date to readable string
  */
 function formatDate(date: Date | null | undefined, locale: string): string {
   if (!date) {
-    return "Never";
+    return "—";
   }
   return new Date(date).toLocaleDateString(locale, {
     year: "numeric",
@@ -105,44 +96,6 @@ function formatDate(date: Date | null | undefined, locale: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
-
-/**
- * Stat card component
- */
-function StatCard({
-  title,
-  value,
-  description,
-  icon: Icon,
-  colorClassName,
-}: {
-  title: string;
-  value: string | number;
-  description?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  colorClassName: string;
-}): React.JSX.Element {
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <Div className="flex items-start gap-3">
-          <Div className={`rounded-lg p-2 ${colorClassName}`}>
-            <Icon className="h-5 w-5" />
-          </Div>
-          <Div className="flex-1 min-w-0">
-            <P className="text-xs text-muted-foreground mb-1">{title}</P>
-            <P className="text-2xl font-bold tabular-nums">{value}</P>
-            {description && (
-              <P className="text-xs text-muted-foreground mt-1">
-                {description}
-              </P>
-            )}
-          </Div>
-        </Div>
-      </CardContent>
-    </Card>
-  );
 }
 
 /**
@@ -315,11 +268,7 @@ export function UserViewContainer({
   );
 
   if (!data) {
-    return (
-      <Div className="flex flex-col items-center justify-center py-12 text-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </Div>
-    );
+    return <LoadingBlock />;
   }
 
   const {
@@ -347,157 +296,153 @@ export function UserViewContainer({
   ];
 
   return (
-    <Div className="flex flex-col gap-4">
-      {/* Top action bar */}
-      <Div className="flex items-center gap-2">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex-1" />
-        {userId && (
-          <>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => void handleEdit()}
-              className="gap-1"
-            >
-              <Pencil className="h-4 w-4" />
-              {t("widget.actions.edit")}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => void handleAddCredits()}
-              className="gap-1"
-            >
-              <Coins className="h-4 w-4" />
-              {t("widget.actions.addCredits")}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => void handleDelete()}
-              className="gap-1 text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-              {t("widget.actions.delete")}
-            </Button>
-            {basicInfo.isBanned ? (
+    <WidgetShell>
+      <WidgetHeader
+        title={basicInfo.privateName}
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+        actions={
+          userId ? (
+            <>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => void handleUnban()}
-                className="gap-1 text-success hover:text-success/80"
+                onClick={() => void handleEdit()}
+                className="gap-1"
               >
-                <CheckCircle className="h-4 w-4" />
-                {t("ban.unbanUser")}
+                <Pencil className="h-4 w-4" />
+                {t("widget.actions.edit")}
               </Button>
-            ) : (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => void handleBan()}
+                onClick={() => void handleAddCredits()}
+                className="gap-1"
+              >
+                <Coins className="h-4 w-4" />
+                {t("widget.actions.addCredits")}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleDelete()}
                 className="gap-1 text-destructive hover:text-destructive"
               >
-                <XCircle className="h-4 w-4" />
-                {t("ban.banUser")}
+                <Trash2 className="h-4 w-4" />
+                {t("widget.actions.delete")}
               </Button>
-            )}
-          </>
-        )}
-      </Div>
+              {basicInfo.isBanned ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => void handleUnban()}
+                  className="gap-1 text-success hover:text-success/80"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  {t("ban.unbanUser")}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => void handleBan()}
+                  className="gap-1 text-destructive hover:text-destructive"
+                >
+                  <XCircle className="h-4 w-4" />
+                  {t("ban.banUser")}
+                </Button>
+              )}
+            </>
+          ) : undefined
+        }
+      />
 
-      {/* Basic User Information Card */}
-      <Card>
-        <CardContent className="p-4 space-y-4">
-          {/* User Header */}
-          <Div className="flex items-start gap-4">
-            {basicInfo.avatarUrl ? (
-              <Div
-                className="h-16 w-16 rounded-full overflow-hidden border-2 border-muted bg-cover bg-center"
-                data-avatar-url={basicInfo.avatarUrl}
-              />
-            ) : (
-              <Div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center border-2 border-muted">
-                <User className="h-8 w-8 text-muted-foreground" />
-              </Div>
-            )}
-            <Div className="flex-1">
-              <Div className="flex items-center gap-2 mb-1 flex-wrap">
-                <Span className="text-xl font-bold">
-                  {basicInfo.privateName}
-                </Span>
-                {basicInfo.isBanned && (
-                  <Badge variant="destructive" className="gap-1">
-                    <XCircle className="h-3 w-3" />
-                    {t("status.banned")}
-                  </Badge>
-                )}
-                {!basicInfo.isActive && !basicInfo.isBanned && (
-                  <Badge variant="secondary" className="gap-1">
-                    <XCircle className="h-3 w-3" />
-                    {t("status.inactive")}
-                  </Badge>
-                )}
-                {basicInfo.isActive && (
-                  <Badge
-                    variant="default"
-                    className="gap-1 bg-success hover:bg-success/90"
-                  >
-                    <CheckCircle className="h-3 w-3" />
-                    {t("status.active")}
-                  </Badge>
-                )}
-                {basicInfo.emailVerified && (
-                  <Badge variant="outline" className="gap-1">
-                    <CheckCircle className="h-3 w-3" />
-                    {t("status.verified")}
-                  </Badge>
-                )}
-              </Div>
-              <P className="text-sm text-muted-foreground">
-                @{basicInfo.publicName}
-              </P>
-              <P className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                <Mail className="h-3 w-3" />
-                {basicInfo.email}
-              </P>
-            </Div>
-          </Div>
-
-          {/* Banned Reason */}
-          {basicInfo.isBanned && basicInfo.bannedReason && (
-            <Div className="rounded-lg bg-destructive/10 p-3 border border-destructive/30">
-              <Div className="flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-destructive mt-0.5" />
-                <Div>
-                  <P className="text-sm font-medium text-destructive">
-                    {t("fields.banReason")}
-                  </P>
-                  <P className="text-sm text-destructive/80 dark:text-destructive/80">
-                    {basicInfo.bannedReason}
-                  </P>
-                </Div>
-              </Div>
+      {/* User Profile Section */}
+      <SectionGroup title={t("sections.basicInfo")}>
+        {/* User Header */}
+        <Div className="flex items-start gap-4">
+          {basicInfo.avatarUrl ? (
+            <Div
+              className="h-16 w-16 rounded-full overflow-hidden border-2 border-muted bg-cover bg-center flex-shrink-0"
+              data-avatar-url={basicInfo.avatarUrl}
+            />
+          ) : (
+            <Div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center border-2 border-muted flex-shrink-0">
+              <User className="h-8 w-8 text-muted-foreground" />
             </Div>
           )}
+          <Div className="flex-1 min-w-0">
+            <Div className="flex items-center gap-2 mb-1 flex-wrap">
+              <Span className="text-xl font-bold">{basicInfo.privateName}</Span>
+              {basicInfo.isBanned && (
+                <StatusPill
+                  status="banned"
+                  label={t("status.banned")}
+                  variant="danger"
+                />
+              )}
+              {!basicInfo.isActive && !basicInfo.isBanned && (
+                <StatusPill
+                  status="inactive"
+                  label={t("status.inactive")}
+                  variant="muted"
+                />
+              )}
+              {basicInfo.isActive && (
+                <StatusPill
+                  status="active"
+                  label={t("status.active")}
+                  variant="success"
+                />
+              )}
+              {basicInfo.emailVerified && (
+                <StatusPill
+                  status="verified"
+                  label={t("status.verified")}
+                  variant="info"
+                />
+              )}
+            </Div>
+            <P className="text-sm text-muted-foreground">
+              @{basicInfo.publicName}
+            </P>
+            <P className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+              <Mail className="h-3 w-3" />
+              {basicInfo.email}
+            </P>
+          </Div>
+        </Div>
 
-          <Separator />
-
-          {/* User Details Grid */}
-          <Div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("fields.userId")}
-              </P>
-              <Div className="flex items-center gap-1">
-                <P className="text-sm font-mono">
-                  {basicInfo.id.slice(0, 8)}...
+        {/* Banned Reason */}
+        {basicInfo.isBanned && basicInfo.bannedReason && (
+          <Div className="rounded-lg bg-destructive/10 p-3 border border-destructive/30">
+            <Div className="flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 text-destructive mt-0.5" />
+              <Div>
+                <P className="text-sm font-medium text-destructive">
+                  {t("fields.banReason")}
                 </P>
+                <P className="text-sm text-destructive/80 dark:text-destructive/80">
+                  {basicInfo.bannedReason}
+                </P>
+              </Div>
+            </Div>
+          </Div>
+        )}
+
+        {/* User Details */}
+        <DetailGrid columns={3}>
+          <DetailField
+            label={t("fields.userId")}
+            mono
+            copyable
+            value={
+              <Div className="flex items-center gap-1">
+                <Span>{basicInfo.id.slice(0, 8)}...</Span>
                 <Button
                   type="button"
                   variant="ghost"
@@ -512,84 +457,63 @@ export function UserViewContainer({
                   )}
                 </Button>
               </Div>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("fields.locale")}
-              </P>
-              <P className="text-sm">{basicInfo.locale}</P>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("fields.twoFactor")}
-              </P>
+            }
+          />
+          <DetailField label={t("fields.locale")} value={basicInfo.locale} />
+          <DetailField
+            label={t("fields.twoFactor")}
+            value={
               <Div className="flex items-center gap-1">
-                {basicInfo.twoFactorEnabled ? (
-                  <>
-                    <Shield className="h-3 w-3 text-success" />
-                    <P className="text-sm">{t("fields.enabled")}</P>
-                  </>
-                ) : (
-                  <>
-                    <Shield className="h-3 w-3 text-muted-foreground" />
-                    <P className="text-sm text-muted-foreground">
-                      {t("fields.disabled")}
-                    </P>
-                  </>
-                )}
+                <Shield
+                  className={`h-3 w-3 ${basicInfo.twoFactorEnabled ? "text-success" : "text-muted-foreground"}`}
+                />
+                <Span>
+                  {basicInfo.twoFactorEnabled
+                    ? t("fields.enabled")
+                    : t("fields.disabled")}
+                </Span>
               </Div>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("fields.created")}
-              </P>
-              <P className="text-sm">
-                {formatDate(basicInfo.createdAt, locale)}
-              </P>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("fields.lastUpdated")}
-              </P>
-              <P className="text-sm">
-                {formatDate(basicInfo.updatedAt, locale)}
-              </P>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("fields.marketing")}
-              </P>
-              <P className="text-sm">
-                {basicInfo.marketingConsent
-                  ? t("fields.optedIn")
-                  : t("fields.optedOut")}
-              </P>
+            }
+          />
+          <DetailField
+            label={t("fields.created")}
+            value={formatDate(basicInfo.createdAt, locale)}
+          />
+          <DetailField
+            label={t("fields.lastUpdated")}
+            value={formatDate(basicInfo.updatedAt, locale)}
+          />
+          <DetailField
+            label={t("fields.marketing")}
+            value={
+              basicInfo.marketingConsent
+                ? t("fields.optedIn")
+                : t("fields.optedOut")
+            }
+          />
+        </DetailGrid>
+
+        {/* Roles */}
+        {roles.length > 0 && (
+          <Div>
+            <P className="text-xs text-muted-foreground mb-2">
+              {t("fields.roles")}
+            </P>
+            <Div className="flex flex-wrap gap-2">
+              {roles.map((roleItem, index) => (
+                <StatusPill
+                  key={index}
+                  status={roleItem.role}
+                  variant="muted"
+                />
+              ))}
             </Div>
           </Div>
-
-          {/* Roles */}
-          {roles.length > 0 && (
-            <>
-              <Separator />
-              <Div>
-                <P className="text-xs text-muted-foreground mb-2">
-                  {t("fields.roles")}
-                </P>
-                <Div className="flex flex-wrap gap-2">
-                  {roles.map((roleItem, index) => (
-                    <Badge key={index} variant="outline">
-                      {formatRoleLabel(roleItem.role)}
-                    </Badge>
-                  ))}
-                </Div>
-              </Div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+        )}
+      </SectionGroup>
 
       {/* Tabs */}
-      <Div className="flex gap-1 border-b">
+      <Div className="flex gap-1 border-b overflow-x-auto">
         {tabs.map((tab) => (
           <Button
             key={tab.id}
@@ -597,7 +521,7 @@ export function UserViewContainer({
             variant="ghost"
             size="sm"
             onClick={() => setActiveTab(tab.id)}
-            className={`rounded-b-none border-b-2 ${
+            className={`rounded-b-none border-b-2 flex-shrink-0 ${
               activeTab === tab.id
                 ? "border-primary text-primary font-semibold"
                 : "border-transparent text-muted-foreground hover:text-foreground"
@@ -672,7 +596,7 @@ export function UserViewContainer({
           endpointOptions={skillsEndpointOptions}
         />
       )}
-    </Div>
+    </WidgetShell>
   );
 }
 
@@ -701,412 +625,294 @@ function OverviewTab({
   locale: CountryLanguage;
 }): React.JSX.Element {
   return (
-    <Div className="flex flex-col gap-6">
+    <Div className="flex flex-col gap-4">
       {/* Chat Activity */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <MessageSquare className="h-4 w-4" />
-            {t("sections.chatActivity")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard
-              title={t("widget.stats.totalThreads")}
-              value={chatStats.totalThreads}
-              description={`${chatStats.activeThreads} active, ${chatStats.archivedThreads} archived`}
-              icon={MessageSquare}
-              colorClassName="bg-info/10 text-info"
-            />
-            <StatCard
-              title={t("widget.stats.totalMessages")}
-              value={chatStats.totalMessages}
-              description={`${chatStats.userMessages} user, ${chatStats.aiMessages} AI`}
-              icon={Activity}
-              colorClassName="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"
-            />
-            <StatCard
-              title={t("widget.stats.userMessages")}
-              value={chatStats.userMessages}
-              icon={User}
-              colorClassName="bg-success/10 text-success"
-            />
-            <StatCard
-              title={t("widget.stats.lastActivity")}
-              value={
-                chatStats.lastActivityAt
-                  ? formatDate(chatStats.lastActivityAt, locale)
-                  : t("widget.stats.never")
-              }
-              icon={Clock}
-              colorClassName="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400"
-            />
-          </Div>
-        </CardContent>
-      </Card>
+      <SectionGroup title={t("sections.chatActivity")}>
+        <MetricGrid columns={4}>
+          <MetricCard
+            label={t("widget.stats.totalThreads")}
+            value={chatStats.totalThreads}
+            description={`${chatStats.activeThreads} active, ${chatStats.archivedThreads} archived`}
+            variant="info"
+            icon={<MessageSquare className="h-4 w-4" />}
+          />
+          <MetricCard
+            label={t("widget.stats.totalMessages")}
+            value={chatStats.totalMessages}
+            description={`${chatStats.userMessages} user, ${chatStats.aiMessages} AI`}
+            icon={<Activity className="h-4 w-4" />}
+          />
+          <MetricCard
+            label={t("widget.stats.userMessages")}
+            value={chatStats.userMessages}
+            variant="success"
+            icon={<User className="h-4 w-4" />}
+          />
+          <MetricCard
+            label={t("widget.stats.lastActivity")}
+            value={
+              chatStats.lastActivityAt
+                ? formatDate(chatStats.lastActivityAt, locale)
+                : t("widget.stats.never")
+            }
+          />
+        </MetricGrid>
+      </SectionGroup>
 
       {/* Credits */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Coins className="h-4 w-4" />
-            {t("sections.credits")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <Div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard
-              title={t("credits.currentBalance")}
-              value={creditInfo.currentBalance.toFixed(2)}
-              description={t("credits.availableCredits")}
-              icon={Coins}
-              colorClassName="bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400"
-            />
-            <StatCard
-              title={t("widget.stats.freeCredits")}
-              value={creditInfo.freeCreditsRemaining.toFixed(2)}
-              description={`${t("widget.stats.freePeriod")}: ${creditInfo.freePeriodId || "N/A"}`}
-              icon={Gift}
-              colorClassName="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
-            />
-            <StatCard
-              title={t("widget.stats.totalSpent")}
-              value={creditInfo.totalCreditsSpent.toFixed(2)}
-              icon={TrendingUp}
-              colorClassName="bg-destructive/10 text-destructive"
-            />
-            <StatCard
-              title={t("widget.stats.totalPurchased")}
-              value={creditInfo.totalCreditsPurchased.toFixed(2)}
-              icon={CreditCard}
-              colorClassName="bg-info/10 text-info"
-            />
-          </Div>
-          <Separator />
-          <P className="text-xs font-medium text-muted-foreground">
-            {t("credits.packBreakdown")}
-          </P>
-          <Div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard
-              title={t("credits.subscription")}
-              value={creditInfo.subscriptionCredits.toFixed(2)}
-              description={
-                creditInfo.nextExpiry
-                  ? `${t("credits.expires")}: ${formatDate(creditInfo.nextExpiry, locale)}`
-                  : undefined
-              }
-              icon={Calendar}
-              colorClassName="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400"
-            />
-            <StatCard
-              title={t("credits.permanent")}
-              value={creditInfo.permanentCredits.toFixed(2)}
-              icon={Shield}
-              colorClassName="bg-info/10 text-info"
-            />
-            <StatCard
-              title={t("credits.bonus")}
-              value={creditInfo.bonusCredits.toFixed(2)}
-              icon={Gift}
-              colorClassName="bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400"
-            />
-            <StatCard
-              title={t("credits.earned")}
-              value={creditInfo.earnedCredits.toFixed(2)}
-              icon={DollarSign}
-              colorClassName="bg-success/10 text-success"
-            />
-          </Div>
-        </CardContent>
-      </Card>
+      <SectionGroup title={t("sections.credits")}>
+        <MetricGrid columns={4}>
+          <MetricCard
+            label={t("credits.currentBalance")}
+            value={creditInfo.currentBalance.toFixed(2)}
+            description={t("credits.availableCredits")}
+            variant="info"
+            icon={<Coins className="h-4 w-4" />}
+          />
+          <MetricCard
+            label={t("widget.stats.freeCredits")}
+            value={creditInfo.freeCreditsRemaining.toFixed(2)}
+            description={`${t("widget.stats.freePeriod")}: ${creditInfo.freePeriodId ?? "N/A"}`}
+            variant="success"
+          />
+          <MetricCard
+            label={t("widget.stats.totalSpent")}
+            value={creditInfo.totalCreditsSpent.toFixed(2)}
+            variant="danger"
+          />
+          <MetricCard
+            label={t("widget.stats.totalPurchased")}
+            value={creditInfo.totalCreditsPurchased.toFixed(2)}
+          />
+        </MetricGrid>
+
+        <P className="text-xs font-medium text-muted-foreground">
+          {t("credits.packBreakdown")}
+        </P>
+
+        <MetricGrid columns={4}>
+          <MetricCard
+            label={t("credits.subscription")}
+            value={creditInfo.subscriptionCredits.toFixed(2)}
+            description={
+              creditInfo.nextExpiry
+                ? `${t("credits.expires")}: ${formatDate(creditInfo.nextExpiry, locale)}`
+                : undefined
+            }
+          />
+          <MetricCard
+            label={t("credits.permanent")}
+            value={creditInfo.permanentCredits.toFixed(2)}
+            variant="info"
+          />
+          <MetricCard
+            label={t("credits.bonus")}
+            value={creditInfo.bonusCredits.toFixed(2)}
+          />
+          <MetricCard
+            label={t("credits.earned")}
+            value={creditInfo.earnedCredits.toFixed(2)}
+            variant="success"
+          />
+        </MetricGrid>
+      </SectionGroup>
 
       {/* Model Usage */}
       {modelUsageStats && modelUsageStats.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Activity className="h-4 w-4" />
-              {t("modelUsage.title")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("modelUsage.model")}</TableHead>
-                  <TableHead className="text-right">
-                    {t("modelUsage.spent")}
-                  </TableHead>
-                  <TableHead className="text-right">
-                    {t("modelUsage.messages")}
-                  </TableHead>
+        <SectionGroup title={t("modelUsage.title")}>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("modelUsage.model")}</TableHead>
+                <TableHead className="text-right">
+                  {t("modelUsage.spent")}
+                </TableHead>
+                <TableHead className="text-right">
+                  {t("modelUsage.messages")}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {modelUsageStats.map((stat) => (
+                <TableRow key={stat.modelId}>
+                  <TableCell className="font-mono text-sm">
+                    {stat.modelId}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {stat.totalCreditsSpent.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {stat.messageCount}
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {modelUsageStats.map((stat) => (
-                  <TableRow key={stat.modelId}>
-                    <TableCell className="font-mono text-sm">
-                      {stat.modelId}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {stat.totalCreditsSpent.toFixed(2)}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {stat.messageCount}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+              ))}
+            </TableBody>
+          </Table>
+        </SectionGroup>
       )}
 
       {/* Payments */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <DollarSign className="h-4 w-4" />
-            {t("sections.payments")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            <StatCard
-              title={t("widget.stats.totalRevenue")}
-              value={formatCurrency(paymentStats.totalRevenueCents)}
-              description={`${paymentStats.totalPayments} ${t("widget.stats.payments")}`}
-              icon={DollarSign}
-              colorClassName="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+      <SectionGroup title={t("sections.payments")}>
+        <MetricGrid columns={4}>
+          <MetricCard
+            label={t("widget.stats.totalRevenue")}
+            value={formatCurrency(paymentStats.totalRevenueCents)}
+            description={`${paymentStats.totalPayments} ${t("widget.stats.payments")}`}
+            variant="success"
+            icon={<DollarSign className="h-4 w-4" />}
+          />
+          <MetricCard
+            label={t("widget.stats.successful")}
+            value={paymentStats.successfulPayments}
+            description={`${t("widget.stats.failed")}: ${paymentStats.failedPayments}`}
+            variant="success"
+          />
+          <MetricCard
+            label={t("widget.stats.totalRefunds")}
+            value={formatCurrency(paymentStats.totalRefundsCents)}
+            variant="danger"
+          />
+          <MetricCard
+            label={t("widget.stats.lastPayment")}
+            value={
+              paymentStats.lastPaymentAt
+                ? formatDate(paymentStats.lastPaymentAt, locale)
+                : t("widget.stats.never")
+            }
+          />
+        </MetricGrid>
+
+        <DetailGrid columns={2}>
+          <DetailField
+            label={t("payment.stripeCustomerId")}
+            value={paymentStats.stripeCustomerId ?? "N/A"}
+            mono
+          />
+          <DetailField
+            label={t("payment.activeSubscription")}
+            value={
+              paymentStats.hasActiveSubscription ? (
+                <StatusPill
+                  status="active"
+                  label={t("common.yes")}
+                  variant="success"
+                />
+              ) : (
+                <StatusPill
+                  status="inactive"
+                  label={t("common.no")}
+                  variant="muted"
+                />
+              )
+            }
+          />
+          {paymentStats.subscriptionPlan && (
+            <DetailField
+              label={t("payment.subscriptionPlan")}
+              value={`${paymentStats.subscriptionPlan}${paymentStats.subscriptionInterval ? ` / ${paymentStats.subscriptionInterval}` : ""}`}
             />
-            <StatCard
-              title={t("widget.stats.successful")}
-              value={paymentStats.successfulPayments}
-              description={`${t("widget.stats.failed")}: ${paymentStats.failedPayments}`}
-              icon={CheckCircle}
-              colorClassName="bg-success/10 text-success"
-            />
-            <StatCard
-              title={t("widget.stats.totalRefunds")}
-              value={formatCurrency(paymentStats.totalRefundsCents)}
-              icon={XCircle}
-              colorClassName="bg-destructive/10 text-destructive"
-            />
-            <StatCard
-              title={t("widget.stats.lastPayment")}
-              value={
-                paymentStats.lastPaymentAt
-                  ? formatDate(paymentStats.lastPaymentAt, locale)
-                  : t("widget.stats.never")
-              }
-              icon={Calendar}
-              colorClassName="bg-info/10 text-info"
-            />
-          </Div>
-          <Separator className="my-4" />
-          <Div className="grid grid-cols-2 gap-4">
-            <Div>
-              <P className="text-xs text-muted-foreground mb-1">
-                {t("payment.stripeCustomerId")}
-              </P>
-              <P className="text-sm font-mono">
-                {paymentStats.stripeCustomerId || "N/A"}
-              </P>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground mb-1">
-                {t("payment.activeSubscription")}
-              </P>
-              <Div className="flex items-center gap-1">
-                {paymentStats.hasActiveSubscription ? (
-                  <>
-                    <CheckCircle className="h-3 w-3 text-success" />
-                    <P className="text-sm">{t("common.yes")}</P>
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="h-3 w-3 text-muted-foreground" />
-                    <P className="text-sm text-muted-foreground">
-                      {t("common.no")}
-                    </P>
-                  </>
-                )}
-              </Div>
-            </Div>
-            {paymentStats.subscriptionPlan && (
-              <Div>
-                <P className="text-xs text-muted-foreground mb-1">
-                  {t("payment.subscriptionPlan")}
-                </P>
-                <P className="text-sm">
-                  {paymentStats.subscriptionPlan}
-                  {paymentStats.subscriptionInterval
-                    ? ` / ${paymentStats.subscriptionInterval}`
-                    : ""}
-                </P>
-              </Div>
+          )}
+          {paymentStats.subscriptionStatus &&
+            !paymentStats.hasActiveSubscription && (
+              <DetailField
+                label={t("payment.subscriptionStatus")}
+                value={
+                  <StatusPill
+                    status={paymentStats.subscriptionStatus}
+                    variant="muted"
+                  />
+                }
+              />
             )}
-            {paymentStats.subscriptionStatus &&
-              !paymentStats.hasActiveSubscription && (
-                <Div>
-                  <P className="text-xs text-muted-foreground mb-1">
-                    {t("payment.subscriptionStatus")}
-                  </P>
-                  <Badge variant="secondary" className="text-xs">
-                    {paymentStats.subscriptionStatus}
-                  </Badge>
-                </Div>
-              )}
-            {paymentStats.subscriptionNextBilling && (
-              <Div>
-                <P className="text-xs text-muted-foreground mb-1">
-                  {t("payment.nextBilling")}
-                </P>
-                <P className="text-sm">
-                  {formatDate(paymentStats.subscriptionNextBilling, locale)}
-                </P>
-              </Div>
-            )}
-          </Div>
-        </CardContent>
-      </Card>
+          {paymentStats.subscriptionNextBilling && (
+            <DetailField
+              label={t("payment.nextBilling")}
+              value={formatDate(paymentStats.subscriptionNextBilling, locale)}
+            />
+          )}
+        </DetailGrid>
+      </SectionGroup>
 
       {/* Newsletter & Referrals */}
-      <Div className="grid md:grid-cols-2 gap-6">
-        {/* Newsletter */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Mail className="h-4 w-4" />
-              {t("sections.newsletter")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Div className="flex items-center justify-between">
-              <P className="text-sm text-muted-foreground">
-                {t("newsletter.status")}
-              </P>
-              {newsletterInfo.isSubscribed ? (
-                <Badge variant="default" className="gap-1">
-                  <CheckCircle className="h-3 w-3" />
-                  {t("newsletter.subscribed")}
-                </Badge>
-              ) : (
-                <Badge variant="secondary" className="gap-1">
-                  <XCircle className="h-3 w-3" />
-                  {t("newsletter.notSubscribed")}
-                </Badge>
-              )}
-            </Div>
+      <Div className="grid @lg:grid-cols-2 gap-4">
+        <SectionGroup title={t("sections.newsletter")}>
+          <DetailGrid columns={1}>
+            <DetailField
+              label={t("newsletter.status")}
+              value={
+                newsletterInfo.isSubscribed ? (
+                  <StatusPill
+                    status="subscribed"
+                    label={t("newsletter.subscribed")}
+                    variant="success"
+                  />
+                ) : (
+                  <StatusPill
+                    status="not-subscribed"
+                    label={t("newsletter.notSubscribed")}
+                    variant="muted"
+                  />
+                )
+              }
+            />
             {newsletterInfo.subscribedAt && (
-              <Div>
-                <P className="text-xs text-muted-foreground">
-                  {t("newsletter.subscribedAt")}
-                </P>
-                <P className="text-sm">
-                  {formatDate(newsletterInfo.subscribedAt, locale)}
-                </P>
-              </Div>
+              <DetailField
+                label={t("newsletter.subscribedAt")}
+                value={formatDate(newsletterInfo.subscribedAt, locale)}
+              />
             )}
             {newsletterInfo.confirmedAt && (
-              <Div>
-                <P className="text-xs text-muted-foreground">
-                  {t("newsletter.confirmedAt")}
-                </P>
-                <P className="text-sm">
-                  {formatDate(newsletterInfo.confirmedAt, locale)}
-                </P>
-              </Div>
+              <DetailField
+                label={t("newsletter.confirmedAt")}
+                value={formatDate(newsletterInfo.confirmedAt, locale)}
+              />
             )}
-          </CardContent>
-        </Card>
+          </DetailGrid>
+        </SectionGroup>
 
-        {/* Referral Stats */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Users className="h-4 w-4" />
-              {t("sections.referrals")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Div className="grid grid-cols-2 gap-3">
-              <Div>
-                <P className="text-xs text-muted-foreground">
-                  {t("referrals.totalReferrals")}
-                </P>
-                <P className="text-2xl font-bold tabular-nums">
-                  {referralStats.totalReferrals}
-                </P>
-              </Div>
-              <Div>
-                <P className="text-xs text-muted-foreground">
-                  {t("referrals.activeCodes")}
-                </P>
-                <P className="text-2xl font-bold tabular-nums">
-                  {referralStats.activeReferralCodes}
-                </P>
-              </Div>
-            </Div>
-            <Separator />
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("referrals.earnings")}
-              </P>
-              <P className="text-xl font-bold text-info">
+        <SectionGroup title={t("sections.referrals")}>
+          <MetricGrid columns={2}>
+            <MetricCard
+              label={t("referrals.totalReferrals")}
+              value={referralStats.totalReferrals}
+            />
+            <MetricCard
+              label={t("referrals.activeCodes")}
+              value={referralStats.activeReferralCodes}
+            />
+          </MetricGrid>
+          <DetailField
+            label={t("referrals.earnings")}
+            value={
+              <Span className="text-xl font-bold text-info">
                 {formatCurrency(referralStats.totalReferralEarningsCents)}
-              </P>
-            </Div>
-          </CardContent>
-        </Card>
+              </Span>
+            }
+          />
+        </SectionGroup>
       </Div>
 
       {/* Recent Activity */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Activity className="h-4 w-4" />
-            {t("sections.recentActivity")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("activity.lastLogin")}
-              </P>
-              <P className="text-sm">
-                {formatDate(recentActivity.lastLogin, locale)}
-              </P>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("activity.lastThread")}
-              </P>
-              <P className="text-sm">
-                {formatDate(recentActivity.lastThreadCreated, locale)}
-              </P>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("activity.lastMessage")}
-              </P>
-              <P className="text-sm">
-                {formatDate(recentActivity.lastMessageSent, locale)}
-              </P>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("activity.lastPayment")}
-              </P>
-              <P className="text-sm">
-                {formatDate(recentActivity.lastPayment, locale)}
-              </P>
-            </Div>
-          </Div>
-        </CardContent>
-      </Card>
+      <SectionGroup title={t("sections.recentActivity")}>
+        <DetailGrid columns={2}>
+          <DetailField
+            label={t("activity.lastLogin")}
+            value={formatDate(recentActivity.lastLogin, locale)}
+          />
+          <DetailField
+            label={t("activity.lastThread")}
+            value={formatDate(recentActivity.lastThreadCreated, locale)}
+          />
+          <DetailField
+            label={t("activity.lastMessage")}
+            value={formatDate(recentActivity.lastMessageSent, locale)}
+          />
+          <DetailField
+            label={t("activity.lastPayment")}
+            value={formatDate(recentActivity.lastPayment, locale)}
+          />
+        </DetailGrid>
+      </SectionGroup>
     </Div>
   );
 }
@@ -1138,150 +944,109 @@ function ConnectionsTab({
   );
 
   const handleViewUser = useCallback(
-    async (userId: string): Promise<void> => {
+    async (viewUserId: string): Promise<void> => {
       const userViewDef = await import("./definition");
       navigate(userViewDef.GET, {
-        data: { userId },
+        data: { userId: viewUserId },
       });
     },
     [navigate],
   );
 
   return (
-    <Div className="flex flex-col gap-6">
+    <Div className="flex flex-col gap-4">
       {/* Connected Leads */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Users className="h-4 w-4" />
-            {t("connections.leadsTitle")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {connectedLeads.length === 0 ? (
-            <P className="text-sm text-muted-foreground">
-              {t("connections.noLeads")}
-            </P>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("connections.leadEmail")}</TableHead>
-                  <TableHead>{t("connections.leadBusiness")}</TableHead>
-                  <TableHead>{t("connections.leadStatus")}</TableHead>
-                  <TableHead>{t("connections.ipAddress")}</TableHead>
-                  <TableHead>{t("connections.device")}</TableHead>
-                  <TableHead>{t("connections.linkReason")}</TableHead>
-                  <TableHead>{t("connections.linkedAt")}</TableHead>
-                  <TableHead />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {connectedLeads.map((lead) => (
-                  <TableRow key={lead.id}>
-                    <TableCell className="text-sm">
-                      {lead.email ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {lead.businessName}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-xs">
-                        {lead.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm font-mono text-muted-foreground">
-                      {lead.ipAddress ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {[lead.deviceType, lead.browser, lead.os]
-                        .filter(Boolean)
-                        .join(" · ") || "—"}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {lead.linkReason ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(lead.linkedAt, locale)}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => void handleViewLead(lead.id)}
-                        className="gap-1"
-                      >
-                        {t("connections.viewLead")}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+      <SectionGroup title={t("connections.leadsTitle")}>
+        {connectedLeads.length === 0 ? (
+          <EmptyBlock
+            icon={<Users className="h-8 w-8" />}
+            title={t("connections.noLeads")}
+          />
+        ) : (
+          <Div className="flex flex-col divide-y divide-border">
+            {connectedLeads.map((lead) => (
+              <ListItem
+                key={lead.id}
+                title={lead.email ?? "—"}
+                subtitle={lead.businessName}
+                badges={<StatusPill status={lead.status} variant="default" />}
+                meta={
+                  <>
+                    {lead.ipAddress && (
+                      <Span className="font-mono text-xs">
+                        {lead.ipAddress}
+                      </Span>
+                    )}
+                    {[lead.deviceType, lead.browser, lead.os]
+                      .filter(Boolean)
+                      .join(" · ") && (
+                      <Span>
+                        {[lead.deviceType, lead.browser, lead.os]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </Span>
+                    )}
+                    {lead.linkReason && <Span>{lead.linkReason}</Span>}
+                    <Span>{formatDate(lead.linkedAt, locale)}</Span>
+                  </>
+                }
+                actions={
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => void handleViewLead(lead.id)}
+                  >
+                    {t("connections.viewLead")}
+                  </Button>
+                }
+              />
+            ))}
+          </Div>
+        )}
+      </SectionGroup>
 
       {/* Connected Users */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <User className="h-4 w-4" />
-            {t("connections.usersTitle")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {connectedUsers.length === 0 ? (
-            <P className="text-sm text-muted-foreground">
-              {t("connections.noUsers")}
-            </P>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("connections.userEmail")}</TableHead>
-                  <TableHead>{t("connections.userPublicName")}</TableHead>
-                  <TableHead>{t("connections.linkReason")}</TableHead>
-                  <TableHead>{t("connections.linkedAt")}</TableHead>
-                  <TableHead />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {connectedUsers.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell className="text-sm">{u.email}</TableCell>
-                    <TableCell className="text-sm">@{u.publicName}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {u.linkReason ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(u.linkedAt, locale)}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => void handleViewUser(u.id)}
-                        className="gap-1"
-                      >
-                        {t("connections.viewUser")}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+      <SectionGroup title={t("connections.usersTitle")}>
+        {connectedUsers.length === 0 ? (
+          <EmptyBlock
+            icon={<User className="h-8 w-8" />}
+            title={t("connections.noUsers")}
+          />
+        ) : (
+          <Div className="flex flex-col divide-y divide-border">
+            {connectedUsers.map((u) => (
+              <ListItem
+                key={u.id}
+                title={u.email}
+                subtitle={`@${u.publicName}`}
+                meta={
+                  <>
+                    {u.linkReason && <Span>{u.linkReason}</Span>}
+                    <Span>{formatDate(u.linkedAt, locale)}</Span>
+                  </>
+                }
+                actions={
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => void handleViewUser(u.id)}
+                  >
+                    {t("connections.viewUser")}
+                  </Button>
+                }
+              />
+            ))}
+          </Div>
+        )}
+      </SectionGroup>
     </Div>
   );
 }
 
 /**
- * Credit History tab - embeds the credits/history EndpointsPage
+ * Credit History tab
  */
 function CreditHistoryTab({
   locale,
@@ -1299,27 +1064,20 @@ function CreditHistoryTab({
     };
   };
 }): React.JSX.Element {
-  const [creditsHistoryDef, setCreditsHistoryDef] = useState<{
-    GET: CreateApiEndpointAny;
-  } | null>(null);
+  const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
 
-  // Lazy load the definition
-  if (!creditsHistoryDef) {
+  if (!def) {
     void import("@/app/api/[locale]/credits/history/definition").then((mod) => {
-      setCreditsHistoryDef(mod.default);
+      setDef(mod.default);
       return undefined;
     });
-    return (
-      <Div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </Div>
-    );
+    return <LoadingBlock />;
   }
 
   return (
     <Div className="border rounded-lg overflow-hidden">
       <EndpointsPage
-        endpoint={creditsHistoryDef}
+        endpoint={def}
         locale={locale}
         user={user}
         endpointOptions={endpointOptions}
@@ -1329,7 +1087,7 @@ function CreditHistoryTab({
 }
 
 /**
- * Referral Codes tab - embeds the referral/codes/list EndpointsPage
+ * Referral Codes tab
  */
 function ReferralCodesTab({
   locale,
@@ -1346,28 +1104,22 @@ function ReferralCodesTab({
     };
   };
 }): React.JSX.Element {
-  const [referralCodesDef, setReferralCodesDef] = useState<{
-    GET: CreateApiEndpointAny;
-  } | null>(null);
+  const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
 
-  if (!referralCodesDef) {
+  if (!def) {
     void import("@/app/api/[locale]/referral/codes/list/definition").then(
       (mod) => {
-        setReferralCodesDef(mod.default);
+        setDef(mod.default);
         return undefined;
       },
     );
-    return (
-      <Div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </Div>
-    );
+    return <LoadingBlock />;
   }
 
   return (
     <Div className="border rounded-lg overflow-hidden">
       <EndpointsPage
-        endpoint={referralCodesDef}
+        endpoint={def}
         locale={locale}
         user={user}
         endpointOptions={endpointOptions}
@@ -1377,103 +1129,7 @@ function ReferralCodesTab({
 }
 
 /**
- * Favorites tab - embeds the agent/chat/favorites EndpointsPage (readonly via admin userId param)
- */
-function FavoritesTab({
-  locale,
-  user,
-  endpointOptions,
-}: {
-  locale: ReturnType<typeof useWidgetLocale>;
-  user: ReturnType<typeof useWidgetContext>["user"];
-  endpointOptions: {
-    read: {
-      initialState: {
-        userId: string;
-      };
-    };
-  };
-}): React.JSX.Element {
-  const [favoritesDef, setFavoritesDef] = useState<{
-    GET: CreateApiEndpointAny;
-  } | null>(null);
-
-  if (!favoritesDef) {
-    void import("@/app/api/[locale]/agent/chat/favorites/definition").then(
-      (mod) => {
-        setFavoritesDef(mod.default);
-        return undefined;
-      },
-    );
-    return (
-      <Div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </Div>
-    );
-  }
-
-  return (
-    <Div className="border rounded-lg overflow-hidden">
-      <EndpointsPage
-        endpoint={favoritesDef}
-        locale={locale}
-        user={user}
-        endpointOptions={endpointOptions}
-      />
-    </Div>
-  );
-}
-
-/**
- * Skills tab - embeds the agent/chat/skills EndpointsPage (readonly via admin targetUserId param)
- */
-function SkillsTab({
-  locale,
-  user,
-  endpointOptions,
-}: {
-  locale: ReturnType<typeof useWidgetLocale>;
-  user: ReturnType<typeof useWidgetContext>["user"];
-  endpointOptions: {
-    read: {
-      initialState: {
-        targetUserId: string;
-      };
-    };
-  };
-}): React.JSX.Element {
-  const [skillsDef, setSkillsDef] = useState<{
-    GET: CreateApiEndpointAny;
-  } | null>(null);
-
-  if (!skillsDef) {
-    void import("@/app/api/[locale]/agent/chat/skills/definition").then(
-      (mod) => {
-        setSkillsDef(mod.default);
-        return undefined;
-      },
-    );
-    return (
-      <Div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </Div>
-    );
-  }
-
-  return (
-    <Div className="border rounded-lg overflow-hidden">
-      <EndpointsPage
-        endpoint={skillsDef}
-        locale={locale}
-        user={user}
-        endpointOptions={endpointOptions}
-      />
-    </Div>
-  );
-}
-
-/**
- * Referral Earnings tab - embeds the referral/earnings/list EndpointsPage
+ * Referral Earnings tab
  */
 function ReferralEarningsTab({
   locale,
@@ -1492,28 +1148,106 @@ function ReferralEarningsTab({
     };
   };
 }): React.JSX.Element {
-  const [referralEarningsDef, setReferralEarningsDef] = useState<{
-    GET: CreateApiEndpointAny;
-  } | null>(null);
+  const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
 
-  if (!referralEarningsDef) {
+  if (!def) {
     void import("@/app/api/[locale]/referral/earnings/list/definition").then(
       (mod) => {
-        setReferralEarningsDef(mod.default);
+        setDef(mod.default);
         return undefined;
       },
     );
-    return (
-      <Div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </Div>
-    );
+    return <LoadingBlock />;
   }
 
   return (
     <Div className="border rounded-lg overflow-hidden">
       <EndpointsPage
-        endpoint={referralEarningsDef}
+        endpoint={def}
+        locale={locale}
+        user={user}
+        endpointOptions={endpointOptions}
+      />
+    </Div>
+  );
+}
+
+/**
+ * Favorites tab
+ */
+function FavoritesTab({
+  locale,
+  user,
+  endpointOptions,
+}: {
+  locale: ReturnType<typeof useWidgetLocale>;
+  user: ReturnType<typeof useWidgetContext>["user"];
+  endpointOptions: {
+    read: {
+      initialState: {
+        userId: string;
+      };
+    };
+  };
+}): React.JSX.Element {
+  const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
+
+  if (!def) {
+    void import("@/app/api/[locale]/agent/chat/favorites/definition").then(
+      (mod) => {
+        setDef(mod.default);
+        return undefined;
+      },
+    );
+    return <LoadingBlock />;
+  }
+
+  return (
+    <Div className="border rounded-lg overflow-hidden">
+      <EndpointsPage
+        endpoint={def}
+        locale={locale}
+        user={user}
+        endpointOptions={endpointOptions}
+      />
+    </Div>
+  );
+}
+
+/**
+ * Skills tab
+ */
+function SkillsTab({
+  locale,
+  user,
+  endpointOptions,
+}: {
+  locale: ReturnType<typeof useWidgetLocale>;
+  user: ReturnType<typeof useWidgetContext>["user"];
+  endpointOptions: {
+    read: {
+      initialState: {
+        targetUserId: string;
+      };
+    };
+  };
+}): React.JSX.Element {
+  const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
+
+  if (!def) {
+    void import("@/app/api/[locale]/agent/chat/skills/definition").then(
+      (mod) => {
+        setDef(mod.default);
+        return undefined;
+      },
+    );
+    return <LoadingBlock />;
+  }
+
+  return (
+    <Div className="border rounded-lg overflow-hidden">
+      <EndpointsPage
+        endpoint={def}
         locale={locale}
         user={user}
         endpointOptions={endpointOptions}

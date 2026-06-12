@@ -21,8 +21,8 @@ import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { useWidgetValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-value";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { useWidgetValue } from "next-vibe-ui/unified/_shared/use-widget-value";
 import {
   DEFAULT_ACCENT,
   ProfileBio,

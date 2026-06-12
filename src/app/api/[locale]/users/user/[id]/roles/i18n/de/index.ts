@@ -1,9 +1,11 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Benutzer",
 
   roles: {
     post: {
       title: "Benutzerrolle hinzufügen",
+      titleShort: "Rolle hinzufügen",
       description: "Einem bestimmten Benutzerkonto eine Rolle zuweisen",
       container: {
         title: "Rolle hinzufügen",
@@ -84,6 +86,7 @@ export const translations = {
     },
     delete: {
       title: "Benutzerrolle entfernen",
+      titleShort: "Rolle entfernen",
       description: "Eine Rolle von einem bestimmten Benutzerkonto entziehen",
       container: {
         title: "Rolle entfernen",

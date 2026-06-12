@@ -8,13 +8,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, logger, user, locale }) => {
-      return await ProfitLossRepository.getProfitLoss(
-        data,
-        logger,
-        user,
-        locale,
-      );
-    },
+    handler: async ({ data, logger, user, locale }) =>
+      ProfitLossRepository.getProfitLoss(data, logger, user, locale),
   },
 });

@@ -1,6 +1,3 @@
-import { translations as idTranslations } from "../../[id]/i18n/de";
-import { translations as listTranslations } from "../../list/i18n/de";
-import { translations as statsTranslations } from "../../stats/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -10,9 +7,723 @@ export const translations: typeof enTranslations = {
     stats: "Statistiken",
     analytics: "Analysen",
   },
-  id: idTranslations,
-  list: listTranslations,
-  stats: statsTranslations,
+  id: {
+    category: "Emails",
+    tags: {
+      emails: "Emails",
+    },
+    title: "E-Mail-Details",
+    description:
+      "Eine einzelne E-Mail anhand ihrer eindeutigen Kennung abrufen",
+    container: {
+      title: "E-Mail-Details",
+      description:
+        "Detaillierte Informationen über eine bestimmte E-Mail anzeigen",
+    },
+    fields: {
+      id: {
+        label: "E-Mail-ID",
+        description: "Eindeutige Kennung der abzurufenden E-Mail",
+      },
+    },
+    response: {
+      email: {
+        title: "E-Mail-Details",
+        description: "Vollständige Informationen über die angeforderte E-Mail",
+        id: "E-Mail-ID",
+        subject: "Betreff",
+        recipientEmail: "Empfänger-E-Mail",
+        recipientName: "Empfängername",
+        senderEmail: "Absender-E-Mail",
+        senderName: "Absendername",
+        type: "E-Mail-Typ",
+        status: "Status",
+        templateName: "Vorlagenname",
+        emailProvider: "E-Mail-Anbieter",
+        externalId: "Externe ID",
+        sentAt: "Gesendet am",
+        deliveredAt: "Zugestellt am",
+        openedAt: "Geöffnet am",
+        clickedAt: "Geklickt am",
+        retryCount: "Wiederholungsanzahl",
+        error: "Fehlermeldung",
+        userId: "Benutzer-ID",
+        leadId: "Lead-ID",
+        createdAt: "Erstellt am",
+        updatedAt: "Aktualisiert am",
+      },
+    },
+    get: {
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Die angegebene E-Mail-ID ist ungültig",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description:
+            "Sie müssen authentifiziert sein, um E-Mail-Details einzusehen",
+        },
+        not_found: {
+          title: "E-Mail nicht gefunden",
+          description: "Keine E-Mail mit der angegebenen ID gefunden",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Sie haben keine Berechtigung, diese E-Mail anzuzeigen",
+        },
+        server: {
+          title: "Serverfehler",
+          description:
+            "Ein interner Serverfehler ist beim Abrufen der E-Mail aufgetreten",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+      },
+    },
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Die angegebene E-Mail-ID ist ungültig",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description:
+          "Sie müssen authentifiziert sein, um E-Mail-Details einzusehen",
+      },
+      notFound: {
+        title: "E-Mail nicht gefunden",
+        description: "Keine E-Mail mit der angegebenen ID gefunden",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Sie haben keine Berechtigung, diese E-Mail anzuzeigen",
+      },
+      server: {
+        title: "Serverfehler",
+        description:
+          "Ein interner Serverfehler ist beim Abrufen der E-Mail aufgetreten",
+      },
+      conflict: {
+        title: "Konfliktfehler",
+        description:
+          "Ein Konflikt ist beim Verarbeiten der E-Mail-Anfrage aufgetreten",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description:
+          "Ein Netzwerkfehler ist beim Abrufen der E-Mail aufgetreten",
+      },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Es gibt ungespeicherte Änderungen",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+    },
+    success: {
+      title: "E-Mail abgerufen",
+      description: "E-Mail-Details erfolgreich abgerufen",
+    },
+    widget: {
+      parties: "Beteiligte",
+      to: "An",
+      from: "Von",
+      timestamps: "Zeitstempel",
+      sentAt: "Gesendet am",
+      deliveredAt: "Zugestellt am",
+      openedAt: "Geöffnet am",
+      clickedAt: "Geklickt am",
+      technical: "Technische Details",
+      template: "Vorlage",
+      provider: "Anbieter",
+      externalId: "Externe ID",
+      retryCount: "Wiederholungsanzahl",
+      error: "Fehler",
+      associations: "Verknüpfungen",
+      lead: "Lead",
+      user: "Benutzer",
+      notFound: "E-Mail nicht gefunden",
+    },
+    enums: {
+      status: {
+        pending: "Ausstehend",
+        sent: "Gesendet",
+        delivered: "Zugestellt",
+        opened: "Geöffnet",
+        clicked: "Geklickt",
+        bounced: "Zurückgewiesen",
+        failed: "Fehlgeschlagen",
+        unsubscribed: "Abgemeldet",
+      },
+      type: {
+        transactional: "Transaktional",
+        marketing: "Marketing",
+        notification: "Benachrichtigung",
+        system: "System",
+        leadCampaign: "Lead-Kampagne",
+        userCommunication: "Benutzerkommunikation",
+      },
+      provider: {
+        resend: "Resend",
+        sendgrid: "SendGrid",
+        mailgun: "Mailgun",
+        ses: "Amazon SES",
+        smtp: "SMTP",
+        mailjet: "Mailjet",
+        postmark: "Postmark",
+        other: "Sonstiges",
+      },
+    },
+  },
+  list: {
+    category: "Emails",
+    tags: {
+      emails: "Emails",
+    },
+    title: "E-Mail-Liste",
+    description:
+      "Eine paginierte Liste von E-Mails mit Filterung und Paginierung abrufen",
+    container: {
+      title: "E-Mail-Liste",
+      description:
+        "E-Mail-Listen-Parameter konfigurieren und Ergebnisse anzeigen",
+    },
+    filters: {
+      title: "Filter",
+      description: "E-Mails filtern und suchen",
+    },
+    displayOptions: {
+      title: "Anzeigeoptionen",
+    },
+    fields: {
+      dateRange: {
+        title: "Datumsbereich",
+      },
+      page: {
+        label: "Seite",
+        description: "Seitenzahl für Paginierung",
+        placeholder: "Seitenzahl eingeben",
+      },
+      limit: {
+        label: "Grenzwert",
+        description: "Anzahl der Elemente pro Seite",
+        placeholder: "Grenzwert eingeben",
+      },
+      search: {
+        label: "Suchen",
+        description: "E-Mails nach Betreff, Empfänger oder Absender suchen",
+        placeholder: "E-Mails suchen...",
+      },
+      status: {
+        label: "Status",
+        description: "Nach E-Mail-Status filtern",
+        placeholder: "Status auswählen",
+      },
+      channel: {
+        label: "Kanal",
+        description: "Nach Nachrichtenkanal filtern",
+      },
+      type: {
+        label: "Typ",
+        description: "Nach E-Mail-Typ filtern",
+        placeholder: "Typ auswählen",
+      },
+      sortBy: {
+        label: "Sortieren nach",
+        description: "Feld zum Sortieren",
+        placeholder: "Sortierfeld auswählen",
+      },
+      sortOrder: {
+        label: "Sortierreihenfolge",
+        description: "Richtung der Sortierreihenfolge",
+        placeholder: "Sortierreihenfolge auswählen",
+      },
+      dateFrom: {
+        label: "Datum von",
+        description: "E-Mails ab diesem Datum filtern",
+        placeholder: "Startdatum auswählen",
+      },
+      dateTo: {
+        label: "Datum bis",
+        description: "E-Mails bis zu diesem Datum filtern",
+        placeholder: "Enddatum auswählen",
+      },
+    },
+    response: {
+      emails: {
+        title: "E-Mails",
+        emptyState: {
+          title: "Keine E-Mails gefunden",
+          description: "Keine E-Mails entsprechen Ihren aktuellen Filtern",
+        },
+        item: {
+          title: "E-Mail",
+          description: "E-Mail-Details",
+          id: "ID",
+          subject: "Betreff",
+          recipientEmail: "Empfänger-E-Mail",
+          recipientName: "Empfängername",
+          senderEmail: "Absender-E-Mail",
+          senderName: "Absendername",
+          type: "Typ",
+          status: "Status",
+          templateName: "Vorlagenname",
+          emailProvider: "E-Mail-Anbieter",
+          externalId: "Externe ID",
+          sentAt: "Gesendet am",
+          deliveredAt: "Zugestellt am",
+          openedAt: "Geöffnet am",
+          clickedAt: "Geklickt am",
+          retryCount: "Wiederholungsanzahl",
+          error: "Fehler",
+          userId: "Benutzer-ID",
+          leadId: "Lead-ID",
+          createdAt: "Erstellt am",
+          updatedAt: "Aktualisiert am",
+          emailCore: {
+            title: "Kerninformationen",
+          },
+          emailParties: {
+            title: "Absender & Empfänger",
+          },
+          emailMetadata: {
+            title: "Metadaten",
+          },
+          emailEngagement: {
+            title: "Engagement-Tracking",
+          },
+          technicalDetails: {
+            title: "Technische Details",
+          },
+          associatedIds: {
+            title: "Zugehörige IDs",
+          },
+          timestamps: {
+            title: "Zeitstempel",
+          },
+        },
+      },
+      pagination: {
+        title: "Paginierung",
+        description: "Paginierungsinformationen",
+        page: "Aktuelle Seite",
+        limit: "Elemente pro Seite",
+        total: "Gesamtelemente",
+        totalPages: "Gesamtseiten",
+      },
+      filters: {
+        title: "Angewendete Filter",
+        description: "Aktuell angewendete Filter",
+        status: "Statusfilter",
+        type: "Typfilter",
+        search: "Suchanfrage",
+        dateFrom: "Startdatum",
+        dateTo: "Enddatum",
+      },
+    },
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Die bereitgestellten Parameter sind ungültig",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description:
+          "Sie müssen authentifiziert sein, um auf diese Ressource zuzugreifen",
+      },
+      forbidden: {
+        title: "Verboten",
+        description:
+          "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Die angeforderte Ressource wurde nicht gefunden",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Ein interner Serverfehler ist aufgetreten",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      unsaved: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Die Anfrage steht im Konflikt mit dem aktuellen Zustand",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Ein Netzwerkfehler ist aufgetreten",
+      },
+    },
+    success: {
+      title: "Erfolg",
+      description: "E-Mails erfolgreich abgerufen",
+    },
+    enums: {
+      type: {
+        transactional: "Transaktional",
+        marketing: "Marketing",
+        notification: "Benachrichtigung",
+        system: "System",
+        leadCampaign: "Lead-Kampagne",
+        userCommunication: "Benutzerkommunikation",
+      },
+      typeFilter: {
+        any: "Alle Typen",
+      },
+      channel: {
+        email: "E-Mail",
+        sms: "SMS",
+        whatsapp: "WhatsApp",
+        telegram: "Telegram",
+      },
+      channelFilter: {
+        any: "Alle Kanäle",
+      },
+      sortField: {
+        subject: "Betreff",
+        recipientEmail: "Empfänger-E-Mail",
+        recipientName: "Empfängername",
+        type: "Typ",
+        status: "Status",
+        sentAt: "Gesendet am",
+        createdAt: "Erstellt am",
+      },
+      sortOrder: {
+        asc: "Aufsteigend",
+        desc: "Absteigend",
+      },
+    },
+    widget: {
+      to: "An",
+      retries: "Wiederholungen",
+      opened: "Geöffnet",
+      clicked: "Geklickt",
+      stats: "Statistiken",
+      graphs: "Graphen",
+      refresh: "Aktualisieren",
+      searchPlaceholder: "E-Mails suchen...",
+      clearSearch: "Löschen",
+      emptyState: "Keine E-Mails gefunden",
+      emptyFiltered: "Keine E-Mails entsprechen Ihren Filtern",
+      page: "Seite",
+      tabs: {
+        all: "Alle",
+        sent: "Gesendet",
+        delivered: "Zugestellt",
+        opened: "Geöffnet",
+        failed: "Fehlgeschlagen",
+        bounced: "Zurückgewiesen",
+      },
+    },
+  },
+  stats: {
+    category: "Emails",
+    tags: {
+      stats: "Statistics",
+      analytics: "Analytics",
+    },
+    dateRange: {
+      today: "Heute",
+      yesterday: "Gestern",
+      last7Days: "Letzte 7 Tage",
+      last30Days: "Letzte 30 Tage",
+      last90Days: "Letzte 90 Tage",
+      thisWeek: "Diese Woche",
+      lastWeek: "Letzte Woche",
+      thisMonth: "Dieser Monat",
+      lastMonth: "Letzter Monat",
+      thisQuarter: "Dieses Quartal",
+      lastQuarter: "Letztes Quartal",
+      thisYear: "Dieses Jahr",
+      lastYear: "Letztes Jahr",
+      custom: "Benutzerdefinierter Bereich",
+    },
+    get: {
+      title: "E-Mail-Statistiken",
+      description: "Umfassende E-Mail-Statistiken und Metriken abrufen",
+      form: {
+        title: "E-Mail-Statistiken Anfrage",
+        description: "Parameter für die Abfrage von E-Mail-Statistiken",
+      },
+      startDate: {
+        label: "Startdatum",
+        description: "Startdatum für den Statistikzeitraum",
+      },
+      endDate: {
+        label: "Enddatum",
+        description: "Enddatum für den Statistikzeitraum",
+      },
+      accountId: {
+        label: "Konto-ID",
+        description: "Statistiken nach spezifischem Konto filtern",
+      },
+      type: {
+        label: "E-Mail-Typ",
+        description: "Nach E-Mail-Typ filtern",
+        options: {
+          all: "Alle",
+          sent: "Gesendet",
+          received: "Empfangen",
+          draft: "Entwurf",
+          trash: "Papierkorb",
+        },
+      },
+      groupBy: {
+        label: "Gruppieren Nach",
+        description: "Wie die Statistiken gruppiert werden sollen",
+        options: {
+          day: "Nach Tag",
+          week: "Nach Woche",
+          month: "Nach Monat",
+          account: "Nach Konto",
+          type: "Nach Typ",
+        },
+      },
+      includeDetails: {
+        label: "Details Einschließen",
+        description: "Detaillierte Aufschlüsselung in Ergebnisse einbeziehen",
+      },
+      status: {
+        label: "E-Mail-Status",
+        description: "Nach E-Mail-Status filtern",
+      },
+      search: {
+        label: "Suchen",
+        description: "E-Mails nach Betreff oder Empfänger suchen",
+      },
+      timePeriod: {
+        label: "Zeitraum",
+        description: "Zeitraumgranularität für historische Daten",
+        hour: "Stunde",
+        day: "Tag",
+        week: "Woche",
+        month: "Monat",
+        quarter: "Quartal",
+        year: "Jahr",
+      },
+      dateRangePreset: {
+        label: "Datumsbereich-Voreinstellung",
+        description: "Vordefinierter Datumsbereich für Filterung",
+      },
+      dateFrom: {
+        label: "Startdatum",
+        description: "E-Mails ab diesem Datum filtern",
+      },
+      dateTo: {
+        label: "Enddatum",
+        description: "E-Mails bis zu diesem Datum filtern",
+      },
+      chartType: {
+        label: "Diagrammtyp",
+        description: "Visualisierungstyp für Diagramme",
+        line: "Liniendiagramm",
+        bar: "Balkendiagramm",
+        area: "Flächendiagramm",
+        pie: "Kreisdiagramm",
+        donut: "Ringdiagramm",
+      },
+      includeComparison: {
+        label: "Vergleich Einschließen",
+        description: "Vergleich mit vorherigem Zeitraum einbeziehen",
+      },
+      sortBy: {
+        label: "Sortieren Nach",
+        description: "Feld zum Sortieren der E-Mails",
+      },
+      sortOrder: {
+        label: "Sortierreihenfolge",
+        description: "Reihenfolge der Sortierung (aufsteigend oder absteigend)",
+      },
+      response: {
+        title: "E-Mail-Statistiken Antwort",
+        description: "Umfassende E-Mail-Statistiken und Metrikdaten",
+        totalEmails: "E-Mails Gesamt",
+        sentEmails: "Gesendete E-Mails",
+        deliveredEmails: "Zugestellte E-Mails",
+        openedEmails: "Geöffnete E-Mails",
+        clickedEmails: "Geklickte E-Mails",
+        bouncedEmails: "Zurückgewiesene E-Mails",
+        failedEmails: "Fehlgeschlagene E-Mails",
+        draftEmails: "Entwurf E-Mails",
+        openRate: "Öffnungsrate",
+        clickRate: "Klickrate",
+        deliveryRate: "Zustellungsrate",
+        bounceRate: "Rückweisungsrate",
+        failureRate: "Fehlerrate",
+        emailsByProvider: "E-Mails nach Anbieter",
+        emailsByTemplate: "E-Mails nach Vorlage",
+        emailsByStatus: "E-Mails nach Status",
+        emailsByType: "E-Mails nach Typ",
+        emailsWithUserId: "E-Mails mit Benutzer-ID",
+        emailsWithoutUserId: "E-Mails ohne Benutzer-ID",
+        emailsWithLeadId: "E-Mails mit Lead-ID",
+        emailsWithoutLeadId: "E-Mails ohne Lead-ID",
+        emailsWithErrors: "E-Mails mit Fehlern",
+        emailsWithoutErrors: "E-Mails ohne Fehler",
+        averageRetryCount: "Durchschnittliche Wiederholungsanzahl",
+        maxRetryCount: "Maximale Wiederholungsanzahl",
+        averageProcessingTime: "Durchschnittliche Verarbeitungszeit",
+        averageDeliveryTime: "Durchschnittliche Zustellungszeit",
+        historicalData: "Historische Daten",
+        groupedStats: "Gruppierte Statistiken",
+        generatedAt: "Generiert Am",
+        dataRange: "Datenbereich",
+        recentActivity: "Aktuelle Aktivität",
+        topPerformingTemplates: "Top-Vorlagen",
+        topPerformingProviders: "Top-Anbieter",
+        metrics: {
+          totalEmails: "Gesamt-E-Mails",
+          sentEmails: "Gesendete E-Mails",
+          deliveredEmails: "Zugestellte E-Mails",
+          openedEmails: "Geöffnete E-Mails",
+          clickedEmails: "Angeklickte E-Mails",
+          bouncedEmails: "Bounce E-Mails",
+          failedEmails: "Fehlgeschlagene E-Mails",
+          deliveryRate: "Zustellrate",
+          openRate: "Öffnungsrate",
+          clickRate: "Klickrate",
+          bounceRate: "Bounce-Rate",
+          failureRate: "Fehlerrate",
+          emails_with_errors: "E-Mails mit Fehlern",
+          average_retry_count: "Durchschnittliche Anzahl der Wiederholungen",
+          average_processing_time: "Durchschnittliche Verarbeitungszeit (ms)",
+          average_delivery_time: "Durchschnittliche Zustellzeit (ms)",
+          provider_historical: "Anbieter-Verlauf",
+          template_historical: "Vorlagen-Verlauf",
+          engagement_historical: "Engagement-Verlauf",
+        },
+        retry: {
+          no_retries: "Keine Wiederholungen",
+          with_retries: "Mit Wiederholungen",
+        },
+        association: {
+          with_user: "Mit Benutzer",
+          with_lead: "Mit Lead",
+          with_both: "Mit Beiden",
+          with_neither: "Eigenständig",
+        },
+      },
+      errors: {
+        unauthorized: {
+          title: "Nicht Autorisiert",
+          description:
+            "Authentifizierung erforderlich für Zugriff auf E-Mail-Statistiken",
+        },
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Anfrageparameter bereitgestellt",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Interner Serverfehler beim Abrufen der Statistiken",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unbekannter Fehler ist aufgetreten",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkfehler beim Abrufen der Statistiken",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Zugriff auf E-Mail-Statistiken ist verboten",
+        },
+        notFound: {
+          title: "Nicht Gefunden",
+          description: "E-Mail-Statistiken nicht gefunden",
+        },
+        unsavedChanges: {
+          title: "Ungespeicherte Änderungen",
+          description:
+            "Es gibt ungespeicherte Änderungen, die zuerst gespeichert werden müssen",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Datenkonflikt beim Abrufen der Statistiken aufgetreten",
+        },
+      },
+      success: {
+        title: "Erfolg",
+        description: "E-Mail-Statistiken erfolgreich abgerufen",
+      },
+    },
+    widget: {
+      title: "E-Mail-Statistiken",
+      total: "Gesamt",
+      sent: "Gesendet",
+      delivered: "Zugestellt",
+      opened: "Geöffnet",
+      clicked: "Geklickt",
+      bounced: "Zurückgewiesen",
+      failed: "Fehlgeschlagen",
+      errors: "Fehler",
+      engagementRates: "Engagement-Raten",
+      deliveryRate: "Zustellungsrate",
+      openRate: "Öffnungsrate",
+      clickRate: "Klickrate",
+      bounceRate: "Absprungrate",
+      failureRate: "Fehlerrate",
+      byStatus: "Nach Status",
+      byType: "Nach Typ",
+      avgRetries: "Ø Wiederholungen",
+      avgDeliveryMs: "Ø Zustellungszeit",
+      viewList: "Liste anzeigen",
+      refresh: "Aktualisieren",
+      search: "E-Mails suchen...",
+    },
+    enums: {
+      status: {
+        pending: "Ausstehend",
+        sent: "Gesendet",
+        delivered: "Zugestellt",
+        opened: "Geöffnet",
+        clicked: "Geklickt",
+        bounced: "Zurückgewiesen",
+        failed: "Fehlgeschlagen",
+        unsubscribed: "Abgemeldet",
+      },
+      statusFilter: {
+        any: "Alle Status",
+      },
+      type: {
+        transactional: "Transaktional",
+        marketing: "Marketing",
+        notification: "Benachrichtigung",
+        system: "System",
+        leadCampaign: "Lead-Kampagne",
+        userCommunication: "Benutzerkommunikation",
+      },
+      typeFilter: {
+        any: "Alle Typen",
+      },
+      sortField: {
+        subject: "Betreff",
+        recipientEmail: "Empfänger-E-Mail",
+        recipientName: "Empfängername",
+        type: "Typ",
+        status: "Status",
+        sentAt: "Gesendet am",
+        createdAt: "Erstellt am",
+      },
+      sortOrder: {
+        asc: "Aufsteigend",
+        desc: "Absteigend",
+      },
+    },
+  },
   enums: {
     status: {
       pending: "Ausstehend",

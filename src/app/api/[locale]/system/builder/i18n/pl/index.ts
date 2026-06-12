@@ -154,6 +154,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Zbuduj pakiet",
+    titleShort: "Zbuduj pakiet",
     description:
       "Kompleksowe narzędzie do kompilacji obsługujące pakowanie CLI, kompilacje Vite, React/Tailwind i dystrybucję npm",
     form: {

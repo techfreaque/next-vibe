@@ -1,8 +1,9 @@
 export const translations = {
   delete: {
     title: "Delete",
+    titleShort: "Delete File",
     description: "Remove a file or folder. Gone forever.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Deleted {{path}}",
     status: {
       loading: "Deleting...",
       done: "Deleted",

@@ -1,26 +1,27 @@
-/**
- * Type Text Widget
- * Form: textarea for text, delay input, optional window targeting
- * Result: success + preview of what was typed
- */
-
 "use client";
 
 import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import {
   useWidgetForm,
+  useWidgetNavigation,
+  useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+
+import { DesktopNavHeader } from "../shared/nav-header";
+import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
+import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
 import type definition from "./definition";
 
@@ -36,41 +37,81 @@ export function TypeTextWidget({ field }: CustomWidgetProps): JSX.Element {
   const children = field.children;
   const form = useWidgetForm<typeof definition.POST>();
   const data = useWidgetValue<typeof definition.POST>();
+  const { push: navigate } = useWidgetNavigation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const typedText = form?.getValues("text") as string | undefined;
+  const windowTitle = form?.getValues("windowTitle") as string | undefined;
+
+  const handleListWindows = (): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../list-windows/definition");
+      navigate(def.default.POST, {});
+    })();
+  };
 
   return (
-    <Div className="flex flex-col gap-4">
-      <FormAlertWidget field={{}} />
+    <Div className="flex flex-col h-full">
+      <DesktopNavHeader title={windowTitle ?? t("widget.titleTypeText")} />
 
-      <TextareaFieldWidget fieldName="text" field={children.text} />
-
-      <Div className="grid grid-cols-2 gap-3">
-        <NumberFieldWidget fieldName="delay" field={children.delay} />
-        <TextFieldWidget fieldName="windowId" field={children.windowId} />
-      </Div>
-      <TextFieldWidget fieldName="windowTitle" field={children.windowTitle} />
-
-      <Div className="flex gap-2">
-        <NavigateButtonWidget field={{}} />
-        <SubmitButtonWidget<typeof definition.POST> field={{}} />
-      </Div>
-
-      {data?.success === true && typedText ? (
-        <Div className="flex flex-col gap-1.5">
-          <Span className="text-sm text-emerald-600 dark:text-emerald-400">
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-            ✓ Text typed
-          </Span>
-          <Badge
-            variant="secondary"
-            className="font-mono text-xs w-fit max-w-full truncate"
+      {data?.success === true ? (
+        /* Success state */
+        <Div className="flex flex-col gap-4 p-4">
+          <Div className="flex flex-col gap-3 rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30 p-4">
+            <Div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <Span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                {t("widget.statusTyped")}
+              </Span>
+            </Div>
+            {typedText ? (
+              <Badge
+                variant="secondary"
+                className="font-mono text-xs w-fit max-w-full truncate"
+              >
+                &ldquo;{truncate(typedText, 60)}&rdquo;
+              </Badge>
+            ) : null}
+          </Div>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="h-8 text-xs w-fit"
+            onClick={handleListWindows}
           >
-            &ldquo;{truncate(typedText, 60)}&rdquo;
-          </Badge>
+            {t("widget.actionAllWindows")}
+          </Button>
         </Div>
-      ) : data?.error ? (
-        <Span className="text-sm text-destructive">{data.error}</Span>
-      ) : null}
+      ) : (
+        /* Form state */
+        <Div className="flex flex-col gap-4 p-4">
+          {/* Primary input — full width */}
+          <TextareaFieldWidget fieldName="text" field={children.text} />
+
+          {/* Secondary fields */}
+          <Div className="grid grid-cols-2 gap-3">
+            <EntityPickerFieldWidget
+              fieldName="windowId"
+              field={children.windowId}
+            />
+            <NumberFieldWidget fieldName="delay" field={children.delay} />
+          </Div>
+          <TextFieldWidget
+            fieldName="windowTitle"
+            field={children.windowTitle}
+          />
+
+          <Div className="flex gap-2">
+            <NavigateButtonWidget field={{}} />
+            <FormAlertWidget field={{}} />
+            <SubmitButtonWidget<typeof definition.POST> field={{}} />
+          </Div>
+
+          {data?.error ? (
+            <Span className="text-sm text-destructive">{data.error}</Span>
+          ) : null}
+        </Div>
+      )}
     </Div>
   );
 }

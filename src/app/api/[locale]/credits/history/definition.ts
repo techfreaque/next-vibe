@@ -41,18 +41,15 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["credits", "history"],
-  title: "history.get.title",
-  description: "history.get.description",
-  category: "credits",
-  subCategory: "Credits",
-  tags: ["tags.credits", "tags.balance"],
-  icon: "wallet",
+  title: "history.get.title" as const,
+  titleShort: "history.get.titleShort" as const,
+  description: "history.get.description" as const,
+  category: "credits" as const,
+  subCategory: "Credits" as const,
+  tags: ["tags.credits" as const, "tags.balance" as const],
+  icon: "wallet" as const,
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
-  defaultWebPinned: [
-    UserRole.PUBLIC,
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-  ] as const,
+  defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     render: CreditHistoryContainer,
@@ -131,47 +128,46 @@ const { GET } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "history.get.success.title",
-    description: "history.get.success.description",
+    title: "history.get.success.title" as const,
+    description: "history.get.success.description" as const,
   },
 
-  // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "history.get.errors.validation.title",
-      description: "history.get.errors.validation.description",
+      title: "history.get.errors.validation.title" as const,
+      description: "history.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "history.get.errors.network.title",
-      description: "history.get.errors.network.description",
+      title: "history.get.errors.network.title" as const,
+      description: "history.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "history.get.errors.unauthorized.title",
-      description: "history.get.errors.unauthorized.description",
+      title: "history.get.errors.unauthorized.title" as const,
+      description: "history.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "history.get.errors.forbidden.title",
-      description: "history.get.errors.forbidden.description",
+      title: "history.get.errors.forbidden.title" as const,
+      description: "history.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "history.get.errors.notFound.title",
-      description: "history.get.errors.notFound.description",
+      title: "history.get.errors.notFound.title" as const,
+      description: "history.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "history.get.errors.server.title",
-      description: "history.get.errors.server.description",
+      title: "history.get.errors.server.title" as const,
+      description: "history.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "history.get.errors.unknown.title",
-      description: "history.get.errors.unknown.description",
+      title: "history.get.errors.unknown.title" as const,
+      description: "history.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "history.get.errors.unsavedChanges.title",
-      description: "history.get.errors.unsavedChanges.description",
+      title: "history.get.errors.unsavedChanges.title" as const,
+      description: "history.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "history.get.errors.conflict.title",
-      description: "history.get.errors.conflict.description",
+      title: "history.get.errors.conflict.title" as const,
+      description: "history.get.errors.conflict.description" as const,
     },
   },
 

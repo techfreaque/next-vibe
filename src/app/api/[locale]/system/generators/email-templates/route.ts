@@ -11,15 +11,15 @@ export const { tools } = endpointsHandler({
   endpoint: definition,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger, t }) => {
-      const { EmailTemplateGeneratorRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return EmailTemplateGeneratorRepository.generateEmailTemplates(
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).EmailTemplateGeneratorRepository.generateEmailTemplates(
         data,
         logger,
         t,
-      );
-    },
+      ),
   },
 });

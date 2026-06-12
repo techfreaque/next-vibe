@@ -11,8 +11,8 @@ export type { MarkdownProps } from "../../web/ui/markdown";
 function stripMarkdown(content: string): string {
   return (
     content
-      // Remove think tags
-      .replace(/<\/?think>/gi, "")
+      // Remove think blocks (tags + content)
+      .replace(/<think>[\s\S]*?<\/think>/gi, "")
       // Remove Chat tags but keep content
       .replace(/<Chat>([\s\S]*?)<\/Chat>/gi, "$1")
       // Remove headings markers

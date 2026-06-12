@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Leady",
   tags: {
     leads: "Leady",
@@ -7,6 +8,7 @@ export const translations = {
 
   patch: {
     title: "Ustaw skill leada",
+    titleShort: "Skill leada",
     description: "Zapisz atrybucję skillu dla tego leada (first-touch)",
     skillId: {
       label: "ID Skillu",

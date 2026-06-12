@@ -22,6 +22,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -35,6 +36,7 @@ const { GET } = createEndpoint({
     "versions",
   ],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
   icon: "history",
   category: "analytics",
@@ -48,7 +50,9 @@ const { GET } = createEndpoint({
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: graphsListDefinitions.GET,
+        labelField: "name",
         label: "get.fields.id.label",
         description: "get.fields.id.description",
         hidden: true,

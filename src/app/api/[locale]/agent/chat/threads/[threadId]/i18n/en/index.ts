@@ -9,6 +9,7 @@ export const translations = {
   },
   get: {
     title: "Get Chat Thread",
+    titleShort: "Thread",
     description: "Retrieve a specific chat thread by ID",
     container: {
       title: "Thread Details",
@@ -131,6 +132,7 @@ export const translations = {
   },
   patch: {
     title: "Update Chat Thread",
+    titleShort: "Update Thread",
     description: "Update an existing chat thread",
     container: {
       title: "Update Thread",
@@ -301,6 +303,7 @@ export const translations = {
   },
   delete: {
     title: "Delete Chat Thread",
+    titleShort: "Delete Thread",
     description: "Delete a chat thread",
     container: {
       title: "Delete Thread",

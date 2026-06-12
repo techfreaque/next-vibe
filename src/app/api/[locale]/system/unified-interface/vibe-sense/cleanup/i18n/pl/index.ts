@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Czyszczenie Vibe Sense",
+    titleShort: "Wyczyść Sense",
     description:
       "Uruchom czyszczenie retencyjne punktów danych i wygaś snapshoty",
     response: {

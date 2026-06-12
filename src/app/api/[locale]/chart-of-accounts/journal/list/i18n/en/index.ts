@@ -1,6 +1,7 @@
 export const translations = {
   get: {
     title: "Journal Entries",
+    titleShort: "Journal",
     description:
       "List journal entries with filters for company, period, status, source type, and date range",
     companyId: {

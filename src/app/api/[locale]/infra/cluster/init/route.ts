@@ -8,11 +8,11 @@ import clusterInitEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: clusterInitEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { ClusterInitRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return ClusterInitRepository.init(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).ClusterInitRepository.init(data, logger, t),
   },
 });

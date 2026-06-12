@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Gesendete Newsletter-Kampagnen",
+    titleShort: "Kampagnen",
     description: "Gesendete Newsletter-Kampagnen pro Auflösungs-Bucket",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

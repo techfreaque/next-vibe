@@ -23,11 +23,12 @@ export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["referral", "lead", "current"],
-  title: "title",
-  description: "description",
-  category: "endpointCategories.referral",
-  subCategory: "endpointCategories.referralProgram",
-  icon: "gift",
+  title: "title" as const,
+  titleShort: "titleShort" as const,
+  description: "description" as const,
+  category: "referral" as const,
+  subCategory: "Program" as const,
+  icon: "gift" as const,
   tags: ["tag"],
   allowedRoles: [
     UserRole.PUBLIC,
@@ -41,12 +42,12 @@ export const { GET } = createEndpoint({
     children: {
       referralCode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.referralCode",
+        content: "response.referralCode" as const,
         schema: z.string().nullable(),
       }),
       referralLabel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.referralLabel",
+        content: "response.referralLabel" as const,
         schema: z.string().nullable(),
       }),
     },
@@ -54,46 +55,46 @@ export const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.unauthorized.title",
-      description: "errors.unauthorized.description",
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title",
-      description: "errors.forbidden.description",
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title",
-      description: "errors.notFound.description",
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.serverError.title",
-      description: "errors.serverError.description",
+      title: "errors.serverError.title" as const,
+      description: "errors.serverError.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.unknown.title",
-      description: "errors.unknown.description",
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.network.title",
-      description: "errors.network.description",
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.unsavedChanges.title",
-      description: "errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
   },
 
   successTypes: {
-    title: "success.title",
-    description: "success.description",
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 
   examples: {
@@ -113,4 +114,4 @@ export const { GET } = createEndpoint({
 export type LeadCurrentReferralGetResponseOutput =
   typeof GET.types.ResponseOutput;
 
-export default { GET };
+export default { GET } as const;

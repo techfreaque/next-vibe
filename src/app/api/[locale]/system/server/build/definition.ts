@@ -25,7 +25,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { BUILD_ALIAS, BUILD_SERVER_ALIAS } from "./constants";
 
 const BuildResultWidget = lazyWidget(() =>
@@ -37,16 +37,17 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "server", "build"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.server",
-  subCategory: "endpointCategories.serverManagement",
+  category: "devTools",
+  subCategory: "serverManagement",
   tags: ["tags.build"],
   icon: "package",
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.AI_TOOL_OFF,
     UserRole.WEB_OFF,
-    UserRole.CLI_AUTH_BYPASS,
   ],
   aliases: [BUILD_ALIAS, BUILD_SERVER_ALIAS],
 

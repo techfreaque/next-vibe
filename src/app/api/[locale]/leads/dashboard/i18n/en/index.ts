@@ -1,0 +1,96 @@
+export const translations = {
+  tags: {
+    leads: "leads",
+    dashboard: "dashboard",
+  },
+  get: {
+    title: "Leads Dashboard",
+    titleShort: "Lead Dashboard",
+    description:
+      "Live counts of active leads, new arrivals, running campaigns, and conversions",
+    errors: {
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      validation: {
+        title: "Validation Error",
+        description: "Invalid request parameters",
+      },
+      server: {
+        title: "Server Error",
+        description: "Failed to load dashboard data",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      network: {
+        title: "Network Error",
+        description: "Network connection failed",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "You do not have access to this data",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "Dashboard data not found",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "There are unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "A data conflict occurred",
+      },
+    },
+    success: {
+      title: "Success",
+      description: "Dashboard data loaded",
+    },
+    response: {
+      activeLeadsCount: "Active Leads",
+      newThisWeekCount: "New This Week",
+      runningCampaignsCount: "Running Campaigns",
+      convertedCount: "Converted",
+      totalLeadsCount: "Total Leads",
+      conversionRate: "Conversion Rate",
+      statusBreakdown: "Status Breakdown",
+      recentLeads: "Recent Leads",
+      "recentLeads.id": "ID",
+      "recentLeads.businessName": "Business Name",
+      "recentLeads.email": "Email",
+      "recentLeads.status": "Status",
+      "recentLeads.source": "Source",
+      "recentLeads.createdAt": "Created At",
+    },
+  },
+  widget: {
+    loading: "Loading dashboard...",
+    activeLeads: "Active Leads",
+    newThisWeek: "New This Week",
+    runningCampaigns: "In Campaign",
+    converted: "Converted",
+    totalLeads: "Total Leads",
+    conversionRate: "Conversion Rate",
+    quickActions: "Quick Actions",
+    newLead: "New Lead",
+    newLeadDesc: "Create a new lead manually",
+    allLeads: "All Leads",
+    allLeadsDesc: "Browse and filter all leads",
+    campaignStats: "Campaign Stats",
+    campaignStatsDesc: "Analyze campaign performance",
+    searchLeads: "Search Leads",
+    searchLeadsDesc: "Find leads by name or email",
+    importLeads: "Import",
+    importLeadsDesc: "Bulk import leads from CSV",
+    statusBreakdown: "Status Breakdown",
+    recentLeads: "Recent Leads",
+    viewAll: "View All",
+    noLeadsYet: "No leads yet",
+    noLeadsHint: "Create your first lead or import from CSV to get started",
+    createFirst: "Create Lead",
+  },
+};

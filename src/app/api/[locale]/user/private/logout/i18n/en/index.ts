@@ -1,5 +1,6 @@
 export const translations = {
   title: "User Logout",
+  titleShort: "Logout",
   description: "Logs out the current user and invalidates their session",
   category: "User Management",
   tag: "logout",

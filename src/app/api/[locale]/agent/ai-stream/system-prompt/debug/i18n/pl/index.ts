@@ -1,6 +1,8 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   get: {
     title: "Debug System Prompt",
+    titleShort: "Debug prompt",
     description:
       "Renderuje pełny system prompt dla danego kontekstu użytkownika. Tylko admin/dev.",
     status: {

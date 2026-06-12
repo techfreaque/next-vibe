@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Uninstall",
+    titleShort: "Uninstall CLI",
     description: "Uninstall endpoint",
     form: {
       title: "Uninstall Configuration",

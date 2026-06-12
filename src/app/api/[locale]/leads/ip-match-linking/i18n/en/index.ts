@@ -7,6 +7,7 @@ export const translations = {
   },
   post: {
     title: "IP Match Linking",
+    titleShort: "IP Linking",
     description: "Link anonymous leads that share the same IP address",
     container: {
       title: "IP Match Linking",

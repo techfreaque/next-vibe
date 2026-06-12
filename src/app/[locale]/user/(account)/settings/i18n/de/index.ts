@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   title: "Einstellungen",
   description: "Profil, Creator-Auftritt und E-Mail-Liste verwalten.",
   nav: {

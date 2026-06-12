@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "SSH",
 
   errors: {
@@ -17,6 +18,7 @@ export const translations = {
 
   post: {
     title: "SSH-Verbindung testen",
+    titleShort: "Verbindung testen",
     description: "Verbindung zu einem SSH-Server testen",
     fields: {
       connectionId: {

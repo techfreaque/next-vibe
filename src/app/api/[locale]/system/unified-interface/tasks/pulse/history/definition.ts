@@ -35,6 +35,7 @@ export const { GET } = createEndpoint({
   path: ["system", "unified-interface", "tasks", "pulse", "history"],
   aliases: [PULSE_HISTORY_ALIAS, "pulse:history"],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
   icon: "activity",
   category: "devTools",

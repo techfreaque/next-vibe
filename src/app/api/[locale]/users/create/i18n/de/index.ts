@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Benutzer",
   tags: {
     create: "Erstellen",
@@ -6,6 +7,7 @@ export const translations = {
   },
   post: {
     title: "Benutzer erstellen",
+    titleShort: "Benutzer erstellen",
     description: "Neues Benutzerkonto erstellen",
     form: {
       title: "Benutzer-Erstellungsformular",

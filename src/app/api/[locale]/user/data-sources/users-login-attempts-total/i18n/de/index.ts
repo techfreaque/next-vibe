@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Anmeldeversuche gesamt",
+    titleShort: "Anmeldeversuche",
     description: "Anzahl aller Anmeldeversuche pro Zeitfenster",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

@@ -11,6 +11,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz wątek czatu",
+    titleShort: "Wątek",
     description: "Pobierz określony wątek czatu według ID",
     container: {
       title: "Szczegóły wątku",
@@ -134,6 +135,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Aktualizuj wątek czatu",
+    titleShort: "Edytuj wątek",
     description: "Aktualizuj istniejący wątek czatu",
     container: {
       title: "Aktualizuj wątek",
@@ -304,6 +306,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Usuń wątek czatu",
+    titleShort: "Usuń wątek",
     description: "Usuń wątek czatu",
     container: {
       title: "Usuń wątek",

@@ -21,6 +21,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import { NEWSLETTER_STATUS_ALIAS } from "./constants";
 
 /**
  * GET endpoint for checking newsletter subscription status
@@ -30,11 +31,12 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["newsletter", "status"],
   title: "title",
+  titleShort: "titleShort",
   description: "description",
   icon: "newspaper",
   tags: [],
-  category: "endpointCategories.newsletter",
-  subCategory: "endpointCategories.newsletterSubscriptions",
+  category: "newsletter",
+  subCategory: "Subscriptions",
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -42,7 +44,7 @@ const { GET } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ],
-  aliases: ["newsletter-status", "newsletter:status"],
+  aliases: [NEWSLETTER_STATUS_ALIAS] as const,
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "form.title",

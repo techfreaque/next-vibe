@@ -1,6 +1,8 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   list: {
     title: "Przechwycone leady",
+    titleShort: "Przechwycone leady",
     description: "Wszyscy, którzy wypełnili Twój formularz lead magnet",
     tag: "lead-magnet-captures",
     response: {

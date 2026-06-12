@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
   uncategorized: "Sonstige",
   get: {
     title: "Tool-Hilfe - Verfügbare Tools entdecken",
+    titleShort: "Tool-Hilfe",
     description:
       "Durchsuchen und entdecken Sie alle verfügbaren Tools. Verwenden Sie query für die Suche, category für die Filterung.",
     tags: {
@@ -20,11 +21,8 @@ export const translations: typeof enTranslations = {
       },
       category: {
         label: "Kategoriefilter",
-        description: "Tools nach Kategoriename filtern",
-      },
-      subCategory: {
-        label: "Unterkategoriefilter",
-        description: "Tools nach Unterkategoriename filtern",
+        description:
+          "Tools nach Kategorie oder Unterkategorie filtern (Groß-/Kleinschreibung egal). Akzeptiert Oberkategorie-Schlüssel (z.B. 'ai') oder Unterkategoriename (z.B. 'Search'). Leer lassen für Kategorieübersicht.",
       },
       toolName: {
         label: "Tool-Name (Detail)",
@@ -96,6 +94,16 @@ export const translations: typeof enTranslations = {
       platforms: {
         title: "Verfügbare Plattformen",
       },
+      viewAsRole: {
+        label: "Ansicht als Rolle",
+        description:
+          "Zeigt, welche Tools für eine bestimmte Benutzerrolle sichtbar sind (nur Admin)",
+        options: {
+          admin: "Admin",
+          customer: "Kunde",
+          public: "Öffentlich",
+        },
+      },
       instanceId: {
         label: "Instanz-ID",
         description:
@@ -110,6 +118,35 @@ export const translations: typeof enTranslations = {
         label: "Tool-Filter",
         description: "Alle Tools, nur angeheftete oder nur erlaubte anzeigen",
       },
+    },
+    hints: {
+      noCapabilitySnapshot:
+        'Kein Capability-Snapshot für Instanz "{{instanceId}}". Verbindung herstellen und auf Sync-Puls warten.',
+      remoteFullSchema:
+        'Vollständiges Schema für {{count}} Tool(s) von "{{instanceId}}". Aufruf: execute-tool toolName="{{instanceId}}__<name>" input={...}.',
+      remoteList:
+        '{{matched}} von {{total}} Tools der Remote-Instanz "{{instanceId}}". Suche auf ≤{{detailThreshold}} Ergebnisse einschränken für vollständige Schemas oder toolName= übergeben.{{pagination}}',
+      toolNotFound:
+        'Tool "{{name}}" nicht gefunden. Mit query nach Stichworten suchen.',
+      detailMode:
+        'Aufruf: execute-tool toolName="{{name}}"{{aliases}}. CLI: vibe {{name}} [--feld=wert].',
+      detailModeAliases: " (Aliase: {{aliases}})",
+      noToolsMatched:
+        "Keine Tools gefunden. Breitere Suche versuchen oder ohne Parameter aufrufen.",
+      compactFullSchema:
+        'Vollständiges Schema für {{count}} Tool(s). Aufruf: execute-tool toolName="<name>" input={...}.',
+      compactCategoryOnly:
+        '{{matched}} Tools in {{categories}} Kategorien. category="<name>" oder subCategory="<name>" verwenden. Unter {{listThreshold}} Ergebnisse zeigt Tool-Namen; unter {{detailThreshold}} vollständige Schemas.',
+      compactList:
+        '{{matched}} Tools. Auf ≤{{detailThreshold}} einschränken für Schemas oder toolName="<name>" für Details. Aufruf: execute-tool toolName="<name>".{{pagination}}',
+      cliFullDetail:
+        "Vollständige Details für {{count}} Tool(s). CLI: vibe <name> [--feld=wert].",
+      cliList:
+        "Seite {{page}}/{{total}} – {{matched}} Tools gefunden. Details: vibe help <name>.",
+      cliListSingle: "{{matched}} Tools gefunden. Details: vibe help <name>.",
+      pagination:
+        " Seite {{page}}/{{total}} – page={{next}} für weitere Ergebnisse.",
+      paginationCli: " – vibe help --page={{next}}",
     },
     success: {
       title: "Tools erfolgreich abgerufen",
@@ -343,6 +380,8 @@ export const translations: typeof enTranslations = {
       selectToolHint: "Wähle ein Tool aus der Seitenleiste",
       allPlatforms: "Alle Plattformen",
       prodOnly: "Nur Prod",
+      adminFilters: "Admin-Filter",
+      resetPins: "Pins zurücksetzen",
       aiPinsTitle: "KI-Tool-Pins",
       aiPinsDescription:
         "Diese Tools sind in jedem KI-Gespräch aktiv. Die KI kann sie automatisch aufrufen — ohne explizite Aufforderung.",
@@ -350,6 +389,11 @@ export const translations: typeof enTranslations = {
       noPinnedTools: "Noch keine angehefteten Tools",
       noPinnedToolsHint:
         "Durchsuche alle Tools und hefte jene an, die die KI nutzen soll",
+      webPinsDescription:
+        "Sidebar-Verknüpfungen. Schnellzugriff auf angeheftete Tools im Admin-Panel.",
+      aiAllowedDescription:
+        "Tools, die die KI bei Bedarf aufrufen darf. Alles hier kann aufgerufen werden, wenn die KI es für nötig hält.",
+      noAllowedTools: "Keine erlaubten Tools",
     },
 
     platformFilter: {

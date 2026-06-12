@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
 
   patch: {
     title: "Zmień nazwę folderu",
+    titleShort: "Zmień nazwę",
     description: "Zmień nazwę istniejącego folderu",
     id: {
       label: "ID folderu",

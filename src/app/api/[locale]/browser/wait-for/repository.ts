@@ -36,6 +36,7 @@ export class WaitForRepository {
           text: data.text,
           timeout: data.timeout,
         }),
+        instanceId: data.instanceId,
       },
       t,
       logger,

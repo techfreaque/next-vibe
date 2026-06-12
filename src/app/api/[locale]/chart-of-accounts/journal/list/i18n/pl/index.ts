@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Dziennik księgowy",
+    titleShort: "Dziennik",
     description:
       "Lista wpisów dziennika z filtrami według firmy, okresu, statusu, źródła i zakresu dat",
     companyId: {

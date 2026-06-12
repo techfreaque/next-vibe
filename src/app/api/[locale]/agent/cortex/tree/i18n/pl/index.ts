@@ -1,8 +1,11 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   get: {
     title: "Drzewo",
-    description: "Cała struktura folderów na jeden rzut oka.",
-    dynamicTitle: "{{path}}",
+    titleShort: "Drzewo plików",
+    description:
+      "Cała struktura folderów na jeden rzut oka. Dla ścieżek /ssh/: maszyny i ich punkty montowania — do nawigacji użyj cortex-list lub cortex-exec.",
+    dynamicTitle: "Drzewo: {{path}}",
     status: {
       loading: "Skanowanie...",
       done: "Zeskanowano",

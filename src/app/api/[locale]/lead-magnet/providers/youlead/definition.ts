@@ -29,10 +29,11 @@ export const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["lead-magnet", "providers", "youlead"],
   title: "providers.youlead.title" as const,
+  titleShort: "providers.youlead.titleShort" as const,
   description: "providers.youlead.description" as const,
   icon: "mail",
-  category: "endpointCategories.leadMagnet",
-  subCategory: "endpointCategories.leadMagnetIntegrations",
+  category: "leads",
+  subCategory: "leadMagnetIntegrations",
   tags: ["providers.shared.saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {

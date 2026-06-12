@@ -14,13 +14,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "../../i18n";
 
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["infra", "cluster", "status"],
   title: "cluster.status.get.title",
+  titleShort: "cluster.status.get.titleShort",
   description: "cluster.status.get.description",
   icon: "activity",
   category: "devTools",

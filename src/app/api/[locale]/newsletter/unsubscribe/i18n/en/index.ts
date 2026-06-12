@@ -44,6 +44,7 @@ export const translations = {
   },
   post: {
     title: "Newsletter Unsubscribe",
+    titleShort: "Unsubscribe",
     description: "Unsubscribe from newsletter updates",
     form: {
       title: "Unsubscribe from Newsletter",

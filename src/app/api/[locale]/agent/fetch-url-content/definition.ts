@@ -32,9 +32,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "fetch-url-content"],
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "ai",
+  subCategory: "Tools",
   tags: [
     "tags.scraping" as const,
     "tags.web" as const,

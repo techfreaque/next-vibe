@@ -7,6 +7,7 @@ export const translations = {
 
   post: {
     title: "Stop Import Job",
+    titleShort: "Stop Import",
     description: "Stop a running import job",
     jobId: {
       label: "Job ID",

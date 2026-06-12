@@ -17,10 +17,11 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
+import listMonitorsDefinitions from "../list-monitors/definition";
 import { DESKTOP_SCREENSHOT_ALIAS } from "./constants";
 
 const TakeScreenshotWidget = lazyWidget(() =>
@@ -33,6 +34,7 @@ const { POST } = createEndpoint({
   path: ["desktop", "take-screenshot"],
   aliases: [DESKTOP_SCREENSHOT_ALIAS] as const,
   title: "take-screenshot.title",
+  titleShort: "take-screenshot.titleShort",
   description: "take-screenshot.description",
   dynamicTitle: ({ request }) => {
     const target =
@@ -92,10 +94,11 @@ const { POST } = createEndpoint({
       }),
       monitorName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: listMonitorsDefinitions.POST,
+        labelField: "name",
         label: "take-screenshot.form.fields.monitorName.label",
         description: "take-screenshot.form.fields.monitorName.description",
-        placeholder: "take-screenshot.form.fields.monitorName.placeholder",
         columns: 6,
         schema: z
           .string()

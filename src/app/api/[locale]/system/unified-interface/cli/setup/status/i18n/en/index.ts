@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "CLI Installation Status",
+    titleShort: "CLI Status",
     description: "Check the current installation status of the Vibe CLI",
     form: {
       title: "Status Configuration",

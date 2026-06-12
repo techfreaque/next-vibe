@@ -18,7 +18,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
 
@@ -30,7 +30,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["desktop", "scroll"],
+  aliases: ["desktop-scroll"] as const,
   title: "scroll.title",
+  titleShort: "scroll.titleShort",
   description: "scroll.description",
   dynamicTitle: ({ request }) => {
     if (request?.direction) {

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Schwellenwert",
+    titleShort: "Schwelle",
     description:
       "Feuert, wenn ein Reihenwert einen Vergleich mit einer Konstanten erfüllt",
     fields: {

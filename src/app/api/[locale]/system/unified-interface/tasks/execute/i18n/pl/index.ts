@@ -13,6 +13,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Wykonaj zadanie",
+    titleShort: "Wykonaj zadanie",
     description:
       "Wyzwól pojedyncze zadanie po ID i odbierz wynik synchronicznie",
     container: {

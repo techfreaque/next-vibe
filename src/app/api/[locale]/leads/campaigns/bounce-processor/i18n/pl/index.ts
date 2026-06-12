@@ -47,6 +47,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Przetwarzanie zwrotów",
+    titleShort: "Przetwórz zwroty",
     description: "Przetwarzaj powiadomienia o zwrotach e-mail z IMAP",
     errors: {
       unauthorized: {
@@ -106,6 +107,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz konfigurację przetwarzania zwrotów",
+    titleShort: "Konfiguracja zwrotów",
     description: "Załaduj konfigurację cron przetwarzania zwrotów",
     errors: {
       unauthorized: {

@@ -18,7 +18,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
 import { DESKTOP_CLICK_ALIAS } from "./constants";
@@ -33,6 +33,7 @@ const { POST } = createEndpoint({
   path: ["desktop", "click"],
   aliases: [DESKTOP_CLICK_ALIAS] as const,
   title: "click.title",
+  titleShort: "click.titleShort",
   description: "click.description",
   dynamicTitle: ({ request }) => {
     if (request?.x !== undefined && request?.y !== undefined) {

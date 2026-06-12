@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Docker-Operationen",
+  titleShort: "Docker-DB",
   description: "Docker-Befehle ausführen und Container verwalten",
   category: "Docker",
   tags: {

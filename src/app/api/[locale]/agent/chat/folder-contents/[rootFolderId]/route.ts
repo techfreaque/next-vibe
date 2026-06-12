@@ -6,7 +6,6 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { DefaultFolderId, isDefaultFolderId } from "../../config";
 import definitions from "./definition";
 import { FolderContentsRepository } from "./repository";
 
@@ -28,6 +27,9 @@ export const { GET, tools } = endpointsHandler({
       if (!rootFolderId) {
         return false;
       }
+
+      const { isDefaultFolderId, DefaultFolderId } =
+        await import("../../config");
 
       if (!isDefaultFolderId(rootFolderId)) {
         const { eq } = await import("drizzle-orm");

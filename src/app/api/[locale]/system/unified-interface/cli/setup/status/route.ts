@@ -14,9 +14,6 @@ import { SetupStatusRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: statusEndpoints,
   [Methods.POST]: {
-    handler: ({ user, logger, t }) => {
-      logger.debug("Setup status check started");
-      return SetupStatusRepository.getStatus(user, t);
-    },
+    handler: ({ user, t }) => SetupStatusRepository.getStatus(user, t),
   },
 });

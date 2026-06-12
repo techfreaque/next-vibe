@@ -24,7 +24,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { scopedTranslation as appLocaleScopedTranslation } from "@/app/[locale]/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
@@ -44,7 +43,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { LiveIndex } from "../shared/live-index";
 import {
   findFilesRecursively,
@@ -97,6 +95,10 @@ interface EndpointMeta {
   credits?: number;
   /** Whether the tool requires user confirmation before execution */
   requiresConfirmation?: boolean;
+  /** Roles for which this tool is AI-pinned by default (overridable per-favorite) */
+  defaultAiPinned?: string[];
+  /** Roles for which this tool is web-sidebar-pinned by default (overridable per-user) */
+  defaultWebPinned?: string[];
   /** Example inputs/responses from the definition */
   examples?: {
     inputs?: Record<string, Record<string, WidgetData>>;
@@ -202,8 +204,19 @@ export class EndpointsMetaGeneratorRepository {
         `Loaded ${loadedEndpoints.length} endpoint definitions (method entries)`,
       );
 
-      // ── 4. Generate one file per locale ─────────────────────────────────
+      // ── 4. Generate default-pins.ts (locale-independent) ────────────────
       let filesWritten = 0;
+      const defaultPinsFile = join(data.outputDir, "default-pins.ts");
+      const defaultPinsContent =
+        EndpointsMetaGeneratorRepository.renderDefaultPins(loadedEndpoints);
+      await writeGeneratedFile(
+        defaultPinsFile,
+        defaultPinsContent,
+        data.dryRun,
+      );
+      filesWritten++;
+
+      // ── 5. Generate one file per locale ─────────────────────────────────
 
       for (const locale of EndpointsMetaGeneratorRepository.GENERATE_LOCALES) {
         const fileName =
@@ -326,19 +339,24 @@ export class EndpointsMetaGeneratorRepository {
   /**
    * Dynamically import each definition file and collect one entry per
    * (definition file × HTTP method).
+   *
+   * Imports run in parallel via Promise.all — each file is an independent
+   * ESM module and Bun deduplicates concurrent requests to the same module.
+   * This is the primary performance bottleneck (~60-70% of gen time when sequential).
    */
   private static async loadDefinitions(
     defFiles: string[],
     logger: EndpointLogger,
   ): Promise<Array<{ definition: CreateApiEndpointAny }>> {
+    const imported = await Promise.all(
+      defFiles.map((defFile) =>
+        EndpointsMetaGeneratorRepository.importDefinitionFile(defFile, logger),
+      ),
+    );
+
     const results: Array<{ definition: CreateApiEndpointAny }> = [];
 
-    for (const defFile of defFiles) {
-      const defaultExport =
-        await EndpointsMetaGeneratorRepository.importDefinitionFile(
-          defFile,
-          logger,
-        );
+    for (const defaultExport of imported) {
       if (!defaultExport || typeof defaultExport !== "object") {
         continue;
       }
@@ -364,16 +382,14 @@ export class EndpointsMetaGeneratorRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): EndpointMeta[] {
-    const { t: appLocaleT } = appLocaleScopedTranslation.scopedT(locale);
-
     const entries = loaded.map(({ definition }) => {
       const { t } = definition.scopedTranslation.scopedT(locale);
 
       // Translate title & description via the endpoint's own scoped i18n
       const title = t(definition.title);
       const description = t(definition.description);
-      const category: TranslatedKeyType = appLocaleT(definition.category);
-      const subCategory: TranslatedKeyType = appLocaleT(definition.subCategory);
+      const category: string = definition.category;
+      const subCategory: string = definition.subCategory ?? "";
 
       // Translate tags via scoped i18n
       const tags = (definition.tags ?? []).map((tag: string) => {
@@ -447,6 +463,22 @@ export class EndpointsMetaGeneratorRepository {
           : {}),
         ...(definition.requiresConfirmation
           ? { requiresConfirmation: true }
+          : {}),
+        ...(definition.defaultAiPinned &&
+        (definition.defaultAiPinned as readonly string[]).length > 0
+          ? {
+              defaultAiPinned: [
+                ...(definition.defaultAiPinned as readonly string[]),
+              ],
+            }
+          : {}),
+        ...(definition.defaultWebPinned &&
+        (definition.defaultWebPinned as readonly string[]).length > 0
+          ? {
+              defaultWebPinned: [
+                ...(definition.defaultWebPinned as readonly string[]),
+              ],
+            }
           : {}),
         ...(examples ? { examples } : {}),
       };
@@ -549,6 +581,8 @@ export interface EndpointMeta {
   tags: string[];
   credits?: number;
   requiresConfirmation?: boolean;
+  defaultAiPinned?: string[];
+  defaultWebPinned?: string[];
   examples?: {
     inputs?: Record<string, Record<string, WidgetData>>;
     responses?: Record<string, Record<string, WidgetData>>;
@@ -556,6 +590,80 @@ export interface EndpointMeta {
 }
 
 export const endpointsMeta: EndpointMeta[] = ${entriesTs};
+`;
+  }
+
+  /** Render a role→ids map as a TypeScript object literal, sorted by role key. */
+  private static renderRoleMap(map: Map<string, string[]>): string {
+    const entries = [...map.entries()]
+      .toSorted(([a], [b]) => a.localeCompare(b))
+      .map(
+        ([role, ids]) => `  ${JSON.stringify(role)}: ${JSON.stringify(ids)},`,
+      )
+      .join("\n");
+    return `{\n${entries}\n}`;
+  }
+
+  /**
+   * Build default-pins.ts: pre-computed role → alias[] maps derived from
+   * defaultAiPinned / defaultWebPinned flags on definitions.
+   * Locale-independent - role values are enum string keys.
+   */
+  private static renderDefaultPins(
+    loaded: Array<{ definition: CreateApiEndpointAny }>,
+  ): string {
+    const aiPinsByRole = new Map<string, string[]>();
+    const webPinsByRole = new Map<string, string[]>();
+
+    for (const { definition } of loaded) {
+      const preferredName = getPreferredToolName(definition);
+      const aiRoles = definition.defaultAiPinned as
+        | readonly string[]
+        | undefined;
+      const webRoles = definition.defaultWebPinned as
+        | readonly string[]
+        | undefined;
+
+      if (aiRoles) {
+        for (const role of aiRoles) {
+          if (!aiPinsByRole.has(role)) {
+            aiPinsByRole.set(role, []);
+          }
+          aiPinsByRole.get(role)!.push(preferredName);
+        }
+      }
+      if (webRoles) {
+        for (const role of webRoles) {
+          if (!webPinsByRole.has(role)) {
+            webPinsByRole.set(role, []);
+          }
+          webPinsByRole.get(role)!.push(preferredName);
+        }
+      }
+    }
+
+    // eslint-disable-next-line i18next/no-literal-string
+    const header = generateFileHeader(
+      "AUTO-GENERATED FILE - DO NOT EDIT",
+      "generators/endpoints-meta",
+      { entries: loaded.length },
+    );
+
+    // eslint-disable-next-line i18next/no-literal-string
+    return `${header}
+
+/**
+ * Role → default AI-pinned tool aliases.
+ * Derived from defaultAiPinned flags on endpoint definitions.
+ * Replaces manual DEFAULT_TOOL_IDS_* arrays in constants.ts.
+ */
+export const DEFAULT_AI_PINNED_IDS: Record<string, string[]> = ${EndpointsMetaGeneratorRepository.renderRoleMap(aiPinsByRole)};
+
+/**
+ * Role → default web-sidebar-pinned tool aliases.
+ * Derived from defaultWebPinned flags on endpoint definitions.
+ */
+export const DEFAULT_WEB_PINNED_IDS: Record<string, string[]> = ${EndpointsMetaGeneratorRepository.renderRoleMap(webPinsByRole)};
 `;
   }
 }

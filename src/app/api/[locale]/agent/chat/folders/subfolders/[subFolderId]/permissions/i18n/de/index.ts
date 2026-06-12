@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Ordnerberechtigungen abrufen",
+    titleShort: "Ordnerzugriff",
     description:
       "Die Liste der Moderatoren für einen bestimmten Ordner abrufen",
     noData: "Keine Daten verfügbar",
@@ -114,6 +115,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Ordnerberechtigungen aktualisieren",
+    titleShort: "Ordnerzugriff",
     description:
       "Die Liste der Moderatoren für einen bestimmten Ordner aktualisieren",
     container: {

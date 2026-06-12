@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "SSH",
 
   errors: {
@@ -14,6 +15,7 @@ export const translations = {
 
   delete: {
     title: "Linux-Benutzer löschen",
+    titleShort: "Benutzer löschen",
     description: "OS-Benutzerkonto vom Host löschen",
     fields: {
       removeHome: {

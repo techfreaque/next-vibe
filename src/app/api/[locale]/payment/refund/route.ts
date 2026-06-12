@@ -14,13 +14,7 @@ import refundDefinitions from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: refundDefinitions,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) => {
-      logger.debug("Payment refund API POST request", {
-        userId: user.id,
-        transactionId: data.transactionId,
-        amount: data.amount,
-      });
-      return PaymentRepository.createRefund(user.id, data, locale, logger);
-    },
+    handler: ({ data, user, locale, logger }) =>
+      PaymentRepository.createRefund(user.id, data, locale, logger),
   },
 });

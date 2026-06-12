@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Crossover",
+    titleShort: "Crossover",
     description: "Fires when series A crosses above series B",
     fields: {
       seriesA: { label: "Series A", description: "First input time series" },

@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Głosuj na wiadomość",
+    titleShort: "Oceń wiadomość",
     description: "Zagłosuj za lub przeciw wiadomości",
     container: {
       title: "Głosowanie",

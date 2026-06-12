@@ -9,14 +9,14 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
   widgetField,
@@ -30,6 +30,10 @@ import {
 } from "./enum";
 import { scopedTranslation } from "./i18n";
 
+const ContactFormWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ContactFormWidget })),
+);
+
 /**
  * Contact form endpoint
  */
@@ -38,9 +42,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["contact"],
   title: "title",
+  titleShort: "titleShort",
   description: "description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.users",
+  category: "messenger",
+  subCategory: "Messages",
   icon: "mail",
   aliases: [CONTACT_FORM_ALIAS],
   requiresConfirmation: true,
@@ -59,13 +64,9 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "form.label",
-    description: "form.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: ContactFormWidget,
+    usage: { request: "data", response: true } as const,
     children: {
       name: requestField(scopedTranslation, {
         schema: z.string().min(2),

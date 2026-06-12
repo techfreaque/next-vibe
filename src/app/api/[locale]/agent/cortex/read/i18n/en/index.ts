@@ -1,9 +1,10 @@
 export const translations = {
   get: {
     title: "Read File",
+    titleShort: "Read File",
     description:
       "Open any file - your notes, threads, memories, skills, or tasks.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Read {{path}}",
     status: {
       loading: "Reading...",
       done: "Loaded",

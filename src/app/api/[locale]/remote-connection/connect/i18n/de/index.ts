@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Konto",
   tags: {
     remoteConnection: "Fernverbindung",
@@ -6,6 +7,8 @@ export const translations = {
   widget: {
     signInDescription:
       "Melde dich an, um dich mit einem Remote-Konto zu verbinden.",
+    adminOnlyDescription:
+      "Ausgehende Verbindungen erfordern Admin-Zugriff. Falls du von einer Remote-Instanz verbunden wurdest, sind deine Verbindungen oben sichtbar.",
     benefit1:
       "Erinnerungen synchronisieren automatisch - alles, was du der KI beibringst, überträgt sich",
     benefit2:
@@ -21,6 +24,7 @@ export const translations = {
   },
   post: {
     title: "Mit Remote-Konto verbinden",
+    titleShort: "Remote verbinden",
     description:
       "Verbinde dein Konto mit einer Remote-Instanz, um Erinnerungen zu synchronisieren",
     remoteUrl: {
@@ -61,6 +65,28 @@ export const translations = {
       label: "Lead-ID",
       description: "Lead-ID der Remote-Instanz (wird automatisch gesetzt)",
     },
+    transportMode: {
+      label: "Verbindungsart",
+      description:
+        "Wie diese Instanz mit der Remote kommuniziert. reverse-ws: persistente ausgehende Verbindung (empfohlen). ws-provider: Remote führt den KI-Inferenz-Loop aus.",
+      default: "reverse-ws (Standard)",
+    },
+    isInferenceProvider: {
+      label: "Als Inference-Provider nutzen",
+      description:
+        "Lässt diese Verbindung KI-Streams ausführen — die Remote-Instanz übernimmt den KI-Loop über den Rück-WS-Kanal.",
+    },
+    syncScope: {
+      label: "Sync-Umfang",
+      description: "Welche Daten über diese Verbindung synchronisiert werden.",
+      memories: "Erinnerungen",
+      documents: "Dokumente",
+      skills: "Skills",
+      tasks: "Aufgaben",
+      cortex: "Cortex-Dateien",
+      defaultNote: "Alle standardmäßig aktiv. Nach dem Verbinden anpassbar.",
+    },
+    advancedSettings: "Erweiterte Einstellungen",
     credentialWarning:
       "Deine Zugangsdaten gehen direkt von deinem Browser an den Remote-Server. Der hier gespeicherte Token gibt dem Betreiber dieses Servers jedoch vollen Zugriff auf dein Remote-Konto - er kann alles tun, was du dort tun kannst. Verbinde dich nur auf Servern, denen du vollständig vertraust.",
     actions: {
@@ -81,8 +107,9 @@ export const translations = {
         description: "Falsche E-Mail oder falsches Passwort",
       },
       forbidden: {
-        title: "Zugriff verweigert",
-        description: "Dein Konto hat keine Berechtigung zur Verbindung",
+        title: "Verbindungen nicht erlaubt",
+        description:
+          "Der Remote-Server akzeptiert keine eingehenden Verbindungen. Stelle sicher, dass du dich mit einer Cloud-Instanz verbindest (z.B. unbottled.ai), nicht mit einer anderen lokalen Installation.",
       },
       notFound: {
         title: "Nicht gefunden",

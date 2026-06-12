@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Tekst na mowę",
+    titleShort: "Tekst na mowę",
     description:
       "Konwertuj tekst na naturalnie brzmiącą mowę za pomocą AI (~0,00052 kredytów na znak)",
     form: {

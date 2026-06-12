@@ -24,7 +24,7 @@ export const translations: typeof enTranslations = {
       benefit1:
         "Twoje wspomnienia synchronizują się automatycznie między tym urządzeniem a kontem w chmurze",
       benefit2: "Uruchamiaj narzędzia AI z wiersza poleceń za pomocą",
-      benefit2Code: "vibe --remote",
+      benefit2Code: "vibe --thea",
       benefit3:
         "Twoje konto w chmurze i lokalna instancja pozostają zsynchronizowane",
     },
@@ -155,6 +155,55 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Połączono!",
       description: "Twoje konto jest teraz połączone ze zdalną instancją",
+    },
+  },
+  syncTriggerPull: {
+    title: "Wyzwól synchronizację",
+    titleShort: "Sync Pull",
+    description:
+      "Wyzwól natychmiastowe pobieranie danych ze wszystkich połączonych zdalnych instancji",
+    errors: {
+      validation: {
+        title: "Błąd walidacji",
+        description: "Nieprawidłowe żądanie",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Nie można połączyć się z serwerem",
+      },
+      unauthorized: {
+        title: "Nie zalogowano",
+        description: "Musisz być zalogowany",
+      },
+      forbidden: {
+        title: "Brak dostępu",
+        description: "Wymagana rola administratora",
+      },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Brak aktywnych połączeń do synchronizacji",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Wystąpił błąd podczas synchronizacji",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieoczekiwany błąd",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Wystąpił konflikt",
+      },
+    },
+    success: {
+      title: "Synchronizacja zakończona",
+      description:
+        "Pobrano najnowsze dane ze wszystkich połączonych zdalnych instancji",
     },
   },
   disconnect: {

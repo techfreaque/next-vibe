@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz uprawnienia folderu",
+    titleShort: "Dostęp do folderu",
     description: "Pobierz listę moderatorów dla konkretnego folderu",
     noData: "Brak dostępnych danych",
     edit: "Edytuj",
@@ -111,6 +112,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Aktualizuj uprawnienia folderu",
+    titleShort: "Dostęp do folderu",
     description: "Aktualizuj listę moderatorów dla konkretnego folderu",
     container: {
       title: "Aktualizuj uprawnienia folderu",

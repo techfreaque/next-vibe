@@ -11,6 +11,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz uprawnienia wątku",
+    titleShort: "Dostęp do wątku",
     description: "Pobierz listę moderatorów dla konkretnego wątku",
     container: {
       title: "Uprawnienia wątku",
@@ -97,6 +98,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Aktualizuj uprawnienia wątku",
+    titleShort: "Dostęp do wątku",
     description: "Aktualizuj listę moderatorów dla konkretnego wątku",
     container: {
       title: "Aktualizuj uprawnienia wątku",

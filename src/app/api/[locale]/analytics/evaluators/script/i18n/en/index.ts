@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Script Evaluator",
+    titleShort: "Eval Script",
     description: "Sandboxed custom evaluation via user-provided function body",
     fields: {
       source: { label: "Source", description: "Input time series" },

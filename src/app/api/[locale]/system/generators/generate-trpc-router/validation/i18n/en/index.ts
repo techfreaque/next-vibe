@@ -1,5 +1,6 @@
 export const translations = {
   title: "TRPC Validation",
+  titleShort: "tRPC Validation",
   description: "Validate TRPC integration across route files",
   category: "Generators",
   tags: {

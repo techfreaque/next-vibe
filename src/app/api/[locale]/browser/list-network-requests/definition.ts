@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,10 +31,12 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "list-network-requests"],
+  aliases: ["browser-list-network-requests"] as const,
   title: "list-network-requests.title",
+  titleShort: "list-network-requests.titleShort",
   description: "list-network-requests.description",
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserDevTools",
+  category: "browser",
+  subCategory: "DevTools",
   icon: "network",
   tags: [
     "list-network-requests.tags.browserAutomation",
@@ -132,6 +135,8 @@ const { POST } = createEndpoint({
             "Filter requests to only return requests of the specified resource types. When omitted or empty, returns all requests.",
           ),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

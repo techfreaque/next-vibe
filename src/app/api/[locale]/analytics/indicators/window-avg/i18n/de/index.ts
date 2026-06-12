@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Fenster-Durchschnitt",
+    titleShort: "Fensterø",
     description:
       "Gleitender Fensterdurchschnitt - glättet Werte über ein festes Fenster",
     fields: {

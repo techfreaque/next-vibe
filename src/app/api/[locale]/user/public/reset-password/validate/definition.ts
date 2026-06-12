@@ -30,10 +30,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["user", "public", "reset-password", "validate"],
   title: "validate.title",
+  titleShort: "validate.titleShort",
   description: "validate.description",
   icon: "shield",
-  category: "userAuth",
-  subCategory: "userAuthLogin",
+  category: "account",
   tags: ["validate.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: objectField(scopedTranslation, {

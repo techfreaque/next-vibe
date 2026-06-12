@@ -1,0 +1,110 @@
+export const translations = {
+  category: "Estimates",
+  tags: { payment: "payment", estimate: "estimate", lines: "lines" },
+  post: {
+    title: "Add Estimate Line",
+    titleShort: "Add Line",
+    description: "Add a line item to an estimate",
+    form: {
+      title: "Add Estimate Line",
+      description: "Add a product or service to this estimate",
+    },
+    response: {
+      success: "Success",
+      message: "Status message",
+      line: {
+        title: "Line Item",
+        subtitle: "Added line details",
+        id: "Line ID",
+        estimateId: "Estimate ID",
+        lineDescription: "Description",
+        productId: "Product ID",
+        quantity: "Quantity",
+        unitPrice: "Unit Price",
+        taxRate: "Tax Rate",
+        taxAmount: "Tax Amount",
+        lineTotal: "Line Total",
+        sortOrder: "Sort Order",
+        createdAt: "Created At",
+        updatedAt: "Updated At",
+      },
+    },
+    errors: {
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      validation: {
+        title: "Validation Error",
+        description: "Check the line item details",
+      },
+      server: { title: "Server Error", description: "Internal server error" },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      network: {
+        title: "Network Error",
+        description: "Network error occurred",
+      },
+      forbidden: { title: "Forbidden", description: "Access denied" },
+      notFound: { title: "Not Found", description: "Estimate not found" },
+      conflict: {
+        title: "Conflict",
+        description: "Estimate must be in DRAFT status to add lines",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "There are unsaved changes",
+      },
+    },
+    success: {
+      title: "Line Added",
+      description: "Line item added to the estimate",
+    },
+  },
+  estimateId: {
+    label: "Estimate ID",
+    description: "The estimate to add a line to",
+    placeholder: "Estimate UUID",
+  },
+  description: {
+    label: "Description",
+    description: "Product or service description",
+    placeholder: "e.g. Web development - 10 hours",
+  },
+  productId: {
+    label: "Product ID",
+    description: "Optional product reference",
+    placeholder: "Product UUID",
+  },
+  quantity: {
+    label: "Quantity",
+    description: "Number of units",
+    placeholder: "1",
+  },
+  unitPrice: {
+    label: "Unit Price",
+    description: "Price per unit (excluding tax)",
+    placeholder: "0.00",
+  },
+  taxRate: {
+    label: "Tax Rate",
+    description: "Tax rate as decimal (e.g. 0.23 for 23%)",
+    placeholder: "0.23",
+  },
+  widget: {
+    searchProduct: "Search Product",
+    searchPlaceholder: "Product name or SKU...",
+    searchButton: "Search",
+    clearProduct: "Clear",
+    noProductResults: "No products found.",
+    orManual: "or enter manually",
+    multiplier: "×",
+    taxLabel: "tax",
+    linePreview: "Line total",
+    addAnotherLine: "Add another line",
+    viewEstimate: "Back to estimate",
+    submit: "Add Line",
+  },
+};

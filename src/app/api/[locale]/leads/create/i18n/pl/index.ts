@@ -28,6 +28,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Stwórz lead",
+    titleShort: "Nowy lead",
     description: "Stwórz nowy lead w systemie",
     backButton: {
       label: "Powrót do leadów",

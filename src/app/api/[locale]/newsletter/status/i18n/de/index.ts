@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Newsletter-Status",
+  titleShort: "Newsletter-Status",
   description: "Newsletter-Abonnementstatus für eine E-Mail-Adresse prüfen",
   category: "Newsletter",
   tags: {

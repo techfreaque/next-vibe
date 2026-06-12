@@ -21,6 +21,7 @@ export const translations = {
   },
   get: {
     title: "List Cron Tasks",
+    titleShort: "Cron Tasks",
     description: "Retrieve a list of cron tasks with optional filtering",
     container: {
       title: "Cron Tasks List",
@@ -155,6 +156,7 @@ export const translations = {
   },
   post: {
     title: "Create Cron Task",
+    titleShort: "Create Task",
     description: "Create a new cron task",
     container: {
       title: "Create Task",

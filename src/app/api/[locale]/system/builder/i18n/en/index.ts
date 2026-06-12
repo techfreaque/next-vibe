@@ -149,6 +149,7 @@ export const translations = {
   },
   post: {
     title: "Build Package",
+    titleShort: "Build Package",
     description:
       "Comprehensive build tool supporting CLI bundling, Vite builds, React/Tailwind, and npm distribution",
     form: {

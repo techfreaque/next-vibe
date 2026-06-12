@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Endpoints-Meta generieren",
+    titleShort: "Endpunkte-Meta",
     description:
       "Lokalisierte Endpoint-Metadaten für das Tools-Modal generieren",
     container: {

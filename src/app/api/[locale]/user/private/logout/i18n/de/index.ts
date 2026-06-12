@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Benutzer Abmelden",
+  titleShort: "Abmelden",
   description:
     "Meldet den aktuellen Benutzer ab und macht seine Sitzung ungültig",
   category: "Benutzerverwaltung",

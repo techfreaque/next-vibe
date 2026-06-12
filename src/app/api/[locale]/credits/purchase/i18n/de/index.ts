@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Credits kaufen",
+    titleShort: "Credits kaufen",
     description: "Stripe-Checkout-Sitzung für Credit-Paket-Kauf erstellen",
     container: {
       title: "Credits kaufen",

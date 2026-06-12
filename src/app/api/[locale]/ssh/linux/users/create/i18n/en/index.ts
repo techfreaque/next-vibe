@@ -34,6 +34,7 @@ export const translations = {
 
   post: {
     title: "Create Linux User",
+    titleShort: "Create User",
     description:
       "Create a new OS user account. Runs useradd on the target host. Admin only.",
     fields: {

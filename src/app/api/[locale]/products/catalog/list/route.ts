@@ -3,6 +3,8 @@
  * Handles GET requests to list catalog products
  */
 
+import "server-only";
+
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 

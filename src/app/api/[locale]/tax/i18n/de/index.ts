@@ -11,6 +11,7 @@ export const translations: typeof enTranslations = {
   rate: {
     create: {
       title: "Steuersatz anlegen",
+      titleShort: "Steuersatz erstellen",
       description: "Einen Steuersatz für Ihr Unternehmen hinzufügen",
       widget: {
         backToList: "Zurück zu Steuersätzen",
@@ -104,6 +105,7 @@ export const translations: typeof enTranslations = {
     },
     list: {
       title: "Steuersätze",
+      titleShort: "Steuersätze",
       description: "Alle konfigurierten Steuersätze Ihres Unternehmens",
       widget: {
         addRate: "Satz hinzufügen",
@@ -207,6 +209,7 @@ export const translations: typeof enTranslations = {
     },
     update: {
       title: "Steuersatz bearbeiten",
+      titleShort: "Steuersatz ändern",
       description: "Einen bestehenden Steuersatz anpassen",
       widget: {
         backToList: "Zurück zu Steuersätzen",
@@ -283,6 +286,7 @@ export const translations: typeof enTranslations = {
     },
     delete: {
       title: "Steuersatz deaktivieren",
+      titleShort: "Steuersatz löschen",
       description: "Einen Steuersatz deaktivieren",
       widget: {
         backToList: "Zurück zu Steuersätzen",
@@ -349,6 +353,7 @@ export const translations: typeof enTranslations = {
 
   report: {
     title: "Steuerbericht",
+    titleShort: "Steuerbericht",
     description: "Erhobene Steuern nach Satz und Zeitraum",
     widget: {
       columnRate: "Satz",

@@ -1,3 +1,4 @@
+import { Text } from "ink";
 import * as React from "react";
 
 export type {
@@ -29,20 +30,24 @@ import type {
 
 export function Drawer({
   children,
+  open,
 }: DrawerRootProps): React.JSX.Element | null {
+  if (open === false) {
+    return null;
+  }
   return <>{children}</>;
 }
 
 export function DrawerTrigger({
   children,
 }: DrawerTriggerProps): React.JSX.Element | null {
-  return <>{children}</>;
+  return <Text>{children}</Text>;
 }
 
 export function DrawerClose({
   children,
 }: DrawerCloseProps): React.JSX.Element | null {
-  return <>{children}</>;
+  return <Text>{children}</Text>;
 }
 
 export function DrawerPortal({
@@ -78,11 +83,11 @@ export function DrawerFooter({
 export function DrawerTitle({
   children,
 }: DrawerTitleProps): React.JSX.Element | null {
-  return <>{children}</>;
+  return <Text bold>{children}</Text>;
 }
 
 export function DrawerDescription({
   children,
 }: DrawerDescriptionProps): React.JSX.Element | null {
-  return <>{children}</>;
+  return <Text>{children}</Text>;
 }

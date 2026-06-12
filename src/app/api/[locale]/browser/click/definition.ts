@@ -19,8 +19,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { BROWSER_CLICK_ALIAS } from "./constants";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,7 +32,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "click"],
+  aliases: [BROWSER_CLICK_ALIAS] as const,
   title: "click.title",
+  titleShort: "click.titleShort",
   description: "click.description",
   dynamicTitle: ({ request }) => {
     if (request?.uid) {
@@ -41,8 +45,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserInteraction",
+  category: "browser",
+  subCategory: "Interaction",
   icon: "mouse-pointer",
   tags: ["click.tags.browserAutomation", "click.tags.inputAutomation"],
 
@@ -77,6 +81,8 @@ const { POST } = createEndpoint({
           .default(false)
           .describe("Set to true for double clicks. Default is false."),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

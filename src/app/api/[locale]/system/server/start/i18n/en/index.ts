@@ -5,6 +5,7 @@ export const translations = {
   },
   post: {
     title: "Start Production Server",
+    titleShort: "Start Server",
     description: "Start the production server with pre-tasks and Next.js",
     form: {
       title: "Start Configuration",

@@ -42,12 +42,13 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["credits", "purchase"],
-  title: "post.title",
-  description: "post.description",
-  category: "credits",
-  subCategory: "Management",
-  tags: ["post.title"],
-  icon: "dollar-sign",
+  title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
+  description: "post.description" as const,
+  category: "credits" as const,
+  subCategory: "Management" as const,
+  tags: ["post.title" as const],
+  icon: "dollar-sign" as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
@@ -62,18 +63,18 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1).default(1),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.INT,
-        label: "post.quantity.label",
-        description: "post.quantity.description",
-        placeholder: "post.quantity.placeholder",
+        label: "post.quantity.label" as const,
+        description: "post.quantity.description" as const,
+        placeholder: "post.quantity.placeholder" as const,
       }),
 
       provider: requestField(scopedTranslation, {
         schema: z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "post.provider.label",
-        description: "post.provider.description",
-        placeholder: "post.provider.placeholder",
+        label: "post.provider.label" as const,
+        description: "post.provider.description" as const,
+        placeholder: "post.provider.placeholder" as const,
         options: PaymentProviderOptions,
       }),
 
@@ -81,25 +82,25 @@ const { POST } = createEndpoint({
       checkoutUrl: responseField(scopedTranslation, {
         schema: z.string().url(),
         type: WidgetType.TEXT,
-        content: "post.checkoutUrl.content",
+        content: "post.checkoutUrl.content" as const,
       }),
 
       sessionId: responseField(scopedTranslation, {
         schema: z.string(),
         type: WidgetType.TEXT,
-        content: "post.sessionId.content",
+        content: "post.sessionId.content" as const,
       }),
 
       totalAmount: responseField(scopedTranslation, {
         schema: z.coerce.number().int(),
         type: WidgetType.TEXT,
-        content: "post.totalAmount.content",
+        content: "post.totalAmount.content" as const,
       }),
 
       totalCredits: responseField(scopedTranslation, {
         schema: z.coerce.number().int(),
         type: WidgetType.TEXT,
-        content: "post.totalCredits.content",
+        content: "post.totalCredits.content" as const,
       }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,
@@ -120,47 +121,46 @@ const { POST } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "post.success.title",
-    description: "post.success.description",
+    title: "post.success.title" as const,
+    description: "post.success.description" as const,
   },
 
-  // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "post.errors.validation.title",
-      description: "post.errors.validation.description",
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "post.errors.network.title",
-      description: "post.errors.network.description",
+      title: "post.errors.network.title" as const,
+      description: "post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "post.errors.unauthorized.title",
-      description: "post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title" as const,
+      description: "post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "post.errors.forbidden.title",
-      description: "post.errors.forbidden.description",
+      title: "post.errors.forbidden.title" as const,
+      description: "post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "post.errors.notFound.title",
-      description: "post.errors.notFound.description",
+      title: "post.errors.notFound.title" as const,
+      description: "post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "post.errors.server.title",
-      description: "post.errors.server.description",
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "post.errors.unknown.title",
-      description: "post.errors.unknown.description",
+      title: "post.errors.unknown.title" as const,
+      description: "post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "post.errors.unsavedChanges.title",
-      description: "post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title" as const,
+      description: "post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "post.errors.conflict.title",
-      description: "post.errors.conflict.description",
+      title: "post.errors.conflict.title" as const,
+      description: "post.errors.conflict.description" as const,
     },
   },
 

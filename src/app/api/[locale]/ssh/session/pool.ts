@@ -1,5 +1,6 @@
 /**
- * In-memory session pool for local shell and remote SSH sessions
+ * In-memory session pool for local shell and remote SSH sessions.
+ * Used internally by cortex-exec to maintain persistent terminal sessions.
  */
 
 import type { ChildProcess } from "node:child_process";
@@ -7,27 +8,38 @@ import type { ChildProcess } from "node:child_process";
 import type { ClientChannel, Ssh2Client } from "../client";
 import type { SshSessionStatus } from "../enum";
 
-export interface LocalSessionEntry {
+// ─── Shared Fields ───────────────────────────────────────────────────────────
+
+interface SessionMeta {
   sessionId: string;
-  kind: "local";
-  proc: ChildProcess;
   outputBuffer: () => string;
   drainOutput: () => string;
   status: SshSessionStatus;
   idleTimer: ReturnType<typeof setTimeout>;
   openedAt: Date;
+  /** Tracked working directory (updated after each command) */
+  cwd: string;
+  /** Cortex mount slug, e.g. "local-machine" or "my-server" */
+  connectionSlug: string;
+  /** UUID from sshConnections or synthetic ID for remote connections */
+  connectionId: string;
+  /** Optional user-provided label for this terminal */
+  name: string;
+  /** Timestamp of last command execution */
+  lastCommandAt: Date;
 }
 
-export interface SshSessionEntry {
-  sessionId: string;
+// ─── Entry Types ─────────────────────────────────────────────────────────────
+
+export interface LocalSessionEntry extends SessionMeta {
+  kind: "local";
+  proc: ChildProcess;
+}
+
+export interface SshSessionEntry extends SessionMeta {
   kind: "ssh";
   client: Ssh2Client;
   channel: ClientChannel;
-  outputBuffer: () => string;
-  drainOutput: () => string;
-  status: SshSessionStatus;
-  idleTimer: ReturnType<typeof setTimeout>;
-  openedAt: Date;
 }
 
 export type SessionEntry = LocalSessionEntry | SshSessionEntry;
@@ -80,4 +92,53 @@ export function drainSessionPool(): void {
     }
     sessionPool.delete(id);
   }
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Get all active sessions for a given connection slug */
+export function getSessionsForConnection(slug: string): SessionEntry[] {
+  const result: SessionEntry[] = [];
+  for (const session of sessionPool.values()) {
+    if (session.connectionSlug === slug) {
+      result.push(session);
+    }
+  }
+  return result;
+}
+
+/** Find the default (first) session for a connection, if any */
+export function getDefaultSession(slug: string): SessionEntry | undefined {
+  for (const session of sessionPool.values()) {
+    if (session.connectionSlug === slug) {
+      return session;
+    }
+  }
+  return undefined;
+}
+
+/** Update the tracked CWD for a session */
+export function updateSessionCwd(sessionId: string, cwd: string): void {
+  const session = sessionPool.get(sessionId);
+  if (session) {
+    session.cwd = cwd;
+  }
+}
+
+/** CWD marker used to detect working directory from command output */
+export const CWD_MARKER_PREFIX = "__CWD__";
+export const CWD_MARKER_SUFFIX = "__CWD__";
+export const CWD_MARKER_REGEX = /__CWD__(.+?)__CWD__\n?/g;
+
+/** Strip CWD markers from output and return the detected cwd (if any) */
+export function extractCwdFromOutput(output: string): {
+  cleanOutput: string;
+  detectedCwd: string | null;
+} {
+  let detectedCwd: string | null = null;
+  const cleanOutput = output.replace(CWD_MARKER_REGEX, (...args: string[]) => {
+    detectedCwd = args[1] ?? null;
+    return "";
+  });
+  return { cleanOutput, detectedCwd };
 }

@@ -30,8 +30,9 @@ import {
   CsvImportJobStatusOptions,
 } from "../enum";
 import { scopedTranslation } from "../i18n";
+import { LEADS_IMPORT_STATUS_ALIAS } from "./constants";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const ImportStatusContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ImportStatusContainer })),
@@ -45,10 +46,12 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["leads", "import", "status"],
+  aliases: [LEADS_IMPORT_STATUS_ALIAS] as const,
   title: "status.get.title",
+  titleShort: "status.get.titleShort",
   description: "status.get.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsImport",
+  category: "leads",
+  subCategory: "Import",
   tags: ["tags.import", "status.tags.jobs", "status.tags.list"],
   allowedRoles: [UserRole.ADMIN] as const,
   icon: "activity",

@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
   tag: "sql",
   post: {
     title: "SQL ausführen",
+    titleShort: "SQL ausführen",
     description: "SQL-Abfragen auf der Datenbank ausführen",
     form: {
       title: "SQL-Abfragekonfiguration",

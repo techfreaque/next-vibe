@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
     },
     post: {
       title: "KI-Agent ausführen",
+      titleShort: "Agent starten",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
         "Delegiert eine Aufgabe an einen Spezialisten-KI-Agenten und gibt dessen Antwort zurück. Zum Erstellen oder Bearbeiten von KI-Skills/Personas immer an skill='skill-creator' delegieren – niemals selbst versuchen. skill + prompt übergeben; der Agent erledigt den Rest. Credits je nach Modell.",
@@ -28,18 +29,18 @@ export const translations: typeof enTranslations = {
         favoriteId: {
           label: "Favoriten-ID",
           description:
-            "Slug oder ID eines gespeicherten Favoriten. Lädt Skill, Modell und Tool-Konfiguration als Standardwerte. Explizite Felder überschreiben Favoriten-Werte.",
-          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+            "Slug eines gespeicherten Favoriten (z.B. 'thea-cheap'). Kein Skill-Slug – dafür das skill-Feld verwenden. Lädt Skill, Modell und Tool-Konfiguration in einem Schritt. Priorität: model > favoriteId > skill.",
+          placeholder: "thea-cheap",
         },
         model: {
-          label: "Modell",
+          label: "Modell (nur CLI)",
           description:
-            "LLM für Text-Reasoning. Optional wenn favoriteId oder skill gesetzt. Schnell: claude-haiku-4.5, gemini-2.5-flash. Ausgewogen: claude-sonnet-4.6, gpt-5. Leistungsstark: claude-opus-4.7. Kostenlos: qwen3_235b-free. Nicht für Bild-/Audio-/Video-Generierung.",
+            "LLM direkt überschreiben. Nur per CLI – andere Plattformen nutzen favoriteId oder skill. Schnell: claude-haiku-4.5, gemini-2.5-flash. Ausgewogen: claude-sonnet-4.6, gpt-5. Leistungsstark: claude-opus-4.7. Kostenlos: qwen3_235b-free.",
         },
         skill: {
           label: "Skill",
           description:
-            "Skill-ID oder Standard-Skill-Name. Definiert KI-Persona und System-Prompt. 'skill-creator' zum Erstellen/Bearbeiten von KI-Skills verwenden. Optional wenn favoriteId gesetzt.",
+            "Skill-Slug (z.B. 'thea', 'thea__cheap-smart'). Kein Favoriten-Slug – dafür favoriteId verwenden. Definiert KI-Persona und System-Prompt. 'skill-creator' zum Erstellen/Bearbeiten verwenden.",
           placeholder: "default",
         },
         prompt: {
@@ -181,6 +182,10 @@ export const translations: typeof enTranslations = {
         },
         conflict: { title: "Konflikt", description: "Datenkonflikt" },
       },
+      requireFavOrSkill:
+        "Mindestens eines angeben: favoriteId, skill oder model (nur CLI). Ohne auflösbares Modell und Skill nicht ausführbar.",
+      skillNotFound:
+        "Skill '{{skill}}' nicht gefunden. Falls es ein Favoriten-Slug ist (z.B. 'thea-cheap'), --favoriteId statt --skill verwenden.",
       success: {
         title: "KI-Ausführung abgeschlossen",
         description: "Erfolgreich abgeschlossen",
@@ -192,6 +197,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "KI-Stream-Chat",
+    titleShort: "KI-Chat",
     description: "Streamen Sie KI-gestützte Chat-Antworten mit OpenAI GPT-4o",
     form: {
       title: "KI-Chat-Konfiguration",
@@ -552,6 +558,7 @@ export const translations: typeof enTranslations = {
   resumeStream: {
     post: {
       title: "KI-Stream fortsetzen",
+      titleShort: "Stream fortsetzen",
       description:
         "Setzt einen bestehenden Thread fort, indem ein headless KI-Schritt ausgeführt wird. Wird nach dem Abschluss eines asynchronen Remote-Tasks verwendet.",
       fields: {

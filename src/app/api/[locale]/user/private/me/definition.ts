@@ -37,6 +37,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { UserRole } from "../../user-roles/enum";
 import { userRoleResponseSchema } from "../../user-roles/types";
 import { scopedTranslation } from "./i18n";
+import { USER_ME_ALIAS } from "./constants";
 
 const MeUpdateWidget = lazy(() =>
   import("./widget").then((m) => ({ default: m.MeUpdateWidget })),
@@ -54,13 +55,20 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["user", "private", "me"],
+  aliases: [USER_ME_ALIAS] as const,
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "user",
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthProfile",
+  category: "account",
   tags: ["tag" as const],
   allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
+  ] as const,
+  defaultWebPinned: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -459,8 +467,7 @@ const { POST } = createEndpoint({
   title: "update.title" as const,
   description: "update.description" as const,
   icon: "user-check" as const,
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthProfile",
+  category: "account",
   tags: ["tag" as const],
   allowedRoles: [
     UserRole.PUBLIC,
@@ -1204,8 +1211,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "user-x" as const,
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthProfile",
+  category: "account",
   tags: ["tag" as const],
   allowedRoles: [
     UserRole.CUSTOMER,

@@ -45,6 +45,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "List Thread Messages",
+    titleShort: "Nachrichten",
     description: "Retrieve all messages in a chat thread",
     container: {
       title: "Messages",
@@ -161,6 +162,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Create Message",
+    titleShort: "Nachricht erstellen",
     description: "Create a new message in a chat thread",
     form: {
       title: "New Message",

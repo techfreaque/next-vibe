@@ -5,6 +5,7 @@ export const translations = {
   },
   post: {
     title: "Cancel AI Stream",
+    titleShort: "Cancel Stream",
     description: "Cancel an active AI streaming response",
     container: {
       title: "Cancel Stream",

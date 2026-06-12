@@ -6,6 +6,7 @@ export const translations = {
   },
   get: {
     title: "Search Leads",
+    titleShort: "Search Leads",
     description: "Search leads with filtering and pagination",
     form: {
       title: "Lead Search Form",

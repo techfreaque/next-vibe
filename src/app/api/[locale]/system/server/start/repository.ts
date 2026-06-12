@@ -9,13 +9,7 @@
 
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
-import {
-  appendFileSync,
-  mkdirSync,
-  readFileSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { monitorEventLoopDelay } from "node:perf_hooks";
 
 import {
@@ -28,6 +22,13 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
+  appendRawToServerLog,
+  truncateClientLogs,
+  truncateServerLog,
+  writeServerLogOfflineHint,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
+import { formatLogPrefix } from "@/app/api/[locale]/system/unified-interface/shared/logger/logger-core";
+import {
   createNextjsFormatter,
   formatConfig,
   formatDatabase,
@@ -39,11 +40,6 @@ import {
   formatTask,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import {
-  truncateClientLogs,
-  truncateStartLog,
-  writeStartLogOfflineHint,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
 import type { WebSocketServerHandle } from "@/app/api/[locale]/system/unified-interface/websocket/server";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
@@ -201,6 +197,7 @@ export class ServerStartRepository {
   private static log(msg: string): void {
     // eslint-disable-next-line no-console
     console.log(msg);
+    appendRawToServerLog(msg);
   }
 
   /**
@@ -240,15 +237,7 @@ export class ServerStartRepository {
         error: err.message,
         stack: err.stack,
       });
-      try {
-        mkdirSync(".tmp", { recursive: true });
-        appendFileSync(
-          ".tmp/vibe-start.log",
-          `${JSON.stringify({ type: "supervisor_uncaught", error: err.message, stack: err.stack, timestamp: new Date().toISOString() })}\n`,
-        );
-      } catch {
-        // Ignore fs errors
-      }
+      void writeServerLogOfflineHint();
       process.exit(2);
     });
     process.on("unhandledRejection", (reason) => {
@@ -342,16 +331,7 @@ export class ServerStartRepository {
           logger.error(crashMessage, crashInfo);
         }
 
-        // Persist crash record to log file so it survives supervisor restarts
-        try {
-          mkdirSync(".tmp", { recursive: true });
-          appendFileSync(
-            ".tmp/vibe-start.log",
-            `${JSON.stringify({ type: "supervisor_crash", ...crashInfo })}\n`,
-          );
-        } catch {
-          // Ignore fs errors
-        }
+        // Crash info already persisted via logger.error above (routes to VIBE_LOG_FILE)
 
         // OOM crashes use a longer backoff to let the OS reclaim memory.
         const delayTable =
@@ -406,15 +386,7 @@ export class ServerStartRepository {
               childPid: ServerStartRepository.supervisedChild?.pid,
             },
           );
-          try {
-            mkdirSync(".tmp", { recursive: true });
-            appendFileSync(
-              ".tmp/vibe-start.log",
-              `${JSON.stringify({ type: "freeze_kill", snapshotAgeMs: Math.round(ageMs), timestamp: new Date().toISOString() })}\n`,
-            );
-          } catch {
-            // ignore fs errors
-          }
+          // Freeze info already logged via logger.error above (routes to VIBE_LOG_FILE)
           if (
             ServerStartRepository.supervisedChild &&
             !ServerStartRepository.supervisedChild.killed
@@ -513,27 +485,23 @@ export class ServerStartRepository {
         // Memory pressure warnings - only log when crossing a new threshold.
         // Skip the first 30s: Node/Bun reports inflated transient heap values at startup.
         const uptime = Math.floor(process.uptime());
-        const memMeta = {
-          heapUsedMb,
-          rssMb,
-          heapTotalMb,
-          heapPct: Math.round(heapPct),
-          uptime,
-        };
         if (uptime < 30) {
           // Suppress pressure warnings during startup - heap metrics are unreliable
         } else if (heapPct >= 90 && lastPressureLevel < 3) {
           lastPressureLevel = 3;
           logger.error(
-            "[Memory] CRITICAL: heap at ≥90% - OOM imminent, consider restarting",
-            memMeta,
+            `[Memory] CRITICAL heap=${heapUsedMb}/${heapTotalMb}MB (${Math.round(heapPct)}%) rss=${rssMb}MB uptime=${uptime}s — OOM imminent`,
           );
         } else if (heapPct >= 80 && lastPressureLevel < 2) {
           lastPressureLevel = 2;
-          logger.warn("[Memory] High pressure: heap at ≥80%", memMeta);
+          logger.warn(
+            `[Memory] High pressure heap=${heapUsedMb}/${heapTotalMb}MB (${Math.round(heapPct)}%) rss=${rssMb}MB uptime=${uptime}s`,
+          );
         } else if (heapPct >= 70 && lastPressureLevel < 1) {
           lastPressureLevel = 1;
-          logger.info("[Memory] Elevated: heap at ≥70%", memMeta);
+          logger.info(
+            `[Memory] Elevated heap=${heapUsedMb}/${heapTotalMb}MB (${Math.round(heapPct)}%) rss=${rssMb}MB uptime=${uptime}s`,
+          );
         } else if (heapPct < 60) {
           // Reset so warnings fire again if pressure rises
           lastPressureLevel = 0;
@@ -569,32 +537,25 @@ export class ServerStartRepository {
           const maxMs = histogram.max / 1e6;
           histogram.reset();
 
+          const uptime2 = Math.floor(process.uptime());
+          const heapMb = Math.round(
+            process.memoryUsage().heapUsed / 1024 / 1024,
+          );
           if (maxMs >= EL_LAG_CRITICAL_MS && lastLagLevel < 3) {
             lastLagLevel = 3;
             logger.error(
-              "[EventLoop] CRITICAL lag detected - server may appear frozen",
-              {
-                meanMs: Math.round(meanMs),
-                maxMs: Math.round(maxMs),
-                uptime: Math.floor(process.uptime()),
-                heapUsedMb: Math.round(
-                  process.memoryUsage().heapUsed / 1024 / 1024,
-                ),
-              },
+              `[EventLoop] CRITICAL lag max=${Math.round(maxMs)}ms mean=${Math.round(meanMs)}ms heap=${heapMb}MB uptime=${uptime2}s — server may appear frozen`,
             );
           } else if (maxMs >= EL_LAG_ERROR_MS && lastLagLevel < 2) {
             lastLagLevel = 2;
-            logger.error("[EventLoop] High lag - requests may be timing out", {
-              meanMs: Math.round(meanMs),
-              maxMs: Math.round(maxMs),
-              uptime: Math.floor(process.uptime()),
-            });
+            logger.error(
+              `[EventLoop] High lag max=${Math.round(maxMs)}ms mean=${Math.round(meanMs)}ms uptime=${uptime2}s — requests may be timing out`,
+            );
           } else if (maxMs >= EL_LAG_WARN_MS && lastLagLevel < 1) {
             lastLagLevel = 1;
-            logger.warn("[EventLoop] Elevated lag", {
-              meanMs: Math.round(meanMs),
-              maxMs: Math.round(maxMs),
-            });
+            logger.warn(
+              `[EventLoop] Elevated lag max=${Math.round(maxMs)}ms mean=${Math.round(meanMs)}ms`,
+            );
           } else if (maxMs < EL_LAG_WARN_MS / 2) {
             lastLagLevel = 0;
           }
@@ -614,7 +575,6 @@ export class ServerStartRepository {
 
   private static logStartupInfo(
     port: number,
-    logger: EndpointLogger,
     data: ServerStartRequestOutput,
     runDb: boolean,
     runTasks: boolean,
@@ -623,7 +583,9 @@ export class ServerStartRepository {
   ): void {
     const currentEnv = process.env["NODE_ENV"] || "production";
     const mode = data.mode ?? "all";
-    logger.vibe(formatStartup("Starting Production Server", "🚀"));
+    ServerStartRepository.log(
+      `${formatLogPrefix()}${formatStartup("Starting Production Server", "🚀")}`,
+    );
     ServerStartRepository.log("");
     ServerStartRepository.log(
       `  ${formatConfig("Port", port)}  ${formatHint("(--port=N)")}`,
@@ -862,24 +824,23 @@ export class ServerStartRepository {
     const runSeed = data.seed && (mode === "all" || mode === "tasks");
     const runNext = data.nextServer && (mode === "all" || mode === "web");
 
+    // Write offline hint on behalf of the previous instance BEFORE truncating —
+    // prevents the old process's own shutdown handler from appending the hint
+    // after the new session has already cleared the log.
+    writeServerLogOfflineHint();
+    // Truncate log files at session start (VIBE_LOG_PATH controls whether file logging is active)
+    truncateServerLog();
+    truncateClientLogs();
+
     // Print config summary immediately, before any async work
     ServerStartRepository.logStartupInfo(
       port,
-      logger,
       data,
       runDb,
       runTasks,
       runSeed,
       runNext,
     );
-
-    // Write offline hint on behalf of the previous instance BEFORE truncating —
-    // prevents the old process's own shutdown handler from appending the hint
-    // after the new session has already cleared the log.
-    writeStartLogOfflineHint();
-    // Truncate log files at session start (VIBE_LOG_PATH controls whether file logging is active)
-    void truncateStartLog();
-    void truncateClientLogs();
 
     // Kill any previous vibe start instance, then write our PID (including resolved port)
     killPreviousInstance(VIBE_START_PID_FILE, logger);
@@ -889,7 +850,7 @@ export class ServerStartRepository {
     // Use stable named functions so process.off() can remove them precisely.
     const earlyExitOnInt = (): void => {
       cleanupPidFile(VIBE_START_PID_FILE);
-      writeStartLogOfflineHint();
+      writeServerLogOfflineHint();
       process.exit(0);
     };
     const earlyExitOnTerm = (): void => {
@@ -990,7 +951,7 @@ export class ServerStartRepository {
       ServerStartRepository.nextServerShuttingDown = true;
       cleanupPidFile(VIBE_START_PID_FILE);
       ServerStartRepository.stopAllProcesses();
-      writeStartLogOfflineHint();
+      writeServerLogOfflineHint();
       process.exit(0);
     };
     const handleShutdownOnTerm = (): void => {
@@ -1212,10 +1173,14 @@ export class ServerStartRepository {
     ServerStartRepository.runningProcesses.set("tanstack", tanstackProcess);
 
     tanstackProcess.stdout?.on("data", (data: Buffer) => {
-      process.stdout.write(data);
+      const formatted = data.toString();
+      process.stdout.write(formatted);
+      appendRawToServerLog(formatted);
     });
     tanstackProcess.stderr?.on("data", (data: Buffer) => {
-      process.stderr.write(data);
+      const formatted = data.toString();
+      process.stderr.write(formatted);
+      appendRawToServerLog(formatted);
     });
 
     tanstackProcess.on("exit", (code, signal) => {
@@ -1333,7 +1298,7 @@ export class ServerStartRepository {
       const profilingEnv = profile ? { NEXT_CPU_PROF: "1" } : {};
       if (profile) {
         // eslint-disable-next-line i18next/no-literal-string
-        process.stdout.write(`
+        const profilingBanner = `
 ┌─────────────────────────────────────────────────────────────────┐
 │  🔬  PROFILING MODE ACTIVE                                      │
 ├─────────────────────────────────────────────────────────────────┤
@@ -1346,7 +1311,9 @@ export class ServerStartRepository {
 │  For compile-time traces, use:  vibe dev --profile             │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
-`);
+`;
+        process.stdout.write(profilingBanner);
+        appendRawToServerLog(profilingBanner);
       }
 
       // --- Start Next.js ---
@@ -1388,10 +1355,14 @@ export class ServerStartRepository {
         );
 
         proc.stdout?.on("data", (chunk: Buffer) => {
-          process.stdout.write(formatNextjs(chunk.toString()));
+          const formatted = formatNextjs(chunk.toString());
+          process.stdout.write(formatted);
+          void appendRawToServerLog(formatted);
         });
         proc.stderr?.on("data", (chunk: Buffer) => {
-          process.stderr.write(formatNextjs(chunk.toString()));
+          const formatted = formatNextjs(chunk.toString());
+          process.stderr.write(formatted);
+          void appendRawToServerLog(formatted);
         });
 
         proc.on("exit", (code, signal) => {

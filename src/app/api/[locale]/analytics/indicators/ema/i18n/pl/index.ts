@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "EMA",
+    titleShort: "EMA",
     description:
       "Wykładnicza średnia krocząca - nadaje większą wagę ostatnim cenom",
     fields: {

@@ -13,26 +13,24 @@ export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, urlPathParams, logger, t, locale }) => {
-      return await FolderPermissionsRepository.getFolderPermissions(
+    handler: async ({ user, urlPathParams, logger, t, locale }) =>
+      FolderPermissionsRepository.getFolderPermissions(
         user,
         { id: urlPathParams.subFolderId },
         logger,
         t,
         locale,
-      );
-    },
+      ),
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async ({ data, urlPathParams, user, logger, t, locale }) => {
-      return await FolderPermissionsRepository.updateFolderPermissions(
+    handler: async ({ data, urlPathParams, user, logger, t, locale }) =>
+      FolderPermissionsRepository.updateFolderPermissions(
         user,
         { ...data, id: urlPathParams.subFolderId },
         logger,
         t,
         locale,
-      );
-    },
+      ),
   },
 });

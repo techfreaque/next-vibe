@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Install",
+    titleShort: "Install CLI",
     description: "Install endpoint",
     form: {
       title: "Install Configuration",

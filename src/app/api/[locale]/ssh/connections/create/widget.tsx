@@ -8,7 +8,11 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetUser,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
 import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/widget";
@@ -19,7 +23,7 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
-import { SshAuthType } from "../../enum";
+import { SshAuthType, SshAuthTypeOptions } from "../../enum";
 import type endpoints from "./definition";
 import type { ConnectionCreateResponseOutput } from "./definition";
 
@@ -34,7 +38,18 @@ export function ConnectionCreateContainer({
 }: CustomWidgetProps): JSX.Element {
   const children = field.children;
   const form = useWidgetForm<typeof endpoints.POST>();
+  const user = useWidgetUser();
   const emptyField = useMemo(() => ({}), []);
+
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  const authTypeOptions = useMemo(
+    () =>
+      isAdmin
+        ? SshAuthTypeOptions
+        : SshAuthTypeOptions.filter((o) => o.value !== SshAuthType.LOCAL),
+    [isAdmin],
+  );
 
   const authType = form.watch("authType");
   const isLocal = authType === SshAuthType.LOCAL;
@@ -62,7 +77,10 @@ export function ConnectionCreateContainer({
       <Div className="px-4 pb-4 flex flex-col gap-4">
         <FormAlertWidget field={emptyField} />
         <TextFieldWidget fieldName="label" field={children.label} />
-        <SelectFieldWidget fieldName="authType" field={children.authType} />
+        <SelectFieldWidget
+          fieldName="authType"
+          field={{ ...children.authType, options: authTypeOptions }}
+        />
         {!isLocal && (
           <>
             <TextFieldWidget fieldName="host" field={children.host} />

@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Archiwizuj graf",
+    titleShort: "Archiwizuj wykres",
     description:
       "Miekkie usuwanie grafu (dezaktywacja i oznaczenie jako zarchiwizowany)",
     fields: {

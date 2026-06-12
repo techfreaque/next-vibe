@@ -14,11 +14,11 @@ export const { tools } = endpointsHandler({
   endpoint: guardStatusEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger, t }) => {
-      const { GuardStatusRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return GuardStatusRepository.getStatus(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).GuardStatusRepository.getStatus(data, logger, t),
   },
 });

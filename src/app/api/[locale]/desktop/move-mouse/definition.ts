@@ -18,7 +18,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
 
@@ -30,7 +30,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["desktop", "move-mouse"],
+  aliases: ["desktop-move-mouse"] as const,
   title: "move-mouse.title",
+  titleShort: "move-mouse.titleShort",
   description: "move-mouse.description",
   dynamicTitle: ({ request }) => {
     if (request?.x !== undefined && request?.y !== undefined) {

@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "TRPC-Validierung",
+  titleShort: "tRPC-Validierung",
   description: "Validieren Sie die TRPC-Integration über Routendateien",
   category: "Generatoren",
   tags: {

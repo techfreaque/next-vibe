@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Benutzerprofil",
 
   title: "Passwort Ändern",
+  titleShort: "Passwort ändern",
   description: "Ändern Sie Ihr Kontokennwort sicher",
   tag: "passwort-ändern",
   debug: {

@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "NOT",
+    titleShort: "NOT",
     description:
       "Inverts a signal stream - fired becomes not-fired and vice versa",
     fields: {

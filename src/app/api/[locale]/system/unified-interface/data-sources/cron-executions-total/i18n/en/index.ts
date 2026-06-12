@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Cron Executions Total",
+    titleShort: "Cron Total",
     description: "Total cron task executions per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },

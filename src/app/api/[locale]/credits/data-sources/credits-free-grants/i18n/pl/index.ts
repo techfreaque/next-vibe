@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Darmowe przyzn.",
     title: "Darmowe granty kredytów",
     description:
       "Suma transakcji darmowych przyznań kredytów na przedział rozdzielczości",

@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   description: "Leady aktualnie aktywne w kampaniach e-mail",
   get: {
     title: "Kolejka kampanii",
+    titleShort: "Kolejka kampanii",
     description:
       "Wyświetl paginowaną listę leadów aktualnie w kampaniach e-mail",
     fields: {

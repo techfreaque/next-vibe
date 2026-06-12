@@ -1,6 +1,7 @@
 export const translations = {
   dashboard: {
     title: "Accounting Dashboard",
+    titleShort: "Dashboard",
     description:
       "Overview of your accounting status — open period, entry counts, and quick navigation to all accounting tools.",
     companyId: {

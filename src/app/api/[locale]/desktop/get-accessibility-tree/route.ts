@@ -5,7 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { DesktopAccessibilityRepository } from "../shared/repository";
+import { DesktopAccessibilityRepository } from "./repository";
 import getAccessibilityTreeEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({

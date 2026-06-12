@@ -14,14 +14,13 @@ import { UnifiedTaskRunnerRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) => {
-      return UnifiedTaskRunnerRepository.manageRunner(
+    handler: ({ data, user, locale, logger }) =>
+      UnifiedTaskRunnerRepository.manageRunner(
         data,
         user,
         locale,
         logger,
         true,
-      );
-    },
+      ),
   },
 });

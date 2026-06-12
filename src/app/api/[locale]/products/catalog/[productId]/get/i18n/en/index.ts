@@ -6,6 +6,7 @@ export const translations = {
   },
   get: {
     title: "Get Catalog Product",
+    titleShort: "Product Details",
     description: "Retrieve a single catalog product by ID.",
     productId: {
       label: "Product ID",
@@ -88,6 +89,7 @@ export const translations = {
       billingYearly: "Yearly",
       addToInvoice: "Add to Invoice",
       details: "Details",
+      select: "Select product",
     },
   },
 };

@@ -5,6 +5,7 @@ export const translations = {
   },
   get: {
     title: "Get Conversation Path",
+    titleShort: "Message Path",
     description: "Retrieve messages following a specific conversation path",
     container: {
       title: "Conversation Path",

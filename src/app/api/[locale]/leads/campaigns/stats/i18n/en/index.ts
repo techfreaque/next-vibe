@@ -3,6 +3,7 @@ export const translations = {
   description: "Email campaign performance statistics",
   get: {
     title: "Campaign Stats",
+    titleShort: "Campaign Stats",
     description: "Retrieve email campaign performance statistics",
     container: {
       title: "Filters",

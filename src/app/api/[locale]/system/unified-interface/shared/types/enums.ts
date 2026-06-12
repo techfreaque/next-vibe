@@ -119,6 +119,7 @@ export enum FieldDataType {
   FILE = "file",
   UUID = "uuid",
   JSON = "json",
+  ENTITY_PICKER = "entity_picker",
 
   // Advanced input types for data-driven UI
   DATE_RANGE = "date_range",

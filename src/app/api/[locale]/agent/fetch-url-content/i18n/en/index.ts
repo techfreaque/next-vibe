@@ -2,6 +2,7 @@ export const translations = {
   category: "Information",
   get: {
     title: "Fetch URL Content",
+    titleShort: "Fetch URL",
     description:
       "Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.",
     form: {
@@ -75,6 +76,7 @@ export const translations = {
   cleanup: {
     post: {
       title: "URL Cache Cleanup",
+      titleShort: "URL Cache Cleanup",
       description: "Delete stale URL cache files older than 7 days",
       container: {
         title: "Cleanup Results",

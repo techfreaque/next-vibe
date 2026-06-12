@@ -32,11 +32,12 @@ export const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["ssh", "linux", "users", "[username]"],
   title: "delete.title",
+  titleShort: "delete.titleShort",
   description: "delete.description",
   icon: "user",
-  category: "endpointCategories.ssh",
-  subCategory: "endpointCategories.sshExecution",
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  category: "ssh",
+  subCategory: "Linux",
+  allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 
   fields: customWidgetObject({

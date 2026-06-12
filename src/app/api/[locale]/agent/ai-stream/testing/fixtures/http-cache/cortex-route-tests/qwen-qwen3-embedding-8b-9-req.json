@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/documents/test-suite/hello.md\n\n---\ndate: 2026-04-19\ntags: [test, cortex]\n---\n\n# Hello Cortex\n\nThis is a cortex integration test document with unique-sentinel-xK9mP.\nMultiple lines for testing truncation and search.",
+    "encoding_format": "float"
+  }
+}

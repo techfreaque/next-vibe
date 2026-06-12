@@ -22,13 +22,19 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 export const NEXT_PORT_OFFSET = 100;
 
 /** PID file for production server (vibe start) */
-export const VIBE_START_PID_FILE = ".tmp/.vibe-start.pid";
+export const VIBE_START_PID_FILE = ".tmp/.hermes.pid";
 
 /** PID file for the supervisor wrapper around vibe start (owns the outer Bun process) */
 export const VIBE_SUPERVISOR_PID_FILE = ".tmp/.vibe-supervisor.pid";
 
 /** PID file for development server (vibe dev) */
-export const VIBE_DEV_PID_FILE = ".tmp/.vibe-dev.pid";
+export const ATLAS_PID_FILE = ".tmp/.atlas.pid";
+
+/** PID file for local-dev server (vibe --hermes dev, port 3002) */
+export const HERMES_DEV_PID_FILE = ".tmp/.hermes-dev.pid";
+
+/** Default port for vibe --hermes dev (shares preview DB at 5433 with vibe start) */
+export const LOCAL_BASE_PORT = 3002;
 
 /**
  * Check if a process with the given PID is still running

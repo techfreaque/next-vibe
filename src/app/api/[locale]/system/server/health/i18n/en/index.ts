@@ -4,6 +4,7 @@ export const translations = {
   tag: "Health",
   get: {
     title: "Health Check",
+    titleShort: "Health Check",
     description: "Get server health status and diagnostics",
     form: {
       title: "Health Check Options",

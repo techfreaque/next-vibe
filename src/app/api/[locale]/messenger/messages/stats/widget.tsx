@@ -6,9 +6,16 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
+import { MetricCard } from "next-vibe-ui/ui/metric-card";
+import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
+import { ProgressBlock } from "next-vibe-ui/ui/progress-block";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Search } from "next-vibe-ui/ui/icons/Search";
+import { SectionGroup } from "next-vibe-ui/ui/section-group";
+import { Span } from "next-vibe-ui/ui/span";
+import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,
@@ -17,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
-import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
 import { cn, objectEntries } from "@/app/api/[locale]/shared/utils";
@@ -30,7 +36,7 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type {
   MessageSortFieldValue,
@@ -64,64 +70,6 @@ import {
   TimePeriod,
   TimePeriodOptions,
 } from "./enum";
-
-function StatCard({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: string | number;
-  color?: string;
-}): React.JSX.Element {
-  return (
-    <Div className="rounded-lg border p-4 flex flex-col gap-1">
-      <Span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-        {label}
-      </Span>
-      <Div
-        style={{
-          fontSize: "1.5rem",
-          fontWeight: 700,
-          color: color ?? "inherit",
-        }}
-      >
-        {value}
-      </Div>
-    </Div>
-  );
-}
-
-function RateBar({
-  label,
-  rate,
-  color,
-}: {
-  label: string;
-  rate: number;
-  color: string;
-}): React.JSX.Element {
-  const pct = Math.min(100, Math.max(0, Math.round(rate * 100)));
-  return (
-    <Div className="flex flex-col gap-1">
-      <Div className="flex items-center justify-between text-xs">
-        <Span className="text-muted-foreground">{label}</Span>
-        <Span className="font-semibold">{pct}%</Span>
-      </Div>
-      <Div className="h-2 rounded-full bg-muted overflow-hidden">
-        <Div
-          style={{
-            width: `${String(pct)}%`,
-            height: "100%",
-            backgroundColor: color,
-            borderRadius: "9999px",
-            transition: "width 0.3s ease",
-          }}
-        />
-      </Div>
-    </Div>
-  );
-}
 
 export function EmailStatsContainer(): React.JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
@@ -239,29 +187,31 @@ export function EmailStatsContainer(): React.JSX.Element {
   }, [endpointMutations]);
 
   return (
-    <Div className="flex flex-col gap-0">
-      {/* Header */}
-      <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <Span className="font-semibold text-base">{t("get.title")}</Span>
-        <Div className="flex-1" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleViewList}
-        >
-          {t("widget.viewList")}
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-      </Div>
+    <WidgetShell>
+      <WidgetHeader
+        title={t("get.title")}
+        actions={
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleViewList}
+            >
+              {t("widget.viewList")}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              title={t("widget.refresh")}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </>
+        }
+      />
 
       {/* Filters */}
       <Div className="px-4 pt-3 pb-2 flex flex-col gap-2">
@@ -442,89 +392,83 @@ export function EmailStatsContainer(): React.JSX.Element {
       </Div>
 
       {isLoading ? (
-        <Div className="h-[300px] flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </Div>
+        <LoadingBlock size="lg" />
       ) : (
-        <Div className="p-4 flex flex-col gap-6">
+        <Div className="p-4 flex flex-col gap-4">
           {/* Volume stats */}
-          <Div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <StatCard label={t("widget.total")} value={data.totalEmails} />
-            <StatCard
+          <MetricGrid>
+            <MetricCard label={t("widget.total")} value={data.totalEmails} />
+            <MetricCard
               label={t("widget.sent")}
               value={data.sentEmails}
-              color="#22c55e"
+              variant="success"
             />
-            <StatCard
+            <MetricCard
               label={t("widget.delivered")}
               value={data.deliveredEmails}
-              color="#10b981"
+              variant="success"
             />
-            <StatCard
+            <MetricCard
               label={t("widget.opened")}
               value={data.openedEmails}
-              color="#3b82f6"
+              variant="info"
             />
-            <StatCard
+            <MetricCard
               label={t("widget.clicked")}
               value={data.clickedEmails}
-              color="#8b5cf6"
+              variant="info"
             />
-            <StatCard
+            <MetricCard
               label={t("widget.bounced")}
               value={data.bouncedEmails}
-              color="#f97316"
+              variant="warning"
             />
-            <StatCard
+            <MetricCard
               label={t("widget.failed")}
               value={data.failedEmails}
-              color="#ef4444"
+              variant="danger"
             />
-            <StatCard
+            <MetricCard
               label={t("widget.errors")}
               value={data.emailsWithErrors}
-              color="#dc2626"
+              variant="danger"
             />
-          </Div>
+          </MetricGrid>
 
           {/* Engagement rates */}
-          <Div className="rounded-lg border p-4 flex flex-col gap-3">
-            <Span className="text-sm font-semibold">
-              {t("widget.engagementRates")}
-            </Span>
-            <RateBar
-              label={t("widget.deliveryRate")}
-              rate={data.deliveryRate}
-              color="#10b981"
-            />
-            <RateBar
-              label={t("widget.openRate")}
-              rate={data.openRate}
-              color="#3b82f6"
-            />
-            <RateBar
-              label={t("widget.clickRate")}
-              rate={data.clickRate}
-              color="#8b5cf6"
-            />
-            <RateBar
-              label={t("widget.bounceRate")}
-              rate={data.bounceRate}
-              color="#f97316"
-            />
-            <RateBar
-              label={t("widget.failureRate")}
-              rate={data.failureRate}
-              color="#ef4444"
-            />
-          </Div>
+          <SectionGroup title={t("widget.engagementRates")}>
+            <Div className="flex flex-col gap-3">
+              <ProgressBlock
+                label={t("widget.deliveryRate")}
+                value={Math.round(data.deliveryRate * 100)}
+                variant="success"
+              />
+              <ProgressBlock
+                label={t("widget.openRate")}
+                value={Math.round(data.openRate * 100)}
+                variant="default"
+              />
+              <ProgressBlock
+                label={t("widget.clickRate")}
+                value={Math.round(data.clickRate * 100)}
+                variant="default"
+              />
+              <ProgressBlock
+                label={t("widget.bounceRate")}
+                value={Math.round(data.bounceRate * 100)}
+                variant="warning"
+              />
+              <ProgressBlock
+                label={t("widget.failureRate")}
+                value={Math.round(data.failureRate * 100)}
+                variant="danger"
+              />
+            </Div>
+          </SectionGroup>
 
           {/* By status breakdown */}
           {data.groupedStats.byStatus.length > 0 && (
-            <Div className="rounded-lg border p-4">
-              <Span className="text-sm font-semibold block mb-3">
-                {t("widget.byStatus")}
-              </Span>
+            <SectionGroup title={t("widget.byStatus")}>
               <Div className="flex flex-col gap-2">
                 {data.groupedStats.byStatus.map((row) => (
                   <Div
@@ -536,15 +480,12 @@ export function EmailStatsContainer(): React.JSX.Element {
                   </Div>
                 ))}
               </Div>
-            </Div>
+            </SectionGroup>
           )}
 
           {/* By type breakdown */}
           {Object.keys(data.emailsByType).length > 0 && (
-            <Div className="rounded-lg border p-4">
-              <Span className="text-sm font-semibold block mb-3">
-                {t("widget.byType")}
-              </Span>
+            <SectionGroup title={t("widget.byType")}>
               <Div className="flex flex-col gap-2">
                 {objectEntries(data.emailsByType).map(([type, count]) => (
                   <Div
@@ -560,26 +501,26 @@ export function EmailStatsContainer(): React.JSX.Element {
                   </Div>
                 ))}
               </Div>
-            </Div>
+            </SectionGroup>
           )}
 
           {/* Performance */}
-          <Div className="grid grid-cols-2 gap-3">
-            <StatCard
+          <MetricGrid columns={2}>
+            <MetricCard
               label={t("widget.avgRetries")}
               value={data.averageRetryCount.toFixed(2)}
             />
-            <StatCard
+            <MetricCard
               label={t("widget.avgDeliveryMs")}
               value={
                 data.averageDeliveryTime > 0
                   ? `${Math.round(data.averageDeliveryTime)}ms`
-                  : "—"
+                  : "\u2014"
               }
             />
-          </Div>
+          </MetricGrid>
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

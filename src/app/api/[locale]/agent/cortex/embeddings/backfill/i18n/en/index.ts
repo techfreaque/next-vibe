@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Backfill Embeddings",
+    titleShort: "Backfill",
     description: "Generate embeddings for all cortex nodes missing them.",
     status: {
       loading: "Embedding...",

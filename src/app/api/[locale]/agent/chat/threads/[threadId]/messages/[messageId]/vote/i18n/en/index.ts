@@ -5,6 +5,7 @@ export const translations = {
   },
   post: {
     title: "Vote on Message",
+    titleShort: "Vote Message",
     description: "Upvote or downvote a message",
     container: {
       title: "Vote",

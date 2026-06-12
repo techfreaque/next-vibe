@@ -27,6 +27,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import { THREAD_SHARE_LINKS_ALIAS } from "./constants";
 
 /**
  * GET endpoint - List all share links for a thread
@@ -35,11 +36,13 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads", "[threadId]", "share-links"],
+  aliases: [THREAD_SHARE_LINKS_ALIAS] as const,
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "share",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsSharing",
+  category: "ai",
+  subCategory: "threadsSharing",
   tags: ["tags.sharing" as const],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
@@ -209,8 +212,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "plus",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsSharing",
+  category: "ai",
+  subCategory: "threadsSharing",
   tags: ["tags.sharing" as const],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
@@ -356,8 +359,8 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "edit",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsSharing",
+  category: "ai",
+  subCategory: "threadsSharing",
   tags: ["tags.sharing" as const],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
@@ -504,8 +507,8 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "trash",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsSharing",
+  category: "ai",
+  subCategory: "threadsSharing",
   tags: ["tags.sharing" as const],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,

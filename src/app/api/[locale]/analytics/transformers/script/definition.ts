@@ -38,10 +38,11 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "unified-interface", "vibe-sense", "transformers", "script"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsTransformers",
-  subCategory: "endpointCategories.analyticsTransformers",
+  category: "analytics",
+  subCategory: "Transformers",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 

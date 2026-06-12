@@ -1,5 +1,7 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   title: "Google Sheets",
+  titleShort: "Google Sheets",
   description:
     "Jeden neuen Lead automatisch als Zeile in dein Google Sheet eintragen. Google-Konto verbinden - keine API-Schlüssel nötig.",
   connect: {
@@ -39,6 +41,7 @@ export const translations = {
   },
   sheetsList: {
     title: "Tabellen auflisten",
+    titleShort: "Tabellen",
     description:
       "Gibt die Liste der für das verbundene Google-Konto zugänglichen Tabellen zurück",
   },

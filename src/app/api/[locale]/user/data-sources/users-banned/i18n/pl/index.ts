@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Zablokowani użytkownicy",
+    titleShort: "Zablokowani użytkownicy",
     description: "Liczba zablokowanych użytkowników na przedział czasu",
     fields: {
       resolution: {

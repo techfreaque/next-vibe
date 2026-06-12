@@ -1,6 +1,7 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Credits Expired",
     title: "Credits Expired",
     description: "Sum of expired credit amounts per resolution bucket",
     fields: {

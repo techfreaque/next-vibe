@@ -16,6 +16,7 @@ export const translations = {
 
   post: {
     title: "Test SSH Connection",
+    titleShort: "Test Connection",
     description: "Test connectivity to an SSH server",
     fields: {
       connectionId: {

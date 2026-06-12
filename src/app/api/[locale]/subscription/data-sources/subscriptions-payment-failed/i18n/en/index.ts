@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Subscriptions Payment Failed",
+    titleShort: "Payment Failed",
     description: "Subscriptions with failed payments per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },

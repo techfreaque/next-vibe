@@ -19,17 +19,20 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { AGENT_VIEW_IMAGE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "view-image"],
+  aliases: [AGENT_VIEW_IMAGE_ALIAS] as const,
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "image",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "ai",
+  subCategory: "Tools",
   tags: ["tags.vision", "tags.ai"],
   dynamicTitle: ({ request }) => {
     if (!request?.url) {

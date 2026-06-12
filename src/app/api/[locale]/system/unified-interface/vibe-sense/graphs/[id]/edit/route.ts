@@ -7,47 +7,13 @@ import "server-only";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { VibeSenseRepository } from "../../../repository";
-
 import definitions from "./definition";
+import { GraphEditRepository } from "./repository";
 
 export const { PUT, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PUT]: {
-    handler: async ({ data, urlPathParams, user, logger, locale }) => {
-      if (!urlPathParams.id || urlPathParams.id === "new") {
-        const result = await VibeSenseRepository.createGraph(
-          {
-            name: data.name ?? "New Graph",
-            slug: data.slug ?? `graph-${Date.now()}`,
-            description: data.description,
-            config: data.config ?? {
-              nodes: {},
-              edges: [],
-              trigger: { type: "manual" },
-            },
-          },
-          user,
-          logger,
-          locale,
-        );
-        if (!result.success) {
-          return result;
-        }
-        return { ...result, data: { newId: result.data.id } };
-      }
-      return VibeSenseRepository.editGraph(
-        urlPathParams.id,
-        {
-          name: data.name,
-          slug: data.slug,
-          description: data.description,
-          config: data.config,
-        },
-        user,
-        logger,
-        locale,
-      );
-    },
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
+      GraphEditRepository.upsert(data, urlPathParams.id, user, logger, locale),
   },
 });

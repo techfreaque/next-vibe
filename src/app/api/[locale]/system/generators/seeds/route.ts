@@ -13,11 +13,11 @@ import endpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { SeedsGeneratorRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return SeedsGeneratorRepository.generateSeeds(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).SeedsGeneratorRepository.generateSeeds(data, logger, t),
   },
 });

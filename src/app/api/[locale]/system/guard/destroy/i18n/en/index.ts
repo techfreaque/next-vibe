@@ -2,6 +2,7 @@ export const translations = {
   category: "System Guard",
 
   title: "Destroy Guard",
+  titleShort: "Destroy Guard",
   description: "Destroy guard environments and clean up resources",
   tag: "guard-management",
   container: {

@@ -1,11 +1,8 @@
-import { translations as addressesTranslations } from "../../addresses/i18n/en";
-import { translations as avatarTranslations } from "../../avatar/i18n/en";
-import { translations as passwordTranslations } from "../../password/i18n/en";
-
 export const translations = {
   // Main user profile routes
   get: {
     title: "Get User Profile",
+    titleShort: "My Profile",
     description: "Retrieve current user profile information",
     response: {
       title: "User Profile Response",
@@ -22,6 +19,7 @@ export const translations = {
       requireTwoFactor: "Two-Factor Authentication Required",
       marketingConsent: "Marketing Consent",
       userRoles: "User Roles",
+      roles: "Roles",
       createdAt: "Created At",
       updatedAt: "Updated At",
       stripeCustomerId: "Stripe Customer ID",
@@ -93,6 +91,7 @@ export const translations = {
   },
   update: {
     title: "Update User Profile",
+    titleShort: "Update Profile",
     description: "Update current user profile information",
     groups: {
       basicInfo: {
@@ -360,6 +359,7 @@ export const translations = {
   },
   delete: {
     title: "Delete User Account",
+    titleShort: "Delete Account",
     description: "Permanently delete your user account",
     response: {
       title: "Deletion Status",
@@ -441,6 +441,7 @@ export const translations = {
       title: "Your email list",
       description:
         "Visitors on your skill page and creator profile can subscribe. You own the list - no platform in the middle.",
+      manage: "Manage",
     },
     previewCard: {
       title: "Your Public Profile",
@@ -460,6 +461,36 @@ export const translations = {
       add: "Add to your collection",
       public: "Community",
       showLess: "Show less",
+      hubSubtitle: "{{count}} published",
+    },
+    nav: {
+      logout: "Log out",
+      back: "←",
+    },
+    sections: {
+      account: "Account",
+      subscription: "Subscription",
+      subscriptionHint: "No active plan — upgrade to unlock features",
+      manageSubscription: "Manage",
+      noSubscription: "No active plan",
+      upgrade: "Upgrade",
+      addresses: "Billing addresses",
+      addressCount: "{{count}} saved",
+      addAddress: "Add address",
+      manageAddresses: "Manage",
+      noAddresses: "None saved",
+      billing: "Billing",
+      delivery: "Delivery",
+      edit: "Edit",
+      credits: "Credits",
+      creditsAvailable: "available",
+      password: "Password",
+      passwordHint: "Change your account password",
+      sessions: "Active sessions",
+      sessionsHint: "Manage where you're logged in",
+      creator: "Creator",
+      referral: "Referral program",
+      referralHint: "Invite friends and earn rewards",
     },
     deleteAccount: {
       dangerZone: "Danger Zone",
@@ -486,7 +517,479 @@ export const translations = {
   },
 
   // Sub-routes
-  avatar: avatarTranslations,
-  password: passwordTranslations,
-  addresses: addressesTranslations,
+  avatar: {
+    category: "User Profile",
+
+    tag: "avatar",
+    errors: {
+      user_not_found: "User not found",
+      failed_to_upload_avatar: "Failed to upload avatar",
+      failed_to_delete_avatar: "Failed to delete avatar",
+      invalid_file_type: "Invalid file type",
+      file_too_large: "File too large",
+    },
+    debug: {
+      uploadingUserAvatar: "Uploading user avatar",
+      errorUploadingUserAvatar: "Error uploading user avatar",
+      deletingUserAvatar: "Deleting user avatar",
+      errorDeletingUserAvatar: "Error deleting user avatar",
+    },
+    success: {
+      uploaded: "Avatar uploaded successfully",
+      deleted: "Avatar deleted successfully",
+      nextSteps: {
+        visible: "Your avatar is now visible on your profile",
+        update: "You can update it anytime from your profile settings",
+        default: "Your profile now shows the default avatar",
+        uploadNew:
+          "You can upload a new avatar anytime from your profile settings",
+      },
+    },
+    upload: {
+      title: "Upload Avatar",
+      description: "Upload a profile avatar image",
+      groups: {
+        fileUpload: {
+          title: "File Upload",
+          description: "Select and upload your avatar image",
+        },
+      },
+      fields: {
+        file: {
+          label: "Avatar Image",
+          description: "Select an image file for your profile avatar",
+          placeholder: "Choose an image file...",
+          help: "Upload an image file (JPG, PNG, GIF) up to 5MB",
+          validation: {
+            maxSize: "File size must be less than 5MB",
+            imageOnly: "Only image files are allowed",
+            unsupportedFormat:
+              "Unsupported image format. Use JPEG, PNG, WebP, or GIF.",
+          },
+        },
+      },
+      response: {
+        title: "Upload Response",
+        label: "Upload Result",
+        description: "Avatar upload response",
+        success: "Upload Successful",
+        message: "Your avatar has been uploaded successfully",
+        avatarUrl: "Avatar URL",
+        uploadTime: "Upload Time",
+        nextSteps: {
+          item: "Next Step",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "The uploaded file is invalid or corrupted",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "You must be logged in to upload an avatar",
+        },
+        server: {
+          title: "Server Error",
+          description: "Failed to process avatar upload",
+        },
+        internal: {
+          title: "Internal Error",
+          description: "An internal server error occurred",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred during upload",
+        },
+        network: {
+          title: "Network Error",
+          description: "A network error occurred during upload",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "You don't have permission to upload an avatar",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "The requested resource was not found",
+        },
+        unsaved: {
+          title: "Unsaved Changes",
+          description: "There are unsaved changes",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "A conflict occurred during the upload",
+        },
+      },
+      success: {
+        title: "Avatar Uploaded",
+        description: "Your profile avatar has been uploaded successfully",
+      },
+    },
+    delete: {
+      title: "Delete Avatar",
+      description: "Remove the current profile avatar",
+      response: {
+        title: "Delete Response",
+        label: "Delete Result",
+        description: "Avatar deletion response",
+        success: "Deletion Successful",
+        message: "Your avatar has been deleted successfully",
+        nextSteps: {
+          item: "Next Step",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "The avatar deletion request is invalid",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "You must be logged in to delete your avatar",
+        },
+        server: {
+          title: "Server Error",
+          description: "Failed to delete avatar",
+        },
+        internal: {
+          title: "Internal Error",
+          description: "An internal server error occurred",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred during deletion",
+        },
+        network: {
+          title: "Network Error",
+          description: "A network error occurred during deletion",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "You don't have permission to delete this avatar",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "The avatar to delete was not found",
+        },
+        unsaved: {
+          title: "Unsaved Changes",
+          description: "There are unsaved changes",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "A conflict occurred during the deletion",
+        },
+      },
+      success: {
+        title: "Avatar Deleted",
+        description: "Your profile avatar has been removed successfully",
+      },
+    },
+  },
+  password: {
+    category: "User Profile",
+
+    title: "Change Password",
+    description: "Update your account password securely",
+    tag: "password-change",
+    debug: {
+      updatingPassword: "Updating password",
+      errorUpdatingPassword: "Error updating password",
+      settingPassword: "Setting password",
+      errorSettingPassword: "Error setting password",
+    },
+    groups: {
+      currentCredentials: {
+        title: "Current Password",
+        description: "Verify your current password to proceed",
+      },
+      newCredentials: {
+        title: "New Password",
+        description: "Choose a strong new password for your account",
+      },
+    },
+    currentPassword: {
+      label: "Current Password",
+      description: "Enter your current password",
+      placeholder: "Enter current password",
+      help: "Enter your current password to verify your identity before changing it",
+    },
+    newPassword: {
+      label: "New Password",
+      description: "Enter your new password (minimum 8 characters)",
+      placeholder: "Enter new password",
+      help: "Choose a strong password with at least 8 characters including letters, numbers, and symbols",
+    },
+    confirmPassword: {
+      label: "Confirm Password",
+      description: "Confirm your new password",
+      placeholder: "Confirm new password",
+      help: "Re-enter your new password to ensure it was typed correctly",
+    },
+    twoFactorCode: {
+      label: "Two-Factor Code",
+      description: "Enter your two-factor authentication code if enabled",
+      placeholder: "Enter 2FA code",
+    },
+    response: {
+      title: "Password Change Response",
+      description: "Response for password change operation",
+      success: "Password Changed",
+      message: "Status Message",
+      securityTip: "Security Tip",
+      nextSteps: {
+        item: "Next Steps",
+      },
+    },
+    validation: {
+      currentPassword: {
+        minLength: "Current password must be at least 8 characters",
+      },
+      newPassword: {
+        minLength: "New password must be at least 8 characters",
+      },
+      confirmPassword: {
+        minLength: "Password confirmation must be at least 8 characters",
+      },
+      passwords: {
+        mismatch: "Passwords do not match",
+      },
+    },
+    errors: {
+      passwords_do_not_match: "Passwords do not match",
+      user_not_found: "User not found",
+      incorrect_password: "Incorrect password",
+      update_failed: "Failed to update password",
+      token_creation_failed: "Failed to create password token",
+      two_factor_code_required: "Two-factor authentication code required",
+      invalid_two_factor_code: "Invalid two-factor authentication code",
+      invalid_request: {
+        title: "Invalid Request",
+        description: "The password change request is invalid",
+      },
+      validation: {
+        title: "Validation Error",
+        description: "Please check your input and try again",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "You must be logged in to change your password",
+      },
+      server: {
+        title: "Server Error",
+        description: "Failed to update password due to server error",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred while updating password",
+      },
+      network: {
+        title: "Network Error",
+        description: "Network connection failed",
+      },
+      forbidden: {
+        title: "Access Forbidden",
+        description: "You don't have permission to perform this action",
+      },
+      notFound: {
+        title: "User Not Found",
+        description: "User account could not be found",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes that will be lost",
+      },
+      conflict: {
+        title: "Data Conflict",
+        description: "A conflict occurred while updating the password",
+      },
+    },
+    success: {
+      updated: "Password updated successfully",
+      securityTip: "For enhanced security, enable two-factor authentication",
+      nextSteps: {
+        logoutOther: "All other sessions have been logged out for security",
+        enable2fa:
+          "Consider enabling two-factor authentication for better security",
+      },
+      title: "Password Updated",
+      description: "Your password has been successfully updated",
+    },
+    update: {
+      success: {
+        title: "Password Updated",
+        description: "Your password has been successfully updated",
+      },
+      errors: {
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred while updating password",
+        },
+      },
+    },
+  },
+  addresses: {
+    category: "User Addresses",
+    tag: "addresses",
+
+    list: {
+      title: "My Addresses",
+      description: "List your saved addresses",
+      response: {
+        addresses: "Addresses",
+      },
+      widget: {
+        addAddress: "Add Address",
+        edit: "Edit",
+        delete: "Delete",
+        billing: "Billing",
+        delivery: "Delivery",
+        empty: "No saved addresses",
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "Invalid request",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: { title: "Forbidden", description: "Access forbidden" },
+        notFound: { title: "Not Found", description: "No addresses found" },
+        conflict: { title: "Conflict", description: "Data conflict" },
+        network: {
+          title: "Network Error",
+          description: "Network error occurred",
+        },
+        unsavedChanges: {
+          title: "Unsaved Changes",
+          description: "There are unsaved changes",
+        },
+        internal: {
+          title: "Server Error",
+          description: "Internal server error",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unknown error occurred",
+        },
+      },
+      success: { title: "Success", description: "Addresses retrieved" },
+    },
+
+    create: {
+      title: "Add Address",
+      description: "Save a new address to your account",
+      fields: {
+        label: {
+          label: "Label",
+          description: "Name this address (e.g. Home, Office)",
+          placeholder: "Home",
+        },
+        fullName: {
+          label: "Full Name",
+          description: "Contact name for this address",
+          placeholder: "Jane Doe",
+        },
+        company: {
+          label: "Company",
+          description: "Company name (optional)",
+          placeholder: "Acme Corp",
+        },
+        phone: {
+          label: "Phone",
+          description: "Contact phone number",
+          placeholder: "+1 555 000 0000",
+        },
+        vatNumber: {
+          label: "VAT Number",
+          description: "EU VAT registration number",
+          placeholder: "DE123456789",
+        },
+        taxId: {
+          label: "Tax ID",
+          description: "National tax identifier",
+          placeholder: "123-45-6789",
+        },
+        addressLine1: {
+          label: "Address Line 1",
+          description: "Street and number",
+          placeholder: "123 Main St",
+        },
+        addressLine2: {
+          label: "Address Line 2",
+          description: "Apartment, suite, unit (optional)",
+          placeholder: "Suite 4B",
+        },
+        city: { label: "City", description: "City", placeholder: "Berlin" },
+        region: {
+          label: "State / Region",
+          description: "State or region (optional)",
+          placeholder: "Bayern",
+        },
+        postalCode: {
+          label: "Postal Code",
+          description: "ZIP or postal code",
+          placeholder: "10115",
+        },
+        country: {
+          label: "Country",
+          description: "ISO 3166-1 alpha-2 country code",
+          placeholder: "DE",
+        },
+        isDefaultBilling: {
+          label: "Default Billing",
+          description: "Use as default billing address",
+        },
+        isDefaultDelivery: {
+          label: "Default Delivery",
+          description: "Use as default delivery address",
+        },
+      },
+      response: {
+        id: "Address ID",
+        label: "Label",
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "Check required fields",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: { title: "Forbidden", description: "Access forbidden" },
+        notFound: { title: "Not Found", description: "User not found" },
+        conflict: { title: "Conflict", description: "Data conflict" },
+        network: {
+          title: "Network Error",
+          description: "Network error occurred",
+        },
+        unsavedChanges: {
+          title: "Unsaved Changes",
+          description: "There are unsaved changes",
+        },
+        internal: {
+          title: "Server Error",
+          description: "Internal server error",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unknown error occurred",
+        },
+      },
+      success: {
+        title: "Address Saved",
+        description: "Address added to your account",
+      },
+      widget: {
+        saved: "Address saved.",
+        backToAddresses: "Back to Addresses",
+      },
+    },
+  },
 };

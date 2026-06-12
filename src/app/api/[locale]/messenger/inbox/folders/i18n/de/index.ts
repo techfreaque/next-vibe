@@ -1,52 +1,66 @@
-export const translations = {
-  title: "List Folders",
-  description: "List available folders for a messenger account",
-  tag: "Inbox",
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
+  title: "Ordner anzeigen",
+  titleShort: "Ordner",
+  description: "Verfügbare Ordner eines Messenger-Kontos anzeigen",
+  tag: "Posteingang",
 
   container: {
-    title: "Folders",
-    description: "Available folders for the selected account",
+    title: "Ordner",
+    description: "Verfügbare Ordner des ausgewählten Kontos",
   },
 
   accountId: {
-    label: "Account",
-    description: "Messenger account to list folders for",
-    placeholder: "Account UUID",
+    label: "Konto",
+    description: "Messenger-Konto, dessen Ordner abgerufen werden sollen",
+    placeholder: "Konto-UUID",
   },
 
   folders: {
-    label: "Folders",
-    path: { label: "Path" },
+    label: "Ordner",
+    path: { label: "Pfad" },
     name: { label: "Name" },
-    displayName: { label: "Display Name" },
-    specialUseType: { label: "Type" },
-    messageCount: { label: "Messages" },
-    unseenCount: { label: "Unseen" },
+    displayName: { label: "Anzeigename" },
+    specialUseType: { label: "Typ" },
+    messageCount: { label: "Nachrichten" },
+    unseenCount: { label: "Ungelesen" },
   },
 
   errors: {
-    validation: { title: "Validation Error", description: "Check your input" },
-    unauthorized: { title: "Unauthorized", description: "Login required" },
-    server: { title: "Server Error", description: "Internal server error" },
-    unknown: { title: "Unknown Error", description: "Unexpected error" },
-    forbidden: { title: "Forbidden", description: "Access denied" },
-    network: { title: "Network Error", description: "Network error" },
+    validation: {
+      title: "Ungültige Eingabe",
+      description: "Bitte Eingaben prüfen",
+    },
+    unauthorized: {
+      title: "Nicht angemeldet",
+      description: "Anmeldung erforderlich",
+    },
+    server: { title: "Serverfehler", description: "Interner Serverfehler" },
+    unknown: {
+      title: "Unbekannter Fehler",
+      description: "Ein unerwarteter Fehler ist aufgetreten",
+    },
+    forbidden: { title: "Kein Zugriff", description: "Zugriff verweigert" },
+    network: {
+      title: "Netzwerkfehler",
+      description: "Netzwerkfehler aufgetreten",
+    },
     notFound: {
-      title: "Account Not Found",
-      description: "Messenger account not found",
+      title: "Konto nicht gefunden",
+      description: "Messenger-Konto nicht gefunden",
     },
     conflict: {
-      title: "Conflict",
-      description: "Request conflicts with existing data",
+      title: "Konflikt",
+      description: "Anfrage steht im Konflikt mit vorhandenen Daten",
     },
     unsavedChanges: {
-      title: "Unsaved Changes",
-      description: "You have unsaved changes",
+      title: "Ungespeicherte Änderungen",
+      description: "Sie haben ungespeicherte Änderungen",
     },
   },
 
   success: {
-    title: "Folders Loaded",
-    description: "Folders retrieved successfully",
+    title: "Ordner geladen",
+    description: "Ordner erfolgreich abgerufen",
   },
 };

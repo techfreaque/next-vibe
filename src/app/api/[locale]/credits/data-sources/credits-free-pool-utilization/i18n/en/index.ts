@@ -1,6 +1,7 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Pool Usage",
     title: "Credits Free Pool Utilization",
     description:
       "Ratio of consumed free credits across lead wallets per resolution bucket",

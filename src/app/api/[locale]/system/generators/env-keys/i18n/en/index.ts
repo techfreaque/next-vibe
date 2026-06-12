@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Generate Env Keys",
+    titleShort: "Env Keys",
     description:
       "Generate the flat env keys metadata file for settings definition",
     container: {

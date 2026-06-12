@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Pobierz Statystyki Zadań Cron",
+    titleShort: "Statystyki cron",
     description: "Pobierz kompleksowe statystyki i metryki zadań cron",
     tag: "Statystyki Cron",
     form: {

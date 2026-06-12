@@ -4,9 +4,8 @@
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { BrowserTool, BrowserSharedRepository } from "./repository";
 
-import { BrowserTool } from "../enum";
-import { BrowserSharedRepository } from "../shared/repository";
 import handleDialogEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -21,6 +20,7 @@ export const { POST, tools } = endpointsHandler({
             action: data.action,
             promptText: data.promptText,
           }),
+          instanceId: data.instanceId,
         },
         t,
         logger,

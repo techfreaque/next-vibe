@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Guard",
   post: {
     title: "Status Strażnika",
+    titleShort: "Status guard",
     description: "Sprawdź status środowiska strażnika",
     tag: "Status",
     container: {

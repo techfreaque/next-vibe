@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Thread umbenennen",
+    titleShort: "Umbenennen",
     description: "Titel und Vorschau eines Chat-Threads ändern",
     container: {
       title: "Thread umbenennen",

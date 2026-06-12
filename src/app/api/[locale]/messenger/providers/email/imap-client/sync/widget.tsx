@@ -14,11 +14,11 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Label } from "next-vibe-ui/ui/label";
 
@@ -155,7 +155,7 @@ export function ImapSyncContainer({
                   {t("widget.errors")}
                 </Span>
                 {result.errors.map((err, i) => (
-                  <Div key={i} style={{ color: "#ef4444", fontSize: "12px" }}>
+                  <Div key={i} className="text-destructive text-[12px]">
                     {err.code}: {err.message}
                   </Div>
                 ))}

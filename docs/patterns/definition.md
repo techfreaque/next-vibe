@@ -22,6 +22,7 @@ Definition files (`definition.ts`) are the single source of truth that automatic
 6. [Import Paths](#import-paths)
 7. [Enum Integration](#enum-integration)
 8. [Common Patterns](#common-patterns)
+9. [Category & Subcategory Registration](#category--subcategory-registration)
 
 ## Field Function Patterns
 
@@ -1065,6 +1066,122 @@ verbose: requestField(st, { schema: z.boolean().default(false), ... })
 
 // ✅ CORRECT - Use logger.isDebugEnabled() in implementation
 ```
+
+## Category & Subcategory Registration
+
+Every module has a `category.ts` that controls the sidebar entry and what loads on click.
+
+```typescript
+// category.ts
+import { PAYMENT_DASHBOARD_ALIAS } from "@/app/api/[locale]/payment/dashboard/constants";
+import { INVOICE_LIST_ALIAS } from "@/app/api/[locale]/payment/invoice/list/constants";
+import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
+
+export const category: CategoryDefinition = {
+  key: "payments",
+  defaultEntry: PAYMENT_DASHBOARD_ALIAS, // loads on category click
+  subcategories: {
+    Transactions: {
+      defaultEntry: INVOICE_LIST_ALIAS, // loads on subcategory click
+      label: {
+        "en-US": "Transactions",
+        "en-GLOBAL": "Transactions",
+        "de-DE": "Transaktionen",
+        "pl-PL": "Transakcje",
+      },
+      icon: "receipt",
+      order: 0,
+    },
+  },
+};
+```
+
+**Rules:**
+
+- `defaultEntry` → always imported from `constants.ts`, never a raw string literal.
+- Category `defaultEntry` → dashboard (KPI cards + quick actions). Subcategory `defaultEntry` → primary list.
+- Every category **and** subcategory must have a `defaultEntry`. No exceptions.
+- Run `vibe gen` after any `category.ts` change to rebuild the registry.
+
+### `defaultWebPinned`
+
+Controls which roles see this endpoint pinned in the web sidebar by default. Web pins are the primary navigation — they form the sidebar at `/admin/endpoints` and determine each role's first impression of the platform.
+
+```typescript
+// definition.ts
+defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+```
+
+**Pin these endpoint types:**
+
+- Dashboards (KPI cards + quick actions — the entry point for a module)
+- Primary list endpoints (invoices, orders, leads, products)
+- Key create forms that users access frequently
+
+**Never pin:**
+
+- Sub-actions (void, send-reminder, approve, dispatch)
+- Detail/get-by-ID views (`[id]` routes — reached via list navigation)
+- Internal utilities (health checks, migrations, seed runners)
+- Config endpoints rarely touched after setup
+- Duplicate entry points (if dashboard exists, don't also pin the list unless the list is genuinely separate)
+
+**Role guidelines:**
+
+- **Public** — AI inference tools only (chat, image/music/video gen, search, models, TTS, STT). Plus `user-me` and `credits-balance`. No business tools. Public users are browsing or trying the platform.
+- **Customer** — Everything Public sees + business tools they operate (accounting, payments, invoices, POS, products, inventory, purchasing, leads dashboard, subscriptions, referrals, messenger, remote/SSH). Customers run their own business on the platform.
+- **Admin** — Everything Customer sees + user management, system settings, error logs, deployment, SQL, coding agent, advanced monitoring (pulse, vibe-sense), full lead management, newsletter campaigns, support sessions.
+
+**Validation rule:** A tool must never appear in `defaultWebPinned` for a role that isn't in its `allowedRoles`. This would show a sidebar entry that fails on click.
+
+### `defaultAiPinned`
+
+Controls which roles get this tool pinned in the AI context window by default. AI-pinned tools are always visible to the AI and can be called automatically without the user explicitly requesting them.
+
+```typescript
+// definition.ts
+defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+```
+
+**Pin for AI:** Tools the AI needs autonomously — `ai-run`, `tool-help`, `cortex-*` (memory), `execute-tool`, `wait-for-task`. Admin adds `coding-agent`, `sql`, `rebuild`.
+
+**Never AI-pin:** UI-only tools (dashboards, lists with custom widgets), endpoints that only make sense through browser interaction, tools with large response payloads that waste context.
+
+### Tool Titles and Labels
+
+Tool titles appear in the sidebar grid, CLI output, and MCP tool lists. They must work across all surfaces.
+
+**Rules:**
+
+- Lead with the noun, not the verb: "Invoice List" not "List Invoices". Exception: action endpoints ("Generate Image", "Run AI Stream").
+- Max 3 words for sidebar display. Longer titles get truncated in the 72px grid cells.
+- No redundant category prefix: "Dashboard" not "Payment Dashboard" (the category already shows "Payments").
+- Fluffless: "Models" not "Browse Available AI Models". "Credits" not "Credit Balance Overview".
+- Consistent within a module: if one endpoint says "List" the sibling says "Create", not "New" or "Add".
+
+**Naming patterns by endpoint type:**
+
+| Type      | Pattern                                  | Example                        |
+| --------- | ---------------------------------------- | ------------------------------ |
+| Dashboard | `{Module} Dashboard` or just `Dashboard` | "Dashboard"                    |
+| List      | `{Entity} List` or `{Entities}` (plural) | "Invoices", "Stock List"       |
+| Create    | `Create {Entity}`                        | "Create Invoice"               |
+| Detail    | `{Entity} Details`                       | "Invoice Details"              |
+| Action    | `{Verb} {Entity}`                        | "Generate Image", "Send Email" |
+| Settings  | `{Module} Settings` or `Settings`        | "Chat Settings"                |
+
+### Module Verification Checklist
+
+When building or auditing a module, verify these in order:
+
+1. **Category registration** — `category.ts` exists, has `defaultEntry` pointing to the dashboard, subcategories have sensible icons and labels, `vibe gen` produces correct registry entry
+2. **Web pins** — dashboards and primary lists are pinned for the right roles. Detail views and sub-actions are NOT pinned. Run `vibe tool-help --statsFilter=webPinned` to verify.
+3. **AI pins** — only tools the AI needs autonomously. Most modules have zero AI-pinned tools (AI discovers them via `tool-help`).
+4. **Tool titles** — short, fluffless, consistent within the module. Check CLI output with `vibe tool-help --category={category}`.
+5. **Role access** — `allowedRoles` matches who should access it. `defaultWebPinned` is a subset of `allowedRoles`.
+6. **View-as-role test** — use `vibe tool-help --viewAsRole=customer --statsFilter=webPinned` and `--viewAsRole=public` to verify each role sees only what they need.
+
+---
 
 ## Quick Checklist
 

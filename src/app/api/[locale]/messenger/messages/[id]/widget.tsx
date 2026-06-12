@@ -16,8 +16,8 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import { MessageStatus } from "../enum";
@@ -213,7 +213,7 @@ export function EmailDetailContainer({
             {email.error !== null && email.error !== undefined && (
               <MetaRow
                 label={t("widget.error")}
-                value={<Div style={{ color: "#ef4444" }}>{email.error}</Div>}
+                value={<Div className="text-destructive">{email.error}</Div>}
               />
             )}
           </Div>

@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Unternehmensdetails",
+    titleShort: "Unternehmen",
     description: "Unternehmensinformationen anzeigen",
     companyId: {
       label: "Unternehmens-ID",

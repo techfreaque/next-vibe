@@ -8,6 +8,7 @@ export const translations = {
   badge: "User Details",
   get: {
     title: "View User",
+    titleShort: "View User",
     description: "View detailed information about a user",
     userId: {
       label: "User ID",

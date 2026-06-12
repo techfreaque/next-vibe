@@ -6,8 +6,6 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
-
 import type {
   HeadlessAiStreamResult,
   HeadlessPreCall,
@@ -15,20 +13,164 @@ import type {
 import { runHeadlessAiStream } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
-import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
-import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
+import type {
+  ChatMessage,
+  MessageMetadata,
+} from "@/app/api/[locale]/agent/chat/db";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "@/app/api/[locale]/user/auth/types";
+import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { defaultLocale } from "@/i18n/core/config";
+import { env } from "@/config/env";
 import { scopedTranslation } from "../stream/i18n";
+
+/**
+ * Resolve a test user by email+password using endpoints only.
+ * Runs the login like a web request: a real lead exists before the call.
+ */
+export async function resolveUser(
+  email: string,
+  password: string = env.VIBE_ADMIN_USER_PASSWORD,
+): Promise<JwtPrivatePayloadType | null> {
+  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const loginDef =
+    await import("@/app/api/[locale]/user/public/login/definition");
+  // The login's public caller needs a REAL lead row — fabricated ids produce
+  // lead-conversion warnings on every login. One marker lead is reused.
+  const { db: dbConn } = await import("@/app/api/[locale]/system/db");
+  const { leads } = await import("@/app/api/[locale]/leads/db");
+  const { LeadStatus, LeadSource } =
+    await import("@/app/api/[locale]/leads/enum");
+  const { eq: eqLead } = await import("drizzle-orm");
+  const TEST_LEAD_EMAIL = "test-runner@local.invalid";
+  let [testLead] = await dbConn
+    .select({ id: leads.id })
+    .from(leads)
+    .where(eqLead(leads.email, TEST_LEAD_EMAIL))
+    .limit(1);
+  if (!testLead) {
+    [testLead] = await dbConn
+      .insert(leads)
+      .values({
+        email: TEST_LEAD_EMAIL,
+        businessName: "",
+        status: LeadStatus.NEW,
+        source: LeadSource.WEBSITE,
+        country: "US",
+        language: "en",
+      })
+      .returning({ id: leads.id });
+  }
+  const publicUser: JwtPayloadType = {
+    isPublic: true,
+    leadId: testLead!.id,
+    roles: [],
+  };
+  const loginResult = await RouteExecuteRepository.runInProcessTyped({
+    definition: loginDef.default.POST,
+    input: { email, password, rememberMe: false },
+    user: publicUser,
+    locale: defaultLocale,
+    platform: Platform.NEXT_API,
+    logger,
+  });
+  if (!loginResult.success) {
+    return null;
+  }
+  const token = loginResult.data?.["token"];
+  if (typeof token !== "string" || !token) {
+    return null;
+  }
+  const verifyResult = await AuthRepository.verifyJwt(
+    token,
+    logger,
+    defaultLocale,
+  );
+  if (!verifyResult.success) {
+    return null;
+  }
+  return verifyResult.data;
+}
+
+/**
+ * Get or create a chat folder by name under a given root + optional parent.
+ * Idempotent: lists existing folders via endpoint, creates if not found.
+ */
+export async function getOrCreateFolder(
+  user: JwtPrivatePayloadType,
+  rootFolderId: DefaultFolderId,
+  name: string,
+  parentId: string | null = null,
+): Promise<string> {
+  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+
+  const listDef =
+    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition");
+  const listResult = await RouteExecuteRepository.runInProcessTyped({
+    definition: listDef.default.GET,
+    input: undefined,
+    urlPathParams: { rootFolderId },
+    user,
+    locale: defaultLocale,
+    platform: Platform.AI,
+    logger,
+  });
+  if (listResult.success) {
+    const folders = listResult.data?.["folders"];
+    if (Array.isArray(folders)) {
+      const existing = (
+        folders as Array<{
+          id: string;
+          name: string;
+          parentId: string | null;
+        }>
+      ).find(
+        (f) => f.name === name && (f.parentId ?? null) === (parentId ?? null),
+      );
+      if (existing) {
+        return existing.id;
+      }
+    }
+  }
+
+  const createDef =
+    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/definition");
+  const createResult = await RouteExecuteRepository.runInProcessTyped({
+    definition: createDef.default.POST,
+    input: { name, parentId: parentId ?? undefined },
+    urlPathParams: { rootFolderId },
+    user,
+    locale: defaultLocale,
+    platform: Platform.AI,
+    logger,
+  });
+  if (!createResult.success) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
+    throw new Error(
+      `getOrCreateFolder: failed to create folder "${name}": ${createResult.message}`,
+    );
+  }
+  const folderId = createResult.data?.["folderId"];
+  if (typeof folderId !== "string") {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
+    throw new Error(
+      `getOrCreateFolder: folder create returned no folderId for "${name}"`,
+    );
+  }
+  return folderId;
+}
 
 export interface TestStreamParams {
   prompt: string;
@@ -112,6 +254,12 @@ export interface TestStreamParams {
     toolId: string;
     requiresConfirmation: boolean;
   }> | null;
+  /**
+   * Override the effective compact trigger token threshold.
+   * Pass Number.MAX_SAFE_INTEGER to disable compacting entirely.
+   * Used in integration tests to prevent compacting from consuming fixture slots.
+   */
+  compactTriggerOverride?: number;
 }
 
 /** Slim message shape - only fields we assert on */
@@ -135,6 +283,7 @@ export interface SlimMessage {
     remoteTaskId?: string;
     callbackMode?: string;
     waitingForConfirmation?: boolean;
+    isConfirmed?: boolean;
   } | null;
   generatedMedia: { type: string; url?: string | null }[] | null;
   /** True when this is a compacting summary message */
@@ -148,6 +297,8 @@ export interface SlimMessage {
   completionTokens: number | null;
   creditCost: number | null;
   finishReason: string | null;
+  /** True when this user message is queued waiting for an active stream to finish */
+  isQueued: boolean;
 }
 
 export interface TestStreamResult {
@@ -218,6 +369,8 @@ function slimMessages(
             r.metadata.toolCall.waitingForConfirmation === true
               ? true
               : undefined,
+          isConfirmed:
+            r.metadata.toolCall.isConfirmed === true ? true : undefined,
         }
       : null,
     generatedMedia: r.metadata?.generatedMedia
@@ -235,36 +388,67 @@ function slimMessages(
     completionTokens: r.metadata?.completionTokens ?? null,
     creditCost: r.metadata?.creditCost ?? null,
     finishReason: r.metadata?.finishReason ?? null,
+    isQueued: r.metadata?.isQueued === true,
   }));
 }
 
-/** Fetch all messages for a thread from the DB as SlimMessage[] */
+/** Fetch all messages for a thread via the messages endpoint as SlimMessage[] */
 export async function fetchThreadMessages(
   threadId: string,
+  user: JwtPayloadType,
 ): Promise<SlimMessage[]> {
-  const rows = await db
-    .select({
-      id: chatMessages.id,
-      role: chatMessages.role,
-      parentId: chatMessages.parentId,
-      sequenceId: chatMessages.sequenceId,
-      content: chatMessages.content,
-      createdAt: chatMessages.createdAt,
-      model: chatMessages.model,
-      isAI: chatMessages.isAI,
-      metadata: chatMessages.metadata,
-    })
-    .from(chatMessages)
-    .where(eq(chatMessages.threadId, threadId));
-
+  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const msgsDef =
+    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition");
+  const result = await RouteExecuteRepository.runInProcessTyped({
+    definition: msgsDef.default.GET,
+    input: { rootFolderId: DefaultFolderId.BACKGROUND },
+    urlPathParams: { threadId },
+    user,
+    locale: defaultLocale,
+    platform: Platform.AI,
+    logger,
+  });
+  if (!result.success) {
+    return [];
+  }
+  const raw = result.data?.["messages"];
+  if (!Array.isArray(raw)) {
+    return [];
+  }
   return slimMessages(
-    rows
+    (raw as ChatMessage[])
       .map((r) => ({
         ...r,
+        createdAt: new Date(r.createdAt),
         metadata: r.metadata ?? {},
       }))
       .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
   );
+}
+
+/** Fetch the current streamingState for a thread via the messages endpoint. */
+export async function fetchThreadStreamingState(
+  threadId: string,
+  user: JwtPayloadType,
+): Promise<string | undefined> {
+  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const msgsDef =
+    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition");
+  const result = await RouteExecuteRepository.runInProcessTyped({
+    definition: msgsDef.default.GET,
+    input: { rootFolderId: DefaultFolderId.BACKGROUND },
+    urlPathParams: { threadId },
+    user,
+    locale: defaultLocale,
+    platform: Platform.AI,
+    logger,
+  });
+  if (!result.success) {
+    return undefined;
+  }
+  const state = result.data?.["streamingState"];
+  return typeof state === "string" ? state : undefined;
 }
 
 /**
@@ -279,18 +463,26 @@ export async function fetchThreadMessages(
  */
 export async function waitForThreadIdle(
   threadId: string,
+  user: JwtPayloadType,
   maxWaitMs = 90_000,
 ): Promise<SlimMessage[]> {
-  const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
   const pollIntervalMs = 500;
   const start = Date.now();
+  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const msgsDef =
+    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition");
   while (Date.now() - start < maxWaitMs) {
-    const [row] = await db
-      .select({ streamingState: chatThreads.streamingState })
-      .from(chatThreads)
-      .where(eq(chatThreads.id, threadId));
-    if (row?.streamingState === "idle") {
-      return fetchThreadMessages(threadId);
+    const result = await RouteExecuteRepository.runInProcessTyped({
+      definition: msgsDef.default.GET,
+      input: { rootFolderId: DefaultFolderId.BACKGROUND },
+      urlPathParams: { threadId },
+      user,
+      locale: defaultLocale,
+      platform: Platform.AI,
+      logger,
+    });
+    if (result.success && result.data?.["streamingState"] === "idle") {
+      return fetchThreadMessages(threadId, user);
     }
     await new Promise((resolve) => {
       setTimeout(resolve, pollIntervalMs);
@@ -302,16 +494,28 @@ export async function waitForThreadIdle(
   );
 }
 
-/** Fetch the thread title from DB */
+/** Fetch the thread title via endpoint */
 export async function fetchThreadTitle(
   threadId: string,
+  user: JwtPayloadType,
 ): Promise<string | null> {
-  const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
-  const [row] = await db
-    .select({ title: chatThreads.title })
-    .from(chatThreads)
-    .where(eq(chatThreads.id, threadId));
-  return row?.title ?? null;
+  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  const threadDef =
+    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+  const result = await RouteExecuteRepository.runInProcessTyped({
+    definition: threadDef.default.GET,
+    input: { rootFolderId: DefaultFolderId.BACKGROUND },
+    urlPathParams: { threadId },
+    user,
+    locale: defaultLocale,
+    platform: Platform.AI,
+    logger,
+  });
+  if (!result.success) {
+    return null;
+  }
+  const title = result.data?.["title"];
+  return typeof title === "string" ? title : null;
 }
 
 export async function runTestStream(
@@ -336,6 +540,7 @@ export async function runTestStream(
     operationOverride: callerOperationOverride,
     abortSignal = new AbortController().signal,
     availableTools,
+    compactTriggerOverride,
   } = params;
 
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -376,12 +581,13 @@ export async function runTestStream(
     favoriteConfig: paramFavoriteConfig ?? null,
     abortSignal,
     availableTools: availableTools ?? null,
+    compactTriggerOverride,
   });
 
   let messages: SlimMessage[] = [];
 
   if (result.success && result.data.threadId) {
-    messages = await fetchThreadMessages(result.data.threadId);
+    messages = await fetchThreadMessages(result.data.threadId, user);
   }
 
   return {

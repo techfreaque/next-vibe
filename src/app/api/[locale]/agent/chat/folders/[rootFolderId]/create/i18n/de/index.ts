@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
     folders: "Ordner",
   },
   title: "Ordner erstellen",
+  titleShort: "Neuer Ordner",
   description: "Einen neuen Ordner erstellen",
   config: {
     folders: {

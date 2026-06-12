@@ -29,8 +29,9 @@ import {
   type EnvKeyName,
 } from "@/app/api/[locale]/system/generated/env-keys";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
+import { SYSTEM_SETTINGS_ALIAS } from "./constants";
 
 const SystemSettingsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SystemSettingsWidget })),
@@ -51,7 +52,7 @@ interface EnvKeyField {
   description: string;
   placeholder: string;
   columns: 12;
-  schema: z.ZodOptional<z.ZodTypeAny>;
+  schema: z.ZodOptional<z.ZodString>;
   usage: { request: "data" };
   schemaType: "primitive";
 }
@@ -66,16 +67,8 @@ const FIELD_TYPE_MAP: Record<EnvFieldType, FieldDataType> = {
   "log-path": FieldDataType.TEXT,
 };
 
-function buildEnvKeySchema(meta: EnvKeyMeta): z.ZodOptional<z.ZodTypeAny> {
-  if (meta.fieldType === "boolean") {
-    return z.boolean().optional();
-  }
-  if (meta.fieldType === "number") {
-    return z.number().optional();
-  }
-  if (meta.fieldType === "select" && meta.options && meta.options.length > 0) {
-    return z.enum(meta.options as [string, ...string[]]).optional();
-  }
+function buildEnvKeySchema(): z.ZodOptional<z.ZodString> {
+  // Env vars are always stored as strings; the fieldType drives UI only.
   return z.string().optional();
 }
 
@@ -87,7 +80,7 @@ function buildEnvKeyField(meta: EnvKeyMeta): EnvKeyField {
     description: meta.comment,
     placeholder: meta.example,
     columns: 12,
-    schema: buildEnvKeySchema(meta),
+    schema: buildEnvKeySchema(),
     usage: { request: "data" },
     schemaType: "primitive",
   };
@@ -140,13 +133,15 @@ export const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["system", "settings"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.ADMIN] as const,
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "settings" as const,
-  category: "endpointCategories.settings",
-  subCategory: "endpointCategories.settingsEnv",
+  category: "devTools",
+  subCategory: "settingsEnv",
   tags: ["get.tags.settings" as const],
-  aliases: ["system-settings", "settings"] as const,
+  aliases: [SYSTEM_SETTINGS_ALIAS] as const,
 
   fields: customWidgetObject({
     render: SystemSettingsWidget,
@@ -290,10 +285,11 @@ export const { PATCH } = createEndpoint({
   path: ["system", "settings"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
   title: "patch.title" as const,
+  titleShort: "patch.titleShort" as const,
   description: "patch.description" as const,
   icon: "settings" as const,
-  category: "endpointCategories.settings",
-  subCategory: "endpointCategories.settingsEnv",
+  category: "devTools",
+  subCategory: "settingsEnv",
   tags: ["patch.tags.settings" as const],
   aliases: ["init", "set-setting"] as const,
 
@@ -393,10 +389,11 @@ export const { POST } = createEndpoint({
   path: ["system", "settings"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "settings" as const,
-  category: "endpointCategories.settings",
-  subCategory: "endpointCategories.settingsEnv",
+  category: "devTools",
+  subCategory: "settingsEnv",
   tags: ["post.tags.settings" as const],
   aliases: ["unbottled-login"] as const,
 

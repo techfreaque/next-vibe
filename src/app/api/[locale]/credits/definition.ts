@@ -34,13 +34,16 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["credits"],
-  title: "get.title",
-  description: "get.description",
-  category: "endpointCategories.credits",
-  subCategory: "endpointCategories.creditsManagement",
-  tags: ["tags.credits", "tags.balance"],
-  icon: "coins",
+  aliases: ["credits-balance"] as const,
+  title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
+  description: "get.description" as const,
+  category: "credits" as const,
+  subCategory: "Management" as const,
+  tags: ["tags.credits" as const, "tags.balance" as const],
+  icon: "coins" as const,
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     render: CreditsBalanceContainer,
@@ -49,49 +52,43 @@ const { GET } = createEndpoint({
       // Total credits available
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.total.content",
+        content: "get.total.content" as const,
         schema: z.coerce.number(),
       }),
 
-      // Expiring credits (from subscription)
       expiring: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.expiring.content",
+        content: "get.expiring.content" as const,
         schema: z.coerce.number(),
       }),
 
-      // Permanent credits (from packs)
       permanent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.permanent.content",
+        content: "get.permanent.content" as const,
         schema: z.coerce.number(),
       }),
 
-      // Earned credits (from referrals)
       earned: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.earned.content",
+        content: "get.earned.content" as const,
         schema: z.coerce.number(),
       }),
 
-      // Free tier credits
       free: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.free.content",
+        content: "get.free.content" as const,
         schema: z.coerce.number(),
       }),
 
-      // Expiration date for expiring credits
       expiresAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.expiresAt.content",
+        content: "get.expiresAt.content" as const,
         schema: dateSchema.nullable(),
       }),
 
-      // Total capacity (sum of original pack amounts + free pool)
       capacity: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.capacity.content",
+        content: "get.capacity.content" as const,
         schema: z.coerce.number(),
       }),
     },
@@ -99,47 +96,46 @@ const { GET } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "get.success.title",
-    description: "get.success.description",
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
-  // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "get.errors.validation.title",
-      description: "get.errors.validation.description",
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "get.errors.network.title",
-      description: "get.errors.network.description",
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "get.errors.unauthorized.title",
-      description: "get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "get.errors.forbidden.title",
-      description: "get.errors.forbidden.description",
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "get.errors.notFound.title",
-      description: "get.errors.notFound.description",
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "get.errors.server.title",
-      description: "get.errors.server.description",
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "get.errors.unknown.title",
-      description: "get.errors.unknown.description",
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "get.errors.unsavedChanges.title",
-      description: "get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title" as const,
+      description: "get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "get.errors.conflict.title",
-      description: "get.errors.conflict.description",
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
     },
   },
 

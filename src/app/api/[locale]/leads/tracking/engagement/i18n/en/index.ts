@@ -6,6 +6,7 @@ export const translations = {
   },
   post: {
     title: "Record Lead Engagement",
+    titleShort: "Track Engagement",
     description: "Record a new engagement event for a lead",
     form: {
       title: "Lead Engagement Form",
@@ -99,6 +100,7 @@ export const translations = {
   },
   get: {
     title: "Track Lead Click",
+    titleShort: "Track Click",
     description: "Track lead click and redirect to target URL",
     form: {
       title: "Click Tracking Parameters",

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Próby logowania łącznie",
+    titleShort: "Próby logowania",
     description: "Liczba wszystkich prób logowania na przedział czasu",
     fields: {
       resolution: {

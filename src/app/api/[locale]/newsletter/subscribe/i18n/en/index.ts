@@ -50,6 +50,7 @@ export const translations = {
   },
   post: {
     title: "Newsletter Subscription",
+    titleShort: "Subscribe",
     description: "Subscribe to newsletter updates and notifications",
     form: {
       title: "Newsletter Subscription",

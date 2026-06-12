@@ -5,6 +5,9 @@
 
 import "server-only";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
+
 import type { SignalEvent } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
 export class AndEvaluatorRepository {
@@ -28,5 +31,12 @@ export class AndEvaluatorRepository {
         fired:
           firedStates.length === signals.length && firedStates.every(Boolean),
       }));
+  }
+
+  static handle(data: {
+    signals: SignalEvent[][];
+  }): ResponseType<{ result: SignalEvent[] }> {
+    const result = AndEvaluatorRepository.computeAnd(data.signals);
+    return success({ result });
   }
 }

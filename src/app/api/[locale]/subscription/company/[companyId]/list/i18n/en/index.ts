@@ -6,6 +6,7 @@ export const translations = {
   },
   get: {
     title: "Company Subscriptions",
+    titleShort: "Company Subs",
     description: "List all subscriptions for a company",
     companyId: {
       label: "Company ID",

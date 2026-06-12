@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Bollinger Bänder",
+    titleShort: "Bollinger",
     description:
       "Bollinger Bänder - oberes, mittleres (SMA) und unteres Band mit Standardabweichung",
     fields: {

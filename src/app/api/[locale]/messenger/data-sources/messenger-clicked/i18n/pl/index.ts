@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Kliknięte wiadomości",
+    titleShort: "Kliknięcia",
     description:
       "Wiadomości z kliknięciami w linki na przedział rozdzielczości",
     fields: {

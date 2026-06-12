@@ -36,10 +36,11 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
 
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "eye",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "ai",
+  subCategory: "Tools",
   tags: ["tags.image", "tags.vision", "tags.ai"],
   dynamicTitle: ({ request }) => {
     const fileUrl = request?.fileUrl;

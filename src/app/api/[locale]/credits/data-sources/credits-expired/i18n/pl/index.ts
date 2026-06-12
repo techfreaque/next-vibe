@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Wygasłe",
     title: "Wygasłe kredyty",
     description: "Suma wygasłych kwot kredytów na przedział rozdzielczości",
     fields: {

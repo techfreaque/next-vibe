@@ -23,7 +23,7 @@ import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-spee
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const SignupFormContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.SignupFormContainer })),
@@ -37,10 +37,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["user", "public", "signup"],
   title: "title",
+  titleShort: "titleShort",
   description: "description",
   icon: "user-plus",
-  category: "userAuth",
-  subCategory: "userAuthLogin",
+  category: "account",
   tags: ["tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: customWidgetObject({

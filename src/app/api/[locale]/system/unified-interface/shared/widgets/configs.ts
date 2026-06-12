@@ -78,6 +78,7 @@ import type { SignalsFieldWidgetConfig } from "../../unified-ui/widgets/form-fie
 import type { TimeSeriesFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-series-field/types";
 import type { TimezoneFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/timezone-field/types";
 import type { UrlFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/url-field/types";
+import type { EntityPickerFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/entity-picker-field/types";
 import type { UuidFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/uuid-field/types";
 import type { ButtonWidgetConfig } from "../../unified-ui/widgets/interactive/button/types";
 import type { FormAlertWidgetConfig } from "../../unified-ui/widgets/interactive/form-alert/types";
@@ -285,6 +286,12 @@ export type FormFieldWidgetConfig<
       TUsage
     >
   | SignalsFieldWidgetConfig<
+      TKey,
+      // @ts-expect-error - TSchema constraint mismatch
+      TSchema,
+      TUsage
+    >
+  | EntityPickerFieldWidgetConfig<
       TKey,
       // @ts-expect-error - TSchema constraint mismatch
       TSchema,

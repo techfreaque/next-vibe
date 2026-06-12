@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   dashboard: {
     title: "Przegląd księgowości",
+    titleShort: "Przegląd",
     description:
       "Stan ksiąg rachunkowych — otwarty okres, liczba zapisów i szybka nawigacja do wszystkich narzędzi księgowych.",
     companyId: {

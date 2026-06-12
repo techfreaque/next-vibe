@@ -19,8 +19,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { BROWSER_NEW_PAGE_ALIAS } from "./constants";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,7 +32,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "new-page"],
+  aliases: [BROWSER_NEW_PAGE_ALIAS] as const,
   title: "new-page.title",
+  titleShort: "new-page.titleShort",
   description: "new-page.description",
   dynamicTitle: ({ request }) => {
     if (request?.url) {
@@ -43,8 +47,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserPages",
+  category: "browser",
+  subCategory: "Pages",
   icon: "file-plus",
   tags: [
     "new-page.tags.browserAutomation",
@@ -106,6 +110,8 @@ const { POST } = createEndpoint({
             "Maximum wait time in milliseconds. If set to 0, the default timeout will be used.",
           ),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

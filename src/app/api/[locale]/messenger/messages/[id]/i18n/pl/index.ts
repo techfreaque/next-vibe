@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
     emails: "Emails",
   },
   title: "Szczegóły e-maila",
+  titleShort: "Szczegóły e-maila",
   description:
     "Pobierz pojedynczy email na podstawie jego unikalnego identyfikatora",
   container: {

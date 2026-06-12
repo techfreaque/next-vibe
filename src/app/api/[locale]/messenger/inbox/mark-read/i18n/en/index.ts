@@ -1,5 +1,6 @@
 export const translations = {
   title: "Mark Read",
+  titleShort: "Mark Read",
   description: "Mark a message as read or unread",
   tag: "Inbox",
 

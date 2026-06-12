@@ -10,6 +10,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "WS-Provider-Stream",
+    titleShort: "WS-Stream",
     description:
       "Startet einen KI-Stream für einen entfernten WS-Provider-Client. Der Client sendet eine Nachricht, ein Modell und optionale Tool-Definitionen. KI-Ereignisse werden über den Standard-WebSocket-Kanal gestreamt. Client-bereitgestellte Tools pausieren den Stream, bis der Client Tool-Ergebnisse zurücksendet.",
     fields: {
@@ -71,6 +72,45 @@ export const translations: typeof enTranslations = {
       timezone: {
         label: "Zeitzone",
         description: "Client-Zeitzone für cache-stabile Zeitstempel",
+      },
+      toolConfirmations: {
+        title: "Tool-Bestätigungen",
+        description:
+          "Tool-Aufrufe freigeben oder ablehnen, die auf Bestätigung warten. Der Stream wird mit dem bestätigten Tool-Ergebnis fortgesetzt.",
+        messageId: {
+          label: "Nachrichten-ID",
+          description: "ID der Tool-Nachricht, die auf Bestätigung wartet",
+        },
+        confirmed: {
+          label: "Bestätigt",
+          description: "True für Freigabe und Ausführung, false für Ablehnung",
+        },
+        updatedArgs: {
+          label: "Geänderte Argumente",
+          description: "Optional bearbeitete Tool-Argumente für die Ausführung",
+        },
+      },
+      attachments: {
+        title: "Anhänge",
+        description:
+          "An die Nutzernachricht angehängte Dateien, base64-kodiert für die Übertragung.",
+        filename: {
+          label: "Dateiname",
+          description: "Ursprünglicher Dateiname",
+        },
+        mimeType: {
+          label: "MIME-Typ",
+          description: "Inhaltstyp der Datei",
+        },
+        data: {
+          label: "Daten",
+          description: "Base64-kodierter Dateiinhalt",
+        },
+      },
+      messageHistory: {
+        label: "Nachrichtenverlauf",
+        description:
+          "Gesprächskontext der aufrufenden Instanz. Der Provider hält keinen Thread-Zustand, daher liefert der Aufrufer die bisherigen Nachrichten bei jedem Zug mit.",
       },
     },
     response: {

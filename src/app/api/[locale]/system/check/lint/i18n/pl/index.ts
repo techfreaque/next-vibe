@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Lint",
+  titleShort: "Lint",
   description: "Uruchom ESLint na swojej bazie kodu",
   category: "Sprawdzenia systemu",
   tag: "Lint",

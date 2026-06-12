@@ -1,9 +1,11 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   patch: {
     title: "Datei bearbeiten",
+    titleShort: "Datei bearbeiten",
     description:
       "Teil einer Datei ändern. Text suchen und ersetzen, oder bestimmte Zeilen bearbeiten.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Bearbeitet: {{path}}",
     status: {
       loading: "Bearbeiten...",
       done: "Bearbeitet",

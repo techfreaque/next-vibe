@@ -5,6 +5,7 @@ export const translations = {
   },
   patch: {
     title: "Publish Skill",
+    titleShort: "Publish Skill",
     description:
       "Publish or unpublish a custom skill. PUBLISHED makes it visible in the community store.",
     dynamicTitle: "Publish: {{name}}",

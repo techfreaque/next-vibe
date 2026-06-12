@@ -3,6 +3,7 @@ export const translations = {
     messaging: "Messaging",
   },
   title: "Create Messenger Account",
+  titleShort: "New Account",
   description: "Create a new messenger account",
 
   enums: {

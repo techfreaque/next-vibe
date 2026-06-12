@@ -13,11 +13,11 @@ import guardStartEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: guardStartEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { GuardStartRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return GuardStartRepository.startGuard(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).GuardStartRepository.startGuard(data, logger, t),
   },
 });

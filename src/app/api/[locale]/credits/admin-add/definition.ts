@@ -34,6 +34,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["credits", "admin-add"],
   title: "adminAdd.post.title" as const,
+  titleShort: "adminAdd.post.titleShort" as const,
   description: "adminAdd.post.description" as const,
   category: "credits",
   subCategory: "Management",

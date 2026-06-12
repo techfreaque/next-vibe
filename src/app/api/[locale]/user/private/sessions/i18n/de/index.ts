@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Benutzer",
 
   list: {
     title: "Meine Sitzungen",
+    titleShort: "Meine Sitzungen",
     description: "Alle aktiven Sitzungen für Ihr Konto auflisten",
     tag: "Sitzungen",
     response: {
@@ -40,6 +42,7 @@ export const translations = {
   },
   create: {
     title: "Sitzungstoken erstellen",
+    titleShort: "Token erstellen",
     description:
       "Einen benannten Sitzungstoken für den programmatischen Zugriff erstellen",
     tag: "Sitzungen",
@@ -85,6 +88,7 @@ export const translations = {
   },
   revoke: {
     title: "Sitzung widerrufen",
+    titleShort: "Sitzung widerrufen",
     description: "Einen Sitzungstoken nach ID widerrufen",
     tag: "Sitzungen",
     response: {

@@ -192,4 +192,24 @@ export class SubscriptionCheckoutRepository {
       });
     }
   }
+
+  static checkout(
+    data: CheckoutRequestOutput,
+    user: JwtPrivatePayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    t: PaymentCheckoutT,
+  ): Promise<ResponseType<CheckoutResponseOutput>> {
+    const requestData = {
+      ...data,
+      billingInterval: data.billingInterval ?? BillingInterval.MONTHLY,
+    };
+    return SubscriptionCheckoutRepository.createCheckoutSession(
+      requestData,
+      user,
+      locale,
+      logger,
+      t,
+    );
+  }
 }

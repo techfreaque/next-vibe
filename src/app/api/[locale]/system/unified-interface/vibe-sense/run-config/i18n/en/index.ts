@@ -3,6 +3,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Run Graph Config",
+    titleShort: "Run Config",
     description:
       "Execute a graph from an inline config without requiring a saved graph",
     fields: {

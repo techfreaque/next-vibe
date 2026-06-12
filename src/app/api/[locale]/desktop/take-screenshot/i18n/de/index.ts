@@ -2,11 +2,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Desktop-Screenshot aufnehmen",
+  titleShort: "Screenshot",
   dynamicTitle: "Screenshot: {{target}}",
   description:
     "Einen Screenshot des Desktops oder eines Bildschirmbereichs aufnehmen",
   form: {
-    label: "Desktop-Screenshot aufnehmen",
+    label: "Screenshot aufnehmen",
+    capturing: "Aufnahme läuft…",
+    refresh: "Neu aufnehmen",
     description:
       "Einen Screenshot des gesamten Desktops oder eines bestimmten Bereichs aufnehmen",
     fields: {
@@ -105,5 +108,10 @@ export const translations: typeof enTranslations = {
   tags: {
     desktopAutomation: "Desktop-Automatisierung",
     captureAutomation: "Erfassungs-Automatisierung",
+  },
+  widget: {
+    actionScreenshot: "Screenshot aufnehmen",
+    actionAllMonitors: "Monitore auflisten",
+    labelSaved: "Gespeichert unter",
   },
 };

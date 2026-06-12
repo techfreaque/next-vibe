@@ -5,7 +5,8 @@ export const translations = {
     list: "List",
   },
   get: {
-    title: "List Product Categories",
+    title: "Categories",
+    titleShort: "Categories",
     description: "Retrieve product categories for a company or owner.",
     companyId: {
       label: "Company ID",

@@ -577,3 +577,94 @@ import * as Ul from "./ul";
 const testUl: typeof webUl = Ul;
 void testUl;
 export * from "./ul";
+
+// widget-shell
+import type * as webWidgetShell from "../../web/ui/widget-shell";
+import * as WidgetShell from "./widget-shell";
+const testWidgetShell: typeof webWidgetShell = WidgetShell;
+void testWidgetShell;
+export * from "./widget-shell";
+
+// widget-header
+import type * as webWidgetHeader from "../../web/ui/widget-header";
+import * as WidgetHeader from "./widget-header";
+const testWidgetHeader: typeof webWidgetHeader = WidgetHeader;
+void testWidgetHeader;
+export * from "./widget-header";
+
+// metric-card
+import type * as webMetricCard from "../../web/ui/metric-card";
+import * as MetricCard from "./metric-card";
+const testMetricCard: typeof webMetricCard = MetricCard;
+void testMetricCard;
+export * from "./metric-card";
+
+// metric-grid
+import type * as webMetricGrid from "../../web/ui/metric-grid";
+import * as MetricGrid from "./metric-grid";
+const testMetricGrid: typeof webMetricGrid = MetricGrid;
+void testMetricGrid;
+export * from "./metric-grid";
+
+// status-pill
+import type * as webStatusPill from "../../web/ui/status-pill";
+import * as StatusPill from "./status-pill";
+const testStatusPill: typeof webStatusPill = StatusPill;
+void testStatusPill;
+export * from "./status-pill";
+
+// detail-grid
+import type * as webDetailGrid from "../../web/ui/detail-grid";
+import * as DetailGrid from "./detail-grid";
+const testDetailGrid: typeof webDetailGrid = DetailGrid;
+void testDetailGrid;
+export * from "./detail-grid";
+
+// list-item
+import type * as webListItem from "../../web/ui/list-item";
+import * as ListItem from "./list-item";
+const testListItem: typeof webListItem = ListItem;
+void testListItem;
+export * from "./list-item";
+
+// section-group
+import type * as webSectionGroup from "../../web/ui/section-group";
+import * as SectionGroup from "./section-group";
+const testSectionGroup: typeof webSectionGroup = SectionGroup;
+void testSectionGroup;
+export * from "./section-group";
+
+// empty-block
+import type * as webEmptyBlock from "../../web/ui/empty-block";
+import * as EmptyBlock from "./empty-block";
+const testEmptyBlock: typeof webEmptyBlock = EmptyBlock;
+void testEmptyBlock;
+export * from "./empty-block";
+
+// loading-block
+import type * as webLoadingBlock from "../../web/ui/loading-block";
+import * as LoadingBlock from "./loading-block";
+const testLoadingBlock: typeof webLoadingBlock = LoadingBlock;
+void testLoadingBlock;
+export * from "./loading-block";
+
+// progress-block
+import type * as webProgressBlock from "../../web/ui/progress-block";
+import * as ProgressBlock from "./progress-block";
+const testProgressBlock: typeof webProgressBlock = ProgressBlock;
+void testProgressBlock;
+export * from "./progress-block";
+
+// action-card
+import type * as webActionCard from "../../web/ui/action-card";
+import * as ActionCard from "./action-card";
+const testActionCard: typeof webActionCard = ActionCard;
+void testActionCard;
+export * from "./action-card";
+
+// result-banner
+import type * as webResultBanner from "../../web/ui/result-banner";
+import * as ResultBanner from "./result-banner";
+const testResultBanner: typeof webResultBanner = ResultBanner;
+void testResultBanner;
+export * from "./result-banner";

@@ -14,15 +14,11 @@ import definitions from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { TRPCValidationRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return TRPCValidationRepository.executeValidationOperation(
-        data,
-        logger,
-        t,
-      );
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).TRPCValidationRepository.executeValidationOperation(data, logger, t),
   },
 });

@@ -45,6 +45,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Wypisz z newslettera",
+    titleShort: "Wypisz się",
     description: "Wypisz się z aktualizacji newslettera",
     form: {
       title: "Wypisz się z newslettera",

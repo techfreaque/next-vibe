@@ -1,4 +1,3 @@
-// eslint-disable-next-line i18next/no-literal-string
 export const translations = {
   tags: {
     image: "Image",
@@ -7,6 +6,7 @@ export const translations = {
   },
   post: {
     title: "Describe Image",
+    titleShort: "Describe Image",
     dynamicTitle: "Describe: {{filename}}",
     description: "Describe the contents of an image using a vision AI model",
     fileUrl: {
@@ -76,4 +76,4 @@ export const translations = {
       description: "The image has been described successfully",
     },
   },
-} as const;
+};

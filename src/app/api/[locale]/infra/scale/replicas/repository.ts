@@ -19,13 +19,13 @@ import type {
   ScaleReplicasRequestOutput,
   ScaleReplicasResponseOutput,
 } from "./definition";
-import type { ScaleReplicasT } from "./i18n";
+import type { InfraT } from "../../i18n";
 
 export class ScaleReplicasRepository {
   static async scale(
     data: ScaleReplicasRequestOutput,
     logger: EndpointLogger,
-    t: ScaleReplicasT,
+    t: InfraT,
   ): Promise<ResponseType<ScaleReplicasResponseOutput>> {
     try {
       const [controlPlane] = await db

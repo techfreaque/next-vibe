@@ -39,6 +39,7 @@ export const translations = {
   },
   get: {
     title: "Get Share Links",
+    titleShort: "Share Links",
     description: "Retrieve all share links for a thread",
     container: {
       title: "Share Links",
@@ -130,6 +131,7 @@ export const translations = {
   },
   post: {
     title: "Create Share Link",
+    titleShort: "Share Link",
     description: "Create a new share link for a thread",
     container: {
       title: "New Share Link",
@@ -209,6 +211,7 @@ export const translations = {
   },
   patch: {
     title: "Update Share Link",
+    titleShort: "Update Link",
     description: "Update an existing share link",
     container: {
       title: "Update Share Link",
@@ -291,6 +294,7 @@ export const translations = {
   },
   delete: {
     title: "Revoke Share Link",
+    titleShort: "Revoke Link",
     description: "Revoke an active share link",
     container: {
       title: "Revoke Share Link",

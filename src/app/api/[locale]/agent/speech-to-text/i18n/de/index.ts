@@ -142,6 +142,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Sprache zu Text",
+    titleShort: "Sprache zu Text",
     description:
       "Konvertieren Sie Audio in Text mit KI-Transkription (0,013 Credits pro Sekunde, 0,78 Credits pro Minute)",
     form: {
@@ -160,6 +161,10 @@ export const translations: typeof enTranslations = {
         maxSize: "Dateigröße muss unter 25 MB liegen",
         audioOnly: "Bitte laden Sie eine Audio- oder Videodatei hoch",
       },
+    },
+    model: {
+      label: "Modell",
+      description: "Transkriptionsmodell",
     },
     provider: {
       label: "Anbieter",
@@ -212,6 +217,7 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Audio erfolgreich transkribiert",
       transcriptionComplete: "Transkription erfolgreich abgeschlossen",
+      transcribing: "Transkribierung…",
     },
   },
   providers: {

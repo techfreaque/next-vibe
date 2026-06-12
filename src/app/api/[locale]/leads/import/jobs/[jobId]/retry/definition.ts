@@ -7,8 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   objectField,
   requestUrlPathParamsField,
   responseField,
@@ -22,8 +22,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { ImportJobRetryContainer } from "../widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
+
+const ImportJobRetryContainer = lazyWidget(() =>
+  import("../widget").then((m) => ({ default: m.ImportJobRetryContainer })),
+);
 
 /**
  * Retry Import Job Endpoint (POST)
@@ -34,9 +38,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["leads", "import", "jobs", ":jobId", "retry"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsImport",
+  category: "leads",
+  subCategory: "Import",
   tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "rotate-ccw",
@@ -46,7 +51,7 @@ const { POST } = createEndpoint({
     usage: { request: "urlPathParams", response: true } as const,
     children: {
       backButton: backButton(scopedTranslation, {
-        usage: { response: true },
+        usage: { request: "urlPathParams", response: true },
       }),
 
       // === URL PARAMETERS ===

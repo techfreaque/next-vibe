@@ -1,8 +1,9 @@
 export const translations = {
   get: {
     title: "List Folder",
+    titleShort: "List Files",
     description: "See what's in a folder.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Listed {{path}}",
     status: {
       loading: "Listing...",
       done: "Listed",
@@ -13,7 +14,8 @@ export const translations = {
     fields: {
       path: {
         label: "Path",
-        description: "Which folder, e.g. / or /documents",
+        description:
+          "Folder to list. /ssh → all machines. /ssh/<name>/ → files or mounts. /ssh/<name>/<mount>/ → mount contents.",
       },
     },
     submitButton: {

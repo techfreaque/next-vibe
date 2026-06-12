@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Chat Threads Active Total",
+    titleShort: "Active Threads",
     description: "Snapshot of total active chat threads per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },

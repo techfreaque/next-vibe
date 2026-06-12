@@ -12,6 +12,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Favorit erstellen",
+    titleShort: "Favorit hinzufügen",
     description: "Neue Favoriten-Konfiguration erstellen",
     container: {
       title: "Neuer Favorit",

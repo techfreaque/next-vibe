@@ -18,7 +18,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { parseError } from "../../../shared/utils";
-import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { ChatModelSelection } from "../../ai-stream/models";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";

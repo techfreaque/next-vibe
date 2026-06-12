@@ -12,6 +12,7 @@ export const translations: typeof enTranslations = {
   search: {
     get: {
       title: "Search Threads",
+      titleShort: "Threads suchen",
       description:
         "Search across thread titles, previews, and system prompts using full-text search",
       container: {

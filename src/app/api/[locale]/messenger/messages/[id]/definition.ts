@@ -24,9 +24,10 @@ import {
 import { dateSchema } from "../../../shared/types/common.schema";
 import { UserRole } from "../../../user/user-roles/enum";
 import { MessageStatus, MessageType } from "../enum";
+import messagesListDefinition from "../list/definition";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const EmailDetailContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.EmailDetailContainer })),
@@ -37,9 +38,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["messenger", "messages", "[id]"],
   title: "title",
+  titleShort: "titleShort",
   description: "description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.messengerMessages",
+  category: "messenger",
+  subCategory: "Messages",
   icon: "message-square",
   tags: ["tags.emails"],
   allowedRoles: [UserRole.ADMIN],
@@ -54,7 +56,9 @@ const { GET } = createEndpoint({
       // === URL PARAMETER ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: messagesListDefinition.GET,
+        labelField: "subject",
         label: "fields.id.label",
         description: "fields.id.description",
         columns: 12,

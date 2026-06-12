@@ -85,7 +85,7 @@ export class UserRepository {
     if (response.success) {
       return {
         success: true,
-        data: response.data as UserType<T>,
+        data: response.data,
         message: response.message,
       };
     }

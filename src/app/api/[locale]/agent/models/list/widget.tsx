@@ -16,7 +16,7 @@ import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model
 import {
   useWidgetLocale,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type definition from "./definition";
 import type { ModelListItem } from "./definition";

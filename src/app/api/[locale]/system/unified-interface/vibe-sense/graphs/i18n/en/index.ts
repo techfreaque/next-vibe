@@ -6,6 +6,7 @@ export const translations = {
 
   list: {
     title: "Pipeline Graphs",
+    titleShort: "Graphs",
     description: "List all graphs visible to the current user",
     fields: {
       search: {

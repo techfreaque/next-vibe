@@ -5,6 +5,7 @@ export const translations = {
   },
   post: {
     title: "Build Electron App",
+    titleShort: "Build Electron",
     description:
       "Compile main/preload with bun, run vibe build, then package with electron-builder",
     form: {

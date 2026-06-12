@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
     },
     post: {
       title: "Uruchom agenta AI",
+      titleShort: "Uruchom agenta",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
         "Deleguje zadanie do wyspecjalizowanego agenta AI i zwraca jego odpowiedź. Do tworzenia lub edycji umiejętności/person AI zawsze deleguj do skill='skill-creator' – nigdy nie próbuj samodzielnie. Podaj skill + prompt; agent zajmie się resztą. Kredyty zależne od modelu.",
@@ -28,18 +29,18 @@ export const translations: typeof enTranslations = {
         favoriteId: {
           label: "ID ulubionego",
           description:
-            "Slug lub ID zapisanego ulubionego. Ładuje skill, model i konfigurację narzędzi jako wartości domyślne. Jawne pola nadpisują wartości ulubionego.",
-          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+            "Slug zapisanego ulubionego (np. 'thea-cheap'). Nie slug skilla – do tego użyj pola skill. Ładuje skill, model i konfigurację narzędzi jednym wywołaniem. Priorytet: model > favoriteId > skill.",
+          placeholder: "thea-cheap",
         },
         model: {
-          label: "Model",
+          label: "Model (tylko CLI)",
           description:
-            "LLM do rozumowania tekstowego. Opcjonalny gdy ustawiono favoriteId lub skill. Szybki: claude-haiku-4.5, gemini-2.5-flash. Zbalansowany: claude-sonnet-4.6, gpt-5. Potężny: claude-opus-4.7. Darmowy: qwen3_235b-free. Nie do generowania obrazów/audio/wideo.",
+            "Bezpośrednie nadpisanie LLM. Tylko przez CLI – inne platformy używają favoriteId lub skill. Szybki: claude-haiku-4.5, gemini-2.5-flash. Zbalansowany: claude-sonnet-4.6, gpt-5. Potężny: claude-opus-4.7. Darmowy: qwen3_235b-free.",
         },
         skill: {
           label: "Umiejętność",
           description:
-            "ID umiejętności lub nazwa domyślna. Definiuje personę AI i prompt systemowy. Użyj 'skill-creator' do tworzenia/edycji umiejętności AI. Opcjonalny gdy ustawiono favoriteId.",
+            "Slug umiejętności (np. 'thea', 'thea__cheap-smart'). Nie slug ulubionego – do tego użyj favoriteId. Definiuje personę AI i prompt systemowy. Użyj 'skill-creator' do tworzenia/edycji.",
           placeholder: "default",
         },
         prompt: {
@@ -176,6 +177,10 @@ export const translations: typeof enTranslations = {
         unsaved: { title: "Niezapisane", description: "Niezapisane zmiany" },
         conflict: { title: "Konflikt", description: "Konflikt danych" },
       },
+      requireFavOrSkill:
+        "Podaj co najmniej jedno z: favoriteId, skill lub model (tylko CLI). Nie można uruchomić bez rozwiązywalnego modelu i skilla.",
+      skillNotFound:
+        "Skill '{{skill}}' nie znaleziony. Jeśli to slug ulubionego (np. 'thea-cheap'), użyj --favoriteId zamiast --skill.",
       success: {
         title: "Wykonanie AI zakończone",
         description: "Zakończono pomyślnie",
@@ -187,6 +192,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Czat strumieniowy AI",
+    titleShort: "Chat AI",
     description:
       "Strumieniuj odpowiedzi czatu wspierane przez AI używając OpenAI GPT-4o",
     form: {
@@ -544,6 +550,7 @@ export const translations: typeof enTranslations = {
   resumeStream: {
     post: {
       title: "Wznów strumień AI",
+      titleShort: "Wznów strumień",
       description:
         "Kontynuuje istniejący wątek przez uruchomienie bezgłowego kroku AI. Używane po zakończeniu asynchronicznego zadania zdalnego.",
       fields: {

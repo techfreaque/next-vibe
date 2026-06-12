@@ -9,6 +9,7 @@ export const translations = {
   },
   get: {
     title: "Get Thread Permissions",
+    titleShort: "Thread Access",
     description: "Retrieve the list of moderators for a specific thread",
     container: {
       title: "Thread Permissions",
@@ -96,6 +97,7 @@ export const translations = {
   },
   patch: {
     title: "Update Thread Permissions",
+    titleShort: "Thread Access",
     description: "Update the list of moderators for a specific thread",
     container: {
       title: "Update Thread Permissions",

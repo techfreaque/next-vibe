@@ -1,5 +1,6 @@
 export const translations = {
   title: "Lint",
+  titleShort: "Lint",
   description:
     "Run ESLint on your codebase. Use vibe-check for comprehensive checks (ESLint + Oxlint + TypeScript). Note: Default values are configurable in check.config.ts.",
   category: "System Checks",

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Liczba sporów płatniczych",
+    titleShort: "Spory",
     description: "Liczba sporów płatniczych na przedział rozdzielczości",
     fields: {
       resolution: {

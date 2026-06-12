@@ -10,7 +10,7 @@ import { createMiddleware, createStart } from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
 import { NextRequest } from "next/server";
 
-import { devFileLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
+import { serverFileLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
 
 // ANSI helpers (inline - avoid importing heavy logger chain at middleware level)
 const C = {
@@ -56,7 +56,7 @@ function logRequest(
   const pathStr = useColors ? `${C.cyan}${path}${C.reset}` : path;
   const line = `${ts} ${methodStr} ${pathStr} ${statusStr} in ${formatMs(totalMs)} (app: ${formatMs(appMs)})`;
   process.stdout.write(`${line}\n`);
-  void devFileLog(line);
+  void serverFileLog(line);
 }
 
 /**

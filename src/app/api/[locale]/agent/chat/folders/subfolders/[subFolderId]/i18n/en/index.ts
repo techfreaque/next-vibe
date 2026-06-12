@@ -6,6 +6,7 @@ export const translations = {
 
   get: {
     title: "Get Folder",
+    titleShort: "Subfolder",
     description: "Get a folder by ID",
     container: {
       title: "Folder",
@@ -69,6 +70,7 @@ export const translations = {
 
   delete: {
     title: "Delete Folder",
+    titleShort: "Delete Folder",
     description: "Delete a folder by ID",
     container: {
       title: "Delete Folder",

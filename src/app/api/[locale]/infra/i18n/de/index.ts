@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Infrastruktur",
   type: "Infrastruktur",
 
@@ -47,6 +48,7 @@ export const translations = {
     init: {
       post: {
         title: "Cluster initialisieren",
+        titleShort: "Cluster init",
         description:
           "k3s auf markierten SSH-Servern einrichten. Installiert k3s, Datenbanken, Redis, MinIO und Ingress.",
         container: { title: "Cluster Init" },
@@ -148,6 +150,7 @@ export const translations = {
     status: {
       get: {
         title: "Cluster-Status",
+        titleShort: "Cluster-Status",
         description:
           "k8s-Knotengesundheit, Pod-Anzahl und Komponentenstatus anzeigen",
         container: { title: "Cluster-Status" },
@@ -208,6 +211,7 @@ export const translations = {
     push: {
       post: {
         title: "Deployen",
+        titleShort: "Deployen",
         description: "Infrastrukturänderungen via Pulumi anwenden (pulumi up)",
         container: { title: "Deploy" },
         fields: {
@@ -274,6 +278,7 @@ export const translations = {
     preview: {
       post: {
         title: "Deploy-Vorschau",
+        titleShort: "Vorschau",
         description:
           "Infrastrukturänderungen vorschauen ohne anzuwenden (pulumi preview)",
         container: { title: "Deploy-Vorschau" },
@@ -340,6 +345,7 @@ export const translations = {
     replicas: {
       post: {
         title: "Skalieren",
+        titleShort: "Skalieren",
         description: "Ein Deployment im Cluster skalieren",
         container: { title: "Deployment skalieren" },
         fields: {

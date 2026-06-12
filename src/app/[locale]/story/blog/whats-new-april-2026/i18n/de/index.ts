@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   meta: {
     title: "123 Modelle. Sehen, hören, erschaffen. Ein Begleiter.",
     description:

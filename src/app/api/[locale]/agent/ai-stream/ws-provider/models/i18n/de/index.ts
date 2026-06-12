@@ -12,6 +12,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "KI-Modelle auflisten",
+    titleShort: "KI-Modelle",
     description:
       "Gibt alle verfuegbaren KI-Modelle mit Preis- und Faehigkeitsinformationen zurueck",
     response: {

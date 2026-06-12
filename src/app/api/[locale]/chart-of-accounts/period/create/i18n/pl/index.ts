@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Otwórz okres księgowy",
+    titleShort: "Nowy okres",
     description: "Utwórz nowy okres księgowy dla firmy",
     companyId: {
       label: "ID firmy",

@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Fähigkeit melden",
+    titleShort: "Skill melden",
     description:
       "Fähigkeit zur Moderation melden. Idempotent - eine Meldung pro Benutzer pro Fähigkeit.",
     dynamicTitle: "Melden: {{name}}",

@@ -42,12 +42,14 @@ const { POST } = createEndpoint({
   path: ["agent", "video-generation"],
   aliases: [VIDEO_GEN_ALIAS],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
+  defaultWebPinned: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
 
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "video",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiGeneration",
+  category: "ai",
+  subCategory: "Generation",
   tags: ["tags.video", "tags.generation", "tags.ai"],
   dynamicTitle: ({ request }) => {
     const prompt = request?.prompt;

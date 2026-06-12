@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Zarejestruj zaangażowanie leada",
+    titleShort: "Śledź zaangażowanie",
     description: "Zarejestruj nowe zdarzenie zaangażowania dla leada",
     form: {
       title: "Formularz zaangażowania leada",
@@ -102,6 +103,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Śledź kliknięcie leada",
+    titleShort: "Śledź kliknięcie",
     description: "Śledź kliknięcie leada i przekieruj do docelowego URL",
     form: {
       title: "Parametry śledzenia kliknięć",

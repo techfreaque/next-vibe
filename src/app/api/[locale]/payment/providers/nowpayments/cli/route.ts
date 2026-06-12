@@ -7,8 +7,7 @@ import { CliNowpaymentsRepositoryImpl } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, locale, t }) => {
-      return CliNowpaymentsRepositoryImpl.execute(data, locale, t);
-    },
+    handler: ({ data, locale, t }) =>
+      CliNowpaymentsRepositoryImpl.execute(data, locale, t),
   },
 });

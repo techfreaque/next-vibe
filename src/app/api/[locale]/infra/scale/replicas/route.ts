@@ -8,11 +8,11 @@ import scaleReplicasEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: scaleReplicasEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { ScaleReplicasRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return ScaleReplicasRepository.scale(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).ScaleReplicasRepository.scale(data, logger, t),
   },
 });

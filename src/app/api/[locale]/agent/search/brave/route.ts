@@ -14,8 +14,8 @@ import { BraveSearchRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: braveSearchDefinition,
   [Methods.GET]: {
-    handler: ({ data, logger, t }) => {
-      return BraveSearchRepository.search(
+    handler: ({ data, logger, t }) =>
+      BraveSearchRepository.search(
         data.query,
         {
           maxResults: data.maxResults,
@@ -24,7 +24,6 @@ export const { GET, tools } = endpointsHandler({
         },
         logger,
         t,
-      );
-    },
+      ),
   },
 });

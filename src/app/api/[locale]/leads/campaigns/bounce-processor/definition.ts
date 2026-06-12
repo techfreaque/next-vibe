@@ -27,7 +27,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { BOUNCE_PROCESSOR_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 const BounceProcessorConfigWidget = lazyWidget(() =>
@@ -40,9 +40,10 @@ const { POST } = createEndpoint({
   path: ["leads", "campaigns", "bounce-processor"],
   aliases: [BOUNCE_PROCESSOR_ALIAS],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsProcessing",
+  category: "newsletter",
+  subCategory: "emailCampaignsProcessing",
   icon: "mail",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
@@ -212,9 +213,10 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "mail",
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsProcessing",
+  category: "newsletter",
+  subCategory: "emailCampaignsProcessing",
   tags: ["tag"],
 
   fields: objectField(scopedTranslation, {

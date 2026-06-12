@@ -8,11 +8,11 @@ import deployPushEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: deployPushEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { DeployPushRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return DeployPushRepository.push(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).DeployPushRepository.push(data, logger, t),
   },
 });

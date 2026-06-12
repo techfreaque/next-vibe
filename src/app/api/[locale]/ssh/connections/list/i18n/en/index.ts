@@ -11,8 +11,10 @@ export const translations = {
   },
 
   get: {
-    title: "List SSH Connections",
-    description: "List all saved SSH connections for the current user",
+    title: "Connections",
+    titleShort: "Connections",
+    description:
+      "All machines you can connect to — local shell, SSH servers, and remote instances",
     errors: {
       validation: {
         title: "Validation Error",
@@ -42,23 +44,32 @@ export const translations = {
     },
     success: {
       title: "Connections Listed",
-      description: "SSH connections retrieved",
+      description: "All machine connections retrieved",
+    },
+    response: {
+      connections: {
+        title: "Connections",
+      },
     },
   },
   widget: {
-    title: "SSH Connections",
-    addButton: "Add Connection",
-    testButton: "Test",
-    deleteButton: "Delete",
-    emptyState:
-      "No SSH connections yet. Add one to connect to remote machines.",
-    labelCol: "Label",
-    hostCol: "Host",
-    userCol: "User",
-    authTypeCol: "Auth",
+    title: "Connections",
+    back: "Back",
+    addSsh: "Add SSH",
+    connectRemote: "Connect Remote",
+    openTerminal: "Terminal",
+    viewRemote: "Details",
     defaultBadge: "Default",
-    testingLabel: "Testing...",
-    testSuccess: "Connected",
-    testFailed: "Failed",
+    localType: "Local",
+    sshType: "SSH",
+    remoteType: "Remote",
+    healthHealthy: "Connected",
+    healthWarning: "Slow",
+    healthCritical: "Unreachable",
+    healthDisconnected: "Offline",
+    noConnections: "No machines configured",
+    noConnectionsHint:
+      "Add an SSH connection or connect a remote instance to get started.",
+    emptyState: "No connections yet. Add one to connect to remote machines.",
   },
 };

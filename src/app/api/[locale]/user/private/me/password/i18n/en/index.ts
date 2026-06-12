@@ -2,6 +2,7 @@ export const translations = {
   category: "User Profile",
 
   title: "Change Password",
+  titleShort: "Change Password",
   description: "Update your account password securely",
   tag: "password-change",
   debug: {

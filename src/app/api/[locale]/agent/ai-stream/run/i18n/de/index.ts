@@ -21,5 +21,14 @@ export const translations: typeof enTranslations = {
       description:
         "Wähle unten ein Skill oder lade einen gespeicherten Favoriten. Das Modell wird automatisch aufgelöst.",
     },
+    noResponse: "Keine Antwort",
+    cli: {
+      submitting: "…",
+      promptPrefix: "› ",
+      skillPrefix: "Skill ",
+      promptHint: "Enter: Senden  ·  Esc: Beenden  ·  Tab: Feld wechseln",
+      promptPlaceholder: "Prompt eingeben...",
+      skillLabel: "Skill: {{skill}}",
+    },
   },
 };

@@ -1,5 +1,6 @@
 export const translations = {
   title: "Create Check Configuration",
+  titleShort: "Check Config",
   description:
     "Create check.config.ts with optional MCP config, VSCode settings, and rule configurations. Run without options for interactive setup.",
   category: "Development Tools",

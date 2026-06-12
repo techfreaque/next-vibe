@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,7 +31,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "emulate"],
+  aliases: ["browser-emulate"] as const,
   title: "emulate.title",
+  titleShort: "emulate.titleShort",
   description: "emulate.description",
   dynamicTitle: ({ request }) => {
     const parts: string[] = [];
@@ -51,8 +54,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserPages",
+  category: "browser",
+  subCategory: "Pages",
   icon: "settings",
   tags: [
     "emulate.tags.browserAutomation",
@@ -234,6 +237,8 @@ const { POST } = createEndpoint({
             "Viewport to emulate. Set to null to reset to the default viewport.",
           ),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

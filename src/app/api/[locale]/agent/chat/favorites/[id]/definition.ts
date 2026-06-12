@@ -68,9 +68,10 @@ import {
   FAVORITE_UPDATE_ALIAS,
 } from "../constants";
 
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import { ChatModelId } from "../../../ai-stream/models";
 import { scopedTranslation } from "./i18n";
+import favoritesListDefinition from "../definition";
 
 const FavoriteEditContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.FavoriteEditContainer })),
@@ -87,6 +88,7 @@ const { DELETE } = createEndpoint({
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
   title: "delete.title" as const,
+  titleShort: "delete.titleShort" as const,
   description: "delete.description" as const,
   icon: "trash" as const,
   category: "ai",
@@ -194,7 +196,9 @@ const { DELETE } = createEndpoint({
       // === REQUEST (URL Path Params) ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: favoritesListDefinition.GET,
+        labelField: "name",
         label: "delete.id.label" as const,
         description: "delete.id.description" as const,
         hidden: true,
@@ -317,6 +321,7 @@ const { PATCH } = createEndpoint({
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
   title: "patch.title" as const,
+  titleShort: "patch.titleShort" as const,
   description: "patch.description" as const,
   icon: "edit" as const,
   category: "ai",
@@ -545,7 +550,9 @@ const { PATCH } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: favoritesListDefinition.GET,
+        labelField: "name",
         label: "patch.id.label" as const,
         hidden: true,
         schema: z.string(),
@@ -870,6 +877,7 @@ const { GET } = createEndpoint({
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "star" as const,
   category: "ai",
@@ -885,7 +893,9 @@ const { GET } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: favoritesListDefinition.GET,
+        labelField: "name",
         label: "get.id.label" as const,
         schema: z.string(),
         hidden: true,

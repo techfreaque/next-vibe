@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "IMAP-Client",
 
   title: "IMAP-Synchronisation",
+  titleShort: "IMAP-Sync",
   description: "IMAP-Synchronisierungsdienst",
   container: {
     title: "IMAP-Sync-Konfiguration",

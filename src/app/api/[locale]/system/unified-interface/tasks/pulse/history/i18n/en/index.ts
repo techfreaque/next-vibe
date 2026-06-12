@@ -12,6 +12,7 @@ export const translations = {
 
   get: {
     title: "Pulse Execution History",
+    titleShort: "Pulse History",
     description: "View historical pulse execution cycles",
     fields: {
       startDate: {

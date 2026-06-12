@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Głosuj na umiejętność",
+    titleShort: "Zagłosuj",
     description:
       "Przełącz głos na umiejętność społeczności. Idempotentne - wywołaj ponownie aby usunąć głos.",
     dynamicTitle: "Głosowanie: {{name}}",

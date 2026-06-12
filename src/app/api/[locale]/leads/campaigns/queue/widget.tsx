@@ -5,6 +5,7 @@
 
 "use client";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { List } from "next-vibe-ui/ui/icons/List";
@@ -13,56 +14,34 @@ import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
+import { scopedTranslation as leadsI18n } from "@/app/api/[locale]/leads/i18n";
+import { scopedTranslation as messengerAccountsI18n } from "@/app/api/[locale]/messenger/accounts/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
+  useWidgetLocale,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type definition from "./definition";
 
 // ── Date formatter ────────────────────────────────────────────────────────────
 
-function formatDate(iso: string | null | undefined): string | null {
+function formatDate(
+  iso: string | null | undefined,
+  locale: string,
+): string | null {
   if (!iso) {
     return null;
   }
-  return new Date(iso).toLocaleDateString(undefined, {
+  return new Date(iso).toLocaleDateString(locale, {
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
 }
-
-// ── Label maps ───────────────────────────────────────────────────────────────
-
-const STAGE_LABELS: Record<string, string> = {
-  "enums.emailCampaignStage.notStarted": "Not Started",
-  "enums.emailCampaignStage.initial": "Initial Contact",
-  "enums.emailCampaignStage.followup1": "Follow-up 1",
-  "enums.emailCampaignStage.followup2": "Follow-up 2",
-  "enums.emailCampaignStage.followup3": "Follow-up 3",
-  "enums.emailCampaignStage.nurture": "Nurture",
-  "enums.emailCampaignStage.reactivation": "Reactivation",
-};
-
-const VARIANT_LABELS: Record<string, string> = {
-  "enums.emailJourneyVariant.uncensoredConvert": "Uncensored Convert",
-  "enums.emailJourneyVariant.sideHustle": "Side Hustle",
-  "enums.emailJourneyVariant.quietRecommendation": "Quiet Recommendation",
-  "enums.emailJourneyVariant.signupNurture": "Signup Nurture",
-  "enums.emailJourneyVariant.retention": "Retention",
-  "enums.emailJourneyVariant.winback": "Winback",
-};
-
-const CAMPAIGN_TYPE_LABELS: Record<string, string> = {
-  "enums.campaignType.leadCampaign": "Lead Campaign",
-  "enums.campaignType.signupNurture": "Signup Nurture",
-  "enums.campaignType.retention": "Retention",
-  "enums.campaignType.winback": "Winback",
-};
 
 // ── Badge ─────────────────────────────────────────────────────────────────────
 
@@ -98,9 +77,15 @@ type QueueTranslation = ReturnType<
 function LeadCard({
   item,
   t,
+  leadsT,
+  messengerT,
+  locale,
 }: {
   item: QueueItem;
   t: QueueTranslation;
+  leadsT: ReturnType<typeof leadsI18n.scopedT>["t"];
+  messengerT: ReturnType<typeof messengerAccountsI18n.scopedT>["t"];
+  locale: CountryLanguage;
 }): React.JSX.Element {
   return (
     <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
@@ -117,13 +102,16 @@ function LeadCard({
       {/* Badges row */}
       <Div className="flex flex-wrap gap-1.5">
         <Badge variant="blue">
-          {CAMPAIGN_TYPE_LABELS[item.campaignType] ?? item.campaignType}
+          {messengerT(item.campaignType as Parameters<typeof messengerT>[0]) ??
+            item.campaignType}
         </Badge>
         <Badge variant="purple">
-          {STAGE_LABELS[item.currentStage] ?? item.currentStage}
+          {leadsT(item.currentStage as Parameters<typeof leadsT>[0]) ??
+            item.currentStage}
         </Badge>
         <Badge variant="green">
-          {VARIANT_LABELS[item.journeyVariant] ?? item.journeyVariant}
+          {leadsT(item.journeyVariant as Parameters<typeof leadsT>[0]) ??
+            item.journeyVariant}
         </Badge>
       </Div>
 
@@ -159,11 +147,11 @@ function LeadCard({
       <Div className="flex justify-between text-xs text-muted-foreground">
         <Span>
           {t("widget.columnStarted")}:{" "}
-          {formatDate(item.startedAt) ?? t("widget.never")}
+          {formatDate(item.startedAt, locale) ?? t("widget.never")}
         </Span>
         <Span>
           {t("widget.columnNext")}:{" "}
-          {formatDate(item.nextScheduledAt) ?? t("widget.never")}
+          {formatDate(item.nextScheduledAt, locale) ?? t("widget.never")}
         </Span>
       </Div>
     </Div>
@@ -176,6 +164,9 @@ export function CampaignQueueWidget(): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
+  const locale = useWidgetLocale();
+  const leadsT = leadsI18n.scopedT(locale).t;
+  const messengerT = messengerAccountsI18n.scopedT(locale).t;
 
   const items = data?.items ?? [];
 
@@ -234,7 +225,14 @@ export function CampaignQueueWidget(): React.JSX.Element {
           {/* Mobile card view */}
           <Div className="flex flex-col gap-3 md:hidden">
             {items.map((item) => (
-              <LeadCard key={item.leadId} item={item} t={t} />
+              <LeadCard
+                key={item.leadId}
+                item={item}
+                t={t}
+                leadsT={leadsT}
+                messengerT={messengerT}
+                locale={locale}
+              />
             ))}
           </Div>
 
@@ -291,20 +289,26 @@ export function CampaignQueueWidget(): React.JSX.Element {
                 </Div>
                 <Div className="px-3 py-2 text-sm">
                   <Badge variant="blue">
-                    {CAMPAIGN_TYPE_LABELS[item.campaignType] ??
-                      item.campaignType}
+                    {messengerT(
+                      item.campaignType as Parameters<typeof messengerT>[0],
+                    ) ?? item.campaignType}
                   </Badge>
                 </Div>
                 <Div className="px-3 py-2 text-sm">
                   <Badge variant="purple">
-                    {STAGE_LABELS[item.currentStage] ?? item.currentStage}
+                    {leadsT(
+                      item.currentStage as Parameters<typeof leadsT>[0],
+                    ) ?? item.currentStage}
                   </Badge>
                 </Div>
                 <Div className="px-3 py-2 text-xs text-muted-foreground overflow-hidden text-ellipsis whitespace-nowrap">
-                  {VARIANT_LABELS[item.journeyVariant] ?? item.journeyVariant}
+                  {leadsT(
+                    item.journeyVariant as Parameters<typeof leadsT>[0],
+                  ) ?? item.journeyVariant}
                 </Div>
                 <Div className="px-3 py-2 text-xs">
-                  {formatDate(item.nextScheduledAt) ?? t("widget.never")}
+                  {formatDate(item.nextScheduledAt, locale) ??
+                    t("widget.never")}
                 </Div>
                 <Div className="px-3 py-2 text-sm tabular-nums text-center">
                   {item.emailsSent}
@@ -316,7 +320,7 @@ export function CampaignQueueWidget(): React.JSX.Element {
                   {item.emailsClicked}
                 </Div>
                 <Div className="px-3 py-2 text-xs text-muted-foreground">
-                  {formatDate(item.startedAt) ?? t("widget.never")}
+                  {formatDate(item.startedAt, locale) ?? t("widget.never")}
                 </Div>
               </Div>
             ))}

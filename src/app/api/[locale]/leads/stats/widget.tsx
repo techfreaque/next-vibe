@@ -8,13 +8,9 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
-import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
-import { ArrowUp } from "next-vibe-ui/ui/icons/ArrowUp";
-import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Filter } from "next-vibe-ui/ui/icons/Filter";
 import { List } from "next-vibe-ui/ui/icons/List";
-import { Minus } from "next-vibe-ui/ui/icons/Minus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
@@ -22,7 +18,12 @@ import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
+import { MetricCard } from "next-vibe-ui/ui/metric-card";
+import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
+import { SectionGroup } from "next-vibe-ui/ui/section-group";
 import { Span } from "next-vibe-ui/ui/span";
+import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import React, { useCallback, useMemo, useState } from "react";
 
 import {
@@ -66,8 +67,6 @@ interface ActivityRecord {
 }
 
 function computeTrend(recentActivity: ActivityRecord[]): TrendDirection {
-  // Use the recentActivity timestamps to proxy a trend - if more than half of
-  // the last-10 items are within the past 2 days, we call it "up".
   if (!recentActivity.length) {
     return "neutral";
   }
@@ -92,7 +91,7 @@ function computeTrend(recentActivity: ActivityRecord[]): TrendDirection {
 
 // ─── Date range helpers ───────────────────────────────────────────────────────
 
-function getWeekRange(): { from: string; to: string } {
+function getWeekRange(locale: string): { from: string; to: string } {
   const now = new Date();
   const day = now.getDay(); // 0 = Sun
   const monday = new Date(now);
@@ -101,95 +100,28 @@ function getWeekRange(): { from: string; to: string } {
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
   return {
-    from: monday.toLocaleDateString(undefined, {
+    from: monday.toLocaleDateString(locale, {
       month: "short",
       day: "numeric",
     }),
-    to: sunday.toLocaleDateString(undefined, {
+    to: sunday.toLocaleDateString(locale, {
       month: "short",
       day: "numeric",
     }),
   };
 }
 
-function getMonthRange(): { from: string; to: string } {
+function getMonthRange(locale: string): { from: string; to: string } {
   const now = new Date();
   const first = new Date(now.getFullYear(), now.getMonth(), 1);
   const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   return {
-    from: first.toLocaleDateString(undefined, {
+    from: first.toLocaleDateString(locale, {
       month: "short",
       day: "numeric",
     }),
-    to: last.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+    to: last.toLocaleDateString(locale, { month: "short", day: "numeric" }),
   };
-}
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function TrendIcon({
-  direction,
-  className,
-}: {
-  direction: TrendDirection;
-  className?: string;
-}): React.JSX.Element {
-  if (direction === "up") {
-    return <ArrowUp className={cn("h-3 w-3 text-success", className)} />;
-  }
-  if (direction === "down") {
-    return <ArrowDown className={cn("h-3 w-3 text-destructive", className)} />;
-  }
-  return <Minus className={cn("h-3 w-3 text-muted-foreground", className)} />;
-}
-
-function StatCard({
-  label,
-  value,
-  format = "number",
-  variant = "default",
-  trend,
-}: {
-  label: string;
-  value: number | null | undefined;
-  format?: "number" | "percent" | "compact";
-  variant?: "default" | "success" | "warning" | "danger" | "info";
-  trend?: TrendDirection;
-}): React.JSX.Element {
-  const variantClass = {
-    default: "text-foreground",
-    success: "text-success",
-    warning: "text-warning",
-    danger: "text-destructive",
-    info: "text-info",
-  }[variant];
-
-  const formatted = useMemo(() => {
-    if (value === null || value === undefined) {
-      return "—";
-    }
-    if (format === "percent") {
-      return `${(value * 100).toFixed(1)}%`;
-    }
-    if (format === "compact" && value >= 1000) {
-      return `${(value / 1000).toFixed(1)}k`;
-    }
-    return value.toLocaleString();
-  }, [value, format]);
-
-  return (
-    <Div className="rounded-lg border bg-card p-4 flex flex-col gap-1">
-      <Div className="flex items-center justify-between">
-        <Span className="text-xs text-muted-foreground">{label}</Span>
-        {trend !== null && trend !== undefined && (
-          <TrendIcon direction={trend} />
-        )}
-      </Div>
-      <Span className={cn("text-2xl font-bold tabular-nums", variantClass)}>
-        {formatted}
-      </Span>
-    </Div>
-  );
 }
 
 // ─── Clickable bar row (for By Status / By Source) ────────────────────────────
@@ -283,8 +215,7 @@ function GroupedStatsSection({
   const max = Math.max(...top.map((i) => i.value), 1);
 
   return (
-    <Div className="rounded-lg border bg-card p-4">
-      <Span className="text-sm font-semibold mb-3 block">{title}</Span>
+    <SectionGroup title={title}>
       <Div className="flex flex-col gap-1">
         {top.map((item) => (
           <ClickableBarRow
@@ -298,7 +229,7 @@ function GroupedStatsSection({
           />
         ))}
       </Div>
-    </Div>
+    </SectionGroup>
   );
 }
 
@@ -320,8 +251,7 @@ function RawGroupedStatsSection({
   const max = Math.max(...top.map((i) => i.value), 1);
 
   return (
-    <Div className="rounded-lg border bg-card p-4">
-      <Span className="text-sm font-semibold mb-3 block">{title}</Span>
+    <SectionGroup title={title}>
       <Div className="flex flex-col gap-1">
         {top.map((item) => (
           <Div
@@ -353,7 +283,7 @@ function RawGroupedStatsSection({
           </Div>
         ))}
       </Div>
-    </Div>
+    </SectionGroup>
   );
 }
 
@@ -516,35 +446,6 @@ const LEAD_SOURCE_TO_FILTER: Record<LeadSourceValue, LeadSourceFilterValue> = {
   [LeadSource.CSV_IMPORT]: LeadSourceFilter.CSV_IMPORT,
 };
 
-// ─── Quick action buttons ─────────────────────────────────────────────────────
-
-interface QuickActionProps {
-  label: string;
-  icon: React.ReactNode;
-  onClick: () => void;
-  variant?: "outline" | "ghost" | "default" | "secondary";
-}
-
-function QuickActionButton({
-  label,
-  icon,
-  onClick,
-  variant = "outline",
-}: QuickActionProps): React.JSX.Element {
-  return (
-    <Button
-      type="button"
-      variant={variant}
-      size="sm"
-      onClick={onClick}
-      className="flex items-center gap-1.5 h-8 text-xs"
-    >
-      {icon}
-      {label}
-    </Button>
-  );
-}
-
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function LeadsStatsContainer({
@@ -592,8 +493,8 @@ export function LeadsStatsContainer({
   const trend = useMemo(() => computeTrend(recentActivity), [recentActivity]);
 
   // Date ranges
-  const weekRange = useMemo(() => getWeekRange(), []);
-  const monthRange = useMemo(() => getMonthRange(), []);
+  const weekRange = useMemo(() => getWeekRange(locale), [locale]);
+  const monthRange = useMemo(() => getMonthRange(locale), [locale]);
 
   // ── Navigation handlers ──────────────────────────────────────────────────
 
@@ -681,53 +582,77 @@ export function LeadsStatsContainer({
   );
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* Header */}
-      <Div className="flex items-center gap-2">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex items-center gap-2 mr-auto">
-          <BarChart2 className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">{t("widget.title")}</Span>
-        </Div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-      </Div>
+    <WidgetShell>
+      <WidgetHeader
+        title={t("widget.title")}
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+        actions={
+          <Div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              title={t("widget.refresh")}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </Div>
+        }
+      />
 
       {/* Quick action buttons */}
       <Div className="flex flex-wrap gap-2">
-        <QuickActionButton
-          label={t("widget.viewAllLeads")}
-          icon={<List className="h-3.5 w-3.5" />}
-          onClick={handleViewAllLeads}
+        <Button
+          type="button"
           variant="default"
-        />
-        <QuickActionButton
-          label={t("widget.searchLeads")}
-          icon={<Search className="h-3.5 w-3.5" />}
+          size="sm"
+          onClick={handleViewAllLeads}
+          className="gap-1.5 h-8 text-xs"
+        >
+          <List className="h-3.5 w-3.5" />
+          {t("widget.viewAllLeads")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
           onClick={handleSearchLeads}
-        />
-        <QuickActionButton
-          label={t("widget.export")}
-          icon={<Download className="h-3.5 w-3.5" />}
+          className="gap-1.5 h-8 text-xs"
+        >
+          <Search className="h-3.5 w-3.5" />
+          {t("widget.searchLeads")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
           onClick={handleExportLeads}
-        />
-        <QuickActionButton
-          label={t("widget.import")}
-          icon={<Upload className="h-3.5 w-3.5" />}
+          className="gap-1.5 h-8 text-xs"
+        >
+          <Download className="h-3.5 w-3.5" />
+          {t("widget.export")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
           onClick={handleImportLeads}
-        />
-        <QuickActionButton
-          label={t("widget.batchUpdate")}
-          icon={<Zap className="h-3.5 w-3.5" />}
+          className="gap-1.5 h-8 text-xs"
+        >
+          <Upload className="h-3.5 w-3.5" />
+          {t("widget.import")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
           onClick={handleBatchUpdate}
-        />
+          className="gap-1.5 h-8 text-xs"
+        >
+          <Zap className="h-3.5 w-3.5" />
+          {t("widget.batchUpdate")}
+        </Button>
       </Div>
 
       {/* Filters toggle */}
@@ -870,101 +795,72 @@ export function LeadsStatsContainer({
       )}
 
       {/* KPI overview */}
-      <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard
+      <MetricGrid columns={4}>
+        <MetricCard
           label={t("widget.totalLeads")}
-          value={data?.totalLeads}
+          value={data?.totalLeads ?? 0}
           trend={trend}
         />
-        <StatCard
+        <MetricCard
           label={t("widget.activeLeads")}
-          value={data?.activeLeads}
+          value={data?.activeLeads ?? 0}
           variant="info"
           trend={trend}
         />
-        <StatCard
+        <MetricCard
           label={t("widget.converted")}
-          value={data?.convertedLeads}
+          value={data?.convertedLeads ?? 0}
           variant="success"
           trend={trend}
         />
-        <StatCard
+        <MetricCard
           label={t("widget.conversionRate")}
-          value={data?.conversionRate}
-          format="percent"
+          value={`${((data?.conversionRate ?? 0) * 100).toFixed(1)}%`}
           variant="success"
           trend={trend}
         />
-      </Div>
+      </MetricGrid>
 
       {/* Email performance */}
-      <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard
+      <MetricGrid columns={4}>
+        <MetricCard
           label={t("widget.openRate")}
-          value={data?.averageOpenRate}
-          format="percent"
+          value={`${((data?.averageOpenRate ?? 0) * 100).toFixed(1)}%`}
           variant="info"
         />
-        <StatCard
+        <MetricCard
           label={t("widget.clickRate")}
-          value={data?.averageClickRate}
-          format="percent"
+          value={`${((data?.averageClickRate ?? 0) * 100).toFixed(1)}%`}
           variant="info"
         />
-        <StatCard
+        <MetricCard
           label={t("widget.unsubscribeRate")}
-          value={data?.signupRate}
-          format="percent"
-          variant="default"
+          value={`${((data?.signupRate ?? 0) * 100).toFixed(1)}%`}
         />
-        <StatCard
+        <MetricCard
           label={t("widget.newThisMonth")}
-          value={data?.leadsCreatedThisMonth}
+          value={data?.leadsCreatedThisMonth ?? 0}
           variant="info"
         />
-      </Div>
+      </MetricGrid>
 
-      {/* New leads timeline - with explicit date ranges */}
-      <Div className="rounded-lg border bg-card p-4">
-        <Span className="text-sm font-semibold mb-3 block">
-          {t("widget.newLeadsTimeline")}
-        </Span>
-        <Div className="grid grid-cols-3 gap-3">
-          <Div className="flex flex-col gap-1">
-            <Span className="text-xs text-muted-foreground">
-              {t("widget.today")} (
-              {new Date().toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-              })}
-              )
-            </Span>
-            <Span className="text-2xl font-bold tabular-nums">
-              {data?.leadsCreatedToday?.toLocaleString() ?? t("widget.emDash")}
-            </Span>
-          </Div>
-          <Div className="flex flex-col gap-1">
-            <Span className="text-xs text-muted-foreground">
-              {t("widget.thisWeek")} ({weekRange.from}{" "}
-              {t("widget.dateSeparator")} {weekRange.to})
-            </Span>
-            <Span className="text-2xl font-bold tabular-nums">
-              {data?.leadsCreatedThisWeek?.toLocaleString() ??
-                t("widget.emDash")}
-            </Span>
-          </Div>
-          <Div className="flex flex-col gap-1">
-            <Span className="text-xs text-muted-foreground">
-              {t("widget.thisMonth")} ({monthRange.from}{" "}
-              {t("widget.dateSeparator")} {monthRange.to})
-            </Span>
-            <Span className="text-2xl font-bold tabular-nums">
-              {data?.leadsCreatedThisMonth?.toLocaleString() ??
-                t("widget.emDash")}
-            </Span>
-          </Div>
-        </Div>
-      </Div>
+      {/* New leads timeline */}
+      <SectionGroup title={t("widget.newLeadsTimeline")}>
+        <MetricGrid columns={3}>
+          <MetricCard
+            label={`${t("widget.today")} (${new Date().toLocaleDateString(locale, { month: "short", day: "numeric" })})`}
+            value={data?.leadsCreatedToday ?? 0}
+          />
+          <MetricCard
+            label={`${t("widget.thisWeek")} (${weekRange.from} ${t("widget.dateSeparator")} ${weekRange.to})`}
+            value={data?.leadsCreatedThisWeek ?? 0}
+          />
+          <MetricCard
+            label={`${t("widget.thisMonth")} (${monthRange.from} ${t("widget.dateSeparator")} ${monthRange.to})`}
+            value={data?.leadsCreatedThisMonth ?? 0}
+          />
+        </MetricGrid>
+      </SectionGroup>
 
       {/* Conversion funnel */}
       <ConversionFunnel
@@ -983,15 +879,10 @@ export function LeadsStatsContainer({
         <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* By Status - clickable rows */}
           {byStatusItems && byStatusItems.length > 0 && (
-            <Div className="rounded-lg border bg-card p-4">
-              <Div className="flex items-center gap-2 mb-3">
-                <Span className="text-sm font-semibold">
-                  {t("widget.byStatus")}
-                </Span>
-                <Span className="text-xs text-muted-foreground">
-                  {t("widget.clickToFilter")}
-                </Span>
-              </Div>
+            <SectionGroup
+              title={t("widget.byStatus")}
+              subtitle={t("widget.clickToFilter")}
+            >
               <Div className="flex flex-col gap-1">
                 {byStatusItems.slice(0, 8).map((item) => (
                   <ClickableBarRow
@@ -1008,20 +899,15 @@ export function LeadsStatsContainer({
                   />
                 ))}
               </Div>
-            </Div>
+            </SectionGroup>
           )}
 
           {/* By Source - clickable rows */}
           {bySourceItems && bySourceItems.length > 0 && (
-            <Div className="rounded-lg border bg-card p-4">
-              <Div className="flex items-center gap-2 mb-3">
-                <Span className="text-sm font-semibold">
-                  {t("widget.bySource")}
-                </Span>
-                <Span className="text-xs text-muted-foreground">
-                  {t("widget.clickToFilter")}
-                </Span>
-              </Div>
+            <SectionGroup
+              title={t("widget.bySource")}
+              subtitle={t("widget.clickToFilter")}
+            >
               <Div className="flex flex-col gap-1">
                 {bySourceItems.slice(0, 8).map((item) => (
                   <ClickableBarRow
@@ -1038,7 +924,7 @@ export function LeadsStatsContainer({
                   />
                 ))}
               </Div>
-            </Div>
+            </SectionGroup>
           )}
 
           <RawGroupedStatsSection
@@ -1055,47 +941,37 @@ export function LeadsStatsContainer({
 
       {/* Top performing campaigns */}
       {topCampaigns.length > 0 && (
-        <Div className="rounded-lg border bg-card p-4">
-          <Span className="text-sm font-semibold mb-3 block">
-            {t("widget.topPerformingCampaigns")}
-          </Span>
+        <SectionGroup title={t("widget.topPerformingCampaigns")}>
           <Div className="flex flex-col gap-2">
-            {topCampaigns.slice(0, 5).map((campaign, i) => {
-              return (
-                <Div key={i} className="flex items-center gap-3 text-sm">
-                  <Span className="w-5 text-muted-foreground text-xs">
-                    {i + 1}.
-                  </Span>
-                  <Span className="flex-1 truncate">
-                    {campaign.campaignName}
-                  </Span>
-                  {campaign.openRate !== null &&
-                    campaign.openRate !== undefined && (
-                      <Span className="text-xs text-muted-foreground">
-                        {(campaign.openRate * 100).toFixed(1)}
-                        {t("widget.openRateSuffix")}
-                      </Span>
-                    )}
-                  {campaign.leadsGenerated !== null &&
-                    campaign.leadsGenerated !== undefined && (
-                      <Span className="text-xs font-medium">
-                        {campaign.leadsGenerated.toLocaleString()}
-                      </Span>
-                    )}
-                </Div>
-              );
-            })}
+            {topCampaigns.slice(0, 5).map((campaign, i) => (
+              <Div key={i} className="flex items-center gap-3 text-sm">
+                <Span className="w-5 text-muted-foreground text-xs">
+                  {i + 1}.
+                </Span>
+                <Span className="flex-1 truncate">{campaign.campaignName}</Span>
+                {campaign.openRate !== null &&
+                  campaign.openRate !== undefined && (
+                    <Span className="text-xs text-muted-foreground">
+                      {(campaign.openRate * 100).toFixed(1)}
+                      {t("widget.openRateSuffix")}
+                    </Span>
+                  )}
+                {campaign.leadsGenerated !== null &&
+                  campaign.leadsGenerated !== undefined && (
+                    <Span className="text-xs font-medium">
+                      {campaign.leadsGenerated.toLocaleString()}
+                    </Span>
+                  )}
+              </Div>
+            ))}
           </Div>
-        </Div>
+        </SectionGroup>
       )}
 
       {/* Top sources */}
       {topSources.length > 0 && (
-        <Div className="rounded-lg border bg-card p-4">
-          <Div className="flex items-center justify-between mb-3">
-            <Span className="text-sm font-semibold">
-              {t("widget.topSources")}
-            </Span>
+        <SectionGroup title={t("widget.topSources")}>
+          <Div className="flex items-center justify-end -mt-2 mb-1">
             <Button
               type="button"
               variant="ghost"
@@ -1142,47 +1018,42 @@ export function LeadsStatsContainer({
               );
             })}
           </Div>
-        </Div>
+        </SectionGroup>
       )}
 
       {/* Recent activity */}
       {recentActivity.length > 0 && (
-        <Div className="rounded-lg border bg-card p-4">
-          <Span className="text-sm font-semibold mb-3 block">
-            {t("widget.recentActivity")}
-          </Span>
+        <SectionGroup title={t("widget.recentActivity")}>
           <Div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
-            {recentActivity.slice(0, 20).map((act, i) => {
-              return (
-                <Div
-                  key={i}
-                  className="flex items-start gap-3 text-sm py-1 border-b last:border-0"
-                >
-                  <Div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-1.5" />
-                  <Div className="flex-1 min-w-0">
-                    <Span className="text-muted-foreground text-xs">
-                      {leadsT(act.type)}
-                    </Span>
-                    {act.leadEmail && (
-                      <Span className="ml-2 truncate">{act.leadEmail}</Span>
-                    )}
-                    {act.details?.status && (
-                      <Span className="ml-2 text-xs text-muted-foreground">
-                        ({leadsT(act.details.status)})
-                      </Span>
-                    )}
-                  </Div>
-                  {act.timestamp && (
-                    <Span className="text-xs text-muted-foreground flex-shrink-0">
-                      {new Date(act.timestamp).toLocaleDateString()}
+            {recentActivity.slice(0, 20).map((act, i) => (
+              <Div
+                key={i}
+                className="flex items-start gap-3 text-sm py-1 border-b last:border-0"
+              >
+                <Div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-1.5" />
+                <Div className="flex-1 min-w-0">
+                  <Span className="text-muted-foreground text-xs">
+                    {leadsT(act.type)}
+                  </Span>
+                  {act.leadEmail && (
+                    <Span className="ml-2 truncate">{act.leadEmail}</Span>
+                  )}
+                  {act.details?.status && (
+                    <Span className="ml-2 text-xs text-muted-foreground">
+                      ({leadsT(act.details.status)})
                     </Span>
                   )}
                 </Div>
-              );
-            })}
+                {act.timestamp && (
+                  <Span className="text-xs text-muted-foreground flex-shrink-0">
+                    {new Date(act.timestamp).toLocaleDateString(locale)}
+                  </Span>
+                )}
+              </Div>
+            ))}
           </Div>
-        </Div>
+        </SectionGroup>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

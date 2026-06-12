@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     products: "Produkty",
     catalog: "Katalog",
@@ -6,6 +7,7 @@ export const translations = {
   },
   get: {
     title: "Pobierz produkt z katalogu",
+    titleShort: "Szczegóły produktu",
     description: "Pobierz jeden produkt z katalogu na podstawie ID.",
     productId: {
       label: "ID produktu",
@@ -88,6 +90,7 @@ export const translations = {
       billingYearly: "Rocznie",
       addToInvoice: "Dodaj do faktury",
       details: "Szczegóły",
+      select: "Wybierz produkt",
     },
   },
 };

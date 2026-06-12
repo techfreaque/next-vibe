@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Diese Instanz umbenennen",
+    titleShort: "Instanz umbenennen",
     description: "Anzeigenamen dieser Instanz aktualisieren",
     newInstanceId: {
       label: "Neue Instanz-ID",

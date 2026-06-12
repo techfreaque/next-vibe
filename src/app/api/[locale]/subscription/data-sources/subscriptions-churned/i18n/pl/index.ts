@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Utracone subskrypcje",
+    titleShort: "Utracone",
     description:
       "Utracone subskrypcje (zakończone) na przedział rozdzielczości",
     fields: {

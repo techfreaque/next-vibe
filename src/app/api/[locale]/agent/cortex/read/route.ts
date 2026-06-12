@@ -8,8 +8,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger, t }) => {
-      return CortexReadRepository.readFile({
+    handler: async ({ data, user, locale, logger, t }) =>
+      CortexReadRepository.readFile({
         userId: user.id,
         user,
         locale,
@@ -17,7 +17,6 @@ export const { GET, tools } = endpointsHandler({
         maxLines: data.maxLines,
         logger,
         t,
-      });
-    },
+      }),
   },
 });

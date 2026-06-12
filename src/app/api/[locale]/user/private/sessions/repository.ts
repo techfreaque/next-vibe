@@ -165,4 +165,29 @@ export class SessionManagementRepository {
       });
     }
   }
+
+  /**
+   * Resolve current token from request headers or cookies, then list sessions.
+   */
+  static async listWithTokenResolution(
+    user: JwtPrivatePayloadType,
+    logger: EndpointLogger,
+    request: Request | undefined,
+    t: PrivateSessionsT,
+  ): Promise<ResponseType<SessionsGetResponseOutput>> {
+    const { cookies } = await import("next-vibe-ui/lib/headers");
+    let currentToken: string | undefined;
+    if (request) {
+      const authHeader = request.headers.get("authorization");
+      if (authHeader?.startsWith("Bearer ")) {
+        currentToken = authHeader.slice(7);
+      }
+    }
+    if (!currentToken) {
+      const { AUTH_TOKEN_COOKIE_NAME } = await import("@/config/constants");
+      const cookieStore = await cookies();
+      currentToken = cookieStore.get(AUTH_TOKEN_COOKIE_NAME)?.value;
+    }
+    return SessionManagementRepository.list(user, currentToken, logger, t);
+  }
 }

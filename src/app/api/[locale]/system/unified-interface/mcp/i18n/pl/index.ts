@@ -70,6 +70,7 @@ export const translations: typeof enTranslations = {
     },
     post: {
       title: "Wykonaj narzędzie MCP",
+      titleShort: "Serwer MCP",
       description: "Wykonaj narzędzie MCP według nazwy z argumentami",
       fields: {
         title: "Parametry wykonania narzędzia",
@@ -147,6 +148,7 @@ export const translations: typeof enTranslations = {
     },
     post: {
       title: "Uruchom serwer MCP",
+      titleShort: "Serwer MCP",
       description: "Uruchom serwer Model Context Protocol",
       response: {
         title: "Status serwera MCP",

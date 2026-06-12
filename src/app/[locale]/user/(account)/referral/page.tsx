@@ -17,7 +17,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getReferralParams, scopedTranslation as pageT } from "./i18n";
+import { scopedTranslation as pageT } from "./i18n";
+import { getReferralParams } from "./i18n/utils";
 import { ReferralPageClient } from "./page-client";
 
 interface ReferralPageProps {

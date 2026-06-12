@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Zbuduj aplikację",
+    titleShort: "Zbuduj aplikację",
     description: "Zbuduj aplikację do wdrożenia produkcyjnego",
     form: {
       title: "Konfiguracja budowania",

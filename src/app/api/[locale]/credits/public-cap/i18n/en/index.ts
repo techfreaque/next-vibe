@@ -5,6 +5,7 @@ export const translations = {
   },
   get: {
     title: "Get Public Free-Tier Cap",
+    titleShort: "Free-Tier Cap",
     description: "View today's global free-tier credit spend and cap",
     container: {
       title: "Public Free-Tier Daily Cap",
@@ -73,6 +74,7 @@ export const translations = {
   },
   post: {
     title: "Update Public Free-Tier Cap",
+    titleShort: "Update Cap",
     description:
       "Update the global daily credit spend cap for non-paying users",
     capAmount: {

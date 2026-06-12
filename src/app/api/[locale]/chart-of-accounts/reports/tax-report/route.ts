@@ -8,8 +8,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, logger, user, locale }) => {
-      return await TaxReportRepository.getTaxReport(data, logger, user, locale);
-    },
+    handler: async ({ data, logger, user, locale }) =>
+      TaxReportRepository.getTaxReport(data, logger, user, locale),
   },
 });

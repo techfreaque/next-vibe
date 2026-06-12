@@ -3,6 +3,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Utworzone wątki czatu",
+    titleShort: "Nowe wątki",
     description: "Liczba nowych wątków czatu na przedział rozdzielczości",
     fields: {
       resolution: {

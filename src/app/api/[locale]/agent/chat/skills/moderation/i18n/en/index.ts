@@ -5,6 +5,7 @@ export const translations = {
   },
   get: {
     title: "Reported Skills",
+    titleShort: "Moderation",
     description: "List skills with reports, sorted by report count",
     fields: {
       minReports: {
@@ -71,6 +72,7 @@ export const translations = {
   },
   patch: {
     title: "Moderate Skill",
+    titleShort: "Moderate Skill",
     description: "Hide a reported skill or clear its reports",
     fields: {
       id: {

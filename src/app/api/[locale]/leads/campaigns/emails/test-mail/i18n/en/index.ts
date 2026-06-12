@@ -6,6 +6,7 @@ export const translations = {
   },
   post: {
     title: "Test Mail",
+    titleShort: "Test Email",
     description: "Send test email with custom lead data",
     form: {
       title: "Test Mail Configuration",

@@ -8,8 +8,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger, t }) => {
-      return CortexTreeRepository.getTree({
+    handler: async ({ data, user, locale, logger, t }) =>
+      CortexTreeRepository.getTree({
         userId: user.id,
         user,
         locale,
@@ -17,7 +17,6 @@ export const { GET, tools } = endpointsHandler({
         maxDepth: data.depth,
         logger,
         t,
-      });
-    },
+      }),
   },
 });

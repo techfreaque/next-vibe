@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,10 +31,12 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "performance-stop-trace"],
+  aliases: ["browser-performance-stop-trace"] as const,
   title: "performance-stop-trace.title",
+  titleShort: "performance-stop-trace.titleShort",
   description: "performance-stop-trace.description",
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserDevTools",
+  category: "browser",
+  subCategory: "DevTools",
   icon: "pause-circle",
   tags: [
     "performance-stop-trace.tags.browserAutomation",
@@ -59,6 +62,8 @@ const { POST } = createEndpoint({
             "The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).",
           ),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

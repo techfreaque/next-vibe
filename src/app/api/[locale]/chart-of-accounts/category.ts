@@ -3,13 +3,8 @@
  * Covers chart of accounts, journal entries, ledger reports, and accounting periods.
  */
 
-import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
 import { ACCOUNTING_DASHBOARD_ALIAS } from "@/app/api/[locale]/chart-of-accounts/dashboard/constants";
-import { COA_ACCOUNT_LIST_ALIAS } from "@/app/api/[locale]/chart-of-accounts/account/list/constants";
-import { COA_JOURNAL_LIST_ALIAS } from "@/app/api/[locale]/chart-of-accounts/journal/list/constants";
-import { COA_PERIOD_LIST_ALIAS } from "@/app/api/[locale]/chart-of-accounts/period/list/constants";
-import { COA_BALANCE_SHEET_ALIAS } from "@/app/api/[locale]/chart-of-accounts/reports/balance-sheet/constants";
-import { COA_SETUP_ALIAS } from "@/app/api/[locale]/chart-of-accounts/setup/constants";
+import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
 
 export const category: CategoryDefinition = {
   key: "accounting",
@@ -33,7 +28,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Konten",
         "pl-PL": "Konta",
       },
-      defaultEntry: COA_ACCOUNT_LIST_ALIAS,
     },
     Journal: {
       icon: "edit",
@@ -44,7 +38,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Journal",
         "pl-PL": "Dziennik",
       },
-      defaultEntry: COA_JOURNAL_LIST_ALIAS,
     },
     Ledger: {
       icon: "bar-chart-2",
@@ -55,7 +48,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Hauptbuch",
         "pl-PL": "Księga główna",
       },
-      defaultEntry: COA_BALANCE_SHEET_ALIAS,
     },
     Periods: {
       icon: "calendar",
@@ -66,7 +58,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Perioden",
         "pl-PL": "Okresy",
       },
-      defaultEntry: COA_PERIOD_LIST_ALIAS,
     },
     Accounting: {
       icon: "settings",
@@ -77,7 +68,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Einrichtung",
         "pl-PL": "Konfiguracja",
       },
-      defaultEntry: COA_SETUP_ALIAS,
     },
   },
 };

@@ -30,11 +30,12 @@ export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["referral", "earnings", "list"],
-  title: "earnings.list.get.title",
-  description: "earnings.list.get.description",
-  category: "endpointCategories.referral",
-  subCategory: "endpointCategories.referralProgram",
-  icon: "dollar-sign",
+  title: "earnings.list.get.title" as const,
+  titleShort: "earnings.list.get.titleShort" as const,
+  description: "earnings.list.get.description" as const,
+  category: "referral" as const,
+  subCategory: "Program" as const,
+  icon: "dollar-sign" as const,
   tags: ["tags.referral", "tags.earnings", "tags.list"],
   allowedRoles: [
     UserRole.CUSTOMER,
@@ -45,8 +46,8 @@ export const { GET } = createEndpoint({
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
-    title: "get.form.title",
-    description: "get.form.description",
+    title: "get.form.title" as const,
+    description: "get.form.description" as const,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
@@ -63,15 +64,15 @@ export const { GET } = createEndpoint({
       limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "get.form.limit.label",
-        description: "get.form.limit.description",
+        label: "get.form.limit.label" as const,
+        description: "get.form.limit.description" as const,
         schema: z.coerce.number().positive().optional(),
       }),
       offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "get.form.offset.label",
-        description: "get.form.offset.description",
+        label: "get.form.offset.label" as const,
+        description: "get.form.offset.description" as const,
         schema: z.coerce.number().min(0).optional(),
       }),
 
@@ -86,47 +87,47 @@ export const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.id",
+              content: "get.response.earnings.id" as const,
               schema: z.string(),
             }),
             earnerUserId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.earnerUserId",
+              content: "get.response.earnings.earnerUserId" as const,
               schema: z.string(),
             }),
             sourceUserId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.sourceUserId",
+              content: "get.response.earnings.sourceUserId" as const,
               schema: z.string(),
             }),
             transactionId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.transactionId",
+              content: "get.response.earnings.transactionId" as const,
               schema: z.string(),
             }),
             level: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.level",
+              content: "get.response.earnings.level" as const,
               schema: z.coerce.number(),
             }),
             amountCents: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.amountCents",
+              content: "get.response.earnings.amountCents" as const,
               schema: z.coerce.number(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.currency",
+              content: "get.response.earnings.currency" as const,
               schema: z.string(),
             }),
             status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.status",
+              content: "get.response.earnings.status" as const,
               schema: z.string(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.createdAt",
+              content: "get.response.earnings.createdAt" as const,
               schema: z.string(),
             }),
           },
@@ -134,7 +135,7 @@ export const { GET } = createEndpoint({
       }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalCount",
+        content: "get.response.totalCount" as const,
         schema: z.coerce.number(),
       }),
     },
@@ -154,49 +155,49 @@ export const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.network.title",
-      description: "errors.network.description",
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.unauthorized.title",
-      description: "errors.unauthorized.description",
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title",
-      description: "errors.forbidden.description",
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title",
-      description: "errors.notFound.description",
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.serverError.title",
-      description: "errors.serverError.description",
+      title: "errors.serverError.title" as const,
+      description: "errors.serverError.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.unknown.title",
-      description: "errors.unknown.description",
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.unsavedChanges.title",
-      description: "errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "success.title",
-    description: "success.description",
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 });
 
 export type EarningsListGetResponseOutput = typeof GET.types.ResponseOutput;
 
-export default { GET };
+export default { GET } as const;

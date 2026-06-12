@@ -6,7 +6,8 @@ export const translations = {
     ai: "AI",
   },
   get: {
-    title: "List AI Models",
+    title: "Models",
+    titleShort: "AI Models",
     description:
       "Browse and search all available AI models. Filter by type, content level, intelligence, price, or capabilities. Use this to find the right model for your task.",
     dynamicTitle: "{{count}} models",
@@ -125,4 +126,4 @@ export const translations = {
       ctx: "ctx",
     },
   },
-} as const;
+};

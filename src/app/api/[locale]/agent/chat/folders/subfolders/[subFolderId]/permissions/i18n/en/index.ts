@@ -6,6 +6,7 @@ export const translations = {
   },
   get: {
     title: "Get Folder Permissions",
+    titleShort: "Folder Access",
     description: "Retrieve the list of moderators for a specific folder",
     noData: "No data available",
     edit: "Edit",
@@ -108,6 +109,7 @@ export const translations = {
   },
   patch: {
     title: "Update Folder Permissions",
+    titleShort: "Folder Access",
     description: "Update the list of moderators for a specific folder",
     container: {
       title: "Update Folder Permissions",

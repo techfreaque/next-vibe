@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Buchhaltungsperioden",
+    titleShort: "Perioden",
     description: "Alle Buchhaltungsperioden eines Unternehmens auflisten",
     companyId: {
       label: "Unternehmens-ID",

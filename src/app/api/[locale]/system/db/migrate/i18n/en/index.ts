@@ -4,6 +4,7 @@ export const translations = {
   tag: "migration",
   post: {
     title: "Database Migration",
+    titleShort: "Migrate DB",
     description: "Run database migrations",
     form: {
       title: "Migration Configuration",

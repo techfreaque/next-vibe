@@ -1,5 +1,6 @@
 export const translations = {
   title: "Oxlint",
+  titleShort: "Oxlint",
   description:
     "Run Oxlint (fast Rust linter) on your codebase. Use vibe-check for comprehensive checks (ESLint + Oxlint + TypeScript). Note: Default values are configurable in check.config.ts.",
   category: "System Checks",

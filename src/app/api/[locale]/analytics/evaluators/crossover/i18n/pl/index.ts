@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Przecięcie",
+    titleShort: "Przecięcie",
     description: "Uruchamia się, gdy seria A przecina serię B od dołu",
     fields: {
       seriesA: {

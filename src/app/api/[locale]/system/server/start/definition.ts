@@ -31,16 +31,17 @@ const { POST } = createEndpoint({
   path: ["system", "server", "start"],
   aliases: START_ALIASES,
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.server",
-  subCategory: "endpointCategories.serverManagement",
+  category: "devTools",
+  subCategory: "serverManagement",
   tags: ["tags.start"],
   icon: "zap",
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.AI_TOOL_OFF,
     UserRole.WEB_OFF,
-    UserRole.CLI_AUTH_BYPASS,
   ],
 
   fields: objectField(scopedTranslation, {

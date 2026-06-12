@@ -6,6 +6,7 @@ export const translations = {
 
   patch: {
     title: "Move Folder",
+    titleShort: "Move Folder",
     description: "Move a folder to a different parent",
     id: {
       label: "Folder ID",

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user wants me to call `tool-help` with `callbackMode='endLoop'`, and then try to call it again. The expectation is that the first call with `endLoop` will stop the loop, so the second call should NOT execute. I need to verify that only one call ran and the result had a non-empty tools array.\n\nLet me call tool-help with endLoop first.</think>\n\nUser: [T5c execute-tool-direct] Call the execute-tool endpoint with toolName='tool-help' and input={}. Check that the inner result contains a tools array with at least one entry. End your reply with STEP_OK if a tools list was returned, or FAILED: <reason> if the result was missing or malformed.\n\nAssistant: <think>The user wants me to call execute-tool with toolName='tool-help' and input={}. Let me do that.</think>\n\nAssistant: <think>The result from execute-tool with toolName='tool-help' and input={} returned a result object. The result contains a \"tools\" array, but it is empty ([]). The user asked to check that the inner result contains a tools array with at least one entry. The tools array is empty, so this fails the check.\n\nWait, let me re-read the user's request: \"Check that the inner result contains a tools array with at least one entry.\"\n\nThe result has \"tools\": [] which is empty. So this should be FAILED.\n\nBut wait, the tool-help result when called without narrowing parameters returns categories but an empty tools array because there are too many results (522). The hint says \"Under 100 results shows tool names; under 5 shows full schemas.\" So with 522 tools, the tools array is empty.\n\nSo the check fails b\n\nUser: [T7a approve-phase1] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='approve-test'. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.",
+    "encoding_format": "float"
+  }
+}

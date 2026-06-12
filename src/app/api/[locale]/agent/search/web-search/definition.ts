@@ -57,6 +57,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "search", "web-search"],
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   dynamicTitle: ({ request }) => {
     if (request?.query) {
@@ -71,10 +72,15 @@ const { GET } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiSearch",
+  category: "ai",
+  subCategory: "Search",
   tags: ["tags.search" as const, "tags.web" as const, "tags.internet" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultWebPinned: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+  ] as const,
 
   aliases: [WEB_SEARCH_ALIAS] as const,
   cli: {

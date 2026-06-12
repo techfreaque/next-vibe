@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Generate Prompt Fragments",
+    titleShort: "Prompt Fragments",
     description: "Generate prompt fragments index with dynamic imports",
     container: {
       title: "Prompt Fragments Generation",

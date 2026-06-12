@@ -1,6 +1,7 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Free Grants",
     title: "Credits Free Grants",
     description: "Sum of free credit grant transactions per resolution bucket",
     fields: {

@@ -14,11 +14,11 @@ export const { tools } = endpointsHandler({
   endpoint: guardDestroyEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger, t }) => {
-      const { GuardDestroyRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return GuardDestroyRepository.destroyGuard(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).GuardDestroyRepository.destroyGuard(data, logger, t),
   },
 });

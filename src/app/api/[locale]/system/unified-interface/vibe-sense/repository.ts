@@ -75,7 +75,7 @@ interface GraphEditInput {
   slug?: string;
   name?: string;
   description?: string;
-  config: GraphConfig;
+  config?: GraphConfig;
 }
 
 interface GraphTriggerInput {
@@ -405,16 +405,6 @@ export class VibeSenseRepository {
   ): Promise<ResponseType<GraphEditPutResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      // Validate config referential integrity
-      const configError = VibeSenseRepository.validateConfig(
-        data.config,
-        t,
-        logger,
-      );
-      if (configError) {
-        return configError;
-      }
-
       const rows = await db
         .select()
         .from(pipelineGraphs)
@@ -427,6 +417,18 @@ export class VibeSenseRepository {
           message: t("graphs.edit.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
+      }
+
+      const resolvedConfig: GraphConfig = data.config ?? parent.config;
+
+      // Validate config referential integrity
+      const configError = VibeSenseRepository.validateConfig(
+        resolvedConfig,
+        t,
+        logger,
+      );
+      if (configError) {
+        return configError;
       }
 
       // System graphs are read-only - cannot branch from system directly
@@ -480,7 +482,7 @@ export class VibeSenseRepository {
           ownerType: GraphOwnerType.ADMIN,
           ownerId: user.id!,
           parentVersionId: parent.id,
-          config: data.config,
+          config: resolvedConfig,
           isActive: true,
         })
         .returning({ id: pipelineGraphs.id });

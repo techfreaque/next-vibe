@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Leady",
   tag: "Łączenie po IP",
   task: {
@@ -7,6 +8,7 @@ export const translations = {
   },
   post: {
     title: "Łączenie po IP",
+    titleShort: "Łączenie IP",
     description: "Łącz anonimowe leady dzielące ten sam adres IP",
     container: {
       title: "Łączenie po IP",

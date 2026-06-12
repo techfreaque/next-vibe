@@ -19,6 +19,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import { THREAD_FILES_ALIAS } from "./constants";
 
 /**
  * Endpoint definition
@@ -27,10 +28,12 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads", "files", "[threadId]", "[filename]"],
+  aliases: [THREAD_FILES_ALIAS] as const,
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
-  category: "endpointCategories.messages",
-  subCategory: "endpointCategories.messagesFiles",
+  category: "ai",
+  subCategory: "messagesFiles",
   icon: "download" as const,
   tags: ["tags.files" as const],
   allowedRoles: [

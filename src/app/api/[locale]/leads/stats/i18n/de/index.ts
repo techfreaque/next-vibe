@@ -6,6 +6,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Lead-Statistiken",
+  titleShort: "Lead-Statistiken",
   description:
     "Umfassende Lead-Statistiken und Analysen mit historischen Daten",
   category: "Lead-Verwaltung",

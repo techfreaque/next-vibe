@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Delta",
+    titleShort: "Delta",
     description:
       "Differenz zwischen aufeinanderfolgenden Werten - misst die Änderungsrate",
     fields: {

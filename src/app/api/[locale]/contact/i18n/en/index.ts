@@ -4,6 +4,7 @@
 
 export const translations = {
   title: "Talk to a Human",
+  titleShort: "Contact Us",
   description:
     "Something isn't working, or you just want to talk to a real person. We're here. Describe what you need and a human on our team will read it and reply.",
   category: "System",

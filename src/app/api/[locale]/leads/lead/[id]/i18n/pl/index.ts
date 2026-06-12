@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Pobierz szczegóły leada",
+    titleShort: "Szczegóły leada",
     description: "Pobierz szczegółowe informacje o określonym leadzie",
     backButton: {
       label: "Powrót do leadów",
@@ -275,6 +276,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Zaktualizuj leada",
+    titleShort: "Edytuj leada",
     description: "Zaktualizuj informacje i status leada",
     backButton: {
       label: "Powrót do leada",
@@ -710,6 +712,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Usuń leada",
+    titleShort: "Usuń leada",
     description: "Usuń leada z systemu",
     container: {
       title: "Usuń leada",

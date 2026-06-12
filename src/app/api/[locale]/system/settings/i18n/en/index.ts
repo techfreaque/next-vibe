@@ -15,6 +15,7 @@ export const translations = {
 
   get: {
     title: "System Settings",
+    titleShort: "System Settings",
     description: "View and manage environment configuration grouped by module",
     tags: {
       settings: "Settings",
@@ -85,6 +86,7 @@ export const translations = {
 
   patch: {
     title: "Update Settings",
+    titleShort: "Update Settings",
     description: "Update environment configuration values in the .env file",
     tags: {
       settings: "Settings",
@@ -254,6 +256,7 @@ export const translations = {
 
   post: {
     title: "Sign In to unbottled.ai",
+    titleShort: "Unbottled Login",
     description:
       "Server-side proxy login — credentials never leave your server",
     tags: { settings: "Unbottled Login" },

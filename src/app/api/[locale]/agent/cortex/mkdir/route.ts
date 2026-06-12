@@ -8,8 +8,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger, t }) => {
-      return CortexMkdirRepository.createDirectory({
+    handler: async ({ data, user, locale, logger, t }) =>
+      CortexMkdirRepository.createDirectory({
         userId: user.id,
         user,
         locale,
@@ -18,7 +18,6 @@ export const { POST, tools } = endpointsHandler({
         createParents: data.createParents,
         logger,
         t,
-      });
-    },
+      }),
   },
 });

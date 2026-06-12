@@ -1,10 +1,11 @@
-import type { translations as en } from "../en";
+import type { translations as enTranslations } from "../en";
 
-export const translations: typeof en = {
+export const translations: typeof enTranslations = {
   category: "Vibe Sense",
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Graph-Konfiguration ausführen",
+    titleShort: "Konfiguration ausführen",
     description:
       "Einen Graphen aus einer Inline-Konfiguration ausführen, ohne einen gespeicherten Graphen zu benötigen",
     fields: {

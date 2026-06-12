@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Massenaufgabenaktion",
+    titleShort: "Massen-Tasks",
     description:
       "Führe eine Massenaktion (löschen, aktivieren, deaktivieren, ausführen) auf mehreren Cron-Aufgaben durch",
     fields: {

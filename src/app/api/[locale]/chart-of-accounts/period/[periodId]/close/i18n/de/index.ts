@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Periode abschließen",
+    titleShort: "Periode schließen",
     description:
       "Buchhaltungsperiode abschließen. Es dürfen keine Buchungen im Entwurfsstatus vorhanden sein.",
     periodId: {

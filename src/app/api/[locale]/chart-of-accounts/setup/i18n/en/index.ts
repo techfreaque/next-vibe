@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Initialize Chart of Accounts",
+    titleShort: "Setup",
     description:
       "Set up a company's chart of accounts from a country-specific template. Idempotent — safe to run multiple times.",
     companyId: {

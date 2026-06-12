@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Generuj indeks zadań",
+    titleShort: "Indeks zadań",
     description: "Generuj pliki indeksu zadań",
     container: {
       title: "Generowanie indeksu zadań",

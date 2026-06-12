@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Zbiorcza akcja na zadaniach",
+    titleShort: "Masowe zadania",
     description:
       "Wykonaj zbiorczą akcję (usuń, włącz, wyłącz, uruchom) na wielu zadaniach cron",
     fields: {

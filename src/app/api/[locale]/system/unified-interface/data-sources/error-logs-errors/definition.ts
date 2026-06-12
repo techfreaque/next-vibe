@@ -21,7 +21,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { ERROR_LOGS_ERRORS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 const ErrorLogsErrorsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ErrorLogsErrorsWidget })),
 );
@@ -32,6 +32,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "unified-interface", "data-sources", "error-logs-errors"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
   category: "analytics",

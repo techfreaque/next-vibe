@@ -12,9 +12,9 @@ import electronBuildDefinition from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: electronBuildDefinition,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { ElectronBuildRepository } = await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository");
-      return ElectronBuildRepository.electronBuildRepository(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      )).ElectronBuildRepository.electronBuildRepository(data, logger, t),
   },
 });

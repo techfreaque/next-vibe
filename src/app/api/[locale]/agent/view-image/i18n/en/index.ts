@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "View Image",
+    titleShort: "View Image",
     description:
       "Fetch and display a previously captured image by its storage URL. Use this to re-examine a screenshot or image from an earlier turn.",
     dynamicTitle: "View: {{url}}",

@@ -1,13 +1,97 @@
-import { translations as componentsTranslations } from "../../components/i18n/en";
-import { translations as emailHandlingTranslations } from "../../email-handling/i18n/en";
-import { translations as emailSendingTranslations } from "../../email-sending/i18n/en";
-
 export const translations = {
   tag: "SMTP Client",
   category: "Email Services",
-  components: componentsTranslations,
-  emailSending: emailSendingTranslations,
-  emailHandling: emailHandlingTranslations,
+  components: {
+    email: {
+      tagline: "Free speech AI platform",
+      footer: {
+        needHelp: "Need help?",
+        helpText: "Need help? Contact us at",
+        unsubscribeText: "Don't want to receive these emails?",
+        unsubscribeLink: "Unsubscribe",
+        copyright: "© {{currentYear}} {{appName}}. All rights reserved.",
+        visitWebsite: "Visit Website",
+        allRightsReserved:
+          "© {{currentYear}} {{appName}}. All rights reserved.",
+        feedbackHook: "Got something to say? Reply - we actually read it.",
+        feedbackBody:
+          "Report a bug, request a feature, or tell us what's missing. Useful feedback earns you {{credits}} credits — a full month on us.",
+        feedbackLink: "Reply with feedback →",
+        footerSeparator: " · ",
+      },
+    },
+    post: {
+      title: "Components",
+      description: "Components endpoint",
+      form: {
+        title: "Components Configuration",
+        description: "Configure components parameters",
+      },
+      response: {
+        title: "Response",
+        description: "Components response data",
+      },
+      errors: {
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        validation: {
+          title: "Validation Error",
+          description: "Invalid request parameters",
+        },
+        server: {
+          title: "Server Error",
+          description: "Internal server error occurred",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unknown error occurred",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error occurred",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access forbidden",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "Resource not found",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "Data conflict occurred",
+        },
+      },
+      success: {
+        title: "Success",
+        description: "Operation completed successfully",
+      },
+    },
+  },
+  emailSending: {
+    email: {
+      defaultSenderName: "System",
+      errors: {
+        sending_failed: "Failed to send email to {{recipient}}",
+      },
+    },
+  },
+  emailHandling: {
+    email: {
+      errors: {
+        rendering_failed: "Failed to render email template",
+        send_failed: "Failed to send email",
+        email_failed_subject: "Email Failed",
+        unknown_recipient: "Unknown recipient",
+        unknown_sender: "System",
+        email_render_exception: "Email rendering exception occurred",
+        batch_send_failed: "Batch email send failed",
+      },
+    },
+  },
   sending: {
     errors: {
       unauthorized: {

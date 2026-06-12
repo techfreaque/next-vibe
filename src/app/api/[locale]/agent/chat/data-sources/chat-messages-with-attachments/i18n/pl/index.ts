@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Wiadomości czatu z załącznikami",
+    titleShort: "Załączniki",
     description:
       "Wiadomości zawierające załączniki plików na przedział rozdzielczości",
     fields: {

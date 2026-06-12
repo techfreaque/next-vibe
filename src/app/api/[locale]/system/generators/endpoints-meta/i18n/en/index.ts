@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Generate Endpoints Meta",
+    titleShort: "Endpoints Meta",
     description:
       "Generate localized endpoint metadata files for the tools modal",
     container: {

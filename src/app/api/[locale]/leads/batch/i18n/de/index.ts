@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
 
   patch: {
     title: "Batch-Aktualisierung",
+    titleShort: "Massenaktualisierung",
     description: "Leads basierend auf Filterkriterien in Stapeln aktualisieren",
     form: {
       title: "Batch-Aktualisierung-Konfiguration",
@@ -119,6 +120,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Batch-Löschung",
+    titleShort: "Massenlöschung",
     description: "Leads basierend auf Filterkriterien in Stapeln löschen",
     form: {
       title: "Batch-Löschung-Konfiguration",

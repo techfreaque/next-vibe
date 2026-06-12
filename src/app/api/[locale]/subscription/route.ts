@@ -4,6 +4,8 @@
  * Create, update, and cancel are in separate subdirectories
  */
 
+import "server-only";
+
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
@@ -14,12 +16,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: { GET: definition.GET },
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, logger, locale }) => {
-      return await SubscriptionRepository.getSubscription(
-        user.id,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ user, logger, locale }) =>
+      SubscriptionRepository.getSubscription(user.id, logger, locale),
   },
 });

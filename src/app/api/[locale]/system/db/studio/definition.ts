@@ -27,6 +27,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "db", "studio"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   category: "database",
   subCategory: "Tools",
@@ -34,9 +35,9 @@ const { POST } = createEndpoint({
   icon: "database",
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
-    UserRole.CLI_AUTH_BYPASS,
     UserRole.PRODUCTION_OFF,
   ],
   aliases: ["studio", "db:studio"],

@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Write File",
+    titleShort: "Write File",
     description: "Save a file. Give it a path and content - done.",
     dynamicTitle: "Saved: {{path}}",
     status: {

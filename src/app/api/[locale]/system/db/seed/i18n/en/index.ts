@@ -4,6 +4,7 @@ export const translations = {
   tag: "seed",
   post: {
     title: "Database Seed",
+    titleShort: "Seed DB",
     description: "Seed database with data",
     form: {
       title: "Seed Configuration",

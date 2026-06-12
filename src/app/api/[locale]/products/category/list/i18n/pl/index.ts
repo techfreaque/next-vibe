@@ -7,7 +7,8 @@ export const translations: typeof enTranslations = {
     list: "Lista",
   },
   get: {
-    title: "Lista kategorii produktów",
+    title: "Kategorie",
+    titleShort: "Kategorie",
     description: "Pobierz kategorie produktów dla firmy lub właściciela.",
     companyId: {
       label: "ID firmy",

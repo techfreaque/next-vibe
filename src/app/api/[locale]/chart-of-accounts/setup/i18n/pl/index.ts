@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Inicjalizacja planu kont",
+    titleShort: "Konfiguracja",
     description:
       "Konfiguruje plan kont firmy na podstawie szablonu krajowego. Idempotentny — bezpieczne wielokrotne uruchamianie.",
     companyId: {

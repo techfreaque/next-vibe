@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Lead-Engagement erfassen",
+    titleShort: "Engagement erfassen",
     description: "Neues Engagement-Ereignis für einen Lead erfassen",
     form: {
       title: "Lead-Engagement-Formular",
@@ -102,6 +103,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Lead-Klick verfolgen",
+    titleShort: "Klick verfolgen",
     description: "Lead-Klick verfolgen und zur Ziel-URL weiterleiten",
     form: {
       title: "Klick-Tracking-Parameter",

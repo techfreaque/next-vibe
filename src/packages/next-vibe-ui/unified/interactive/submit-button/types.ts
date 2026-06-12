@@ -1,0 +1,62 @@
+/**
+ * Submit Button Widget Type Definitions
+ */
+
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+
+import type {
+  SpacingSize,
+  WidgetType,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type {
+  BasePrimitiveDisplayOnlyWidgetConfig,
+  FieldUsageConfig,
+} from "../../_shared/types";
+
+/**
+ * Submit Button Widget Configuration
+ */
+export interface SubmitButtonWidgetConfig<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "widget",
+> extends BasePrimitiveDisplayOnlyWidgetConfig<TUsage, TSchemaType> {
+  type: WidgetType.SUBMIT_BUTTON;
+  text?: NoInfer<TKey>;
+  loadingText?: NoInfer<TKey>;
+  icon?: IconKey;
+  variant?:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "destructive"
+    | "ghost"
+    | "outline"
+    | "link";
+  size?: "default" | "sm" | "lg" | "icon";
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Spacing to the right of icon */
+  iconSpacing?: SpacingSize;
+}
+
+/**
+ * Type-safe submit button field for direct use in custom widgets.
+ * Usage: `<SubmitButtonWidget field={{ text: "key" } satisfies SubmitButtonField<typeof definition.POST>} />`
+ */
+export type SubmitButtonField<
+  TEndpoint extends { scopedTranslation: { ScopedTranslationKey: string } },
+> = Pick<
+  SubmitButtonWidgetConfig<
+    TEndpoint["scopedTranslation"]["ScopedTranslationKey"],
+    FieldUsageConfig,
+    "widget"
+  >,
+  | "text"
+  | "loadingText"
+  | "icon"
+  | "variant"
+  | "size"
+  | "iconSize"
+  | "iconSpacing"
+>;

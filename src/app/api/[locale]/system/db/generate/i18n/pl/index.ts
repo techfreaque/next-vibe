@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   tag: "migracja",
   post: {
     title: "Generuj migracje",
+    titleShort: "Generuj migracje",
     description: "Generuj pliki migracji Drizzle ze zmian schematu",
     form: {
       title: "Konfiguracja generowania",

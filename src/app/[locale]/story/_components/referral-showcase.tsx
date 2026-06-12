@@ -12,13 +12,13 @@ import { useInView } from "react-intersection-observer";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as referralScopedTranslation } from "@/app/[locale]/user/(account)/referral/i18n";
 import {
   getChainScenarios,
   getChainTotal,
   getCommissionRows,
   getReferralParams,
-  scopedTranslation as referralScopedTranslation,
-} from "@/app/[locale]/user/(account)/referral/i18n";
+} from "@/app/[locale]/user/(account)/referral/i18n/utils";
 
 interface ReferralShowcaseProps {
   locale: CountryLanguage;

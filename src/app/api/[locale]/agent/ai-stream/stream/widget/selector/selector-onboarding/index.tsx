@@ -3,7 +3,7 @@
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
-import { useWidgetUser } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetUser } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CompanionStep } from "./companion-step";

@@ -5,6 +5,7 @@ export const translations = {
   },
   post: {
     title: "Build Application",
+    titleShort: "Build App",
     description: "Build the application for production deployment",
     form: {
       title: "Build Configuration",

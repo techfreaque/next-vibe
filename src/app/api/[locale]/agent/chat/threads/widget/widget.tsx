@@ -5,6 +5,7 @@
 
 "use client";
 
+import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -124,6 +125,7 @@ function ThreadRow({
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
+  const { pushState } = useSilentHistory();
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
 
   const handleThreadClick = (e: DivMouseEvent): void => {
@@ -143,7 +145,7 @@ function ThreadRow({
     const url = thread.folderId
       ? `/${locale}/threads/${thread.rootFolderId}/${thread.folderId}/${thread.id}`
       : `/${locale}/threads/${thread.rootFolderId}/${thread.id}`;
-    window.history.pushState(null, "", url);
+    pushState(url);
   };
 
   const isIncognito = thread.rootFolderId === DefaultFolderId.INCOGNITO;

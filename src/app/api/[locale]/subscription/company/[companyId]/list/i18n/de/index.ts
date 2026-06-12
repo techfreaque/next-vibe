@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Unternehmensabonnements",
+    titleShort: "Unternehmens-Abos",
     description: "Alle Abonnements eines Unternehmens auflisten",
     companyId: {
       label: "Unternehmens-ID",

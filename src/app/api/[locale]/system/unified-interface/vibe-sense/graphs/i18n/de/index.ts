@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
 
   list: {
     title: "Pipeline-Graphen",
+    titleShort: "Graphen",
     description:
       "Alle fuer den aktuellen Benutzer sichtbaren Graphen auflisten",
     fields: {

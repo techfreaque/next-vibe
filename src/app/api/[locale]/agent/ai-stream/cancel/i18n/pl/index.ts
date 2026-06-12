@@ -1,10 +1,12 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "AI",
   tags: {
     streaming: "Streaming",
   },
   post: {
     title: "Anuluj strumień AI",
+    titleShort: "Anuluj strumień",
     description: "Anuluj aktywną odpowiedź strumieniową AI",
     container: {
       title: "Anuluj strumień",

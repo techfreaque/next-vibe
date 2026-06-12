@@ -21,7 +21,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { CREDITS_PURCHASED_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 const CreditsPurchasedWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CreditsPurchasedWidget })),
 );
@@ -32,6 +32,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["credits", "data-sources", "credits-purchased"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
   category: "analytics",

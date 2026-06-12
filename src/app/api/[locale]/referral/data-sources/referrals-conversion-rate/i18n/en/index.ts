@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Referral Conversion Rate",
+    titleShort: "Conversion Rate",
     description:
       "Signups per lead click - how many referral clicks turn into registered users",
     fields: {

@@ -29,6 +29,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { usePickerCallback } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/picker-context";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
@@ -219,13 +220,16 @@ export function LeadsSearchContainer({
   const data = useWidgetValue<typeof definition.GET>();
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
-  const { push: navigate } = useWidgetNavigation();
+  const { push: navigate, pop } = useWidgetNavigation();
   const form = useWidgetForm<typeof definition.GET>();
   const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
   const isFetching = endpointMutations?.read?.isFetching ?? false;
   const isLoading = isLoadingFresh;
 
   const t = useWidgetTranslation<typeof definition.GET>();
+
+  const onPick = usePickerCallback<Omit<Lead, "metadata">>();
+  const isPickerMode = !!onPick;
 
   const leads = data?.response?.leads ?? [];
   const total = data?.response?.total ?? 0;
@@ -237,13 +241,18 @@ export function LeadsSearchContainer({
 
   const handleViewLead = useCallback(
     (lead: Lead): void => {
+      if (isPickerMode && onPick) {
+        onPick(lead);
+        pop();
+        return;
+      }
       void (async (): Promise<void> => {
         const leadDef =
           await import("@/app/api/[locale]/leads/lead/[id]/definition");
         navigate(leadDef.default.GET, { urlPathParams: { id: lead.id } });
       })();
     },
-    [navigate],
+    [isPickerMode, onPick, pop, navigate],
   );
 
   const handleEditLead = useCallback(
@@ -412,16 +421,18 @@ export function LeadsSearchContainer({
                 {t("widget.noResultsSubtitle")}
               </Span>
             </Div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-1.5 mt-1"
-              onClick={handleCreateLead}
-            >
-              <Plus className="h-3.5 w-3.5" />
-              {t("widget.createLead")}
-            </Button>
+            {!isPickerMode && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1.5 mt-1"
+                onClick={handleCreateLead}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                {t("widget.createLead")}
+              </Button>
+            )}
           </Div>
         )}
 
@@ -539,36 +550,38 @@ export function LeadsSearchContainer({
                     )}
                   </Div>
 
-                  {/* Inline hover action buttons */}
-                  <Div
-                    className="hidden group-hover/row:flex items-center gap-1 absolute right-3 top-1/2 -translate-y-1/2 bg-background/95 backdrop-blur-sm border rounded-md px-1 py-0.5 shadow-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    <Button
-                      type="button"
-                      title={t("widget.editLeadTitle")}
+                  {/* Inline hover action buttons - hidden in picker mode */}
+                  {!isPickerMode && (
+                    <Div
+                      className="hidden group-hover/row:flex items-center gap-1 absolute right-3 top-1/2 -translate-y-1/2 bg-background/95 backdrop-blur-sm border rounded-md px-1 py-0.5 shadow-sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleEditLead(lead);
                       }}
-                      className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      type="button"
-                      title={t("widget.deleteLeadTitle")}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteLead(lead);
-                      }}
-                      className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </Div>
+                      <Button
+                        type="button"
+                        title={t("widget.editLeadTitle")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditLead(lead);
+                        }}
+                        className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        type="button"
+                        title={t("widget.deleteLeadTitle")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteLead(lead);
+                        }}
+                        className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </Div>
+                  )}
                 </Div>
               );
             })}

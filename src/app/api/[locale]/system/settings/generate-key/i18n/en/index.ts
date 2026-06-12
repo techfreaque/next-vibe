@@ -2,6 +2,7 @@ export const translations = {
   category: "System",
   get: {
     title: "Generate Secret Key",
+    titleShort: "Generate Key",
     description:
       "Generate a cryptographically secure random 64-character hex key",
     tags: {

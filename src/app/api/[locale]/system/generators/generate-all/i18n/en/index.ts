@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Generate All",
+    titleShort: "Generate All",
     description: "Run all code generators",
     container: {
       title: "Generate All Configuration",

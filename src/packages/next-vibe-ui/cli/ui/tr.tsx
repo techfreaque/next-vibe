@@ -4,7 +4,7 @@ import * as React from "react";
 
 import type { TrProps } from "../../web/ui/tr";
 import { parseClassesToBoxProps } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
-import { useIsMcp } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 export type { TrProps } from "../../web/ui/tr";
 

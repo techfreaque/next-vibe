@@ -4,6 +4,7 @@
 
 export const translations = {
   title: "Lead Statistics",
+  titleShort: "Lead Stats",
   description:
     "Comprehensive leads statistics and analytics with historical data",
   category: "Lead Management",

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Chat-Upvotes Gesamt",
+    titleShort: "Upvotes",
     description: "Summe der Nachrichten-Upvotes pro Auflösungs-Bucket",
     fields: {
       resolution: {

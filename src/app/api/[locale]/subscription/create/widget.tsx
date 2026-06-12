@@ -40,7 +40,7 @@ import {
 import {
   ProductIds,
   productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
+} from "@/app/api/[locale]/products/platform-products";
 import {
   BillingInterval,
   SubscriptionPlan,
@@ -49,6 +49,7 @@ import {
 import { useSubscription } from "@/app/api/[locale]/subscription/hooks";
 import {
   useWidgetForm,
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetOnSubmit,
   useWidgetTranslation,
@@ -56,7 +57,6 @@ import {
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { useTranslation } from "@/i18n/core/client";
 
 import FormAlertWidget from "../../system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
 import type definition from "./definition";
@@ -77,7 +77,7 @@ function formatPrice(price: number, locale: string, currency: string): string {
  */
 export function SubscriptionCreateContainer(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
-  const { locale } = useTranslation();
+  const locale = useWidgetLocale();
   const form = useWidgetForm();
   const value = useWidgetValue<typeof definition.POST>();
   const onSubmit = useWidgetOnSubmit();
@@ -139,9 +139,9 @@ export function SubscriptionCreateContainer(): JSX.Element {
     setIsProviderModalOpen(false);
 
     // Set form values
-    form.setValue("plan", SubscriptionPlan.SUBSCRIPTION);
-    form.setValue("billingInterval", billingInterval);
-    form.setValue("provider", provider);
+    form.setValue("plan", SubscriptionPlan.SUBSCRIPTION, { shouldDirty: true });
+    form.setValue("billingInterval", billingInterval, { shouldDirty: true });
+    form.setValue("provider", provider, { shouldDirty: true });
 
     // Submit form
     onSubmit?.();

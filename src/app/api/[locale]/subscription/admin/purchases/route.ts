@@ -3,6 +3,8 @@
  * Handles GET requests for listing credit pack purchases
  */
 
+import "server-only";
+
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
@@ -13,12 +15,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, logger, locale }) => {
-      return await SubscriptionAdminPurchasesRepository.listPurchases(
-        data,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ data, logger, locale }) =>
+      SubscriptionAdminPurchasesRepository.listPurchases(data, logger, locale),
   },
 });

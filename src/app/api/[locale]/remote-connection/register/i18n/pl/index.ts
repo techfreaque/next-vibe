@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Zarejestruj lokalną instancję",
+    titleShort: "Rejestruj instancję",
     description:
       "Wywoływane przez lokalną instancję podczas łączenia, aby zarejestrować się w chmurze",
     instanceId: {

@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Chat Share Links Created",
+    titleShort: "Share Links",
     description: "Number of thread share links created per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },

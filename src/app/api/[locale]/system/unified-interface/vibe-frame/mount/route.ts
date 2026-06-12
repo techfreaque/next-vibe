@@ -17,8 +17,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, locale, logger }) => {
-      return VibeFrameConfigRepository.config({ data, locale, logger });
-    },
+    handler: ({ data, locale, logger }) =>
+      VibeFrameConfigRepository.config({ data, locale, logger }),
   },
 });

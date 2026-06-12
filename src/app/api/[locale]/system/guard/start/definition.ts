@@ -27,9 +27,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "guard", "start"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.server",
-  subCategory: "endpointCategories.serverGuard",
+  category: "devTools",
+  subCategory: "serverGuard",
   tags: ["tag"],
   icon: "lock",
   allowedRoles: [

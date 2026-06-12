@@ -28,6 +28,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SKILL_REPORT_ALIAS } from "../../constants";
+import skillsListDefinition from "../../definition";
 import { scopedTranslation } from "./i18n";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
@@ -46,8 +47,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "alert-triangle",
-  category: "endpointCategories.skills",
-  subCategory: "endpointCategories.skillsCommunity",
+  category: "ai",
+  subCategory: "skillsCommunity",
   tags: ["tags.skills"],
 
   fields: customWidgetObject({
@@ -56,7 +57,9 @@ const { POST } = createEndpoint({
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: skillsListDefinition.GET,
+        labelField: "name",
         label: "post.title" as const,
         description: "post.description" as const,
         hidden: true,

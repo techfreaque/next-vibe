@@ -14,8 +14,7 @@ import { HealthCheckRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, locale, logger, t }) => {
-      return HealthCheckRepository.checkHealth(data, logger, t, locale);
-    },
+    handler: ({ data, locale, logger, t }) =>
+      HealthCheckRepository.checkHealth(data, logger, t, locale),
   },
 });

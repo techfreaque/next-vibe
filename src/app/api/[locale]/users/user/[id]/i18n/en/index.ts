@@ -1,13 +1,155 @@
-import { translations as rolesTranslations } from "../../roles/i18n/en";
-
 export const translations = {
   category: "Users",
   tag: "User Management",
 
   id: {
-    roles: rolesTranslations.roles,
+    roles: {
+      post: {
+        title: "Add User Role",
+        description: "Grant a role to a specific user account",
+        container: {
+          title: "Add Role",
+          description: "Select a role to grant to this user",
+        },
+        id: {
+          label: "User ID",
+          description: "Unique identifier of the user to grant the role to",
+          placeholder: "Enter user ID...",
+        },
+        role: {
+          label: "Role",
+          description: "The role to grant to the user",
+          placeholder: "Select a role...",
+        },
+        submit: {
+          label: "Add Role",
+        },
+        response: {
+          roleId: {
+            content: "Role Assignment ID",
+          },
+          userId: {
+            content: "User ID",
+          },
+          assignedRole: {
+            content: "Assigned Role",
+          },
+        },
+        errors: {
+          unauthorized: {
+            title: "Unauthorized",
+            description: "You must be logged in to manage user roles",
+          },
+          validation: {
+            title: "Validation Failed",
+            description: "Please provide a valid user ID and role",
+          },
+          forbidden: {
+            title: "Access Forbidden",
+            description: "Only administrators can manage user roles",
+          },
+          notFound: {
+            title: "User Not Found",
+            description: "The specified user could not be found",
+          },
+          conflict: {
+            title: "Role Already Assigned",
+            description: "This user already has the specified role",
+          },
+          network: {
+            title: "Network Error",
+            description: "Unable to connect to the server",
+          },
+          unsavedChanges: {
+            title: "Unsaved Changes",
+            description: "You have unsaved changes that will be lost",
+          },
+          server: {
+            title: "Server Error",
+            description: "Unable to add role due to server error",
+          },
+          unknown: {
+            title: "Unknown Error",
+            description: "An unexpected error occurred while adding the role",
+          },
+        },
+        success: {
+          title: "Role Added",
+          description: "The role has been successfully granted to the user",
+        },
+      },
+      delete: {
+        title: "Remove User Role",
+        description: "Revoke a role from a specific user account",
+        container: {
+          title: "Remove Role",
+          description: "Select a role to revoke from this user",
+        },
+        id: {
+          label: "User ID",
+          description: "Unique identifier of the user to revoke the role from",
+          placeholder: "Enter user ID...",
+        },
+        role: {
+          label: "Role",
+          description: "The role to revoke from the user",
+          placeholder: "Select a role...",
+        },
+        submit: {
+          label: "Remove Role",
+        },
+        response: {
+          success: {
+            content: "Role Removed",
+          },
+        },
+        errors: {
+          unauthorized: {
+            title: "Unauthorized",
+            description: "You must be logged in to manage user roles",
+          },
+          validation: {
+            title: "Validation Failed",
+            description: "Please provide a valid user ID and role",
+          },
+          forbidden: {
+            title: "Access Forbidden",
+            description: "Only administrators can manage user roles",
+          },
+          notFound: {
+            title: "User Not Found",
+            description: "The specified user could not be found",
+          },
+          conflict: {
+            title: "Conflict Error",
+            description: "Unable to remove role due to existing dependencies",
+          },
+          network: {
+            title: "Network Error",
+            description: "Unable to connect to the server",
+          },
+          unsavedChanges: {
+            title: "Unsaved Changes",
+            description: "You have unsaved changes that will be lost",
+          },
+          server: {
+            title: "Server Error",
+            description: "Unable to remove role due to server error",
+          },
+          unknown: {
+            title: "Unknown Error",
+            description: "An unexpected error occurred while removing the role",
+          },
+        },
+        success: {
+          title: "Role Removed",
+          description: "The role has been successfully revoked from the user",
+        },
+      },
+    },
     get: {
       title: "Get User",
+      titleShort: "User Details",
       description: "Retrieve detailed information about a specific user",
       container: {
         title: "User Details",
@@ -222,6 +364,7 @@ export const translations = {
     },
     put: {
       title: "Update User",
+      titleShort: "Update User",
       description: "Update user information and profile details",
       container: {
         title: "Update User",
@@ -427,6 +570,7 @@ export const translations = {
     },
     delete: {
       title: "Delete User",
+      titleShort: "Delete User",
       description: "Permanently delete a user account",
       container: {
         title: "Delete User",
@@ -527,6 +671,327 @@ export const translations = {
       titleReferralCodes: "View referral codes and stats",
       titleSubscription: "View subscription",
       titleCopyUserId: "Copy User ID",
+    },
+    getCrm: {
+      get: {
+        title: "Get User CRM Profile",
+        titleShort: "CRM Profile",
+        description: "Retrieve a user's billing fields and note count",
+        fields: {
+          userId: {
+            label: "User ID",
+            description: "The user to look up",
+            placeholder: "User UUID",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validation Error",
+            description: "Invalid user ID",
+          },
+          unauthorized: {
+            title: "Unauthorized",
+            description: "You must be logged in",
+          },
+          forbidden: {
+            title: "Forbidden",
+            description: "You don't have access to this user's CRM data",
+          },
+          notFound: {
+            title: "Not Found",
+            description: "User not found",
+          },
+          conflict: {
+            title: "Conflict",
+            description: "A conflict occurred",
+          },
+          network: {
+            title: "Network Error",
+            description: "Network request failed",
+          },
+          unsavedChanges: {
+            title: "Unsaved Changes",
+            description: "There are unsaved changes",
+          },
+          internal: {
+            title: "Internal Error",
+            description: "Server error — try again",
+          },
+          unknown: {
+            title: "Unknown Error",
+            description: "An unexpected error occurred",
+          },
+        },
+        success: {
+          title: "CRM Profile Loaded",
+          description: "User CRM data retrieved",
+        },
+        widget: {
+          addNote: "Add Note",
+          viewNotes: "View Notes",
+        },
+        response: {
+          id: "User ID",
+          email: "Email",
+          privateName: "Name",
+          companyBillingName: "Company / Billing Name",
+          vatNumber: "VAT Number",
+          taxId: "Tax ID",
+          phone: "Phone",
+          addressLine1: "Address Line 1",
+          addressLine2: "Address Line 2",
+          city: "City",
+          region: "Region",
+          postalCode: "Postal Code",
+          billingCountry: "Country",
+          defaultCurrency: "Default Currency",
+          paymentTermsDays: "Payment Terms (days)",
+          notesCount: "Total Notes",
+        },
+      },
+      tag: "CRM",
+    },
+    notesCreate: {
+      post: {
+        title: "Create User Note",
+        titleShort: "Create Note",
+        description:
+          "Add a CRM note, call log, email record, meeting or task for a user",
+        fields: {
+          userId: {
+            label: "User",
+            description: "The user this note is about",
+            placeholder: "Select user",
+          },
+          type: {
+            label: "Activity Type",
+            description: "What kind of interaction this records",
+            placeholder: "Select type",
+          },
+          content: {
+            label: "Content",
+            description: "Details of the activity",
+            placeholder: "Write what happened...",
+          },
+          isPrivate: {
+            label: "Private",
+            description: "Only you can see private notes",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validation Error",
+            description: "Check the fields and try again",
+          },
+          unauthorized: {
+            title: "Unauthorized",
+            description: "You must be logged in",
+          },
+          forbidden: {
+            title: "Forbidden",
+            description: "You don't have access to this user",
+          },
+          notFound: {
+            title: "Not Found",
+            description: "User not found",
+          },
+          conflict: {
+            title: "Conflict",
+            description: "A conflict occurred",
+          },
+          network: {
+            title: "Network Error",
+            description: "Network request failed",
+          },
+          unsavedChanges: {
+            title: "Unsaved Changes",
+            description: "There are unsaved changes",
+          },
+          internal: {
+            title: "Internal Error",
+            description: "Server error — try again",
+          },
+          unknown: {
+            title: "Unknown Error",
+            description: "An unexpected error occurred",
+          },
+        },
+        success: {
+          title: "Note Created",
+          description: "The note was saved",
+        },
+        widget: {
+          created: "Note Created",
+          noteId: "Note ID",
+          backToNotes: "Back to Notes",
+        },
+        response: {
+          id: "Note ID",
+          userId: "User ID",
+          authorUserId: "Author ID",
+          type: "Type",
+          content: "Content",
+          isPrivate: "Private",
+          createdAt: "Created At",
+          updatedAt: "Updated At",
+        },
+      },
+      tag: "CRM",
+    },
+    notesList: {
+      get: {
+        title: "List User Notes",
+        titleShort: "User Notes",
+        description:
+          "List CRM notes for a user, filtered by type and visibility",
+        fields: {
+          userId: {
+            label: "User ID",
+            description: "Whose notes to list",
+            placeholder: "User UUID",
+          },
+          type: {
+            label: "Type",
+            description: "Filter by activity type",
+            placeholder: "All types",
+          },
+          isPrivate: {
+            label: "Private Only",
+            description: "Show only your private notes",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validation Error",
+            description: "Check the filters and try again",
+          },
+          unauthorized: {
+            title: "Unauthorized",
+            description: "You must be logged in",
+          },
+          forbidden: {
+            title: "Forbidden",
+            description: "You don't have access to these notes",
+          },
+          notFound: {
+            title: "Not Found",
+            description: "User not found",
+          },
+          conflict: {
+            title: "Conflict",
+            description: "A conflict occurred",
+          },
+          network: {
+            title: "Network Error",
+            description: "Network request failed",
+          },
+          unsavedChanges: {
+            title: "Unsaved Changes",
+            description: "There are unsaved changes",
+          },
+          internal: {
+            title: "Internal Error",
+            description: "Server error — try again",
+          },
+          unknown: {
+            title: "Unknown Error",
+            description: "An unexpected error occurred",
+          },
+        },
+        success: {
+          title: "Notes Loaded",
+          description: "Notes retrieved successfully",
+        },
+        widget: {
+          addNote: "Add Note",
+          total: "Total",
+          empty: "No notes yet",
+          delete: "Delete",
+          private: "Private",
+          ago: "ago",
+        },
+        response: {
+          notes: "Notes",
+          total: "Total",
+          note: {
+            id: "Note ID",
+            userId: "User ID",
+            authorUserId: "Author ID",
+            type: "Type",
+            content: "Content",
+            isPrivate: "Private",
+            createdAt: "Created At",
+            updatedAt: "Updated At",
+          },
+        },
+      },
+      tag: "CRM",
+    },
+    noteDelete: {
+      post: {
+        title: "Delete User Note",
+        titleShort: "Delete Note",
+        description:
+          "Delete a CRM note — only the author or an admin can do this",
+        fields: {
+          noteId: {
+            label: "Note ID",
+            description: "The note to delete",
+            placeholder: "Note UUID",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validation Error",
+            description: "Invalid note ID",
+          },
+          unauthorized: {
+            title: "Unauthorized",
+            description: "You must be logged in",
+          },
+          forbidden: {
+            title: "Forbidden",
+            description: "Only the author or an admin can delete this note",
+          },
+          notFound: {
+            title: "Not Found",
+            description: "Note not found",
+          },
+          conflict: {
+            title: "Conflict",
+            description: "A conflict occurred",
+          },
+          network: {
+            title: "Network Error",
+            description: "Network request failed",
+          },
+          unsavedChanges: {
+            title: "Unsaved Changes",
+            description: "There are unsaved changes",
+          },
+          internal: {
+            title: "Internal Error",
+            description: "Server error — try again",
+          },
+          unknown: {
+            title: "Unknown Error",
+            description: "An unexpected error occurred",
+          },
+        },
+        success: {
+          title: "Note Deleted",
+          description: "The note was permanently removed",
+        },
+        widget: {
+          warning: "This note will be permanently deleted.",
+          deleted: "Note deleted.",
+          backToNotes: "Back to Notes",
+        },
+        response: {
+          deleted: "Deleted",
+        },
+      },
+      tag: "CRM",
     },
   },
 };

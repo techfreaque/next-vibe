@@ -4,6 +4,7 @@ export const translations = {
   roles: {
     post: {
       title: "Add User Role",
+      titleShort: "Add Role",
       description: "Grant a role to a specific user account",
       container: {
         title: "Add Role",
@@ -78,6 +79,7 @@ export const translations = {
     },
     delete: {
       title: "Remove User Role",
+      titleShort: "Remove Role",
       description: "Revoke a role from a specific user account",
       container: {
         title: "Remove Role",

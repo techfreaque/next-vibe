@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Import Job Management API Routes
  * Individual job operations (update, delete)

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Głosy przeciw w czacie łącznie",
+    titleShort: "Negatywne",
     description: "Suma głosów przeciw wiadomościom na przedział rozdzielczości",
     fields: {
       resolution: {

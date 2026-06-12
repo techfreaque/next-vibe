@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Generatoren",
 
   post: {
     title: "E-Mail-Vorlagen generieren",
+    titleShort: "E-Mail-Vorlagen",
     description: "E-Mail-Vorlagen-Registry mit Lazy Loading generieren",
     container: {
       title: "E-Mail-Vorlagen-Generator-Konfiguration",

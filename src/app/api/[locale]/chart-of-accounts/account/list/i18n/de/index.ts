@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Kontenplan",
+    titleShort: "Konten",
     description:
       "Vollständiger Kontenbaum eines Unternehmens mit Hierarchiestruktur",
     companyId: {

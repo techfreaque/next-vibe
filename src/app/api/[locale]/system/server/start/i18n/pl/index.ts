@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Tytuł",
+    titleShort: "Uruchom serwer",
     description: "Opis endpointu",
     form: {
       title: "Konfiguracja",

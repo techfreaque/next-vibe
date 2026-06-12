@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     messaging: "Messaging",
   },
   title: "Messenger-Konto erstellen",
+  titleShort: "Neues Konto",
   description: "Ein neues Messenger-Konto erstellen",
   enums: {
     channel: {

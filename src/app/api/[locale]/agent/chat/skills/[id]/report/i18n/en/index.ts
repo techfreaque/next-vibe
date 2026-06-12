@@ -5,6 +5,7 @@ export const translations = {
   },
   post: {
     title: "Report Skill",
+    titleShort: "Report Skill",
     description:
       "Report a community skill for moderation. Idempotent - one report per user per skill.",
     dynamicTitle: "Report: {{name}}",

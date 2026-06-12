@@ -4,9 +4,8 @@
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { BrowserTool, BrowserSharedRepository } from "./repository";
 
-import { BrowserTool } from "../enum";
-import { BrowserSharedRepository } from "../shared/repository";
 import listConsoleMessagesEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -23,6 +22,7 @@ export const { POST, tools } = endpointsHandler({
             types: data.types,
             includePreservedMessages: data.includePreservedMessages,
           }),
+          instanceId: data.instanceId,
         },
         t,
         logger,

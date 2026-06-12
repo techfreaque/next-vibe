@@ -1,6 +1,7 @@
 export const translations = {
   get: {
     title: "User List",
+    titleShort: "User List",
     description: "Search and filter users",
     form: {
       title: "User Management",

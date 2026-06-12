@@ -18,7 +18,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
@@ -31,7 +31,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["desktop", "list-monitors"],
+  aliases: ["desktop-list-monitors"] as const,
   title: "list-monitors.title",
+  titleShort: "list-monitors.titleShort",
   description: "list-monitors.description",
   category: "desktop",
   subCategory: "Capture",

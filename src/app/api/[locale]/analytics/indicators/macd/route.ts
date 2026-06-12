@@ -5,8 +5,6 @@
 
 import "server-only";
 
-import { success } from "next-vibe/shared/types/response.schema";
-
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
@@ -16,30 +14,6 @@ import { MacdIndicatorRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ data }) => {
-      const {
-        source,
-        fastPeriod,
-        slowPeriod,
-        signalPeriod,
-        resolution,
-        lookback,
-      } = data;
-      const { macd, signal, histogram } = MacdIndicatorRepository.computeMacd(
-        source,
-        fastPeriod,
-        slowPeriod,
-        signalPeriod,
-      );
-      return success({
-        macd,
-        signal,
-        histogram,
-        meta: {
-          actualResolution: resolution ?? "enums.resolution.1d",
-          lookbackUsed: lookback ?? 0,
-        },
-      });
-    },
+    handler: ({ data }) => MacdIndicatorRepository.handle(data),
   },
 });

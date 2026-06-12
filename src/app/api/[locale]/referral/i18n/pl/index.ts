@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
   // GET endpoint (get referral code)
   get: {
     title: "Pobierz kod polecający",
+    titleShort: "Pobierz kod",
     description: "Pobierz szczegóły kodu polecającego",
     form: {
       title: "Szczegóły kodu polecającego",
@@ -49,6 +50,7 @@ export const translations: typeof enTranslations = {
   // POST endpoint (create referral code)
   post: {
     title: "Utwórz kod polecający",
+    titleShort: "Utwórz kod",
     description: "Utwórz nowy kod polecający",
     form: {
       title: "Utwórz kod polecający",
@@ -84,6 +86,7 @@ export const translations: typeof enTranslations = {
   linkToLead: {
     post: {
       title: "Połącz polecenie z leadem",
+      titleShort: "Połącz polecenie",
       description: "Połącz kod polecający z leadem przed rejestracją",
       form: {
         title: "Połącz kod polecający",
@@ -101,6 +104,7 @@ export const translations: typeof enTranslations = {
     list: {
       get: {
         title: "Lista kodów polecających",
+        titleShort: "Moje kody",
         description: "Pobierz wszystkie swoje kody polecające ze statystykami",
         form: {
           title: "Twoje kody polecające",
@@ -150,6 +154,7 @@ export const translations: typeof enTranslations = {
   stats: {
     get: {
       title: "Statystyki poleceń",
+      titleShort: "Statystyki",
       description: "Pobierz statystyki swojego programu poleceń",
       form: {
         title: "Twoje statystyki poleceń",
@@ -189,6 +194,7 @@ export const translations: typeof enTranslations = {
     list: {
       get: {
         title: "Lista zarobków z poleceń",
+        titleShort: "Zarobki",
         description: "Pobierz historię swoich zarobków z poleceń",
         form: {
           title: "Twoje zarobki z poleceń",
@@ -274,10 +280,12 @@ export const translations: typeof enTranslations = {
     payouts: {
       get: {
         title: "Żądania wypłat",
+        titleShort: "Wypłaty",
         description: "Zarządzaj żądaniami wypłat poleceń",
       },
       post: {
         title: "Przetwórz wypłatę",
+        titleShort: "Przetwórz wypłatę",
         description: "Zatwierdź, odrzuć lub zakończ żądanie wypłaty",
       },
       fields: {
@@ -316,10 +324,12 @@ export const translations: typeof enTranslations = {
   payout: {
     get: {
       title: "Twoje zarobki",
+      titleShort: "Moje zarobki",
       description: "Wyświetl zarobki z poleceń i historię wypłat",
     },
     post: {
       title: "Poproś o wypłatę",
+      titleShort: "Poproś o wypłatę",
       description: "Wypłać swoje zarobki z poleceń",
     },
     fields: {

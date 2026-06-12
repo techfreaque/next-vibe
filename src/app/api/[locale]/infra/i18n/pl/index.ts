@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Infrastruktura",
   type: "Infrastruktura",
 
@@ -48,6 +49,7 @@ export const translations = {
     init: {
       post: {
         title: "Inicjalizuj klaster",
+        titleShort: "Init klastra",
         container: { title: "Inicjalizacja klastra" },
         description:
           "Skonfiguruj k3s na oznaczonych serwerach SSH. Instaluje k3s, bazy danych, Redis, MinIO i ingress.",
@@ -149,6 +151,7 @@ export const translations = {
     status: {
       get: {
         title: "Status klastra",
+        titleShort: "Status klastra",
         container: { title: "Status klastra" },
         description:
           "Pokaż zdrowie węzłów k8s, liczbę podów i status komponentów",
@@ -206,6 +209,7 @@ export const translations = {
     push: {
       post: {
         title: "Wdróż",
+        titleShort: "Wdróż",
         description: "Zastosuj zmiany infrastruktury przez Pulumi (pulumi up)",
         container: { title: "Wdrożenie" },
         fields: {
@@ -272,6 +276,7 @@ export const translations = {
     preview: {
       post: {
         title: "Podgląd wdrożenia",
+        titleShort: "Podgląd",
         description:
           "Podgląd zmian infrastruktury bez ich stosowania (pulumi preview)",
         container: { title: "Podgląd wdrożenia" },
@@ -335,6 +340,7 @@ export const translations = {
     replicas: {
       post: {
         title: "Skaluj",
+        titleShort: "Skaluj",
         description: "Skaluj deployment w klastrze",
         container: { title: "Skalowanie deploymentu" },
         fields: {

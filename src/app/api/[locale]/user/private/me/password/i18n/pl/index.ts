@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Profil użytkownika",
 
   title: "Zmień Hasło",
+  titleShort: "Zmień hasło",
   description: "Bezpiecznie zaktualizuj hasło do swojego konta",
   tag: "zmiana-hasła",
   debug: {

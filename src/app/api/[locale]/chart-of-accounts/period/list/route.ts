@@ -8,13 +8,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
-      return await CoaPeriodListRepository.listPeriods(
-        data,
-        user.id,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ data, user, logger, locale }) =>
+      CoaPeriodListRepository.listPeriods(data, user.id, logger, locale),
   },
 });

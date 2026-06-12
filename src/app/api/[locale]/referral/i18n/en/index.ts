@@ -15,6 +15,7 @@ export const translations = {
   // GET endpoint (get referral code)
   get: {
     title: "Get Referral Code",
+    titleShort: "Get Code",
     description: "Retrieve referral code details",
     form: {
       title: "Referral Code Details",
@@ -47,6 +48,7 @@ export const translations = {
   // POST endpoint (create referral code)
   post: {
     title: "Create Referral Code",
+    titleShort: "Create Code",
     description: "Create a new referral code",
     form: {
       title: "Create Referral Code",
@@ -82,6 +84,7 @@ export const translations = {
   linkToLead: {
     post: {
       title: "Link Referral to Lead",
+      titleShort: "Link Referral",
       description: "Link a referral code to a lead before signup",
       form: {
         title: "Link Referral Code",
@@ -99,6 +102,7 @@ export const translations = {
     list: {
       get: {
         title: "List Referral Codes",
+        titleShort: "My Codes",
         description: "Get all your referral codes with statistics",
         form: {
           title: "Your Referral Codes",
@@ -148,6 +152,7 @@ export const translations = {
   stats: {
     get: {
       title: "Referral Statistics",
+      titleShort: "Stats",
       description: "Get your referral program statistics",
       form: {
         title: "Your Referral Stats",
@@ -186,6 +191,7 @@ export const translations = {
     list: {
       get: {
         title: "List Referral Earnings",
+        titleShort: "Earnings",
         description: "Get your referral earnings history",
         form: {
           title: "Your Referral Earnings",
@@ -271,10 +277,12 @@ export const translations = {
     payouts: {
       get: {
         title: "Payout Requests",
+        titleShort: "Requests",
         description: "Manage referral payout requests",
       },
       post: {
         title: "Process Payout",
+        titleShort: "Process Payout",
         description: "Approve, reject, or complete a payout request",
       },
       fields: {
@@ -313,10 +321,12 @@ export const translations = {
   payout: {
     get: {
       title: "Your Earnings",
+      titleShort: "My Earnings",
       description: "View your referral earnings and payout history",
     },
     post: {
       title: "Request Payout",
+      titleShort: "Request Payout",
       description: "Withdraw your referral earnings",
     },
     fields: {

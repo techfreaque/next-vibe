@@ -13,11 +13,11 @@ import builderEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: builderEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { builderRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return builderRepository.execute(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).builderRepository.execute(data, logger, t),
   },
 });

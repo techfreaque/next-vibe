@@ -28,6 +28,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "db", "seed"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   category: "database",
   subCategory: "Tools",

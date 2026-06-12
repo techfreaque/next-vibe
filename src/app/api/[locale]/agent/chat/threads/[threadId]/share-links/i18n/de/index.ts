@@ -43,6 +43,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Teilen-Links abrufen",
+    titleShort: "Teillinks",
     description: "Alle Teilen-Links für einen Thread abrufen",
     container: {
       title: "Teilen-Links",
@@ -135,6 +136,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Teilen-Link erstellen",
+    titleShort: "Link teilen",
     description: "Neuen Teilen-Link für einen Thread erstellen",
     container: {
       title: "Neuer Teilen-Link",
@@ -216,6 +218,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Teilen-Link aktualisieren",
+    titleShort: "Link bearbeiten",
     description: "Existierenden Teilen-Link aktualisieren",
     container: {
       title: "Teilen-Link aktualisieren",
@@ -302,6 +305,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Teilen-Link widerrufen",
+    titleShort: "Link widerrufen",
     description: "Aktiven Teilen-Link widerrufen",
     container: {
       title: "Teilen-Link widerrufen",

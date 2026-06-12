@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "SSH",
   type: "SSH",
 
@@ -1023,6 +1024,10 @@ export const translations = {
           isDefault: {
             label: "Domyślne",
             description: "Ustaw jako domyślne połączenie",
+          },
+          clusterRole: {
+            label: "Rola klastra",
+            description: "Rola tego serwera w klastrze k8s",
           },
           notes: {
             label: "Notatki",

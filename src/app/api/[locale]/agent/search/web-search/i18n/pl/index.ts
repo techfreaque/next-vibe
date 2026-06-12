@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Informacja",
   get: {
     title: "Wyszukaj w sieci",
+    titleShort: "Szukaj w sieci",
     dynamicTitle: "Szukaj: {{query}}",
     description:
       "Przeszukuje internet w poszukiwaniu aktualnych informacji, wiadomości, faktów lub wydarzeń. Automatycznie kieruje do preferowanego dostawcy wyszukiwania.",
@@ -91,6 +92,17 @@ export const translations: typeof enTranslations = {
         title: "Brak dostępnego dostawcy",
         description:
           "Brak skonfigurowanych kluczy API. Skonfiguruj Brave Search lub Kagi w pliku .env.",
+      },
+      noProviderAdmin: {
+        title:
+          "Brak skonfigurowanego dostawcy. Dodaj BRAVE_SEARCH_API_KEY lub KAGI_API_KEY do pliku .env.",
+        description:
+          "Brave Search: https://api.search.brave.com/app/keys — Kagi: https://kagi.com/settings?p=api",
+      },
+      noProviderUser: {
+        title: "Wyszukiwanie w sieci jest teraz niedostępne.",
+        description:
+          "Administrator nie skonfigurował jeszcze dostawcy wyszukiwania.",
       },
       providerUnavailable: {
         title: "Dostawca niedostępny",

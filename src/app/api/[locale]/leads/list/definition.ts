@@ -65,11 +65,13 @@ const { GET } = createEndpoint({
   path: ["leads", "list"],
   aliases: [LEADS_LIST_ALIAS],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
 
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   tags: ["tags.leads", "tags.management"],
   icon: "list",
 

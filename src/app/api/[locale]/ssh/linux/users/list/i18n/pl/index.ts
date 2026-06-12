@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "SSH",
 
   errors: {
@@ -17,6 +18,7 @@ export const translations = {
 
   get: {
     title: "Wylistuj użytkowników Linux",
+    titleShort: "Użytkownicy Linux",
     description: "Wylistuj konta użytkowników OS na hoście (uid >= 1000)",
     fields: {
       connectionId: {

@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Graph auslösen",
+    titleShort: "Graph auslösen",
     description: "Graph-Ausführung manuell auslösen",
     fields: {
       id: { label: "Graph-ID", description: "UUID des Graphen" },

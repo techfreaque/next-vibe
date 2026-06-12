@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Rückerstattungen",
     title: "Rückerstattete Credits",
     description:
       "Summe der Rückerstattungs-Transaktionsbeträge pro Auflösungs-Bucket",

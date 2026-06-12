@@ -67,6 +67,7 @@ export const translations = {
     },
     post: {
       title: "Execute MCP Tool",
+      titleShort: "MCP Server",
       description: "Execute an MCP tool by name with arguments",
       fields: {
         title: "Tool Execution Parameters",
@@ -145,6 +146,7 @@ export const translations = {
     },
     post: {
       title: "Start MCP Server",
+      titleShort: "MCP Server",
       description: "Start the Model Context Protocol server",
       response: {
         title: "MCP Server Status",

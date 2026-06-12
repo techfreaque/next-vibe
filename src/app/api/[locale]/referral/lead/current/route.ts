@@ -7,18 +7,17 @@ import "server-only";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { ReferralRepository } from "../../repository";
 import definitions from "./definition";
+import { LeadCurrentReferralRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: async ({ user, locale, logger }) => {
-      return await ReferralRepository.getLatestLeadReferralWithLabel(
+    handler: ({ user, locale, logger }) =>
+      LeadCurrentReferralRepository.getLatestLeadReferralWithLabel(
         user.leadId,
         logger,
         locale,
-      );
-    },
+      ),
   },
 });

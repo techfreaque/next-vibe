@@ -12,11 +12,11 @@ import electronStartDefinition from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: electronStartDefinition,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { ElectronStartRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return ElectronStartRepository.electronStartRepository(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).ElectronStartRepository.electronStartRepository(data, logger, t),
   },
 });

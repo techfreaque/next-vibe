@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
 
   patch: {
     title: "Ordner verschieben",
+    titleShort: "Ordner verschieben",
     description:
       "Einen Ordner zu einem anderen übergeordneten Ordner verschieben",
     id: {

@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   dashboard: {
     title: "Buchhaltungs-Übersicht",
+    titleShort: "Übersicht",
     description:
       "Aktueller Status der Buchhaltung — offene Periode, Buchungszahlen und schnelle Navigation zu allen Buchhaltungsfunktionen.",
     companyId: {

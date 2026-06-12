@@ -13,6 +13,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Kolejka zadań",
+    titleShort: "Kolejka zadań",
     description:
       "Wyświetl nadchodzącą kolejkę wykonania zadań posortowaną według czasu następnego uruchomienia",
     fields: {

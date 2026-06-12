@@ -12,6 +12,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Lista modeli AI",
+    titleShort: "Modele AI",
     description:
       "Zwraca wszystkie dostepne modele AI z informacjami o cenach i mozliwosciach",
     response: {

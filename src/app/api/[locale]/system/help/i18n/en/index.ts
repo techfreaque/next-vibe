@@ -4,6 +4,7 @@ export const translations = {
   uncategorized: "Other",
   get: {
     title: "Tool Help - Discover Available Tools",
+    titleShort: "Tool Help",
     description:
       "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
     tags: {
@@ -19,12 +20,7 @@ export const translations = {
       category: {
         label: "Category Filter",
         description:
-          "Filter tools by category name (case-insensitive). Call with no params first to see available categories.",
-      },
-      subCategory: {
-        label: "Sub-Category Filter",
-        description:
-          "Filter tools by sub-category name (case-insensitive). Use together with category to narrow results.",
+          "Filter tools by category or sub-category name (case-insensitive). Accepts a parent category key (e.g. 'ai') or a sub-category name (e.g. 'Search'). Omit to see all categories.",
       },
       toolName: {
         label: "Tool Name (Detail)",
@@ -97,6 +93,16 @@ export const translations = {
       platforms: {
         title: "Available platforms",
       },
+      viewAsRole: {
+        label: "View as Role",
+        description:
+          "See what tools are visible to a specific user role (admin only)",
+        options: {
+          admin: "Admin",
+          customer: "Customer",
+          public: "Public",
+        },
+      },
       instanceId: {
         label: "Instance ID",
         description:
@@ -111,6 +117,35 @@ export const translations = {
         label: "Tool Filter",
         description: "Show all tools, only pinned tools, or only allowed tools",
       },
+    },
+    hints: {
+      noCapabilitySnapshot:
+        'No capability snapshot for instance "{{instanceId}}". Connect the instance and wait for a sync pulse.',
+      remoteFullSchema:
+        'Full schema for {{count}} tool(s) from "{{instanceId}}". Call via: execute-tool toolName="{{instanceId}}__<name>" input={...}.',
+      remoteList:
+        '{{matched}} of {{total}} tools from remote instance "{{instanceId}}". Narrow search to ≤{{detailThreshold}} results for full schemas, or pass toolName= for a specific tool.{{pagination}}',
+      toolNotFound:
+        'Tool "{{name}}" not found. Use query to search by keyword.',
+      detailMode:
+        'Call as: execute-tool toolName="{{name}}"{{aliases}}. CLI: vibe {{name}} [--field=value].',
+      detailModeAliases: " (aliases: {{aliases}})",
+      noToolsMatched:
+        "No tools matched. Try a broader query or call without params to see all categories.",
+      compactFullSchema:
+        'Full schema for {{count}} tool(s). Call via: execute-tool toolName="<name>" input={...}.',
+      compactCategoryOnly:
+        '{{matched}} tools across {{categories}} categories. Use category="<name>" to narrow results (accepts parent category or sub-category). Under {{listThreshold}} results shows tool names; under {{detailThreshold}} shows full schemas.',
+      compactList:
+        '{{matched}} tools. Narrow to ≤{{detailThreshold}} for full schemas, or pass toolName="<name>" for detail. Call any tool: execute-tool toolName="<name>".{{pagination}}',
+      cliFullDetail:
+        "Showing full detail for {{count}} tool(s). CLI: vibe <name> [--field=value].",
+      cliList:
+        "Page {{page}}/{{total}} - {{matched}} tools match. Use vibe help <name> for full details.",
+      cliListSingle:
+        "{{matched}} tools matched. Use vibe help <name> for full details.",
+      pagination: " Page {{page}}/{{total}} - pass page={{next}} to continue.",
+      paginationCli: " - vibe help --page={{next}}",
     },
     success: {
       title: "Tools fetched successfully",
@@ -339,6 +374,8 @@ export const translations = {
       selectToolHint: "Choose a tool from the sidebar to get started",
       allPlatforms: "All platforms",
       prodOnly: "Prod only",
+      adminFilters: "Admin filters",
+      resetPins: "Reset pins to defaults",
       aiPinsTitle: "AI Tool Pins",
       aiPinsDescription:
         "These tools are active in every AI conversation. The AI can call them automatically — no prompting needed.",
@@ -346,6 +383,11 @@ export const translations = {
       noPinnedTools: "No pinned tools yet",
       noPinnedToolsHint:
         "Browse all tools and pin the ones you want the AI to use",
+      webPinsDescription:
+        "Sidebar shortcuts. Quick-launch tools pinned to your admin panel.",
+      aiAllowedDescription:
+        "Tools the AI may call on demand. Anything here can be invoked when the AI decides it's needed.",
+      noAllowedTools: "No allowed tools",
     },
 
     platformFilter: {

@@ -12,8 +12,7 @@ import { CronStatsRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: async ({ data, user, t, logger }) => {
-      return await CronStatsRepository.getStats(data, user, t, logger);
-    },
+    handler: ({ data, user, t, logger }) =>
+      CronStatsRepository.getStats(data, user, t, logger),
   },
 });

@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   patch: {
     title: "Edytuj konto",
+    titleShort: "Edytuj konto",
     description:
       "Zmień nazwę, opis lub kolejność konta. Typ i podtyp kont systemowych są zablokowane.",
     accountId: {

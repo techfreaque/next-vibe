@@ -33,12 +33,13 @@ export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["referral"],
-  title: "post.title",
-  description: "post.description",
-  category: "endpointCategories.referral",
-  subCategory: "endpointCategories.referralProgram",
+  title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
+  description: "post.description" as const,
+  category: "referral" as const,
+  subCategory: "Program" as const,
   tags: ["tags.referral", "tags.create"],
-  icon: "share",
+  icon: "share" as const,
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -101,9 +102,9 @@ export const { POST } = createEndpoint({
           code: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "form.fields.code.label",
-            description: "form.fields.code.description",
-            placeholder: "form.fields.code.placeholder",
+            label: "form.fields.code.label" as const,
+            description: "form.fields.code.description" as const,
+            placeholder: "form.fields.code.placeholder" as const,
             schema: z.string().min(3).max(50),
             theme: {
               style: "none",
@@ -113,9 +114,9 @@ export const { POST } = createEndpoint({
           label: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "form.fields.label.label",
-            description: "form.fields.label.description",
-            placeholder: "form.fields.label.placeholder",
+            label: "form.fields.label.label" as const,
+            description: "form.fields.label.description" as const,
+            placeholder: "form.fields.label.placeholder" as const,
             schema: z.string().optional(),
             theme: {
               style: "none",
@@ -146,8 +147,8 @@ export const { POST } = createEndpoint({
         usage: { request: "data" },
         children: {
           submit: submitButton(scopedTranslation, {
-            label: "post.submit.label",
-            loadingText: "post.submit.loading",
+            label: "post.submit.label" as const,
+            loadingText: "post.submit.loading" as const,
             usage: { request: "data" },
           }),
         },
@@ -157,46 +158,46 @@ export const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title",
-      description: "errors.notFound.description",
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.unauthorized.title",
-      description: "errors.unauthorized.description",
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title",
-      description: "errors.forbidden.description",
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.serverError.title",
-      description: "errors.serverError.description",
+      title: "errors.serverError.title" as const,
+      description: "errors.serverError.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.network.title",
-      description: "errors.network.description",
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.unknown.title",
-      description: "errors.unknown.description",
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.unsavedChanges.title",
-      description: "errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "success.title",
-    description: "success.description",
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 
   examples: {
@@ -204,7 +205,7 @@ export const { POST } = createEndpoint({
       default: {
         fieldsGrid: {
           code: "FRIEND2024",
-          label: "Friend Referral",
+          label: "Friend Referral" as const,
         },
       },
       unlimited: {
@@ -225,4 +226,4 @@ export const { POST } = createEndpoint({
 export type ReferralPostRequestOutput = typeof POST.types.RequestOutput;
 export type ReferralPostResponseOutput = typeof POST.types.ResponseOutput;
 
-export default { POST };
+export default { POST } as const;

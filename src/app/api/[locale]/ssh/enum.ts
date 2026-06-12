@@ -89,9 +89,14 @@ export const SshCommandStatusDB = [
 export enum ExecBackend {
   LOCAL = "LOCAL",
   SSH = "SSH",
+  REMOTE_WS = "REMOTE_WS",
 }
 
-export const ExecBackendDB = [ExecBackend.LOCAL, ExecBackend.SSH] as const;
+export const ExecBackendDB = [
+  ExecBackend.LOCAL,
+  ExecBackend.SSH,
+  ExecBackend.REMOTE_WS,
+] as const;
 
 // ─── Cluster Role ─────────────────────────────────────────────────────────────
 

@@ -5,10 +5,8 @@
  * - /threads/[rootId]/[sub1]/[sub2]/... - Nested folder view
  * - /threads/[rootId]/[sub1]/.../[threadId] - Thread view
  *
- * All paths render the same ChatInterface component.
- * The ChatInterface will determine from the URL path whether to show:
- * - Folder view (no thread selected, just sidebar + empty chat area)
- * - Thread view (specific thread selected, sidebar + chat messages)
+ * Sets up ChatNavigationProvider + ChatBootProvider with server-prefetched data,
+ * then delegates all UI to the ai-stream widget via EndpointsPage.
  */
 
 export const dynamic = "force-dynamic";
@@ -18,6 +16,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
+import aiStreamDefinition from "@/app/api/[locale]/agent/ai-stream/stream/definition";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import type { FolderContentsResponseOutput } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
@@ -54,7 +53,7 @@ import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/reposit
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
@@ -63,8 +62,6 @@ import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import { ChatInterface } from "./_components/chat-interface";
 
 interface ThreadsPathPageProps {
   params: Promise<{
@@ -485,38 +482,38 @@ export function TanstackPage({
     return <Div>{userT("auth.errors.unknownError")}</Div>;
   }
 
-  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(isAdmin);
-
   return (
-    <>
-      <ChatNavigationProvider
+    <ChatNavigationProvider
+      activeThreadId={initialThreadId}
+      currentRootFolderId={initialRootFolderId}
+      currentSubFolderId={initialSubFolderId}
+      leafMessageId={initialPathData?.resolvedLeafMessageId ?? leafMessageId}
+    >
+      <ChatBootProvider
         activeThreadId={initialThreadId}
         currentRootFolderId={initialRootFolderId}
         currentSubFolderId={initialSubFolderId}
-        leafMessageId={initialPathData?.resolvedLeafMessageId ?? leafMessageId}
+        initialCredits={creditsToUse}
+        rootFolderPermissions={rootFolderPermissions}
+        initialFoldersData={initialFoldersData}
+        initialThreadsData={initialThreadsData}
+        initialMessagesData={initialMessagesData}
+        initialPathData={initialPathData}
+        initialSettingsData={initialSettingsData}
+        initialSkillData={initialSkillData}
+        initialPublicFeedData={initialPublicFeedData}
+        initialFolderContentsData={initialFolderContentsData}
+        initialSubFolderContentsData={initialSubFolderContentsData}
+        initialSubFolderId={initialSubFolderId}
       >
-        <ChatBootProvider
-          activeThreadId={initialThreadId}
-          currentRootFolderId={initialRootFolderId}
-          currentSubFolderId={initialSubFolderId}
-          initialCredits={creditsToUse}
-          rootFolderPermissions={rootFolderPermissions}
-          initialFoldersData={initialFoldersData}
-          initialThreadsData={initialThreadsData}
-          initialMessagesData={initialMessagesData}
-          initialPathData={initialPathData}
-          initialSettingsData={initialSettingsData}
-          initialSkillData={initialSkillData}
-          initialPublicFeedData={initialPublicFeedData}
-          initialFolderContentsData={initialFolderContentsData}
-          initialSubFolderContentsData={initialSubFolderContentsData}
-          initialSubFolderId={initialSubFolderId}
-        >
-          <ChatInterface user={user} totalModelCount={totalModelCount} />
-        </ChatBootProvider>
-      </ChatNavigationProvider>
-    </>
+        <EndpointsPage
+          endpoint={aiStreamDefinition}
+          locale={locale}
+          user={user}
+          className="flex flex-col h-dvh w-full"
+        />
+      </ChatBootProvider>
+    </ChatNavigationProvider>
   );
 }
 

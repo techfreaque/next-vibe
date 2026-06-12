@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Threshold",
+    titleShort: "Threshold",
     description:
       "Fires when a series value satisfies a comparison against a constant",
     fields: {

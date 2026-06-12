@@ -21,13 +21,13 @@ import type {
   ClusterInitRequestOutput,
   ClusterInitResponseOutput,
 } from "./definition";
-import type { ClusterInitT } from "./i18n";
+import type { InfraT } from "../../i18n";
 
 export class ClusterInitRepository {
   static async init(
     data: ClusterInitRequestOutput,
     logger: EndpointLogger,
-    t: ClusterInitT,
+    t: InfraT,
   ): Promise<ResponseType<ClusterInitResponseOutput>> {
     try {
       logger.info("cluster-init: starting", {

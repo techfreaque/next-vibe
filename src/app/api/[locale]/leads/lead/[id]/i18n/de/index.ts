@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Leads",
   tags: {
     leads: "Leads",
@@ -7,6 +8,7 @@ export const translations = {
 
   get: {
     title: "Lead-Details abrufen",
+    titleShort: "Lead-Details",
     description: "Detaillierte Informationen zu einem bestimmten Lead laden",
     backButton: {
       label: "Zurück zu Leads",
@@ -274,6 +276,7 @@ export const translations = {
   },
   patch: {
     title: "Lead aktualisieren",
+    titleShort: "Lead bearbeiten",
     description: "Lead-Informationen und Status aktualisieren",
     backButton: {
       label: "Zurück zum Lead",
@@ -711,6 +714,7 @@ export const translations = {
   },
   delete: {
     title: "Lead löschen",
+    titleShort: "Lead löschen",
     description: "Lead aus dem System löschen",
     container: {
       title: "Lead löschen",

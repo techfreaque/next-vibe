@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Zgłoś umiejętność",
+    titleShort: "Zgłoś skill",
     description:
       "Zgłoś umiejętność społeczności do moderacji. Idempotentne - jedno zgłoszenie na użytkownika.",
     dynamicTitle: "Zgłoszenie: {{name}}",

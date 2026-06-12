@@ -33,9 +33,10 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
   title: "title" as const,
+  titleShort: "titleShort" as const,
   description: "description" as const,
-  category: "endpointCategories.payments",
-  subCategory: "endpointCategories.paymentTransactions",
+  category: "payments",
+  subCategory: "Transactions",
   icon: "refresh-ccw" as const,
   tags: ["tags.refund" as const, "tags.transaction" as const],
 

@@ -1,5 +1,6 @@
 export const translations = {
   title: "List Inbox",
+  titleShort: "Inbox",
   description: "List messages from the inbox or a specific folder",
   tag: "Inbox",
 

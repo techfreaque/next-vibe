@@ -18,8 +18,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
+import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 
 const ArchiveWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ArchiveWidget })),
@@ -37,6 +38,7 @@ const { POST } = createEndpoint({
     "archive",
   ],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "archive",
   category: "analytics",
@@ -50,7 +52,9 @@ const { POST } = createEndpoint({
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: graphsListDefinitions.GET,
+        labelField: "name",
         label: "post.fields.id.label",
         description: "post.fields.id.description",
         hidden: true,

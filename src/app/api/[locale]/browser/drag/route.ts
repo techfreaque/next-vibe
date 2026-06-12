@@ -4,9 +4,8 @@
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { BrowserTool, BrowserSharedRepository } from "./repository";
 
-import { BrowserTool } from "../enum";
-import { BrowserSharedRepository } from "../shared/repository";
 import dragEndpoints, { type DragResponseOutput } from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -21,6 +20,7 @@ export const { POST, tools } = endpointsHandler({
             from_uid: data.from_uid,
             to_uid: data.to_uid,
           }),
+          instanceId: data.instanceId,
         },
         t,
         logger,

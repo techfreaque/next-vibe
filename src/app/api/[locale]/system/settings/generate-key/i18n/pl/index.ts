@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "System",
   get: {
     title: "Generuj klucz bezpieczeństwa",
+    titleShort: "Generuj klucz",
     description:
       "Generuj kryptograficznie bezpieczny losowy 64-znakowy klucz hex",
     tags: {

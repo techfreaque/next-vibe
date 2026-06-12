@@ -1,6 +1,7 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Spent by Users",
     title: "Credits Spent by Users",
     description:
       "Sum of usage transactions from user wallets per resolution bucket",

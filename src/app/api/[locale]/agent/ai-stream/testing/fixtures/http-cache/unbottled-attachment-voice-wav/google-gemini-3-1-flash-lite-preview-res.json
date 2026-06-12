@@ -1,0 +1,74 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a060fa1abb62371d-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Wed, 03 Jun 2026 19:06:52 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1780513607-y30wSfkWzlUMNPoeB6lV"
+  },
+  "body": {
+    "id": "gen-1780513607-y30wSfkWzlUMNPoeB6lV",
+    "object": "chat.completion",
+    "created": 1780513607,
+    "model": "google/gemini-3.1-flash-lite-preview-20260303",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This video is a short, high-definition, professional-quality close-up shot that appears to be a promotional or cinematic clip related to Rubik’s Cubes.\n\n**Visual Content and Progression:**\nThe scene features a pair of hands holding a standard-sized 3x3 Rubik’s Cube in the center of the frame. The background is a dense, out-of-focus pile of dozens of other Rubik’s Cubes, creating a chaotic, cluttered, yet colorful \"sea\" of cubes. \n\nThroughout the duration of the clip, the hands perform a single, smooth, calculated manipulation of the cube: the fingers of the right hand rotate the top layer of the cube 90 degrees to the left. The lighting is dramatic and studio-quality, with deliberate highlights reflecting off the glossy plastic surfaces of the cubes, emphasizing the texture and mechanical nature of the object. There is no camera movement (the shot is static), and there are no cuts during the duration of the video. \n\n**Text and UI:**\nThere is no text, subtitles, or UI elements displayed on the screen at any point.\n\n**Audio:**\nThere is no human speech in the video. The primary audio is a crisp, amplified \"mechanical click-clack\" sound, representing the distinct sound of a Rubik’s Cube mechanism rotating. Beneath this, there is a low-frequency, slightly ominous, or rhythmic synthesized bass note that sustains throughout the clip, providing a high-tension atmosphere.\n\n**Style and Production:**\nThe style is hyper-realistic and cinematic, likely produced for a commercial, YouTube intro, or social media aesthetic video. The production quality is very high, utilizing shallow depth of field (bokeh) to isolate the primary cube held in the hands while blurring the background. \n\n**Mood and Arc:**\nThe tone is focused, precise, and satisfying. The arc is minimal, focusing entirely on the tactile sensation of solving or manipulating the puzzle. It conveys a sense of mastery and \"asmr-style\" sensory satisfaction. \n\n**Duration and Pacing:**\nThe clip is approximately 4 seconds long. The pacing is deliberate and slow, highlighting the singular mechanical motion of the layer shift. The focus is on the precision of the movement and the tactile nature of the object.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "EjQKMgEMOdbH/DcNoEy+RkFN5zyqQpsdj1OeGQbZuW8s2CadtZBtPxF4BYe9ENSYfKrEMleD",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 409,
+      "completion_tokens": 473,
+      "total_tokens": 882,
+      "cost": 0.00081175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00081175,
+        "upstream_inference_prompt_cost": 0.00010225,
+        "upstream_inference_completions_cost": 0.0007095
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

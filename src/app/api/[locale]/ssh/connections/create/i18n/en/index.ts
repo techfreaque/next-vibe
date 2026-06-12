@@ -18,6 +18,7 @@ export const translations = {
 
   post: {
     title: "Create SSH Connection",
+    titleShort: "Create Connection",
     description:
       "Save a new SSH connection. Credentials are encrypted at rest using AES-256-GCM.",
     fields: {

@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Utwórz konto",
+    titleShort: "Nowe konto",
     description: "Dodaj niestandardowe konto do planu kont firmy",
     companyId: {
       label: "ID firmy",

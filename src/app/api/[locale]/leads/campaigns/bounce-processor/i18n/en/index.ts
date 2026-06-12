@@ -45,6 +45,7 @@ export const translations = {
   },
   post: {
     title: "Bounce Processor",
+    titleShort: "Process Bounces",
     description: "Process email bounce notifications from IMAP",
     errors: {
       unauthorized: {
@@ -104,6 +105,7 @@ export const translations = {
   },
   get: {
     title: "Get Bounce Processor Config",
+    titleShort: "Bounce Config",
     description: "Retrieve bounce processor background task configuration",
     errors: {
       unauthorized: {

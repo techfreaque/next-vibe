@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Root-Ordner-Berechtigungen abrufen",
+    titleShort: "Ordnerzugriff",
     description: "Berechtigungen für einen Root-Ordner berechnen",
     container: {
       title: "Root-Ordner-Berechtigungen",

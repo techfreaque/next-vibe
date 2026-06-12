@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "JSON-Pfad",
+    titleShort: "JSON-Pfad",
     description:
       "JSON-Pfad - extrahiert Wert per Punktnotation (abgelöst, gibt leer zurück)",
     fields: {

@@ -70,6 +70,7 @@ export const translations: typeof enTranslations = {
     },
     post: {
       title: "MCP-Tool ausführen",
+      titleShort: "MCP-Server",
       description: "Ein MCP-Tool nach Namen mit Argumenten ausführen",
       fields: {
         title: "Tool-Ausführungsparameter",
@@ -148,6 +149,7 @@ export const translations: typeof enTranslations = {
     },
     post: {
       title: "MCP-Server starten",
+      titleShort: "MCP-Server",
       description: "Starten Sie den Model Context Protocol Server",
       response: {
         title: "MCP-Server-Status",

@@ -1,5 +1,6 @@
 export const translations = {
   title: "Docker Operations",
+  titleShort: "Docker DB",
   description: "Execute Docker commands and manage containers",
   category: "Docker",
   tags: {

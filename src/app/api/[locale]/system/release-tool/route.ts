@@ -13,11 +13,11 @@ import releaseToolEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: releaseToolEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, locale, logger }) => {
-      const { releaseToolRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return releaseToolRepository.execute(data, locale, logger);
-    },
+    handler: async ({ data, locale, logger }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).releaseToolRepository.execute(data, locale, logger),
   },
 });

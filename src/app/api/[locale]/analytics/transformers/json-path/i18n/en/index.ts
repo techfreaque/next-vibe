@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "JSON Path",
+    titleShort: "JSON Path",
     description:
       "JSON Path - extracts a value via dot-notation path (superseded, returns empty)",
     fields: {

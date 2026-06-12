@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Integracja Stripe CLI",
+  titleShort: "Stripe CLI",
   description: "Zarządzanie operacjami Stripe CLI i nasłuchiwaniem webhook-ów",
   category: "Integracja płatności",
   tags: {

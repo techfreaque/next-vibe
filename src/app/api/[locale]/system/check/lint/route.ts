@@ -13,18 +13,18 @@ import endpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, platform, locale, streamContext }) => {
-      const { LintRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return await LintRepository.execute(
+    handler: async ({ data, logger, platform, locale, streamContext }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).LintRepository.execute(
         data,
         logger,
         platform,
         undefined,
         streamContext.abortSignal,
         locale,
-      );
-    },
+      ),
   },
 });

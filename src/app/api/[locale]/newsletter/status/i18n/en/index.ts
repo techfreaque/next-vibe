@@ -1,5 +1,6 @@
 export const translations = {
   title: "Newsletter Status",
+  titleShort: "Newsletter Status",
   description: "Check newsletter subscription status for an email address",
   category: "Newsletter",
   tags: {

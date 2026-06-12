@@ -5,6 +5,7 @@ export const translations = {
   },
   post: {
     title: "Register Local Instance",
+    titleShort: "Register Instance",
     description:
       "Called by a local instance during connect flow to register itself on the cloud",
     instanceId: {

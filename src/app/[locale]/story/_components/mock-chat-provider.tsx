@@ -17,9 +17,9 @@ import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-
 import type { UseNavigationStackReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { ReactWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
-import { WidgetContextStoreContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import type { WidgetContextStoreType } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/widget-context-store";
+import type { ReactWidgetContext } from "next-vibe-ui/unified/_shared/react-types";
+import { WidgetContextStoreContext } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { WidgetContextStoreType } from "next-vibe-ui/unified/_shared/widget-context-store";
 
 const MOCK_CREDITS: ChatBootValue["initialCredits"] = {
   total: 0,

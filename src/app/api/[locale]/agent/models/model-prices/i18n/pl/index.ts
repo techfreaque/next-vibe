@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Agent",
 
   get: {
     title: "Aktualizuj wszystkie ceny modeli",
+    titleShort: "Aktualizuj ceny",
     description:
       "Pobierz aktualne ceny dla wszystkich modeli z każdego API dostawcy (OpenRouter, Replicate itp.) i zaktualizuj models.ts",
     form: {

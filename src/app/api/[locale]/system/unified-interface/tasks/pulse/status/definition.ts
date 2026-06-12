@@ -31,6 +31,7 @@ const pulseStatusEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["system", "unified-interface", "tasks", "pulse", "status"],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
   icon: "activity",
   category: "devTools",

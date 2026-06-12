@@ -1,6 +1,8 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   post: {
     title: "Verschieben",
+    titleShort: "Datei verschieben",
     description: "Datei oder Ordner verschieben oder umbenennen.",
     dynamicTitle: "{{from}} → {{to}}",
     status: {

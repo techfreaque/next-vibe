@@ -39,10 +39,11 @@ const { POST } = createEndpoint({
   aliases: ["ws-provider-stream"],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.AI_TOOL_OFF],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "radio",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiInference",
+  category: "ai",
+  subCategory: "Inference",
   tags: ["tags.ai", "tags.streaming"],
 
   fields: objectField(scopedTranslation, {

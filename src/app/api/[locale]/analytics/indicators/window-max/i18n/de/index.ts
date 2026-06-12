@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Fenster-Maximum",
+    titleShort: "Fenster-Max",
     description:
       "Gleitendes Fenstermaximum - verfolgt den höchsten Wert in einem festen Fenster",
     fields: {

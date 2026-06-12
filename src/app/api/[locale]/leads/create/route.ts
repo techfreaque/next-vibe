@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Leads Create API Route Handler
  * Handles POST requests for creating new leads

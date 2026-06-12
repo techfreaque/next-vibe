@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Generate Skills Index",
+    titleShort: "Skills Index",
     description: "Generate the default skills index file",
     container: {
       title: "Skills Index Generation",

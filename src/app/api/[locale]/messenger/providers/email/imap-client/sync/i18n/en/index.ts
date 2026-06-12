@@ -2,6 +2,7 @@ export const translations = {
   category: "IMAP Client",
 
   title: "IMAP Sync",
+  titleShort: "IMAP Sync",
   description: "IMAP synchronization service",
   container: {
     title: "IMAP Sync Configuration",

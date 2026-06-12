@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "NOWPayments CLI",
+    titleShort: "NOWPayments",
     description: "Manage NOWPayments webhook tunneling with ngrok",
     category: "Payment",
     tags: {

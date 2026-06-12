@@ -1,9 +1,11 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     publicFeed: "Öffentlicher Feed",
   },
   get: {
     title: "Community-Feed",
+    titleShort: "Community-Feed",
     description: "Öffentliche Threads der Community",
     sortMode: {
       label: "Sortierung",
@@ -51,6 +53,10 @@ export const translations = {
       pageSize: { content: "Seitengröße" },
     },
     errors: {
+      validationFailed: {
+        title: "Validierungsfehler",
+        description: "Ungültige Anfrageparameter",
+      },
       validation: {
         title: "Validierungsfehler",
         description: "Ungültige Anfrageparameter",
@@ -71,11 +77,23 @@ export const translations = {
         title: "Serverfehler",
         description: "Ein interner Serverfehler ist aufgetreten",
       },
+      serverError: {
+        title: "Serverfehler",
+        description: "Ein interner Serverfehler ist aufgetreten",
+      },
       network: {
         title: "Netzwerkfehler",
         description: "Keine Verbindung zum Server",
       },
+      networkError: {
+        title: "Netzwerkfehler",
+        description: "Keine Verbindung zum Server",
+      },
       unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      unknownError: {
         title: "Unbekannter Fehler",
         description: "Ein unerwarteter Fehler ist aufgetreten",
       },

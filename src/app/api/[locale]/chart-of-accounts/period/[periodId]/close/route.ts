@@ -8,13 +8,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
-      return await CoaPeriodCloseRepository.closePeriod(
-        data,
-        user,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ data, user, logger, locale }) =>
+      CoaPeriodCloseRepository.closePeriod(data, user, logger, locale),
   },
 });

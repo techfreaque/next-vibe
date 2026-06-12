@@ -22,15 +22,17 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import { GUARD_STATUS_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["system", "guard", "status"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.server",
-  subCategory: "endpointCategories.serverGuard",
+  category: "devTools",
+  subCategory: "serverGuard",
   tags: ["post.tag"],
   icon: "eye",
   allowedRoles: [
@@ -39,7 +41,7 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.PRODUCTION_OFF,
   ],
-  aliases: ["guard:status", "guard-status"],
+  aliases: [GUARD_STATUS_ALIAS] as const,
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

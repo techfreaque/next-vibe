@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Lead-Interaktionen",
+    titleShort: "Interaktionen",
     description: "Anzahl der Lead-Interaktionsereignisse pro Zeitfenster",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

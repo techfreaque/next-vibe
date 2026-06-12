@@ -7,29 +7,32 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  customWidgetObject,
   responseField,
-  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { LogoutWidget } from "./widget";
+
 import { UserRole } from "../../user-roles/enum";
 import { scopedTranslation } from "./i18n";
+
+export const LOGOUT_ALIAS = "logout" as const;
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["user", "private", "logout"],
+  aliases: [LOGOUT_ALIAS] as const,
   title: "title",
+  titleShort: "titleShort",
   description: "description",
   icon: "log-out",
-  category: "endpointCategories.userAuth",
-  subCategory: "endpointCategories.userAuthLogin",
+  category: "account",
   tags: ["tag"],
   allowedRoles: [
     UserRole.CUSTOMER,
@@ -38,25 +41,20 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "title",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { response: true },
+  defaultWebPinned: [
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
+  ] as const,
+  fields: customWidgetObject({
+    render: LogoutWidget,
+    usage: { response: true } as const,
     children: {
       message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         content: "response.message",
         schema: z.string(),
-      }),
-      submitButton: widgetField(scopedTranslation, {
-        type: WidgetType.SUBMIT_BUTTON,
-        text: "logoutButton",
-        loadingText: "loggingOut",
-        icon: "log-out",
-        columns: 12,
-        usage: { response: true },
       }),
     },
   }),

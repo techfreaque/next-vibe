@@ -10,7 +10,8 @@ export const translations: typeof enTranslations = {
     FEMALE: "Damski głos",
   },
   get: {
-    title: "Pobierz ustawienia czatu",
+    title: "Ustawienia",
+    titleShort: "Ustawienia chatu",
     description: "Pobierz ustawienia i preferencje użytkownika",
     errors: {
       validation: {
@@ -56,7 +57,8 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Aktualizuj ustawienia czatu",
+    title: "Zapisz ustawienia",
+    titleShort: "Ustawienia",
     description: "Aktualizuj ustawienia i preferencje użytkownika",
     container: {
       title: "Ustawienia czatu",
@@ -103,8 +105,7 @@ export const translations: typeof enTranslations = {
     searchProvider: {
       label: "Dostawca wyszukiwania",
       description:
-        "Preferowana wyszukiwarka. Auto wybiera najtańszego dostępnego dostawcę.",
-      auto: "Automatycznie",
+        "Preferowana wyszukiwarka. Auto używa Brave jeśli skonfigurowane, w przeciwnym razie Kagi.",
     },
     codingAgent: {
       label: "Agent kodowania",

@@ -1,5 +1,6 @@
 export const translations = {
   title: "Get leads by email",
+  titleShort: "Platform Email",
   description:
     "Receive an email notification every time someone submits your lead form. No third-party platform required - uses your account's email.",
   notifyEmail: {

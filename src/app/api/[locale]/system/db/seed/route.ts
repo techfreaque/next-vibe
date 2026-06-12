@@ -14,8 +14,6 @@ import { SeedRepository } from "./repository";
 export const { tools } = endpointsHandler({
   endpoint: seedEndpoints,
   [Methods.POST]: {
-    handler: ({ data, t, logger }) => {
-      return SeedRepository.execute(data, t, logger);
-    },
+    handler: ({ data, t, logger }) => SeedRepository.execute(data, t, logger),
   },
 });

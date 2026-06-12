@@ -1,6 +1,7 @@
 export const translations = {
   // Main checkout titles and descriptions
   title: "Create Subscription Checkout",
+  titleShort: "Checkout",
   description: "Create a Stripe checkout session for subscription",
   category: "Subscription",
 

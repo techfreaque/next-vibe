@@ -171,6 +171,7 @@ export const translations = {
     },
     klaviyo: {
       title: "Connect Klaviyo",
+      titleShort: "Klaviyo",
       description:
         "Connect your Klaviyo account to capture leads from your skill page",
       klaviyoApiKey: {
@@ -181,6 +182,7 @@ export const translations = {
     },
     getresponse: {
       title: "Connect GetResponse",
+      titleShort: "GetResponse",
       description:
         "Connect your GetResponse account to capture leads from your skill page",
       getresponseApiKey: {
@@ -191,6 +193,7 @@ export const translations = {
     },
     emarsys: {
       title: "Connect Emarsys",
+      titleShort: "Emarsys",
       description:
         "Connect your Emarsys account to capture leads from your skill page",
       emarsysUserName: {
@@ -211,6 +214,7 @@ export const translations = {
     },
     acumbamail: {
       title: "Connect Acumbamail",
+      titleShort: "Acumbamail",
       description:
         "Connect your Acumbamail account to capture leads from your skill page",
       acumbamailApiKey: {
@@ -221,6 +225,7 @@ export const translations = {
     },
     cleverreach: {
       title: "Connect CleverReach",
+      titleShort: "CleverReach",
       description:
         "Connect your CleverReach account to capture leads from your skill page",
       cleverreachClientId: {
@@ -251,6 +256,7 @@ export const translations = {
     },
     connectif: {
       title: "Connect Connectif",
+      titleShort: "Connectif",
       description:
         "Connect your Connectif account to capture leads from your skill page",
       connectifApiKey: {
@@ -261,6 +267,7 @@ export const translations = {
     },
     datanext: {
       title: "Connect DataNext",
+      titleShort: "DataNext",
       description:
         "Connect your DataNext account to capture leads from your skill page",
       datanextApiKey: {
@@ -286,6 +293,7 @@ export const translations = {
     },
     edrone: {
       title: "Connect Edrone",
+      titleShort: "Edrone",
       description:
         "Connect your Edrone account to capture leads from your skill page",
       edroneAppId: {
@@ -296,6 +304,7 @@ export const translations = {
     },
     expertsender: {
       title: "Connect ExpertSender",
+      titleShort: "ExpertSender",
       description:
         "Connect your ExpertSender account to capture leads from your skill page",
       expertSenderApiDomain: {
@@ -311,6 +320,7 @@ export const translations = {
     },
     freshmail: {
       title: "Connect FreshMail",
+      titleShort: "FreshMail",
       description:
         "Connect your FreshMail account to capture leads from your skill page",
       freshmailApiKey: {
@@ -331,6 +341,7 @@ export const translations = {
     },
     mailup: {
       title: "Connect MailUp",
+      titleShort: "MailUp",
       description:
         "Connect your MailUp account to capture leads from your skill page",
       mailupClientId: {
@@ -361,6 +372,7 @@ export const translations = {
     },
     mapp: {
       title: "Connect Mapp",
+      titleShort: "Mapp",
       description:
         "Connect your Mapp account to capture leads from your skill page",
       mappUsername: {
@@ -381,6 +393,7 @@ export const translations = {
     },
     sailthru: {
       title: "Connect Sailthru",
+      titleShort: "Sailthru",
       description:
         "Connect your Sailthru account to capture leads from your skill page",
       sailthruApiKey: {
@@ -401,6 +414,7 @@ export const translations = {
     },
     salesmanago: {
       title: "Connect SALESmanago",
+      titleShort: "SALESmanago",
       description:
         "Connect your SALESmanago account to capture leads from your skill page",
       salesManagoClientId: {
@@ -431,6 +445,7 @@ export const translations = {
     },
     shopify: {
       title: "Connect Shopify",
+      titleShort: "Shopify",
       description:
         "Connect your Shopify store to capture leads from your skill page",
       shopifyDomain: {
@@ -446,6 +461,7 @@ export const translations = {
     },
     spotler: {
       title: "Connect Spotler",
+      titleShort: "Spotler",
       description:
         "Connect your Spotler account to capture leads from your skill page",
       spotlerConsumerKey: {
@@ -461,6 +477,7 @@ export const translations = {
     },
     youlead: {
       title: "Connect YouLead",
+      titleShort: "YouLead",
       description:
         "Connect your YouLead account to capture leads from your skill page",
       youLeadAppId: {
@@ -481,6 +498,7 @@ export const translations = {
     },
     adobecampaign: {
       title: "Connect Adobe Campaign",
+      titleShort: "Adobe Campaign",
       description:
         "Connect your Adobe Campaign account to capture leads from your skill page",
       adobeCampaignOrganizationId: {
@@ -511,6 +529,7 @@ export const translations = {
     },
     platformEmail: {
       title: "Notify via platform email",
+      titleShort: "Platform Email",
       description:
         "Get an email notification every time someone signs up via your lead magnet",
       notifyEmail: {
@@ -526,6 +545,7 @@ export const translations = {
     },
     googleSheets: {
       title: "Connect Google Sheets",
+      titleShort: "Google Sheets",
       description:
         "Append a row to your Google Spreadsheet each time a lead signs up",
       saveTitle: "Save Google Sheets config",

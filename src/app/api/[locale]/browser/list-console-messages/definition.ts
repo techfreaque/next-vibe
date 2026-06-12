@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,10 +31,12 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "list-console-messages"],
+  aliases: ["browser-list-console-messages"] as const,
   title: "list-console-messages.title",
+  titleShort: "list-console-messages.titleShort",
   description: "list-console-messages.description",
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserDevTools",
+  category: "browser",
+  subCategory: "DevTools",
   icon: "terminal",
   tags: [
     "list-console-messages.tags.browserAutomation",
@@ -131,6 +134,8 @@ const { POST } = createEndpoint({
             "Filter messages to only return messages of the specified types. When omitted or empty, returns all messages.",
           ),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

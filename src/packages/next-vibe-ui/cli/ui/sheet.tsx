@@ -1,3 +1,4 @@
+import { Text } from "ink";
 import * as React from "react";
 
 export type {
@@ -25,20 +26,26 @@ import type {
   SheetDescriptionProps,
 } from "../../web/ui/sheet";
 
-export function Sheet({ children }: SheetRootProps): React.JSX.Element | null {
+export function Sheet({
+  children,
+  open,
+}: SheetRootProps): React.JSX.Element | null {
+  if (open === false) {
+    return null;
+  }
   return <>{children}</>;
 }
 
 export function SheetTrigger({
   children,
 }: SheetTriggerProps): React.JSX.Element | null {
-  return <>{children}</>;
+  return <Text>{children}</Text>;
 }
 
 export function SheetClose({
   children,
 }: SheetCloseProps): React.JSX.Element | null {
-  return <>{children}</>;
+  return <Text>{children}</Text>;
 }
 
 export function SheetPortal({
@@ -72,11 +79,11 @@ export function SheetFooter({
 export function SheetTitle({
   children,
 }: SheetTitleProps): React.JSX.Element | null {
-  return <>{children}</>;
+  return <Text bold>{children}</Text>;
 }
 
 export function SheetDescription({
   children,
 }: SheetDescriptionProps): React.JSX.Element | null {
-  return <>{children}</>;
+  return <Text>{children}</Text>;
 }

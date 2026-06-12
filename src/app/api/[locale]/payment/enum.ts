@@ -242,3 +242,81 @@ export const PaymentIntervalDB = [
   PaymentInterval.YEAR,
   PaymentInterval.ONE_TIME,
 ] as const;
+
+/**
+ * Manual payment method enum
+ * Methods for recording manual payments against invoices
+ */
+export const {
+  enum: ManualPaymentMethod,
+  options: ManualPaymentMethodOptions,
+  Value: ManualPaymentMethodValue,
+} = createEnumOptions(scopedTranslation, {
+  CASH: "enums.manualPaymentMethod.cash",
+  BANK_TRANSFER: "enums.manualPaymentMethod.bankTransfer",
+  OTHER: "enums.manualPaymentMethod.other",
+} as const);
+
+export type ManualPaymentMethodType = typeof ManualPaymentMethodValue;
+
+export const ManualPaymentMethodDB = [
+  ManualPaymentMethod.CASH,
+  ManualPaymentMethod.BANK_TRANSFER,
+  ManualPaymentMethod.OTHER,
+] as const;
+
+/**
+ * Bill status enum
+ * Tracks the lifecycle of AP bills received from suppliers
+ */
+export const {
+  enum: BillStatus,
+  options: BillStatusOptions,
+  Value: BillStatusValue,
+} = createEnumOptions(scopedTranslation, {
+  DRAFT: "enums.billStatus.DRAFT",
+  RECEIVED: "enums.billStatus.RECEIVED",
+  APPROVED: "enums.billStatus.APPROVED",
+  PAID: "enums.billStatus.PAID",
+  DISPUTED: "enums.billStatus.DISPUTED",
+} as const);
+
+export type BillStatusType = typeof BillStatusValue;
+
+export const BillStatusDB = [
+  BillStatus.DRAFT,
+  BillStatus.RECEIVED,
+  BillStatus.APPROVED,
+  BillStatus.PAID,
+  BillStatus.DISPUTED,
+] as const;
+
+export type BillStatusDBType = (typeof BillStatusDB)[number];
+
+/**
+ * Estimate status enum
+ * Tracks the lifecycle of sales estimates/quotes
+ */
+export const {
+  enum: EstimateStatus,
+  options: EstimateStatusOptions,
+  Value: EstimateStatusValue,
+} = createEnumOptions(scopedTranslation, {
+  DRAFT: "enums.estimateStatus.DRAFT",
+  SENT: "enums.estimateStatus.SENT",
+  ACCEPTED: "enums.estimateStatus.ACCEPTED",
+  DECLINED: "enums.estimateStatus.DECLINED",
+  EXPIRED: "enums.estimateStatus.EXPIRED",
+  CONVERTED: "enums.estimateStatus.CONVERTED",
+} as const);
+
+export type EstimateStatusType = typeof EstimateStatusValue;
+
+export const EstimateStatusDB = [
+  EstimateStatus.DRAFT,
+  EstimateStatus.SENT,
+  EstimateStatus.ACCEPTED,
+  EstimateStatus.DECLINED,
+  EstimateStatus.EXPIRED,
+  EstimateStatus.CONVERTED,
+] as const;

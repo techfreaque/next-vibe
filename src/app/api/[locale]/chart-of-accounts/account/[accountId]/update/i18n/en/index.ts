@@ -1,6 +1,7 @@
 export const translations = {
   patch: {
     title: "Edit Account",
+    titleShort: "Edit Account",
     description:
       "Update account name, description, or sort order. Type and subtype cannot be changed on system accounts.",
     accountId: {

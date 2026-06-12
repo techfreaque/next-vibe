@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
 
   patch: {
     title: "Aktualizacja wsadowa",
+    titleShort: "Aktualizacja wsadowa",
     description:
       "Aktualizacja leadów wsadowo na podstawie kryteriów filtrowania",
     form: {
@@ -121,6 +122,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Usuwanie wsadowe",
+    titleShort: "Usuwanie wsadowe",
     description: "Usuwanie leadów wsadowo na podstawie kryteriów filtrowania",
     form: {
       title: "Konfiguracja usuwania wsadowego",

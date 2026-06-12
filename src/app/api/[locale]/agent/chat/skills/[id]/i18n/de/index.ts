@@ -32,6 +32,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Charakter abrufen",
+    titleShort: "Skill-Details",
     dynamicTitle: "Charakter: {{name}}",
     description: "Eine bestimmte Charakter anhand der ID abrufen",
     container: {
@@ -241,6 +242,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Charakter aktualisieren",
+    titleShort: "Skill bearbeiten",
     dynamicTitle: "Bearbeiten: {{name}}",
     container: {
       title: "Charakter aktualisieren",
@@ -456,6 +458,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Charakter löschen",
+    titleShort: "Skill löschen",
     dynamicTitle: "Löschen: {{name}}",
     description: "Einen benutzerdefinierten Charakter löschen",
     container: {

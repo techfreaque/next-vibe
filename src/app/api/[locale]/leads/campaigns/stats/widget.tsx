@@ -6,18 +6,24 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
+import { DetailField } from "next-vibe-ui/ui/detail-grid";
 import { Div } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
 import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { Play } from "next-vibe-ui/ui/icons/Play";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { Users } from "next-vibe-ui/ui/icons/Users";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import { MetricCard } from "next-vibe-ui/ui/metric-card";
+import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
+import { ProgressBlock } from "next-vibe-ui/ui/progress-block";
+import { ResultBanner } from "next-vibe-ui/ui/result-banner";
+import { SectionGroup } from "next-vibe-ui/ui/section-group";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useMemo } from "react";
+import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+import React from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
@@ -27,7 +33,8 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { scopedTranslation as leadsI18n } from "@/app/api/[locale]/leads/i18n";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -37,58 +44,6 @@ import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import type definition from "./definition";
 
 type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
-
-// ── Stat card ────────────────────────────────────────────────────────────────
-
-function StatCard({
-  label,
-  value,
-  format = "number",
-  variant = "default",
-  size = "default",
-}: {
-  label: string;
-  value: number | null | undefined;
-  format?: "number" | "percent" | "compact";
-  variant?: "default" | "success" | "warning" | "danger" | "info";
-  size?: "default" | "large";
-}): React.JSX.Element {
-  const variantClass = {
-    default: "text-foreground",
-    success: "text-success",
-    warning: "text-warning",
-    danger: "text-destructive",
-    info: "text-info",
-  }[variant];
-
-  const formatted = useMemo(() => {
-    if (value === null || value === undefined) {
-      return "—";
-    }
-    if (format === "percent") {
-      return `${(value * 100).toFixed(1)}%`;
-    }
-    if (format === "compact" && value >= 1000) {
-      return `${(value / 1000).toFixed(1)}k`;
-    }
-    return value.toLocaleString();
-  }, [value, format]);
-
-  return (
-    <Div className="flex flex-col gap-1">
-      <Span className="text-xs text-muted-foreground">{label}</Span>
-      <Span
-        className={cn(
-          "font-bold tabular-nums",
-          size === "large" ? "text-3xl" : "text-2xl",
-          variantClass,
-        )}
-      >
-        {formatted}
-      </Span>
-    </Div>
-  );
-}
 
 // ── Bar row ──────────────────────────────────────────────────────────────────
 
@@ -140,25 +95,6 @@ const STAGE_COLORS: Record<string, string> = {
   "enums.emailCampaignStage.reactivation": "#22c55e",
 };
 
-const STAGE_LABELS: Record<string, string> = {
-  "enums.emailCampaignStage.notStarted": "Not Started",
-  "enums.emailCampaignStage.initial": "Initial Contact",
-  "enums.emailCampaignStage.followup1": "Follow-up 1",
-  "enums.emailCampaignStage.followup2": "Follow-up 2",
-  "enums.emailCampaignStage.followup3": "Follow-up 3",
-  "enums.emailCampaignStage.nurture": "Nurture",
-  "enums.emailCampaignStage.reactivation": "Reactivation",
-};
-
-const VARIANT_LABELS: Record<string, string> = {
-  "enums.emailJourneyVariant.uncensoredConvert": "Uncensored Convert",
-  "enums.emailJourneyVariant.sideHustle": "Side Hustle",
-  "enums.emailJourneyVariant.quietRecommendation": "Quiet Recommendation",
-  "enums.emailJourneyVariant.signupNurture": "Signup Nurture",
-  "enums.emailJourneyVariant.retention": "Retention",
-  "enums.emailJourneyVariant.winback": "Winback",
-};
-
 const VARIANT_COLORS: string[] = [
   "#3b82f6",
   "#6366f1",
@@ -206,32 +142,6 @@ function getStatusDotColor(status: string | null): string {
   }
 }
 
-function getHealthBg(health: string): string {
-  switch (health) {
-    case "healthy":
-      return "bg-success/10 border-success/30";
-    case "warning":
-      return "bg-warning/10 border-warning/30";
-    case "critical":
-      return "bg-destructive/10 border-destructive/30";
-    default:
-      return "bg-muted border-border";
-  }
-}
-
-function getHealthColor(health: string): string {
-  switch (health) {
-    case "healthy":
-      return "text-success";
-    case "warning":
-      return "text-orange-600 dark:text-orange-400";
-    case "critical":
-      return "text-destructive";
-    default:
-      return "text-muted-foreground";
-  }
-}
-
 type CampaignTask = NonNullable<GetResponseOutput["campaignTasks"]>[number];
 type TaskAlert = NonNullable<GetResponseOutput["alerts"]>[number];
 
@@ -257,39 +167,24 @@ function CronHealthSection({
     <Div className="flex flex-col gap-3">
       {/* Health bar */}
       {stats && (
-        <Div
-          className={cn(
-            "rounded-lg border p-3 flex items-center gap-3",
-            getHealthBg(health),
-          )}
-        >
-          {health === "healthy" ? (
-            <CheckCircle2
-              className={cn("h-5 w-5 flex-shrink-0", getHealthColor(health))}
-            />
-          ) : (
-            <XCircle
-              className={cn("h-5 w-5 flex-shrink-0", getHealthColor(health))}
-            />
-          )}
-          <Span className={cn("font-semibold text-sm", getHealthColor(health))}>
-            {t(`widget.cronHealth.${health}` as Parameters<typeof t>[0])}
-          </Span>
-          <Div className="flex items-center gap-4 ml-auto text-xs text-muted-foreground">
-            <Span>
-              {stats.enabledTasks}/{stats.totalTasks}{" "}
-              {t("widget.cronHealth.enabled")}
-            </Span>
-            {stats.successRate24h !== null && (
-              <Span className="font-medium">{stats.successRate24h}%</Span>
-            )}
-            {stats.failedTasks24h > 0 && (
-              <Span className="text-destructive font-medium">
-                {stats.failedTasks24h} {t("widget.cronHealth.failed24h")}
-              </Span>
-            )}
-          </Div>
-        </Div>
+        <ResultBanner
+          variant={
+            health === "healthy"
+              ? "success"
+              : health === "warning"
+                ? "warning"
+                : "danger"
+          }
+          icon={
+            health === "healthy" ? (
+              <CheckCircle2 className="h-5 w-5" />
+            ) : (
+              <XCircle className="h-5 w-5" />
+            )
+          }
+          title={t(`widget.cronHealth.${health}` as Parameters<typeof t>[0])}
+          message={`${stats.enabledTasks}/${stats.totalTasks} ${t("widget.cronHealth.enabled")}${stats.successRate24h !== null ? ` · ${stats.successRate24h}%` : ""}${stats.failedTasks24h > 0 ? ` · ${stats.failedTasks24h} ${t("widget.cronHealth.failed24h")}` : ""}`}
+        />
       )}
 
       {/* Alerts */}
@@ -299,26 +194,13 @@ function CronHealthSection({
             {t("widget.cronHealth.alerts")}
           </Span>
           {alerts.map((alert) => (
-            <Div
+            <ResultBanner
               key={alert.taskId}
-              className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 flex flex-col gap-1"
-            >
-              <Div className="flex items-center gap-2">
-                <AlertTriangle className="h-3.5 w-3.5 text-destructive flex-shrink-0" />
-                <Span className="font-semibold text-sm text-destructive">
-                  {alert.taskName}
-                </Span>
-                <Span className="text-xs text-destructive ml-auto">
-                  {alert.consecutiveFailures}{" "}
-                  {t("widget.cronHealth.alertFailures")}
-                </Span>
-              </Div>
-              {alert.lastError && (
-                <Span className="text-xs text-destructive font-mono pl-5 truncate">
-                  {alert.lastError}
-                </Span>
-              )}
-            </Div>
+              variant="danger"
+              icon={<AlertTriangle className="h-3.5 w-3.5" />}
+              title={alert.taskName}
+              message={`${alert.consecutiveFailures} ${t("widget.cronHealth.alertFailures")}${alert.lastError ? ` · ${alert.lastError}` : ""}`}
+            />
           ))}
         </Div>
       )}
@@ -329,7 +211,7 @@ function CronHealthSection({
           {t("widget.cronHealth.empty")}
         </Span>
       ) : (
-        <Div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Div className="grid grid-cols-1 @sm:grid-cols-3 gap-3">
           {tasks.map((task) => {
             const successRate =
               task.executionCount > 0
@@ -421,27 +303,48 @@ function CronHealthSection({
                   </Span>
                 )}
                 <Div className="grid grid-cols-2 gap-2 text-xs">
-                  <Div className="flex flex-col gap-0.5">
-                    <Span className="text-muted-foreground">
-                      {t("widget.cronHealth.lastRun")}
-                    </Span>
-                    <Span>
-                      {formatDate(task.lastExecutedAt) ||
-                        t("widget.cronHealth.never")}
-                    </Span>
-                  </Div>
-                  <Div className="flex flex-col gap-0.5">
-                    <Span className="text-muted-foreground">
-                      {t("widget.cronHealth.nextRun")}
-                    </Span>
-                    <Span>{formatDate(task.nextExecutionAt) || "—"}</Span>
-                  </Div>
+                  <DetailField
+                    label={t("widget.cronHealth.lastRun")}
+                    value={
+                      formatDate(task.lastExecutedAt) ||
+                      t("widget.cronHealth.never")
+                    }
+                  />
+                  <DetailField
+                    label={t("widget.cronHealth.nextRun")}
+                    value={formatDate(task.nextExecutionAt) || "—"}
+                  />
                 </Div>
               </Div>
             );
           })}
         </Div>
       )}
+    </Div>
+  );
+}
+
+// ── Rate card with ratio subtitle ───────────────────────────────────────────
+
+function RateCard({
+  label,
+  rate,
+  numerator,
+  denominator,
+  variant = "info",
+}: {
+  label: string;
+  rate: number;
+  numerator: number;
+  denominator: number;
+  variant?: "default" | "success" | "warning" | "danger" | "info";
+}): React.JSX.Element {
+  const formatted = `${(rate * 100).toFixed(1)}%`;
+  const subtitle = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
+  return (
+    <Div className="flex flex-col gap-1">
+      <MetricCard label={label} value={formatted} variant={variant} />
+      <Span className="text-xs text-muted-foreground pl-1">{subtitle}</Span>
     </Div>
   );
 }
@@ -455,6 +358,7 @@ export function CampaignStatsWidget(): React.JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const locale = useWidgetLocale();
   const logger = useWidgetLogger();
+  const leadsT = leadsI18n.scopedT(locale).t;
 
   const handleRun = React.useCallback(
     (taskId: string): void => {
@@ -479,26 +383,25 @@ export function CampaignStatsWidget(): React.JSX.Element {
   const hasData = data !== null && data !== undefined;
 
   return (
-    <Div className="flex flex-col gap-6 p-4">
+    <WidgetShell>
       {/* Header */}
-      <Div className="flex items-center gap-2">
-        <BarChart2 className="h-5 w-5 text-muted-foreground" />
-        <Span className="font-semibold text-base mr-auto">
-          {t("widget.title")}
-        </Span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => endpointMutations?.read?.refetch?.()}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-      </Div>
+      <WidgetHeader
+        title={t("widget.title")}
+        actions={
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => endpointMutations?.read?.refetch?.()}
+            title={t("widget.refresh")}
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        }
+      />
 
       {/* ── Hero row: 2 large highlight cards ───────────────────────── */}
-      <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
         {/* Active campaigns card */}
         <Div className="rounded-xl border bg-gradient-to-br from-info/10 to-primary/10 p-5 flex flex-col gap-3">
           <Div className="flex items-center gap-2">
@@ -509,20 +412,18 @@ export function CampaignStatsWidget(): React.JSX.Element {
               {t("widget.activeCampaigns")}
             </Span>
           </Div>
-          <Div className="grid grid-cols-2 gap-4">
-            <StatCard
+          <MetricGrid columns={2}>
+            <MetricCard
               label={t("get.response.pendingLeadsCount")}
-              value={data?.pendingLeadsCount}
+              value={data?.pendingLeadsCount ?? 0}
               variant="info"
-              size="large"
             />
-            <StatCard
+            <MetricCard
               label={t("get.response.emailsScheduledToday")}
-              value={data?.emailsScheduledToday}
+              value={data?.emailsScheduledToday ?? 0}
               variant="info"
-              size="large"
             />
-          </Div>
+          </MetricGrid>
         </Div>
 
         {/* Today's activity card */}
@@ -535,148 +436,117 @@ export function CampaignStatsWidget(): React.JSX.Element {
               {t("widget.sendPerformance")}
             </Span>
           </Div>
-          <Div className="grid grid-cols-2 gap-4">
-            <StatCard
+          <MetricGrid columns={2}>
+            <MetricCard
               label={t("get.response.sent")}
-              value={data?.sent}
+              value={data?.sent ?? 0}
               variant="success"
-              size="large"
             />
-            <StatCard
+            <MetricCard
               label={t("get.response.delivered")}
-              value={data?.delivered}
+              value={data?.delivered ?? 0}
               variant="success"
-              size="large"
             />
-          </Div>
+          </MetricGrid>
         </Div>
       </Div>
 
       {/* ── KPI row: 4 compact rate cards ───────────────────────────── */}
-      <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Div className="rounded-lg border bg-card p-4 flex flex-col gap-1">
-          <Span className="text-xs text-muted-foreground">
-            {t("get.response.openRate")}
-          </Span>
-          <Span className="text-2xl font-bold tabular-nums text-info">
-            {hasData ? `${(data.openRate * 100).toFixed(1)}%` : "—"}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {hasData
-              ? `${data.opened.toLocaleString()} / ${data.sent.toLocaleString()}`
-              : ""}
-          </Span>
-        </Div>
-        <Div className="rounded-lg border bg-card p-4 flex flex-col gap-1">
-          <Span className="text-xs text-muted-foreground">
-            {t("get.response.clickRate")}
-          </Span>
-          <Span className="text-2xl font-bold tabular-nums text-info">
-            {hasData ? `${(data.clickRate * 100).toFixed(1)}%` : "—"}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {hasData
-              ? `${data.clicked.toLocaleString()} / ${data.sent.toLocaleString()}`
-              : ""}
-          </Span>
-        </Div>
-        <Div className="rounded-lg border bg-card p-4 flex flex-col gap-1">
-          <Span className="text-xs text-muted-foreground">
-            {t("get.response.deliveryRate")}
-          </Span>
-          <Span className="text-2xl font-bold tabular-nums text-success">
-            {hasData ? `${(data.deliveryRate * 100).toFixed(1)}%` : "—"}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {hasData
-              ? `${data.delivered.toLocaleString()} / ${data.total.toLocaleString()}`
-              : ""}
-          </Span>
-        </Div>
-        <Div className="rounded-lg border bg-card p-4 flex flex-col gap-1">
-          <Span className="text-xs text-muted-foreground">
-            {t("get.response.failureRate")}
-          </Span>
-          <Span
-            className={cn(
-              "text-2xl font-bold tabular-nums",
-              hasData && data.failureRate > 0.05
-                ? "text-destructive"
-                : "text-foreground",
-            )}
-          >
-            {hasData ? `${(data.failureRate * 100).toFixed(1)}%` : "—"}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {hasData
-              ? `${data.failed.toLocaleString()} ${t("get.response.failed").toLowerCase()}`
-              : ""}
-          </Span>
-        </Div>
-      </Div>
+      <MetricGrid columns={4}>
+        {hasData ? (
+          <>
+            <RateCard
+              label={t("get.response.openRate")}
+              rate={data.openRate}
+              numerator={data.opened}
+              denominator={data.sent}
+            />
+            <RateCard
+              label={t("get.response.clickRate")}
+              rate={data.clickRate}
+              numerator={data.clicked}
+              denominator={data.sent}
+            />
+            <RateCard
+              label={t("get.response.deliveryRate")}
+              rate={data.deliveryRate}
+              numerator={data.delivered}
+              denominator={data.total}
+              variant="success"
+            />
+            <RateCard
+              label={t("get.response.failureRate")}
+              rate={data.failureRate}
+              numerator={data.failed}
+              denominator={data.total}
+              variant={data.failureRate > 0.05 ? "danger" : "default"}
+            />
+          </>
+        ) : (
+          <>
+            <MetricCard label={t("get.response.openRate")} value="—" />
+            <MetricCard label={t("get.response.clickRate")} value="—" />
+            <MetricCard label={t("get.response.deliveryRate")} value="—" />
+            <MetricCard label={t("get.response.failureRate")} value="—" />
+          </>
+        )}
+      </MetricGrid>
 
       {/* ── Lead overview (compact) ─────────────────────────────────── */}
       {hasData && data.totalLeads > 0 && (
-        <Div className="rounded-lg border bg-card p-4">
-          <Div className="flex items-center gap-2 mb-3">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <Span className="text-sm font-semibold">
-              {t("widget.leadOverview")}
-            </Span>
-          </Div>
-          <Div className="grid grid-cols-3 gap-4">
-            <StatCard
+        <SectionGroup title={t("widget.leadOverview")}>
+          <MetricGrid columns={3}>
+            <MetricCard
               label={t("widget.totalLeads")}
               value={data.totalLeads}
               format="compact"
             />
-            <StatCard
+            <MetricCard
               label={t("widget.linkedLeadsCount")}
               value={data.linkedLeadsCount}
               format="compact"
               variant="info"
             />
-            <StatCard
+            <MetricCard
               label={t("widget.uniquePersonsEstimate")}
               value={data.uniquePersonsEstimate}
               format="compact"
               variant="success"
             />
-          </Div>
-        </Div>
+          </MetricGrid>
+        </SectionGroup>
       )}
 
       {/* ── Stage funnel + variant breakdown side by side ────────────── */}
-      <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
         {byStage.length > 0 && (
-          <Div className="rounded-lg border bg-card p-4">
-            <Span className="text-sm font-semibold mb-3 block">
-              {t("widget.stageLabel")}
-            </Span>
+          <SectionGroup title={t("widget.stageLabel")}>
             <Div className="flex flex-col gap-1.5">
               {byStage.map((s) => (
                 <BarRow
                   key={s.stage}
-                  label={STAGE_LABELS[s.stage] ?? s.stage}
+                  label={
+                    leadsT(s.stage as Parameters<typeof leadsT>[0]) ?? s.stage
+                  }
                   value={s.total}
                   max={stageMax}
                   color={STAGE_COLORS[s.stage] ?? "hsl(var(--primary))"}
                 />
               ))}
             </Div>
-          </Div>
+          </SectionGroup>
         )}
 
         {byVariant.length > 0 && (
-          <Div className="rounded-lg border bg-card p-4">
-            <Span className="text-sm font-semibold mb-3 block">
-              {t("widget.variantLabel")}
-            </Span>
+          <SectionGroup title={t("widget.variantLabel")}>
             <Div className="flex flex-col gap-1.5">
               {byVariant.map((v, i) => (
                 <BarRow
                   key={v.variant}
-                  label={VARIANT_LABELS[v.variant] ?? v.variant}
+                  label={
+                    leadsT(v.variant as Parameters<typeof leadsT>[0]) ??
+                    v.variant
+                  }
                   value={v.total}
                   max={variantMax}
                   color={VARIANT_COLORS[i % VARIANT_COLORS.length]}
@@ -684,28 +554,26 @@ export function CampaignStatsWidget(): React.JSX.Element {
                 />
               ))}
             </Div>
-          </Div>
+          </SectionGroup>
         )}
       </Div>
 
       {/* ── Weekly quota progress ───────────────────────────────────── */}
       {hasData && (data.quotaProgress ?? []).length > 0 && (
-        <Div className="rounded-lg border bg-card p-4">
-          <Span className="text-sm font-semibold mb-3 block">
-            {t("get.response.quotaProgress")}
-          </Span>
-          <Div className="flex flex-col gap-2">
+        <SectionGroup title={t("get.response.quotaProgress")}>
+          <Div className="flex flex-col gap-3">
             {(data.quotaProgress ?? []).map((q) => {
               const pct =
                 q.weeklyQuota > 0
-                  ? Math.min(1, q.startedThisWeek / q.weeklyQuota)
+                  ? Math.round(
+                      Math.min(1, q.startedThisWeek / q.weeklyQuota) * 100,
+                    )
                   : 0;
-              const isAlmostFull = pct >= 0.9;
-              const barColor = isAlmostFull ? "#22c55e" : "#3b82f6";
+              const isAlmostFull = pct >= 90;
               const isZeroBudget = q.perRunBudget <= 0 && q.weeklyQuota > 0;
-              const accPct = Math.min(1, q.accumulator ?? 0);
+              const accPct = Math.round(Math.min(1, q.accumulator ?? 0) * 100);
               return (
-                <Div key={q.locale} className="flex flex-col gap-1">
+                <Div key={q.locale} className="flex flex-col gap-1.5">
                   <Div className="flex items-center justify-between">
                     <Span className="text-xs font-medium">{q.locale}</Span>
                     <Div className="flex items-center gap-2">
@@ -727,22 +595,16 @@ export function CampaignStatsWidget(): React.JSX.Element {
                       </Span>
                     </Div>
                   </Div>
-                  <Div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <Div
-                      style={{
-                        width: `${pct * 100}%`,
-                        height: "100%",
-                        borderRadius: "9999px",
-                        backgroundColor: barColor,
-                      }}
-                    />
-                  </Div>
+                  <ProgressBlock
+                    value={pct}
+                    variant={isAlmostFull ? "success" : "default"}
+                  />
                   {q.weeklyQuota > 0 && (
                     <Div className="flex items-center gap-1.5">
                       <Div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
                         <Div
                           style={{
-                            width: `${accPct * 100}%`,
+                            width: `${accPct}%`,
                             height: "100%",
                             borderRadius: "9999px",
                             backgroundColor: "#a855f7",
@@ -751,7 +613,7 @@ export function CampaignStatsWidget(): React.JSX.Element {
                       </Div>
                       <Span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
                         {t("widget.accumulator", {
-                          pct: Math.round(accPct * 100),
+                          pct: accPct,
                         })}
                       </Span>
                     </Div>
@@ -760,15 +622,12 @@ export function CampaignStatsWidget(): React.JSX.Element {
               );
             })}
           </Div>
-        </Div>
+        </SectionGroup>
       )}
 
       {/* ── Cron health ─────────────────────────────────────────────── */}
       {hasData && (
-        <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
-          <Span className="text-sm font-semibold">
-            {t("widget.cronHealth.title")}
-          </Span>
+        <SectionGroup title={t("widget.cronHealth.title")}>
           <CronHealthSection
             data={data}
             t={t}
@@ -776,28 +635,28 @@ export function CampaignStatsWidget(): React.JSX.Element {
             locale={locale}
             logger={logger}
           />
-        </Div>
+        </SectionGroup>
       )}
 
       {/* ── Volume summary row ──────────────────────────────────────── */}
-      <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard label={t("get.response.total")} value={data?.total} />
-        <StatCard
+      <MetricGrid columns={4}>
+        <MetricCard label={t("get.response.total")} value={data?.total ?? 0} />
+        <MetricCard
           label={t("get.response.pending")}
-          value={data?.pending}
+          value={data?.pending ?? 0}
           variant="warning"
         />
-        <StatCard
+        <MetricCard
           label={t("get.response.opened")}
-          value={data?.opened}
+          value={data?.opened ?? 0}
           variant="success"
         />
-        <StatCard
+        <MetricCard
           label={t("get.response.clicked")}
-          value={data?.clicked}
+          value={data?.clicked ?? 0}
           variant="success"
         />
-      </Div>
-    </Div>
+      </MetricGrid>
+    </WidgetShell>
   );
 }

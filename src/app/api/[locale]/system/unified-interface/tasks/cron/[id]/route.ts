@@ -12,77 +12,21 @@ import { endpoints } from "./definition";
 export const { GET, PUT, DELETE, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: async ({ urlPathParams, user, locale, logger }) =>
-      await CronTasksRepository.getTaskById(
-        urlPathParams.id,
-        user,
-        locale,
-        logger,
-      ),
+    handler: ({ urlPathParams, user, locale, logger }) =>
+      CronTasksRepository.getTaskById(urlPathParams.id, user, locale, logger),
   },
   [Methods.PUT]: {
-    handler: async ({ data, urlPathParams, user, locale, logger }) => {
-      const updates: Partial<
-        Parameters<typeof CronTasksRepository.updateTask>[1]
-      > = {};
-      if (data.displayName !== undefined) {
-        updates.displayName = data.displayName;
-      }
-      if (data.description !== undefined) {
-        updates.description = data.description;
-      }
-      if (data.schedule !== undefined) {
-        updates.schedule = data.schedule;
-      }
-      if (data.enabled !== undefined) {
-        updates.enabled = data.enabled;
-      }
-      if (data.priority !== undefined) {
-        updates.priority = data.priority;
-      }
-      if (data.outputMode !== undefined) {
-        updates.outputMode = data.outputMode;
-      }
-      if (data.timeout !== undefined) {
-        updates.timeout = data.timeout;
-      }
-      if (data.retries !== undefined) {
-        updates.retries = data.retries;
-      }
-      if (data.retryDelay !== undefined) {
-        updates.retryDelay = data.retryDelay;
-      }
-      if (data.hidden !== undefined) {
-        updates.hidden = data.hidden;
-      }
-      if (data.taskInput !== undefined) {
-        updates.taskInput = data.taskInput;
-      }
-      if (data.runOnce !== undefined) {
-        updates.runOnce = data.runOnce;
-      }
-      if (data.targetInstance !== undefined) {
-        updates.targetInstance = data.targetInstance;
-      }
-      if (data.lastExecutionStatus !== undefined) {
-        updates.lastExecutionStatus = data.lastExecutionStatus;
-      }
-      return await CronTasksRepository.updateTask(
+    handler: ({ data, urlPathParams, user, locale, logger }) =>
+      CronTasksRepository.patchTask(
         urlPathParams.id,
-        updates,
-        user,
-        locale,
-        logger,
-      );
-    },
-  },
-  [Methods.DELETE]: {
-    handler: async ({ urlPathParams, user, locale, logger }) =>
-      await CronTasksRepository.deleteTask(
-        urlPathParams.id,
+        data,
         user,
         locale,
         logger,
       ),
+  },
+  [Methods.DELETE]: {
+    handler: ({ urlPathParams, user, locale, logger }) =>
+      CronTasksRepository.deleteTask(urlPathParams.id, user, locale, logger),
   },
 });

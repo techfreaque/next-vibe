@@ -1,10 +1,12 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Chat",
   tags: {
     files: "Dateien",
   },
   get: {
     title: "Datei abrufen",
+    titleShort: "Thread-Datei",
     description: "Hochgeladene Datei abrufen",
     success: {
       title: "Datei abgerufen",

@@ -47,6 +47,7 @@ export const translations = {
   },
   post: {
     title: "Campaign Starter",
+    titleShort: "Start Campaign",
     description: "Start campaigns for new leads",
     errors: {
       unauthorized: {
@@ -106,6 +107,7 @@ export const translations = {
   },
   get: {
     title: "Get Campaign Starter Config",
+    titleShort: "Campaign Config",
     description: "Retrieve campaign starter configuration",
     errors: {
       unauthorized: {
@@ -279,6 +281,15 @@ export const translations = {
       advanced: "Advanced",
       advancedDescription:
         "Task execution settings like priority, timeouts, and retry behavior.",
+    },
+    days: {
+      mon: "Mon",
+      tue: "Tue",
+      wed: "Wed",
+      thu: "Thu",
+      fri: "Fri",
+      sat: "Sat",
+      sun: "Sun",
     },
   },
 };

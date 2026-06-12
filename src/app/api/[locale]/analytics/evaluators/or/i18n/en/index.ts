@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "OR",
+    titleShort: "OR",
     description: "Fires when any input signal fires at a given timestamp",
     fields: {
       signals: {

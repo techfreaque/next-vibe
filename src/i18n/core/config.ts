@@ -2,7 +2,7 @@
 // TYPES
 
 import type { configScopedTranslation } from "@/config/i18n";
-import { languageConfig, languageDefaults } from "../../i18n";
+import { languageConfig, languageDefaults } from "@/i18n";
 
 type ConfigTranslationKey =
   (typeof configScopedTranslation)["ScopedTranslationKey"];

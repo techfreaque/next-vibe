@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Electron-App starten",
+    titleShort: "Electron starten",
     description:
       "Main/Preload kompilieren und Electron-Desktop-Fenster starten (Dev-Modus - kein Paketieren)",
     form: {

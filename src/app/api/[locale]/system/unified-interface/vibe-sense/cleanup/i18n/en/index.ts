@@ -11,6 +11,7 @@ export const translations = {
   },
   post: {
     title: "Vibe Sense Cleanup",
+    titleShort: "Sense Cleanup",
     description: "Run retention cleanup for datapoints and expire snapshots",
     response: {
       nodesProcessed: "Nodes processed",

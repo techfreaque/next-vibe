@@ -27,10 +27,11 @@ export const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["lead-magnet", "providers", "google-sheets", "sheets-list"],
   title: "sheetsList.title" as const,
+  titleShort: "sheetsList.titleShort" as const,
   description: "sheetsList.description" as const,
   icon: "list",
-  category: "endpointCategories.leadMagnet",
-  subCategory: "endpointCategories.leadMagnetIntegrations",
+  category: "leads",
+  subCategory: "leadMagnetIntegrations",
   tags: ["saveTag" as const],
   allowedRoles: ALLOWED_ROLES,
 

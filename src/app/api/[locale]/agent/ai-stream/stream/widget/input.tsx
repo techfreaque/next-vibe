@@ -35,7 +35,7 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
 import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
@@ -79,7 +79,7 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 import { CallModeIndicator } from "../hooks/call-mode-indicator";
@@ -571,6 +571,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
         >
           <Textarea
             ref={inputRef}
+            name="prompt"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -751,9 +752,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             initialSkillData={initialSkillData}
           />
 
-          {modelSupportsTools && (
-            <ToolsButton disabled={false} locale={locale} />
-          )}
+          <ToolsButton disabled={!modelSupportsTools} locale={locale} />
 
           <CortexButton
             disabled={isInputDisabled}
@@ -794,6 +793,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                         "bg-success hover:bg-success/90",
                       voiceUnconfigured && "opacity-50 cursor-not-allowed",
                     )}
+                    title={t("voiceMode.callMode")}
                     data-tour={TOUR_DATA_ATTRS.CALL_MODE_BUTTON}
                   >
                     <Phone className="h-4 w-4" />
@@ -837,6 +837,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                       "h-8 w-8 @sm:h-9 @sm:w-9",
                       voiceUnconfigured && "opacity-50 cursor-not-allowed",
                     )}
+                    title={t("voiceMode.tapToRecord")}
                     data-tour={TOUR_DATA_ATTRS.SPEECH_INPUT}
                   >
                     <Mic className="h-4 w-4" />
@@ -875,6 +876,11 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                     onClick={isAborting ? undefined : stopGeneration}
                     disabled={isAborting}
                     className="h-8 w-8 @sm:h-9 @sm:w-9"
+                    title={
+                      isAborting
+                        ? t("actions.cancellingGeneration")
+                        : t("actions.stopGeneration")
+                    }
                   >
                     {isAborting ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -906,6 +912,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                   }
                   onClick={handleSmartSend}
                   className="h-8 w-8 @sm:h-9 @sm:w-9"
+                  title={t("actions.sendMessage")}
                 >
                   <Send className="h-4 w-4" />
                 </Button>

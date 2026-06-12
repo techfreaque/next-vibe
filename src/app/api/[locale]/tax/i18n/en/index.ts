@@ -9,6 +9,7 @@ export const translations = {
   rate: {
     create: {
       title: "Create Tax Rate",
+      titleShort: "Create Rate",
       description: "Add a tax rate for your company",
       widget: {
         backToList: "Back to Tax Rates",
@@ -99,6 +100,7 @@ export const translations = {
     },
     list: {
       title: "Tax Rates",
+      titleShort: "Tax Rates",
       description: "All tax rates configured for your company",
       widget: {
         addRate: "Add Rate",
@@ -195,6 +197,7 @@ export const translations = {
     },
     update: {
       title: "Update Tax Rate",
+      titleShort: "Update Rate",
       description: "Modify an existing tax rate",
       widget: {
         backToList: "Back to Tax Rates",
@@ -265,6 +268,7 @@ export const translations = {
     },
     delete: {
       title: "Delete Tax Rate",
+      titleShort: "Delete Rate",
       description: "Deactivate a tax rate",
       widget: {
         backToList: "Back to Tax Rates",
@@ -325,6 +329,7 @@ export const translations = {
 
   report: {
     title: "Tax Report",
+    titleShort: "Tax Report",
     description: "Tax collected by rate and period",
     widget: {
       columnRate: "Rate",

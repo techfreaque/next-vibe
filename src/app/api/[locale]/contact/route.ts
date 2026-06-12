@@ -10,8 +10,8 @@ import contactEndpoints from "./definition";
 import {
   adminContactFormEmailTemplate,
   contactFormEmailTemplate,
-} from "./email";
-import { ContactRepository } from "./repository";
+  ContactRepository,
+} from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: contactEndpoints,

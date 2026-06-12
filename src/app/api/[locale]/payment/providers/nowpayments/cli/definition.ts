@@ -22,10 +22,11 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["payment", "providers", "nowpayments", "cli"],
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "bitcoin" as const,
-  category: "endpointCategories.payments",
-  subCategory: "endpointCategories.paymentProviders",
+  category: "payments",
+  subCategory: "Providers",
   tags: [
     "post.tags.nowpayments" as const,
     "post.tags.cli" as const,

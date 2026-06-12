@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Close Period",
+    titleShort: "Close Period",
     description:
       "Close an accounting period. Requires no DRAFT journal entries in the period.",
     periodId: {

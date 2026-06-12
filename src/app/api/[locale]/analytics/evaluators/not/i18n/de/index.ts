@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "NICHT",
+    titleShort: "NICHT",
     description:
       "Invertiert einen Signalstrom - gefeuert wird nicht-gefeuert und umgekehrt",
     fields: {

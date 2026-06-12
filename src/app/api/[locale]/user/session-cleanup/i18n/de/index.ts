@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Benutzer",
 
   post: {
     title: "Sitzungsbereinigung",
+    titleShort: "Sessions bereinigen",
     description: "Abgelaufene Benutzersitzungen und Token bereinigen",
     tag: "Sitzungsbereinigung",
     container: {

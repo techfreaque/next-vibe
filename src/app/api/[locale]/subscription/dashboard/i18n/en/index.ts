@@ -1,6 +1,7 @@
 export const translations = {
   get: {
     title: "Subscription Overview",
+    titleShort: "Dashboard",
     description: "Your subscription at a glance",
     errors: {
       unauthorized: {

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Wpisy ostrzeżeń",
+    titleShort: "Logi ostrzeżeń",
     description:
       "Wpisy dziennika poziomu ostrzeżeń na przedział rozdzielczości",
     fields: {

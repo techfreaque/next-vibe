@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pulse Status",
+    titleShort: "Pulse-Status",
     description: "Pulse-Gesundheitsüberwachungsstatus abrufen",
     container: {
       title: "Pulse-Gesundheitsstatus",

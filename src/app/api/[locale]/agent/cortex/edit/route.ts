@@ -8,8 +8,8 @@ export const { PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger, t }) => {
-      return CortexEditRepository.editFile({
+    handler: async ({ data, user, locale, logger, t }) =>
+      CortexEditRepository.editFile({
         userId: user.id,
         user,
         locale,
@@ -21,7 +21,6 @@ export const { PATCH, tools } = endpointsHandler({
         newContent: data.newContent,
         logger,
         t,
-      });
-    },
+      }),
   },
 });

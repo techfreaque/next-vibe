@@ -6,6 +6,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Nachricht senden",
+  titleShort: "Nachricht senden",
   description:
     "Nachricht über beliebigen Kanal senden (E-Mail, SMS, WhatsApp, Telegram)",
   category: "Messaging",

@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "RSI",
+    titleShort: "RSI",
     description: "Relative Strength Index - measures momentum on a 0–100 scale",
     fields: {
       source: { label: "Source", description: "Input time series" },

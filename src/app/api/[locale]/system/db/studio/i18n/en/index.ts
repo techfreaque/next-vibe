@@ -4,6 +4,7 @@ export const translations = {
   tag: "studio",
   post: {
     title: "Database Studio",
+    titleShort: "DB Studio",
     description: "Open database studio for visual database management",
     form: {
       title: "Studio Configuration",

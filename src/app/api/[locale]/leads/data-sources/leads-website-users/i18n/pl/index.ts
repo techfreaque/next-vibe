@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Użytkownicy strony (leady)",
+    titleShort: "Użytkownicy strony",
     description:
       "Liczba leadów ze statusem użytkownika strony na przedział czasowy",
     fields: {

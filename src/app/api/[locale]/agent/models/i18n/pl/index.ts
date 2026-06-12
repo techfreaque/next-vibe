@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   selector: {
     bestForFilter: "Najlepszy dla tego filtra",
     setupRequired: "Wymagana konfiguracja",
@@ -207,4 +208,4 @@ export const translations = {
     violence: "Przemoc",
     vision: "Przetwarzanie obrazu",
   },
-} as const;
+};

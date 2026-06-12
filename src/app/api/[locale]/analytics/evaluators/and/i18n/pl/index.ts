@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "AND",
+    titleShort: "AND",
     description:
       "Uruchamia się tylko gdy wszystkie sygnały wejściowe są aktywne w tym samym czasie",
     fields: {

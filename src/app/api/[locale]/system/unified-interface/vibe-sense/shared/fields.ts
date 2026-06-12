@@ -12,6 +12,7 @@ import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import {
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -19,6 +20,7 @@ import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { GraphResolution, GraphResolutionDB } from "../enum";
 
@@ -106,15 +108,58 @@ interface AnyScoped {
 
 // ─── Standard Field Helpers ───────────────────────────────────────────────────
 
+// ─── Shared return-type helpers ──────────────────────────────────────────────
+// requestField / responseField produce complex inferred intersections.
+// These aliases let the exported functions carry explicit return types without
+// repeating the full intersection inline.
+
+type RequestFieldReturn<
+  TST extends AnyScoped,
+  TConfig extends {
+    type: WidgetType;
+    fieldType: FieldDataType;
+    label: TST["ScopedTranslationKey"];
+    description?: TST["ScopedTranslationKey"];
+    schema: z.ZodTypeAny;
+    options?: { value: string; label: string }[];
+  },
+> = TConfig & {
+  usage: { request: "data"; response?: never };
+  schemaType: "primitive";
+};
+
+type ResponseFieldReturn<
+  TST extends AnyScoped,
+  TConfig extends {
+    type: WidgetType;
+    fieldType: FieldDataType;
+    label: TST["ScopedTranslationKey"];
+    description?: TST["ScopedTranslationKey"];
+    schema: z.ZodTypeAny;
+  },
+> = TConfig & {
+  usage: { request?: never; response: true };
+  schemaType: "primitive";
+};
+
 /** Input time series - one per logical input port. Renders as an input handle. */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export function timeSeriesRequestField<TST extends AnyScoped>(
   st: TST,
   opts: {
     label: TST["ScopedTranslationKey"];
     description?: TST["ScopedTranslationKey"];
   },
-) {
+): RequestFieldReturn<
+  TST,
+  {
+    type: WidgetType.FORM_FIELD;
+    fieldType: FieldDataType.TIME_SERIES;
+    label: TST["ScopedTranslationKey"];
+    description: TST["ScopedTranslationKey"] | undefined;
+    schema: typeof TimeSeriesSchema;
+  }
+> {
   return requestField(st, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TIME_SERIES,
@@ -125,14 +170,24 @@ export function timeSeriesRequestField<TST extends AnyScoped>(
 }
 
 /** Resolution selector - defaults to 1d. */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export function resolutionRequestField<TST extends AnyScoped>(
   st: TST,
   opts: {
     label: TST["ScopedTranslationKey"];
     description?: TST["ScopedTranslationKey"];
   },
-) {
+): RequestFieldReturn<
+  TST,
+  {
+    type: WidgetType.FORM_FIELD;
+    fieldType: FieldDataType.SELECT;
+    label: TST["ScopedTranslationKey"];
+    description: TST["ScopedTranslationKey"] | undefined;
+    schema: z.ZodDefault<typeof ResolutionSchema>;
+    options: { value: string; label: string }[];
+  }
+> {
   return requestField(st, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
@@ -147,14 +202,23 @@ export function resolutionRequestField<TST extends AnyScoped>(
 }
 
 /** Time range - from/to. */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export function rangeRequestField<TST extends AnyScoped>(
   st: TST,
   opts: {
     label: TST["ScopedTranslationKey"];
     description?: TST["ScopedTranslationKey"];
   },
-) {
+): RequestFieldReturn<
+  TST,
+  {
+    type: WidgetType.FORM_FIELD;
+    fieldType: FieldDataType.DATE_RANGE;
+    label: TST["ScopedTranslationKey"];
+    description: TST["ScopedTranslationKey"] | undefined;
+    schema: typeof RangeSchema;
+  }
+> {
   return requestField(st, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.DATE_RANGE,
@@ -165,14 +229,23 @@ export function rangeRequestField<TST extends AnyScoped>(
 }
 
 /** Lookback periods - extra bars before range.from for warm-up. */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export function lookbackRequestField<TST extends AnyScoped>(
   st: TST,
   opts: {
     label: TST["ScopedTranslationKey"];
     description?: TST["ScopedTranslationKey"];
   },
-) {
+): RequestFieldReturn<
+  TST,
+  {
+    type: WidgetType.FORM_FIELD;
+    fieldType: FieldDataType.INT;
+    label: TST["ScopedTranslationKey"];
+    description: TST["ScopedTranslationKey"] | undefined;
+    schema: z.ZodDefault<z.ZodNumber>;
+  }
+> {
   return requestField(st, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.INT,
@@ -183,14 +256,23 @@ export function lookbackRequestField<TST extends AnyScoped>(
 }
 
 /** Output time series - renders as an output handle. */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export function timeSeriesResponseField<TST extends AnyScoped>(
   st: TST,
   opts: {
     label: TST["ScopedTranslationKey"];
     description?: TST["ScopedTranslationKey"];
   },
-) {
+): ResponseFieldReturn<
+  TST,
+  {
+    type: WidgetType.FORM_FIELD;
+    fieldType: FieldDataType.TIME_SERIES;
+    label: TST["ScopedTranslationKey"];
+    description: TST["ScopedTranslationKey"] | undefined;
+    schema: typeof TimeSeriesSchema;
+  }
+> {
   return responseField(st, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TIME_SERIES,
@@ -201,14 +283,23 @@ export function timeSeriesResponseField<TST extends AnyScoped>(
 }
 
 /** Output signals - evaluator result. Renders as an output handle. */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export function signalsResponseField<TST extends AnyScoped>(
   st: TST,
   opts: {
     label: TST["ScopedTranslationKey"];
     description?: TST["ScopedTranslationKey"];
   },
-) {
+): ResponseFieldReturn<
+  TST,
+  {
+    type: WidgetType.FORM_FIELD;
+    fieldType: FieldDataType.SIGNALS;
+    label: TST["ScopedTranslationKey"];
+    description: TST["ScopedTranslationKey"] | undefined;
+    schema: typeof SignalsSchema;
+  }
+> {
   return responseField(st, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SIGNALS,
@@ -219,14 +310,23 @@ export function signalsResponseField<TST extends AnyScoped>(
 }
 
 /** Input signals - single signal stream. Renders as an input handle. */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export function signalsRequestField<TST extends AnyScoped>(
   st: TST,
   opts: {
     label: TST["ScopedTranslationKey"];
     description?: TST["ScopedTranslationKey"];
   },
-) {
+): RequestFieldReturn<
+  TST,
+  {
+    type: WidgetType.FORM_FIELD;
+    fieldType: FieldDataType.SIGNALS;
+    label: TST["ScopedTranslationKey"];
+    description: TST["ScopedTranslationKey"] | undefined;
+    schema: typeof SignalsSchema;
+  }
+> {
   return requestField(st, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SIGNALS,
@@ -237,14 +337,23 @@ export function signalsRequestField<TST extends AnyScoped>(
 }
 
 /** Input signal streams - multiple signal arrays. Renders as an input handle. */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export function signalStreamsRequestField<TST extends AnyScoped>(
   st: TST,
   opts: {
     label: TST["ScopedTranslationKey"];
     description?: TST["ScopedTranslationKey"];
   },
-) {
+): RequestFieldReturn<
+  TST,
+  {
+    type: WidgetType.FORM_FIELD;
+    fieldType: FieldDataType.SIGNALS;
+    label: TST["ScopedTranslationKey"];
+    description: TST["ScopedTranslationKey"] | undefined;
+    schema: typeof SignalStreamsSchema;
+  }
+> {
   return requestField(st, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SIGNALS,
@@ -255,19 +364,99 @@ export function signalStreamsRequestField<TST extends AnyScoped>(
 }
 
 /** Node execution metadata - strictly typed. */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export function nodeMetaResponseField<TST extends AnyScoped>(
   st: TST,
   opts: {
     label: TST["ScopedTranslationKey"];
     description?: TST["ScopedTranslationKey"];
   },
-) {
+): ResponseFieldReturn<
+  TST,
+  {
+    type: WidgetType.FORM_FIELD;
+    fieldType: FieldDataType.TEXT;
+    label: TST["ScopedTranslationKey"];
+    description: TST["ScopedTranslationKey"] | undefined;
+    schema: typeof NodeMetaSchema;
+  }
+> {
   return responseField(st, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
     label: opts.label,
     description: opts.description,
     schema: NodeMetaSchema,
+  });
+}
+
+interface DataSourceWidgetReturn<TST extends AnyScoped> {
+  render: typeof DataSourceChartWidgetLazy;
+  noFormElement: true;
+  usage: { request: "data"; response: true };
+  children: {
+    resolution: ReturnType<typeof resolutionRequestField<TST>>;
+    range: ReturnType<typeof rangeRequestField<TST>>;
+    lookback: ReturnType<typeof lookbackRequestField<TST>>;
+    result: ReturnType<typeof timeSeriesResponseField<TST>>;
+    meta: ReturnType<typeof nodeMetaResponseField<TST>>;
+  };
+  type: WidgetType.CUSTOM_WIDGET;
+  schemaType: "object";
+}
+
+// ─── Data Source Built-in Widget ─────────────────────────────────────────────
+
+/**
+ * Shared lazy widget for all data source chart endpoints.
+ * Defined once here so no per-endpoint widget.tsx is needed.
+ */
+const DataSourceChartWidgetLazy = lazyWidget(() =>
+  import("./data-source-widget").then((m) => ({
+    default: m.DataSourceChartWidget,
+  })),
+);
+
+/**
+ * Creates the full customWidgetObject for a data source endpoint.
+ * Replaces the per-endpoint widget.tsx + lazyWidget boilerplate.
+ * Pass scoped translation keys for each of the 5 standard fields.
+ */
+export function dataSourceWidget<TST extends AnyScoped>(
+  st: TST,
+  keys: {
+    resolution: {
+      label: TST["ScopedTranslationKey"];
+      description?: TST["ScopedTranslationKey"];
+    };
+    range: {
+      label: TST["ScopedTranslationKey"];
+      description?: TST["ScopedTranslationKey"];
+    };
+    lookback: {
+      label: TST["ScopedTranslationKey"];
+      description?: TST["ScopedTranslationKey"];
+    };
+    result: {
+      label: TST["ScopedTranslationKey"];
+      description?: TST["ScopedTranslationKey"];
+    };
+    meta: {
+      label: TST["ScopedTranslationKey"];
+      description?: TST["ScopedTranslationKey"];
+    };
+  },
+): DataSourceWidgetReturn<TST> {
+  return customWidgetObject({
+    render: DataSourceChartWidgetLazy,
+    noFormElement: true,
+    usage: { request: "data", response: true } as const,
+    children: {
+      resolution: resolutionRequestField(st, keys.resolution),
+      range: rangeRequestField(st, keys.range),
+      lookback: lookbackRequestField(st, keys.lookback),
+      result: timeSeriesResponseField(st, keys.result),
+      meta: nodeMetaResponseField(st, keys.meta),
+    },
   });
 }

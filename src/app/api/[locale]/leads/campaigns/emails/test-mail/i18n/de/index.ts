@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Test-Mail",
+    titleShort: "Test-E-Mail",
     description: "Test-E-Mail mit benutzerdefinierten Lead-Daten senden",
     form: {
       title: "Test-Mail-Konfiguration",

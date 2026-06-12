@@ -37,6 +37,7 @@ const { POST } = createEndpoint({
     "promote",
   ],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "shield",
   category: "analytics",

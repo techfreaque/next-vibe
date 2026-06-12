@@ -13,17 +13,13 @@ import installEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: installEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, user, logger, t }) => {
-      logger.debug("Setup install operation started", {
-        force: data.force,
-        verbose: data.verbose,
-      });
+    handler: async ({ data, user, t }) =>
       // Dynamic import prevents Turbopack NFT from statically tracing process.cwd()
       // and filesystem calls in repository.ts during production builds.
-      const { SetupInstallRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return SetupInstallRepository.installCli(data, user, t);
-    },
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).SetupInstallRepository.installCli(data, user, t),
   },
 });

@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "SSH",
 
   enums: {
@@ -18,6 +19,7 @@ export const translations = {
 
   get: {
     title: "SSH-Verbindung",
+    titleShort: "SSH-Verbindung",
     description: "SSH-Verbindungsdetails anzeigen",
     fields: {
       id: {
@@ -64,6 +66,7 @@ export const translations = {
   },
   patch: {
     title: "SSH-Verbindung aktualisieren",
+    titleShort: "Verbindung ändern",
     description: "SSH-Verbindungseinstellungen aktualisieren",
     fields: {
       id: {
@@ -156,6 +159,7 @@ export const translations = {
   },
   delete: {
     title: "SSH-Verbindung löschen",
+    titleShort: "Verbindung löschen",
     description: "Eine SSH-Verbindung löschen",
     fields: {
       id: {
@@ -214,5 +218,7 @@ export const translations = {
     testButton: "Verbindung testen",
     confirmDelete:
       "Diese Verbindung löschen? Dies kann nicht rückgängig gemacht werden.",
+    mountsSection: "Eingehängte Verzeichnisse",
+    manageMounts: "Mounts verwalten",
   },
 };

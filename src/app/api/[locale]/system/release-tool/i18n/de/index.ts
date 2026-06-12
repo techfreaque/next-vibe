@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Release-Tool",
+  titleShort: "Release-Tool",
   description:
     "Verwalte Paket-Releases mit Versionierung, Git-Tagging und CI/CD-Integration",
   category: "Release Tool",

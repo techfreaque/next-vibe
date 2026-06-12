@@ -1,6 +1,7 @@
 export const translations = {
   get: {
     title: "Accounting Periods",
+    titleShort: "Periods",
     description: "List all accounting periods for a company",
     companyId: {
       label: "Company ID",

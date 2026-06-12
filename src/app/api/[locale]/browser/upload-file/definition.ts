@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,7 +31,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "upload-file"],
+  aliases: ["browser-upload-file"] as const,
   title: "upload-file.title",
+  titleShort: "upload-file.titleShort",
   description: "upload-file.description",
   dynamicTitle: ({ request }) => {
     if (request?.filePath) {
@@ -45,8 +48,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserInteraction",
+  category: "browser",
+  subCategory: "Interaction",
   icon: "upload",
   tags: [
     "upload-file.tags.browserAutomation",
@@ -81,6 +84,8 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().describe("The local path of the file to upload"),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

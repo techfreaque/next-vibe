@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Generatoren",
 
   post: {
     title: "Endpoint Generator",
+    titleShort: "Endpunkt-Gen.",
     description: "Generate endpoint.ts with dynamic imports",
     container: {
       title: "Endpoint Generator Configuration",

@@ -5,6 +5,7 @@ export const translations = {
   },
   post: {
     title: "Vote for Skill",
+    titleShort: "Vote Skill",
     description:
       "Toggle upvote on a community skill. Idempotent - call again to remove your vote.",
     dynamicTitle: "Vote: {{name}}",

@@ -24,7 +24,7 @@ import { UserRole } from "../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 import { USERS_VIEW_ALIAS } from "./constants";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const UserViewContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UserViewContainer })),
@@ -39,13 +39,13 @@ export const { GET } = createEndpoint({
   path: ["users", "view"],
   aliases: [USERS_VIEW_ALIAS] as const,
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "userAuth",
-  subCategory: "userAdminManagement",
+  category: "account",
+  subCategory: "manageUsers",
   icon: "user" as const,
   tags: ["tags.user" as const, "tags.view" as const],
   allowedRoles: [UserRole.ADMIN] as const,
-  defaultWebPinned: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     render: UserViewContainer,

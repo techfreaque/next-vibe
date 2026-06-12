@@ -13,30 +13,24 @@ export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (props) => {
-      return await ThreadPermissionsRepository.getThreadPermissions(
+    handler: (props) =>
+      ThreadPermissionsRepository.getThreadPermissions(
         props.user,
         { threadId: props.urlPathParams.threadId },
         props.t,
         props.logger,
         props.locale,
-      );
-    },
+      ),
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async (props) => {
-      const dataWithId = {
-        ...props.data,
-        threadId: props.urlPathParams.threadId,
-      };
-      return await ThreadPermissionsRepository.updateThreadPermissions(
+    handler: (props) =>
+      ThreadPermissionsRepository.updateThreadPermissions(
         props.user,
-        dataWithId,
+        { ...props.data, threadId: props.urlPathParams.threadId },
         props.t,
         props.logger,
         props.locale,
-      );
-    },
+      ),
   },
 });

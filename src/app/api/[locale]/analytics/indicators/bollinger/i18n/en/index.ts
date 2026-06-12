@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Bollinger Bands",
+    titleShort: "Bollinger",
     description:
       "Bollinger Bands - upper, middle (SMA), and lower band using standard deviation",
     fields: {

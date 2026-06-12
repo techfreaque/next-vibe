@@ -57,12 +57,14 @@ const { GET } = createEndpoint({
   path: ["subscription", "admin", "list"],
   aliases: [SUBSCRIPTION_ADMIN_LIST_ALIAS],
   allowedRoles: [UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "list",
-  category: "endpointCategories.subscriptions",
-  subCategory: "endpointCategories.subscriptionManagement",
+  category: "subscriptions",
+  subCategory: "Management",
   tags: ["get.title" as const],
 
   fields: customWidgetObject({

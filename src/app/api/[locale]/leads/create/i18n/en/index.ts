@@ -26,6 +26,7 @@ export const translations = {
   },
   post: {
     title: "Create Lead",
+    titleShort: "New Lead",
     description: "Create a new lead in the system",
     backButton: {
       label: "Back to Leads",

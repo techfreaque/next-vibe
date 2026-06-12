@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Wolumen transf.",
     title: "Wolumen transferów kredytów",
     description:
       "Suma dodatnich kwot transakcji transferów na przedział rozdzielczości",

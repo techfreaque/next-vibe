@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Fenstersumme",
+    titleShort: "Fenstersumme",
     description:
       "Gleitende Fenstersumme - akkumuliert Werte über ein festes Fenster",
     fields: {

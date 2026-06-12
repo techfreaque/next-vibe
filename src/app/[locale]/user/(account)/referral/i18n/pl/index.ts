@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   backToChat: "Wróć do czatu",
   title: "Twój łańcuch poleceń. Cyklicznie. Wiecznie.",
   description:

@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Individual Lead API Route Handlers
  * Next.js API route handlers with validation and notifications

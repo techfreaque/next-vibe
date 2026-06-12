@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "RSI",
+    titleShort: "RSI",
     description: "Wskaźnik względnej siły - mierzy momentum w skali 0–100",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },

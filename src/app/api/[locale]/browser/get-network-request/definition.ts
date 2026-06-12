@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,7 +31,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "get-network-request"],
+  aliases: ["browser-get-network-request"] as const,
   title: "get-network-request.title",
+  titleShort: "get-network-request.titleShort",
   description: "get-network-request.description",
   dynamicTitle: ({ request }) => {
     if (request?.reqid !== undefined) {
@@ -41,8 +44,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserDevTools",
+  category: "browser",
+  subCategory: "DevTools",
   icon: "network",
   tags: [
     "get-network-request.tags.browserAutomation",
@@ -113,6 +116,8 @@ const { POST } = createEndpoint({
             "Maximum number of characters to return from inline request/response bodies. Bodies exceeding this limit are truncated with a notice. Omit for no limit.",
           ),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

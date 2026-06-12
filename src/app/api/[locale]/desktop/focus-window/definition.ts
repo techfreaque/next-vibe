@@ -18,9 +18,10 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
+import listWindowsDefinitions from "../list-windows/definition";
 
 const FocusWindowWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.FocusWindowWidget })),
@@ -30,7 +31,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["desktop", "focus-window"],
+  aliases: ["desktop-focus-window"] as const,
   title: "focus-window.title",
+  titleShort: "focus-window.titleShort",
   description: "focus-window.description",
   dynamicTitle: ({ request }) => {
     const target = request?.title || request?.windowId || request?.pid;
@@ -58,10 +61,11 @@ const { POST } = createEndpoint({
     children: {
       windowId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: listWindowsDefinitions.POST,
+        labelField: "title",
         label: "focus-window.form.fields.windowId.label",
         description: "focus-window.form.fields.windowId.description",
-        placeholder: "focus-window.form.fields.windowId.placeholder",
         columns: 4,
         schema: z
           .string()

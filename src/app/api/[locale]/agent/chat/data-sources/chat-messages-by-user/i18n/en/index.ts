@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Chat Messages By User",
+    titleShort: "User Messages",
     description: "Count of user-sent chat messages per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },

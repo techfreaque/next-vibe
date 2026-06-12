@@ -8,6 +8,7 @@ export const translations = {
   },
   post: {
     title: "Vibe Frame Config",
+    titleShort: "Vibe Frame",
     description:
       "Returns iframe URLs for the requested integrations. Server reads real auth cookies (credentials: include) and mints short-lived exchange tokens so no secrets appear in URLs.",
     container: {

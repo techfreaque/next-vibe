@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Aktywne wątki czatu łącznie",
+    titleShort: "Aktywne wątki",
     description: "Migawka aktywnych wątków czatu na przedział rozdzielczości",
     fields: {
       resolution: {

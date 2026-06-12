@@ -31,10 +31,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["user", "public", "reset-password", "request"],
   title: "request.title",
+  titleShort: "request.titleShort",
   description: "request.description",
   icon: "lock",
-  category: "userAuth",
-  subCategory: "userAuthLogin",
+  category: "account",
   tags: ["request.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: objectField(scopedTranslation, {

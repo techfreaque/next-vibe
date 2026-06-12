@@ -4,6 +4,7 @@ export const translations = {
 
   update: {
     title: "Update Address",
+    titleShort: "Update Address",
     description: "Edit a saved address",
     fields: {
       addressId: { label: "Address ID", description: "Address to update" },
@@ -116,6 +117,7 @@ export const translations = {
 
   delete: {
     title: "Delete Address",
+    titleShort: "Delete Address",
     description: "Remove a saved address from your account",
     fields: {
       addressId: { label: "Address ID", description: "Address to delete" },

@@ -30,16 +30,16 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { creditWallets } from "../../../credits/db";
-import { csvImportJobs, importBatches } from "../../../leads/import/db";
 import { leads } from "../../../leads/db";
+import { csvImportJobs, importBatches } from "../../../leads/import/db";
 import { messengerAccounts } from "../../../messenger/accounts/db";
 import { payoutRequests } from "../../../referral/db";
 import { subscriptions } from "../../../subscription/db";
 import { SubscriptionRepository } from "../../../subscription/repository";
 import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
-import { users, userRoles } from "../../db";
-import { passwordResets } from "../../public/reset-password/db";
+import { userRoles, users } from "../../db";
 import { UserDetailLevel } from "../../enum";
+import { passwordResets } from "../../public/reset-password/db";
 import { UserRepository } from "../../repository";
 import type {
   MeDeleteResponseOutput,
@@ -50,7 +50,6 @@ import type {
 import type { MeT } from "./i18n";
 
 /** Fetch public skills for a user, enriched with model display info */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- inferred from complex mapped return
 async function fetchUserSkills(userId: string, viewer: JwtPayloadType) {
   const skillRows = await db
     .select({
@@ -60,7 +59,6 @@ async function fetchUserSkills(userId: string, viewer: JwtPayloadType) {
       description: customSkills.description,
       icon: customSkills.icon,
       category: customSkills.category,
-      modelSelection: customSkills.modelSelection,
       ownershipType: customSkills.ownershipType,
       voteCount: customSkills.voteCount,
       trustLevel: customSkills.trustLevel,
@@ -88,7 +86,7 @@ async function fetchUserSkills(userId: string, viewer: JwtPayloadType) {
         }))
       : [
           {
-            modelSelection: row.modelSelection,
+            modelSelection: variants?.[0]?.modelSelection,
             variantId: null,
             variantName: null,
             isVariant: false,
@@ -162,6 +160,7 @@ export class UserProfileRepository {
         return success({
           isPublic: true,
           leadId: user.leadId,
+          skills: [],
         });
       }
 

@@ -10,6 +10,7 @@ export const translations = {
   },
   get: {
     title: "List AI Models",
+    titleShort: "AI Models",
     description:
       "Returns all available AI models with pricing and capability information",
     response: {

@@ -14,6 +14,7 @@ export const translations = {
   },
   get: {
     title: "Get Folder Contents",
+    titleShort: "Folder Contents",
     description:
       "Retrieve merged list of folders and threads for a given folder level",
     rootFolderId: {

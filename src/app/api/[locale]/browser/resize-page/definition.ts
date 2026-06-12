@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,7 +31,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "resize-page"],
+  aliases: ["browser-resize-page"] as const,
   title: "resize-page.title",
+  titleShort: "resize-page.titleShort",
   description: "resize-page.description",
   dynamicTitle: ({ request }) => {
     if (request?.width !== undefined && request?.height !== undefined) {
@@ -44,8 +47,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserPages",
+  category: "browser",
+  subCategory: "Pages",
   icon: "maximize",
   tags: [
     "resize-page.tags.browserAutomation",
@@ -76,6 +79,8 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.coerce.number().describe("Page height"),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

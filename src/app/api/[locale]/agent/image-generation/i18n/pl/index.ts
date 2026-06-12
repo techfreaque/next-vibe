@@ -1,5 +1,5 @@
-// eslint-disable-next-line i18next/no-literal-string
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     image: "Obraz",
     generation: "Generowanie",
@@ -7,6 +7,7 @@ export const translations = {
   },
   post: {
     title: "Generuj obraz",
+    titleShort: "Generuj obraz",
     dynamicTitle: "Obraz: {{prompt}}",
     description: "Wygeneruj obraz z opisu tekstowego przy użyciu AI",
     form: {
@@ -127,4 +128,4 @@ export const translations = {
       description: "Twój obraz został pomyślnie wygenerowany",
     },
   },
-} as const;
+};

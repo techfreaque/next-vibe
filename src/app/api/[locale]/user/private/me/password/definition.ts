@@ -27,10 +27,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["user", "private", "me", "password"],
   title: "title",
+  titleShort: "titleShort",
   description: "description",
   icon: "lock",
-  category: "userAuth",
-  subCategory: "userAuthProfile",
+  category: "account",
   tags: ["tag"],
   allowedRoles: [
     UserRole.CUSTOMER,

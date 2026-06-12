@@ -33,17 +33,18 @@ const { POST } = createEndpoint({
   path: ["system", "server", "electron", "start"],
   aliases: [ELECTRON_ALIAS, ELECTRON_START_ALIAS, ELECTRON_START_DEV_ALIAS],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.server",
-  subCategory: "endpointCategories.serverElectron",
+  category: "devTools",
+  subCategory: "serverElectron",
   tags: ["tags.electronStart"],
   icon: "monitor",
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.AI_TOOL_OFF,
     UserRole.WEB_OFF,
     UserRole.MCP_OFF,
-    UserRole.CLI_AUTH_BYPASS,
   ],
 
   fields: objectField(scopedTranslation, {

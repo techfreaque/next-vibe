@@ -6,6 +6,7 @@ export const translations = {
 
   get: {
     title: "Get Root Folder Permissions",
+    titleShort: "Folder Access",
     description: "Compute permissions for a root folder",
     container: {
       title: "Root Folder Permissions",

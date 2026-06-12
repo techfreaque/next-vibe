@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Wstęgi Bollingera",
+    titleShort: "Bollinger",
     description:
       "Wstęgi Bollingera - górna, środkowa (SMA) i dolna wstęga z odchyleniem standardowym",
     fields: {

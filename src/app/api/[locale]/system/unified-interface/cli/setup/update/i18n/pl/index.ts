@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Aktualizuj",
+    titleShort: "Aktualizuj CLI",
     description: "Punkt końcowy aktualizacji",
     form: {
       title: "Konfiguracja aktualizacji",

@@ -12,8 +12,10 @@ import {
   useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
 import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/widget";
@@ -24,7 +26,7 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
-import { SshAuthType } from "../../enum";
+import { SshAuthType, SshAuthTypeOptions } from "../../enum";
 import type endpoints from "./definition";
 
 interface CustomWidgetProps {
@@ -36,10 +38,21 @@ export function ConnectionDetailContainer({
 }: CustomWidgetProps): JSX.Element {
   const children = field.children;
   const form = useWidgetForm<typeof endpoints.PATCH>();
+  const user = useWidgetUser();
   const emptyField = useMemo(() => ({}), []);
   const loadedData = useWidgetValue<typeof endpoints.GET>();
   const navigation = useWidgetNavigation();
   const endpoint = useWidgetEndpoint();
+
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  const authTypeOptions = useMemo(
+    () =>
+      isAdmin
+        ? SshAuthTypeOptions
+        : SshAuthTypeOptions.filter((o) => o.value !== SshAuthType.LOCAL),
+    [isAdmin],
+  );
 
   const t = useWidgetTranslation<typeof endpoints.PATCH>();
   const isDeleteMode = endpoint.method === Methods.DELETE;
@@ -117,7 +130,10 @@ export function ConnectionDetailContainer({
         <FormAlertWidget field={emptyField} />
         <TextFieldWidget fieldName="label" field={children.label} />
         {!isLocal && (
-          <SelectFieldWidget fieldName="authType" field={children.authType} />
+          <SelectFieldWidget
+            fieldName="authType"
+            field={{ ...children.authType, options: authTypeOptions }}
+          />
         )}
         {!isLocal && (
           <>

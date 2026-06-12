@@ -1,15 +1,12 @@
 /**
- * AI Stream Integration - Direct (hermes 3001, transportMode='direct-http')
+ * AI Stream Integration - Direct (hermes 3002, transportMode='direct-http')
  *
- * Simulates a publicly accessible remote instance. Tool calls go via
- * execute-tool(instanceId='hermes') with transportMode='direct-http':
+ * AI loop runs on hermes (loopLocation='server') via direct-http relay.
+ * System prompt + tools are built locally (atlas) and sent in the relay POST.
+ * Hermes runs the AI loop; tools execute directly on hermes (no execute-tool wrapper).
+ * Thread mirrored locally under BACKGROUND root (threadMirrorMode='both').
  *
- *   1. execute-tool resolves connection → transportMode='direct-http'
- *   2. RouteExecuteRepository.executeRemoteDirect() POSTs to hermes (3001)
- *   3. Hermes executes the tool locally and returns the result inline
- *   4. Stream continues with the tool result - no pulse needed
- *
- * Setup is E2E: connectToHermes logs into prod, registers hermes-dev, syncs caps.
+ * Setup is E2E: connectToHermes logs into remote (3002), registers atlas, syncs caps.
  * triggerPull() ensures capabilities are populated before any test runs.
  */
 
@@ -19,10 +16,8 @@ import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { describeStreamSuite } from "./route-base.test";
 import { resolveRemoteUrl } from "../../testing/remote-setup";
-
-const HERMES_INSTANCE_ID = "hermes";
+import { describeStreamSuite } from "./route-base.test";
 
 let _prodUserId: string | null = null;
 
@@ -32,7 +27,8 @@ async function setupDirectConnection(
   const {
     connectToHermes,
     disconnectFromHermes,
-    ensureProdUserCredits,
+    ensureRemoteUserCredits,
+    resolveProdAdminToken,
     resolveProdUserId,
     triggerPull,
   } = await import("../../testing/remote-setup");
@@ -40,19 +36,28 @@ async function setupDirectConnection(
   // Idempotent: clean up any leftover connection from a previous failed run
   await disconnectFromHermes(testUser.id);
 
-  // E2E: log into prod, register hermes-dev on hermes, sync capabilities
-  // _resolvedRemoteUrl is guaranteed non-null (module-level hard fail above)
-  await connectToHermes(testUser, _resolvedRemoteUrl);
+  // E2E: log into remote, register atlas, sync capabilities
+  // _resolvedRemoteUrl is guaranteed non-null when the suite runs
+  await connectToHermes(
+    testUser,
+    _resolvedRemoteUrl ?? "http://localhost:3002",
+  );
 
   // Ensure capabilities are populated before tests run
   await triggerPull();
 
   _prodUserId = await resolveProdUserId();
 
-  // Direct-mode tests POST tool calls to hermes using the stored remote admin token.
-  // Credits are deducted on the remote DB for the remote admin user (_prodUserId).
-  // Ensure the remote admin wallet is funded via direct DB access (same preview DB 5433).
-  await ensureProdUserCredits(_prodUserId, 20000);
+  // Top up credits on the remote via real endpoint — no direct DB writes
+  const remoteAdminToken = await resolveProdAdminToken(
+    _resolvedRemoteUrl ?? "http://localhost:3002",
+  );
+  await ensureRemoteUserCredits(
+    _resolvedRemoteUrl ?? "http://localhost:3002",
+    remoteAdminToken,
+    _prodUserId,
+    20000,
+  );
 
   // transportMode='direct-http' is the default after connectToHermes (same machine)
 }
@@ -60,7 +65,7 @@ async function setupDirectConnection(
 async function teardownDirectConnection(
   testUser: JwtPrivatePayloadType,
 ): Promise<void> {
-  const { disconnectFromHermes, unregisterDevFromHermes, closeProdDb } =
+  const { disconnectFromHermes, unregisterDevFromHermes } =
     await import("../../testing/remote-setup");
 
   const tasks: Promise<void>[] = [disconnectFromHermes(testUser.id)];
@@ -68,39 +73,33 @@ async function teardownDirectConnection(
     tasks.push(unregisterDevFromHermes(_prodUserId));
   }
   await Promise.all(tasks);
-  await closeProdDb();
   _prodUserId = null;
 }
 
 const _resolvedRemoteUrl = await resolveRemoteUrl();
-if (!_resolvedRemoteUrl) {
-  // oxlint-disable-next-line restricted-syntax -- intentional hard fail: server required
-  throw new Error(
-    "AI Stream Integration - Direct: no remote server reachable.\n" +
-      "Start one of:\n" +
-      "  vibe start        → http://localhost:3001\n" +
-      "  vibe --local dev  → http://localhost:3002",
+if (_resolvedRemoteUrl) {
+  describeStreamSuite({
+    label: `AI Stream Integration - Direct (${_resolvedRemoteUrl}, transportMode='direct-http')`,
+    cachePrefix: "direct-",
+    // No remoteInstanceId: AI loop runs on hermes (loopLocation='server') via relay.
+    // Tools execute locally on hermes — no execute-tool wrapper from the test side.
+    // System prompt + tools are built on local client (atlas) and sent in relay POST.
+    // skipWaitForTaskTest: wait-for-task revival runs on remote, not mirrored locally.
+    skipWaitForTaskTest: true,
+    // skipApprovalTests: tool confirmations require local state; AI runs on remote.
+    skipApprovalTests: true,
+    // skipAttachmentTests: local user message has no attachment metadata in relay mode.
+    skipAttachmentTests: true,
+    // Credits are deducted on hermes (remote) — not visible in local testUser balance.
+    skipTokenMetadataAssertions: true,
+    // assertSystemPromptFromLocal: system prompt built locally; AI must report local instance ID.
+    assertSystemPromptFromLocal: true,
+    setup: setupDirectConnection,
+    teardown: teardownDirectConnection,
+  });
+} else {
+  process.stderr.write(
+    "[test skip] AI Stream Integration - Direct: remote server not running.\n" +
+      "  Start: vibe --hermes dev --fixture-mode  → http://localhost:3002\n",
   );
 }
-
-describeStreamSuite({
-  label: `AI Stream Integration - Direct (${_resolvedRemoteUrl}, transportMode='direct-http')`,
-  cachePrefix: "direct-",
-  remoteInstanceId: HERMES_INSTANCE_ID,
-  setup: setupDirectConnection,
-  teardown: teardownDirectConnection,
-  // No pulse - direct HTTP returns synchronously
-  // T4 (music + video gen) skipped: external media API calls run on remote server
-  // where FetchCache cannot intercept them, causing real API timeouts.
-  // T4 skip also covers T11c-T11f (image-to-video and image-to-image tests that
-  // similarly call generate_video/generate_image via execute-tool on the remote).
-  // T6 (wakeUp) skipped: goroutine calls remote image gen (live API) which FetchCache
-  // cannot intercept on the remote server, making revival timing unpredictable.
-  // T7 (approve) skipped: T7a creates pending tool messages, T7b confirmed execution calls
-  // remote image gen (live API). Skipping both avoids branch violations in assertNoOrphans.
-  // T11 skipped: T5c (execute-tool-direct) leaves role=tool messages in thread history.
-  // Gemini rejects these via OpenRouter: "#/definitions/__schema0 in function_response.response
-  // does not match display_name in function_response.parts." Gemini function_response format
-  // is incompatible with execute-tool result messages accumulated in direct-http conversation.
-  skipTests: ["T4", "T6", "T7", "T11"],
-});

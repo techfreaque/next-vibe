@@ -27,10 +27,11 @@ import { scopedTranslation } from "../i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   title: "generate.post.title",
+  titleShort: "generate.post.titleShort",
   description: "generate.post.description",
   icon: "mobile",
-  category: "endpointCategories.devTools",
-  subCategory: "endpointCategories.devToolsBuild",
+  category: "devTools",
+  subCategory: "Build",
   tags: ["generate.post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF],
   aliases: ["generate:expo", "native:generate"],

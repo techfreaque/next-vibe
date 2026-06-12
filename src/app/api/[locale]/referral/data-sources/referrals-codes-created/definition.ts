@@ -4,12 +4,10 @@
  */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
-  WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   lookbackRequestField,
@@ -23,24 +21,29 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { REFERRALS_CODES_CREATED_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+const ReferralsCodesCreatedWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ReferralsCodesCreatedWidget })),
+);
+
 const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [REFERRALS_CODES_CREATED_ALIAS],
   method: Methods.POST,
   path: ["referral", "data-sources", "referrals-codes-created"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsDataSources",
-  subCategory: "endpointCategories.referralAnalytics",
+  category: "analytics",
+  subCategory: "referralData",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: ReferralsCodesCreatedWidget,
+    noFormElement: true,
+    usage: { request: "data", response: true } as const,
     children: {
       resolution: resolutionRequestField(scopedTranslation, {
         label: "post.fields.resolution.label",

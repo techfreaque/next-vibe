@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Konto erstellen",
+    titleShort: "Konto erstellen",
     description:
       "Benutzerdefiniertes Konto zum Kontenplan des Unternehmens hinzufügen",
     companyId: {

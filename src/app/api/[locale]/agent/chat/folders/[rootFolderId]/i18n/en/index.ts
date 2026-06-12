@@ -126,6 +126,7 @@ export const translations = {
   },
   get: {
     title: "Get Folders",
+    titleShort: "Folders",
     description: "Retrieve all folders for the current root folder",
     rootFolderId: {
       label: "Root Folder",

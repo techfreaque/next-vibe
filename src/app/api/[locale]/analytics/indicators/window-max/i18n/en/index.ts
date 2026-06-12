@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Window Max",
+    titleShort: "Win Max",
     description:
       "Rolling window maximum - tracks the highest value in a fixed window",
     fields: {

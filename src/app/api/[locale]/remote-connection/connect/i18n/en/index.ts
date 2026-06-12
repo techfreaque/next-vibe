@@ -5,6 +5,8 @@ export const translations = {
   },
   widget: {
     signInDescription: "Sign in to connect to a remote account.",
+    adminOnlyDescription:
+      "Creating outbound connections requires admin access. If you were connected by a remote instance, your connections are visible above.",
     // Customer benefits (non-admin)
     benefit1:
       "Memories sync automatically - everything you teach the AI here carries over",
@@ -21,6 +23,7 @@ export const translations = {
   },
   post: {
     title: "Connect to Remote Account",
+    titleShort: "Remote Connect",
     description:
       "Connect your account to a remote instance to sync memories and use AI tools from anywhere",
     remoteUrl: {
@@ -61,6 +64,29 @@ export const translations = {
       label: "Lead ID",
       description: "Lead ID from the remote instance (set automatically)",
     },
+    // ── Advanced settings (admin only) ───────────────────────────────────────
+    transportMode: {
+      label: "Transport Mode",
+      description:
+        "How this instance connects to the remote. reverse-ws: persistent outbound connection (recommended). ws-provider: remote runs AI inference loop.",
+      default: "reverse-ws (default)",
+    },
+    isInferenceProvider: {
+      label: "Use as Inference Provider",
+      description:
+        "Let this connection run AI streams — the remote instance handles the AI loop over the reverse WS channel.",
+    },
+    syncScope: {
+      label: "Sync Scope",
+      description: "Which data syncs over this connection.",
+      memories: "Memories",
+      documents: "Documents",
+      skills: "Skills",
+      tasks: "Tasks",
+      cortex: "Cortex files",
+      defaultNote: "All enabled by default. Adjust after connecting.",
+    },
+    advancedSettings: "Advanced Settings",
     credentialWarning:
       "Your credentials go directly from your browser to the remote server. However, the token stored here grants the operator of this server full access to your remote account - they can do anything you can do there. Only connect on servers you fully trust.",
     actions: {
@@ -82,8 +108,9 @@ export const translations = {
         description: "Incorrect email or password for the remote account",
       },
       forbidden: {
-        title: "Access Denied",
-        description: "Your account doesn't have permission to connect",
+        title: "Remote Not Accepting Connections",
+        description:
+          "The remote server is not configured to accept incoming connections. Make sure you are connecting to a cloud instance (e.g. unbottled.ai), not another local install.",
       },
       notFound: {
         title: "Not Found",

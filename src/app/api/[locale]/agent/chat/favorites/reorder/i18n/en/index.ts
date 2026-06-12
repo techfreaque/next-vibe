@@ -5,6 +5,7 @@ export const translations = {
   },
   post: {
     title: "Reorder Favorites",
+    titleShort: "Reorder",
     description: "Update the order of your favorite configurations",
     positions: {
       label: "Positions",

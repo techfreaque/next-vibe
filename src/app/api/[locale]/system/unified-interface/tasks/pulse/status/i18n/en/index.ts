@@ -5,6 +5,7 @@ export const translations = {
   },
   get: {
     title: "Pulse Status",
+    titleShort: "Pulse Status",
     description: "Get pulse health monitoring status",
     container: {
       title: "Pulse Health Status",

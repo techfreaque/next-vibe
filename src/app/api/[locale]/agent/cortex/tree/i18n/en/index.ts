@@ -1,8 +1,10 @@
 export const translations = {
   get: {
     title: "Show Tree",
-    description: "See the full folder structure at a glance.",
-    dynamicTitle: "{{path}}",
+    titleShort: "File Tree",
+    description:
+      "See the full folder structure at a glance. For /ssh/ paths, shows machines and mount summaries — use cortex-list or cortex-exec to navigate deeper.",
+    dynamicTitle: "Tree {{path}}",
     status: {
       loading: "Scanning...",
       done: "Scanned",

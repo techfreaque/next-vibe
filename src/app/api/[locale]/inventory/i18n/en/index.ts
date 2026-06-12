@@ -48,6 +48,7 @@ export const translations = {
   warehouseCreate: {
     post: {
       title: "Create Warehouse",
+      titleShort: "New Warehouse",
       description: "Register a new warehouse for a company.",
       widget: {
         backToList: "Back to warehouses",
@@ -135,7 +136,8 @@ export const translations = {
   // Warehouse list
   warehouseList: {
     get: {
-      title: "List Warehouses",
+      title: "Warehouses",
+      titleShort: "Warehouses",
       description: "List all warehouses for a company.",
       widget: {
         active: "Active",
@@ -146,6 +148,7 @@ export const translations = {
         empty: "No warehouses yet.",
         emptyHint: "Create your first warehouse to start tracking inventory.",
         emptyIcon: "🏭",
+        back: "Back",
         loading: "Loading warehouses…",
         load: "Load",
         viewStock: "View Stock",
@@ -207,10 +210,13 @@ export const translations = {
   warehouseGet: {
     get: {
       title: "Get Warehouse",
+      titleShort: "Warehouse",
       description: "Retrieve details for a specific warehouse.",
       widget: {
+        back: "Back",
         edit: "Edit warehouse",
         viewStock: "View stock",
+        select: "Select warehouse",
       },
       warehouseId: {
         label: "Warehouse ID",
@@ -273,6 +279,7 @@ export const translations = {
   warehouseUpdate: {
     patch: {
       title: "Update Warehouse",
+      titleShort: "Edit Warehouse",
       description: "Update warehouse details.",
       widget: {
         backToWarehouse: "Back to warehouse",
@@ -362,9 +369,11 @@ export const translations = {
   stockList: {
     get: {
       title: "Stock Levels",
+      titleShort: "Stock Levels",
       description:
         "View stock levels for a warehouse with availability and low-stock indicators.",
       widget: {
+        back: "Back",
         lowStock: "Low stock",
         available: "Available",
         onHand: "On hand",
@@ -453,6 +462,7 @@ export const translations = {
   stockAdjust: {
     post: {
       title: "Adjust Stock",
+      titleShort: "Adjust Stock",
       description:
         "Manually adjust stock quantity. Use negative values for write-offs.",
       widget: {
@@ -540,6 +550,7 @@ export const translations = {
   stockReceive: {
     post: {
       title: "Receive Stock",
+      titleShort: "Receive Stock",
       description:
         "Record incoming stock — updates on-hand quantity and weighted average cost.",
       widget: {
@@ -618,6 +629,7 @@ export const translations = {
   stockIssue: {
     post: {
       title: "Issue Stock",
+      titleShort: "Issue Stock",
       description:
         "Issue stock out of a warehouse. Validates sufficient available quantity.",
       widget: {
@@ -696,6 +708,7 @@ export const translations = {
   transferCreate: {
     post: {
       title: "Create Transfer",
+      titleShort: "New Transfer",
       description:
         "Create a warehouse transfer request. Starts in Draft status.",
       widget: {
@@ -781,9 +794,11 @@ export const translations = {
   // Transfer list
   transferList: {
     get: {
-      title: "List Transfers",
+      title: "Transfers",
+      titleShort: "Transfers",
       description: "List warehouse transfers for a company.",
       widget: {
+        back: "Back",
         newTransfer: "New Transfer",
         empty: "No transfers yet.",
         emptyHint: "Create a transfer to move stock between warehouses.",
@@ -861,11 +876,14 @@ export const translations = {
   transferGet: {
     get: {
       title: "Get Transfer",
+      titleShort: "Transfer",
       description: "Retrieve a transfer with all its line items.",
       widget: {
+        back: "Back",
         dispatch: "Dispatch transfer",
         receive: "Mark received",
         status: "Status",
+        select: "Select transfer",
       },
       transferId: { label: "Transfer ID", description: "Transfer to retrieve" },
       errors: {
@@ -911,7 +929,9 @@ export const translations = {
         id: "Transfer ID",
         companyId: "Company ID",
         fromWarehouseId: "From Warehouse",
+        fromWarehouseName: "From Warehouse",
         toWarehouseId: "To Warehouse",
+        toWarehouseName: "To Warehouse",
         status: "Status",
         reference: "Reference",
         notes: "Notes",
@@ -920,6 +940,7 @@ export const translations = {
         items: "Items",
         itemId: "Item ID",
         productId: "Product ID",
+        productName: "Product",
         quantityRequested: "Requested",
         quantityReceived: "Received",
       },
@@ -930,6 +951,7 @@ export const translations = {
   transferDispatch: {
     post: {
       title: "Dispatch Transfer",
+      titleShort: "Dispatch",
       description:
         "Mark transfer as in transit. Stock leaves the source warehouse.",
       widget: {
@@ -989,6 +1011,7 @@ export const translations = {
   transferReceive: {
     post: {
       title: "Receive Transfer",
+      titleShort: "Receive Transfer",
       description:
         "Mark transfer as received. Creates stock movements and updates inventory on both ends.",
       widget: {
@@ -1049,6 +1072,7 @@ export const translations = {
   dashboard: {
     get: {
       title: "Inventory Overview",
+      titleShort: "Overview",
       description:
         "Live snapshot of stock health, pending transfers, and warehouse counts.",
       widget: {

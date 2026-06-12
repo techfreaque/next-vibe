@@ -20,6 +20,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Einheitlicher Task Runner",
+    titleShort: "Task-Runner",
     description:
       "Verwalten Sie den einheitlichen Task Runner für Cron-Tasks und Seitenaufgaben",
     container: {

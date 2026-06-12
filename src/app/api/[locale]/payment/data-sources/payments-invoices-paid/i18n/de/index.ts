@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Bezahlte Rechnungen",
+    titleShort: "Bezahlte Rechnungen",
     description: "Anzahl der bezahlten Rechnungen pro Auflösungs-Bucket",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

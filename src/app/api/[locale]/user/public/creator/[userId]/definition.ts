@@ -19,7 +19,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
@@ -40,10 +40,10 @@ export const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["user", "public", "creator", ":userId"],
   title: "get.title" as const,
+  titleShort: "get.titleShort",
   description: "get.description" as const,
   icon: "user",
-  category: "userAuth",
-  subCategory: "userAuthDirectory",
+  category: "account",
   tags: ["tags.creator" as const],
   allowedRoles: [
     UserRole.PUBLIC,

@@ -5,7 +5,15 @@
 
 import "server-only";
 
-import type { TimeSeries } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { GraphResolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/enum";
+
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
+
+import type {
+  Resolution,
+  TimeSeries,
+} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
 export class EmaIndicatorRepository {
   /**
@@ -32,5 +40,24 @@ export class EmaIndicatorRepository {
     }
 
     return result;
+  }
+
+  static handle(data: {
+    source: TimeSeries;
+    period: number;
+    resolution?: Resolution | null;
+    lookback?: number | null;
+  }): ResponseType<{
+    result: TimeSeries;
+    meta: { actualResolution: Resolution; lookbackUsed: number };
+  }> {
+    const result = EmaIndicatorRepository.computeEma(data.source, data.period);
+    return success({
+      result,
+      meta: {
+        actualResolution: data.resolution ?? GraphResolution.ONE_DAY,
+        lookbackUsed: data.lookback ?? 0,
+      },
+    });
   }
 }

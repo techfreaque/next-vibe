@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
   tag: "Gesundheit",
   get: {
     title: "Gesundheitsprüfung",
+    titleShort: "Systemstatus",
     description: "Server-Gesundheitsstatus und Diagnose abrufen",
     form: {
       title: "Gesundheitsprüfungsoptionen",

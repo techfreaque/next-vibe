@@ -8,7 +8,8 @@ export const translations: typeof enTranslations = {
   },
 
   get: {
-    title: "Leads auflisten",
+    title: "Leads",
+    titleShort: "Leads",
     description: "Abrufen einer paginierten Liste von Leads mit Filterung",
     createButton: {
       label: "Lead erstellen",

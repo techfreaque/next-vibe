@@ -35,7 +35,7 @@ import { UserRole } from "../../user/user-roles/enum";
 import { LeadSource, LeadSourceOptions, LeadStatus } from "../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const LeadCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadCreateContainer })),
@@ -50,9 +50,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["leads", "create"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   tags: ["tags.leads", "tags.create"],
   allowedRoles: [UserRole.ADMIN],
   icon: "user-plus",

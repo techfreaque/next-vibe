@@ -3,6 +3,8 @@
  * Handles GET (dashboard) and POST (payout actions)
  */
 
+import "server-only";
+
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
@@ -13,23 +15,17 @@ export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, logger, locale }) => {
-      return await SubscriptionAdminReferralsRepository.listReferrals(
-        data,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ data, logger, locale }) =>
+      SubscriptionAdminReferralsRepository.listReferrals(data, logger, locale),
   },
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
-      return await SubscriptionAdminReferralsRepository.processPayoutAction(
+    handler: async ({ data, user, logger, locale }) =>
+      SubscriptionAdminReferralsRepository.processPayoutAction(
         data,
         user,
         logger,
         locale,
-      );
-    },
+      ),
   },
 });

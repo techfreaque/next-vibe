@@ -29,7 +29,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { DefaultFolderId, isDefaultFolderId } from "../../../config";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const FolderCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.FolderCreateContainer })),
@@ -47,6 +47,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "title" as const,
+  titleShort: "title" as const,
   description: "description" as const,
 
   tags: ["tags.folders" as const],

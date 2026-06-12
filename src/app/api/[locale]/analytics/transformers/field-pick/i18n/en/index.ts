@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Field Pick",
+    titleShort: "Field Pick",
     description:
       "Field Pick - extracts a named field from a time series (superseded, returns empty)",
     fields: {

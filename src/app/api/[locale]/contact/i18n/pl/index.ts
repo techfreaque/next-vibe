@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Porozmawiaj z człowiekiem",
+  titleShort: "Kontakt",
   description:
     "Coś nie działa, albo po prostu chcesz pogadać z prawdziwą osobą. Jesteśmy tu. Napisz, czego potrzebujesz – ktoś z naszego zespołu to przeczyta i odpowie.",
   category: "System",

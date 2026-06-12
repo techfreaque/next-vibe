@@ -13,6 +13,7 @@ export const translations = {
       monitoring: "Monitoring",
     },
     title: "Task Execution History",
+    titleShort: "Task History",
     description: "View historical execution records for cron tasks",
     fields: {
       taskId: {

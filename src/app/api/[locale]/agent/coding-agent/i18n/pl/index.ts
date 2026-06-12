@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
     run: {
       post: {
         title: "Uruchom agenta kodowania",
+        titleShort: "Agent kodowania",
         dynamicTitle: "Agent kodowania: {{prompt}}",
         description:
           "Uruchamia zadanie agenta kodowania. Tryb wsadowy (DOMYŚLNY): działa bezgłowo i zwraca wynik. Tryb interaktywny: otwiera sesję terminala na żywo.",

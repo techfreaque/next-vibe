@@ -4,12 +4,10 @@
  */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
-  WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   lookbackRequestField,
@@ -23,24 +21,29 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { PAYMENTS_REFUND_COUNT_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+const PaymentsRefundCountWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.PaymentsRefundCountWidget })),
+);
+
 const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [PAYMENTS_REFUND_COUNT_ALIAS],
   method: Methods.POST,
   path: ["payment", "data-sources", "payments-refund-count"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsDataSources",
-  subCategory: "endpointCategories.paymentAnalytics",
+  category: "analytics",
+  subCategory: "paymentsData",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: PaymentsRefundCountWidget,
+    noFormElement: true,
+    usage: { request: "data", response: true } as const,
     children: {
       resolution: resolutionRequestField(scopedTranslation, {
         label: "post.fields.resolution.label",

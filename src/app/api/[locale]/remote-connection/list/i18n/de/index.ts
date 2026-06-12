@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Fernverbindungen",
+    titleShort: "Verbindungen",
     description: "Alle Fernverbindungen für dein Konto auflisten",
     fields: {
       activeOnly: {

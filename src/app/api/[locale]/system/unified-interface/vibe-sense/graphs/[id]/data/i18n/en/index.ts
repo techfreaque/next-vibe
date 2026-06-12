@@ -3,6 +3,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   get: {
     title: "Graph Detail",
+    titleShort: "Graph Data",
     description: "View graph chart with indicators and signals",
     fields: {
       id: { label: "Graph ID", description: "UUID of the graph" },

@@ -19,13 +19,14 @@ import {
   ScaleComponentDB,
   ScaleComponentOptions,
 } from "../../enum";
-import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "../../i18n";
 
 export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["infra", "scale", "replicas"],
   title: "scale.replicas.post.title",
+  titleShort: "scale.replicas.post.titleShort",
   description: "scale.replicas.post.description",
   icon: "layers",
   category: "devTools",

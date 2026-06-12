@@ -7,6 +7,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
@@ -21,7 +22,11 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { Users } from "next-vibe-ui/ui/icons/Users";
+import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { Span } from "next-vibe-ui/ui/span";
+import { StatusPill } from "next-vibe-ui/ui/status-pill";
+import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import React, { useCallback, useMemo } from "react";
 
 import {
@@ -38,6 +43,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { usePickerCallback } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/picker-context";
 import { MultiSelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/widget";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
@@ -58,40 +64,44 @@ interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  "enums.leadStatus.new": "bg-info/10 text-info",
-  "enums.leadStatus.pending": "bg-warning/10 text-warning",
-  "enums.leadStatus.campaignRunning":
-    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  "enums.leadStatus.websiteUser":
-    "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  "enums.leadStatus.newsletterSubscriber":
-    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  "enums.leadStatus.inContact":
-    "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  "enums.leadStatus.signedUp":
-    "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  "enums.leadStatus.subscriptionConfirmed": "bg-success/10 text-success",
-  "enums.leadStatus.unsubscribed":
-    "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
-  "enums.leadStatus.bounced": "bg-destructive/10 text-destructive",
-  "enums.leadStatus.invalid": "bg-destructive/10 text-destructive",
+type PillVariant = "default" | "success" | "warning" | "danger" | "info";
+
+const STATUS_VARIANT: Record<string, PillVariant> = {
+  "enums.leadStatus.new": "info",
+  "enums.leadStatus.pending": "warning",
+  "enums.leadStatus.campaignRunning": "info",
+  "enums.leadStatus.websiteUser": "info",
+  "enums.leadStatus.newsletterSubscriber": "info",
+  "enums.leadStatus.inContact": "warning",
+  "enums.leadStatus.signedUp": "success",
+  "enums.leadStatus.subscriptionConfirmed": "success",
+  "enums.leadStatus.unsubscribed": "default",
+  "enums.leadStatus.bounced": "danger",
+  "enums.leadStatus.invalid": "danger",
 };
 
-const CAMPAIGN_STAGE_COLORS: Record<string, string> = {
-  "enums.emailCampaignStage.notStarted":
-    "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-  "enums.emailCampaignStage.initial":
-    "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
-  "enums.emailCampaignStage.followup1":
-    "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
-  "enums.emailCampaignStage.followup2":
-    "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/30 dark:text-fuchsia-300",
-  "enums.emailCampaignStage.followup3":
-    "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
-  "enums.emailCampaignStage.nurture":
-    "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-  "enums.emailCampaignStage.reactivation": "bg-warning/10 text-warning",
+const STATUS_DOT_COLORS: Record<string, string> = {
+  "enums.leadStatus.new": "bg-info",
+  "enums.leadStatus.pending": "bg-warning",
+  "enums.leadStatus.campaignRunning": "bg-purple-500",
+  "enums.leadStatus.websiteUser": "bg-cyan-500",
+  "enums.leadStatus.newsletterSubscriber": "bg-indigo-500",
+  "enums.leadStatus.inContact": "bg-orange-500",
+  "enums.leadStatus.signedUp": "bg-teal-500",
+  "enums.leadStatus.subscriptionConfirmed": "bg-success",
+  "enums.leadStatus.unsubscribed": "bg-gray-400",
+  "enums.leadStatus.bounced": "bg-destructive",
+  "enums.leadStatus.invalid": "bg-destructive",
+};
+
+const CAMPAIGN_STAGE_VARIANT: Record<string, PillVariant> = {
+  "enums.emailCampaignStage.notStarted": "default",
+  "enums.emailCampaignStage.initial": "info",
+  "enums.emailCampaignStage.followup1": "info",
+  "enums.emailCampaignStage.followup2": "info",
+  "enums.emailCampaignStage.followup3": "info",
+  "enums.emailCampaignStage.nurture": "success",
+  "enums.emailCampaignStage.reactivation": "warning",
 };
 
 /** Status tab values for quick filtering */
@@ -119,6 +129,18 @@ const STATUS_TAB_VALUES = [
   },
 ] as const;
 
+interface LeadRowProps {
+  lead: Lead;
+  locale: CountryLanguage;
+  onView: (lead: Lead) => void;
+  onEdit: (lead: Lead) => void;
+  onDelete: (lead: Lead) => void;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  leadsT: ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
+  isTouch: boolean;
+  isPickerMode: boolean;
+}
+
 function LeadRow({
   lead,
   locale,
@@ -128,16 +150,8 @@ function LeadRow({
   t,
   leadsT,
   isTouch,
-}: {
-  lead: Lead;
-  locale: CountryLanguage;
-  onView: (lead: Lead) => void;
-  onEdit: (lead: Lead) => void;
-  onDelete: (lead: Lead) => void;
-  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
-  leadsT: ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
-  isTouch: boolean;
-}): React.JSX.Element {
+  isPickerMode,
+}: LeadRowProps): React.JSX.Element {
   const isConverted = Boolean(lead.convertedUserId);
 
   return (
@@ -157,42 +171,30 @@ function LeadRow({
             {lead.businessName ?? lead.email ?? "—"}
           </Span>
           {lead.status && (
-            <Span
-              className={cn(
-                "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                STATUS_COLORS[lead.status] ??
-                  "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
-              )}
-            >
-              {leadsT(lead.status)}
-            </Span>
+            <StatusPill
+              status={leadsT(lead.status)}
+              variant={STATUS_VARIANT[lead.status] ?? "default"}
+            />
           )}
           {isConverted && (
-            <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-warning/10 text-warning">
-              {t("widget.converted")}
-            </Span>
+            <StatusPill status={t("widget.converted")} variant="warning" />
           )}
           {lead.linkedLeadsCount > 0 && (
-            <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300">
-              {t("widget.linkedCount", { count: lead.linkedLeadsCount })}
-            </Span>
+            <StatusPill
+              status={t("widget.linkedCount", { count: lead.linkedLeadsCount })}
+              variant="info"
+            />
           )}
           {lead.hasLinkedUser && (
-            <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300">
-              <Users className="h-2.5 w-2.5 mr-1" />
-              {t("widget.hasLinkedUser")}
-            </Span>
+            <StatusPill status={t("widget.hasLinkedUser")} variant="info" />
           )}
           {lead.currentCampaignStage && (
-            <Span
-              className={cn(
-                "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                CAMPAIGN_STAGE_COLORS[lead.currentCampaignStage] ??
-                  "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
-              )}
-            >
-              {leadsT(lead.currentCampaignStage)}
-            </Span>
+            <StatusPill
+              status={leadsT(lead.currentCampaignStage)}
+              variant={
+                CAMPAIGN_STAGE_VARIANT[lead.currentCampaignStage] ?? "default"
+              }
+            />
           )}
         </Div>
         <Div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
@@ -214,7 +216,7 @@ function LeadRow({
       </Div>
 
       {/* Stats */}
-      <Div className="hidden md:flex flex-col items-end gap-1 flex-shrink-0 text-xs text-muted-foreground">
+      <Div className="hidden @md:flex flex-col items-end gap-1 flex-shrink-0 text-xs text-muted-foreground">
         {lead.emailsSent !== null && lead.emailsSent !== undefined && (
           <Span>
             {t("widget.emailsSent", {
@@ -246,45 +248,47 @@ function LeadRow({
           )}
       </Div>
 
-      {/* Actions */}
-      <Div
-        className={cn(
-          "flex-shrink-0 flex gap-0.5",
-          isTouch
-            ? "opacity-100"
-            : "opacity-0 group-hover:opacity-100 transition-opacity",
-        )}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => onView(lead)}
-          title={t("widget.view")}
+      {/* Actions - hidden in picker mode */}
+      {!isPickerMode && (
+        <Div
+          className={cn(
+            "flex-shrink-0 flex gap-0.5",
+            isTouch
+              ? "opacity-100"
+              : "opacity-0 group-hover:opacity-100 transition-opacity",
+          )}
+          onClick={(e) => e.stopPropagation()}
         >
-          <Eye className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => onEdit(lead)}
-          title={t("widget.edit")}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="text-destructive hover:text-destructive"
-          onClick={() => onDelete(lead)}
-          title={t("widget.delete")}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </Div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onView(lead)}
+            title={t("widget.view")}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onEdit(lead)}
+            title={t("widget.edit")}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-destructive hover:text-destructive"
+            onClick={() => onDelete(lead)}
+            title={t("widget.delete")}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </Div>
+      )}
     </Div>
   );
 }
@@ -301,6 +305,8 @@ export function LeadsListContainer({
   const form = useWidgetForm<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const widgetData = useWidgetValue<typeof definition.GET>();
+  const onPick = usePickerCallback<Lead>();
+  const isPickerMode = !!onPick;
 
   const onSubmit = useWidgetOnSubmit();
 
@@ -347,8 +353,6 @@ export function LeadsListContainer({
   const handleToggleStatus = useCallback(
     (status: string): void => {
       const current = form.getValues("statusFilters.status") ?? [];
-      // status may be a LeadStatus key ("enums.leadStatus.xxx") or already a LeadStatusFilter key
-      // Normalize to LeadStatusFilter key space ("enums.leadStatusFilter.xxx")
       const filterKey = status.replace(
         "enums.leadStatus.",
         "enums.leadStatusFilter.",
@@ -369,6 +373,11 @@ export function LeadsListContainer({
 
   const handleView = useCallback(
     (lead: Lead): void => {
+      if (onPick) {
+        onPick(lead);
+        navigation.pop();
+        return;
+      }
       void (async (): Promise<void> => {
         const leadDef =
           await import("@/app/api/[locale]/leads/lead/[id]/definition");
@@ -377,7 +386,7 @@ export function LeadsListContainer({
         });
       })();
     },
-    [navigation],
+    [navigation, onPick],
   );
 
   const handleEdit = useCallback(
@@ -526,102 +535,91 @@ export function LeadsListContainer({
   const hasActiveFilters =
     activeStatuses.length > 0 || activeSources.length > 0;
 
-  return (
-    <Div className="flex flex-col gap-0">
-      {/* Header */}
-      <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base">
-          {t("get.title")}
-          {totalCount > 0 && (
-            <Span className="ml-2 text-sm text-muted-foreground font-normal">
-              ({totalCount})
-            </Span>
-          )}
-        </Span>
-        {isFetching && !isLoadingFresh && (
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        )}
-
-        {/* Spacer */}
-        <Div className="flex-1" />
-
-        {/* Action buttons */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleStats}
-          title={t("widget.stats")}
-          className="gap-1"
-        >
-          <BarChart3 className="h-4 w-4" />
-          <Span className="hidden sm:inline">{t("widget.stats")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleGraphs}
-          title={t("widget.graphs")}
-          className="gap-1"
-        >
-          <GitBranch className="h-4 w-4" />
-          <Span className="hidden sm:inline">{t("widget.graphs")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleSearch}
-          title={t("widget.search")}
-          className="gap-1"
-        >
-          <Search className="h-4 w-4" />
-          <Span className="hidden sm:inline">{t("widget.search")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleExport}
-          title={t("widget.export")}
-          className="gap-1"
-        >
-          <Download className="h-4 w-4" />
-          <Span className="hidden sm:inline">{t("widget.export")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleImport}
-          title={t("widget.import")}
-          className="gap-1"
-        >
-          <Upload className="h-4 w-4" />
-          <Span className="hidden sm:inline">{t("widget.import")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleBatchUpdate}
-          title={t("widget.batch")}
-          className="gap-1"
-        >
-          <Users className="h-4 w-4" />
-          <Span className="hidden sm:inline">{t("widget.batch")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+  const headerActions = (
+    <Div className="flex items-center gap-1 flex-wrap">
+      {isFetching && !isLoadingFresh && (
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+      )}
+      {!isPickerMode && (
+        <>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleStats}
+            title={t("widget.stats")}
+            className="gap-1"
+          >
+            <BarChart3 className="h-4 w-4" />
+            <Span className="hidden @sm:inline">{t("widget.stats")}</Span>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleGraphs}
+            title={t("widget.graphs")}
+            className="gap-1"
+          >
+            <GitBranch className="h-4 w-4" />
+            <Span className="hidden @sm:inline">{t("widget.graphs")}</Span>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleSearch}
+            title={t("widget.search")}
+            className="gap-1"
+          >
+            <Search className="h-4 w-4" />
+            <Span className="hidden @sm:inline">{t("widget.search")}</Span>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleExport}
+            title={t("widget.export")}
+            className="gap-1"
+          >
+            <Download className="h-4 w-4" />
+            <Span className="hidden @sm:inline">{t("widget.export")}</Span>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleImport}
+            title={t("widget.import")}
+            className="gap-1"
+          >
+            <Upload className="h-4 w-4" />
+            <Span className="hidden @sm:inline">{t("widget.import")}</Span>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleBatchUpdate}
+            title={t("widget.batch")}
+            className="gap-1"
+          >
+            <Users className="h-4 w-4" />
+            <Span className="hidden @sm:inline">{t("widget.batch")}</Span>
+          </Button>
+        </>
+      )}
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={handleRefresh}
+        title={t("widget.refresh")}
+      >
+        <RefreshCw className="h-4 w-4" />
+      </Button>
+      {!isPickerMode && (
         <Button
           type="button"
           variant="default"
@@ -632,6 +630,19 @@ export function LeadsListContainer({
           <Plus className="h-4 w-4" />
           {t("get.createButton.label")}
         </Button>
+      )}
+    </Div>
+  );
+
+  return (
+    <WidgetShell padding="none">
+      {/* Header */}
+      <Div className="px-4 pt-4">
+        <WidgetHeader
+          title={`${t("get.title")}${totalCount > 0 ? ` (${totalCount})` : ""}`}
+          backButton={<NavigateButtonWidget field={children.backButton} />}
+          actions={headerActions}
+        />
       </Div>
 
       {/* Status quick-filter tabs */}
@@ -686,7 +697,7 @@ export function LeadsListContainer({
       </Div>
 
       {/* Search + Filters row */}
-      <Div className="px-4 pt-2 pb-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+      <Div className="px-4 pt-2 pb-0 grid grid-cols-1 @sm:grid-cols-2 @md:grid-cols-3 gap-2">
         <TextFieldWidget
           fieldName="statusFilters.search"
           field={children.statusFilters.children.search}
@@ -744,7 +755,7 @@ export function LeadsListContainer({
                   <Span
                     className={cn(
                       "inline-block w-2 h-2 rounded-full mr-1",
-                      STATUS_COLORS[status]?.split(" ")[0] ?? "bg-gray-400",
+                      STATUS_DOT_COLORS[status] ?? "bg-gray-400",
                     )}
                   />
                   {leadsT(status)}: {count}
@@ -762,9 +773,7 @@ export function LeadsListContainer({
         )}
       >
         {isLoading ? (
-          <Div className="h-[300px] flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </Div>
+          <LoadingBlock />
         ) : leads.length > 0 ? (
           <Div className="flex flex-col gap-2">
             {leads.map((lead) => (
@@ -778,39 +787,24 @@ export function LeadsListContainer({
                 t={t}
                 leadsT={leadsT}
                 isTouch={isTouch}
+                isPickerMode={isPickerMode}
               />
             ))}
           </Div>
         ) : (
-          <Div className="text-center text-muted-foreground py-12">
-            <Div className="mb-2">
-              {hasActiveFilters ? t("get.emptySearch") : t("get.emptyState")}
-            </Div>
-            {!hasActiveFilters && (
-              <Div className="mt-4 flex items-center justify-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCreate}
-                  className="gap-1"
-                >
-                  <Plus className="h-4 w-4" />
-                  {t("widget.addLead")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleImport}
-                  className="gap-1"
-                >
-                  <Upload className="h-4 w-4" />
-                  {t("widget.importCsv")}
-                </Button>
-              </Div>
-            )}
-          </Div>
+          <EmptyBlock
+            title={
+              hasActiveFilters ? t("get.emptySearch") : t("get.emptyState")
+            }
+            action={
+              !hasActiveFilters && !isPickerMode
+                ? {
+                    label: t("widget.addLead"),
+                    onClick: handleCreate,
+                  }
+                : undefined
+            }
+          />
         )}
       </Div>
 
@@ -846,6 +840,6 @@ export function LeadsListContainer({
           </Div>
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

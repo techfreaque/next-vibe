@@ -46,7 +46,8 @@ export function SkillsPageClient({
         </Div>
         <P className="text-muted-foreground mb-6">{t("description")}</P>
 
-        <Div className="rounded-xl border bg-card overflow-hidden">
+        {/* overflow-clip (not hidden) keeps the sticky header inside working */}
+        <Div className="rounded-xl border bg-card overflow-clip">
           <Suspense fallback={null}>
             <SkillsContent locale={locale} user={user} />
           </Suspense>

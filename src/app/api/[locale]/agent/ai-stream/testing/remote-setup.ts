@@ -5,12 +5,12 @@
  * Uses the real connect/disconnect HTTP endpoints for proper E2E setup.
  *
  * Two connection directions:
- *   hermes-dev → hermes  (direct HTTP, transportMode='direct-http')
- *   hermes → hermes-dev  (queue path, transportMode='cloud-only' + allowTaskQueue=true)
+ *   atlas → hermes  (direct HTTP, transportMode='direct-http')
+ *   hermes → atlas  (reverse WS, transportMode='reverse-ws')
  *
  * `connectToHermes()` calls the local connect endpoint via HTTP, which:
  *   1. Logs into the prod server with email+password
- *   2. Registers hermes-dev on hermes (reverse connection)
+ *   2. Registers atlas on hermes (reverse connection)
  *   3. Syncs capabilities both ways
  *
  * `teardown` deletes the connection rows from both sides.
@@ -21,44 +21,45 @@ import "server-only";
 import { existsSync, readFileSync } from "node:fs";
 
 import { and, eq, sql } from "drizzle-orm";
-import { z } from "zod";
+import { describe, expect, it } from "vitest";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import { z } from "zod";
 
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import * as userSchema from "@/app/api/[locale]/user/db";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
 import {
   remoteConnections,
   RemoteToolCapabilitySchema,
 } from "@/app/api/[locale]/remote-connection/db";
+import { db } from "@/app/api/[locale]/system/db";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import * as userSchema from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-/** instanceId used by hermes-dev to refer to the prod (hermes) connection */
+/** instanceId used by atlas to refer to the prod (hermes) connection */
 export const HERMES_INSTANCE_ID = "hermes";
 
-/** instanceId used by hermes to refer to the hermes-dev (local) connection */
-export const HERMES_DEV_INSTANCE_ID = "hermes-dev";
+/** instanceId used by hermes to refer to the atlas (local) connection */
+export const ATLAS_INSTANCE_ID = "atlas";
 
 /** Dev server URL (vibe dev proxy) */
-export const DEV_URL = "http://localhost:3000";
+export const ATLAS_URL = "http://localhost:3000";
 
 /** Prod server URL (hermes, vibe start) */
 export const PROD_URL = "http://localhost:3001";
 
-/** Local-dev server URL (hermes, vibe --local dev) */
+/** Local-dev server URL (hermes, vibe --hermes dev) */
 export const LOCAL_DEV_URL = "http://localhost:3002";
 
 /** PID file for vibe start (hermes prod build) */
-export const VIBE_START_PID_FILE_PATH = ".tmp/.vibe-start.pid";
+export const VIBE_START_PID_FILE_PATH = ".tmp/.hermes.pid";
 
-/** PID file for vibe --local dev (hermes local dev) */
-export const VIBE_LOCAL_PID_FILE_PATH = ".tmp/.vibe-local.pid";
+/** PID file for vibe --hermes dev (hermes local dev) */
+export const HERMES_DEV_PID_FILE_PATH = ".tmp/.hermes-dev.pid";
 
 /** Port for the prod/preview PostgreSQL database */
 const PROD_DB_PORT = 5433;
@@ -108,14 +109,14 @@ export async function isServerRunning(
 }
 
 /**
- * Resolve the remote URL: only checks port 3002 (vibe --local dev --fixture-mode).
+ * Resolve the remote URL: only checks port 3002 (vibe --hermes dev --fixture-mode).
  * Returns null if the server is not running.
  *
  * To run remote integration tests, start the local dev server in fixture mode:
- *   vibe --local dev --fixture-mode
+ *   vibe --hermes dev --fixture-mode
  */
 export async function resolveRemoteUrl(): Promise<string | null> {
-  if (await isServerRunning(LOCAL_DEV_URL, VIBE_LOCAL_PID_FILE_PATH)) {
+  if (await isServerRunning(LOCAL_DEV_URL, HERMES_DEV_PID_FILE_PATH)) {
     return LOCAL_DEV_URL;
   }
   return null;
@@ -193,7 +194,7 @@ export async function closeProdDb(): Promise<void> {
 // ── Prod user resolution ──────────────────────────────────────────────────────
 
 /**
- * Resolve the admin user's JwtPrivatePayloadType from the local (hermes-dev) DB.
+ * Resolve the admin user's JwtPrivatePayloadType from the local (atlas) DB.
  * Used by integration tests that need a real user object.
  */
 export async function resolveDevUser(
@@ -345,10 +346,11 @@ export async function callRemoteEndpoint(
   adminToken: string,
   path: string[],
   body: Record<string, string | number | boolean | null>,
+  method: "POST" | "PATCH" = "POST",
 ): Promise<RemoteEndpointResponse> {
   const url = `${remoteUrl}/api/en-US/${path.join("/")}`;
   const resp = await fetch(url, {
-    method: "POST",
+    method,
     headers: {
       "Content-Type": "application/json",
       // eslint-disable-next-line i18next/no-literal-string
@@ -423,11 +425,11 @@ function isConnectTransientFailure(msg: string | undefined): boolean {
 }
 
 /**
- * Establish hermes-dev → hermes connection in-process via connectRemote.
+ * Establish atlas → hermes connection in-process via connectRemote.
  *
  * Calls RemoteConnectionConnectRepository.connectRemote directly (no HTTP overhead).
  * This logs into hermes (prod, port 3001) with email+password, stores the token
- * locally in hermes-dev's DB, and registers hermes-dev on hermes (reverse row).
+ * locally in atlas's DB, and registers atlas on hermes (reverse row).
  * Capability sync happens automatically inside connectRemote.
  */
 export async function connectToHermes(
@@ -511,16 +513,16 @@ export async function connectToHermes(
         "[connectToHermes] Already Connected - cleaning up remote and retrying",
       );
 
-      // Delete hermes-dev's registration on hermes (remote side).
+      // Delete atlas's registration on hermes (remote side).
       // Use broad delete (no user filter) to catch any leftover registrations.
       const pdb = getProdDb();
       await pdb.execute(
-        sql`DELETE FROM remote_connections WHERE instance_id = ${HERMES_DEV_INSTANCE_ID}`,
+        sql`DELETE FROM remote_connections WHERE instance_id = ${ATLAS_INSTANCE_ID}`,
       );
 
-      // Also fix self-identity if it got set to hermes-dev by a previous register call
+      // Also fix self-identity if it got set to atlas by a previous register call
       await pdb.execute(
-        sql`UPDATE instance_identities SET instance_id = 'hermes' WHERE instance_id = ${HERMES_DEV_INSTANCE_ID}`,
+        sql`UPDATE instance_identities SET instance_id = 'hermes' WHERE instance_id = ${ATLAS_INSTANCE_ID}`,
       );
 
       // Retry connect
@@ -547,9 +549,11 @@ export async function connectToHermes(
 
   // transportMode is normally set asynchronously by the remote ping when the
   // reverse connection is registered on hermes. For tests we know hermes
-  // (localhost:3001) is directly reachable, so set it explicitly here.
+  // (localhost:3002) is directly reachable, so set it explicitly here.
   // Also lock in the relay settings for E2E tests: local client always provides
-  // system prompt + tools; remote runs the AI loop; threads mirrored on both sides.
+  // system prompt + tools; remote runs the AI loop; threads mirrored on both
+  // sides; isDefault=true makes hermes the inference provider for ALL threads
+  // (REMOTE-folder threads route natively without any rules).
   await db
     .update(remoteConnections)
     .set({
@@ -557,8 +561,14 @@ export async function connectToHermes(
       loopLocation: "server",
       toolSource: "local",
       threadMirrorMode: "both",
-      // resolveTarget() checks routingRules.isDefault (JSON column), NOT the DB isDefault boolean.
-      // Without this, resolveTarget() returns null and the AI loop runs locally, defeating the relay.
+      // Enable full sync scope so WS push events for all providers reach this instance
+      syncScope: {
+        favorites: true,
+        documents: true,
+        memories: true,
+        skills: true,
+        threads: true,
+      },
       routingRules: {
         folderIds: [],
         handlesModelProviders: [],
@@ -572,10 +582,132 @@ export async function connectToHermes(
         eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
       ),
     );
+
+  // Close any persistent WS connection that was opened by connectRemote() before
+  // we changed transportMode to direct-http. For direct-http, no persistent WS
+  // should be maintained — relayStream() opens a per-stream dedicated WS instead.
+  const { closeConnection } =
+    await import("@/app/api/[locale]/remote-connection/connector");
+  closeConnection(HERMES_INSTANCE_ID);
+
+  // Patch hermes's side: set syncScope on its record for atlas so that
+  // pull-based sync (D5/D6/M5/M6) returns documents/memories in the payload.
+  // Without this, hermes filters them out because its connRow.syncScope=null.
+  const { RemoteTransport } =
+    await import("@/app/api/[locale]/remote-connection/transport");
+  const target = await RemoteTransport.resolveTarget({
+    userId: user.id,
+    locale: defaultLocale,
+    logger,
+  });
+  if (target) {
+    const { default: connByIdDef } =
+      await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+    const { callEndpoint } =
+      await import("@/app/api/[locale]/remote-connection/call-endpoint");
+    await callEndpoint({
+      definition: connByIdDef.PATCH,
+      input: {
+        syncScope: {
+          favorites: true,
+          documents: true,
+          memories: true,
+          skills: true,
+          threads: true,
+        },
+      },
+      urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
+      target,
+      locale: defaultLocale,
+      user,
+      logger,
+    });
+  }
 }
 
 /**
- * Remove the hermes-dev → hermes connection from hermes-dev's local DB.
+ * Establish atlas → hermes connection with LOCAL AI loop + reverse-WS tool dispatch.
+ *
+ * Same as connectToHermes but configured for "AI stays on atlas, tools run on hermes":
+ *   - transportMode='reverse-ws'  → execute-tool dispatches via reverse-WS connector
+ *   - routingRules.isDefault=false → resolveTarget() returns null → AI loop on atlas
+ *   - Opens hermes's reverse-WS connector (PATCHes its atlas row) so it's ready to
+ *     pick up tool-execute-request events immediately when the AI calls execute-tool.
+ *
+ * Thread storage: BACKGROUND on atlas. Hermes only executes tools.
+ */
+export async function connectToHermesLocalAi(
+  user: JwtPrivatePayloadType,
+  remoteUrl: string = LOCAL_DEV_URL,
+): Promise<void> {
+  // Idempotent: clean up any leftover connection before reconnecting.
+  await disconnectFromHermes(user.id);
+  // Full connect flow (registers both sides, syncs capabilities, sets isDefault=true).
+  await connectToHermes(user, remoteUrl);
+
+  // Override the connection settings set by connectToHermes:
+  //   isDefault=false → only REMOTE-folder threads route to hermes (native)
+  //   transportMode=reverse-ws → traffic rides the reverse-WS connector
+  await db
+    .update(remoteConnections)
+    .set({
+      transportMode: "reverse-ws",
+      routingRules: {
+        folderIds: [],
+        handlesModelProviders: [],
+        isDefault: false,
+      },
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(remoteConnections.userId, user.id),
+        eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
+      ),
+    );
+
+  // Open the reverse-WS connector on hermes so it's ready to handle
+  // tool-execute-request events dispatched by execute-tool(instanceId='hermes').
+  // PATCHing hermes's atlas row to transportMode=reverse-ws triggers openConnection()
+  // on hermes, which subscribes to system/tool-dispatch/{userId}.
+  const hermesAdminToken = await resolveProdAdminToken(remoteUrl);
+  await callRemoteEndpoint(
+    remoteUrl,
+    hermesAdminToken,
+    ["remote-connection", ATLAS_INSTANCE_ID],
+    { transportMode: "reverse-ws" },
+    "PATCH",
+  );
+}
+
+/**
+ * Tear down a connectToHermesLocalAi session.
+ *
+ * Resets hermes's reverse-WS connector back to cloud-only (closes the open WS),
+ * then removes the atlas → hermes connection from both sides.
+ */
+export async function disconnectFromHermesLocalAi(
+  user: JwtPrivatePayloadType,
+  remoteUrl: string = LOCAL_DEV_URL,
+): Promise<void> {
+  // Best-effort: reset hermes's atlas row so its WS connector closes cleanly.
+  try {
+    const hermesAdminToken = await resolveProdAdminToken(remoteUrl);
+    await callRemoteEndpoint(
+      remoteUrl,
+      hermesAdminToken,
+      ["remote-connection", ATLAS_INSTANCE_ID],
+      { transportMode: "cloud-only" },
+      "PATCH",
+    );
+  } catch {
+    /* best-effort */
+  }
+  await disconnectFromHermes(user.id);
+}
+
+/**
+ * Remove the atlas → hermes connection from atlas's local DB.
  */
 export async function disconnectFromHermes(userId: string): Promise<void> {
   await db
@@ -589,21 +721,21 @@ export async function disconnectFromHermes(userId: string): Promise<void> {
 }
 
 /**
- * Remove the hermes-dev registration from the prod DB (hermes side).
+ * Remove the atlas registration from the prod DB (hermes side).
  */
 export async function unregisterDevFromHermes(
   prodUserId: string,
 ): Promise<void> {
   const pdb = getProdDb();
   await pdb.execute(
-    sql`DELETE FROM remote_connections WHERE user_id = ${prodUserId} AND instance_id = ${HERMES_DEV_INSTANCE_ID}`,
+    sql`DELETE FROM remote_connections WHERE user_id = ${prodUserId} AND instance_id = ${ATLAS_INSTANCE_ID}`,
   );
 }
 
 // ── Task-sync pull trigger ────────────────────────────────────────────────────
 
 /**
- * Trigger an immediate task-sync pull on hermes-dev without waiting the full
+ * Trigger an immediate task-sync pull on atlas without waiting the full
  * 60s pulse cycle. Calls TaskSyncRepository.pullFromRemote in-process.
  *
  * If the remote pull fails (e.g. TanStack dev server socket error), falls back
@@ -737,9 +869,10 @@ export async function resolveProdAdminToken(
 // ── Hermes pull trigger ───────────────────────────────────────────────────────
 
 /**
- * Trigger hermes (prod, port 3001) to pull memory/capability updates from hermes-dev.
+ * Trigger hermes (prod, port 3001) to pull memory/capability updates from atlas.
  * Used by cortex-sync tests to verify cross-instance memory synchronization.
  *
+ * Calls the admin-only sync/trigger-pull endpoint which runs pullFromRemote in-process.
  * Requires an admin-role JWT for hermes (use resolveProdAdminToken).
  */
 export async function triggerHermesPull(
@@ -753,7 +886,7 @@ export async function triggerHermesPull(
   };
 
   const pullResp = await fetch(
-    `${remoteUrl}/api/en-US/system/unified-interface/tasks/task-sync/pull`,
+    `${remoteUrl}/api/en-US/remote-connection/sync/trigger-pull`,
     { method: "POST", headers, body: JSON.stringify({}) },
   );
   const pullBody = await pullResp.text().catch(() => "unknown");
@@ -768,6 +901,110 @@ export async function triggerHermesPull(
   console.log(
     `[triggerHermesPull] status=${String(pullResp.status)} body=${pullBody}`,
   );
+}
+
+// ── Fixture-mode detection ────────────────────────────────────────────────────
+
+/**
+ * Returns true if the given pid file exists and contains a PORT:<n> line,
+ * which means the server is running. By convention, hermes-dev (port 3002)
+ * is always started with --fixture-mode for integration tests.
+ * Use this to gate recording-only operations without log grepping.
+ */
+export function readFixtureMode(pidFile: string): boolean {
+  return readServerPort(pidFile) !== null;
+}
+
+/**
+ * Returns true if the hermes-dev server (port 3002) is currently running.
+ * Hermes-dev is always started in fixture mode for integration tests.
+ * Use this as a guard before tests that require fixture recording/replay.
+ */
+export function isHermesInFixtureMode(): boolean {
+  return readFixtureMode(HERMES_DEV_PID_FILE_PATH);
+}
+
+// ── Prerequisite enforcement ──────────────────────────────────────────────────
+
+/**
+ * Register a FAILING test when a suite's prerequisites are not met.
+ * Missing servers must never produce a silent 0-test "pass" — the suite
+ * fails with the exact command needed to make it runnable.
+ */
+export function failSuitePrerequisites(suiteName: string, hint: string): void {
+  describe(suiteName, () => {
+    it("prerequisites", () => {
+      expect(false, `${suiteName}: prerequisites not met — ${hint}`).toBe(true);
+    });
+  });
+}
+
+// ── Prod DB-level test assertions ─────────────────────────────────────────────
+
+/**
+ * Assert that a table has zero rows matching the given threadId.
+ * Used by ws-provider tests to confirm no AI messages landed on hermes.
+ *
+ * @param threadId - thread UUID to check
+ * @param table - SQL table name to query (must have a thread_id column)
+ */
+export async function assertProdDbEmpty(
+  threadId: string,
+  table: string,
+): Promise<void> {
+  const pdb = getProdDb();
+  const rows = await pdb.execute<{ count: string }>(
+    sql`SELECT COUNT(*) AS count FROM ${sql.raw(table)} WHERE thread_id = ${threadId}`,
+  );
+  const count = parseInt(rows.rows[0]?.count ?? "0", 10);
+  const { expect: expectBun } = await import("bun:test");
+  expectBun(
+    count,
+    `[assertProdDbEmpty] Expected 0 rows in ${table} for thread ${threadId}, got ${String(count)}`,
+  ).toBe(0);
+}
+
+/**
+ * Assert that a thread exists in the hermes prod DB inside the given folder.
+ * Used by remote-chat-root tests to verify bidirectional thread mirroring.
+ */
+export async function assertProdDbHasThread(
+  threadId: string,
+  folderId: string,
+): Promise<void> {
+  const pdb = getProdDb();
+  const rows = await pdb.execute<{ id: string; folder_id: string }>(
+    sql`SELECT id, folder_id FROM chat_threads WHERE id = ${threadId} LIMIT 1`,
+  );
+  const { expect: expectBun } = await import("bun:test");
+  expectBun(
+    rows.rows.length,
+    `[assertProdDbHasThread] Thread ${threadId} not found in hermes prod DB`,
+  ).toBeGreaterThan(0);
+  expectBun(
+    rows.rows[0]?.folder_id,
+    `[assertProdDbHasThread] Thread ${threadId} expected in folder ${folderId}, got ${rows.rows[0]?.folder_id ?? "null"}`,
+  ).toBe(folderId);
+}
+
+/**
+ * Assert that a thread in the hermes prod DB has at least minCount messages.
+ * Used by remote-chat-root tests to confirm the AI loop ran on hermes.
+ */
+export async function assertProdDbHasMessages(
+  threadId: string,
+  minCount: number,
+): Promise<void> {
+  const pdb = getProdDb();
+  const rows = await pdb.execute<{ count: string }>(
+    sql`SELECT COUNT(*) AS count FROM chat_messages WHERE thread_id = ${threadId}`,
+  );
+  const count = parseInt(rows.rows[0]?.count ?? "0", 10);
+  const { expect: expectBun } = await import("bun:test");
+  expectBun(
+    count,
+    `[assertProdDbHasMessages] Thread ${threadId} expected at least ${String(minCount)} messages in hermes prod DB, got ${String(count)}`,
+  ).toBeGreaterThanOrEqual(minCount);
 }
 
 // ── DB-level test assertions ─────────────────────────────────────────────────
@@ -797,14 +1034,14 @@ export async function assertCronTaskCompleted(threadId: string): Promise<void> {
       ),
     );
 
-  const { expect } = await import("bun:test");
-  expect(
+  const { expect: expectBun } = await import("bun:test");
+  expectBun(
     tasks.length,
     `[assertCronTaskCompleted] Expected at least one remote cron task for thread ${threadId}`,
   ).toBeGreaterThan(0);
 
   for (const task of tasks) {
-    expect(
+    expectBun(
       task.lastExecutionStatus,
       `[assertCronTaskCompleted] Task ${task.id} (target=${String(task.targetInstance)}) must be completed`,
     ).toBe(CronTaskStatus.COMPLETED);
@@ -824,12 +1061,12 @@ export async function assertThreadIdle(threadId: string): Promise<void> {
     .from(chatThreads)
     .where(eq(chatThreads.id, threadId));
 
-  const { expect } = await import("bun:test");
-  expect(
+  const { expect: expectBun } = await import("bun:test");
+  expectBun(
     thread,
     `[assertThreadIdle] Thread ${threadId} not found`,
   ).toBeTruthy();
-  expect(
+  expectBun(
     thread.streamingState,
     `[assertThreadIdle] Thread ${threadId} must be idle (got "${thread.streamingState}")`,
   ).toBe("idle");
@@ -859,8 +1096,8 @@ export async function assertNoOrphanPendingTasks(
       ),
     );
 
-  const { expect } = await import("bun:test");
-  expect(
+  const { expect: expectBun } = await import("bun:test");
+  expectBun(
     orphans,
     `[assertNoOrphanPendingTasks] Found ${String(orphans.length)} orphan tasks: ${JSON.stringify(orphans.map((o) => ({ id: o.id, route: o.routeId })))}`,
   ).toHaveLength(0);

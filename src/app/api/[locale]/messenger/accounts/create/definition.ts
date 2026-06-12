@@ -55,7 +55,7 @@ import {
 } from "../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const MessengerAccountCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -68,9 +68,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["messenger", "accounts", "create"],
   title: "title",
+  titleShort: "titleShort",
   description: "description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.messengerAccounts",
+  category: "messenger",
+  subCategory: "Accounts",
   icon: "message-circle",
   tags: ["tags.messaging"],
   allowedRoles: [UserRole.ADMIN],

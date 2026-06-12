@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Clamp",
+    titleShort: "Clamp",
     description:
       "Werte auf einen [min, max] Bereich begrenzen - kappt Ausreißer",
     fields: {

@@ -4,6 +4,7 @@ export const translations = {
 
   list: {
     title: "My Addresses",
+    titleShort: "My Addresses",
     description: "List your saved addresses",
     response: {
       addresses: "Addresses",
@@ -15,6 +16,9 @@ export const translations = {
       billing: "Billing",
       delivery: "Delivery",
       empty: "No saved addresses",
+      emptyHint: "Save addresses for faster checkout",
+      emptyCta: "Add your first address",
+      loading: "Loading addresses…",
     },
     errors: {
       validation: { title: "Validation Error", description: "Invalid request" },
@@ -44,6 +48,7 @@ export const translations = {
 
   create: {
     title: "Add Address",
+    titleShort: "Add Address",
     description: "Save a new address to your account",
     fields: {
       label: {

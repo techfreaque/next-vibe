@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "NOWPayments CLI",
+    titleShort: "NOWPayments",
     description: "Zarządzaj tunelowaniem webhooków NOWPayments za pomocą ngrok",
     category: "Płatność",
     tags: {

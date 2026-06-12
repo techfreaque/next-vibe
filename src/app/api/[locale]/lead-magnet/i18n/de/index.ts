@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Lead Magnet",
   tags: {
     leadMagnet: "lead-magnet",
@@ -177,6 +178,7 @@ export const translations = {
     },
     klaviyo: {
       title: "Klaviyo verbinden",
+      titleShort: "Klaviyo",
       description: "Verbinde dein Klaviyo-Konto mit deiner Skill-Seite",
       klaviyoApiKey: {
         label: "Klaviyo API-Schlüssel",
@@ -186,6 +188,7 @@ export const translations = {
     },
     getresponse: {
       title: "GetResponse verbinden",
+      titleShort: "GetResponse",
       description: "Verbinde dein GetResponse-Konto mit deiner Skill-Seite",
       getresponseApiKey: {
         label: "GetResponse API-Schlüssel",
@@ -196,6 +199,7 @@ export const translations = {
     },
     emarsys: {
       title: "Emarsys verbinden",
+      titleShort: "Emarsys",
       description: "Verbinde dein Emarsys-Konto mit deiner Skill-Seite",
       emarsysUserName: {
         label: "Benutzername",
@@ -215,6 +219,7 @@ export const translations = {
     },
     acumbamail: {
       title: "Acumbamail verbinden",
+      titleShort: "Acumbamail",
       description: "Verbinde dein Acumbamail-Konto mit deiner Skill-Seite",
       acumbamailApiKey: {
         label: "API-Schlüssel",
@@ -224,6 +229,7 @@ export const translations = {
     },
     cleverreach: {
       title: "CleverReach verbinden",
+      titleShort: "CleverReach",
       description: "Verbinde dein CleverReach-Konto mit deiner Skill-Seite",
       cleverreachClientId: {
         label: "Client-ID",
@@ -254,6 +260,7 @@ export const translations = {
     },
     connectif: {
       title: "Connectif verbinden",
+      titleShort: "Connectif",
       description: "Verbinde dein Connectif-Konto mit deiner Skill-Seite",
       connectifApiKey: {
         label: "API-Schlüssel",
@@ -263,6 +270,7 @@ export const translations = {
     },
     datanext: {
       title: "DataNext verbinden",
+      titleShort: "DataNext",
       description: "Verbinde dein DataNext-Konto mit deiner Skill-Seite",
       datanextApiKey: {
         label: "API-Schlüssel",
@@ -287,6 +295,7 @@ export const translations = {
     },
     edrone: {
       title: "Edrone verbinden",
+      titleShort: "Edrone",
       description: "Verbinde dein Edrone-Konto mit deiner Skill-Seite",
       edroneAppId: {
         label: "App-ID",
@@ -296,6 +305,7 @@ export const translations = {
     },
     expertsender: {
       title: "ExpertSender verbinden",
+      titleShort: "ExpertSender",
       description: "Verbinde dein ExpertSender-Konto mit deiner Skill-Seite",
       expertSenderApiDomain: {
         label: "API-Domain",
@@ -310,6 +320,7 @@ export const translations = {
     },
     freshmail: {
       title: "FreshMail verbinden",
+      titleShort: "FreshMail",
       description: "Verbinde dein FreshMail-Konto mit deiner Skill-Seite",
       freshmailApiKey: {
         label: "API-Schlüssel",
@@ -329,6 +340,7 @@ export const translations = {
     },
     mailup: {
       title: "MailUp verbinden",
+      titleShort: "MailUp",
       description: "Verbinde dein MailUp-Konto mit deiner Skill-Seite",
       mailupClientId: {
         label: "Client-ID",
@@ -358,6 +370,7 @@ export const translations = {
     },
     mapp: {
       title: "Mapp verbinden",
+      titleShort: "Mapp",
       description: "Verbinde dein Mapp-Konto mit deiner Skill-Seite",
       mappUsername: {
         label: "Benutzername",
@@ -377,6 +390,7 @@ export const translations = {
     },
     sailthru: {
       title: "Sailthru verbinden",
+      titleShort: "Sailthru",
       description: "Verbinde dein Sailthru-Konto mit deiner Skill-Seite",
       sailthruApiKey: {
         label: "API-Schlüssel",
@@ -396,6 +410,7 @@ export const translations = {
     },
     salesmanago: {
       title: "SALESmanago verbinden",
+      titleShort: "SALESmanago",
       description: "Verbinde dein SALESmanago-Konto mit deiner Skill-Seite",
       salesManagoClientId: {
         label: "Client-ID",
@@ -425,6 +440,7 @@ export const translations = {
     },
     shopify: {
       title: "Shopify verbinden",
+      titleShort: "Shopify",
       description: "Verbinde deinen Shopify-Shop mit deiner Skill-Seite",
       shopifyDomain: {
         label: "Shop-Domain",
@@ -439,6 +455,7 @@ export const translations = {
     },
     spotler: {
       title: "Spotler verbinden",
+      titleShort: "Spotler",
       description: "Verbinde dein Spotler-Konto mit deiner Skill-Seite",
       spotlerConsumerKey: {
         label: "Consumer Key",
@@ -453,6 +470,7 @@ export const translations = {
     },
     youlead: {
       title: "YouLead verbinden",
+      titleShort: "YouLead",
       description: "Verbinde dein YouLead-Konto mit deiner Skill-Seite",
       youLeadAppId: {
         label: "App-ID",
@@ -472,6 +490,7 @@ export const translations = {
     },
     adobecampaign: {
       title: "Adobe Campaign verbinden",
+      titleShort: "Adobe Campaign",
       description: "Verbinde dein Adobe Campaign-Konto mit deiner Skill-Seite",
       adobeCampaignOrganizationId: {
         label: "Organisations-ID",
@@ -501,6 +520,7 @@ export const translations = {
     },
     platformEmail: {
       title: "Benachrichtigung per Plattform-E-Mail",
+      titleShort: "Plattform-E-Mail",
       description:
         "Erhalte eine E-Mail-Benachrichtigung, wenn sich jemand über deinen Lead-Magneten anmeldet",
       notifyEmail: {
@@ -516,6 +536,7 @@ export const translations = {
     },
     googleSheets: {
       title: "Google Sheets verbinden",
+      titleShort: "Google Sheets",
       description:
         "Fügt bei jeder Anmeldung eine neue Zeile in deine Google-Tabelle ein",
       saveTitle: "Google Sheets speichern",

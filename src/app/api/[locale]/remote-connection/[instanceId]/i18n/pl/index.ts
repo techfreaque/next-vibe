@@ -8,34 +8,57 @@ export const translations: typeof enTranslations = {
   widget: {
     title: "Połączenie zdalne",
     signInDescription: "Zaloguj się, aby skonfigurować połączenie zdalne",
+    back: "Wróć",
+    statusSection: "Status",
     connected: {
-      title: "Połączono z kontem w chmurze",
+      title: "Połączono",
       badge: "Aktywne",
-      description:
-        "Twoje wspomnienia i narzędzia AI synchronizują się automatycznie z kontem w chmurze.",
-      connectedTo: "Połączono z",
+      connectedTo: "Adres zdalny",
+      transport: "Transport",
+      remoteInstance: "Zdalna instancja",
+      capabilities: "Wersja capabilities",
       lastSynced: "Ostatnia synchronizacja",
+      wsConnected: "WS połączono",
       refresh: "Odśwież",
-      reauth: "Ponowna autoryzacja",
-      rename: "Zmień nazwę",
-      settings: "Ustawienia",
-      disconnect: "Rozłącz",
     },
     notConnected: {
-      title: "Połącz konto w chmurze",
+      title: "Brak połączenia",
       description:
-        "Połącz się ze swoim kontem w chmurze (np. unbottled.ai), aby synchronizować wspomnienia i korzystać z narzędzi AI z terminala - z dowolnego miejsca.",
+        "Połącz się z kontem w chmurze (np. unbottled.ai), aby synchronizować wspomnienia i korzystać z narzędzi AI z terminala — z dowolnego miejsca.",
       benefit1:
-        "Twoje wspomnienia synchronizują się automatycznie między tym urządzeniem a kontem w chmurze",
+        "Wspomnienia synchronizują się automatycznie między tym urządzeniem a kontem w chmurze",
       benefit2: "Uruchamiaj narzędzia AI z wiersza poleceń za pomocą",
-      benefit2Code: "vibe --remote",
-      benefit3:
-        "Twoje konto w chmurze i lokalna instancja pozostają zsynchronizowane",
+      benefit2Code: "vibe --thea",
+      benefit3: "Lokalna instancja i chmura pozostają zsynchronizowane",
     },
+    behaviorSection: "Zachowanie",
+    syncSection: "Synchronizacja i dostęp",
+    syncScope: {
+      memories: "Wspomnienia",
+      documents: "Dokumenty",
+      skills: "Umiejętności",
+      favorites: "Ulubione",
+      threads: "Wątki",
+    },
+    cortexSection: "Cortex",
+    cortexDescription: "Przeglądaj wspólny system plików tego połączenia.",
+    cortexLink: "Otwórz Cortex",
+    sshSection: "SSH i terminal",
+    sshDescription: "Konfiguracje SSH i sesje terminala przez to połączenie.",
+    sshLink: "Otwórz połączenia SSH",
+    reauthButton: "Ponowna autoryzacja",
+    renameButton: "Zmień nazwę",
+    disconnectButton: "Rozłącz",
+    disconnectConfirmTitle: "Rozłączyć tę instancję?",
+    disconnectConfirmDescription:
+      "Połączenie zostanie usunięte. Możesz je przywrócić w dowolnym momencie.",
+    disconnectConfirmCancel: "Anuluj",
+    disconnectConfirmProceed: "Rozłącz",
   },
   get: {
     title: "Status połączenia zdalnego",
-    description: "Pobierz status określonego połączenia zdalnego",
+    titleShort: "Połączenie",
+    description: "Pełny status i ustawienia określonego połączenia zdalnego",
     instanceId: {
       label: "ID instancji",
       description: "Instancja połączenia do wyświetlenia",
@@ -85,32 +108,66 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Zaktualizuj połączenie zdalne",
+    titleShort: "Zaktualizuj",
     description:
-      "Konfiguruj transport, pętlę i ustawienia synchronizacji tego połączenia",
-    isSystemProvider: {
-      label: "Dostawca systemowy",
+      "Zmień nazwę, ponownie autoryzuj lub konfiguruj transport i synchronizację",
+    newInstanceId: {
+      label: "Nowa nazwa",
       description:
-        "Użyj tego połączenia jako odwrotnego dostawcy WS dla zdalnego wywoływania narzędzi",
+        "Zmień nazwę połączenia. Aktualizuje lokalną etykietę i synchronizuje ze zdalnym.",
+    },
+    email: {
+      label: "E-mail",
+      description: "Twój e-mail konta na zdalnej instancji",
+    },
+    password: {
+      label: "Hasło",
+      description: "Twoje hasło konta na zdalnej instancji",
+    },
+    transportMode: {
+      label: "Tryb transportu",
+      description:
+        "Jak to połączenie komunikuje się. reverse-ws: stały wychodzący WS (otwiera się natychmiast po zapisie). direct-http: bezpośrednie wywołania HTTP. ws-provider: zdalna instancja uruchamia pętlę AI. cloud-only: brak połączenia wychodzącego.",
+    },
+    isInferenceProvider: {
+      label: "Dostawca wnioskowania",
+      description:
+        "Pozwól temu połączeniu obsługiwać wnioskowanie AI — zdalna instancja uruchamia pętlę LLM przez odwrotny WS.",
+    },
+    forceSystemProvider: {
+      label: "Wymuś dostawcę systemowego",
+      description:
+        "Nadpisanie administratora: kieruj wszystkie strumienie AI przez to połączenie, pomijając koszt i reguły użytkowników. Tylko jedno naraz.",
     },
     loopLocation: {
       label: "Lokalizacja pętli AI",
       description:
-        "Gdzie działa pętla wnioskowania AI. Klient: lokalny komputer obsługuje pętlę. Serwer: zdalna instancja ją obsługuje.",
+        "Gdzie działa pętla wnioskowania AI. Klient: lokalny komputer. Serwer: zdalna instancja.",
     },
     threadMirrorMode: {
       label: "Przechowywanie wątków",
       description:
-        "Gdzie przechowywane są wątki z folderu tego połączenia. Chmura: tylko chmura. Lokalnie: tylko lokalnie. Oba: lustrzane. Brak: bez przechowywania.",
+        "Gdzie przechowywane są wątki z folderu tego połączenia. Chmura / Lokalnie / Oba / Brak.",
     },
     toolSource: {
       label: "Źródło narzędzi",
       description:
-        "Które narzędzia są dostępne w strumieniach AI tego połączenia. Lokalne: twoje lokalne narzędzia. Zdalne: tylko zdalne. Oba: połączone.",
+        "Które narzędzia są dostępne w strumieniach AI. Lokalne / Zdalne / Oba.",
     },
     routingRules: {
       label: "Reguły routingu",
       description:
-        "Deklaratywne reguły routingu: ID folderów, których strumienie AI trafiają tutaj, obsługiwane dostawcy modeli i czy to jest domyślny fallback.",
+        "Deklaratywne reguły: foldery, dostawcy modeli, domyślny fallback.",
+    },
+    syncScope: {
+      label: "Zakres synchronizacji",
+      description:
+        "Które dane synchronizują się przez to połączenie: wspomnienia, dokumenty, umiejętności, ulubione, wątki.",
+      memories: "Wspomnienia",
+      documents: "Dokumenty",
+      skills: "Umiejętności",
+      favorites: "Ulubione",
+      threads: "Wątki",
     },
     errors: {
       validation: {
@@ -124,7 +181,7 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Brak dostępu",
-        description: "Wymagana rola administratora",
+        description: "Wymagana rola administratora dla tego pola",
       },
       notFound: {
         title: "Nie znaleziono",
@@ -146,8 +203,45 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Zaktualizowano połączenie",
-      description:
-        "Ustawienie dostawcy systemu zaktualizowane i łącznik przeładowany",
+      description: "Ustawienia zapisane pomyślnie",
+    },
+  },
+  delete: {
+    title: "Rozłącz",
+    titleShort: "Rozłącz",
+    description: "Usuń to zdalne połączenie i zamknij kanał WebSocket",
+    errors: {
+      validation: {
+        title: "Błąd walidacji",
+        description: "Nieprawidłowe żądanie",
+      },
+      network: { title: "Błąd sieci", description: "Nie udało się połączyć" },
+      unauthorized: {
+        title: "Nie zalogowano",
+        description: "Wymagane uwierzytelnienie",
+      },
+      forbidden: { title: "Brak dostępu", description: "Brak uprawnień" },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Połączenie nie istnieje",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Rozłączenie nie powiodło się",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieoczekiwany błąd",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+      conflict: { title: "Konflikt", description: "Wystąpił konflikt" },
+    },
+    success: {
+      title: "Rozłączono",
+      description: "Zdalne połączenie usunięte pomyślnie",
     },
   },
 };

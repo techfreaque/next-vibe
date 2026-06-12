@@ -1,5 +1,7 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   title: "Leads per E-Mail empfangen",
+  titleShort: "Plattform-E-Mail",
   description:
     "Erhalte eine E-Mail-Benachrichtigung, sobald jemand dein Lead-Formular ausfüllt. Keine Drittanbieter-Plattform nötig - nutzt die E-Mail deines Kontos.",
   notifyEmail: {

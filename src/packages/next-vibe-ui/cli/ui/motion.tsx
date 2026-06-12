@@ -16,6 +16,9 @@ import type {
   MotionButtonProps,
 } from "../../web/ui/motion";
 
+import { Div } from "./div";
+import { Span } from "./span";
+
 export function AnimatePresence({
   children,
 }: AnimatePresenceProps): React.JSX.Element | null {
@@ -24,13 +27,21 @@ export function AnimatePresence({
 
 export function MotionDiv({
   children,
+  className,
 }: MotionDivProps): React.JSX.Element | null {
+  if (className) {
+    return <Div className={className}>{children}</Div>;
+  }
   return <>{children}</>;
 }
 
 export function MotionSpan({
   children,
+  className,
 }: MotionSpanProps): React.JSX.Element | null {
+  if (className) {
+    return <Span className={className}>{children}</Span>;
+  }
   return <>{children}</>;
 }
 

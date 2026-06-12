@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Leads",
   tag: "IP-Übereinstimmungsverknüpfung",
   task: {
@@ -7,6 +8,7 @@ export const translations = {
   },
   post: {
     title: "IP-Übereinstimmungsverknüpfung",
+    titleShort: "IP-Verknüpfung",
     description: "Anonyme Leads mit gleicher IP-Adresse verknüpfen",
     container: {
       title: "IP-Übereinstimmungsverknüpfung",

@@ -28,10 +28,11 @@ export const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["lead-magnet", "capture"],
   title: "submit.title" as const,
+  titleShort: "submit.titleShort" as const,
   description: "submit.description" as const,
   icon: "mail",
-  category: "endpointCategories.leadMagnet",
-  subCategory: "endpointCategories.leadMagnetCapture",
+  category: "leads",
+  subCategory: "Capture",
   tags: ["submit.tag" as const],
   allowedRoles: [
     UserRole.PUBLIC,

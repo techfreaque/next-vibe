@@ -64,6 +64,7 @@ const { POST } = createEndpoint({
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "plus" as const,
   category: "ai",

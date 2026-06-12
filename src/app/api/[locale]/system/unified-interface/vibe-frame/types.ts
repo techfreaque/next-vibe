@@ -5,6 +5,8 @@
  * Used by both the standalone embed script and the Next.js server.
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 // ─── Mount Config ────────────────────────────────────────────────────────────
 // What the host page passes to mount an endpoint
 
@@ -16,7 +18,7 @@ export interface FrameMountConfig {
   /** Target DOM element or CSS selector for inline mounting */
   target: string | HTMLElement;
   /** Locale override (default: auto-detect from browser) */
-  locale?: string;
+  locale?: CountryLanguage;
   /** URL path params for parameterized endpoints */
   urlPathParams?: Record<string, string>;
   /** Pre-fill form data */
@@ -112,7 +114,7 @@ export type ParentToFrameMessage =
       frameId: string;
       origin: string;
       theme: FrameTheme;
-      locale: string;
+      locale: CountryLanguage;
       cssVars: Record<string, string>;
     }
   | { type: "vf:auth"; token: string }
@@ -367,7 +369,7 @@ export interface FrameHydrationData {
   /** Endpoint identifier */
   endpoint: string;
   /** Resolved locale */
-  locale: string;
+  locale: CountryLanguage;
   /** URL path params */
   urlPathParams: Record<string, string>;
   /** Pre-fill data */
@@ -415,7 +417,7 @@ export interface VibeFrameIntegrationConfig extends Omit<
   /** Override serverUrl for this integration only (federation) */
   serverUrl?: string;
   /** Override locale for this integration only */
-  locale?: string;
+  locale?: CountryLanguage;
   /** Override authToken for this integration only */
   authToken?: string;
   /** Override leadId for this integration only */
@@ -427,7 +429,7 @@ export interface VibeFrameGlobalConfig {
   /** Base URL of the vibe-frame server */
   serverUrl: string;
   /** Locale override (default: auto-detect from browser) */
-  locale?: string;
+  locale?: CountryLanguage;
   /** Auth token applied to all integrations unless overridden per-integration */
   authToken?: string;
   /**
@@ -486,7 +488,7 @@ export interface VibeFrameSharedOptions {
   /** Base URL of the vibe-frame server */
   serverUrl: string;
   /** Locale override (default: auto-detect) */
-  locale?: string;
+  locale?: CountryLanguage;
   /** Auth token for authenticated endpoints */
   authToken?: string;
   /** Lead ID for visitor tracking */

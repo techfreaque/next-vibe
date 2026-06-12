@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Empfehlungs-Konversionsrate",
+    titleShort: "Konversionsrate",
     description:
       "Anmeldungen pro Lead-Klick - wie viele Empfehlungsklicks zu registrierten Nutzern werden",
     fields: {

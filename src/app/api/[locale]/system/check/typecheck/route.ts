@@ -13,11 +13,12 @@ import endpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, platform, t, locale, streamContext }) => {
-      const { TypecheckRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return await TypecheckRepository.execute(
+    handler: async ({ data, logger, platform, t, locale, streamContext }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).TypecheckRepository.execute(
         data,
         logger,
         platform,
@@ -25,7 +26,6 @@ export const { tools } = endpointsHandler({
         locale,
         undefined,
         streamContext.abortSignal,
-      );
-    },
+      ),
   },
 });

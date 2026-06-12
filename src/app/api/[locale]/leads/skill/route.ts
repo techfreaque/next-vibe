@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Lead Skill Attribution Route Handler
  */

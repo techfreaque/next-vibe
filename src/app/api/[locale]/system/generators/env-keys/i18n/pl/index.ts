@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Generuj klucze env",
+    titleShort: "Klucze środowiska",
     description: "Generuj plik metadanych kluczy env dla definicji ustawień",
     container: {
       title: "Generowanie kluczy env",

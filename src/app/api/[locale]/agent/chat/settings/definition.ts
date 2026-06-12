@@ -9,18 +9,16 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatModelId, ChatModelIdOptions } from "../../ai-stream/models";
@@ -49,6 +47,7 @@ const { GET } = createEndpoint({
   allowedClientRoles: [UserRole.PUBLIC] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "settings" as const,
   category: "ai",
@@ -57,11 +56,14 @@ const { GET } = createEndpoint({
 
   aliases: [CHAT_SETTINGS_GET_ALIAS],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.STACKED,
-    usage: { response: true },
+  fields: customWidgetObject({
+    render: ChatSettingsWidget,
+    noFormElement: true,
+    usage: { response: true } as const,
     children: {
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       selectedModel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
@@ -297,6 +299,7 @@ const { POST } = createEndpoint({
   allowedClientRoles: [UserRole.PUBLIC] as const,
 
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "settings" as const,
   category: "ai",

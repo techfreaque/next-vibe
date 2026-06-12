@@ -12,26 +12,12 @@ import { CronTasksListRepository } from "./repository";
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: async ({ data, user, locale, t, logger }) => {
-      return await CronTasksListRepository.getTasks(
-        data,
-        user,
-        locale,
-        t,
-        logger,
-      );
-    },
+    handler: async ({ data, user, locale, t, logger }) =>
+      CronTasksListRepository.getTasks(data, user, locale, t, logger),
     canSubscribe: ({ user }) => !!user.id,
   },
   [Methods.POST]: {
-    handler: async ({ data, user, locale, t, logger }) => {
-      return await CronTasksListRepository.createTask(
-        data,
-        user,
-        locale,
-        t,
-        logger,
-      );
-    },
+    handler: async ({ data, user, locale, t, logger }) =>
+      CronTasksListRepository.createTask(data, user, locale, t, logger),
   },
 });

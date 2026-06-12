@@ -1,9 +1,10 @@
 export const translations = {
   patch: {
     title: "Edit File",
+    titleShort: "Edit File",
     description:
       "Change part of a file. Find text and replace it, or edit specific lines.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Edited {{path}}",
     status: {
       loading: "Editing...",
       done: "Edited",

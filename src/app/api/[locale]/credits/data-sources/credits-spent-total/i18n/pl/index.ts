@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Łączne wydatki",
     title: "Łączne wydane kredyty",
     description:
       "Suma wszystkich kwot transakcji użytkowania na przedział rozdzielczości",

@@ -12,6 +12,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Favorit abrufen",
+    titleShort: "Favorit",
     description: "Spezifische Favoriten-Konfiguration abrufen",
     container: {
       title: "Favoriten-Details",
@@ -153,6 +154,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Favorit aktualisieren",
+    titleShort: "Favorit bearbeiten",
     description: "Bestehende Favoriten-Konfiguration aktualisieren",
     container: {
       title: "Favorit bearbeiten",
@@ -428,6 +430,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Favorit löschen",
+    titleShort: "Favorit löschen",
     description: "Favoriten-Konfiguration entfernen",
     container: {
       title: "Favorit löschen",

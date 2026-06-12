@@ -26,12 +26,13 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import {
   EmailJourneyVariantFilter,
   EmailJourneyVariantFilterOptions,
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
+import { CAMPAIGN_STATS_ALIAS } from "./constants";
 const CampaignStatsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CampaignStatsWidget })),
 );
@@ -40,13 +41,16 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["leads", "campaigns", "stats"],
+  aliases: [CAMPAIGN_STATS_ALIAS] as const,
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsStats",
+  category: "newsletter",
+  subCategory: "emailCampaignsStats",
   icon: "bar-chart-3",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: CampaignStatsWidget,

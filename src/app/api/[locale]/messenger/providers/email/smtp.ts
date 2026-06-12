@@ -31,7 +31,7 @@ import { CampaignType, MessageChannel } from "../../accounts/enum";
 import { messengerFolders } from "../../messages/db";
 import type { SpecialFolderTypeValue } from "../../messages/enum";
 import { SpecialFolderType } from "../../messages/enum";
-import { scopedTranslation as providerScopedTranslation } from "../i18n";
+import { scopedTranslation as providerScopedTranslation } from "../../i18n";
 import { LocalStateProvider } from "../local-state-base";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { toImapShape } from "./imap-client/db";

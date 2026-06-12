@@ -27,10 +27,10 @@ const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["user", "private", "sessions", "[id]"],
   title: "revoke.title",
+  titleShort: "revoke.titleShort",
   description: "revoke.description",
   icon: "trash",
-  category: "userAuth",
-  subCategory: "userAuthSessions",
+  category: "account",
   tags: ["revoke.tag"],
   allowedRoles: [
     UserRole.CUSTOMER,

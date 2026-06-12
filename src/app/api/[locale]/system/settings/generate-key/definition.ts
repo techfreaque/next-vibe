@@ -26,10 +26,11 @@ export const { GET } = createEndpoint({
   path: ["system", "settings", "generate-key"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "key" as const,
-  category: "endpointCategories.settings",
-  subCategory: "endpointCategories.settingsKeys",
+  category: "devTools",
+  subCategory: "settingsKeys",
   tags: ["get.tags.generateKey" as const],
   aliases: ["generate-key", "gen-key"] as const,
 

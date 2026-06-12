@@ -4,6 +4,7 @@
 
 export const translations = {
   title: "Stripe CLI Integration",
+  titleShort: "Stripe CLI",
   description: "Manage Stripe CLI operations and webhook listening",
   category: "Payment Integration",
   tags: {

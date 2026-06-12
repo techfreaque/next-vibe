@@ -11,7 +11,7 @@ import {
   useWidgetPlatform,
   useWidgetResponseOnly,
   useWidgetTranslation,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type { RebuildResponseOutput } from "./definition";
 import type endpoints from "./definition";

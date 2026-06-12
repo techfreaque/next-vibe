@@ -30,9 +30,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["payment", "providers", "stripe", "cli"],
   title: "title" as const,
+  titleShort: "titleShort" as const,
   description: "description" as const,
-  category: "endpointCategories.payments",
-  subCategory: "endpointCategories.paymentProviders",
+  category: "payments",
+  subCategory: "Providers",
   icon: "credit-card" as const,
   tags: ["tags.stripe" as const, "tags.cli" as const, "tags.webhook" as const],
   allowedRoles: [

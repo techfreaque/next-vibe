@@ -13,16 +13,17 @@ import { useInView } from "react-intersection-observer";
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
 
@@ -114,7 +115,7 @@ function mkToolMsg(
   tid: string,
   seq: string,
   toolCallId: string,
-  toolName: string,
+  toolName: keyof typeof pathToAliasMap,
   args: WidgetData,
   result: WidgetData,
   executionTime: number,
@@ -321,7 +322,7 @@ function buildSshGroup(t: ScopedT): MessageGroup {
     tid,
     seq,
     "toolu_ssh1",
-    "ssh-exec",
+    "cortex-exec",
     {
       command:
         "cd /srv/app && git pull origin main && bun install --frozen-lockfile",
@@ -343,7 +344,7 @@ function buildSshGroup(t: ScopedT): MessageGroup {
     tid,
     seq,
     "toolu_ssh2",
-    "ssh-exec",
+    "cortex-exec",
     { command: "pm2 reload ecosystem.config.js --update-env" },
     {
       stdout:

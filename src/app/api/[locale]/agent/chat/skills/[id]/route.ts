@@ -6,9 +6,6 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { parseSkillId } from "../../slugify";
-import { DEFAULT_SKILLS } from "../config";
-import { SkillOwnershipType } from "../enum";
 import { SkillsRepository } from "../repository";
 import definitions from "./definition";
 
@@ -23,6 +20,10 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
       if (!raw) {
         return false;
       }
+
+      const { parseSkillId } = await import("../../slugify");
+      const { DEFAULT_SKILLS } = await import("../config");
+      const { SkillOwnershipType } = await import("../enum");
 
       const { skillId } = parseSkillId(raw);
 

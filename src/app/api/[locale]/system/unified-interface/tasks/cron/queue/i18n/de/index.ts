@@ -13,6 +13,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Aufgabenwarteschlange",
+    titleShort: "Task-Warteschlange",
     description:
       "Die anstehende Aufgabenwarteschlange nach nächster Ausführungszeit sortiert anzeigen",
     fields: {

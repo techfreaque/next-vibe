@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Create Account",
+    titleShort: "New Account",
     description: "Add a custom account to the company's chart of accounts",
     companyId: {
       label: "Company ID",

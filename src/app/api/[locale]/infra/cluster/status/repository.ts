@@ -20,7 +20,7 @@ import { sshConnections } from "@/app/api/[locale]/ssh/db";
 import { ClusterRole } from "@/app/api/[locale]/ssh/enum";
 
 import type { ClusterStatusResponseOutput } from "./definition";
-import type { ClusterStatusT } from "./i18n";
+import type { InfraT } from "../../i18n";
 
 const GET_NODES_JSON = `k3s kubectl get nodes -o json 2>/dev/null`;
 const GET_PODS_BY_NS = `k3s kubectl get pods --all-namespaces --no-headers 2>/dev/null | awk '{print $1}' | sort | uniq -c`;
@@ -30,7 +30,7 @@ const CHECK_COMPONENT = (ns: string, label: string): string =>
 export class ClusterStatusRepository {
   static async get(
     logger: EndpointLogger,
-    t: ClusterStatusT,
+    t: InfraT,
   ): Promise<ResponseType<ClusterStatusResponseOutput>> {
     try {
       // Find a control-plane node

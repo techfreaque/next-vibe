@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "SSH",
 
   enums: {
@@ -35,6 +36,7 @@ export const translations = {
 
   post: {
     title: "Linux-Benutzer erstellen",
+    titleShort: "Benutzer erstellen",
     description:
       "Neues OS-Benutzerkonto erstellen. Führt useradd auf dem Zielhost aus. Nur für Admins.",
     fields: {

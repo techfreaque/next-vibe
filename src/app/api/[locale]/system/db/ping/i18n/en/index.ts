@@ -3,6 +3,7 @@ export const translations = {
   tag: "database",
   post: {
     title: "Database Ping",
+    titleShort: "DB Ping",
     description: "Check database connectivity and health",
     form: {
       title: "Ping Configuration",

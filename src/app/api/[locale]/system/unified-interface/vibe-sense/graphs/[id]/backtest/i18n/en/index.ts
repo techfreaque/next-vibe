@@ -3,6 +3,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Run Backtest",
+    titleShort: "Backtest",
     description: "Run a backtest over a historical range (actions simulated)",
     fields: {
       id: { label: "Graph ID", description: "UUID of the graph" },

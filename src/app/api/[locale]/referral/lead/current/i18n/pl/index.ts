@@ -1,5 +1,7 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   title: "Pobierz aktualny kod polecenia leada",
+  titleShort: "Polecenie leada",
   description:
     "Zwraca kod polecenia powiązany z aktualnym leadem, jeśli istnieje",
   tag: "Polecenie",

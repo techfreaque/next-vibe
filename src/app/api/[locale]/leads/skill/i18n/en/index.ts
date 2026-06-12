@@ -7,6 +7,7 @@ export const translations = {
 
   patch: {
     title: "Set Lead Skill",
+    titleShort: "Lead Skill",
     description:
       "Record which skill brought this lead (first-touch attribution)",
     skillId: {

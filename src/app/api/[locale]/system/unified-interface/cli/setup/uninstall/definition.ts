@@ -29,10 +29,11 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "package",
-  category: "endpointCategories.interfaces",
-  subCategory: "endpointCategories.interfacesCli",
+  category: "devTools",
+  subCategory: "interfacesCli",
   tags: ["post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["uninstall", "setup:uninstall"],

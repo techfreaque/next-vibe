@@ -30,6 +30,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SKILL_PUBLISH_ALIAS } from "../../constants";
+import skillsListDefinition from "../../definition";
 import { SkillStatus, SkillStatusOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
@@ -49,8 +50,8 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "send",
-  category: "endpointCategories.skills",
-  subCategory: "endpointCategories.skillsCommunity",
+  category: "ai",
+  subCategory: "skillsCommunity",
   tags: ["tags.skills"],
 
   fields: customWidgetObject({
@@ -59,7 +60,9 @@ const { PATCH } = createEndpoint({
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: skillsListDefinition.GET,
+        labelField: "name",
         label: "patch.title" as const,
         description: "patch.description" as const,
         hidden: true,

@@ -11,6 +11,7 @@ export const translations: typeof enTranslations = {
   rate: {
     create: {
       title: "Utwórz stawkę podatkową",
+      titleShort: "Utwórz stawkę",
       description: "Dodaj stawkę podatkową dla swojej firmy",
       widget: {
         backToList: "Powrót do stawek podatkowych",
@@ -101,6 +102,7 @@ export const translations: typeof enTranslations = {
     },
     list: {
       title: "Stawki podatkowe",
+      titleShort: "Stawki podatkowe",
       description: "Wszystkie stawki podatkowe skonfigurowane dla Twojej firmy",
       widget: {
         addRate: "Dodaj stawkę",
@@ -198,6 +200,7 @@ export const translations: typeof enTranslations = {
     },
     update: {
       title: "Aktualizuj stawkę podatkową",
+      titleShort: "Zmień stawkę",
       description: "Zmodyfikuj istniejącą stawkę podatkową",
       widget: {
         backToList: "Powrót do stawek podatkowych",
@@ -268,6 +271,7 @@ export const translations: typeof enTranslations = {
     },
     delete: {
       title: "Usuń stawkę podatkową",
+      titleShort: "Usuń stawkę",
       description: "Dezaktywuj stawkę podatkową",
       widget: {
         backToList: "Powrót do stawek podatkowych",
@@ -328,6 +332,7 @@ export const translations: typeof enTranslations = {
 
   report: {
     title: "Raport podatkowy",
+    titleShort: "Raport podatkowy",
     description: "Podatki zestawione według stawki i okresu",
     widget: {
       columnRate: "Stawka",

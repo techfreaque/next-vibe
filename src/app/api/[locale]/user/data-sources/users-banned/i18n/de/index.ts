@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Gesperrte Nutzer",
+    titleShort: "Gesperrte Nutzer",
     description: "Anzahl gesperrter Nutzer pro Zeitfenster",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

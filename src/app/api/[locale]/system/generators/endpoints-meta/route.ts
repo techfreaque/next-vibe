@@ -10,15 +10,11 @@ import endpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { EndpointsMetaGeneratorRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return EndpointsMetaGeneratorRepository.generateEndpointsMeta(
-        data,
-        logger,
-        t,
-      );
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).EndpointsMetaGeneratorRepository.generateEndpointsMeta(data, logger, t),
   },
 });

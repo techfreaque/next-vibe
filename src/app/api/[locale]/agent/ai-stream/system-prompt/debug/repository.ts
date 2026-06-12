@@ -13,9 +13,9 @@ import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { scopedTranslation } from "./i18n";
 
 import type { SystemPromptDebugResponseOutput } from "./definition";
-import type { SystemPromptDebugT } from "./i18n";
 
 interface DebugSystemPromptParams {
   rootFolderId: DefaultFolderId;
@@ -26,7 +26,6 @@ interface DebugSystemPromptParams {
   user: JwtPayloadType;
   locale: CountryLanguage;
   logger: EndpointLogger;
-  t: SystemPromptDebugT;
 }
 
 export async function buildDebugSystemPrompt(
@@ -41,9 +40,8 @@ export async function buildDebugSystemPrompt(
     user,
     locale,
     logger,
-    t,
   } = params;
-
+  const { t } = scopedTranslation.scopedT(params.locale);
   try {
     const userId = user.isPublic ? undefined : user.id;
 

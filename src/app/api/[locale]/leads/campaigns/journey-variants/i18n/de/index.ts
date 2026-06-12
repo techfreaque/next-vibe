@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   title: "Journey-Varianten",
   description: "E-Mail-Journey-Varianten-Registrierungen verwalten",
   get: {
     title: "Journey-Varianten",
+    titleShort: "Journey-Varianten",
     description: "Alle registrierten E-Mail-Journey-Varianten anzeigen",
     response: {
       id: "ID",
@@ -55,6 +57,7 @@ export const translations = {
   },
   post: {
     title: "Journey-Variante registrieren",
+    titleShort: "Neue Variante",
     description: "Neue E-Mail-Journey-Variante registrieren",
     fields: {
       variantKey: {
@@ -135,6 +138,7 @@ export const translations = {
   },
   patch: {
     title: "Journey-Variante aktualisieren",
+    titleShort: "Variante bearbeiten",
     description: "Registrierte E-Mail-Journey-Variante aktualisieren",
     fields: {
       id: {

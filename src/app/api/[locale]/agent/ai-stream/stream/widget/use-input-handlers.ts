@@ -3,6 +3,7 @@
  * Handles input submission, keyboard events, model changes, and prompt filling
  */
 
+import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
 import type { TextareaKeyboardEvent } from "next-vibe-ui/ui/textarea";
 import { useCallback, useMemo, useRef } from "react";
 
@@ -70,6 +71,7 @@ export function useInputHandlers({
   logger,
   draftKey,
 }: UseInputHandlersProps): UseInputHandlersReturn {
+  const { pushState, replaceState } = useSilentHistory();
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
   const navActiveThreadId = useChatNavigationStore((s) => s.activeThreadId);
@@ -141,7 +143,7 @@ export function useInputHandlers({
             : `/${locale}/threads/${rootFolderId}/${threadId}`;
 
           // Synchronous URL update - Zustand store is source of truth
-          window.history.replaceState(null, "", url);
+          replaceState(url);
         },
       );
 
@@ -173,6 +175,7 @@ export function useInputHandlers({
     navActiveThreadId,
     navRootFolderId,
     navSubFolderId,
+    replaceState,
   ]);
 
   /**
@@ -227,7 +230,7 @@ export function useInputHandlers({
             const url = subFolderId
               ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
               : `/${locale}/threads/${rootFolderId}/${threadId}`;
-            window.history.pushState(null, "", url);
+            pushState(url);
           },
         );
 
@@ -256,6 +259,7 @@ export function useInputHandlers({
       navActiveThreadId,
       navRootFolderId,
       navSubFolderId,
+      pushState,
     ],
   );
 
@@ -304,7 +308,7 @@ export function useInputHandlers({
           const url = subFolderId
             ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
             : `/${locale}/threads/${rootFolderId}/${threadId}`;
-          window.history.pushState(null, "", url);
+          pushState(url);
         },
       );
 
@@ -326,6 +330,7 @@ export function useInputHandlers({
       navActiveThreadId,
       navRootFolderId,
       navSubFolderId,
+      pushState,
     ],
   );
 

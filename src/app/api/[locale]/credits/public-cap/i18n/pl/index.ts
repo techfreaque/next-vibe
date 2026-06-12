@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz publiczny dzienny limit",
+    titleShort: "Dzienny limit",
     description:
       "Wyświetl dzisiejsze globalne wydatki i limit darmowych kredytów",
     container: {
@@ -78,6 +79,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Zaktualizuj publiczny dzienny limit",
+    titleShort: "Zmień limit",
     description:
       "Zaktualizuj globalny dzienny limit kredytów dla użytkowników niepłacących",
     capAmount: {

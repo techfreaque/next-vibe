@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Buchhaltungsperiode eröffnen",
+    titleShort: "Neue Periode",
     description: "Neue Buchhaltungsperiode für ein Unternehmen anlegen",
     companyId: {
       label: "Unternehmens-ID",

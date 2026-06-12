@@ -1,61 +1,76 @@
-export const translations = {
-  title: "List Inbox",
-  description: "List messages from the inbox or a specific folder",
-  tag: "Inbox",
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
+  title: "Posteingang",
+  titleShort: "Posteingang",
+  description:
+    "Nachrichten aus dem Posteingang oder einem bestimmten Ordner anzeigen",
+  tag: "Posteingang",
 
   container: {
-    title: "Inbox Messages",
-    description: "Messages from the selected account and folder",
+    title: "Posteingang",
+    description: "Nachrichten des ausgewählten Kontos und Ordners",
   },
 
   accountId: {
-    label: "Account",
-    description: "Messenger account to read inbox from",
-    placeholder: "Account UUID",
+    label: "Konto",
+    description: "Messenger-Konto, dessen Posteingang abgerufen werden soll",
+    placeholder: "Konto-UUID",
   },
   folderPath: {
-    label: "Folder",
-    description: "Folder path to list (defaults to INBOX)",
+    label: "Ordner",
+    description: "Ordnerpfad (Standard: INBOX)",
     placeholder: "INBOX",
   },
 
   messages: {
-    label: "Messages",
+    label: "Nachrichten",
     uid: { label: "UID" },
-    messageId: { label: "Message ID" },
-    subject: { label: "Subject" },
-    from: { label: "From" },
-    to: { label: "To" },
-    date: { label: "Date" },
-    isRead: { label: "Read" },
-    isFlagged: { label: "Flagged" },
-    folderPath: { label: "Folder" },
-    bodyText: { label: "Body" },
+    messageId: { label: "Nachrichten-ID" },
+    subject: { label: "Betreff" },
+    from: { label: "Von" },
+    to: { label: "An" },
+    date: { label: "Datum" },
+    isRead: { label: "Gelesen" },
+    isFlagged: { label: "Markiert" },
+    folderPath: { label: "Ordner" },
+    bodyText: { label: "Inhalt" },
   },
 
   errors: {
-    validation: { title: "Validation Error", description: "Check your input" },
-    unauthorized: { title: "Unauthorized", description: "Login required" },
-    server: { title: "Server Error", description: "Internal server error" },
-    unknown: { title: "Unknown Error", description: "Unexpected error" },
-    forbidden: { title: "Forbidden", description: "Access denied" },
-    network: { title: "Network Error", description: "Network error" },
+    validation: {
+      title: "Ungültige Eingabe",
+      description: "Bitte Eingaben prüfen",
+    },
+    unauthorized: {
+      title: "Nicht angemeldet",
+      description: "Anmeldung erforderlich",
+    },
+    server: { title: "Serverfehler", description: "Interner Serverfehler" },
+    unknown: {
+      title: "Unbekannter Fehler",
+      description: "Ein unerwarteter Fehler ist aufgetreten",
+    },
+    forbidden: { title: "Kein Zugriff", description: "Zugriff verweigert" },
+    network: {
+      title: "Netzwerkfehler",
+      description: "Netzwerkfehler aufgetreten",
+    },
     notFound: {
-      title: "Account Not Found",
-      description: "Messenger account not found",
+      title: "Konto nicht gefunden",
+      description: "Messenger-Konto nicht gefunden",
     },
     conflict: {
-      title: "Conflict",
-      description: "Request conflicts with existing data",
+      title: "Konflikt",
+      description: "Anfrage steht im Konflikt mit vorhandenen Daten",
     },
     unsavedChanges: {
-      title: "Unsaved Changes",
-      description: "You have unsaved changes",
+      title: "Ungespeicherte Änderungen",
+      description: "Sie haben ungespeicherte Änderungen",
     },
   },
 
   success: {
-    title: "Inbox Loaded",
-    description: "Messages retrieved successfully",
+    title: "Posteingang geladen",
+    description: "Nachrichten erfolgreich abgerufen",
   },
 };

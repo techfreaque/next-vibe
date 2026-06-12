@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   // Main checkout titles and descriptions
   title: "Abonnement-Checkout erstellen",
+  titleShort: "Kasse",
   description: "Eine Stripe-Checkout-Sitzung für Abonnements erstellen",
   category: "Abonnement",
 

@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Guard Starten",
+  titleShort: "Guard starten",
   description: "Guard-Umgebungen für VSCode-Projekte starten",
   tag: "Starten",
   category: "Guard",

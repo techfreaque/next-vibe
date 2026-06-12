@@ -13,11 +13,11 @@ import testEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: testEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { TestRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return TestRepository.execute(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).TestRepository.execute(data, logger, t),
   },
 });

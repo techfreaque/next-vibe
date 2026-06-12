@@ -1,9 +1,8 @@
-import { translations as validationTranslations } from "../../validation/i18n/en";
-
 export const translations = {
   category: "Generators",
 
   title: "Generate tRPC Router",
+  titleShort: "tRPC Router",
   description: "Generate tRPC router from API endpoints",
   tag: "tRPC",
   container: {
@@ -58,7 +57,101 @@ export const translations = {
     title: "tRPC Router Generated",
     description: "tRPC router has been generated successfully",
   },
-  validation: validationTranslations,
+  validation: {
+    title: "TRPC Validation",
+    description: "Validate TRPC integration across route files",
+    category: "Generators",
+    tags: {
+      trpc: "tRPC",
+      validation: "Validation",
+    },
+    operations: {
+      validateIntegration: "Validate Integration",
+      validateRouteFile: "Validate Route File",
+      generateReport: "Generate Report",
+      fixRoutes: "Fix Routes",
+      checkRouterExists: "Check Router Exists",
+    },
+    severity: {
+      error: "Error",
+      warning: "Warning",
+      info: "Info",
+    },
+    fields: {
+      operation: {
+        label: "Operation",
+        description: "Select validation operation to perform",
+        placeholder: "Choose operation",
+      },
+      filePath: {
+        label: "File Path",
+        description: "Specific route file path to validate",
+        placeholder: "Enter file path",
+      },
+      options: {
+        label: "Options",
+        description: "Validation options",
+        placeholder: "Enter options",
+      },
+    },
+    response: {
+      operation: {
+        label: "Operation",
+      },
+      success: {
+        label: "Success",
+      },
+      result: {
+        label: "Result",
+      },
+    },
+    success: {
+      title: "TRPC Validation Successful",
+      description: "TRPC validation completed successfully",
+    },
+    errors: {
+      validation: {
+        title: "Validation Failed",
+        description: "TRPC validation failed",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "You are not authorized to perform this action",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "You do not have permission to perform this action",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "The requested resource was not found",
+      },
+      server: {
+        title: "Server Error",
+        description: "An internal server error occurred",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "There are unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "A conflict occurred",
+      },
+      network: {
+        title: "Network Error",
+        description: "A network error occurred",
+      },
+      executionFailed: {
+        title: "Execution Failed",
+        description: "TRPC validation operation execution failed",
+      },
+    },
+  },
   trpcValidator: {
     apiDirectoryNotFound: "API directory not found: {{resolvedApiDir}}",
     foundRouteFiles: "Found {{count}} route files to validate",

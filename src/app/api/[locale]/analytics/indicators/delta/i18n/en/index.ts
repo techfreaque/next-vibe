@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Delta",
+    titleShort: "Delta",
     description:
       "Difference between consecutive values - measures rate of change",
     fields: {

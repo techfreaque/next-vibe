@@ -43,6 +43,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz linki udostępniania",
+    titleShort: "Linki udostępniania",
     description: "Pobierz wszystkie linki udostępniania dla wątku",
     container: {
       title: "Linki udostępniania",
@@ -135,6 +136,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Utwórz link udostępniania",
+    titleShort: "Udostępnij link",
     description: "Utwórz nowy link udostępniania dla wątku",
     container: {
       title: "Nowy link udostępniania",
@@ -215,6 +217,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Zaktualizuj link udostępniania",
+    titleShort: "Edytuj link",
     description: "Zaktualizuj istniejący link udostępniania",
     container: {
       title: "Zaktualizuj link udostępniania",
@@ -299,6 +302,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Unieważnij link udostępniania",
+    titleShort: "Unieważnij link",
     description: "Unieważnij aktywny link udostępniania",
     container: {
       title: "Unieważnij link udostępniania",

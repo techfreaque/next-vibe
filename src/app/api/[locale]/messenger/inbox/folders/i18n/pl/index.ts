@@ -1,5 +1,7 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   title: "List Folders",
+  titleShort: "Foldery",
   description: "List available folders for a messenger account",
   tag: "Inbox",
 

@@ -10,10 +10,12 @@ import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
+import type { CountryLanguage } from "@/i18n/core/config";
 import React, { useCallback, useMemo, useState } from "react";
 
 import {
   useWidgetContext,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
@@ -44,11 +46,13 @@ function StatCard({
   value,
   format = "number",
   variant = "default",
+  locale,
 }: {
   label: string;
   value: number | null | undefined;
   format?: "number" | "percent" | "compact" | "currency";
   variant?: "default" | "success" | "warning" | "danger" | "info";
+  locale: CountryLanguage;
 }): React.JSX.Element {
   const variantColor = variantColorMap[variant];
 
@@ -65,8 +69,8 @@ function StatCard({
     if (format === "compact" && value >= 1000) {
       return `${(value / 1000).toFixed(1)}k`;
     }
-    return value.toLocaleString();
-  }, [value, format]);
+    return value.toLocaleString(locale);
+  }, [value, format, locale]);
 
   return (
     <Div className="rounded-lg border bg-card p-4 flex flex-col gap-1">
@@ -88,9 +92,11 @@ function StatCard({
 function BarChartSection({
   title,
   items,
+  locale,
 }: {
   title: string;
   items: Array<{ x: string; y: number; label?: string }> | undefined;
+  locale: CountryLanguage;
 }): React.JSX.Element | null {
   if (!items?.length) {
     return null;
@@ -120,7 +126,7 @@ function BarChartSection({
             <Span className="text-xs tabular-nums w-16 text-right">
               {item.y >= 100
                 ? `$${(item.y / 100).toFixed(0)}`
-                : item.y.toLocaleString()}
+                : item.y.toLocaleString(locale)}
             </Span>
           </Div>
         ))}
@@ -136,6 +142,7 @@ export function SubscriptionStatsContainer({
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const locale = useWidgetLocale();
   const onSubmit = useWidgetOnSubmit();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -149,6 +156,20 @@ export function SubscriptionStatsContainer({
     void (async (): Promise<void> => {
       const listDef = await import("../list/definition");
       navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
+
+  const handleViewPurchases = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const purchasesDef = await import("../purchases/definition");
+      navigate(purchasesDef.default.GET);
+    })();
+  }, [navigate]);
+
+  const handleViewReferrals = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const referralsDef = await import("../referrals/definition");
+      navigate(referralsDef.default.GET);
     })();
   }, [navigate]);
 
@@ -184,7 +205,7 @@ export function SubscriptionStatsContainer({
           onClick={() => {
             setFiltersOpen((v) => !v);
           }}
-          title="Filters"
+          title={t("widget.filters")}
         >
           <BarChart3 className="h-4 w-4" />
         </Button>
@@ -228,7 +249,7 @@ export function SubscriptionStatsContainer({
       )}
 
       {/* Action buttons */}
-      <Div className="flex items-center gap-2">
+      <Div className="flex items-center gap-2 flex-wrap">
         <Button
           type="button"
           variant="outline"
@@ -236,6 +257,22 @@ export function SubscriptionStatsContainer({
           onClick={handleViewList}
         >
           {t("get.response.subscriptionStats.title")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleViewPurchases}
+        >
+          {t("get.response.creditStats.title")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleViewReferrals}
+        >
+          {t("get.response.referralStats.title")}
         </Button>
       </Div>
 
@@ -246,24 +283,28 @@ export function SubscriptionStatsContainer({
           value={revenueStats?.mrr}
           format="currency"
           variant="success"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.revenueStats.arr.label")}
           value={revenueStats?.arr}
           format="currency"
           variant="success"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.revenueStats.totalRevenue.label")}
           value={revenueStats?.totalRevenue}
           format="currency"
           variant="info"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.revenueStats.avgOrderValue.label")}
           value={revenueStats?.avgOrderValue}
           format="currency"
           variant="info"
+          locale={locale}
         />
       </Div>
 
@@ -273,22 +314,26 @@ export function SubscriptionStatsContainer({
           label={t("get.response.subscriptionStats.activeCount.label")}
           value={subscriptionStats?.activeCount}
           variant="success"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.subscriptionStats.trialingCount.label")}
           value={subscriptionStats?.trialingCount}
           variant="info"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.subscriptionStats.canceledCount.label")}
           value={subscriptionStats?.canceledCount}
           variant="warning"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.subscriptionStats.churnRate.label")}
           value={subscriptionStats?.churnRate}
           format="percent"
           variant="warning"
+          locale={locale}
         />
       </Div>
 
@@ -298,17 +343,20 @@ export function SubscriptionStatsContainer({
           label={t("get.response.intervalStats.monthlyCount.label")}
           value={intervalStats?.monthlyCount}
           variant="info"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.intervalStats.yearlyCount.label")}
           value={intervalStats?.yearlyCount}
           variant="success"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.intervalStats.yearlyRevenuePct.label")}
           value={intervalStats?.yearlyRevenuePct}
           format="percent"
           variant="info"
+          locale={locale}
         />
       </Div>
 
@@ -319,24 +367,28 @@ export function SubscriptionStatsContainer({
           value={creditStats?.totalPurchased}
           format="compact"
           variant="success"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.creditStats.totalSpent.label")}
           value={creditStats?.totalSpent}
           format="compact"
           variant="warning"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.creditStats.packsSold.label")}
           value={creditStats?.packsSold}
           format="compact"
           variant="info"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.creditStats.avgPackSize.label")}
           value={creditStats?.avgPackSize}
           format="compact"
           variant="info"
+          locale={locale}
         />
       </Div>
 
@@ -346,24 +398,28 @@ export function SubscriptionStatsContainer({
           label={t("get.response.referralStats.totalReferrals.label")}
           value={referralStats?.totalReferrals}
           variant="info"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.referralStats.conversionRate.label")}
           value={referralStats?.conversionRate}
           format="percent"
           variant="info"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.referralStats.totalEarned.label")}
           value={referralStats?.totalEarned}
           format="currency"
           variant="success"
+          locale={locale}
         />
         <StatCard
           label={t("get.response.referralStats.pendingPayouts.label")}
           value={referralStats?.pendingPayouts}
           format="currency"
           variant="warning"
+          locale={locale}
         />
       </Div>
 
@@ -372,10 +428,12 @@ export function SubscriptionStatsContainer({
         <BarChartSection
           title={t("get.response.growthMetrics.revenueChart.label")}
           items={growthMetrics?.revenueChart}
+          locale={locale}
         />
         <BarChartSection
           title={t("get.response.growthMetrics.subscriptionChart.label")}
           items={growthMetrics?.subscriptionChart}
+          locale={locale}
         />
       </Div>
 
@@ -383,7 +441,7 @@ export function SubscriptionStatsContainer({
       {generatedAt && (
         <Div className="text-xs text-muted-foreground text-right">
           {t("get.response.businessInsights.generatedAt.label")}{" "}
-          {generatedAt.toLocaleString()}
+          {generatedAt.toLocaleString(locale)}
         </Div>
       )}
     </Div>

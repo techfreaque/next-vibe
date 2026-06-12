@@ -26,26 +26,27 @@ export function resolutionBucketExpr(
   resolution: Resolution,
   col: SQLWrapper,
 ): SQL<string> {
+  // All expressions cast to timestamptz (UTC-aware) so new Date(r.bucket) parses correctly
   switch (resolution) {
     case GraphResolution.ONE_MINUTE:
-      return sql<string>`date_bin('1 minute', ${col}, '2000-01-01')`;
+      return sql<string>`date_bin('1 minute', ${col}, '2000-01-01')::timestamptz`;
     case GraphResolution.THREE_MINUTES:
-      return sql<string>`date_bin('3 minutes', ${col}, '2000-01-01')`;
+      return sql<string>`date_bin('3 minutes', ${col}, '2000-01-01')::timestamptz`;
     case GraphResolution.FIVE_MINUTES:
-      return sql<string>`date_bin('5 minutes', ${col}, '2000-01-01')`;
+      return sql<string>`date_bin('5 minutes', ${col}, '2000-01-01')::timestamptz`;
     case GraphResolution.FIFTEEN_MINUTES:
-      return sql<string>`date_bin('15 minutes', ${col}, '2000-01-01')`;
+      return sql<string>`date_bin('15 minutes', ${col}, '2000-01-01')::timestamptz`;
     case GraphResolution.THIRTY_MINUTES:
-      return sql<string>`date_bin('30 minutes', ${col}, '2000-01-01')`;
+      return sql<string>`date_bin('30 minutes', ${col}, '2000-01-01')::timestamptz`;
     case GraphResolution.ONE_HOUR:
-      return sql<string>`date_bin('1 hour', ${col}, '2000-01-01')`;
+      return sql<string>`date_bin('1 hour', ${col}, '2000-01-01')::timestamptz`;
     case GraphResolution.FOUR_HOURS:
-      return sql<string>`date_bin('4 hours', ${col}, '2000-01-01')`;
+      return sql<string>`date_bin('4 hours', ${col}, '2000-01-01')::timestamptz`;
     case GraphResolution.ONE_DAY:
-      return sql<string>`date_trunc('day', ${col})`;
+      return sql<string>`date_trunc('day', ${col})::timestamptz`;
     case GraphResolution.ONE_WEEK:
-      return sql<string>`date_trunc('week', ${col})`;
+      return sql<string>`date_trunc('week', ${col})::timestamptz`;
     case GraphResolution.ONE_MONTH:
-      return sql<string>`date_trunc('month', ${col})`;
+      return sql<string>`date_trunc('month', ${col})::timestamptz`;
   }
 }

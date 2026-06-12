@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Deactivate Account",
+    titleShort: "Deactivate",
     description:
       "Soft-deactivate an account. Cannot deactivate system accounts or accounts with posted journal entry lines.",
     accountId: {

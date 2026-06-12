@@ -1,12 +1,10 @@
-import { translations as addressesTranslations } from "../../addresses/i18n/pl";
-import { translations as avatarTranslations } from "../../avatar/i18n/pl";
-import { translations as passwordTranslations } from "../../password/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   // Main user profile routes - typed from English
   get: {
     title: "Pobierz profil użytkownika",
+    titleShort: "Mój profil",
     description: "Pobierz aktualne informacje o profilu użytkownika",
     response: {
       title: "Odpowiedź profilu użytkownika",
@@ -23,6 +21,7 @@ export const translations: typeof enTranslations = {
       requireTwoFactor: "Wymagana autoryzacja dwuskładnikowa",
       marketingConsent: "Zgoda marketingowa",
       userRoles: "Role użytkownika",
+      roles: "Role",
       createdAt: "Utworzono",
       updatedAt: "Zaktualizowano",
       stripeCustomerId: "ID klienta Stripe",
@@ -94,6 +93,7 @@ export const translations: typeof enTranslations = {
   },
   update: {
     title: "Aktualizuj profil użytkownika",
+    titleShort: "Aktualizuj profil",
     description: "Aktualizuj aktualne informacje o profilu użytkownika",
     groups: {
       basicInfo: {
@@ -362,6 +362,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Usuń konto użytkownika",
+    titleShort: "Usuń konto",
     description: "Trwale usuń swoje konto użytkownika",
     response: {
       title: "Status usunięcia",
@@ -443,6 +444,7 @@ export const translations: typeof enTranslations = {
       title: "Twoja lista e-mail",
       description:
         "Odwiedzający Twoją stronę skilla i profil twórcy mogą się zapisać. Lista jest Twoja - bez pośredników.",
+      manage: "Zarządzaj",
     },
     previewCard: {
       title: "Twój publiczny profil",
@@ -462,6 +464,36 @@ export const translations: typeof enTranslations = {
       add: "Dodaj do kolekcji",
       public: "Społeczność",
       showLess: "Pokaż mniej",
+      hubSubtitle: "{count} opublikowanych",
+    },
+    nav: {
+      logout: "Wyloguj się",
+      back: "←",
+    },
+    sections: {
+      account: "Konto",
+      subscription: "Subskrypcja",
+      subscriptionHint: "Brak aktywnego planu — ulepsz, by odblokować funkcje",
+      manageSubscription: "Zarządzaj",
+      noSubscription: "Brak aktywnego planu",
+      upgrade: "Uaktualnij",
+      addresses: "Adresy rozliczeniowe",
+      addressCount: "{count} zapisanych",
+      addAddress: "Dodaj adres",
+      manageAddresses: "Zarządzaj",
+      noAddresses: "Brak zapisanych",
+      billing: "Rozliczeniowy",
+      delivery: "Dostawczy",
+      edit: "Edytuj",
+      credits: "Kredyty",
+      creditsAvailable: "dostępnych",
+      password: "Hasło",
+      passwordHint: "Zmień hasło do konta",
+      sessions: "Aktywne sesje",
+      sessionsHint: "Zarządzaj swoimi sesjami",
+      creator: "Twórca",
+      referral: "Program poleceń",
+      referralHint: "Zaproś znajomych i zdobądź nagrody",
     },
     deleteAccount: {
       dangerZone: "Strefa zagrożenia",
@@ -488,7 +520,486 @@ export const translations: typeof enTranslations = {
   },
 
   // Sub-routes
-  avatar: avatarTranslations,
-  password: passwordTranslations,
-  addresses: addressesTranslations,
+  avatar: {
+    category: "Profil użytkownika",
+
+    tag: "awatar",
+    errors: {
+      user_not_found: "Użytkownik nie znaleziony",
+      failed_to_upload_avatar: "Nie udało się przesłać awatara",
+      failed_to_delete_avatar: "Nie udało się usunąć awatara",
+      invalid_file_type: "Nieprawidłowy typ pliku",
+      file_too_large: "Plik zbyt duży",
+    },
+    debug: {
+      uploadingUserAvatar: "Przesyłanie awatara użytkownika",
+      errorUploadingUserAvatar: "Błąd podczas przesyłania awatara użytkownika",
+      deletingUserAvatar: "Usuwanie awatara użytkownika",
+      errorDeletingUserAvatar: "Błąd podczas usuwania awatara użytkownika",
+    },
+    success: {
+      uploaded: "Awatar przesłany pomyślnie",
+      deleted: "Awatar usunięty pomyślnie",
+      nextSteps: {
+        visible: "Twój awatar jest teraz widoczny w Twoim profilu",
+        update:
+          "Możesz go zaktualizować w dowolnym momencie w ustawieniach profilu",
+        default: "Twój profil teraz pokazuje domyślny awatar",
+        uploadNew:
+          "Możesz przesłać nowy awatar w dowolnym momencie w ustawieniach profilu",
+      },
+    },
+    upload: {
+      title: "Prześlij Awatar",
+      description: "Prześlij zdjęcie profilowe",
+      groups: {
+        fileUpload: {
+          title: "Przesyłanie Pliku",
+          description: "Wybierz i prześlij zdjęcie awatara",
+        },
+      },
+      fields: {
+        file: {
+          label: "Zdjęcie Awatara",
+          description: "Wybierz plik obrazu dla swojego awatara",
+          placeholder: "Wybierz plik obrazu...",
+          help: "Prześlij plik obrazu (JPG, PNG, GIF) do 5MB",
+          validation: {
+            maxSize: "Rozmiar pliku musi być mniejszy niż 5MB",
+            imageOnly: "Dozwolone są tylko pliki obrazów",
+            unsupportedFormat:
+              "Nieobsługiwany format obrazu. Użyj JPEG, PNG, WebP lub GIF.",
+          },
+        },
+      },
+      response: {
+        title: "Odpowiedź Przesyłania",
+        label: "Wynik Przesyłania",
+        description: "Odpowiedź przesyłania awatara",
+        success: "Przesyłanie Pomyślne",
+        message: "Twój awatar został pomyślnie przesłany",
+        avatarUrl: "URL Awatara",
+        uploadTime: "Czas Przesyłania",
+        nextSteps: {
+          item: "Następny Krok",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Błąd Walidacji",
+          description: "Przesłany plik jest nieprawidłowy lub uszkodzony",
+        },
+        unauthorized: {
+          title: "Brak Autoryzacji",
+          description: "Musisz być zalogowany, aby przesłać awatar",
+        },
+        server: {
+          title: "Błąd Serwera",
+          description: "Nie udało się przetworzyć przesyłania awatara",
+        },
+        internal: {
+          title: "Błąd Wewnętrzny",
+          description: "Wystąpił wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany Błąd",
+          description: "Wystąpił nieoczekiwany błąd podczas przesyłania",
+        },
+        network: {
+          title: "Błąd Sieci",
+          description: "Wystąpił błąd sieci podczas przesyłania",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Nie masz uprawnień do przesyłania awatara",
+        },
+        notFound: {
+          title: "Nie Znaleziono",
+          description: "Żądany zasób nie został znaleziony",
+        },
+        unsaved: {
+          title: "Niezapisane Zmiany",
+          description: "Istnieją niezapisane zmiany",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Wystąpił konflikt podczas przesyłania",
+        },
+      },
+      success: {
+        title: "Awatar Przesłany",
+        description: "Twoje zdjęcie profilowe zostało pomyślnie przesłane",
+      },
+    },
+    delete: {
+      title: "Usuń Awatar",
+      description: "Usuń obecne zdjęcie profilowe",
+      response: {
+        title: "Odpowiedź Usuwania",
+        label: "Wynik Usuwania",
+        description: "Odpowiedź usuwania awatara",
+        success: "Usuwanie Pomyślne",
+        message: "Twój awatar został pomyślnie usunięty",
+        nextSteps: {
+          item: "Następny Krok",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Błąd Walidacji",
+          description: "Żądanie usunięcia awatara jest nieprawidłowe",
+        },
+        unauthorized: {
+          title: "Brak Autoryzacji",
+          description: "Musisz być zalogowany, aby usunąć swój awatar",
+        },
+        server: {
+          title: "Błąd Serwera",
+          description: "Nie udało się usunąć awatara",
+        },
+        internal: {
+          title: "Błąd Wewnętrzny",
+          description: "Wystąpił wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany Błąd",
+          description: "Wystąpił nieoczekiwany błąd podczas usuwania",
+        },
+        network: {
+          title: "Błąd Sieci",
+          description: "Wystąpił błąd sieci podczas usuwania",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Nie masz uprawnień do usuwania tego awatara",
+        },
+        notFound: {
+          title: "Nie Znaleziono",
+          description: "Awatar do usunięcia nie został znaleziony",
+        },
+        unsaved: {
+          title: "Niezapisane Zmiany",
+          description: "Istnieją niezapisane zmiany",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Wystąpił konflikt podczas usuwania",
+        },
+      },
+      success: {
+        title: "Awatar Usunięty",
+        description: "Twoje zdjęcie profilowe zostało pomyślnie usunięte",
+      },
+    },
+  },
+  password: {
+    category: "Profil użytkownika",
+
+    title: "Zmień Hasło",
+    description: "Bezpiecznie zaktualizuj hasło do swojego konta",
+    tag: "zmiana-hasła",
+    debug: {
+      updatingPassword: "Aktualizowanie hasła",
+      errorUpdatingPassword: "Błąd podczas aktualizacji hasła",
+      settingPassword: "Ustawianie hasła",
+      errorSettingPassword: "Błąd podczas ustawiania hasła",
+    },
+    groups: {
+      currentCredentials: {
+        title: "Obecne Hasło",
+        description: "Zweryfikuj swoje obecne hasło, aby kontynuować",
+      },
+      newCredentials: {
+        title: "Nowe Hasło",
+        description: "Wybierz silne nowe hasło dla swojego konta",
+      },
+    },
+    currentPassword: {
+      label: "Obecne Hasło",
+      description: "Wprowadź swoje obecne hasło",
+      placeholder: "Wprowadź obecne hasło",
+      help: "Wprowadź swoje obecne hasło, aby zweryfikować swoją tożsamość przed zmianą",
+    },
+    newPassword: {
+      label: "Nowe Hasło",
+      description: "Wprowadź nowe hasło (minimum 8 znaków)",
+      placeholder: "Wprowadź nowe hasło",
+      help: "Wybierz silne hasło z co najmniej 8 znakami, w tym literami, cyframi i symbolami",
+    },
+    confirmPassword: {
+      label: "Potwierdź Hasło",
+      description: "Potwierdź swoje nowe hasło",
+      placeholder: "Potwierdź nowe hasło",
+      help: "Ponownie wprowadź nowe hasło, aby upewnić się, że zostało wpisane poprawnie",
+    },
+    twoFactorCode: {
+      label: "Kod Dwuskładnikowy",
+      description:
+        "Wprowadź kod uwierzytelniania dwuskładnikowego, jeśli jest włączony",
+      placeholder: "Wprowadź kod 2FA",
+    },
+    response: {
+      title: "Odpowiedź Zmiany Hasła",
+      description: "Odpowiedź na operację zmiany hasła",
+      success: "Hasło zostało pomyślnie zaktualizowane",
+      message: "Wiadomość o statusie",
+      securityTip: "Wskazówka bezpieczeństwa",
+      nextSteps: {
+        item: "Następne kroki",
+      },
+    },
+    validation: {
+      currentPassword: {
+        minLength: "Obecne hasło musi mieć co najmniej 8 znaków",
+      },
+      newPassword: {
+        minLength: "Nowe hasło musi mieć co najmniej 8 znaków",
+      },
+      confirmPassword: {
+        minLength: "Potwierdzenie hasła musi mieć co najmniej 8 znaków",
+      },
+      passwords: {
+        mismatch: "Hasła nie są zgodne",
+      },
+    },
+    errors: {
+      passwords_do_not_match: "Hasła nie pasują do siebie",
+      user_not_found: "Użytkownik nie znaleziony",
+      incorrect_password: "Nieprawidłowe hasło",
+      update_failed: "Nie udało się zaktualizować hasła",
+      token_creation_failed: "Nie udało się utworzyć tokenu hasła",
+      two_factor_code_required:
+        "Wymagany kod uwierzytelniania dwuskładnikowego",
+      invalid_two_factor_code:
+        "Nieprawidłowy kod uwierzytelniania dwuskładnikowego",
+      invalid_request: {
+        title: "Nieprawidłowe Żądanie",
+        description: "Żądanie zmiany hasła jest nieprawidłowe",
+      },
+      validation: {
+        title: "Błąd Walidacji",
+        description: "Sprawdź swoje dane i spróbuj ponownie",
+      },
+      unauthorized: {
+        title: "Brak Autoryzacji",
+        description: "Musisz być zalogowany, aby zmienić hasło",
+      },
+      server: {
+        title: "Błąd Serwera",
+        description: "Nie udało się zaktualizować hasła z powodu błędu serwera",
+      },
+      unknown: {
+        title: "Nieznany Błąd",
+        description: "Wystąpił nieoczekiwany błąd podczas aktualizacji hasła",
+      },
+      network: {
+        title: "Błąd Sieci",
+        description: "Połączenie sieciowe nie powiodło się",
+      },
+      forbidden: {
+        title: "Dostęp Zabroniony",
+        description: "Nie masz uprawnień do wykonania tej czynności",
+      },
+      notFound: {
+        title: "Użytkownik Nie Znaleziony",
+        description: "Nie można znaleźć konta użytkownika",
+      },
+      unsavedChanges: {
+        title: "Niezapisane Zmiany",
+        description: "Masz niezapisane zmiany, które zostaną utracone",
+      },
+      conflict: {
+        title: "Konflikt Danych",
+        description: "Wystąpił konflikt podczas aktualizacji hasła",
+      },
+    },
+    success: {
+      updated: "Hasło zaktualizowane pomyślnie",
+      securityTip:
+        "Aby zwiększyć bezpieczeństwo, włącz uwierzytelnianie dwuskładnikowe",
+      nextSteps: {
+        logoutOther:
+          "Wszystkie inne sesje zostały wylogowane ze względów bezpieczeństwa",
+        enable2fa:
+          "Rozważ włączenie uwierzytelniania dwuskładnikowego dla lepszego bezpieczeństwa",
+      },
+      title: "Hasło Zaktualizowane",
+      description: "Twoje hasło zostało pomyślnie zaktualizowane",
+    },
+    update: {
+      success: {
+        title: "Hasło Zaktualizowane",
+        description: "Twoje hasło zostało pomyślnie zaktualizowane",
+      },
+      errors: {
+        unknown: {
+          title: "Nieznany Błąd",
+          description: "Wystąpił nieoczekiwany błąd podczas aktualizacji hasła",
+        },
+      },
+    },
+  },
+  addresses: {
+    category: "Adresy",
+    tag: "addresses",
+
+    list: {
+      title: "Moje adresy",
+      description: "Lista zapisanych adresów",
+      response: {
+        addresses: "Adresy",
+      },
+      widget: {
+        addAddress: "Dodaj adres",
+        edit: "Edytuj",
+        delete: "Usuń",
+        billing: "Rozliczeniowy",
+        delivery: "Dostawczy",
+        empty: "Brak zapisanych adresów",
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe żądanie",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagane logowanie",
+        },
+        forbidden: { title: "Zabronione", description: "Brak dostępu" },
+        notFound: { title: "Nie znaleziono", description: "Brak adresów" },
+        conflict: { title: "Konflikt", description: "Konflikt danych" },
+        network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
+        unsavedChanges: {
+          title: "Niezapisane zmiany",
+          description: "Są niezapisane zmiany",
+        },
+        internal: {
+          title: "Błąd serwera",
+          description: "Wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+      },
+      success: { title: "Sukces", description: "Adresy pobrane" },
+    },
+
+    create: {
+      title: "Dodaj adres",
+      description: "Zapisz nowy adres na koncie",
+      fields: {
+        label: {
+          label: "Nazwa",
+          description: "Nazwij ten adres (np. Dom, Biuro)",
+          placeholder: "Dom",
+        },
+        fullName: {
+          label: "Imię i nazwisko",
+          description: "Osoba kontaktowa dla adresu",
+          placeholder: "Jan Kowalski",
+        },
+        company: {
+          label: "Firma",
+          description: "Nazwa firmy (opcjonalnie)",
+          placeholder: "Przykład Sp. z o.o.",
+        },
+        phone: {
+          label: "Telefon",
+          description: "Numer kontaktowy",
+          placeholder: "+48 22 000 00 00",
+        },
+        vatNumber: {
+          label: "NIP",
+          description: "Numer identyfikacji podatkowej VAT",
+          placeholder: "PL1234567890",
+        },
+        taxId: {
+          label: "REGON",
+          description: "Krajowy identyfikator podatkowy",
+          placeholder: "123456789",
+        },
+        addressLine1: {
+          label: "Adres (linia 1)",
+          description: "Ulica i numer",
+          placeholder: "ul. Przykładowa 1",
+        },
+        addressLine2: {
+          label: "Adres (linia 2)",
+          description: "Mieszkanie, piętro (opcjonalnie)",
+          placeholder: "m. 5",
+        },
+        city: {
+          label: "Miasto",
+          description: "Miasto",
+          placeholder: "Warszawa",
+        },
+        region: {
+          label: "Województwo / Region",
+          description: "Województwo lub region (opcjonalnie)",
+          placeholder: "Mazowieckie",
+        },
+        postalCode: {
+          label: "Kod pocztowy",
+          description: "Kod pocztowy",
+          placeholder: "00-001",
+        },
+        country: {
+          label: "Kraj",
+          description: "Kod kraju ISO 3166-1 alpha-2",
+          placeholder: "PL",
+        },
+        isDefaultBilling: {
+          label: "Domyślny adres rozliczeniowy",
+          description: "Użyj jako domyślny adres rozliczeniowy",
+        },
+        isDefaultDelivery: {
+          label: "Domyślny adres dostawy",
+          description: "Użyj jako domyślny adres dostawy",
+        },
+      },
+      response: {
+        id: "ID adresu",
+        label: "Nazwa",
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Sprawdź wymagane pola",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagane logowanie",
+        },
+        forbidden: { title: "Zabronione", description: "Brak dostępu" },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Użytkownik nie znaleziony",
+        },
+        conflict: { title: "Konflikt", description: "Konflikt danych" },
+        network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
+        unsavedChanges: {
+          title: "Niezapisane zmiany",
+          description: "Są niezapisane zmiany",
+        },
+        internal: {
+          title: "Błąd serwera",
+          description: "Wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+      },
+      success: {
+        title: "Adres zapisany",
+        description: "Adres dodany do konta",
+      },
+      widget: {
+        saved: "Adres zapisany.",
+        backToAddresses: "Wróć do adresów",
+      },
+    },
+  },
 };

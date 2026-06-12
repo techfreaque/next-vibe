@@ -47,6 +47,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "E-Mail-Kampagnen",
+    titleShort: "Kampagnen senden",
     description: "E-Mail-Kampagnen für Leads verarbeiten",
     errors: {
       unauthorized: {
@@ -107,6 +108,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "E-Mail-Kampagnen-Konfiguration abrufen",
+    titleShort: "E-Mail-Kampagnenkonfiguration",
     description: "E-Mail-Kampagnen-Hintergrundaufgaben-Konfiguration laden",
     errors: {
       unauthorized: {

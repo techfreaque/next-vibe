@@ -9,14 +9,14 @@ import { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "./auth/types";
+import type { JwtPayloadType, JwtPrivatePayloadType } from "./auth/types";
 import {
   Language,
   Theme,
   type UserDetailLevel,
   type UserDetailLevelValue,
 } from "./enum";
-import type { UserRoleValue } from "./user-roles/enum";
+import { UserRoleDB, type UserRoleValue } from "./user-roles/enum";
 import { userRoleResponseSchema } from "./user-roles/types";
 
 /**
@@ -55,6 +55,7 @@ export const standardUserSchema = z.object({
   requireTwoFactor: z.boolean().optional(),
   marketingConsent: z.boolean().optional(),
   userRoles: z.array(userRoleResponseSchema),
+  roles: z.array(z.enum(UserRoleDB)),
   createdAt: dateSchema,
   updatedAt: dateSchema,
 });
@@ -86,6 +87,13 @@ export const completeUserSchema = standardUserSchema.extend({
   avatarUrl: z.string().nullable().optional(),
 });
 export type CompleteUserType = z.infer<typeof completeUserSchema>;
+
+// Compile-time check: CompleteUserType must extend JwtPrivatePayloadType
+type _AssertCompleteExtendsJwt = CompleteUserType extends JwtPrivatePayloadType
+  ? true
+  : never;
+const _completeExtendsJwt: _AssertCompleteExtendsJwt = true;
+void _completeExtendsJwt;
 
 /**
  * User detail level types

@@ -24,6 +24,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "unified-interface", "vibe-sense", "cleanup"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "trash",
   category: "analytics",

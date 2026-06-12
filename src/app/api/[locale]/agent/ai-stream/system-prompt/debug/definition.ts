@@ -18,10 +18,12 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
+import skillsDefinitions from "@/app/api/[locale]/agent/chat/skills/definition";
 
 const SystemPromptDebugWidget = lazyWidget(() =>
   import("./widget.cli").then((m) => ({ default: m.SystemPromptDebugWidget })),
@@ -32,9 +34,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "ai-stream", "system-prompt", "debug"],
   aliases: ["system-prompt-debug"] as const,
-  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "terminal",
   dynamicIcon: () => "terminal" as const,
@@ -94,18 +97,20 @@ const { GET } = createEndpoint({
       }),
       threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "get.fields.threadId.label" as const,
         description: "get.fields.threadId.description" as const,
-        placeholder: "get.fields.threadId.placeholder" as const,
         schema: z.string().uuid().optional().describe("Thread ID for context"),
       }),
       skillId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: skillsDefinitions.GET,
+        labelField: "name",
         label: "get.fields.skillId.label" as const,
         description: "get.fields.skillId.description" as const,
-        placeholder: "get.fields.skillId.placeholder" as const,
         schema: z.string().uuid().optional().describe("Skill ID to inject"),
       }),
       subFolderId: requestField(scopedTranslation, {

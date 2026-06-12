@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Buchungsjournal",
+    titleShort: "Journal",
     description:
       "Buchungen nach Unternehmen, Periode, Status, Quelle und Datum filtern",
     companyId: {

@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   put: {
     title: "Edytuj graf",
+    titleShort: "Edytuj wykres",
     description:
       "Rozgaleziaj i edytuj graf (tworzy nowa wersje, nigdy nie mutuje)",
     fields: {

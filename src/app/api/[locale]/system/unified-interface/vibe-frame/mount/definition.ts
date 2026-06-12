@@ -39,6 +39,7 @@ const { POST } = createEndpoint({
   path: ["system", "unified-interface", "vibe-frame", "mount"],
   aliases: [VIBE_FRAME_MOUNT_ALIAS] as const,
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "globe",
   category: "devTools",

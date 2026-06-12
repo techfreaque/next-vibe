@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Ustawienia systemowe",
+    titleShort: "Ustawienia systemu",
     description:
       "Przeglądaj i zarządzaj konfiguracją środowiska pogrupowaną według modułu",
     tags: {
@@ -88,6 +89,7 @@ export const translations: typeof enTranslations = {
 
   patch: {
     title: "Aktualizuj ustawienia",
+    titleShort: "Aktualizuj ustawienia",
     description: "Aktualizuj wartości konfiguracji środowiska w pliku .env",
     tags: {
       settings: "Ustawienia",
@@ -258,6 +260,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Zaloguj się do unbottled.ai",
+    titleShort: "Logowanie Unbottled",
     description:
       "Logowanie przez serwer — dane nigdy nie opuszczają twojego serwera",
     tags: { settings: "Logowanie Unbottled" },

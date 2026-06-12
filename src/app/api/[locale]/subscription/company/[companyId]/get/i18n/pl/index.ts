@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Subskrypcja firmy",
+    titleShort: "Sub. firmy",
     description: "Pobierz aktywną subskrypcję firmy",
     companyId: {
       label: "ID firmy",

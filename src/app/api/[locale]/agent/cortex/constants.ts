@@ -10,6 +10,8 @@ export const CORTEX_MOVE_ALIAS = "cortex-move";
 export const CORTEX_DELETE_ALIAS = "cortex-delete";
 export const CORTEX_TREE_ALIAS = "cortex-tree";
 export const CORTEX_SEARCH_ALIAS = "cortex-search";
+export const CORTEX_EXEC_ALIAS = "cortex-exec";
+export const CORTEX_TERMINALS_ALIAS = "cortex-terminals";
 
 /**
  * Folder-type icon mapping for dynamicIcon on cortex endpoint definitions.

@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "SSH",
 
   enums: {
@@ -18,6 +19,7 @@ export const translations = {
 
   get: {
     title: "Połączenie SSH",
+    titleShort: "Połączenie SSH",
     description: "Wyświetl szczegóły połączenia SSH",
     fields: {
       id: { label: "ID połączenia", description: "Połączenie do wyświetlenia" },
@@ -58,6 +60,7 @@ export const translations = {
   },
   patch: {
     title: "Aktualizuj połączenie SSH",
+    titleShort: "Zaktualizuj",
     description: "Zaktualizuj ustawienia połączenia SSH",
     fields: {
       id: { label: "ID połączenia", description: "Połączenie do aktualizacji" },
@@ -143,6 +146,7 @@ export const translations = {
   },
   delete: {
     title: "Usuń połączenie SSH",
+    titleShort: "Usuń połączenie",
     description: "Usuń połączenie SSH",
     fields: {
       id: { label: "ID połączenia", description: "Połączenie do usunięcia" },
@@ -194,5 +198,7 @@ export const translations = {
     deleteButton: "Usuń połączenie",
     testButton: "Testuj połączenie",
     confirmDelete: "Usunąć to połączenie? Tej operacji nie można cofnąć.",
+    mountsSection: "Zamontowane katalogi",
+    manageMounts: "Zarządzaj montowaniami",
   },
 };

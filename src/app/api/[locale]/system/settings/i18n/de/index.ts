@@ -18,6 +18,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Systemeinstellungen",
+    titleShort: "Systemeinstellungen",
     description:
       "Umgebungskonfiguration nach Modul gruppiert anzeigen und verwalten",
     tags: {
@@ -89,6 +90,7 @@ export const translations: typeof enTranslations = {
 
   patch: {
     title: "Einstellungen aktualisieren",
+    titleShort: "Einstellungen aktualisieren",
     description: "Umgebungskonfigurationswerte in der .env-Datei aktualisieren",
     tags: {
       settings: "Einstellungen",
@@ -260,6 +262,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Bei unbottled.ai anmelden",
+    titleShort: "Unbottled-Anmeldung",
     description:
       "Server-seitige Proxy-Anmeldung — Zugangsdaten verlassen nie deinen Server",
     tags: { settings: "Unbottled-Anmeldung" },

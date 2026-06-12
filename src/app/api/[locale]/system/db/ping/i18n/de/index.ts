@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   tag: "datenbank",
   post: {
     title: "Datenbank-Ping",
+    titleShort: "DB-Ping",
     description: "Datenbankverbindung und -status prüfen",
     form: {
       title: "Ping-Konfiguration",

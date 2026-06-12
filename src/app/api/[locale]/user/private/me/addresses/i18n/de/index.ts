@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
 
   list: {
     title: "Meine Adressen",
+    titleShort: "Meine Adressen",
     description: "Gespeicherte Adressen anzeigen",
     response: {
       addresses: "Adressen",
@@ -17,6 +18,9 @@ export const translations: typeof enTranslations = {
       billing: "Rechnung",
       delivery: "Lieferung",
       empty: "Keine gespeicherten Adressen",
+      emptyHint: "Adressen speichern für schnelleres Bestellen",
+      emptyCta: "Erste Adresse hinzufügen",
+      loading: "Adressen werden geladen…",
     },
     errors: {
       validation: {
@@ -52,6 +56,7 @@ export const translations: typeof enTranslations = {
 
   create: {
     title: "Adresse hinzufügen",
+    titleShort: "Adresse hinzufügen",
     description: "Neue Adresse speichern",
     fields: {
       label: {

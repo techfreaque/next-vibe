@@ -11,6 +11,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Chat-Thread abrufen",
+    titleShort: "Thread",
     description: "Einen bestimmten Chat-Thread nach ID abrufen",
     container: {
       title: "Thread-Details",
@@ -133,6 +134,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Chat-Thread aktualisieren",
+    titleShort: "Thread bearbeiten",
     description: "Einen bestehenden Chat-Thread aktualisieren",
     container: {
       title: "Thread aktualisieren",
@@ -304,6 +306,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Chat-Thread löschen",
+    titleShort: "Thread löschen",
     description: "Einen Chat-Thread löschen",
     container: {
       title: "Thread löschen",

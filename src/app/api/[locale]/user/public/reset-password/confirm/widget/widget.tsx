@@ -18,18 +18,18 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
-import { EmailFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/email-field/widget";
-import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/widget";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import { EmailFieldWidget } from "next-vibe-ui/unified/form-fields/email-field/widget";
+import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { PasswordStrengthIndicator } from "@/app/api/[locale]/user/public/signup/widget/password-strength-indicator";
 
 import type definition from "../definition";
-import AlertWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/widget";
+import AlertWidget from "next-vibe-ui/unified/display-only/alert/widget";
 
 /**
  * Props for custom widget

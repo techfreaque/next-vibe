@@ -1,0 +1,75 @@
+export const translations = {
+  category: "Estimates",
+  tags: { payment: "payment", estimate: "estimate" },
+  post: {
+    title: "Get Estimate",
+    titleShort: "Get Estimate",
+    description: "Get a single estimate with all its lines",
+    form: {
+      title: "Get Estimate",
+      description: "Get a single estimate with all its lines",
+    },
+    response: { success: "Success", message: "Status message" },
+    errors: {
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      validation: {
+        title: "Validation Error",
+        description: "Invalid parameters",
+      },
+      server: { title: "Server Error", description: "Internal server error" },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      network: {
+        title: "Network Error",
+        description: "Network error occurred",
+      },
+      forbidden: { title: "Forbidden", description: "Access denied" },
+      notFound: { title: "Not Found", description: "Estimate not found" },
+      conflict: {
+        title: "Conflict",
+        description: "Cannot perform action in current status",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "There are unsaved changes",
+      },
+    },
+    success: {
+      title: "Success",
+      description: "Get a single estimate with all its lines",
+    },
+  },
+  estimateId: { label: "Estimate ID", description: "The estimate to act on" },
+  widget: {
+    back: "Back",
+    submit: "Look Up Estimate",
+    estimateNumber: "Estimate",
+    valid: "Valid until",
+    customer: "Customer",
+    lineItems: "Line Items",
+    description: "Description",
+    qty: "Qty",
+    unitPrice: "Unit Price",
+    tax: "Tax",
+    total: "Total",
+    subtotal: "Subtotal",
+    sendEstimate: "Send",
+    acceptEstimate: "Accept",
+    declineEstimate: "Decline",
+    convertToInvoice: "Convert to Invoice",
+    duplicate: "Duplicate",
+    status: {
+      draft: "Draft",
+      sent: "Sent",
+      accepted: "Accepted",
+      declined: "Declined",
+      expired: "Expired",
+      converted: "Converted",
+    },
+  },
+};

@@ -2,7 +2,8 @@ import TextInput from "ink-text-input";
 import { Text } from "ink";
 import type { JSX } from "react";
 
-import { useIsMcp } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { useCliFieldFocus } from "@/packages/next-vibe-ui/cli/lib/focus-manager";
 import type { InputProps } from "../../web/ui/input";
 
 export type {
@@ -85,7 +86,9 @@ export function Input<
   name,
   type,
 }: InputProps<T>): JSX.Element | null {
+  // Hooks must be called unconditionally
   const isMcp = useIsMcp();
+  const isFocused = useCliFieldFocus(name ?? "input");
 
   if (isMcp) {
     return null;
@@ -104,15 +107,20 @@ export function Input<
     );
   }
 
+  // Focus prefix "▸ " survives ANSI stripping so agents can detect focus.
   return (
-    <TextInput
-      value={displayValue}
-      placeholder={placeholder ?? ""}
-      mask={isMask ? "*" : undefined}
-      onChange={(text): void => {
-        onChangeText?.(text);
-        onChange?.(makeChangeEvent(name, text));
-      }}
-    />
+    <Text>
+      {isFocused ? "▸ " : "  "}
+      <TextInput
+        value={displayValue}
+        placeholder={placeholder ?? ""}
+        focus={isFocused}
+        mask={isMask ? "*" : undefined}
+        onChange={(text): void => {
+          onChangeText?.(text);
+          onChange?.(makeChangeEvent(name, text));
+        }}
+      />
+    </Text>
   );
 }

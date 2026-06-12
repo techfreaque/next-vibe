@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Lead Search API Route Handler
  * Handles GET requests for searching leads
@@ -13,8 +14,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, t, logger, locale }) => {
-      return await LeadSearchRepository.searchLeads(data, t, logger, locale);
-    },
+    handler: async ({ data, t, logger, locale }) =>
+      LeadSearchRepository.searchLeads(data, t, logger, locale),
   },
 });

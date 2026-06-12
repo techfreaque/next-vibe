@@ -1,9 +1,11 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     messaging: "Messaging",
   },
   get: {
     title: "Messenger-Konto anzeigen",
+    titleShort: "Konto anzeigen",
     description: "Messenger-Konto-Details abrufen",
   },
   enums: {
@@ -66,6 +68,7 @@ export const translations = {
 
   delete: {
     title: "Konto löschen",
+    titleShort: "Konto löschen",
     description: "Dieses Messenger-Konto dauerhaft löschen",
     container: {
       title: "Konto löschen",
@@ -85,6 +88,7 @@ export const translations = {
   },
   put: {
     title: "Messenger-Konto bearbeiten",
+    titleShort: "Konto bearbeiten",
     description: "Messenger-Konto-Einstellungen aktualisieren",
     success: {
       title: "Konto aktualisiert",

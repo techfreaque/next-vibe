@@ -47,6 +47,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Bounce-Verarbeitung",
+    titleShort: "Bounces verarbeiten",
     description: "E-Mail-Bounce-Benachrichtigungen aus IMAP verarbeiten",
     errors: {
       unauthorized: {
@@ -109,6 +110,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Bounce-Verarbeitung-Konfiguration abrufen",
+    titleShort: "Bounce-Konfiguration",
     description: "Bounce-Verarbeitung-Hintergrundaufgaben-Konfiguration laden",
     errors: {
       unauthorized: {

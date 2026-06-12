@@ -54,6 +54,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Newsletter abonnieren",
+    titleShort: "Abonnieren",
     description: "Newsletter-Abonnement einrichten",
     form: {
       title: "Newsletter-Abonnement",

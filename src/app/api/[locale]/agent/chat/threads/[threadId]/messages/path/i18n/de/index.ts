@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Konversationspfad abrufen",
+    titleShort: "Nachrichtenpfad",
     description:
       "Nachrichten entlang eines bestimmten Konversationspfads abrufen",
     container: {

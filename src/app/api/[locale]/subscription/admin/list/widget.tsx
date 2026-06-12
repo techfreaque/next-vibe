@@ -57,10 +57,12 @@ function SubscriptionRow({
   subscription,
   locale,
   t,
+  onClick,
 }: {
   subscription: Subscription;
   locale: CountryLanguage;
   t: SubscriptionAdminListT;
+  onClick: () => void;
 }): React.JSX.Element {
   // Extract last part of enum value for display
   const statusLabel =
@@ -70,7 +72,10 @@ function SubscriptionRow({
     "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
 
   return (
-    <Div className="group flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors">
+    <Div
+      className="group flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors cursor-pointer"
+      onClick={onClick}
+    >
       {/* Avatar with initials */}
       <Div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
         {(subscription.userEmail || "?").slice(0, 2).toUpperCase()}
@@ -170,6 +175,20 @@ export function SubscriptionListContainer({
     })();
   }, [navigate]);
 
+  const handleRowClick = useCallback(
+    (subscriptionId: string): void => {
+      void (async (): Promise<void> => {
+        // Navigate to company subscription detail page using subscription id
+        const companyGetDef =
+          await import("../../company/[companyId]/get/definition");
+        navigate(companyGetDef.default.GET, {
+          urlPathParams: { companyId: subscriptionId },
+        });
+      })();
+    },
+    [navigate],
+  );
+
   return (
     <Div className="flex flex-col gap-0">
       {/* Header */}
@@ -188,7 +207,7 @@ export function SubscriptionListContainer({
           variant="ghost"
           size="sm"
           onClick={handleViewStats}
-          title="Statistics"
+          title={t("widget.viewStats")}
           className="gap-1"
         >
           <BarChart3 className="h-4 w-4" />
@@ -254,6 +273,7 @@ export function SubscriptionListContainer({
                 subscription={subscription}
                 locale={locale}
                 t={t}
+                onClick={() => handleRowClick(subscription.id)}
               />
             ))}
           </Div>

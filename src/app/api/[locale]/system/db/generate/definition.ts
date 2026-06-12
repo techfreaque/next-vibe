@@ -25,6 +25,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "db", "generate"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   category: "database",
   subCategory: "Migrations",
@@ -32,9 +33,9 @@ const { POST } = createEndpoint({
   icon: "file-plus",
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
-    UserRole.CLI_AUTH_BYPASS,
   ],
   aliases: [DB_GENERATE_ALIAS] as const,
 

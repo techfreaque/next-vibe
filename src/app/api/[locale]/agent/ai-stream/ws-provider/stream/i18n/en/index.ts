@@ -8,6 +8,7 @@ export const translations = {
   },
   post: {
     title: "WS Provider Stream",
+    titleShort: "WS Stream",
     description:
       "Start an AI stream for a remote WS Provider client. The client sends a message, model, and optional tool definitions. AI events are streamed via the standard WebSocket channel. Client-provided tools pause the stream until the client sends back tool results.",
     fields: {
@@ -68,6 +69,45 @@ export const translations = {
       timezone: {
         label: "Timezone",
         description: "Client timezone for cache-stable timestamps",
+      },
+      toolConfirmations: {
+        title: "Tool Confirmations",
+        description:
+          "Approve or deny tool calls that paused waiting for confirmation. The stream resumes with the confirmed tool result.",
+        messageId: {
+          label: "Message ID",
+          description: "ID of the tool message awaiting confirmation",
+        },
+        confirmed: {
+          label: "Confirmed",
+          description: "True to approve and execute, false to deny",
+        },
+        updatedArgs: {
+          label: "Updated Arguments",
+          description: "Optional edited tool arguments to use on execution",
+        },
+      },
+      attachments: {
+        title: "Attachments",
+        description:
+          "Files attached to the user message, base64-encoded for transport.",
+        filename: {
+          label: "Filename",
+          description: "Original file name",
+        },
+        mimeType: {
+          label: "MIME Type",
+          description: "File content type",
+        },
+        data: {
+          label: "Data",
+          description: "Base64-encoded file content",
+        },
+      },
+      messageHistory: {
+        label: "Message History",
+        description:
+          "Conversation context from the calling instance. The provider holds no thread state, so the caller supplies prior messages on every turn.",
       },
     },
     response: {

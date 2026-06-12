@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Lead Magnet",
   tags: {
     leadMagnet: "lead-magnet",
@@ -166,6 +167,7 @@ export const translations = {
     },
     klaviyo: {
       title: "Połącz Klaviyo",
+      titleShort: "Klaviyo",
       description: "Połącz konto Klaviyo ze stroną skilla",
       klaviyoApiKey: {
         label: "Klucz API Klaviyo",
@@ -175,6 +177,7 @@ export const translations = {
     },
     getresponse: {
       title: "Połącz GetResponse",
+      titleShort: "GetResponse",
       description: "Połącz konto GetResponse ze stroną skilla",
       getresponseApiKey: {
         label: "Klucz API GetResponse",
@@ -184,6 +187,7 @@ export const translations = {
     },
     emarsys: {
       title: "Połącz Emarsys",
+      titleShort: "Emarsys",
       description: "Połącz konto Emarsys ze stroną skilla",
       emarsysUserName: {
         label: "Nazwa użytkownika",
@@ -203,6 +207,7 @@ export const translations = {
     },
     acumbamail: {
       title: "Połącz Acumbamail",
+      titleShort: "Acumbamail",
       description: "Połącz konto Acumbamail ze stroną skilla",
       acumbamailApiKey: {
         label: "Klucz API",
@@ -212,6 +217,7 @@ export const translations = {
     },
     cleverreach: {
       title: "Połącz CleverReach",
+      titleShort: "CleverReach",
       description: "Połącz konto CleverReach ze stroną skilla",
       cleverreachClientId: {
         label: "Client ID",
@@ -242,6 +248,7 @@ export const translations = {
     },
     connectif: {
       title: "Połącz Connectif",
+      titleShort: "Connectif",
       description: "Połącz konto Connectif ze stroną skilla",
       connectifApiKey: {
         label: "Klucz API",
@@ -251,6 +258,7 @@ export const translations = {
     },
     datanext: {
       title: "Połącz DataNext",
+      titleShort: "DataNext",
       description: "Połącz konto DataNext ze stroną skilla",
       datanextApiKey: {
         label: "Klucz API",
@@ -275,6 +283,7 @@ export const translations = {
     },
     edrone: {
       title: "Połącz Edrone",
+      titleShort: "Edrone",
       description: "Połącz konto Edrone ze stroną skilla",
       edroneAppId: {
         label: "App ID",
@@ -284,6 +293,7 @@ export const translations = {
     },
     expertsender: {
       title: "Połącz ExpertSender",
+      titleShort: "ExpertSender",
       description: "Połącz konto ExpertSender ze stroną skilla",
       expertSenderApiDomain: {
         label: "Domena API",
@@ -298,6 +308,7 @@ export const translations = {
     },
     freshmail: {
       title: "Połącz FreshMail",
+      titleShort: "FreshMail",
       description: "Połącz konto FreshMail ze stroną skilla",
       freshmailApiKey: {
         label: "Klucz API",
@@ -317,6 +328,7 @@ export const translations = {
     },
     mailup: {
       title: "Połącz MailUp",
+      titleShort: "MailUp",
       description: "Połącz konto MailUp ze stroną skilla",
       mailupClientId: {
         label: "Client ID",
@@ -346,6 +358,7 @@ export const translations = {
     },
     mapp: {
       title: "Połącz Mapp",
+      titleShort: "Mapp",
       description: "Połącz konto Mapp ze stroną skilla",
       mappUsername: {
         label: "Nazwa użytkownika",
@@ -365,6 +378,7 @@ export const translations = {
     },
     sailthru: {
       title: "Połącz Sailthru",
+      titleShort: "Sailthru",
       description: "Połącz konto Sailthru ze stroną skilla",
       sailthruApiKey: {
         label: "Klucz API",
@@ -384,6 +398,7 @@ export const translations = {
     },
     salesmanago: {
       title: "Połącz SALESmanago",
+      titleShort: "SALESmanago",
       description: "Połącz konto SALESmanago ze stroną skilla",
       salesManagoClientId: {
         label: "Client ID",
@@ -413,6 +428,7 @@ export const translations = {
     },
     shopify: {
       title: "Połącz Shopify",
+      titleShort: "Shopify",
       description: "Połącz sklep Shopify ze stroną skilla",
       shopifyDomain: {
         label: "Domena sklepu",
@@ -427,6 +443,7 @@ export const translations = {
     },
     spotler: {
       title: "Połącz Spotler",
+      titleShort: "Spotler",
       description: "Połącz konto Spotler ze stroną skilla",
       spotlerConsumerKey: {
         label: "Consumer Key",
@@ -441,6 +458,7 @@ export const translations = {
     },
     youlead: {
       title: "Połącz YouLead",
+      titleShort: "YouLead",
       description: "Połącz konto YouLead ze stroną skilla",
       youLeadAppId: {
         label: "App ID",
@@ -460,6 +478,7 @@ export const translations = {
     },
     adobecampaign: {
       title: "Połącz Adobe Campaign",
+      titleShort: "Adobe Campaign",
       description: "Połącz konto Adobe Campaign ze stroną skilla",
       adobeCampaignOrganizationId: {
         label: "ID organizacji",
@@ -489,6 +508,7 @@ export const translations = {
     },
     platformEmail: {
       title: "Powiadomienie e-mailem platformy",
+      titleShort: "E-mail platformy",
       description:
         "Otrzymuj e-mail za każdym razem, gdy ktoś zapisze się przez Twój lead magnet",
       notifyEmail: {
@@ -504,6 +524,7 @@ export const translations = {
     },
     googleSheets: {
       title: "Połącz Google Sheets",
+      titleShort: "Google Sheets",
       description:
         "Dodaje nowy wiersz do arkusza Google za każdym razem, gdy ktoś się zapisze",
       saveTitle: "Zapisz konfigurację Google Sheets",

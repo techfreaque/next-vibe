@@ -30,6 +30,7 @@ export const translations = {
 
   get: {
     title: "Get skill",
+    titleShort: "Skill Details",
     dynamicTitle: "skill: {{name}}",
     description: "Retrieve a specific skill by ID",
     container: {
@@ -235,6 +236,7 @@ export const translations = {
   },
   patch: {
     title: "Update skill",
+    titleShort: "Update Skill",
     dynamicTitle: "Edit: {{name}}",
     container: {
       title: "Update skill",
@@ -449,6 +451,7 @@ export const translations = {
   },
   delete: {
     title: "Delete skill",
+    titleShort: "Delete Skill",
     dynamicTitle: "Delete: {{name}}",
     description: "Delete a custom skill",
     container: {

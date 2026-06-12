@@ -1,4 +1,3 @@
-import { translations as rolesTranslations } from "../../roles/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -6,9 +5,168 @@ export const translations: typeof enTranslations = {
   tag: "Benutzerverwaltung",
 
   id: {
-    roles: rolesTranslations.roles,
+    roles: {
+      post: {
+        title: "Benutzerrolle hinzufügen",
+        description: "Einem bestimmten Benutzerkonto eine Rolle zuweisen",
+        container: {
+          title: "Rolle hinzufügen",
+          description:
+            "Wählen Sie eine Rolle aus, die diesem Benutzer gewährt werden soll",
+        },
+        id: {
+          label: "Benutzer-ID",
+          description:
+            "Eindeutige Kennung des Benutzers, dem die Rolle zugewiesen werden soll",
+          placeholder: "Benutzer-ID eingeben...",
+        },
+        role: {
+          label: "Rolle",
+          description: "Die dem Benutzer zu gewährende Rolle",
+          placeholder: "Rolle auswählen...",
+        },
+        submit: {
+          label: "Rolle hinzufügen",
+        },
+        response: {
+          roleId: {
+            content: "Rollenzuweisungs-ID",
+          },
+          userId: {
+            content: "Benutzer-ID",
+          },
+          assignedRole: {
+            content: "Zugewiesene Rolle",
+          },
+        },
+        errors: {
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description:
+              "Sie müssen angemeldet sein, um Benutzerrollen zu verwalten",
+          },
+          validation: {
+            title: "Validierung fehlgeschlagen",
+            description:
+              "Bitte geben Sie eine gültige Benutzer-ID und Rolle an",
+          },
+          forbidden: {
+            title: "Zugriff verweigert",
+            description: "Nur Administratoren können Benutzerrollen verwalten",
+          },
+          notFound: {
+            title: "Benutzer nicht gefunden",
+            description: "Der angegebene Benutzer konnte nicht gefunden werden",
+          },
+          conflict: {
+            title: "Rolle bereits zugewiesen",
+            description: "Dieser Benutzer hat die angegebene Rolle bereits",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Verbindung zum Server nicht möglich",
+          },
+          unsavedChanges: {
+            title: "Ungespeicherte Änderungen",
+            description:
+              "Sie haben ungespeicherte Änderungen, die verloren gehen",
+          },
+          server: {
+            title: "Serverfehler",
+            description:
+              "Rolle konnte aufgrund eines Serverfehlers nicht hinzugefügt werden",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description:
+              "Beim Hinzufügen der Rolle ist ein unerwarteter Fehler aufgetreten",
+          },
+        },
+        success: {
+          title: "Rolle hinzugefügt",
+          description: "Die Rolle wurde dem Benutzer erfolgreich gewährt",
+        },
+      },
+      delete: {
+        title: "Benutzerrolle entfernen",
+        description: "Eine Rolle von einem bestimmten Benutzerkonto entziehen",
+        container: {
+          title: "Rolle entfernen",
+          description:
+            "Wählen Sie eine Rolle aus, die diesem Benutzer entzogen werden soll",
+        },
+        id: {
+          label: "Benutzer-ID",
+          description:
+            "Eindeutige Kennung des Benutzers, dem die Rolle entzogen werden soll",
+          placeholder: "Benutzer-ID eingeben...",
+        },
+        role: {
+          label: "Rolle",
+          description: "Die dem Benutzer zu entziehende Rolle",
+          placeholder: "Rolle auswählen...",
+        },
+        submit: {
+          label: "Rolle entfernen",
+        },
+        response: {
+          success: {
+            content: "Rolle entfernt",
+          },
+        },
+        errors: {
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description:
+              "Sie müssen angemeldet sein, um Benutzerrollen zu verwalten",
+          },
+          validation: {
+            title: "Validierung fehlgeschlagen",
+            description:
+              "Bitte geben Sie eine gültige Benutzer-ID und Rolle an",
+          },
+          forbidden: {
+            title: "Zugriff verweigert",
+            description: "Nur Administratoren können Benutzerrollen verwalten",
+          },
+          notFound: {
+            title: "Benutzer nicht gefunden",
+            description: "Der angegebene Benutzer konnte nicht gefunden werden",
+          },
+          conflict: {
+            title: "Konfliktfehler",
+            description:
+              "Rolle konnte aufgrund bestehender Abhängigkeiten nicht entfernt werden",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Verbindung zum Server nicht möglich",
+          },
+          unsavedChanges: {
+            title: "Ungespeicherte Änderungen",
+            description:
+              "Sie haben ungespeicherte Änderungen, die verloren gehen",
+          },
+          server: {
+            title: "Serverfehler",
+            description:
+              "Rolle konnte aufgrund eines Serverfehlers nicht entfernt werden",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description:
+              "Beim Entfernen der Rolle ist ein unerwarteter Fehler aufgetreten",
+          },
+        },
+        success: {
+          title: "Rolle entfernt",
+          description: "Die Rolle wurde dem Benutzer erfolgreich entzogen",
+        },
+      },
+    },
     get: {
       title: "Benutzer abrufen",
+      titleShort: "Benutzerdetails",
       description:
         "Detaillierte Informationen zu einem bestimmten Benutzer abrufen",
       container: {
@@ -230,6 +388,7 @@ export const translations: typeof enTranslations = {
     },
     put: {
       title: "Benutzer aktualisieren",
+      titleShort: "Benutzer aktualisieren",
       description: "Benutzerinformationen und Profildetails aktualisieren",
       container: {
         title: "Benutzer aktualisieren",
@@ -445,6 +604,7 @@ export const translations: typeof enTranslations = {
     },
     delete: {
       title: "Benutzer löschen",
+      titleShort: "Benutzer löschen",
       description: "Benutzerkonto dauerhaft löschen",
       container: {
         title: "Benutzer löschen",
@@ -549,6 +709,331 @@ export const translations: typeof enTranslations = {
       titleReferralCodes: "Referral-Codes und Statistiken",
       titleSubscription: "Abonnement anzeigen",
       titleCopyUserId: "Benutzer-ID kopieren",
+    },
+    getCrm: {
+      get: {
+        title: "CRM-Profil des Benutzers abrufen",
+        titleShort: "CRM-Profil",
+        description: "Rechnungsfelder und Notizanzahl eines Benutzers abrufen",
+        fields: {
+          userId: {
+            label: "Benutzer-ID",
+            description: "Der abzufragende Benutzer",
+            placeholder: "Benutzer-UUID",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validierungsfehler",
+            description: "Ungültige Benutzer-ID",
+          },
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description: "Sie müssen angemeldet sein",
+          },
+          forbidden: {
+            title: "Zugriff verweigert",
+            description:
+              "Sie haben keinen Zugriff auf CRM-Daten dieses Benutzers",
+          },
+          notFound: {
+            title: "Nicht gefunden",
+            description: "Benutzer nicht gefunden",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Ein Konflikt ist aufgetreten",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Netzwerkanfrage fehlgeschlagen",
+          },
+          unsavedChanges: {
+            title: "Nicht gespeicherte Änderungen",
+            description: "Es gibt nicht gespeicherte Änderungen",
+          },
+          internal: {
+            title: "Interner Fehler",
+            description: "Serverfehler — erneut versuchen",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unerwarteter Fehler ist aufgetreten",
+          },
+        },
+        success: {
+          title: "CRM-Profil geladen",
+          description: "Benutzer-CRM-Daten abgerufen",
+        },
+        widget: {
+          addNote: "Notiz hinzufügen",
+          viewNotes: "Notizen ansehen",
+        },
+        response: {
+          id: "Benutzer-ID",
+          email: "E-Mail",
+          privateName: "Name",
+          companyBillingName: "Unternehmen / Rechnungsname",
+          vatNumber: "USt-IdNr.",
+          taxId: "Steuer-ID",
+          phone: "Telefon",
+          addressLine1: "Adresszeile 1",
+          addressLine2: "Adresszeile 2",
+          city: "Stadt",
+          region: "Region",
+          postalCode: "Postleitzahl",
+          billingCountry: "Land",
+          defaultCurrency: "Standardwährung",
+          paymentTermsDays: "Zahlungsziel (Tage)",
+          notesCount: "Gesamtnotizen",
+        },
+      },
+      tag: "CRM",
+    },
+    notesCreate: {
+      post: {
+        title: "Benutzernotiz erstellen",
+        titleShort: "Notiz erstellen",
+        description:
+          "CRM-Notiz, Gesprächsprotokoll, E-Mail, Meeting oder Aufgabe für einen Benutzer hinzufügen",
+        fields: {
+          userId: {
+            label: "Benutzer",
+            description: "Der Benutzer, auf den sich diese Notiz bezieht",
+            placeholder: "Benutzer auswählen",
+          },
+          type: {
+            label: "Aktivitätstyp",
+            description: "Welche Art von Interaktion dies erfasst",
+            placeholder: "Typ auswählen",
+          },
+          content: {
+            label: "Inhalt",
+            description: "Details der Aktivität",
+            placeholder: "Was ist passiert...",
+          },
+          isPrivate: {
+            label: "Privat",
+            description: "Private Notizen sind nur für Sie sichtbar",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validierungsfehler",
+            description:
+              "Überprüfen Sie die Felder und versuchen Sie es erneut",
+          },
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description: "Sie müssen angemeldet sein",
+          },
+          forbidden: {
+            title: "Zugriff verweigert",
+            description: "Sie haben keinen Zugriff auf diesen Benutzer",
+          },
+          notFound: {
+            title: "Nicht gefunden",
+            description: "Benutzer nicht gefunden",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Ein Konflikt ist aufgetreten",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Netzwerkanfrage fehlgeschlagen",
+          },
+          unsavedChanges: {
+            title: "Nicht gespeicherte Änderungen",
+            description: "Es gibt nicht gespeicherte Änderungen",
+          },
+          internal: {
+            title: "Interner Fehler",
+            description: "Serverfehler — erneut versuchen",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unerwarteter Fehler ist aufgetreten",
+          },
+        },
+        success: {
+          title: "Notiz erstellt",
+          description: "Die Notiz wurde gespeichert",
+        },
+        widget: {
+          created: "Notiz erstellt",
+          noteId: "Notiz-ID",
+          backToNotes: "Zurück zu Notizen",
+        },
+        response: {
+          id: "Notiz-ID",
+          userId: "Benutzer-ID",
+          authorUserId: "Autor-ID",
+          type: "Typ",
+          content: "Inhalt",
+          isPrivate: "Privat",
+          createdAt: "Erstellt am",
+          updatedAt: "Aktualisiert am",
+        },
+      },
+      tag: "CRM",
+    },
+    notesList: {
+      get: {
+        title: "Benutzernotizen auflisten",
+        titleShort: "Benutzernotizen",
+        description:
+          "CRM-Notizen für einen Benutzer anzeigen, gefiltert nach Typ und Sichtbarkeit",
+        fields: {
+          userId: {
+            label: "Benutzer-ID",
+            description: "Notizen welches Benutzers auflisten",
+            placeholder: "Benutzer-UUID",
+          },
+          type: {
+            label: "Typ",
+            description: "Nach Aktivitätstyp filtern",
+            placeholder: "Alle Typen",
+          },
+          isPrivate: {
+            label: "Nur private",
+            description: "Nur eigene private Notizen anzeigen",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validierungsfehler",
+            description:
+              "Überprüfen Sie die Filter und versuchen Sie es erneut",
+          },
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description: "Sie müssen angemeldet sein",
+          },
+          forbidden: {
+            title: "Zugriff verweigert",
+            description: "Sie haben keinen Zugriff auf diese Notizen",
+          },
+          notFound: {
+            title: "Nicht gefunden",
+            description: "Benutzer nicht gefunden",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Ein Konflikt ist aufgetreten",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Netzwerkanfrage fehlgeschlagen",
+          },
+          unsavedChanges: {
+            title: "Nicht gespeicherte Änderungen",
+            description: "Es gibt nicht gespeicherte Änderungen",
+          },
+          internal: {
+            title: "Interner Fehler",
+            description: "Serverfehler — erneut versuchen",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unerwarteter Fehler ist aufgetreten",
+          },
+        },
+        success: {
+          title: "Notizen geladen",
+          description: "Notizen erfolgreich abgerufen",
+        },
+        widget: {
+          addNote: "Notiz hinzufügen",
+          total: "Gesamt",
+          empty: "Noch keine Notizen",
+          delete: "Löschen",
+          private: "Privat",
+          ago: "vor",
+        },
+        response: {
+          notes: "Notizen",
+          total: "Gesamt",
+          note: {
+            id: "Notiz-ID",
+            userId: "Benutzer-ID",
+            authorUserId: "Autor-ID",
+            type: "Typ",
+            content: "Inhalt",
+            isPrivate: "Privat",
+            createdAt: "Erstellt am",
+            updatedAt: "Aktualisiert am",
+          },
+        },
+      },
+      tag: "CRM",
+    },
+    noteDelete: {
+      post: {
+        title: "Benutzernotiz löschen",
+        titleShort: "Notiz löschen",
+        description:
+          "CRM-Notiz löschen — nur der Autor oder ein Administrator kann dies tun",
+        fields: {
+          noteId: {
+            label: "Notiz-ID",
+            description: "Die zu löschende Notiz",
+            placeholder: "Notiz-UUID",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validierungsfehler",
+            description: "Ungültige Notiz-ID",
+          },
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description: "Sie müssen angemeldet sein",
+          },
+          forbidden: {
+            title: "Zugriff verweigert",
+            description:
+              "Nur der Autor oder ein Administrator kann diese Notiz löschen",
+          },
+          notFound: {
+            title: "Nicht gefunden",
+            description: "Notiz nicht gefunden",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Ein Konflikt ist aufgetreten",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Netzwerkanfrage fehlgeschlagen",
+          },
+          unsavedChanges: {
+            title: "Nicht gespeicherte Änderungen",
+            description: "Es gibt nicht gespeicherte Änderungen",
+          },
+          internal: {
+            title: "Interner Fehler",
+            description: "Serverfehler — erneut versuchen",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unerwarteter Fehler ist aufgetreten",
+          },
+        },
+        success: {
+          title: "Notiz gelöscht",
+          description: "Die Notiz wurde dauerhaft entfernt",
+        },
+        widget: {
+          warning: "Diese Notiz wird unwiderruflich gelöscht.",
+          deleted: "Notiz gelöscht.",
+          backToNotes: "Zurück zu Notizen",
+        },
+        response: {
+          deleted: "Gelöscht",
+        },
+      },
+      tag: "CRM",
     },
   },
 };

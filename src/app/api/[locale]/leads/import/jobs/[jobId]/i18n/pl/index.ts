@@ -1,5 +1,3 @@
-import { translations as retryTranslations } from "../../retry/i18n/pl";
-import { translations as stopTranslations } from "../../stop/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -11,6 +9,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Pobierz zadanie importu",
+    titleShort: "Zadanie importu",
     description: "Pobierz szczegóły konkretnego zadania importu",
     actions: {
       retry: "Ponów",
@@ -141,6 +140,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Zaktualizuj zadanie importu",
+    titleShort: "Edytuj zadanie importu",
     description: "Zaktualizuj ustawienia konfiguracji zadania importu",
     jobId: {
       label: "ID zadania",
@@ -280,6 +280,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Usuń zadanie importu",
+    titleShort: "Usuń zadanie importu",
     description: "Usuń konkretne zadanie importu",
     jobId: {
       label: "ID zadania",
@@ -343,11 +344,164 @@ export const translations: typeof enTranslations = {
       description: "Zadanie importu zostało pomyślnie usunięte",
     },
   },
-  retry: retryTranslations,
-  stop: stopTranslations,
+  retry: {
+    category: "Import danych",
+    tags: {
+      leads: "Leady",
+      management: "Zarządzanie",
+    },
+
+    post: {
+      title: "Ponów zadanie importu",
+      description: "Ponów nieudane zadanie importu",
+      jobId: {
+        label: "ID zadania",
+        description: "Unikalny identyfikator zadania importu do ponowienia",
+      },
+      form: {
+        title: "Ponów zadanie importu",
+        description: "Ponów nieudane zadanie importu",
+      },
+      response: {
+        title: "Wynik ponowienia",
+        description: "Wynik operacji ponowienia",
+        success: {
+          content: "Status sukcesu",
+        },
+        message: {
+          content: "Wiadomość o ponowieniu",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Podane ID zadania jest nieprawidłowe",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagana autoryzacja do ponowienia zadań",
+        },
+        forbidden: {
+          title: "Dostęp zabroniony",
+          description: "Nie masz uprawnień do ponowienia tego zadania",
+        },
+        notFound: {
+          title: "Zadanie nie znalezione",
+          description: "Nie znaleziono zadania importu o podanym ID",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Wystąpił błąd podczas ponowienia zadania",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Nie można połączyć się z serwerem",
+        },
+        unsavedChanges: {
+          title: "Niezapisane zmiany",
+          description: "Masz niezapisane zmiany",
+        },
+        conflict: {
+          title: "Konflikt ponowienia",
+          description:
+            "Nie można ponowić zadania, które jest obecnie przetwarzane",
+        },
+      },
+      success: {
+        title: "Sukces",
+        description: "Zadanie importu zostało pomyślnie ponowione",
+      },
+    },
+    widget: {
+      title: "Ponów zadanie importu",
+      successMessage: "Ponowienie zadania zostało pomyślnie zainicjowane",
+    },
+  },
+  stop: {
+    category: "Import danych",
+    tags: {
+      leads: "Leady",
+      management: "Zarządzanie",
+    },
+
+    post: {
+      title: "Zatrzymaj zadanie importu",
+      description: "Zatrzymaj uruchomione zadanie importu",
+      jobId: {
+        label: "ID zadania",
+        description: "Unikalny identyfikator zadania importu do zatrzymania",
+      },
+      form: {
+        title: "Zatrzymaj zadanie importu",
+        description: "Zatrzymaj uruchomione zadanie importu",
+      },
+      response: {
+        title: "Wynik zatrzymania",
+        description: "Wynik operacji zatrzymania",
+        success: {
+          content: "Status sukcesu",
+        },
+        message: {
+          content: "Wiadomość o zatrzymaniu",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Podane ID zadania jest nieprawidłowe",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagana autoryzacja do zatrzymania zadań",
+        },
+        forbidden: {
+          title: "Dostęp zabroniony",
+          description: "Nie masz uprawnień do zatrzymania tego zadania",
+        },
+        notFound: {
+          title: "Zadanie nie znalezione",
+          description: "Nie znaleziono zadania importu o podanym ID",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Wystąpił błąd podczas zatrzymywania zadania",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Nie można połączyć się z serwerem",
+        },
+        unsavedChanges: {
+          title: "Niezapisane zmiany",
+          description: "Masz niezapisane zmiany",
+        },
+        conflict: {
+          title: "Konflikt zatrzymania",
+          description:
+            "Nie można zatrzymać zadania, które nie jest obecnie przetwarzane",
+        },
+      },
+      success: {
+        title: "Sukces",
+        description: "Zadanie importu zostało pomyślnie zatrzymane",
+      },
+    },
+    widget: {
+      title: "Zatrzymaj zadanie importu",
+      successMessage: "Zadanie zostało pomyślnie zatrzymane",
+    },
+  },
   widget: {
     status: {
       title: "Status zadania importu",
+      jobId: "ID zadania",
       loadingJobStatus: "Ładowanie statusu zadania…",
       totalRows: "Łączna liczba wierszy",
       processed: "Przetworzone",

@@ -10,15 +10,15 @@ import endpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { PromptFragmentsGeneratorRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return PromptFragmentsGeneratorRepository.generatePromptFragments(
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).PromptFragmentsGeneratorRepository.generatePromptFragments(
         data,
         logger,
         t,
-      );
-    },
+      ),
   },
 });

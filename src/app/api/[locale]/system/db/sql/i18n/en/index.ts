@@ -4,6 +4,7 @@ export const translations = {
   tag: "sql",
   post: {
     title: "Execute SQL",
+    titleShort: "Run SQL",
     description: "Execute SQL queries on the database",
     form: {
       title: "SQL Query Configuration",

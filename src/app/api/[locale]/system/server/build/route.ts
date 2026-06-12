@@ -13,9 +13,9 @@ import buildEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: buildEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, locale, logger, t }) => {
-      const { BuildRepository } = await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository");
-      return BuildRepository.execute(data, locale, logger, t);
-    },
+    handler: async ({ data, locale, logger, t }) =>
+      (await import(
+        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+      )).BuildRepository.execute(data, locale, logger, t),
   },
 });

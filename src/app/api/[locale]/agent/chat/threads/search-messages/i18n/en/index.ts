@@ -6,6 +6,7 @@ export const translations = {
   search: {
     get: {
       title: "Global Message Search",
+      titleShort: "Search Messages",
       description: "Search messages across all threads using full-text search",
       container: {
         title: "Global Message Search",

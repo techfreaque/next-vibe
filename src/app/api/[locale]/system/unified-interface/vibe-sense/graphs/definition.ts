@@ -22,7 +22,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { graphConfigSchema } from "../graph/schema";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
 import { VIBE_SENSE_GRAPHS_ALIAS } from "./constants";
 
@@ -38,6 +38,7 @@ const { GET } = createEndpoint({
   path: ["system", "unified-interface", "vibe-sense", "graphs"],
   aliases: [VIBE_SENSE_GRAPHS_ALIAS] as const,
   title: "list.title",
+  titleShort: "list.titleShort",
   description: "list.description",
   icon: "git-branch",
   category: "analytics",
@@ -166,6 +167,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "unified-interface", "vibe-sense", "graphs"],
   title: "create.title",
+  titleShort: "create.title",
   description: "create.description",
   icon: "plus",
   category: "analytics",

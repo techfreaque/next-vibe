@@ -38,6 +38,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/incognito/event-persist";
 
 import { scopedTranslation } from "./i18n";
+import { THREAD_MESSAGES_ALIAS } from "./constants";
 
 const MessagesWidget = lazy(() =>
   import("./widget/widget").then((m) => ({ default: m.MessagesWidget })),
@@ -55,13 +56,15 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads", "[threadId]", "messages"],
+  aliases: [THREAD_MESSAGES_ALIAS] as const,
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "message-circle",
-  category: "endpointCategories.messages",
-  subCategory: "endpointCategories.messagesModerating",
+  category: "ai",
+  subCategory: "messagesModerating",
   tags: ["tags.messages" as const],
 
   events: {
@@ -740,8 +743,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "message-circle",
-  category: "endpointCategories.messages",
-  subCategory: "endpointCategories.messagesModerating",
+  category: "ai",
+  subCategory: "messagesModerating",
   tags: ["tags.messages" as const],
 
   errorTypes: {

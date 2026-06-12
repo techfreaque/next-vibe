@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Portfele łącznie",
     title: "Portfele kredytowe łącznie",
     description:
       "Migawka łącznej liczby portfeli kredytowych na przedział rozdzielczości",

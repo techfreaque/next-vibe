@@ -1,5 +1,6 @@
 export const translations = {
   title: "Process Refund",
+  titleShort: "Refund",
   description: "Process a refund for a payment transaction",
   category: "Payment Refunds",
 

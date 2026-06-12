@@ -41,9 +41,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "execute"],
   aliases: [TASK_EXECUTE_ALIAS, "task-execute"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER],
+  allowedRoles: [UserRole.ADMIN],
 
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "play",
   category: "devTools",

@@ -8,13 +8,12 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
-      return await CoaAccountDeactivateRepository.deactivateAccount(
+    handler: async ({ data, user, logger, locale }) =>
+      CoaAccountDeactivateRepository.deactivateAccount(
         data,
         user.id,
         logger,
         locale,
-      );
-    },
+      ),
   },
 });

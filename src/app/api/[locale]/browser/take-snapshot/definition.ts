@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,10 +31,12 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "take-snapshot"],
+  aliases: ["browser-take-snapshot"] as const,
   title: "take-snapshot.title",
+  titleShort: "take-snapshot.titleShort",
   description: "take-snapshot.description",
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserInspection",
+  category: "browser",
+  subCategory: "Inspection",
   icon: "file-text",
   tags: [
     "take-snapshot.tags.browserAutomation",
@@ -74,6 +77,8 @@ const { POST } = createEndpoint({
             "The absolute path, or a path relative to the current working directory, to save the snapshot to instead of attaching it to the response.",
           ),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

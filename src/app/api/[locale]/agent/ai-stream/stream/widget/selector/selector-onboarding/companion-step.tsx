@@ -16,7 +16,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/skills/config";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface CompanionStepProps {

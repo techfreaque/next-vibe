@@ -1,6 +1,7 @@
 export const translations = {
   list: {
     title: "Captured Leads",
+    titleShort: "Captured Leads",
     description: "Everyone who submitted your lead magnet form",
     tag: "lead-magnet-captures",
     response: {

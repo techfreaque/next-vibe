@@ -13,6 +13,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Titel",
+    titleShort: "Rechnung",
     description: "Endpunkt-Beschreibung",
     form: {
       title: "Konfiguration",
@@ -80,6 +81,9 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Erfolg",
       description: "Vorgang erfolgreich abgeschlossen",
+    },
+    widget: {
+      back: "Zurück",
     },
   },
   customerId: {

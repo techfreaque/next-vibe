@@ -22,12 +22,13 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import {
   CampaignTypeFilterDB,
   CampaignTypeFilterOptions,
 } from "../../../messenger/accounts/enum";
 import { scopedTranslation } from "./i18n";
+import { CAMPAIGN_QUEUE_ALIAS } from "./constants";
 const CampaignQueueWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CampaignQueueWidget })),
 );
@@ -36,13 +37,16 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["leads", "campaigns", "queue"],
+  aliases: [CAMPAIGN_QUEUE_ALIAS] as const,
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsQueue",
+  category: "newsletter",
+  subCategory: "emailCampaignsQueue",
   icon: "list",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: CampaignQueueWidget,

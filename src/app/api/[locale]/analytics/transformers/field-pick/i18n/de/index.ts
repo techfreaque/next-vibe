@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Feld auswählen",
+    titleShort: "Feldauswahl",
     description:
       "Feld auswählen - extrahiert ein benanntes Feld (abgelöst, gibt leer zurück)",
     fields: {

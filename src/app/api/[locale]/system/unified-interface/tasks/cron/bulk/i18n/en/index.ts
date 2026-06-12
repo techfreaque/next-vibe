@@ -7,6 +7,7 @@ export const translations = {
   },
   post: {
     title: "Bulk Task Action",
+    titleShort: "Bulk Tasks",
     description:
       "Perform a bulk action (delete, enable, disable, run) on multiple cron tasks",
     fields: {

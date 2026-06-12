@@ -14,7 +14,14 @@ export async function tanstackLoader(): Promise<
 }
 
 export function TanstackPage({ children }: ThreadsLayoutData): JSX.Element {
-  return <PageLayout scrollable={false}>{children}</PageLayout>;
+  return (
+    <PageLayout
+      scrollable={false}
+      className="flex flex-col h-dvh w-full overflow-hidden"
+    >
+      {children}
+    </PageLayout>
+  );
 }
 
 export default function ThreadsLayout({

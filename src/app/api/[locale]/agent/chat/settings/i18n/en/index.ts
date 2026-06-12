@@ -8,7 +8,8 @@ export const translations = {
     FEMALE: "Female voice",
   },
   get: {
-    title: "Get Chat Settings",
+    title: "Settings",
+    titleShort: "Chat Settings",
     description: "Retrieve user's chat settings and preferences",
     errors: {
       validation: {
@@ -54,7 +55,8 @@ export const translations = {
     },
   },
   post: {
-    title: "Update Chat Settings",
+    title: "Save Settings",
+    titleShort: "Save Settings",
     description: "Update user's chat settings and preferences",
     container: {
       title: "Chat Settings",
@@ -101,8 +103,7 @@ export const translations = {
     searchProvider: {
       label: "Search Provider",
       description:
-        "Your preferred web search engine. Auto picks the cheapest available provider.",
-      auto: "Auto",
+        "Your preferred web search engine. Auto uses Brave if configured, falls back to Kagi.",
     },
     codingAgent: {
       label: "Coding Agent",

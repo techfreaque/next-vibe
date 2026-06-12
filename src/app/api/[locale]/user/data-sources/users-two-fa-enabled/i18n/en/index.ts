@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Users 2FA Enabled",
+    titleShort: "2FA Enabled",
     description: "Count of users with 2FA enabled per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },

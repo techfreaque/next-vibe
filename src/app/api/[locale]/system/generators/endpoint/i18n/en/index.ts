@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Endpoint Generator",
+    titleShort: "Endpoint Gen",
     description: "Generate endpoint.ts with dynamic imports",
     container: {
       title: "Endpoint Generator Configuration",

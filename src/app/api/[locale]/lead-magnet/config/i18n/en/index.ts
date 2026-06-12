@@ -2,6 +2,7 @@ export const translations = {
   get: {
     tag: "lead-magnet-config",
     title: "Lead Magnet Config",
+    titleShort: "LM Config",
     description: "View your current lead magnet configuration",
     response: {
       exists: "Config exists",
@@ -87,6 +88,7 @@ export const translations = {
   delete: {
     tag: "lead-magnet-config",
     title: "Disconnect Email Platform",
+    titleShort: "Disconnect",
     description:
       "Remove your lead magnet configuration and stop capturing leads",
     response: {

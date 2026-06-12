@@ -1,5 +1,7 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   title: "Mark Read",
+  titleShort: "Oznacz jako przeczytane",
   description: "Mark a message as read or unread",
   tag: "Inbox",
 

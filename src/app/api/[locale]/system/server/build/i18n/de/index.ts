@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Anwendung erstellen",
+    titleShort: "App bauen",
     description: "Anwendung für Produktionsbereitstellung erstellen",
     form: {
       title: "Build-Konfiguration",

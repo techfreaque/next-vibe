@@ -67,6 +67,10 @@ export interface InkBoxProps {
     | "doubleSingle"
     | "classic";
   borderColor?: string;
+  borderTop?: boolean;
+  borderBottom?: boolean;
+  borderLeft?: boolean;
+  borderRight?: boolean;
   display?: "flex" | "none";
 }
 
@@ -210,17 +214,44 @@ export function parseClassesToInkProps(className?: string): InkProps {
 
   const classes = className.split(/\s+/).filter(Boolean);
 
+  // Track whether an explicit `flex` class was found.
+  // In CSS, `display: flex` defaults to row direction.
+  // Div component defaults to column (matching block-level div stacking),
+  // but when `flex` is explicit, direction should be row unless overridden.
+  let hasExplicitFlex = false;
+  let hasExplicitDirection = false;
+  let hasBgColor: string | null = null;
+  let hasRounded = false;
+
   for (const cls of classes) {
     // Strip responsive / dark-mode / state prefixes: "lg:", "dark:", "hover:", etc.
     const bare = cls.includes(":") ? (cls.split(":").pop() ?? cls) : cls;
 
     // ── Visibility ─────────────────────────────────────────────────────────
+    // Pattern: "hidden sm:flex" means hidden mobile, visible desktop.
+    // CLI is wide-format (largest breakpoint), so responsive overrides
+    // that show the element must undo a prior `hidden`.
     if (bare === "hidden" || bare === "invisible") {
       hidden = true;
       continue;
     }
+    // pointer-events-none / pointer-events-auto — ignored in terminal
+    if (bare.startsWith("pointer-events-")) {
+      continue;
+    }
     if (bare === "visible" || bare === "block" || bare === "inline-block") {
+      hidden = false;
       box.display = "flex";
+      continue;
+    }
+    // Explicit flex / inline-flex → show element + CSS default is row direction
+    if (bare === "flex" || bare === "inline-flex") {
+      hidden = false;
+      hasExplicitFlex = true;
+      continue;
+    }
+    if (bare === "inline") {
+      hidden = false;
       continue;
     }
 
@@ -273,6 +304,33 @@ export function parseClassesToInkProps(className?: string): InkProps {
       continue;
     }
 
+    // ── Background color ──────────────────────────────────────────────────
+    // Track bg-* with real colors for bubble detection (rounded + bg → border).
+    // Ink Box doesn't support backgroundColor; we use borders instead.
+    if (bare.startsWith("bg-")) {
+      const token = bare.slice(3);
+      // Skip theme-default backgrounds that shouldn't stand out
+      if (
+        token !== "background" &&
+        token !== "card" &&
+        token !== "popover" &&
+        token !== "transparent" &&
+        !token.startsWith("black") &&
+        !token.startsWith("white")
+      ) {
+        const bgColor = resolveColor(token);
+        if (bgColor) {
+          hasBgColor = bgColor;
+        }
+      }
+      continue;
+    }
+    // ── Rounded ──────────────────────────────────────────────────────────
+    if (bare.startsWith("rounded") && bare !== "rounded-none") {
+      hasRounded = true;
+      continue;
+    }
+
     // ── Font weight ────────────────────────────────────────────────────────
     if (
       bare === "font-bold" ||
@@ -319,8 +377,14 @@ export function parseClassesToInkProps(className?: string): InkProps {
     // ── Opacity ────────────────────────────────────────────────────────────
     if (bare.startsWith("opacity-")) {
       const pct = parseInt(bare.slice(8), 10);
-      if (!isNaN(pct) && pct <= 60) {
-        text.dimColor = true;
+      if (!isNaN(pct)) {
+        // opacity-0 is typically used for hover-reveal patterns (invisible
+        // until hover/focus). In CLI there is no hover, so we ignore
+        // opacity-0 entirely — elements stay visible. Low but non-zero
+        // opacity (1-60) gets dimmed.
+        if (pct > 0 && pct <= 60) {
+          text.dimColor = true;
+        }
       }
       continue;
     }
@@ -340,21 +404,38 @@ export function parseClassesToInkProps(className?: string): InkProps {
       continue;
     }
 
+    // ── Grid → column layout in terminal ───────────────────────────────────
+    // CSS grid has no terminal equivalent - collapse all grid layouts to column
+    if (
+      bare === "grid" ||
+      bare.startsWith("grid-cols-") ||
+      bare.startsWith("grid-rows-") ||
+      bare.startsWith("col-span-") ||
+      bare.startsWith("row-span-")
+    ) {
+      box.flexDirection = "column";
+      continue;
+    }
+
     // ── Flex direction ─────────────────────────────────────────────────────
     if (bare === "flex-col" || bare === "flex-column") {
       box.flexDirection = "column";
+      hasExplicitDirection = true;
       continue;
     }
     if (bare === "flex-row") {
       box.flexDirection = "row";
+      hasExplicitDirection = true;
       continue;
     }
     if (bare === "flex-col-reverse") {
       box.flexDirection = "column-reverse";
+      hasExplicitDirection = true;
       continue;
     }
     if (bare === "flex-row-reverse") {
       box.flexDirection = "row-reverse";
+      hasExplicitDirection = true;
       continue;
     }
     if (bare === "flex-wrap") {
@@ -491,6 +572,20 @@ export function parseClassesToInkProps(className?: string): InkProps {
       continue;
     }
 
+    // ── Margin auto → align-self ─────────────────────────────────────────
+    if (bare === "ml-auto") {
+      box.alignSelf = "flex-end";
+      continue;
+    }
+    if (bare === "mr-auto") {
+      box.alignSelf = "flex-start";
+      continue;
+    }
+    if (bare === "mx-auto") {
+      box.alignSelf = "center";
+      continue;
+    }
+
     // ── Margin ─────────────────────────────────────────────────────────────
     if (bare.startsWith("m-")) {
       const v = spacingToChars(bare.slice(2));
@@ -548,6 +643,42 @@ export function parseClassesToInkProps(className?: string): InkProps {
       box.height = "100%";
       continue;
     }
+    // ── Max-width → width (Ink has no maxWidth, approximate with width) ──
+    if (bare.startsWith("max-w-")) {
+      const token = bare.slice(6);
+      // Arbitrary value: max-w-[75%] → width: "75%"
+      if (token.startsWith("[") && token.endsWith("]")) {
+        const inner = token.slice(1, -1);
+        if (inner.endsWith("%")) {
+          box.width = inner;
+        }
+      }
+      // Named sizes → approximate terminal columns (1 col ≈ 8px)
+      // These cap width; Ink has no maxWidth, so we set width directly.
+      // Only apply when no explicit width is already set.
+      else if (!box.width) {
+        const named: Record<string, number> = {
+          xs: 40, // 320px
+          sm: 48, // 384px
+          md: 56, // 448px
+          lg: 64, // 512px
+          xl: 72, // 576px
+          "2xl": 84, // 672px
+          "3xl": 96, // 768px
+          "4xl": 112, // 896px
+          "5xl": 128, // 1024px
+          "6xl": 144, // 1152px
+          "7xl": 160, // 1280px
+          full: 0, // 100% - skip
+          screen: 0, // 100vw - skip
+        };
+        const cols = named[token];
+        if (cols) {
+          box.width = cols;
+        }
+      }
+      continue;
+    }
     if (bare.startsWith("min-w-")) {
       const v = parseInt(bare.slice(6), 10);
       if (!isNaN(v)) {
@@ -579,8 +710,63 @@ export function parseClassesToInkProps(className?: string): InkProps {
       continue;
     }
 
-    // Everything else (bg-*, border-*, rounded-*, shadow-*, ring-*, cursor-*,
-    // transition-*, animate-*, z-*, absolute, relative, fixed, etc.) - ignored
+    // ── Borders → Ink borderStyle ─────────────────────────────────────────
+    // Tailwind: border, border-t, border-b, border-l, border-r
+    // Ink: borderStyle + borderTop/borderBottom/borderLeft/borderRight
+    if (bare === "border") {
+      box.borderStyle = "single";
+      continue;
+    }
+    if (bare === "border-t") {
+      box.borderStyle = "single";
+      box.borderTop = true;
+      box.borderBottom = false;
+      box.borderLeft = false;
+      box.borderRight = false;
+      continue;
+    }
+    if (bare === "border-b") {
+      box.borderStyle = "single";
+      box.borderTop = false;
+      box.borderBottom = true;
+      box.borderLeft = false;
+      box.borderRight = false;
+      continue;
+    }
+    if (bare === "border-l") {
+      box.borderStyle = "single";
+      box.borderTop = false;
+      box.borderBottom = false;
+      box.borderLeft = true;
+      box.borderRight = false;
+      continue;
+    }
+    if (bare === "border-r") {
+      box.borderStyle = "single";
+      box.borderTop = false;
+      box.borderBottom = false;
+      box.borderLeft = false;
+      box.borderRight = true;
+      continue;
+    }
+
+    // Everything else (bg-*, border-color-*, rounded-*, shadow-*, ring-*,
+    // cursor-*, transition-*, animate-*, z-*, absolute, relative, etc.) - ignored
+  }
+
+  // When `flex` is explicit and no direction was set, default to row
+  // (matching CSS flex default). Without explicit `flex`, Div component
+  // applies its own column default for block-level div stacking.
+  if (hasExplicitFlex && !hasExplicitDirection) {
+    box.flexDirection = "row";
+  }
+
+  // When both rounded + bg-color are present (e.g. message bubbles),
+  // add a rounded border for visual containment. On web these elements
+  // have a background color; in CLI, borders serve the same purpose.
+  if (hasRounded && hasBgColor && !box.borderStyle) {
+    box.borderStyle = "round";
+    box.borderColor = hasBgColor;
   }
 
   return { text, box, hidden };

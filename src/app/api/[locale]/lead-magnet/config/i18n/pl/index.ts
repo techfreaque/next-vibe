@@ -1,7 +1,9 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   get: {
     tag: "lead-magnet-config",
     title: "Konfiguracja Lead Magnet",
+    titleShort: "Konfiguracja LM",
     description: "Pobierz swoją aktualną konfigurację lead magnet",
     response: {
       exists: "Konfiguracja istnieje",
@@ -84,6 +86,7 @@ export const translations = {
   delete: {
     tag: "lead-magnet-config",
     title: "Odłącz platformę e-mail",
+    titleShort: "Odłącz",
     description: "Usuń konfigurację lead magnet i zatrzymaj zbieranie leadów",
     response: {
       deleted: "Odłączono",

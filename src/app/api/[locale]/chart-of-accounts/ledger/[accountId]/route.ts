@@ -8,14 +8,13 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, urlPathParams, user, logger, locale }) => {
-      return await CoaLedgerRepository.getLedger(
+    handler: async ({ data, urlPathParams, user, logger, locale }) =>
+      CoaLedgerRepository.getLedger(
         urlPathParams.accountId,
         data,
         user.id,
         logger,
         locale,
-      );
-    },
+      ),
   },
 });

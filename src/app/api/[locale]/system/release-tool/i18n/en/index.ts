@@ -1,5 +1,6 @@
 export const translations = {
   title: "Release Tool",
+  titleShort: "Release Tool",
   description:
     "Manage package releases with version bumping, git tagging, and CI/CD integration",
   category: "Release Tool",

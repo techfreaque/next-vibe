@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   generate: {
     post: {
       title: "TanStack-Routen Generieren",
+      titleShort: "TanStack-Routen",
       description:
         "TanStack Router Kompatibilitäts-Wrapper für Next.js-Seiten generieren",
       response: {

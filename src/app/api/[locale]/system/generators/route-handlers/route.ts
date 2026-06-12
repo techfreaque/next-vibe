@@ -6,15 +6,15 @@ import definitions from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: async (props) => {
-      const { RouteHandlersGeneratorRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return RouteHandlersGeneratorRepository.generateRouteHandlers(
+    handler: async (props) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).RouteHandlersGeneratorRepository.generateRouteHandlers(
         props.data,
         props.logger,
         props.t,
-      );
-    },
+      ),
   },
 });

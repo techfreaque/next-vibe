@@ -8,8 +8,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: createSkillDefinition,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger, t }) => {
-      return SkillsRepository.createSkill(data, user, logger, t);
-    },
+    handler: ({ data, user, logger, t }) =>
+      SkillsRepository.createSkill(data, user, logger, t),
   },
 });

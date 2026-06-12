@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   get: {
     title: "Graph-Versionsverlauf",
+    titleShort: "Graph-Versionen",
     description:
       "Versionskette fuer einen Graphen abrufen (Vorfahren-Traversierung)",
     fields: {

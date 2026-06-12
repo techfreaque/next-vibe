@@ -28,6 +28,7 @@ export const translations = {
   },
   upload: {
     title: "Upload Avatar",
+    titleShort: "Upload Avatar",
     description: "Upload a profile avatar image",
     groups: {
       fileUpload: {
@@ -110,6 +111,7 @@ export const translations = {
   },
   delete: {
     title: "Delete Avatar",
+    titleShort: "Delete Avatar",
     description: "Remove the current profile avatar",
     response: {
       title: "Delete Response",

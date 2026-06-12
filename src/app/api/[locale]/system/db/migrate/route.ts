@@ -13,11 +13,11 @@ import migrateEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: migrateEndpoints,
   [Methods.POST]: {
-    handler: async ({ t, logger }) => {
-      const { DatabaseMigrationRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return DatabaseMigrationRepository.runMigrations(t, logger);
-    },
+    handler: async ({ t, logger }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).DatabaseMigrationRepository.runMigrations(t, logger),
   },
 });

@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "SSH",
 
   enums: {
@@ -11,9 +12,10 @@ export const translations = {
   },
 
   get: {
-    title: "SSH-Verbindungen auflisten",
+    title: "Verbindungen",
+    titleShort: "Verbindungen",
     description:
-      "Alle gespeicherten SSH-Verbindungen für den aktuellen Benutzer auflisten",
+      "Alle erreichbaren Maschinen — lokale Shell, SSH-Server und Remote-Instanzen",
     errors: {
       validation: {
         title: "Validierungsfehler",
@@ -43,23 +45,33 @@ export const translations = {
     },
     success: {
       title: "Verbindungen aufgelistet",
-      description: "SSH-Verbindungen abgerufen",
+      description: "Alle Maschinenverbindungen abgerufen",
+    },
+    response: {
+      connections: {
+        title: "Verbindungen",
+      },
     },
   },
   widget: {
-    title: "SSH-Verbindungen",
-    addButton: "Verbindung hinzufügen",
-    testButton: "Testen",
-    deleteButton: "Löschen",
-    emptyState:
-      "Noch keine SSH-Verbindungen. Fügen Sie eine hinzu, um auf entfernte Maschinen zuzugreifen.",
-    labelCol: "Name",
-    hostCol: "Host",
-    userCol: "Benutzer",
-    authTypeCol: "Authentifizierung",
+    title: "Verbindungen",
+    back: "Zurück",
+    addSsh: "SSH hinzufügen",
+    connectRemote: "Remote verbinden",
+    openTerminal: "Terminal",
+    viewRemote: "Details",
     defaultBadge: "Standard",
-    testingLabel: "Wird getestet...",
-    testSuccess: "Verbunden",
-    testFailed: "Fehlgeschlagen",
+    localType: "Lokal",
+    sshType: "SSH",
+    remoteType: "Remote",
+    healthHealthy: "Verbunden",
+    healthWarning: "Langsam",
+    healthCritical: "Nicht erreichbar",
+    healthDisconnected: "Offline",
+    noConnections: "Keine Maschinen konfiguriert",
+    noConnectionsHint:
+      "SSH-Verbindung hinzufügen oder Remote-Instanz verbinden.",
+    emptyState:
+      "Noch keine Verbindungen. Fügen Sie eine hinzu, um auf entfernte Maschinen zuzugreifen.",
   },
 };

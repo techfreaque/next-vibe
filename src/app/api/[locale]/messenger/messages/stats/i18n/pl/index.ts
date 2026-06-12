@@ -24,6 +24,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Statystyki E-maili",
+    titleShort: "Statystyki e-mail",
     description: "Pobierz kompleksowe statystyki i metryki e-maili",
     form: {
       title: "Żądanie Statystyk E-maili",

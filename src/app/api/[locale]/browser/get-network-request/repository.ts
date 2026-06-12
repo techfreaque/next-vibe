@@ -41,6 +41,7 @@ export class GetNetworkRequestRepository {
             requestFilePath: data.requestFilePath,
             responseFilePath: data.responseFilePath,
           }),
+          instanceId: data.instanceId,
         },
         t,
         logger,

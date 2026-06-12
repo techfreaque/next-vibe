@@ -1,6 +1,6 @@
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -8,7 +8,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
+import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { canManageFolder } from "@/app/api/[locale]/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -26,6 +26,27 @@ import type {
   FolderUpdateRequestOutput,
   FolderUpdateResponseOutput,
 } from "./update/definition";
+
+/**
+ * Collect the given folder ID and all its descendants recursively.
+ */
+function collectDescendantIds(
+  rootId: string,
+  allFolders: { id: string; parentId: string | null }[],
+): string[] {
+  const result: string[] = [rootId];
+  const queue = [rootId];
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    for (const f of allFolders) {
+      if (f.parentId === current) {
+        result.push(f.id);
+        queue.push(f.id);
+      }
+    }
+  }
+  return result;
+}
 
 /**
  * Folder Repository - Static class pattern
@@ -222,6 +243,19 @@ export class FolderRepository {
           message: t("delete.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
+      }
+
+      // Collect all descendant folder IDs (the folder itself + all nested children)
+      // We need to delete their threads first since chatThreads.folderId has onDelete: "set null"
+      const allFolders = await db.select().from(chatFolders);
+      const descendantIds = collectDescendantIds(data.id, allFolders);
+
+      // Delete all threads in this folder and all descendant folders
+      // Cascade from chatThreads → chatMessages is handled by FK onDelete: "cascade"
+      if (descendantIds.length > 0) {
+        await db
+          .delete(chatThreads)
+          .where(inArray(chatThreads.folderId, descendantIds));
       }
 
       await db.delete(chatFolders).where(eq(chatFolders.id, data.id));

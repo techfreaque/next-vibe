@@ -1,5 +1,6 @@
 export const translations = {
   title: "User Statistics",
+  titleShort: "User Stats",
   description: "Comprehensive user analytics and statistics",
   category: "Users",
   tag: "Statistics",

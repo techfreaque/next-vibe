@@ -5,6 +5,9 @@
 
 import "server-only";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
+
 import type { SignalEvent } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
 export class OrEvaluatorRepository {
@@ -22,5 +25,12 @@ export class OrEvaluatorRepository {
     return [...tsMap.entries()]
       .toSorted(([a], [b]) => a - b)
       .map(([ts, fired]) => ({ timestamp: new Date(ts), fired }));
+  }
+
+  static handle(data: {
+    signals: SignalEvent[][];
+  }): ResponseType<{ result: SignalEvent[] }> {
+    const result = OrEvaluatorRepository.computeOr(data.signals);
+    return success({ result });
   }
 }

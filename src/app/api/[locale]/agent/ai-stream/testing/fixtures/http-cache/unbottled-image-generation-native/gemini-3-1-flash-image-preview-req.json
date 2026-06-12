@@ -1,0 +1,16 @@
+{
+  "url": "http://localhost:3002/api/en-GLOBAL/agent/ai-stream/ws-provider/stream",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "[redacted]"
+  },
+  "body": {
+    "content": "[T11 native-image] Generate an image of a blue triangle. Output the image directly (no tool call needed). End your reply with STEP_OK if the image was generated, or FAILED: <reason> if generation failed.",
+    "model": "gemini-3.1-flash-image-preview",
+    "skill": "quality-tester",
+    "timezone": "UTC",
+    "threadId": "c19a7407-54e6-4774-97ff-e5c83ef22423",
+    "instanceId": "c19a7407-54e6-4774-97ff-e5c83ef22423"
+  }
+}

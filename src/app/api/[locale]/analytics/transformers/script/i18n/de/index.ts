@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Skript",
+    titleShort: "Skript",
     description:
       "Skript - wendet eine benutzerdefinierte Sandbox-Funktion auf eine Zeitreihe an",
     fields: {

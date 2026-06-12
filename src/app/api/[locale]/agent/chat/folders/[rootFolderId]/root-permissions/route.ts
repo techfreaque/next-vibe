@@ -13,13 +13,12 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
-      return await RootFolderPermissionsRepository.getRootFolderPermissions(
+    handler: ({ data, user, logger, locale }) =>
+      RootFolderPermissionsRepository.getRootFolderPermissions(
         data,
         user,
         locale,
         logger,
-      );
-    },
+      ),
   },
 });

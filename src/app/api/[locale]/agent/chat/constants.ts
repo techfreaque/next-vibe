@@ -6,23 +6,22 @@
 import { envClient } from "@/config/env-client";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  UserPermissionRole,
+  UserRole,
+} from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  DEFAULT_AI_PINNED_IDS,
+  DEFAULT_WEB_PINNED_IDS,
+} from "@/app/api/[locale]/system/generated/endpoints-meta/default-pins";
 
 import { DefaultFolderId } from "./config";
 
-import { SSH_EXEC_ALIAS } from "../../ssh/exec/constants";
-import { SSH_FILES_READ_ALIAS } from "../../ssh/files/read/constants";
-import { SSH_FILES_WRITE_ALIAS } from "../../ssh/files/write/constants";
-import { SQL_ALIAS } from "../../system/db/sql/constants";
-import { TOOL_HELP_ALIAS } from "../../system/help/constants";
-import { REBUILD_ALIAS } from "../../system/server/rebuild/constants";
-import { EXECUTE_TOOL_ALIAS } from "../../system/unified-interface/ai/execute-tool/constants";
-import { WAIT_FOR_TASK_ALIAS } from "../../system/unified-interface/tasks/wait-for-task/constants";
-import { AI_RUN_ALIAS } from "../ai-stream/run/constants";
 import { CODING_AGENT_ALIAS } from "../coding-agent/constants";
 import {
   CORTEX_DELETE_ALIAS,
   CORTEX_EDIT_ALIAS,
+  CORTEX_EXEC_ALIAS,
   CORTEX_LIST_ALIAS,
   CORTEX_MKDIR_ALIAS,
   CORTEX_MOVE_ALIAS,

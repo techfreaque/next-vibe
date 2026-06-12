@@ -1,9 +1,3 @@
-import { translations as emailServiceTranslations } from "../../providers/email/smtp-client/i18n/de";
-import { translations as imapClientTranslations } from "../../providers/email/imap-client/i18n/de";
-import { translations as messagesTranslations } from "../../messages/i18n/de";
-import { translations as messagingTranslations } from "../../messaging/i18n/de";
-import { translations as sendTranslations } from "../../send/i18n/de";
-import { translations as smtpClientTranslations } from "../../providers/email/smtp-client/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -483,11 +477,1816 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-  emailService: emailServiceTranslations,
-  imapClient: imapClientTranslations,
-  messages: messagesTranslations,
-  send: sendTranslations,
-  smtpClient: smtpClientTranslations,
+  emailService: {
+    tag: "SMTP-Client",
+    category: "E-Mail-Dienste",
+    components: {
+      email: {
+        tagline: "KI-Plattform für freie Meinungsäußerung",
+        footer: {
+          needHelp: "Brauchen Sie Hilfe?",
+          helpText: "Brauchen Sie Hilfe? Kontaktieren Sie uns unter",
+          unsubscribeText: "Möchten Sie diese E-Mails nicht mehr erhalten?",
+          unsubscribeLink: "Abmelden",
+          copyright: "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
+          visitWebsite: "Website besuchen",
+          allRightsReserved:
+            "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
+          feedbackHook: "Etwas zu sagen? Antworten - wir lesen es wirklich.",
+          feedbackBody:
+            "Fehler melden, Funktion anfragen oder sagen, was fehlt. Nuetzliches Feedback bringt dir {{credits}} Credits — ein ganzer Monat gratis.",
+          feedbackLink: "Feedback senden →",
+          footerSeparator: " · ",
+        },
+      },
+      post: {
+        title: "Titel",
+        description: "Endpunkt-Beschreibung",
+        form: {
+          title: "Konfiguration",
+          description: "Parameter konfigurieren",
+        },
+        response: {
+          title: "Antwort",
+          description: "Antwortdaten",
+        },
+        errors: {
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description: "Authentifizierung erforderlich",
+          },
+          validation: {
+            title: "Validierungsfehler",
+            description: "Ungültige Anfrageparameter",
+          },
+          server: {
+            title: "Serverfehler",
+            description: "Interner Serverfehler",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unbekannter Fehler ist aufgetreten",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Netzwerkfehler aufgetreten",
+          },
+          forbidden: {
+            title: "Verboten",
+            description: "Zugriff verboten",
+          },
+          notFound: {
+            title: "Nicht gefunden",
+            description: "Ressource nicht gefunden",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Datenkonflikt aufgetreten",
+          },
+        },
+        success: {
+          title: "Erfolg",
+          description: "Vorgang erfolgreich abgeschlossen",
+        },
+      },
+    },
+    emailSending: {
+      email: {
+        defaultSenderName: "System",
+        errors: {
+          sending_failed:
+            "E-Mail an {{recipient}} konnte nicht gesendet werden",
+        },
+      },
+    },
+    emailHandling: {
+      email: {
+        errors: {
+          rendering_failed: "E-Mail-Vorlage konnte nicht gerendert werden",
+          send_failed: "E-Mail konnte nicht gesendet werden",
+          email_failed_subject: "E-Mail fehlgeschlagen",
+          unknown_recipient: "Unbekannter Empfänger",
+          unknown_sender: "System",
+          email_render_exception: "E-Mail-Rendering-Ausnahme aufgetreten",
+          batch_send_failed: "Batch-E-Mail-Versand fehlgeschlagen",
+        },
+      },
+    },
+    sending: {
+      errors: {
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung für SMTP-Sendevorgänge erforderlich",
+        },
+        server: {
+          title: "Server-Fehler",
+          description: "Ein Fehler ist auf dem SMTP-Server aufgetreten",
+        },
+        rejected: {
+          title: "E-Mail abgelehnt",
+          defaultReason: "E-Mail vom Server abgelehnt",
+        },
+        no_recipients: {
+          title: "Keine Empfänger akzeptiert",
+          defaultReason: "Keine Empfänger akzeptiert",
+        },
+        rate_limit: {
+          title: "Ratenlimit überschritten",
+        },
+        capacity: {
+          title: "Kapazitätsfehler",
+        },
+        no_account: {
+          title: "Kein SMTP-Konto verfügbar",
+        },
+      },
+    },
+    emailMetadata: {
+      errors: {
+        server: {
+          title: "E-Mail-Metadaten Serverfehler",
+          description: "Speichern von E-Mail-Metadaten fehlgeschlagen",
+        },
+      },
+    },
+    enums: {
+      status: {
+        active: "Aktiv",
+        inactive: "Inaktiv",
+        error: "Fehler",
+        testing: "Testen",
+      },
+      securityType: {
+        none: "Keine",
+        tls: "TLS",
+        ssl: "SSL",
+        starttls: "STARTTLS",
+      },
+      statusFilter: {
+        all: "Alle Status",
+      },
+      healthStatus: {
+        healthy: "Gesund",
+        degraded: "Beeinträchtigt",
+        unhealthy: "Ungesund",
+        unknown: "Unbekannt",
+      },
+      healthStatusFilter: {
+        all: "Alle Gesundheitsstatus",
+      },
+      sortField: {
+        name: "Name",
+        status: "Status",
+        createdAt: "Erstellt am",
+        updatedAt: "Aktualisiert am",
+        priority: "Priorität",
+        totalEmailsSent: "Gesamt gesendete E-Mails",
+        lastUsedAt: "Zuletzt verwendet",
+      },
+      campaignType: {
+        leadCampaign: "Lead-Kampagne",
+        newsletter: "Newsletter",
+        signupNurture: "Anmelde-Pflege",
+        retention: "Kundenbindung",
+        winback: "Rückgewinnung",
+        transactional: "Transaktional",
+        notification: "Benachrichtigung",
+        system: "System",
+      },
+      campaignTypeFilter: {
+        all: "Alle Kampagnentypen",
+      },
+      selectionRuleSortField: {
+        name: "Name",
+        priority: "Priorität",
+        campaignType: "Kampagnentyp",
+        journeyVariant: "Journey-Variante",
+        campaignStage: "Kampagnenstufe",
+        country: "Land",
+        language: "Sprache",
+        createdAt: "Erstellt am",
+        updatedAt: "Aktualisiert am",
+        emailsSent: "Gesendete E-Mails",
+        successRate: "Erfolgsrate",
+        lastUsedAt: "Zuletzt verwendet",
+      },
+      selectionRuleStatusFilter: {
+        all: "Alle",
+        active: "Aktiv",
+        inactive: "Inaktiv",
+        default: "Standard",
+        failover: "Failover",
+      },
+      loadBalancingStrategy: {
+        roundRobin: "Round-Robin",
+        weighted: "Gewichtet",
+        priority: "Priorität",
+        leastUsed: "Am wenigsten verwendet",
+      },
+      testResult: {
+        success: "Erfolg",
+        authFailed: "Authentifizierung fehlgeschlagen",
+        connectionFailed: "Verbindung fehlgeschlagen",
+        timeout: "Zeitüberschreitung",
+        unknownError: "Unbekannter Fehler",
+      },
+    },
+  },
+  imapClient: {
+    category: "IMAP-Client",
+    tag: "IMAP-Client",
+    tags: {
+      health: "Gesundheit",
+      monitoring: "Überwachung",
+      sync: "Synchronisation",
+      accounts: "Konten",
+      folders: "Ordner",
+      messages: "Nachrichten",
+      config: "Konfiguration",
+    },
+    messages: {
+      tag: "Nachrichten",
+      id: {
+        widget: {
+          markRead: "Als gelesen markieren",
+          markUnread: "Als ungelesen markieren",
+          flag: "Markieren",
+          unflag: "Markierung entfernen",
+        },
+      },
+      errors: {
+        server: { title: "Serverfehler" },
+        notFound: { title: "Nachricht nicht gefunden" },
+        accountNotFound: { title: "Konto nicht gefunden" },
+        syncFailed: { title: "Synchronisierung fehlgeschlagen" },
+        syncSuccess: { message: "Nachrichten erfolgreich synchronisiert" },
+        list: {
+          get: {
+            errors: {
+              server: { title: "Serverfehler beim Auflisten von Nachrichten" },
+            },
+          },
+        },
+      },
+    },
+    sync: {
+      category: "IMAP-Client",
+
+      title: "IMAP-Synchronisation",
+      description: "IMAP-Synchronisierungsdienst",
+      container: {
+        title: "IMAP-Sync-Konfiguration",
+        description: "IMAP-Synchronisierungsparameter konfigurieren",
+      },
+      accountIds: {
+        label: "Konto-IDs",
+        description: "IMAP-Konto-IDs zum Synchronisieren",
+        placeholder: "Konto-IDs durch Kommas getrennt eingeben",
+      },
+      force: {
+        label: "Sync erzwingen",
+        description:
+          "Synchronisation auch bei kürzlich erfolgter Sync erzwingen",
+      },
+      dryRun: {
+        label: "Testlauf",
+        description: "Testlauf ohne Änderungen durchführen",
+      },
+      maxMessages: {
+        label: "Max. Nachrichten",
+        description:
+          "Maximale Anzahl Nachrichten pro Ordner zu synchronisieren",
+        placeholder: "Maximale Nachrichtenanzahl eingeben",
+      },
+      post: {
+        title: "Titel",
+        description: "Endpunkt-Beschreibung",
+        form: {
+          title: "Konfiguration",
+          description: "Parameter konfigurieren",
+        },
+        response: {
+          title: "Antwort",
+          description: "Antwortdaten",
+          result: {
+            title: "Sync-Ergebnisse",
+            description: "Detaillierte Synchronisationsergebnisse",
+            accountsProcessed: "Verarbeitete Konten",
+            foldersProcessed: "Verarbeitete Ordner",
+            messagesProcessed: "Verarbeitete Nachrichten",
+            messagesAdded: "Hinzugefügte Nachrichten",
+            messagesUpdated: "Aktualisierte Nachrichten",
+            messagesDeleted: "Gelöschte Nachrichten",
+            duration: "Dauer",
+          },
+          errors: {
+            error: {
+              title: "Sync-Fehler",
+              description: "Fehlerdetails",
+              code: "Fehlercode",
+              message: "Fehlermeldung",
+            },
+          },
+        },
+        errors: {
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description: "Authentifizierung erforderlich",
+          },
+          validation: {
+            title: "Validierungsfehler",
+            description: "Ungültige Anfrageparameter",
+          },
+          server: {
+            title: "Serverfehler",
+            description: "Interner Serverfehler",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unbekannter Fehler ist aufgetreten",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Netzwerkfehler aufgetreten",
+          },
+          forbidden: {
+            title: "Verboten",
+            description: "Zugriff verboten",
+          },
+          notFound: {
+            title: "Nicht gefunden",
+            description: "Ressource nicht gefunden",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Datenkonflikt aufgetreten",
+          },
+        },
+        success: {
+          title: "Erfolg",
+          description: "Vorgang erfolgreich abgeschlossen",
+        },
+      },
+      errors: {
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Anfrageparameter",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Interner Serverfehler",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unbekannter Fehler ist aufgetreten",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Zugriff verboten",
+        },
+      },
+      success: {
+        title: "Erfolg",
+        description: "Vorgang erfolgreich abgeschlossen",
+      },
+      widget: {
+        title: "Vollständige IMAP-Synchronisierung",
+        options: "Synchronisierungsoptionen",
+        noAccounts: "Keine IMAP-Konten konfiguriert",
+        result: "Synchronisierungsergebnis",
+        duration: "Dauer",
+        errors: "Fehler",
+        accountsProcessed: "Verarbeitete Konten",
+        foldersProcessed: "Verarbeitete Ordner",
+        messagesProcessed: "Verarbeitete Nachrichten",
+        messagesAdded: "Hinzugefügte Nachrichten",
+        messagesUpdated: "Aktualisierte Nachrichten",
+        messagesDeleted: "Gelöschte Nachrichten",
+        submit: "Sync starten",
+        submitting: "Synchronisiere...",
+      },
+    },
+    imapErrors: {
+      accounts: {
+        post: {
+          error: {
+            duplicate: {
+              title: "Konto existiert bereits",
+            },
+            server: {
+              title: "Serverfehler beim Erstellen des Kontos",
+            },
+          },
+        },
+        get: {
+          error: {
+            not_found: {
+              title: "Konto nicht gefunden",
+            },
+            server: {
+              title: "Serverfehler beim Abrufen des Kontos",
+            },
+          },
+        },
+        put: {
+          error: {
+            not_found: {
+              title: "Konto nicht gefunden",
+            },
+            duplicate: {
+              title: "Konto mit dieser E-Mail existiert bereits",
+            },
+            server: {
+              title: "Serverfehler beim Aktualisieren des Kontos",
+            },
+          },
+        },
+        delete: {
+          error: {
+            not_found: {
+              title: "Konto nicht gefunden",
+            },
+            server: {
+              title: "Serverfehler beim Löschen des Kontos",
+            },
+          },
+          success: {
+            title: "Konto erfolgreich gelöscht",
+          },
+        },
+      },
+      folders: {
+        get: {
+          error: {
+            not_found: {
+              title: "Ordner nicht gefunden",
+            },
+            server: {
+              title: "Serverfehler beim Abrufen des Ordners",
+            },
+          },
+        },
+        sync: {
+          error: {
+            missing_account: {
+              title: "Konto für Ordnersynchronisation nicht gefunden",
+            },
+          },
+        },
+      },
+      messages: {
+        get: {
+          error: {
+            not_found: {
+              title: "Nachricht nicht gefunden",
+            },
+            server: {
+              title: "Serverfehler beim Abrufen der Nachricht",
+            },
+          },
+        },
+      },
+      connection: {
+        failed: "Verbindung fehlgeschlagen",
+        timeout: {
+          title: "Verbindungszeitüberschreitung",
+        },
+        test: {
+          failed: "Verbindungstest fehlgeschlagen",
+        },
+        close: {
+          failed: "Verbindung konnte nicht geschlossen werden",
+        },
+        folders: {
+          list: {
+            failed: "Ordner konnten nicht aufgelistet werden",
+          },
+        },
+        messages: {
+          list: {
+            failed: "Nachrichten konnten nicht aufgelistet werden",
+          },
+        },
+      },
+      sync: {
+        failed: "Synchronisation fehlgeschlagen",
+        account: {
+          failed: "Kontosynchronisation fehlgeschlagen",
+        },
+        folder: {
+          failed: "Ordnersynchronisation fehlgeschlagen",
+        },
+        message: {
+          failed: "Nachrichtensynchronisation fehlgeschlagen",
+        },
+        post: {
+          error: {
+            server: {
+              title: "Serverfehler während der Synchronisation",
+            },
+          },
+        },
+      },
+      validation: {
+        account: {
+          username: {
+            required: "Benutzername ist erforderlich",
+          },
+          port: {
+            invalid: "Ungültige Portnummer",
+          },
+          host: {
+            invalid: "Ungültiger Host",
+          },
+        },
+      },
+    },
+    imap: {
+      "example.com": "imap.example.com",
+      "gmail.com": "imap.gmail.com",
+      connection: {
+        test: {
+          success: "Verbindungstest erfolgreich",
+          failed: "Verbindungstest fehlgeschlagen",
+          timeout: "Verbindungstest-Zeitüberschreitung",
+        },
+      },
+      sync: {
+        messages: {
+          accounts: {
+            success: "Alle Konten erfolgreich synchronisiert",
+            successWithErrors: "Konten mit Fehlern synchronisiert",
+          },
+          account: {
+            success: "Konto erfolgreich synchronisiert",
+            successWithErrors: "Konto mit Fehlern synchronisiert",
+          },
+          folders: {
+            success: "Ordner erfolgreich synchronisiert",
+            successWithErrors: "Ordner mit Fehlern synchronisiert",
+          },
+          messages: {
+            success: "Nachrichten erfolgreich synchronisiert",
+            successWithErrors: "Nachrichten mit Fehlern synchronisiert",
+          },
+        },
+        errors: {
+          default: "IMAP-Synchronisation fehlgeschlagen",
+          account_failed: "Kontosynchronisation fehlgeschlagen",
+          folder_sync_failed: "Ordnersynchronisation fehlgeschlagen",
+          message_sync_error: "Nachrichtensynchronisationsfehler",
+          message_sync_failed: "Nachrichtensynchronisation fehlgeschlagen",
+        },
+      },
+    },
+    enums: {
+      loggingLevel: {
+        error: "Fehler",
+        warn: "Warnung",
+        info: "Info",
+        debug: "Debug",
+      },
+      syncStatus: {
+        pending: "Ausstehend",
+        syncing: "Synchronisierung",
+        synced: "Synchronisiert",
+        error: "Fehler",
+      },
+      overallSyncStatus: {
+        idle: "Inaktiv",
+        running: "Läuft",
+        completed: "Abgeschlossen",
+        failed: "Fehlgeschlagen",
+        cancelled: "Abgebrochen",
+      },
+      sortOrder: {
+        asc: "Aufsteigend",
+        desc: "Absteigend",
+      },
+      authMethod: {
+        plain: "Einfach",
+        oauth2: "OAuth2",
+        xoauth2: "XOAuth2",
+      },
+      imapAuthMethod: {
+        plain: "Einfach",
+        oauth2: "OAuth2",
+        xoauth2: "XOAuth2",
+      },
+      specialUseType: {
+        inbox: "Posteingang",
+        sent: "Gesendet",
+        drafts: "Entwürfe",
+        trash: "Papierkorb",
+        junk: "Spam",
+        archive: "Archiv",
+      },
+      folderSortField: {
+        name: "Name",
+        displayName: "Anzeigename",
+        messageCount: "Nachrichtenanzahl",
+        unseenCount: "Ungelesene Anzahl",
+        createdAt: "Erstellt am",
+      },
+      accountSortField: {
+        name: "Name",
+        email: "E-Mail",
+        host: "Host",
+        enabled: "Aktiviert",
+        lastSyncAt: "Letzte Synchronisation",
+        createdAt: "Erstellt am",
+      },
+      connectionStatus: {
+        disconnected: "Getrennt",
+        connecting: "Verbindung wird hergestellt",
+        connected: "Verbunden",
+        error: "Fehler",
+        timeout: "Zeitüberschreitung",
+      },
+      syncStatusFilter: {
+        all: "Alle Synchronisationsstatus",
+      },
+      accountStatusFilter: {
+        all: "Alle Kontostatus",
+        enabled: "Aktiviert",
+        disabled: "Deaktiviert",
+      },
+      accountFilter: {
+        all: "Alle Konten",
+      },
+      messageSortField: {
+        subject: "Betreff",
+        senderName: "Absendername",
+        senderEmail: "Absender-E-Mail",
+        recipientEmail: "Empfänger-E-Mail",
+        recipientName: "Empfängername",
+        isRead: "Gelesen-Status",
+        isFlagged: "Markiert",
+        messageSize: "Nachrichtengröße",
+        sentAt: "Gesendet am",
+        createdAt: "Erstellt am",
+      },
+      messageStatusFilter: {
+        all: "Alle Nachrichten",
+        read: "Gelesen",
+        unread: "Ungelesen",
+        flagged: "Markiert",
+        unflagged: "Nicht markiert",
+        draft: "Entwurf",
+        deleted: "Gelöscht",
+        hasAttachments: "Mit Anhängen",
+        noAttachments: "Ohne Anhänge",
+      },
+      healthStatus: {
+        healthy: "Gesund",
+        warning: "Warnung",
+        error: "Fehler",
+        maintenance: "Wartung",
+      },
+      performanceStatus: {
+        good: "Gut",
+        warning: "Warnung",
+        error: "Fehler",
+      },
+    },
+  },
+  messages: {
+    category: "E-Mail-Nachrichten",
+    tag: "Nachrichten",
+    tags: {
+      stats: "Statistiken",
+      analytics: "Analysen",
+    },
+    id: {
+      category: "Emails",
+      tags: {
+        emails: "Emails",
+      },
+      title: "E-Mail-Details",
+      description:
+        "Eine einzelne E-Mail anhand ihrer eindeutigen Kennung abrufen",
+      container: {
+        title: "E-Mail-Details",
+        description:
+          "Detaillierte Informationen über eine bestimmte E-Mail anzeigen",
+      },
+      fields: {
+        id: {
+          label: "E-Mail-ID",
+          description: "Eindeutige Kennung der abzurufenden E-Mail",
+        },
+      },
+      response: {
+        email: {
+          title: "E-Mail-Details",
+          description:
+            "Vollständige Informationen über die angeforderte E-Mail",
+          id: "E-Mail-ID",
+          subject: "Betreff",
+          recipientEmail: "Empfänger-E-Mail",
+          recipientName: "Empfängername",
+          senderEmail: "Absender-E-Mail",
+          senderName: "Absendername",
+          type: "E-Mail-Typ",
+          status: "Status",
+          templateName: "Vorlagenname",
+          emailProvider: "E-Mail-Anbieter",
+          externalId: "Externe ID",
+          sentAt: "Gesendet am",
+          deliveredAt: "Zugestellt am",
+          openedAt: "Geöffnet am",
+          clickedAt: "Geklickt am",
+          retryCount: "Wiederholungsanzahl",
+          error: "Fehlermeldung",
+          userId: "Benutzer-ID",
+          leadId: "Lead-ID",
+          createdAt: "Erstellt am",
+          updatedAt: "Aktualisiert am",
+        },
+      },
+      get: {
+        errors: {
+          validation: {
+            title: "Validierungsfehler",
+            description: "Die angegebene E-Mail-ID ist ungültig",
+          },
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description:
+              "Sie müssen authentifiziert sein, um E-Mail-Details einzusehen",
+          },
+          not_found: {
+            title: "E-Mail nicht gefunden",
+            description: "Keine E-Mail mit der angegebenen ID gefunden",
+          },
+          forbidden: {
+            title: "Verboten",
+            description:
+              "Sie haben keine Berechtigung, diese E-Mail anzuzeigen",
+          },
+          server: {
+            title: "Serverfehler",
+            description:
+              "Ein interner Serverfehler ist beim Abrufen der E-Mail aufgetreten",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unerwarteter Fehler ist aufgetreten",
+          },
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Die angegebene E-Mail-ID ist ungültig",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description:
+            "Sie müssen authentifiziert sein, um E-Mail-Details einzusehen",
+        },
+        notFound: {
+          title: "E-Mail nicht gefunden",
+          description: "Keine E-Mail mit der angegebenen ID gefunden",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Sie haben keine Berechtigung, diese E-Mail anzuzeigen",
+        },
+        server: {
+          title: "Serverfehler",
+          description:
+            "Ein interner Serverfehler ist beim Abrufen der E-Mail aufgetreten",
+        },
+        conflict: {
+          title: "Konfliktfehler",
+          description:
+            "Ein Konflikt ist beim Verarbeiten der E-Mail-Anfrage aufgetreten",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description:
+            "Ein Netzwerkfehler ist beim Abrufen der E-Mail aufgetreten",
+        },
+        unsavedChanges: {
+          title: "Ungespeicherte Änderungen",
+          description: "Es gibt ungespeicherte Änderungen",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+      },
+      success: {
+        title: "E-Mail abgerufen",
+        description: "E-Mail-Details erfolgreich abgerufen",
+      },
+      widget: {
+        parties: "Beteiligte",
+        to: "An",
+        from: "Von",
+        timestamps: "Zeitstempel",
+        sentAt: "Gesendet am",
+        deliveredAt: "Zugestellt am",
+        openedAt: "Geöffnet am",
+        clickedAt: "Geklickt am",
+        technical: "Technische Details",
+        template: "Vorlage",
+        provider: "Anbieter",
+        externalId: "Externe ID",
+        retryCount: "Wiederholungsanzahl",
+        error: "Fehler",
+        associations: "Verknüpfungen",
+        lead: "Lead",
+        user: "Benutzer",
+        notFound: "E-Mail nicht gefunden",
+      },
+      enums: {
+        status: {
+          pending: "Ausstehend",
+          sent: "Gesendet",
+          delivered: "Zugestellt",
+          opened: "Geöffnet",
+          clicked: "Geklickt",
+          bounced: "Zurückgewiesen",
+          failed: "Fehlgeschlagen",
+          unsubscribed: "Abgemeldet",
+        },
+        type: {
+          transactional: "Transaktional",
+          marketing: "Marketing",
+          notification: "Benachrichtigung",
+          system: "System",
+          leadCampaign: "Lead-Kampagne",
+          userCommunication: "Benutzerkommunikation",
+        },
+        provider: {
+          resend: "Resend",
+          sendgrid: "SendGrid",
+          mailgun: "Mailgun",
+          ses: "Amazon SES",
+          smtp: "SMTP",
+          mailjet: "Mailjet",
+          postmark: "Postmark",
+          other: "Sonstiges",
+        },
+      },
+    },
+    list: {
+      category: "Emails",
+      tags: {
+        emails: "Emails",
+      },
+      title: "E-Mail-Liste",
+      description:
+        "Eine paginierte Liste von E-Mails mit Filterung und Paginierung abrufen",
+      container: {
+        title: "E-Mail-Liste",
+        description:
+          "E-Mail-Listen-Parameter konfigurieren und Ergebnisse anzeigen",
+      },
+      filters: {
+        title: "Filter",
+        description: "E-Mails filtern und suchen",
+      },
+      displayOptions: {
+        title: "Anzeigeoptionen",
+      },
+      fields: {
+        dateRange: {
+          title: "Datumsbereich",
+        },
+        page: {
+          label: "Seite",
+          description: "Seitenzahl für Paginierung",
+          placeholder: "Seitenzahl eingeben",
+        },
+        limit: {
+          label: "Grenzwert",
+          description: "Anzahl der Elemente pro Seite",
+          placeholder: "Grenzwert eingeben",
+        },
+        search: {
+          label: "Suchen",
+          description: "E-Mails nach Betreff, Empfänger oder Absender suchen",
+          placeholder: "E-Mails suchen...",
+        },
+        status: {
+          label: "Status",
+          description: "Nach E-Mail-Status filtern",
+          placeholder: "Status auswählen",
+        },
+        channel: {
+          label: "Kanal",
+          description: "Nach Nachrichtenkanal filtern",
+        },
+        type: {
+          label: "Typ",
+          description: "Nach E-Mail-Typ filtern",
+          placeholder: "Typ auswählen",
+        },
+        sortBy: {
+          label: "Sortieren nach",
+          description: "Feld zum Sortieren",
+          placeholder: "Sortierfeld auswählen",
+        },
+        sortOrder: {
+          label: "Sortierreihenfolge",
+          description: "Richtung der Sortierreihenfolge",
+          placeholder: "Sortierreihenfolge auswählen",
+        },
+        dateFrom: {
+          label: "Datum von",
+          description: "E-Mails ab diesem Datum filtern",
+          placeholder: "Startdatum auswählen",
+        },
+        dateTo: {
+          label: "Datum bis",
+          description: "E-Mails bis zu diesem Datum filtern",
+          placeholder: "Enddatum auswählen",
+        },
+      },
+      response: {
+        emails: {
+          title: "E-Mails",
+          emptyState: {
+            title: "Keine E-Mails gefunden",
+            description: "Keine E-Mails entsprechen Ihren aktuellen Filtern",
+          },
+          item: {
+            title: "E-Mail",
+            description: "E-Mail-Details",
+            id: "ID",
+            subject: "Betreff",
+            recipientEmail: "Empfänger-E-Mail",
+            recipientName: "Empfängername",
+            senderEmail: "Absender-E-Mail",
+            senderName: "Absendername",
+            type: "Typ",
+            status: "Status",
+            templateName: "Vorlagenname",
+            emailProvider: "E-Mail-Anbieter",
+            externalId: "Externe ID",
+            sentAt: "Gesendet am",
+            deliveredAt: "Zugestellt am",
+            openedAt: "Geöffnet am",
+            clickedAt: "Geklickt am",
+            retryCount: "Wiederholungsanzahl",
+            error: "Fehler",
+            userId: "Benutzer-ID",
+            leadId: "Lead-ID",
+            createdAt: "Erstellt am",
+            updatedAt: "Aktualisiert am",
+            emailCore: {
+              title: "Kerninformationen",
+            },
+            emailParties: {
+              title: "Absender & Empfänger",
+            },
+            emailMetadata: {
+              title: "Metadaten",
+            },
+            emailEngagement: {
+              title: "Engagement-Tracking",
+            },
+            technicalDetails: {
+              title: "Technische Details",
+            },
+            associatedIds: {
+              title: "Zugehörige IDs",
+            },
+            timestamps: {
+              title: "Zeitstempel",
+            },
+          },
+        },
+        pagination: {
+          title: "Paginierung",
+          description: "Paginierungsinformationen",
+          page: "Aktuelle Seite",
+          limit: "Elemente pro Seite",
+          total: "Gesamtelemente",
+          totalPages: "Gesamtseiten",
+        },
+        filters: {
+          title: "Angewendete Filter",
+          description: "Aktuell angewendete Filter",
+          status: "Statusfilter",
+          type: "Typfilter",
+          search: "Suchanfrage",
+          dateFrom: "Startdatum",
+          dateTo: "Enddatum",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Die bereitgestellten Parameter sind ungültig",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description:
+            "Sie müssen authentifiziert sein, um auf diese Ressource zuzugreifen",
+        },
+        forbidden: {
+          title: "Verboten",
+          description:
+            "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
+        },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Die angeforderte Ressource wurde nicht gefunden",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Ein interner Serverfehler ist aufgetreten",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        unsaved: {
+          title: "Nicht gespeicherte Änderungen",
+          description: "Sie haben nicht gespeicherte Änderungen",
+        },
+        conflict: {
+          title: "Konflikt",
+          description:
+            "Die Anfrage steht im Konflikt mit dem aktuellen Zustand",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Ein Netzwerkfehler ist aufgetreten",
+        },
+      },
+      success: {
+        title: "Erfolg",
+        description: "E-Mails erfolgreich abgerufen",
+      },
+      enums: {
+        type: {
+          transactional: "Transaktional",
+          marketing: "Marketing",
+          notification: "Benachrichtigung",
+          system: "System",
+          leadCampaign: "Lead-Kampagne",
+          userCommunication: "Benutzerkommunikation",
+        },
+        typeFilter: {
+          any: "Alle Typen",
+        },
+        channel: {
+          email: "E-Mail",
+          sms: "SMS",
+          whatsapp: "WhatsApp",
+          telegram: "Telegram",
+        },
+        channelFilter: {
+          any: "Alle Kanäle",
+        },
+        sortField: {
+          subject: "Betreff",
+          recipientEmail: "Empfänger-E-Mail",
+          recipientName: "Empfängername",
+          type: "Typ",
+          status: "Status",
+          sentAt: "Gesendet am",
+          createdAt: "Erstellt am",
+        },
+        sortOrder: {
+          asc: "Aufsteigend",
+          desc: "Absteigend",
+        },
+      },
+      widget: {
+        to: "An",
+        retries: "Wiederholungen",
+        opened: "Geöffnet",
+        clicked: "Geklickt",
+        stats: "Statistiken",
+        graphs: "Graphen",
+        refresh: "Aktualisieren",
+        searchPlaceholder: "E-Mails suchen...",
+        clearSearch: "Löschen",
+        emptyState: "Keine E-Mails gefunden",
+        emptyFiltered: "Keine E-Mails entsprechen Ihren Filtern",
+        page: "Seite",
+        tabs: {
+          all: "Alle",
+          sent: "Gesendet",
+          delivered: "Zugestellt",
+          opened: "Geöffnet",
+          failed: "Fehlgeschlagen",
+          bounced: "Zurückgewiesen",
+        },
+      },
+    },
+    stats: {
+      category: "Emails",
+      tags: {
+        stats: "Statistics",
+        analytics: "Analytics",
+      },
+      dateRange: {
+        today: "Heute",
+        yesterday: "Gestern",
+        last7Days: "Letzte 7 Tage",
+        last30Days: "Letzte 30 Tage",
+        last90Days: "Letzte 90 Tage",
+        thisWeek: "Diese Woche",
+        lastWeek: "Letzte Woche",
+        thisMonth: "Dieser Monat",
+        lastMonth: "Letzter Monat",
+        thisQuarter: "Dieses Quartal",
+        lastQuarter: "Letztes Quartal",
+        thisYear: "Dieses Jahr",
+        lastYear: "Letztes Jahr",
+        custom: "Benutzerdefinierter Bereich",
+      },
+      get: {
+        title: "E-Mail-Statistiken",
+        description: "Umfassende E-Mail-Statistiken und Metriken abrufen",
+        form: {
+          title: "E-Mail-Statistiken Anfrage",
+          description: "Parameter für die Abfrage von E-Mail-Statistiken",
+        },
+        startDate: {
+          label: "Startdatum",
+          description: "Startdatum für den Statistikzeitraum",
+        },
+        endDate: {
+          label: "Enddatum",
+          description: "Enddatum für den Statistikzeitraum",
+        },
+        accountId: {
+          label: "Konto-ID",
+          description: "Statistiken nach spezifischem Konto filtern",
+        },
+        type: {
+          label: "E-Mail-Typ",
+          description: "Nach E-Mail-Typ filtern",
+          options: {
+            all: "Alle",
+            sent: "Gesendet",
+            received: "Empfangen",
+            draft: "Entwurf",
+            trash: "Papierkorb",
+          },
+        },
+        groupBy: {
+          label: "Gruppieren Nach",
+          description: "Wie die Statistiken gruppiert werden sollen",
+          options: {
+            day: "Nach Tag",
+            week: "Nach Woche",
+            month: "Nach Monat",
+            account: "Nach Konto",
+            type: "Nach Typ",
+          },
+        },
+        includeDetails: {
+          label: "Details Einschließen",
+          description: "Detaillierte Aufschlüsselung in Ergebnisse einbeziehen",
+        },
+        status: {
+          label: "E-Mail-Status",
+          description: "Nach E-Mail-Status filtern",
+        },
+        search: {
+          label: "Suchen",
+          description: "E-Mails nach Betreff oder Empfänger suchen",
+        },
+        timePeriod: {
+          label: "Zeitraum",
+          description: "Zeitraumgranularität für historische Daten",
+          hour: "Stunde",
+          day: "Tag",
+          week: "Woche",
+          month: "Monat",
+          quarter: "Quartal",
+          year: "Jahr",
+        },
+        dateRangePreset: {
+          label: "Datumsbereich-Voreinstellung",
+          description: "Vordefinierter Datumsbereich für Filterung",
+        },
+        dateFrom: {
+          label: "Startdatum",
+          description: "E-Mails ab diesem Datum filtern",
+        },
+        dateTo: {
+          label: "Enddatum",
+          description: "E-Mails bis zu diesem Datum filtern",
+        },
+        chartType: {
+          label: "Diagrammtyp",
+          description: "Visualisierungstyp für Diagramme",
+          line: "Liniendiagramm",
+          bar: "Balkendiagramm",
+          area: "Flächendiagramm",
+          pie: "Kreisdiagramm",
+          donut: "Ringdiagramm",
+        },
+        includeComparison: {
+          label: "Vergleich Einschließen",
+          description: "Vergleich mit vorherigem Zeitraum einbeziehen",
+        },
+        sortBy: {
+          label: "Sortieren Nach",
+          description: "Feld zum Sortieren der E-Mails",
+        },
+        sortOrder: {
+          label: "Sortierreihenfolge",
+          description:
+            "Reihenfolge der Sortierung (aufsteigend oder absteigend)",
+        },
+        response: {
+          title: "E-Mail-Statistiken Antwort",
+          description: "Umfassende E-Mail-Statistiken und Metrikdaten",
+          totalEmails: "E-Mails Gesamt",
+          sentEmails: "Gesendete E-Mails",
+          deliveredEmails: "Zugestellte E-Mails",
+          openedEmails: "Geöffnete E-Mails",
+          clickedEmails: "Geklickte E-Mails",
+          bouncedEmails: "Zurückgewiesene E-Mails",
+          failedEmails: "Fehlgeschlagene E-Mails",
+          draftEmails: "Entwurf E-Mails",
+          openRate: "Öffnungsrate",
+          clickRate: "Klickrate",
+          deliveryRate: "Zustellungsrate",
+          bounceRate: "Rückweisungsrate",
+          failureRate: "Fehlerrate",
+          emailsByProvider: "E-Mails nach Anbieter",
+          emailsByTemplate: "E-Mails nach Vorlage",
+          emailsByStatus: "E-Mails nach Status",
+          emailsByType: "E-Mails nach Typ",
+          emailsWithUserId: "E-Mails mit Benutzer-ID",
+          emailsWithoutUserId: "E-Mails ohne Benutzer-ID",
+          emailsWithLeadId: "E-Mails mit Lead-ID",
+          emailsWithoutLeadId: "E-Mails ohne Lead-ID",
+          emailsWithErrors: "E-Mails mit Fehlern",
+          emailsWithoutErrors: "E-Mails ohne Fehler",
+          averageRetryCount: "Durchschnittliche Wiederholungsanzahl",
+          maxRetryCount: "Maximale Wiederholungsanzahl",
+          averageProcessingTime: "Durchschnittliche Verarbeitungszeit",
+          averageDeliveryTime: "Durchschnittliche Zustellungszeit",
+          historicalData: "Historische Daten",
+          groupedStats: "Gruppierte Statistiken",
+          generatedAt: "Generiert Am",
+          dataRange: "Datenbereich",
+          recentActivity: "Aktuelle Aktivität",
+          topPerformingTemplates: "Top-Vorlagen",
+          topPerformingProviders: "Top-Anbieter",
+          metrics: {
+            totalEmails: "Gesamt-E-Mails",
+            sentEmails: "Gesendete E-Mails",
+            deliveredEmails: "Zugestellte E-Mails",
+            openedEmails: "Geöffnete E-Mails",
+            clickedEmails: "Angeklickte E-Mails",
+            bouncedEmails: "Bounce E-Mails",
+            failedEmails: "Fehlgeschlagene E-Mails",
+            deliveryRate: "Zustellrate",
+            openRate: "Öffnungsrate",
+            clickRate: "Klickrate",
+            bounceRate: "Bounce-Rate",
+            failureRate: "Fehlerrate",
+            emails_with_errors: "E-Mails mit Fehlern",
+            average_retry_count: "Durchschnittliche Anzahl der Wiederholungen",
+            average_processing_time: "Durchschnittliche Verarbeitungszeit (ms)",
+            average_delivery_time: "Durchschnittliche Zustellzeit (ms)",
+            provider_historical: "Anbieter-Verlauf",
+            template_historical: "Vorlagen-Verlauf",
+            engagement_historical: "Engagement-Verlauf",
+          },
+          retry: {
+            no_retries: "Keine Wiederholungen",
+            with_retries: "Mit Wiederholungen",
+          },
+          association: {
+            with_user: "Mit Benutzer",
+            with_lead: "Mit Lead",
+            with_both: "Mit Beiden",
+            with_neither: "Eigenständig",
+          },
+        },
+        errors: {
+          unauthorized: {
+            title: "Nicht Autorisiert",
+            description:
+              "Authentifizierung erforderlich für Zugriff auf E-Mail-Statistiken",
+          },
+          validation: {
+            title: "Validierungsfehler",
+            description: "Ungültige Anfrageparameter bereitgestellt",
+          },
+          server: {
+            title: "Serverfehler",
+            description: "Interner Serverfehler beim Abrufen der Statistiken",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unbekannter Fehler ist aufgetreten",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Netzwerkfehler beim Abrufen der Statistiken",
+          },
+          forbidden: {
+            title: "Verboten",
+            description: "Zugriff auf E-Mail-Statistiken ist verboten",
+          },
+          notFound: {
+            title: "Nicht Gefunden",
+            description: "E-Mail-Statistiken nicht gefunden",
+          },
+          unsavedChanges: {
+            title: "Ungespeicherte Änderungen",
+            description:
+              "Es gibt ungespeicherte Änderungen, die zuerst gespeichert werden müssen",
+          },
+          conflict: {
+            title: "Konflikt",
+            description:
+              "Datenkonflikt beim Abrufen der Statistiken aufgetreten",
+          },
+        },
+        success: {
+          title: "Erfolg",
+          description: "E-Mail-Statistiken erfolgreich abgerufen",
+        },
+      },
+      widget: {
+        title: "E-Mail-Statistiken",
+        total: "Gesamt",
+        sent: "Gesendet",
+        delivered: "Zugestellt",
+        opened: "Geöffnet",
+        clicked: "Geklickt",
+        bounced: "Zurückgewiesen",
+        failed: "Fehlgeschlagen",
+        errors: "Fehler",
+        engagementRates: "Engagement-Raten",
+        deliveryRate: "Zustellungsrate",
+        openRate: "Öffnungsrate",
+        clickRate: "Klickrate",
+        bounceRate: "Absprungrate",
+        failureRate: "Fehlerrate",
+        byStatus: "Nach Status",
+        byType: "Nach Typ",
+        avgRetries: "Ø Wiederholungen",
+        avgDeliveryMs: "Ø Zustellungszeit",
+        viewList: "Liste anzeigen",
+        refresh: "Aktualisieren",
+        search: "E-Mails suchen...",
+      },
+      enums: {
+        status: {
+          pending: "Ausstehend",
+          sent: "Gesendet",
+          delivered: "Zugestellt",
+          opened: "Geöffnet",
+          clicked: "Geklickt",
+          bounced: "Zurückgewiesen",
+          failed: "Fehlgeschlagen",
+          unsubscribed: "Abgemeldet",
+        },
+        statusFilter: {
+          any: "Alle Status",
+        },
+        type: {
+          transactional: "Transaktional",
+          marketing: "Marketing",
+          notification: "Benachrichtigung",
+          system: "System",
+          leadCampaign: "Lead-Kampagne",
+          userCommunication: "Benutzerkommunikation",
+        },
+        typeFilter: {
+          any: "Alle Typen",
+        },
+        sortField: {
+          subject: "Betreff",
+          recipientEmail: "Empfänger-E-Mail",
+          recipientName: "Empfängername",
+          type: "Typ",
+          status: "Status",
+          sentAt: "Gesendet am",
+          createdAt: "Erstellt am",
+        },
+        sortOrder: {
+          asc: "Aufsteigend",
+          desc: "Absteigend",
+        },
+      },
+    },
+    enums: {
+      status: {
+        pending: "Ausstehend",
+        sent: "Gesendet",
+        delivered: "Zugestellt",
+        opened: "Geöffnet",
+        clicked: "Geklickt",
+        bounced: "Zurückgewiesen",
+        failed: "Fehlgeschlagen",
+        unsubscribed: "Abgemeldet",
+      },
+      statusFilter: {
+        any: "Alle Status",
+      },
+      type: {
+        transactional: "Transaktional",
+        marketing: "Marketing",
+        notification: "Benachrichtigung",
+        system: "System",
+        leadCampaign: "Lead-Kampagne",
+        userCommunication: "Benutzerkommunikation",
+      },
+      typeFilter: {
+        any: "Alle Typen",
+      },
+      provider: {
+        resend: "Resend",
+        sendgrid: "SendGrid",
+        mailgun: "Mailgun",
+        ses: "Amazon SES",
+        smtp: "SMTP",
+        mailjet: "Mailjet",
+        postmark: "Postmark",
+        other: "Andere",
+      },
+      sortField: {
+        subject: "Betreff",
+        recipientEmail: "Empfänger-E-Mail",
+        recipientName: "Empfängername",
+        type: "Typ",
+        status: "Status",
+        sentAt: "Gesendet am",
+        createdAt: "Erstellt am",
+      },
+      retryRange: {
+        noRetries: "Keine Wiederholungen",
+        oneToTwo: "1-2 Wiederholungen",
+        threeToFive: "3-5 Wiederholungen",
+        sixPlus: "6+ Wiederholungen",
+      },
+      syncStatus: {
+        pending: "Synchronisierung ausstehend",
+        syncing: "Synchronisierung läuft",
+        synced: "Synchronisiert",
+        failed: "Synchronisierung fehlgeschlagen",
+      },
+      specialFolder: {
+        inbox: "Posteingang",
+        sent: "Gesendet",
+        drafts: "Entwürfe",
+        trash: "Papierkorb",
+        spam: "Spam",
+        archive: "Archiv",
+      },
+      sortOrder: {
+        asc: "Aufsteigend",
+        desc: "Absteigend",
+      },
+    },
+  },
+  send: {
+    title: "Nachricht senden",
+    description:
+      "Nachricht über beliebigen Kanal senden (E-Mail, SMS, WhatsApp, Telegram)",
+    category: "Messaging",
+    tag: "Senden",
+
+    container: {
+      title: "Nachricht senden",
+      description: "Über ein konfiguriertes Messenger-Konto senden",
+    },
+
+    accountId: {
+      label: "Messenger-Konto",
+      description: "Konto zum Senden",
+      placeholder: "Konto-UUID auswählen",
+    },
+    to: {
+      label: "Empfänger",
+      description: "E-Mail-Adresse, Telefonnummer oder Chat-ID",
+      placeholder: "benutzer@beispiel.de oder +4912345678",
+    },
+    toName: {
+      label: "Empfängername",
+      description: "Anzeigename des Empfängers (optional)",
+      placeholder: "Max Mustermann",
+    },
+    subject: {
+      label: "Betreff",
+      description: "Betreffzeile (nur E-Mail, optional für andere Kanäle)",
+      placeholder: "Ihr Betreff hier...",
+    },
+    text: {
+      label: "Nachricht",
+      description:
+        "Nur-Text-Inhalt - für SMS/WhatsApp/Telegram; E-Mail-Fallback",
+      placeholder: "Nachricht eingeben...",
+    },
+    html: {
+      label: "HTML-Inhalt",
+      description: "HTML-Inhalt (nur E-Mail, optional - Fallback auf Text)",
+      placeholder: "<p>HTML-E-Mail-Inhalt eingeben...</p>",
+    },
+    senderName: {
+      label: "Absendername",
+      description: "Anzeigename des Absenders (nur E-Mail, optional)",
+      placeholder: "Ihr Unternehmen",
+    },
+    replyTo: {
+      label: "Antworten an",
+      description: "Antwortadresse (nur E-Mail, optional)",
+      placeholder: "support@beispiel.de",
+    },
+    leadId: {
+      label: "Lead-ID",
+      description: "Zugehöriger Lead zur Verfolgung (optional)",
+      placeholder: "UUID",
+    },
+    campaignId: {
+      label: "Kampagnen-ID",
+      description: "Zugehörige Kampagne zur Verfolgung (optional)",
+      placeholder: "UUID",
+    },
+
+    response: {
+      title: "Sendeergebnis",
+      description: "Ergebnis des Sendevorgangs",
+      messageId: { label: "Nachrichten-ID" },
+      accountName: { label: "Konto" },
+      channel: { label: "Kanal" },
+      provider: { label: "Anbieter" },
+      sentAt: { label: "Gesendet am" },
+    },
+
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description:
+          "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Sie haben keine Berechtigung zum Senden von Nachrichten",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Ein interner Serverfehler ist beim Senden aufgetreten",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Zugriff auf diese Ressource ist verboten",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Ein Netzwerkfehler ist beim Senden aufgetreten",
+      },
+      notFound: {
+        title: "Konto nicht gefunden",
+        description: "Das angegebene Messenger-Konto wurde nicht gefunden",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Anfrage steht im Konflikt mit vorhandenen Daten",
+      },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Sie haben ungespeicherte Änderungen",
+      },
+    },
+
+    success: {
+      title: "Nachricht gesendet",
+      description: "Ihre Nachricht wurde erfolgreich gesendet",
+    },
+  },
+  smtpClient: {
+    tag: "SMTP-Client",
+    category: "E-Mail-Dienste",
+    components: {
+      email: {
+        tagline: "KI-Plattform für freie Meinungsäußerung",
+        footer: {
+          needHelp: "Brauchen Sie Hilfe?",
+          helpText: "Brauchen Sie Hilfe? Kontaktieren Sie uns unter",
+          unsubscribeText: "Möchten Sie diese E-Mails nicht mehr erhalten?",
+          unsubscribeLink: "Abmelden",
+          copyright: "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
+          visitWebsite: "Website besuchen",
+          allRightsReserved:
+            "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
+          feedbackHook: "Etwas zu sagen? Antworten - wir lesen es wirklich.",
+          feedbackBody:
+            "Fehler melden, Funktion anfragen oder sagen, was fehlt. Nuetzliches Feedback bringt dir {{credits}} Credits — ein ganzer Monat gratis.",
+          feedbackLink: "Feedback senden →",
+          footerSeparator: " · ",
+        },
+      },
+      post: {
+        title: "Titel",
+        description: "Endpunkt-Beschreibung",
+        form: {
+          title: "Konfiguration",
+          description: "Parameter konfigurieren",
+        },
+        response: {
+          title: "Antwort",
+          description: "Antwortdaten",
+        },
+        errors: {
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description: "Authentifizierung erforderlich",
+          },
+          validation: {
+            title: "Validierungsfehler",
+            description: "Ungültige Anfrageparameter",
+          },
+          server: {
+            title: "Serverfehler",
+            description: "Interner Serverfehler",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unbekannter Fehler ist aufgetreten",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Netzwerkfehler aufgetreten",
+          },
+          forbidden: {
+            title: "Verboten",
+            description: "Zugriff verboten",
+          },
+          notFound: {
+            title: "Nicht gefunden",
+            description: "Ressource nicht gefunden",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Datenkonflikt aufgetreten",
+          },
+        },
+        success: {
+          title: "Erfolg",
+          description: "Vorgang erfolgreich abgeschlossen",
+        },
+      },
+    },
+    emailSending: {
+      email: {
+        defaultSenderName: "System",
+        errors: {
+          sending_failed:
+            "E-Mail an {{recipient}} konnte nicht gesendet werden",
+        },
+      },
+    },
+    emailHandling: {
+      email: {
+        errors: {
+          rendering_failed: "E-Mail-Vorlage konnte nicht gerendert werden",
+          send_failed: "E-Mail konnte nicht gesendet werden",
+          email_failed_subject: "E-Mail fehlgeschlagen",
+          unknown_recipient: "Unbekannter Empfänger",
+          unknown_sender: "System",
+          email_render_exception: "E-Mail-Rendering-Ausnahme aufgetreten",
+          batch_send_failed: "Batch-E-Mail-Versand fehlgeschlagen",
+        },
+      },
+    },
+    sending: {
+      errors: {
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung für SMTP-Sendevorgänge erforderlich",
+        },
+        server: {
+          title: "Server-Fehler",
+          description: "Ein Fehler ist auf dem SMTP-Server aufgetreten",
+        },
+        rejected: {
+          title: "E-Mail abgelehnt",
+          defaultReason: "E-Mail vom Server abgelehnt",
+        },
+        no_recipients: {
+          title: "Keine Empfänger akzeptiert",
+          defaultReason: "Keine Empfänger akzeptiert",
+        },
+        rate_limit: {
+          title: "Ratenlimit überschritten",
+        },
+        capacity: {
+          title: "Kapazitätsfehler",
+        },
+        no_account: {
+          title: "Kein SMTP-Konto verfügbar",
+        },
+      },
+    },
+    emailMetadata: {
+      errors: {
+        server: {
+          title: "E-Mail-Metadaten Serverfehler",
+          description: "Speichern von E-Mail-Metadaten fehlgeschlagen",
+        },
+      },
+    },
+    enums: {
+      status: {
+        active: "Aktiv",
+        inactive: "Inaktiv",
+        error: "Fehler",
+        testing: "Testen",
+      },
+      securityType: {
+        none: "Keine",
+        tls: "TLS",
+        ssl: "SSL",
+        starttls: "STARTTLS",
+      },
+      statusFilter: {
+        all: "Alle Status",
+      },
+      healthStatus: {
+        healthy: "Gesund",
+        degraded: "Beeinträchtigt",
+        unhealthy: "Ungesund",
+        unknown: "Unbekannt",
+      },
+      healthStatusFilter: {
+        all: "Alle Gesundheitsstatus",
+      },
+      sortField: {
+        name: "Name",
+        status: "Status",
+        createdAt: "Erstellt am",
+        updatedAt: "Aktualisiert am",
+        priority: "Priorität",
+        totalEmailsSent: "Gesamt gesendete E-Mails",
+        lastUsedAt: "Zuletzt verwendet",
+      },
+      campaignType: {
+        leadCampaign: "Lead-Kampagne",
+        newsletter: "Newsletter",
+        signupNurture: "Anmelde-Pflege",
+        retention: "Kundenbindung",
+        winback: "Rückgewinnung",
+        transactional: "Transaktional",
+        notification: "Benachrichtigung",
+        system: "System",
+      },
+      campaignTypeFilter: {
+        all: "Alle Kampagnentypen",
+      },
+      selectionRuleSortField: {
+        name: "Name",
+        priority: "Priorität",
+        campaignType: "Kampagnentyp",
+        journeyVariant: "Journey-Variante",
+        campaignStage: "Kampagnenstufe",
+        country: "Land",
+        language: "Sprache",
+        createdAt: "Erstellt am",
+        updatedAt: "Aktualisiert am",
+        emailsSent: "Gesendete E-Mails",
+        successRate: "Erfolgsrate",
+        lastUsedAt: "Zuletzt verwendet",
+      },
+      selectionRuleStatusFilter: {
+        all: "Alle",
+        active: "Aktiv",
+        inactive: "Inaktiv",
+        default: "Standard",
+        failover: "Failover",
+      },
+      loadBalancingStrategy: {
+        roundRobin: "Round-Robin",
+        weighted: "Gewichtet",
+        priority: "Priorität",
+        leastUsed: "Am wenigsten verwendet",
+      },
+      testResult: {
+        success: "Erfolg",
+        authFailed: "Authentifizierung fehlgeschlagen",
+        connectionFailed: "Verbindung fehlgeschlagen",
+        timeout: "Zeitüberschreitung",
+        unknownError: "Unbekannter Fehler",
+      },
+    },
+  },
 
   // Core emails level translations
   tag: "E-Mails",
@@ -755,6 +2554,7 @@ export const translations: typeof enTranslations = {
     render: {
       post: {
         title: "E-Mail-Vorschau rendern",
+        titleShort: "Vorschau rendern",
         description: "Serverseitiges Rendern von E-Mail-Vorlagen",
         container: {
           title: "E-Mail-Vorschau-Konfiguration",
@@ -838,6 +2638,7 @@ export const translations: typeof enTranslations = {
     sendTest: {
       post: {
         title: "Test-E-Mail senden",
+        titleShort: "Test-E-Mail",
         description: "Test-E-Mail mit benutzerdefinierten Vorlagendaten senden",
         container: {
           title: "Test-E-Mail-Konfiguration",
@@ -925,7 +2726,42 @@ export const translations: typeof enTranslations = {
       submitting: "Sende...",
     },
   },
-  messaging: messagingTranslations,
+  messaging: {
+    category: "Messaging",
+    tag: "messaging",
+    enums: {
+      channel: {
+        email: "E-Mail",
+        sms: "SMS",
+        whatsapp: "WhatsApp",
+        telegram: "Telegram",
+      },
+      channelFilter: {
+        any: "Alle Kanäle",
+      },
+      provider: {
+        twilio: "Twilio",
+        awsSns: "AWS SNS",
+        messagebird: "MessageBird",
+        http: "HTTP",
+        whatsappBusiness: "WhatsApp Business",
+        telegramBot: "Telegram Bot",
+      },
+      accountStatus: {
+        active: "Aktiv",
+        inactive: "Inaktiv",
+        error: "Fehler",
+        testing: "Test",
+      },
+    },
+    send: {
+      errors: {
+        accountNotFound: "Messaging-Konto {{accountId}} nicht gefunden",
+        sendFailed: "Nachricht konnte nicht gesendet werden",
+        unexpected: "Unerwarteter Fehler beim Senden der Nachricht: {{error}}",
+      },
+    },
+  },
   providers: {
     errors: {
       smtpSendFailed: "SMTP-Versand fehlgeschlagen",

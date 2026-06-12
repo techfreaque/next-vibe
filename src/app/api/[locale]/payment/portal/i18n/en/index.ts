@@ -4,6 +4,7 @@ export const translations = {
   },
   post: {
     title: "Customer Portal",
+    titleShort: "Customer Portal",
     description: "Create customer portal session for billing management",
     form: {
       title: "Portal Configuration",

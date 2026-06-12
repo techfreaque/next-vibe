@@ -1,5 +1,6 @@
 export const translations = {
   title: "Get Current Lead Referral",
+  titleShort: "Lead Referral",
   description: "Returns the referral code linked to the current lead, if any",
   tag: "Referral",
   response: {

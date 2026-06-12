@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Wypłaty z poleceń",
+    titleShort: "Wypłaty",
     description: "Wnioski o wypłatę na przedział rozdzielczości",
     fields: {
       resolution: {

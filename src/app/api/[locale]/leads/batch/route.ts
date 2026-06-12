@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Batch Operations API Route Handler
  * Handles PATCH requests for batch updating leads

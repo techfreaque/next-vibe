@@ -138,6 +138,7 @@ export const translations = {
   },
   post: {
     title: "Speech to Text",
+    titleShort: "Speech to Text",
     description:
       "Convert audio to text using AI transcription (0.013 credits per second, 0.78 credits per minute)",
     form: {
@@ -156,6 +157,10 @@ export const translations = {
         maxSize: "File size must be less than 25MB",
         audioOnly: "Please upload an audio or video file",
       },
+    },
+    model: {
+      label: "Model",
+      description: "Transcription model",
     },
     provider: {
       label: "Provider",
@@ -208,6 +213,7 @@ export const translations = {
       title: "Success",
       description: "Audio transcribed successfully",
       transcriptionComplete: "Transcription completed successfully",
+      transcribing: "Transcribing…",
     },
   },
   providers: {

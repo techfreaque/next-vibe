@@ -38,7 +38,7 @@ import {
 import { leadsBatchFilterFields } from "../shared-filter-fields";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const LeadsBatchDeleteContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadsBatchDeleteContainer })),
@@ -58,9 +58,10 @@ const { PATCH } = createEndpoint({
   icon: "users",
 
   title: "patch.title",
+  titleShort: "patch.titleShort",
   description: "patch.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   tags: ["tags.leads", "tags.batch"],
 
   fields: customWidgetObject({
@@ -319,10 +320,11 @@ const { DELETE } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
 
   title: "delete.title",
+  titleShort: "delete.titleShort",
   description: "delete.description",
   icon: "user-x",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   tags: ["tags.leads", "tags.batch"],
 
   fields: customWidgetObject({

@@ -1,7 +1,9 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   submit: {
     tag: "lead-magnet-capture",
     title: "Zapisz się i uzyskaj dostęp",
+    titleShort: "Zapisz się",
     description:
       "Podaj swoje dane, żeby dołączyć do listy twórcy i uzyskać dostęp do tego skilla",
     groups: {

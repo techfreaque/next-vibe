@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Produkt aktualisieren",
+    titleShort: "Produkt aktualisieren",
     description: "Felder eines bestehenden Katalogprodukts aktualisieren.",
     productId: {
       label: "Produkt-ID",

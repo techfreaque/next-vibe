@@ -32,10 +32,11 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
+  titleShort: "patch.titleShort" as const,
   description: "patch.description" as const,
   icon: "pencil",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsManagement",
+  category: "ai",
+  subCategory: "threadsManagement",
   tags: ["tags.threads" as const],
 
   fields: objectField(scopedTranslation, {

@@ -22,18 +22,22 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import { MESSENGER_INBOX_ALIAS } from "./constants";
 
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["messenger", "inbox", "list"],
+  aliases: [MESSENGER_INBOX_ALIAS] as const,
   title: "title",
+  titleShort: "titleShort",
   description: "description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.messengerInbox",
+  category: "messenger",
+  subCategory: "Inbox",
   icon: "inbox",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

@@ -217,3 +217,8 @@ export class ContactRepository {
     }
   }
 }
+
+export {
+  adminContactFormEmailTemplate,
+  contactFormEmailTemplate,
+} from "./email";

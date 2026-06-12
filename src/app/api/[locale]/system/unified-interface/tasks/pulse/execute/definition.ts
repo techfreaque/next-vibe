@@ -36,6 +36,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
   category: "devTools",

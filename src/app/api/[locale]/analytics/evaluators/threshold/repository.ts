@@ -5,6 +5,9 @@
 
 import "server-only";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
+
 import type {
   SignalEvent,
   TimeSeries,
@@ -37,5 +40,18 @@ export class ThresholdEvaluatorRepository {
         meta: { op, threshold: value, actual: p.value },
       };
     });
+  }
+
+  static handle(data: {
+    source: TimeSeries;
+    op: string;
+    value: number;
+  }): ResponseType<{ signals: SignalEvent[] }> {
+    const signals = ThresholdEvaluatorRepository.computeThreshold(
+      data.source,
+      data.op,
+      data.value,
+    );
+    return success({ signals });
   }
 }

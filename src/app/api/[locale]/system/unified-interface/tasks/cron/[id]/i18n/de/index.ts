@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Cron-Aufgabe abrufen",
+    titleShort: "Cron-Task",
     description: "Eine einzelne Cron-Aufgabe nach ID abrufen",
     container: {
       title: "Cron-Aufgabendetails",
@@ -72,6 +73,7 @@ export const translations: typeof enTranslations = {
   },
   put: {
     title: "Cron-Aufgabe aktualisieren",
+    titleShort: "Aufgabe aktualisieren",
     description: "Eine bestehende Cron-Aufgabe aktualisieren",
     container: {
       title: "Cron-Aufgabe aktualisieren",
@@ -225,6 +227,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Cron-Aufgabe löschen",
+    titleShort: "Aufgabe löschen",
     description: "Eine Cron-Aufgabe löschen",
     container: {
       title: "Cron-Aufgabe löschen",

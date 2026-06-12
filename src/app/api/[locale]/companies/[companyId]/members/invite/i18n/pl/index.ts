@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Zaproś członka",
+    titleShort: "Zaproś członka",
     description: "Zaproś zarejestrowanego użytkownika do firmy przez e-mail",
     companyId: {
       label: "ID firmy",

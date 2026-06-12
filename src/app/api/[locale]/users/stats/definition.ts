@@ -52,7 +52,7 @@ import {
 import { USERS_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const UsersStatsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UsersStatsContainer })),
@@ -64,10 +64,11 @@ const { GET } = createEndpoint({
   path: ["users", "stats"],
   aliases: [USERS_STATS_ALIAS],
   title: "title" as const,
+  titleShort: "titleShort",
   description: "description" as const,
   icon: "bar-chart-3",
-  category: "userAuth",
-  subCategory: "userAdminStats",
+  category: "account",
+  subCategory: "userStats",
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
   defaultWebPinned: [UserRole.ADMIN] as const,

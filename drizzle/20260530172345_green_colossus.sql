@@ -1,0 +1,2 @@
+ALTER TABLE "payment_bills" ALTER COLUMN "status" SET DEFAULT 'enums.billStatus.DRAFT';
+UPDATE "payment_bills" SET "status" = 'enums.billStatus.' || "status" WHERE "status" IN ('DRAFT', 'RECEIVED', 'APPROVED', 'PAID', 'DISPUTED');

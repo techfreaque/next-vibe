@@ -206,4 +206,4 @@ export const translations = {
     violence: "Violence",
     vision: "Vision",
   },
-} as const;
+};

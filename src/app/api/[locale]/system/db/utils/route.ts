@@ -14,8 +14,7 @@ import { DbUtilsRepository } from "./repository";
 export const { tools } = endpointsHandler({
   endpoint: dbUtilsHealthEndpoint,
   [Methods.GET]: {
-    handler: async ({ data, t, logger }) => {
-      return await DbUtilsRepository.checkHealth(data, t, logger);
-    },
+    handler: async ({ data, t, logger }) =>
+      DbUtilsRepository.checkHealth(data, t, logger),
   },
 });

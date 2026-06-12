@@ -26,7 +26,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { CsvImportJobStatus } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const ImportJobStatusContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ImportJobStatusContainer })),
@@ -41,9 +41,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["leads", "import", "jobs", ":jobId"],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsImport",
+  category: "leads",
+  subCategory: "Import",
   tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "activity",
@@ -300,9 +301,10 @@ const { PATCH } = createEndpoint({
   method: Methods.PATCH,
   path: ["leads", "import", "jobs", ":jobId"],
   title: "patch.title",
+  titleShort: "patch.titleShort",
   description: "patch.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsImport",
+  category: "leads",
+  subCategory: "Import",
   tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "upload",
@@ -589,9 +591,10 @@ const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["leads", "import", "jobs", ":jobId"],
   title: "delete.title",
+  titleShort: "delete.titleShort",
   description: "delete.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsImport",
+  category: "leads",
+  subCategory: "Import",
   tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "upload",

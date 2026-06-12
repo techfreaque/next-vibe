@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Generate Client Routes Index",
+    titleShort: "Client Routes",
     description: "Automatically generate the client routes index file",
     container: {
       title: "Client Routes Index Generator",

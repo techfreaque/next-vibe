@@ -4,6 +4,7 @@ export const translations = {
     emails: "Emails",
   },
   title: "Email Detail",
+  titleShort: "Email Detail",
   description: "Retrieve a single email by its unique identifier",
   container: {
     title: "Email Details",

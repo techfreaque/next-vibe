@@ -47,6 +47,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "wait-for-task"],
   title: "waitForTask.post.title",
+  titleShort: "waitForTask.post.titleShort",
   description: "waitForTask.post.description",
   icon: "clock",
   statusBadge: {
@@ -59,15 +60,15 @@ const { POST } = createEndpoint({
       color: "bg-green-500/10 text-green-500",
     },
   },
-  category: "endpointCategories.tasks",
-  subCategory: "endpointCategories.tasksCron",
+  category: "devTools",
+  subCategory: "tasksCron",
   tags: ["tags.tasks" as const],
   allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
+    UserRole.ADMIN,
   ] as const,
+  defaultAiPinned: [UserRole.ADMIN] as const,
   aliases: ["wait-for-task"],
 
   fields: customWidgetObject({

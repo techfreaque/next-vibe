@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
 
   update: {
     title: "Edytuj adres",
+    titleShort: "Zmień adres",
     description: "Zmień zapisany adres",
     fields: {
       addressId: { label: "ID adresu", description: "Adres do edycji" },
@@ -121,6 +122,7 @@ export const translations: typeof enTranslations = {
 
   delete: {
     title: "Usuń adres",
+    titleShort: "Usuń adres",
     description: "Usuń zapisany adres z konta",
     fields: {
       addressId: { label: "ID adresu", description: "Adres do usunięcia" },

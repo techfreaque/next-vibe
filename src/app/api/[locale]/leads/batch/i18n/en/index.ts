@@ -7,6 +7,7 @@ export const translations = {
 
   patch: {
     title: "Batch Update",
+    titleShort: "Batch Update",
     description: "Batch update leads based on filter criteria",
     form: {
       title: "Batch Update Configuration",
@@ -116,6 +117,7 @@ export const translations = {
   },
   delete: {
     title: "Batch Delete",
+    titleShort: "Batch Delete",
     description: "Batch delete leads based on filter criteria",
     form: {
       title: "Batch Delete Configuration",

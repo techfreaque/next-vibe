@@ -12,6 +12,7 @@ export const translations: typeof enTranslations = {
   generate: {
     post: {
       title: "Expo Indizes Generieren",
+      titleShort: "Expo-Indizes",
       description:
         "Expo Router Kompatibilitäts-Wrapper für Next.js-Seiten generieren",
       response: {

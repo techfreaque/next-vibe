@@ -10,6 +10,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Stream WS Provider",
+    titleShort: "Strumień WS",
     description:
       "Uruchamia strumień AI dla zdalnego klienta WS Provider. Klient wysyła wiadomość, model i opcjonalne definicje narzędzi. Zdarzenia AI są przesyłane strumieniowo przez standardowy kanał WebSocket. Narzędzia klienta wstrzymują strumień do momentu odesłania wyników.",
     fields: {
@@ -71,6 +72,46 @@ export const translations: typeof enTranslations = {
         label: "Strefa czasowa",
         description:
           "Strefa czasowa klienta dla stabilnych znaczników czasu w cache",
+      },
+      toolConfirmations: {
+        title: "Potwierdzenia narzędzi",
+        description:
+          "Zatwierdź lub odrzuć wywołania narzędzi oczekujące na potwierdzenie. Stream wznowi się z wynikiem zatwierdzonego narzędzia.",
+        messageId: {
+          label: "ID wiadomości",
+          description: "ID wiadomości narzędzia oczekującej na potwierdzenie",
+        },
+        confirmed: {
+          label: "Potwierdzono",
+          description: "True, aby zatwierdzić i wykonać; false, aby odrzucić",
+        },
+        updatedArgs: {
+          label: "Zmienione argumenty",
+          description:
+            "Opcjonalnie edytowane argumenty narzędzia użyte przy wykonaniu",
+        },
+      },
+      attachments: {
+        title: "Załączniki",
+        description:
+          "Pliki dołączone do wiadomości użytkownika, zakodowane w base64 na potrzeby transportu.",
+        filename: {
+          label: "Nazwa pliku",
+          description: "Oryginalna nazwa pliku",
+        },
+        mimeType: {
+          label: "Typ MIME",
+          description: "Typ zawartości pliku",
+        },
+        data: {
+          label: "Dane",
+          description: "Zawartość pliku zakodowana w base64",
+        },
+      },
+      messageHistory: {
+        label: "Historia wiadomości",
+        description:
+          "Kontekst rozmowy z instancji wywołującej. Provider nie przechowuje stanu wątku, więc wywołujący dostarcza wcześniejsze wiadomości przy każdej turze.",
       },
     },
     response: {

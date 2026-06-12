@@ -3,6 +3,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Wywołania narzędzi czatu łącznie",
+    titleShort: "Wywołania narzędzi",
     description:
       "Łączna liczba wiadomości z wywołaniami narzędzi na przedział rozdzielczości",
     fields: {

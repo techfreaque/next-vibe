@@ -78,8 +78,8 @@ const { POST } = createEndpoint({
     return undefined;
   },
   icon: "sparkle" as const,
-  category: "endpointCategories.skills",
-  subCategory: "endpointCategories.skillsManagement",
+  category: "ai",
+  subCategory: "skillsManagement",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_CREATE_ALIAS],

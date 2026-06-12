@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Utworzone kody polecające",
+    titleShort: "Kody utworzone",
     description: "Nowe kody polecające utworzone na przedział rozdzielczości",
     fields: {
       resolution: {

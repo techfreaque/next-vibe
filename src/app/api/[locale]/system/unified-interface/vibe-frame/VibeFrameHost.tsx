@@ -8,6 +8,7 @@
 
 "use client";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { JSX } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -28,7 +29,7 @@ export interface VibeFrameHostProps {
   /** Endpoint identifier (e.g. "contact_POST") */
   endpoint: string;
   /** Locale (default: "en-US") */
-  locale?: string;
+  locale?: CountryLanguage;
   /** URL path params for parameterized endpoints */
   urlPathParams?: Record<string, string>;
   /** Pre-fill form data */

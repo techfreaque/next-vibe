@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
   uncategorized: "Inne",
   get: {
     title: "Pomoc narzędzi - odkryj dostępne narzędzia",
+    titleShort: "Pomoc narzędzia",
     description:
       "Wyszukuj i odkrywaj wszystkie dostępne narzędzia. Użyj query do wyszukiwania, category do filtrowania.",
     tags: {
@@ -20,11 +21,8 @@ export const translations: typeof enTranslations = {
       },
       category: {
         label: "Filtr kategorii",
-        description: "Filtruj narzędzia według nazwy kategorii",
-      },
-      subCategory: {
-        label: "Filtr podkategorii",
-        description: "Filtruj narzędzia według nazwy podkategorii",
+        description:
+          "Filtruj narzędzia według kategorii lub podkategorii (bez rozróżniania wielkości liter). Przyjmuje klucz kategorii głównej (np. 'ai') lub nazwę podkategorii (np. 'Search'). Puste pole pokazuje przegląd kategorii.",
       },
       toolName: {
         label: "Nazwa narzędzia (szczegóły)",
@@ -96,6 +94,16 @@ export const translations: typeof enTranslations = {
       platforms: {
         title: "Dostępne platformy",
       },
+      viewAsRole: {
+        label: "Widok jako rola",
+        description:
+          "Zobacz jakie narzędzia są widoczne dla danej roli użytkownika (tylko admin)",
+        options: {
+          admin: "Admin",
+          customer: "Klient",
+          public: "Publiczny",
+        },
+      },
       instanceId: {
         label: "ID instancji",
         description:
@@ -111,6 +119,35 @@ export const translations: typeof enTranslations = {
         description:
           "Pokaż wszystkie, tylko przypięte lub tylko dozwolone narzędzia",
       },
+    },
+    hints: {
+      noCapabilitySnapshot:
+        'Brak snapshotu możliwości dla instancji "{{instanceId}}". Połącz instancję i poczekaj na puls synchronizacji.',
+      remoteFullSchema:
+        'Pełny schemat dla {{count}} narzędzi z "{{instanceId}}". Wywołaj: execute-tool toolName="{{instanceId}}__<name>" input={...}.',
+      remoteList:
+        '{{matched}} z {{total}} narzędzi zdalnej instancji "{{instanceId}}". Ogranicz do ≤{{detailThreshold}} wyników dla pełnych schematów lub podaj toolName=.{{pagination}}',
+      toolNotFound:
+        'Narzędzie "{{name}}" nie znalezione. Użyj query do wyszukiwania po słowach kluczowych.',
+      detailMode:
+        'Wywołaj: execute-tool toolName="{{name}}"{{aliases}}. CLI: vibe {{name}} [--pole=wartość].',
+      detailModeAliases: " (aliasy: {{aliases}})",
+      noToolsMatched:
+        "Brak wyników. Spróbuj szerszego zapytania lub wywołaj bez parametrów.",
+      compactFullSchema:
+        'Pełny schemat dla {{count}} narzędzi. Wywołaj: execute-tool toolName="<name>" input={...}.',
+      compactCategoryOnly:
+        '{{matched}} narzędzi w {{categories}} kategoriach. Użyj category="<name>" lub subCategory="<name>". Poniżej {{listThreshold}} wyników pokazuje nazwy; poniżej {{detailThreshold}} pełne schematy.',
+      compactList:
+        '{{matched}} narzędzi. Ogranicz do ≤{{detailThreshold}} dla schematów lub podaj toolName="<name>" dla szczegółów. Wywołaj: execute-tool toolName="<name>".{{pagination}}',
+      cliFullDetail:
+        "Pełne szczegóły dla {{count}} narzędzi. CLI: vibe <name> [--pole=wartość].",
+      cliList:
+        "Strona {{page}}/{{total}} – {{matched}} narzędzi. Szczegóły: vibe help <name>.",
+      cliListSingle: "{{matched}} narzędzi. Szczegóły: vibe help <name>.",
+      pagination:
+        " Strona {{page}}/{{total}} – podaj page={{next}} aby kontynuować.",
+      paginationCli: " – vibe help --page={{next}}",
     },
     success: {
       title: "Narzędzia pobrane pomyślnie",
@@ -341,6 +378,8 @@ export const translations: typeof enTranslations = {
       selectToolHint: "Wybierz narzędzie z paska bocznego",
       allPlatforms: "Wszystkie platformy",
       prodOnly: "Tylko prod",
+      adminFilters: "Filtry admina",
+      resetPins: "Resetuj piny",
       aiPinsTitle: "Przypięte narzędzia AI",
       aiPinsDescription:
         "Te narzędzia są aktywne w każdej rozmowie z AI. AI może je wywoływać automatycznie — bez żadnych poleceń.",
@@ -348,6 +387,11 @@ export const translations: typeof enTranslations = {
       noPinnedTools: "Brak przypiętych narzędzi",
       noPinnedToolsHint:
         "Przeglądaj wszystkie narzędzia i przypnij te, których chcesz używać z AI",
+      webPinsDescription:
+        "Skróty w sidebarze. Szybki dostęp do przypiętych narzędzi w panelu admina.",
+      aiAllowedDescription:
+        "Narzędzia, które AI może wywoływać na żądanie. Wszystko tutaj może być użyte, gdy AI uzna to za potrzebne.",
+      noAllowedTools: "Brak dozwolonych narzędzi",
     },
 
     platformFilter: {

@@ -6,15 +6,20 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { MessageCircle } from "next-vibe-ui/ui/icons/MessageCircle";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Send } from "next-vibe-ui/ui/icons/Send";
+import { ListItem } from "next-vibe-ui/ui/list-item";
+import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { Span } from "next-vibe-ui/ui/span";
+import { StatusPill } from "next-vibe-ui/ui/status-pill";
+import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import React, { useCallback, useMemo } from "react";
 
 import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/messenger/messages/i18n";
@@ -27,9 +32,10 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 
 import type { MessengerChannelFilterValue } from "../../accounts/enum";
 import {
@@ -53,17 +59,16 @@ interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-const STATUS_STYLE: Record<string, string> = {
-  [MessageStatus.SENT]: "bg-success/10 text-success",
-  [MessageStatus.DELIVERED]:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-  [MessageStatus.FAILED]: "bg-destructive/10 text-destructive",
-  [MessageStatus.PENDING]: "bg-warning/10 text-warning",
-  [MessageStatus.BOUNCED]:
-    "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  [MessageStatus.OPENED]: "bg-info/10 text-info",
-  [MessageStatus.CLICKED]:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+type PillVariant = "default" | "success" | "warning" | "danger" | "info";
+
+const STATUS_VARIANT: Record<string, PillVariant> = {
+  [MessageStatus.SENT]: "success",
+  [MessageStatus.DELIVERED]: "success",
+  [MessageStatus.FAILED]: "danger",
+  [MessageStatus.PENDING]: "warning",
+  [MessageStatus.BOUNCED]: "warning",
+  [MessageStatus.OPENED]: "info",
+  [MessageStatus.CLICKED]: "info",
 };
 
 const STATUS_TABS = [
@@ -103,79 +108,11 @@ const CHANNEL_ICON: Record<
   [MessageChannel.TELEGRAM]: MessageCircle,
 };
 
-function EmailRow({
-  email,
-  onView,
-  t,
-  messagesT,
-}: {
-  email: EmailItem;
-  onView: (email: EmailItem) => void;
-  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
-  messagesT: ReturnType<typeof messagesScopedTranslation.scopedT>["t"];
-}): React.JSX.Element {
-  const status = email.emailCore.status;
-  const channel = email.emailCore.channel ?? MessageChannel.EMAIL;
-  const statusClassName =
-    STATUS_STYLE[status] ??
-    "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
-  const ChannelIcon = CHANNEL_ICON[channel] ?? Mail;
-
+function ChannelAvatar({ channel }: { channel: string }): React.JSX.Element {
+  const Icon = CHANNEL_ICON[channel] ?? Mail;
   return (
-    <Div
-      className="group flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer transition-colors"
-      onClick={() => onView(email)}
-    >
-      <Div className="flex-shrink-0 w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-        <ChannelIcon className="h-4 w-4 text-primary" />
-      </Div>
-
-      <Div className="flex-1 min-w-0">
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Span className="font-semibold text-sm truncate max-w-[240px]">
-            {email.emailCore.subject}
-          </Span>
-          <Span
-            className={cn(
-              "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-              statusClassName,
-            )}
-          >
-            {messagesT(status)}
-          </Span>
-        </Div>
-        <Div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
-          <Span className="truncate max-w-[180px]">
-            {t("widget.to")}: {email.emailParties.recipient.recipientEmail}
-          </Span>
-          {email.emailMetadata.type !== null &&
-            email.emailMetadata.type !== undefined && (
-              <Span className="flex-shrink-0">
-                {messagesT(email.emailMetadata.type)}
-              </Span>
-            )}
-        </Div>
-      </Div>
-
-      <Div className="hidden md:flex flex-col items-end gap-1 flex-shrink-0 text-xs text-muted-foreground">
-        {email.technicalDetails.retryCount > 0 && (
-          <Span>
-            {t("widget.retries")}: {email.technicalDetails.retryCount}
-          </Span>
-        )}
-        {email.emailEngagement.openedAt !== null &&
-          email.emailEngagement.openedAt !== undefined && (
-            <Div style={{ color: "#22c55e", fontSize: "11px" }}>
-              {t("widget.opened")}
-            </Div>
-          )}
-        {email.emailEngagement.clickedAt !== null &&
-          email.emailEngagement.clickedAt !== undefined && (
-            <Div style={{ color: "#8b5cf6", fontSize: "11px" }}>
-              {t("widget.clicked")}
-            </Div>
-          )}
-      </Div>
+    <Div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+      <Icon className="h-4 w-4 text-primary" />
     </Div>
   );
 }
@@ -188,9 +125,12 @@ export function EmailsListContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const value = useWidgetValue<typeof definition.GET>();
   const messagesT = messagesScopedTranslation.scopedT(locale).t;
-  const { push: navigate } = useWidgetNavigation();
+  const { push: navigate, pop } = useWidgetNavigation();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
+
+  const onPick = usePickerCallback<EmailItem>();
+  const isPickerMode = !!onPick;
 
   const activeStatus: typeof MessageStatusFilterValue =
     form.watch("filters.status") ?? MessageStatusFilter.ANY;
@@ -210,6 +150,11 @@ export function EmailsListContainer({
 
   const handleView = useCallback(
     (email: EmailItem): void => {
+      if (isPickerMode && onPick) {
+        onPick(email);
+        pop();
+        return;
+      }
       void (async (): Promise<void> => {
         const msgDef = await import("../[id]/definition");
         navigate(msgDef.default.GET, {
@@ -217,7 +162,7 @@ export function EmailsListContainer({
         });
       })();
     },
-    [navigate],
+    [isPickerMode, onPick, pop, navigate],
   );
 
   const handleRefresh = useCallback((): void => {
@@ -293,48 +238,49 @@ export function EmailsListContainer({
   const totalPages = pagination?.totalPages ?? 1;
   const total = pagination?.total ?? 0;
 
+  const headerActions = !isPickerMode ? (
+    <Div className="flex items-center gap-1">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={handleStats}
+        className="gap-1"
+      >
+        <Span className="hidden @sm:inline">{t("widget.stats")}</Span>
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={handleGraphs}
+        title={t("widget.graphs")}
+        className="gap-1"
+      >
+        <GitBranch className="h-4 w-4" />
+        <Span className="hidden @sm:inline">{t("widget.graphs")}</Span>
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={handleRefresh}
+        title={t("widget.refresh")}
+      >
+        <RefreshCw className="h-4 w-4" />
+      </Button>
+    </Div>
+  ) : undefined;
+
   return (
-    <Div className="flex flex-col gap-0">
+    <WidgetShell padding="none">
       {/* Header */}
-      <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <Span className="font-semibold text-base">
-          {t("title")}
-          {total > 0 && (
-            <Span className="ml-2 text-sm text-muted-foreground font-normal">
-              ({total})
-            </Span>
-          )}
-        </Span>
-        <Div className="flex-1" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleStats}
-          className="gap-1"
-        >
-          <Span className="hidden sm:inline">{t("widget.stats")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleGraphs}
-          title={t("widget.graphs")}
-          className="gap-1"
-        >
-          <GitBranch className="h-4 w-4" />
-          <Span className="hidden sm:inline">{t("widget.graphs")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+      <Div className="px-4 pt-4">
+        <WidgetHeader
+          title={`${t("title")}${total > 0 ? ` (${total})` : ""}`}
+          actions={headerActions}
+          border={false}
+        />
       </Div>
 
       {/* Status filter tabs - scrollable */}
@@ -426,7 +372,7 @@ export function EmailsListContainer({
       </Div>
 
       {/* Search + sort */}
-      <Div className="px-4 pt-2 pb-2 grid grid-cols-1 sm:grid-cols-3 gap-2 border-b">
+      <Div className="px-4 pt-2 pb-2 grid grid-cols-1 @sm:grid-cols-3 gap-2 border-b">
         <TextFieldWidget
           fieldName="filters.search"
           field={field.children.filters.children.search}
@@ -444,27 +390,70 @@ export function EmailsListContainer({
       {/* Email list */}
       <Div className="px-4 pb-2">
         {isLoading ? (
-          <Div className="h-[300px] flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </Div>
+          <LoadingBlock />
         ) : emails.length > 0 ? (
           <Div className="flex flex-col gap-2">
-            {emails.map((email) => (
-              <EmailRow
-                key={email.emailCore.id}
-                email={email}
-                onView={handleView}
-                t={t}
-                messagesT={messagesT}
-              />
-            ))}
+            {emails.map((email) => {
+              const status = email.emailCore.status;
+              const channel = email.emailCore.channel ?? MessageChannel.EMAIL;
+              const subtitle = [
+                `${t("widget.to")}: ${email.emailParties.recipient.recipientEmail}`,
+                email.emailMetadata.type !== null &&
+                email.emailMetadata.type !== undefined
+                  ? messagesT(email.emailMetadata.type)
+                  : null,
+              ]
+                .filter(Boolean)
+                .join(" · ");
+
+              const meta = (
+                <>
+                  {email.technicalDetails.retryCount > 0 && (
+                    <Span className="text-xs text-muted-foreground">
+                      {t("widget.retries")}: {email.technicalDetails.retryCount}
+                    </Span>
+                  )}
+                  {email.emailEngagement.openedAt !== null &&
+                    email.emailEngagement.openedAt !== undefined && (
+                      <Span className="text-xs text-success">
+                        {t("widget.opened")}
+                      </Span>
+                    )}
+                  {email.emailEngagement.clickedAt !== null &&
+                    email.emailEngagement.clickedAt !== undefined && (
+                      <Span className="text-xs text-info">
+                        {t("widget.clicked")}
+                      </Span>
+                    )}
+                </>
+              );
+
+              return (
+                <ListItem
+                  key={email.emailCore.id}
+                  avatar={<ChannelAvatar channel={channel} />}
+                  title={email.emailCore.subject}
+                  badges={
+                    <StatusPill
+                      status={messagesT(status)}
+                      variant={STATUS_VARIANT[status] ?? "default"}
+                    />
+                  }
+                  subtitle={subtitle}
+                  meta={meta}
+                  onClick={() => handleView(email)}
+                />
+              );
+            })}
           </Div>
         ) : (
-          <Div className="text-center text-muted-foreground py-12">
-            {activeStatus !== MessageStatusFilter.ANY
-              ? t("widget.emptyFiltered")
-              : t("widget.emptyState")}
-          </Div>
+          <EmptyBlock
+            title={
+              activeStatus !== MessageStatusFilter.ANY
+                ? t("widget.emptyFiltered")
+                : t("widget.emptyState")
+            }
+          />
         )}
       </Div>
 
@@ -496,6 +485,6 @@ export function EmailsListContainer({
           </Div>
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

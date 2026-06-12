@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Użycie puli",
     title: "Wykorzystanie darmowej puli kredytów",
     description:
       "Wskaźnik zużytych darmowych kredytów w portfelach leadów na przedział rozdzielczości",

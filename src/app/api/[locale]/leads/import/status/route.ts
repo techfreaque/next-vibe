@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Import Jobs Management API Routes
  * Comprehensive CRUD operations for import jobs
@@ -13,8 +14,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, data, logger, t }) => {
-      return await LeadsImportRepository.listImportJobsFormatted(
+    handler: ({ user, data, logger, t }) =>
+      LeadsImportRepository.listImportJobsFormatted(
         user.id,
         {
           status: data.filters.status,
@@ -23,7 +24,6 @@ export const { GET, tools } = endpointsHandler({
         },
         logger,
         t,
-      );
-    },
+      ),
   },
 });

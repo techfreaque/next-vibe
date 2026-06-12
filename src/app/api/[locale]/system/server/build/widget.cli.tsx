@@ -10,7 +10,7 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import {
   useWidgetPlatform,
   useWidgetResponseOnly,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type { BuildResponseOutput } from "./definition";
 

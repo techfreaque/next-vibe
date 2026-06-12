@@ -29,7 +29,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const CampaignStarterConfigContainer = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -43,9 +43,10 @@ const { POST } = createEndpoint({
   path: ["leads", "campaigns", "campaign-starter"],
   aliases: ["campaign-starter"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsProcessing",
+  category: "newsletter",
+  subCategory: "emailCampaignsProcessing",
   icon: "play",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
@@ -349,9 +350,10 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "rocket",
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsProcessing",
+  category: "newsletter",
+  subCategory: "emailCampaignsProcessing",
   tags: ["tag"],
 
   fields: customWidgetObject({

@@ -1,5 +1,6 @@
 export const translations = {
   title: "List Folders",
+  titleShort: "Folders",
   description: "List available folders for a messenger account",
   tag: "Inbox",
 

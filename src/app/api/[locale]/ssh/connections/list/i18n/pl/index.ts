@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "SSH",
 
   enums: {
@@ -11,9 +12,10 @@ export const translations = {
   },
 
   get: {
-    title: "Wylistuj połączenia SSH",
+    title: "Połączenia",
+    titleShort: "Połączenia",
     description:
-      "Wylistuj wszystkie zapisane połączenia SSH dla bieżącego użytkownika",
+      "Wszystkie dostępne maszyny — lokalna powłoka, serwery SSH i zdalne instancje",
     errors: {
       validation: {
         title: "Błąd walidacji",
@@ -40,23 +42,33 @@ export const translations = {
     },
     success: {
       title: "Połączenia wylistowane",
-      description: "Połączenia SSH pobrane",
+      description: "Wszystkie połączenia maszynowe pobrane",
+    },
+    response: {
+      connections: {
+        title: "Połączenia",
+      },
     },
   },
   widget: {
-    title: "Połączenia SSH",
-    addButton: "Dodaj połączenie",
-    testButton: "Testuj",
-    deleteButton: "Usuń",
-    emptyState:
-      "Brak połączeń SSH. Dodaj jedno, aby połączyć się ze zdalnymi maszynami.",
-    labelCol: "Nazwa",
-    hostCol: "Host",
-    userCol: "Użytkownik",
-    authTypeCol: "Uwierzytelnianie",
+    title: "Połączenia",
+    back: "Wróć",
+    addSsh: "Dodaj SSH",
+    connectRemote: "Połącz remote",
+    openTerminal: "Terminal",
+    viewRemote: "Szczegóły",
     defaultBadge: "Domyślne",
-    testingLabel: "Testowanie...",
-    testSuccess: "Połączono",
-    testFailed: "Błąd",
+    localType: "Lokalny",
+    sshType: "SSH",
+    remoteType: "Remote",
+    healthHealthy: "Połączony",
+    healthWarning: "Wolny",
+    healthCritical: "Nieosiągalny",
+    healthDisconnected: "Offline",
+    noConnections: "Brak skonfigurowanych maszyn",
+    noConnectionsHint:
+      "Dodaj połączenie SSH lub połącz zdalną instancję, aby rozpocząć.",
+    emptyState:
+      "Brak połączeń. Dodaj jedno, aby połączyć się ze zdalnymi maszynami.",
   },
 };

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Przesłania formularzy leadów",
+    titleShort: "Przesłania formularzy",
     description: "Liczba zdarzeń przesłania formularza na przedział czasowy",
     fields: {
       resolution: {

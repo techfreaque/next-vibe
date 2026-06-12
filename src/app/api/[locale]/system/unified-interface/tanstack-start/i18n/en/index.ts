@@ -2,6 +2,7 @@ export const translations = {
   generate: {
     post: {
       title: "Generate TanStack Routes",
+      titleShort: "TanStack Routes",
       description:
         "Generate TanStack Router compatibility wrappers for Next.js pages",
       response: {

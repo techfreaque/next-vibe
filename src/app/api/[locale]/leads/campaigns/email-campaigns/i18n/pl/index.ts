@@ -47,6 +47,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Kampanie e-mailowe",
+    titleShort: "Wyślij kampanie",
     description: "Przetwarzaj kampanie e-mailowe dla leadów",
     errors: {
       unauthorized: {
@@ -104,6 +105,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz konfigurację kampanii e-mailowych",
+    titleShort: "Konfiguracja kampanii e-mail",
     description: "Załaduj konfigurację cron kampanii e-mailowych",
     errors: {
       unauthorized: {

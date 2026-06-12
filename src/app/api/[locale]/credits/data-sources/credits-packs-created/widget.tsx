@@ -6,7 +6,7 @@
 
 import React from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetTranslation } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { DataSourceChartWidget } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/data-source-widget";
 
 import definitions from "./definition";

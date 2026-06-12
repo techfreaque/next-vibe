@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "ODER",
+    titleShort: "ODER",
     description:
       "Feuert, wenn irgendein Eingangssignal zu einem bestimmten Zeitstempel feuert",
     fields: {

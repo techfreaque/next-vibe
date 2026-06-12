@@ -1,11 +1,18 @@
 "use client";
 import type { Route } from "next";
-import { usePathname, useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { setCookie } from "next-vibe-ui/lib/cookies";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { storage } from "next-vibe-ui/lib/storage";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
-import type { JSX, ReactNode } from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type JSX,
+  type ReactNode,
+} from "react";
 
 import { LOCALE_COOKIE_NAME } from "@/config/constants";
 

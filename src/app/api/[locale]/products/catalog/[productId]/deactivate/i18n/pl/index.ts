@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Dezaktywuj produkt",
+    titleShort: "Dezaktywuj",
     description:
       "Oznacz produkt z katalogu jako nieaktywny. Dane produktu zostają zachowane.",
     productId: {

@@ -43,10 +43,11 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "thumbs-up",
-  category: "endpointCategories.messages",
-  subCategory: "endpointCategories.messagesModerating",
+  category: "ai",
+  subCategory: "messagesModerating",
   tags: ["tags.messages" as const],
 
   errorTypes: {

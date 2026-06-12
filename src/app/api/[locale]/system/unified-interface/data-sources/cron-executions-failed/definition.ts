@@ -21,7 +21,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { CRON_EXECUTIONS_FAILED_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 const CronExecutionsFailedWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CronExecutionsFailedWidget })),
 );
@@ -37,6 +37,7 @@ const { POST } = createEndpoint({
     "cron-executions-failed",
   ],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
   category: "analytics",

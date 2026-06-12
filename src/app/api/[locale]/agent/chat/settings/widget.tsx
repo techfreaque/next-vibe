@@ -15,8 +15,8 @@ import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/chat/favorites/
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -83,13 +83,16 @@ import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/
 import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/chat/skills/config";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { SearchProviderOptions } from "@/app/api/[locale]/agent/search/enum";
+import {
+  SearchProvider,
+  SearchProviderOptions,
+} from "@/app/api/[locale]/agent/search/enum";
 import { scopedTranslation as searchScopedTranslation } from "@/app/api/[locale]/agent/search/i18n";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import type definition from "./definition";
 import type { ChatSettingsUpdateRequestOutput } from "./definition";
 import { useChatSettings } from "./hooks";
@@ -499,12 +502,27 @@ function SettingsRow({
   description,
   children,
   className,
+  stacked = false,
 }: {
   label: string;
   description?: string;
   children: ReactNode;
   className?: string;
+  stacked?: boolean;
 }): JSX.Element {
+  if (stacked) {
+    return (
+      <Div className={cn("flex flex-col gap-1.5 py-2.5", className)}>
+        <Span className="text-sm font-medium">{label}</Span>
+        {description && (
+          <Span className="text-xs text-muted-foreground leading-relaxed">
+            {description}
+          </Span>
+        )}
+        {children}
+      </Div>
+    );
+  }
   return (
     <Div
       className={cn(
@@ -833,7 +851,7 @@ function PulseSectionDreaming({
           )}
         </Div>
       )}
-      <SettingsRow label={t("post.dreaming.schedule.label")}>
+      <SettingsRow label={t("post.dreaming.schedule.label")} stacked>
         <ScheduleAutocomplete
           value={schedule}
           onChange={onScheduleChange}
@@ -852,7 +870,7 @@ function PulseSectionDreaming({
           defaultSkillId="thea-dreamer"
         />
       </Div>
-      <SettingsRow label={t("post.dreaming.prompt.label")}>
+      <SettingsRow label={t("post.dreaming.prompt.label")} stacked>
         <Textarea
           value={prompt ?? t("post.dreaming.prompt.defaultPrompt")}
           onChange={(e) =>
@@ -860,7 +878,7 @@ function PulseSectionDreaming({
           }
           placeholder={t("post.dreaming.prompt.placeholder")}
           disabled={!enabled}
-          className="text-sm min-h-[80px] resize-none"
+          className="text-sm min-h-[80px] resize-none w-full"
         />
       </SettingsRow>
       <Button
@@ -951,7 +969,7 @@ function PulseSectionAutopilot({
           )}
         </Div>
       )}
-      <SettingsRow label={t("post.autopilot.schedule.label")}>
+      <SettingsRow label={t("post.autopilot.schedule.label")} stacked>
         <ScheduleAutocomplete
           value={schedule}
           onChange={onScheduleChange}
@@ -970,7 +988,7 @@ function PulseSectionAutopilot({
           defaultSkillId="hermes-autopilot"
         />
       </Div>
-      <SettingsRow label={t("post.autopilot.prompt.label")}>
+      <SettingsRow label={t("post.autopilot.prompt.label")} stacked>
         <Textarea
           value={prompt ?? t("post.autopilot.prompt.defaultPrompt")}
           onChange={(e) =>
@@ -978,7 +996,7 @@ function PulseSectionAutopilot({
           }
           placeholder={t("post.autopilot.prompt.placeholder")}
           disabled={!enabled}
-          className="text-sm min-h-[80px] resize-none"
+          className="text-sm min-h-[80px] resize-none w-full"
         />
       </SettingsRow>
       <Button
@@ -1051,7 +1069,7 @@ function PulseSectionMama({
       <SettingsRow label={t("post.mama.toggle.label")}>
         <Switch checked={enabled} onCheckedChange={onToggle} />
       </SettingsRow>
-      <SettingsRow label={t("post.mama.schedule.label")}>
+      <SettingsRow label={t("post.mama.schedule.label")} stacked>
         <ScheduleAutocomplete
           value={schedule}
           onChange={onScheduleChange}
@@ -1059,7 +1077,7 @@ function PulseSectionMama({
           locale={locale}
         />
       </SettingsRow>
-      <SettingsRow label={t("post.mama.prompt.label")}>
+      <SettingsRow label={t("post.mama.prompt.label")} stacked>
         <Textarea
           value={prompt ?? t("post.mama.prompt.defaultPrompt")}
           onChange={(e) =>
@@ -1067,7 +1085,7 @@ function PulseSectionMama({
           }
           placeholder={t("post.mama.prompt.placeholder")}
           disabled={!enabled}
-          className="text-sm min-h-[80px] resize-none"
+          className="text-sm min-h-[80px] resize-none w-full"
         />
       </SettingsRow>
       <Button
@@ -1088,11 +1106,8 @@ function PulseSectionMama({
   );
 }
 
-/** Sentinel value for the "Auto" search provider option (not a real provider ID) */
-const SEARCH_AUTO_VALUE = "auto-detect";
-
 interface ChatSettingsWidgetProps {
-  field: (typeof definition.POST)["fields"];
+  field: (typeof definition.POST)["fields"] | (typeof definition.GET)["fields"];
 }
 
 export function ChatSettingsWidget({
@@ -1247,25 +1262,19 @@ export function ChatSettingsWidget({
       >
         <SettingsRow label={t("post.searchProvider.label")}>
           <Select
-            value={settings.searchProvider ?? SEARCH_AUTO_VALUE}
+            value={settings.searchProvider ?? SearchProvider.AUTO}
             onValueChange={(value) =>
               void handleUpdate({
-                searchProvider:
-                  value === SEARCH_AUTO_VALUE
-                    ? null
-                    : (value as NonNullable<
-                        ChatSettingsUpdateRequestOutput["searchProvider"]
-                      >),
+                searchProvider: value as NonNullable<
+                  ChatSettingsUpdateRequestOutput["searchProvider"]
+                >,
               })
             }
           >
-            <SelectTrigger className="w-[140px] h-8 text-sm">
+            <SelectTrigger className="w-full h-8 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={SEARCH_AUTO_VALUE}>
-                {t("post.searchProvider.auto")}
-              </SelectItem>
               {SearchProviderOptions.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {tSearch(opt.label)}
@@ -1294,7 +1303,7 @@ export function ChatSettingsWidget({
                 })
               }
             >
-              <SelectTrigger className="w-[160px] h-8 text-sm">
+              <SelectTrigger className="w-full h-8 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Teammitglieder",
+    titleShort: "Teammitglieder",
     description: "Alle Mitglieder dieses Unternehmens auflisten",
     companyId: {
       label: "Unternehmens-ID",

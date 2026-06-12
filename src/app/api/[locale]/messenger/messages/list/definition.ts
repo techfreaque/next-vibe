@@ -44,8 +44,9 @@ import {
   SortOrderOptions,
 } from "../enum";
 import { scopedTranslation } from "./i18n";
+import { MESSENGER_MESSAGES_ALIAS } from "./constants";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const EmailsListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.EmailsListContainer })),
@@ -59,13 +60,16 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["messenger", "messages", "list"],
+  aliases: [MESSENGER_MESSAGES_ALIAS] as const,
   title: "title",
+  titleShort: "titleShort",
   description: "description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.messengerMessages",
+  category: "messenger",
+  subCategory: "Messages",
   icon: "file-text",
   tags: ["tags.emails"],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: EmailsListContainer,

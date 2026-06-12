@@ -4,6 +4,7 @@ export const translations = {
   },
   get: {
     title: "View Messenger Account",
+    titleShort: "View Account",
     description: "Get messenger account details",
   },
   enums: {
@@ -66,6 +67,7 @@ export const translations = {
 
   delete: {
     title: "Delete Account",
+    titleShort: "Delete Account",
     description: "Permanently delete this messenger account",
     container: {
       title: "Delete Account",
@@ -85,6 +87,7 @@ export const translations = {
   },
   put: {
     title: "Edit Messenger Account",
+    titleShort: "Edit Account",
     description: "Update messenger account settings",
     success: {
       title: "Account Updated",

@@ -1,10 +1,12 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Chat",
   tags: {
     messages: "Nachrichten",
   },
   post: {
     title: "Nachricht bewerten",
+    titleShort: "Nachricht bewerten",
     description: "Nachricht hoch- oder runterbewerten",
     container: {
       title: "Bewertung",

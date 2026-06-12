@@ -10,7 +10,7 @@
  * - Run it, read the failure, fix the fragment, repeat until green
  *
  * Setup mirrors route.direct.test.ts:
- *   1. connectToHermes → registers hermes-dev on hermes, syncs capabilities
+ *   1. connectToHermes → registers atlas on hermes, syncs capabilities
  *   2. triggerPull → populates capabilities before tests run
  *   3. Override admin user's codingAgent setting to "next-vibe-coder"
  *   4. Create a stable vibe-coder favorite for the test user
@@ -106,7 +106,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
     const {
       connectToHermes,
       disconnectFromHermes,
-      ensureProdUserCredits,
+      ensureRemoteUserCredits,
+      resolveProdAdminToken,
       resolveProdUserId,
       triggerPull,
     } = await import("../../testing/remote-setup");
@@ -171,12 +172,23 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
     await triggerPull();
 
     _prodUserId = await resolveProdUserId();
-    await ensureProdUserCredits(_prodUserId, 5000);
-    await ensureProdUserCredits(testUser.id, 5000);
+    const remoteAdminToken = await resolveProdAdminToken();
+    await ensureRemoteUserCredits(
+      "http://localhost:3002",
+      remoteAdminToken,
+      _prodUserId,
+      5000,
+    );
+    await ensureRemoteUserCredits(
+      "http://localhost:3002",
+      remoteAdminToken,
+      testUser.id,
+      5000,
+    );
   }, 120_000);
 
   afterAll(async () => {
-    const { disconnectFromHermes, unregisterDevFromHermes, closeProdDb } =
+    const { disconnectFromHermes, unregisterDevFromHermes } =
       await import("../../testing/remote-setup");
 
     // ── Restore original codingAgent setting ──
@@ -190,7 +202,6 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       tasks.push(unregisterDevFromHermes(_prodUserId));
     }
     await Promise.all(tasks);
-    await closeProdDb();
     _prodUserId = null;
   });
 
@@ -212,7 +223,12 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       return;
     }
 
-    const aiContent = result.data.lastAiMessageContent ?? "";
+    // Strip <think>...</think> blocks before assertions - AI reasoning may contain
+    // the words "FAILED" or "STEP_OK" while narrating the instructions, not as outcomes.
+    const aiContent = (result.data.lastAiMessageContent ?? "").replace(
+      /<think>[\s\S]*?<\/think>/g,
+      "",
+    );
 
     // ── Assert ai-run was called ──
     const toolMessages = messages.filter((m) => m.role === "tool");
@@ -283,7 +299,12 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       return;
     }
 
-    const aiContent = result.data.lastAiMessageContent ?? "";
+    // Strip <think>...</think> blocks before assertions - AI reasoning may contain
+    // the words "FAILED" or "STEP_OK" while narrating the instructions, not as outcomes.
+    const aiContent = (result.data.lastAiMessageContent ?? "").replace(
+      /<think>[\s\S]*?<\/think>/g,
+      "",
+    );
 
     // ── Assert SSH was addressed ──
     const toolMessages = messages.filter((m) => m.role === "tool");

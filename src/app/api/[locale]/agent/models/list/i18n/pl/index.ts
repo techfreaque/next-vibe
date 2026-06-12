@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     models: "Modele",
   },
@@ -6,7 +7,8 @@ export const translations = {
     ai: "AI",
   },
   get: {
-    title: "Lista modeli AI",
+    title: "Modele",
+    titleShort: "Modele AI",
     description:
       "Przeglądaj i wyszukuj wszystkie dostępne modele AI. Filtruj według typu, poziomu treści, inteligencji, ceny lub możliwości.",
     dynamicTitle: "{{count}} modeli",
@@ -119,12 +121,10 @@ export const translations = {
       supportsTools: "✓ narzędzia",
       noModels: "Żadne modele nie pasują do filtrów.",
       allLabel: "Wszystkie",
-      pageLabel: "strona {{current}}/{{total}}",
       statsLabel: "{{matched}} z {{total}} modeli",
-      statsLabelFiltered: "{{matched}} przefiltrowane",
       free: "Darmowy",
       credits: "~{{cost}} kr.",
       ctx: "kontekst",
     },
   },
-} as const;
+};

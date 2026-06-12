@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Zusammenführen",
+    titleShort: "Zusammenführen",
     description:
       "Zusammenführen - summiert zwei zeitlich ausgerichtete Zeitreihen",
     fields: {

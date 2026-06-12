@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   delete: {
     title: "Löschen",
+    titleShort: "Datei löschen",
     description: "Datei oder Ordner entfernen. Unwiderruflich.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Gelöscht: {{path}}",
     status: {
       loading: "Löschen...",
       done: "Gelöscht",

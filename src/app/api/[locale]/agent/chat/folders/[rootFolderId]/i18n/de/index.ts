@@ -128,6 +128,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Ordner abrufen",
+    titleShort: "Ordner",
     description: "Alle Ordner für den aktuellen Stammordner abrufen",
     rootFolderId: {
       label: "Stammordner",

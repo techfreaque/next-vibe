@@ -1,6 +1,7 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Transfer Volume",
     title: "Credits Transfer Volume",
     description:
       "Sum of positive transfer transaction amounts per resolution bucket",

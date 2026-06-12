@@ -49,6 +49,7 @@ export const translations: typeof enTranslations = {
   warehouseCreate: {
     post: {
       title: "Utwórz magazyn",
+      titleShort: "Nowy magazyn",
       description: "Zarejestruj nowy magazyn dla firmy.",
       widget: {
         backToList: "Wróć do listy magazynów",
@@ -138,7 +139,8 @@ export const translations: typeof enTranslations = {
 
   warehouseList: {
     get: {
-      title: "Lista magazynów",
+      title: "Magazyny",
+      titleShort: "Magazyny",
       description: "Wyświetl wszystkie magazyny firmy.",
       widget: {
         active: "Aktywny",
@@ -150,6 +152,7 @@ export const translations: typeof enTranslations = {
         emptyHint:
           "Utwórz pierwszy magazyn, aby zacząć śledzić stan magazynowy.",
         emptyIcon: "🏭",
+        back: "Wróć",
         loading: "Ładowanie magazynów…",
         load: "Załaduj",
         viewStock: "Pokaż stan",
@@ -213,10 +216,13 @@ export const translations: typeof enTranslations = {
   warehouseGet: {
     get: {
       title: "Pobierz magazyn",
+      titleShort: "Magazyn",
       description: "Pobierz szczegóły konkretnego magazynu.",
       widget: {
+        back: "Wróć",
         edit: "Edytuj magazyn",
         viewStock: "Wyświetl stan",
+        select: "Wybierz magazyn",
       },
       warehouseId: { label: "ID magazynu", description: "Magazyn do pobrania" },
       errors: {
@@ -275,6 +281,7 @@ export const translations: typeof enTranslations = {
   warehouseUpdate: {
     patch: {
       title: "Aktualizuj magazyn",
+      titleShort: "Edytuj magazyn",
       description: "Edytuj dane magazynu.",
       widget: {
         backToWarehouse: "Wróć do magazynu",
@@ -363,9 +370,11 @@ export const translations: typeof enTranslations = {
   stockList: {
     get: {
       title: "Stany magazynowe",
+      titleShort: "Stany magazynowe",
       description:
         "Wyświetl stany magazynowe dla wybranego magazynu wraz z dostępnością i wskaźnikami niskiego stanu.",
       widget: {
+        back: "Wróć",
         lowStock: "Niski stan",
         available: "Dostępne",
         onHand: "Na stanie",
@@ -456,6 +465,7 @@ export const translations: typeof enTranslations = {
   stockAdjust: {
     post: {
       title: "Korekta stanu",
+      titleShort: "Korekta stanu",
       description:
         "Ręczna korekta stanu magazynowego. Użyj wartości ujemnych do odpisania.",
       widget: {
@@ -542,6 +552,7 @@ export const translations: typeof enTranslations = {
   stockReceive: {
     post: {
       title: "Przyjęcie towaru",
+      titleShort: "Przyjęcie towaru",
       description:
         "Zarejestruj przyjęcie towaru — aktualizuje stan i średni ważony koszt.",
       widget: {
@@ -619,6 +630,7 @@ export const translations: typeof enTranslations = {
   stockIssue: {
     post: {
       title: "Wydanie towaru",
+      titleShort: "Wydanie towaru",
       description:
         "Wydaj towar z magazynu. Sprawdza dostępność przed wydaniem.",
       widget: {
@@ -696,6 +708,7 @@ export const translations: typeof enTranslations = {
   transferCreate: {
     post: {
       title: "Utwórz przesunięcie",
+      titleShort: "Nowe przesunięcie",
       description:
         "Utwórz zlecenie przesunięcia między magazynami. Status: Szkic.",
       widget: {
@@ -783,9 +796,11 @@ export const translations: typeof enTranslations = {
 
   transferList: {
     get: {
-      title: "Lista przesunięć",
+      title: "Przesunięcia",
+      titleShort: "Przesunięcia",
       description: "Wyświetl przesunięcia magazynowe firmy.",
       widget: {
+        back: "Wróć",
         newTransfer: "Nowe przesunięcie",
         empty: "Brak przesunięć.",
         emptyHint:
@@ -866,11 +881,14 @@ export const translations: typeof enTranslations = {
   transferGet: {
     get: {
       title: "Pobierz przesunięcie",
+      titleShort: "Przesunięcie",
       description: "Pobierz przesunięcie ze wszystkimi pozycjami.",
       widget: {
+        back: "Wróć",
         dispatch: "Wyślij przesunięcie",
         receive: "Oznacz jako przyjęte",
         status: "Status",
+        select: "Wybierz przesunięcie",
       },
       transferId: {
         label: "ID przesunięcia",
@@ -919,7 +937,9 @@ export const translations: typeof enTranslations = {
         id: "ID przesunięcia",
         companyId: "ID firmy",
         fromWarehouseId: "Magazyn źródłowy",
+        fromWarehouseName: "Magazyn źródłowy",
         toWarehouseId: "Magazyn docelowy",
+        toWarehouseName: "Magazyn docelowy",
         status: "Status",
         reference: "Referencja",
         notes: "Notatki",
@@ -928,6 +948,7 @@ export const translations: typeof enTranslations = {
         items: "Pozycje",
         itemId: "ID pozycji",
         productId: "ID produktu",
+        productName: "Produkt",
         quantityRequested: "Ilość zlecona",
         quantityReceived: "Ilość przyjęta",
       },
@@ -937,6 +958,7 @@ export const translations: typeof enTranslations = {
   transferDispatch: {
     post: {
       title: "Wyślij przesunięcie",
+      titleShort: "Wyślij",
       description:
         "Oznacz przesunięcie jako w drodze. Towar opuszcza magazyn źródłowy.",
       widget: {
@@ -998,6 +1020,7 @@ export const translations: typeof enTranslations = {
   transferReceive: {
     post: {
       title: "Przyjmij przesunięcie",
+      titleShort: "Przyjmij przesunięcie",
       description:
         "Oznacz przesunięcie jako przyjęte. Tworzy ruchy magazynowe i aktualizuje stany.",
       widget: {
@@ -1060,6 +1083,7 @@ export const translations: typeof enTranslations = {
   dashboard: {
     get: {
       title: "Przegląd magazynu",
+      titleShort: "Przegląd",
       description:
         "Aktualny stan zapasów, oczekujące transfery i liczba magazynów.",
       widget: {

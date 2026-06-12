@@ -3,6 +3,7 @@ export const translations = {
   tag: "migration",
   post: {
     title: "Generate Migrations",
+    titleShort: "Generate Migrations",
     description: "Generate Drizzle migration files from schema changes",
     form: {
       title: "Generate Configuration",

@@ -8,7 +8,7 @@ import type { JSX } from "react";
 import * as React from "react";
 
 import type { DataTableProps } from "../../web/ui/data-table";
-import { useIsMcp } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 export type { DataTableProps } from "../../web/ui/data-table";
 

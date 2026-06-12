@@ -23,6 +23,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ThreadStatus, ThreadStatusOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
+import { SEARCH_THREADS_ALIAS } from "./constants";
 
 /**
  * Search Threads Endpoint (GET)
@@ -32,13 +33,15 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads", "search-threads"],
+  aliases: [SEARCH_THREADS_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "search.get.title" as const,
+  titleShort: "search.get.titleShort" as const,
   description: "search.get.description" as const,
   icon: "search",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsSearch",
+  category: "ai",
+  subCategory: "threadsSearch",
   tags: ["tags.threads" as const],
 
   fields: objectField(scopedTranslation, {

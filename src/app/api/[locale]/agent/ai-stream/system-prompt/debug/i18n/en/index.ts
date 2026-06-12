@@ -1,6 +1,7 @@
 export const translations = {
   get: {
     title: "System Prompt Debug",
+    titleShort: "Debug Prompt",
     description:
       "Render the full system prompt for a given user context. Admin/dev only.",
     status: {

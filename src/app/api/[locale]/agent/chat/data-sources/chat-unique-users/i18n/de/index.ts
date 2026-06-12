@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Einzigartige Chat-Benutzer",
+    titleShort: "Eindeutige Nutzer",
     description:
       "Eindeutige Benutzer, die Nachrichten pro Auflösungs-Bucket gesendet haben",
     fields: {

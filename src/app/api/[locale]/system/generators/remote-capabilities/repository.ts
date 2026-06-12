@@ -27,7 +27,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { scopedTranslation as appLocaleScopedTranslation } from "@/app/[locale]/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
@@ -37,7 +36,7 @@ import {
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { RemoteToolCapability } from "@/app/api/[locale]/user/remote-connection/db";
+import type { RemoteToolCapability } from "@/app/api/[locale]/remote-connection/db";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   filterUserPermissionRoles,
@@ -366,14 +365,18 @@ export class RemoteCapabilitiesGeneratorRepository {
     defFiles: string[],
     logger: EndpointLogger,
   ): Promise<Array<{ definition: CreateApiEndpointAny }>> {
-    const results: Array<{ definition: CreateApiEndpointAny }> = [];
-
-    for (const defFile of defFiles) {
-      const defaultExport =
-        await RemoteCapabilitiesGeneratorRepository.importDefinitionFile(
+    const imported = await Promise.all(
+      defFiles.map((defFile) =>
+        RemoteCapabilitiesGeneratorRepository.importDefinitionFile(
           defFile,
           logger,
-        );
+        ),
+      ),
+    );
+
+    const results: Array<{ definition: CreateApiEndpointAny }> = [];
+
+    for (const defaultExport of imported) {
       if (!defaultExport || typeof defaultExport !== "object") {
         continue;
       }
@@ -445,8 +448,6 @@ export class RemoteCapabilitiesGeneratorRepository {
     locale: CountryLanguage,
   ): RemoteToolCapability[] {
     const capabilities: RemoteToolCapability[] = [];
-    const { t: appLocaleT } = appLocaleScopedTranslation.scopedT(locale);
-
     for (const { definition } of loaded) {
       try {
         const { t } = definition.scopedTranslation.scopedT(locale);
@@ -456,8 +457,7 @@ export class RemoteCapabilitiesGeneratorRepository {
 
         const description = t(definition.description ?? definition.title);
 
-        // category is a scoped categories key like "chat"
-        const category = appLocaleT(definition.category);
+        const category = definition.category;
 
         // Translate tags via scoped i18n
         const tags = (definition.tags ?? []).map((tag: string) => {

@@ -42,6 +42,7 @@ export const translations: typeof enTranslations = {
   vendorCreate: {
     post: {
       title: "Lieferant anlegen",
+      titleShort: "Lieferant erstellen",
       description: "Neuen Lieferanten für Ihr Unternehmen registrieren.",
       widget: {
         back: "Zurück",
@@ -185,7 +186,8 @@ export const translations: typeof enTranslations = {
 
   vendorList: {
     get: {
-      title: "Lieferanten auflisten",
+      title: "Lieferanten",
+      titleShort: "Lieferanten",
       description: "Alle Lieferanten eines Unternehmens anzeigen.",
       widget: {
         back: "Zurück",
@@ -261,6 +263,7 @@ export const translations: typeof enTranslations = {
   vendorGet: {
     get: {
       title: "Lieferant abrufen",
+      titleShort: "Lieferantdetails",
       description: "Vollständige Details eines Lieferanten abrufen.",
       widget: {
         back: "Zurück",
@@ -342,6 +345,7 @@ export const translations: typeof enTranslations = {
   vendorUpdate: {
     patch: {
       title: "Lieferant aktualisieren",
+      titleShort: "Lieferant aktualisieren",
       description: "Lieferantendaten bearbeiten.",
       widget: {
         backToVendor: "Zurück zum Lieferanten",
@@ -481,6 +485,7 @@ export const translations: typeof enTranslations = {
   vendorDeactivate: {
     post: {
       title: "Lieferant deaktivieren",
+      titleShort: "Deaktivieren",
       description:
         "Lieferant als inaktiv markieren. Bestehende Bestellungen bleiben unverändert.",
       vendorId: {
@@ -541,6 +546,7 @@ export const translations: typeof enTranslations = {
   orderCreate: {
     post: {
       title: "Bestellung erstellen",
+      titleShort: "Bestellung erstellen",
       description: "Neue Bestellung im Entwurfsstatus anlegen.",
       errors: {
         validation: {
@@ -663,7 +669,8 @@ export const translations: typeof enTranslations = {
 
   orderList: {
     get: {
-      title: "Bestellungen auflisten",
+      title: "Bestellungen",
+      titleShort: "Bestellungen",
       description:
         "Bestellungen eines Unternehmens mit optionalem Statusfilter anzeigen.",
       widget: {
@@ -746,6 +753,7 @@ export const translations: typeof enTranslations = {
   orderGet: {
     get: {
       title: "Bestellung abrufen",
+      titleShort: "Bestellungsdetails",
       description:
         "Bestellung mit allen Positionen und Wareneingangshistorie abrufen.",
       widget: {
@@ -851,6 +859,7 @@ export const translations: typeof enTranslations = {
   orderUpdate: {
     patch: {
       title: "Bestellung aktualisieren",
+      titleShort: "Bestellung aktualisieren",
       description: "Entwurfsbestellung bearbeiten — Felder und Positionen.",
       widget: { backToPO: "Zurück zur Bestellung" },
       poId: { label: "Bestell-ID", description: "Zu bearbeitende Bestellung" },
@@ -969,6 +978,7 @@ export const translations: typeof enTranslations = {
   orderSend: {
     post: {
       title: "Bestellung senden",
+      titleShort: "Bestellung senden",
       description: "Bestellung als an Lieferant gesendet markieren.",
       poId: { label: "Bestell-ID", description: "Zu sendende Bestellung" },
       widget: {
@@ -1029,6 +1039,7 @@ export const translations: typeof enTranslations = {
   orderConfirm: {
     post: {
       title: "Bestellung bestätigen",
+      titleShort: "Bestellung bestätigen",
       description: "Lieferant hat bestätigt — als Bestätigt markieren.",
       poId: { label: "Bestell-ID", description: "Zu bestätigende Bestellung" },
       widget: {
@@ -1088,6 +1099,7 @@ export const translations: typeof enTranslations = {
   orderReceive: {
     post: {
       title: "Waren annehmen",
+      titleShort: "Waren empfangen",
       description:
         "Wareneingang für eine Bestellung erfassen. Erstellt Lagerbuchungen.",
       widget: { backToPO: "Zurück zur Bestellung" },
@@ -1167,6 +1179,7 @@ export const translations: typeof enTranslations = {
   orderConvertToBill: {
     post: {
       title: "In Rechnung umwandeln",
+      titleShort: "In Rechnung umwandeln",
       description: "Aus dieser Bestellung eine Eingangsrechnung erstellen.",
       widget: {
         back: "Zurück",
@@ -1231,6 +1244,7 @@ export const translations: typeof enTranslations = {
         lineAdded: "Position hinzugefügt",
       },
       title: "Position hinzufügen",
+      titleShort: "Zeile hinzufügen",
       description: "Eine Position zur Bestellung hinzufügen.",
       poId: {
         label: "Bestell-ID",
@@ -1315,12 +1329,18 @@ export const translations: typeof enTranslations = {
   orderLineRemove: {
     post: {
       title: "Position entfernen",
+      titleShort: "Zeile entfernen",
       description: "Eine Position aus der Bestellung entfernen.",
       poId: {
         label: "Bestell-ID",
         description: "Bestellung, aus der eine Position entfernt wird",
       },
       lineId: { label: "Positions-ID", description: "Zu entfernende Position" },
+      widget: {
+        backToOrder: "Zurück zur Bestellung",
+        warning:
+          "Die Position wird unwiderruflich aus der Bestellung entfernt.",
+      },
       errors: {
         validation: {
           title: "Validierungsfehler",
@@ -1374,6 +1394,7 @@ export const translations: typeof enTranslations = {
   dashboard: {
     get: {
       title: "Einkaufsübersicht",
+      titleShort: "Übersicht",
       description:
         "Aktueller Stand der Bestellungen und Lieferantenaktivitäten für Ihr Unternehmen.",
       widget: {
@@ -1448,6 +1469,7 @@ export const translations: typeof enTranslations = {
   orderCancel: {
     post: {
       title: "Bestellung stornieren",
+      titleShort: "Bestellung stornieren",
       description: "Entwurf- oder gesendete Bestellung stornieren.",
       poId: { label: "Bestell-ID", description: "Zu stornierende Bestellung" },
       widget: {

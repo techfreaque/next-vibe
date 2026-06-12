@@ -20,7 +20,7 @@ import { UserRole } from "../../user/user-roles/enum";
 import { scopedTranslation } from "../i18n";
 import { REFERRAL_STATS_ALIAS } from "./constants";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const ReferralStatsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ReferralStatsContainer })),
@@ -34,13 +34,20 @@ export const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["referral", "stats"],
   aliases: [REFERRAL_STATS_ALIAS],
-  title: "stats.get.title",
-  description: "stats.get.description",
-  category: "endpointCategories.referral",
-  subCategory: "endpointCategories.referralProgram",
-  icon: "trending-up",
-  tags: ["tags.referral", "tags.get"],
+  title: "stats.get.title" as const,
+  titleShort: "stats.get.titleShort" as const,
+  description: "stats.get.description" as const,
+  category: "referral" as const,
+  subCategory: "Program" as const,
+  icon: "trending-up" as const,
+  tags: ["tags.referral" as const, "tags.get" as const],
   allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
+  ] as const,
+  defaultWebPinned: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
@@ -134,49 +141,49 @@ export const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.network.title",
-      description: "errors.network.description",
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.unauthorized.title",
-      description: "errors.unauthorized.description",
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title",
-      description: "errors.forbidden.description",
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title",
-      description: "errors.notFound.description",
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.serverError.title",
-      description: "errors.serverError.description",
+      title: "errors.serverError.title" as const,
+      description: "errors.serverError.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.unknown.title",
-      description: "errors.unknown.description",
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.unsavedChanges.title",
-      description: "errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "success.title",
-    description: "success.description",
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 });
 
 export type StatsGetResponseOutput = typeof GET.types.ResponseOutput;
 
-export default { GET };
+export default { GET } as const;

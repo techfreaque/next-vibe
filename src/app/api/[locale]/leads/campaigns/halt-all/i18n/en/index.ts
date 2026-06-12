@@ -3,6 +3,7 @@ export const translations = {
   description: "Stop all active email campaigns",
   post: {
     title: "Halt All Campaigns",
+    titleShort: "Halt Campaigns",
     description:
       "Immediately halt all active email campaigns and cancel pending sends",
     fields: {

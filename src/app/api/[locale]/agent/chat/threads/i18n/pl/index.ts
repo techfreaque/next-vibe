@@ -8,7 +8,8 @@ export const translations: typeof enTranslations = {
     count_failed: "Nie udało się pobrać liczby konwersacji: {{error}}",
   },
   get: {
-    title: "Lista wątków czatu",
+    title: "Wątki",
+    titleShort: "Wątki",
     description:
       "Pobierz stronicowaną listę wątków czatu z opcjami filtrowania",
     container: {
@@ -176,7 +177,8 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Utwórz wątek czatu",
+    title: "Nowy wątek",
+    titleShort: "Nowy wątek",
     description: "Utwórz nowy wątek czatu",
     form: {
       title: "Utwórz wątek",

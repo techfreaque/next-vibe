@@ -13,13 +13,13 @@ import generateEndpoints from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: generateEndpoints,
   [Methods.POST]: {
-    handler: async ({ user, t }) => {
+    handler: async ({ user, t }) =>
       // Dynamic import keeps repository out of the static module graph so
       // Turbopack's NFT tracer doesn't follow process.cwd() + fs calls here.
-      const { GenerateTanstackRoutesRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return GenerateTanstackRoutesRepository.generate(user, t);
-    },
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).GenerateTanstackRoutesRepository.generate(user, t),
   },
 });

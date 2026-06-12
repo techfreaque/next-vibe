@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Chat-Nachrichten mit Anhängen",
+    titleShort: "Anhänge",
     description: "Nachrichten mit Dateianhängen pro Auflösungs-Bucket",
     fields: {
       resolution: {

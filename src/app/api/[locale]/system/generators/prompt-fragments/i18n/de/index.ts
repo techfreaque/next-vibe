@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Generatoren",
 
   post: {
     title: "Prompt-Fragmente generieren",
+    titleShort: "Prompt-Fragmente",
     description: "Prompt-Fragmente-Index mit dynamischen Importen generieren",
     container: {
       title: "Prompt-Fragmente-Generierung",

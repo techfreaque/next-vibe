@@ -11,6 +11,7 @@ export const translations = {
   },
   get: {
     title: "Task Queue",
+    titleShort: "Task Queue",
     description:
       "View the upcoming task execution queue sorted by next run time",
     fields: {

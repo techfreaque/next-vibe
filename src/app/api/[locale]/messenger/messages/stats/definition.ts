@@ -54,7 +54,7 @@ import {
 } from "./enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const EmailStatsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.EmailStatsContainer })),
@@ -70,11 +70,13 @@ const { GET } = createEndpoint({
   path: ["messenger", "messages", "stats"],
   aliases: [EMAIL_STATS_ALIAS],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
 
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.messengerMessages",
+  category: "messenger",
+  subCategory: "Messages",
   icon: "bar-chart-3",
   tags: ["tags.stats", "tags.analytics"],
 

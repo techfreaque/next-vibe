@@ -13,13 +13,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, data, logger, locale }) => {
-      return SearchThreadsRepository.searchThreads(
-        user.id,
-        data,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ user, data, logger, locale }) =>
+      SearchThreadsRepository.searchThreads(user.id, data, logger, locale),
   },
 });

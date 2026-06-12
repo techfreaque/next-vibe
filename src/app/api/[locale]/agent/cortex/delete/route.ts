@@ -8,8 +8,8 @@ export const { DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.DELETE]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger, t }) => {
-      return CortexDeleteRepository.deleteNode({
+    handler: async ({ data, user, locale, logger, t }) =>
+      CortexDeleteRepository.deleteNode({
         userId: user.id,
         user,
         locale,
@@ -17,7 +17,6 @@ export const { DELETE, tools } = endpointsHandler({
         recursive: data.recursive,
         logger,
         t,
-      });
-    },
+      }),
   },
 });

@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
     run: {
       post: {
         title: "Coding-Agent ausführen",
+        titleShort: "Coding-Agent",
         dynamicTitle: "Coding-Agent: {{prompt}}",
         description:
           "Führt eine Coding-Agent-Aufgabe aus. Batch-Modus (STANDARD): läuft headless und gibt die Ausgabe zurück. Interaktiver Modus: öffnet eine Live-Terminal-Sitzung.",

@@ -6,7 +6,8 @@ export const translations = {
     count_failed: "Failed to get conversation count: {{error}}",
   },
   get: {
-    title: "List Chat Threads",
+    title: "Threads",
+    titleShort: "Threads",
     description:
       "Retrieve a paginated list of chat threads with filtering options",
     container: {
@@ -173,7 +174,8 @@ export const translations = {
     },
   },
   post: {
-    title: "Create Chat Thread",
+    title: "New Thread",
+    titleShort: "New Thread",
     description: "Create a new chat thread",
     form: {
       title: "Create Thread",

@@ -107,6 +107,7 @@ export class RebuildRepository {
               skipTaskIndex: false,
               enableTrpc: false,
               skipTanstack: data.framework !== ServerFramework.TANSTACK,
+              force: false,
             },
             logger,
             locale,

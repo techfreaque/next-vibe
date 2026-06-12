@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Hintergrundaufgaben-Statistiken Abrufen",
+    titleShort: "Cron-Statistiken",
     description: "Umfassende Statistiken und Metriken für Cron-Tasks abrufen",
     tag: "Hintergrund-Statistiken",
     form: {

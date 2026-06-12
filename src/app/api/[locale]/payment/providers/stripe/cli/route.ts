@@ -12,8 +12,7 @@ import { CliStripeRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, t, logger }) => {
-      return CliStripeRepository.processStripe(data, user, t, logger);
-    },
+    handler: ({ data, user, t, logger }) =>
+      CliStripeRepository.processStripe(data, user, t, logger),
   },
 });

@@ -2,18 +2,21 @@
  * CLI Select - interactive keyboard navigation
  * Items are collected via SelectItem children, Select manages state
  */
-import { Box, Text, useInput } from "ink";
+import { Box, Text, useFocus, useInput } from "ink";
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import type { JSX } from "react";
 
-import { useIsMcp } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useFocusScopeRegister, useShouldFocus } from "./dialog";
+
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type {
   SelectRootProps,
   SelectGroupProps,
@@ -47,6 +50,7 @@ interface SelectContextType {
   setCursor: (c: number) => void;
   registerItem: (value: string, label: string, disabled: boolean) => () => void;
   items: Array<{ value: string; label: string; disabled: boolean }>;
+  isFocused: boolean;
 }
 
 const SelectContext = createContext<SelectContextType | null>(null);
@@ -64,6 +68,7 @@ function useSelectContext(): SelectContextType {
       setCursor: () => undefined,
       registerItem: () => () => undefined,
       items: [],
+      isFocused: false,
     };
   }
   return ctx;
@@ -91,6 +96,15 @@ export function Select<TValue extends string>({
     Array<{ value: string; label: string; disabled: boolean }>
   >([]);
   const [, forceUpdate] = useState(0);
+  // Stable ID for Ink's focus system
+  const idRef = useRef(`select-${Math.random().toString(36).slice(2, 7)}`);
+  const shouldFocus = useShouldFocus();
+  const { isFocused } = useFocus({
+    id: idRef.current,
+    autoFocus: false,
+    isActive: shouldFocus,
+  });
+  useFocusScopeRegister(idRef.current);
 
   const registerItem = useCallback(
     (itemValue: string, label: string, itemDisabled: boolean) => {
@@ -154,20 +168,25 @@ export function Select<TValue extends string>({
         setOpen(false);
       }
     },
-    { isActive: !isMcp && !disabled },
+    { isActive: !isMcp && !disabled && (isFocused || open) },
   );
 
-  const ctx: SelectContextType = {
-    value,
-    onValueChange: onValueChange as ((v: string) => void) | undefined,
-    disabled,
-    open,
-    setOpen,
-    cursor,
-    setCursor,
-    registerItem,
-    items: itemsRef.current,
-  };
+  const ctx: SelectContextType = useMemo(
+    () => ({
+      value,
+      onValueChange: onValueChange as ((v: string) => void) | undefined,
+      disabled,
+      open,
+      setOpen,
+      cursor,
+      setCursor,
+      registerItem,
+      items: itemsRef.current,
+      isFocused,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [value, onValueChange, disabled, open, cursor, registerItem, isFocused],
+  );
 
   return (
     <SelectContext.Provider value={ctx}>{children}</SelectContext.Provider>
@@ -181,7 +200,7 @@ export function SelectGroup({ children }: SelectGroupProps): JSX.Element {
 SelectGroup.displayName = "SelectGroup";
 
 export function SelectValue({ placeholder }: SelectValueProps): JSX.Element {
-  const { value, items, disabled, open } = useSelectContext();
+  const { value, items, disabled, open, isFocused } = useSelectContext();
   const isMcp = useIsMcp();
 
   const selectedLabel = items.find((i) => i.value === value)?.label ?? value;
@@ -191,9 +210,19 @@ export function SelectValue({ placeholder }: SelectValueProps): JSX.Element {
     return <Text>{display}</Text>;
   }
 
+  const isActive = isFocused || open;
+  // Text-based focus: «...» when focused, [...] when not.
+  // Survives ANSI stripping so agents can detect focus in frame capture.
+  const open_ = isFocused ? "«" : "[";
+  const close_ = isFocused ? "»" : "]";
   return (
-    <Text dimColor={!selectedLabel} color={disabled ? undefined : "cyan"}>
+    <Text
+      dimColor={!selectedLabel}
+      color={disabled ? undefined : isActive ? "cyan" : "gray"}
+    >
+      {open_}
       {open ? `▼ ${display}` : `▶ ${display}`}
+      {close_}
     </Text>
   );
 }

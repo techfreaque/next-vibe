@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Ścieżka JSON",
+    titleShort: "JSON Path",
     description:
       "Ścieżka JSON - wyodrębnia wartość przez notację kropkową (przestarzałe, zwraca pustą tablicę)",
     fields: {

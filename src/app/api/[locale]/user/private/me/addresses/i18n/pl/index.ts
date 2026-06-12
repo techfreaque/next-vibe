@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
 
   list: {
     title: "Moje adresy",
+    titleShort: "Moje adresy",
     description: "Lista zapisanych adresów",
     response: {
       addresses: "Adresy",
@@ -17,6 +18,9 @@ export const translations: typeof enTranslations = {
       billing: "Rozliczeniowy",
       delivery: "Dostawczy",
       empty: "Brak zapisanych adresów",
+      emptyHint: "Zapisz adresy, by szybciej składać zamówienia",
+      emptyCta: "Dodaj pierwszy adres",
+      loading: "Ładowanie adresów…",
     },
     errors: {
       validation: {
@@ -49,6 +53,7 @@ export const translations: typeof enTranslations = {
 
   create: {
     title: "Dodaj adres",
+    titleShort: "Dodaj adres",
     description: "Zapisz nowy adres na koncie",
     fields: {
       label: {

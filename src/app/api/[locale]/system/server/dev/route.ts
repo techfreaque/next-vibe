@@ -13,11 +13,11 @@ import endpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, locale, logger }) => {
-      const { DevRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return await DevRepository.execute(data, locale, logger);
-    },
+    handler: async ({ data, locale, logger }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).DevRepository.execute(data, locale, logger),
   },
 });

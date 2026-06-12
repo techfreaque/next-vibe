@@ -1,9 +1,11 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     publicFeed: "Publiczny Feed",
   },
   get: {
     title: "Feed społeczności",
+    titleShort: "Publiczny feed",
     description: "Publiczne wątki udostępnione społeczności",
     sortMode: {
       label: "Sortowanie",
@@ -51,6 +53,10 @@ export const translations = {
       pageSize: { content: "Rozmiar strony" },
     },
     errors: {
+      validationFailed: {
+        title: "Błąd walidacji",
+        description: "Nieprawidłowe parametry żądania",
+      },
       validation: {
         title: "Błąd walidacji",
         description: "Nieprawidłowe parametry żądania",
@@ -71,11 +77,23 @@ export const translations = {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
       },
+      serverError: {
+        title: "Błąd serwera",
+        description: "Wystąpił wewnętrzny błąd serwera",
+      },
       network: {
         title: "Błąd sieci",
         description: "Nie można połączyć się z serwerem",
       },
+      networkError: {
+        title: "Błąd sieci",
+        description: "Nie można połączyć się z serwerem",
+      },
       unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieoczekiwany błąd",
+      },
+      unknownError: {
         title: "Nieznany błąd",
         description: "Wystąpił nieoczekiwany błąd",
       },

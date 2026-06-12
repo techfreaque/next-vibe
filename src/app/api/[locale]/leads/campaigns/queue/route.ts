@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Campaign Queue API Route Handler
  */

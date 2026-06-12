@@ -4,12 +4,10 @@
  */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
-  WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   lookbackRequestField,
@@ -24,24 +22,29 @@ import { scopedTranslation } from "./i18n";
 
 import { USERS_ACTIVE_TOTAL_ALIAS } from "./constants";
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+const UsersActiveTotalWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UsersActiveTotalWidget })),
+);
+
 const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [USERS_ACTIVE_TOTAL_ALIAS],
   method: Methods.POST,
   path: ["user", "data-sources", "users-active-total"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsDataSources",
-  subCategory: "endpointCategories.users",
+  category: "analytics",
+  subCategory: "usersData",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: UsersActiveTotalWidget,
+    noFormElement: true,
+    usage: { request: "data", response: true } as const,
     children: {
       resolution: resolutionRequestField(scopedTranslation, {
         label: "post.fields.resolution.label",

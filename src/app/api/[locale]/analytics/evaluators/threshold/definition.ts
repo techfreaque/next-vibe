@@ -45,10 +45,11 @@ const { POST } = createEndpoint({
     "threshold",
   ],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsEvaluators",
-  subCategory: "endpointCategories.analyticsEvaluators",
+  category: "analytics",
+  subCategory: "Evaluators",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 

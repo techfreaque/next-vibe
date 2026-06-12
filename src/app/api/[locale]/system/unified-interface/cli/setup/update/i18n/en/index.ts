@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Update",
+    titleShort: "Update CLI",
     description: "Update endpoint",
     form: {
       title: "Update Configuration",

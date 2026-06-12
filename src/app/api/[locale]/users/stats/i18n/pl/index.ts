@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Statystyki użytkowników",
+  titleShort: "Statystyki użytkowników",
   description: "Kompleksowe analizy i statystyki użytkowników",
   category: "Użytkownicy",
   tag: "Statystyki",

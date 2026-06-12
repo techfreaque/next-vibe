@@ -8,13 +8,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
-      return await CoaSetupRepository.setupChartOfAccounts(
-        data,
-        user.id,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ data, user, logger, locale }) =>
+      CoaSetupRepository.setupChartOfAccounts(data, user.id, logger, locale),
   },
 });

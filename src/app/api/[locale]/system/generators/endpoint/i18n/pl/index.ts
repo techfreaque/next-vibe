@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Endpoint Generator",
+    titleShort: "Generator endpointów",
     description: "Generate endpoint.ts with dynamic imports",
     container: {
       title: "Endpoint Generator Configuration",

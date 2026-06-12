@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   get: {
     title: "Pokaż folder",
+    titleShort: "Lista plików",
     description: "Zobacz co jest w folderze.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Wylistowano: {{path}}",
     status: {
       loading: "Listowanie...",
       done: "Wylistowano",
@@ -13,7 +15,8 @@ export const translations = {
     fields: {
       path: {
         label: "Ścieżka",
-        description: "Który folder, np. / lub /documents",
+        description:
+          "Folder do wylistowania. /ssh → wszystkie maszyny. /ssh/<nazwa>/ → pliki lub punkty montowania. /ssh/<nazwa>/<mount>/ → zawartość punktu montowania.",
       },
     },
     submitButton: {

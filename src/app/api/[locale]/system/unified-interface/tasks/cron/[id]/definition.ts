@@ -35,6 +35,7 @@ import {
   TaskOutputModeOptions,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
 import { taskInputSchema, taskOwnerSchema } from "../db";
 import {
@@ -43,10 +44,18 @@ import {
   CRON_UPDATE_ALIAS,
 } from "./constants";
 import { scopedTranslation } from "./i18n";
-import {
-  CronTaskDetailContainer,
-  CronTaskEditContainer,
-} from "./widget/widget";
+
+const CronTaskDetailContainer = lazyWidget(() =>
+  import("./widget/widget").then((m) => ({
+    default: m.CronTaskDetailContainer,
+  })),
+);
+
+const CronTaskEditContainer = lazyWidget(() =>
+  import("./widget/widget").then((m) => ({
+    default: m.CronTaskEditContainer,
+  })),
+);
 
 /**
  * GET /cron/task/[id] - Get individual task
@@ -57,12 +66,12 @@ const { GET } = createEndpoint({
   path: ["system", "unified-interface", "tasks", "cron", "[id]"],
   aliases: [CRON_GET_ALIAS],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
   icon: "clock",
-  category: "endpointCategories.tasks",
-  subCategory: "endpointCategories.tasksCron",
+  category: "devTools",
+  subCategory: "tasksCron",
   allowedRoles: [
-    UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
@@ -378,10 +387,9 @@ const { PUT } = createEndpoint({
   title: "put.title",
   description: "put.description",
   icon: "clock",
-  category: "endpointCategories.tasks",
-  subCategory: "endpointCategories.tasksCron",
+  category: "devTools",
+  subCategory: "tasksCron",
   allowedRoles: [
-    UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
@@ -938,10 +946,9 @@ const { DELETE } = createEndpoint({
   title: "delete.title",
   description: "delete.description",
   icon: "clock",
-  category: "endpointCategories.tasks",
-  subCategory: "endpointCategories.tasksCron",
+  category: "devTools",
+  subCategory: "tasksCron",
   allowedRoles: [
-    UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,

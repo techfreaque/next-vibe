@@ -41,10 +41,11 @@ export const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["lead-magnet", "captures"],
   title: "list.title" as const,
+  titleShort: "list.titleShort" as const,
   description: "list.description" as const,
   icon: "users",
-  category: "endpointCategories.leadMagnet",
-  subCategory: "endpointCategories.leadMagnetCapture",
+  category: "leads",
+  subCategory: "Capture",
   tags: ["list.tag" as const],
   allowedRoles: ALLOWED_ROLES,
 

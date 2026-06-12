@@ -84,13 +84,13 @@ import {
   useWidgetLocale,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import { CountryLanguageValues } from "@/i18n/core/config";
 
 import type definition from "./definition";
@@ -100,7 +100,15 @@ interface CustomWidgetProps {
 }
 
 const DAY_OPTIONS = [1, 2, 3, 4, 5, 6, 7] as const;
-const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+const DAY_LABEL_KEYS = [
+  "widget.days.mon",
+  "widget.days.tue",
+  "widget.days.wed",
+  "widget.days.thu",
+  "widget.days.fri",
+  "widget.days.sat",
+  "widget.days.sun",
+] as const;
 
 export function CampaignStarterConfigContainer({
   field,
@@ -442,7 +450,7 @@ function LocaleConfigRow({
                 updateEntry({ enabledDays: days });
               }}
             >
-              {DAY_LABELS[i]}
+              {t(DAY_LABEL_KEYS[i] as Parameters<typeof t>[0])}
             </Button>
           );
         })}

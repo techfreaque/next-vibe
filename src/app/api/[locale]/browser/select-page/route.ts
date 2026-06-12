@@ -4,9 +4,8 @@
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { BrowserTool, BrowserSharedRepository } from "./repository";
 
-import { BrowserTool } from "../enum";
-import { BrowserSharedRepository } from "../shared/repository";
 import selectPageEndpoints, {
   type SelectPageResponseOutput,
 } from "./definition";
@@ -23,6 +22,7 @@ export const { POST, tools } = endpointsHandler({
             pageId: data.pageId,
             bringToFront: data.bringToFront,
           }),
+          instanceId: data.instanceId,
         },
         t,
         logger,

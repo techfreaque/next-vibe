@@ -7,6 +7,7 @@ export const translations = {
     run: {
       post: {
         title: "Run Coding Agent",
+        titleShort: "Coding Agent",
         dynamicTitle: "Coding Agent: {{prompt}}",
         description:
           "Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.",

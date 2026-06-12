@@ -18,6 +18,7 @@ export const translations = {
   },
   post: {
     title: "Unified Task Runner",
+    titleShort: "Task Runner",
     description:
       "Manage unified task runner for background tasks and side tasks",
     container: {

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Wolumen zwrotów",
+    titleShort: "Wolumen zwrotów",
     description: "Suma kwot zwrotów na przedział rozdzielczości",
     fields: {
       resolution: {

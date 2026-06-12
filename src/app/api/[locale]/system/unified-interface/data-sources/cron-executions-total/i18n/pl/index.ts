@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Wykonania cron łącznie",
+    titleShort: "Cron łącznie",
     description: "Łączna liczba wykonań zadań cron na przedział rozdzielczości",
     fields: {
       resolution: {

@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Lista użytkowników",
+    titleShort: "Lista użytkowników",
     description: "Wyszukaj i filtruj użytkowników",
     form: {
       title: "Zarządzanie użytkownikami",

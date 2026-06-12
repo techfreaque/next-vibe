@@ -14,8 +14,6 @@ import { SqlRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: sqlEndpoints,
   [Methods.POST]: {
-    handler: ({ data, t, logger }) => {
-      return SqlRepository.execute(data, t, logger);
-    },
+    handler: ({ data, t, logger }) => SqlRepository.execute(data, t, logger),
   },
 });

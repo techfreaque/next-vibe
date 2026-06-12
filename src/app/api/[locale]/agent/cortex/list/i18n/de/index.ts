@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   get: {
     title: "Ordner anzeigen",
+    titleShort: "Dateien auflisten",
     description: "Zeigt was in einem Ordner ist.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Aufgelistet: {{path}}",
     status: {
       loading: "Auflisten...",
       done: "Aufgelistet",
@@ -13,7 +15,8 @@ export const translations = {
     fields: {
       path: {
         label: "Pfad",
-        description: "Welcher Ordner, z.B. / oder /documents",
+        description:
+          "Ordner zum Auflisten. /ssh → alle Maschinen. /ssh/<Name>/ → Dateien oder Mounts. /ssh/<Name>/<Mount>/ → Mount-Inhalt.",
       },
     },
     submitButton: {

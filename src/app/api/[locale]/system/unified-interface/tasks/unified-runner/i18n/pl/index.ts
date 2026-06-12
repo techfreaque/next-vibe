@@ -20,6 +20,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Ujednolicony Runner Zadań",
+    titleShort: "Runner zadań",
     description:
       "Zarządzaj ujednoliconym runnerem zadań dla zadań cron i zadań pobocznych",
     container: {

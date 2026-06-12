@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Dodane metody płatności",
+    titleShort: "Metody płatności",
     description: "Nowe metody płatności dodane na przedział rozdzielczości",
     fields: {
       resolution: {

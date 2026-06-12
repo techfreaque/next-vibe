@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Merge",
+    titleShort: "Merge",
     description: "Merge - sums two time series aligned by timestamp",
     fields: {
       a: { label: "Series A", description: "First input time series" },

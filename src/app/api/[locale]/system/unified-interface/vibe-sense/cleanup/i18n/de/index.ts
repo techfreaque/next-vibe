@@ -13,6 +13,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Vibe Sense Bereinigung",
+    titleShort: "Sense bereinigen",
     description:
       "Aufbewahrungsbereinigung für Datenpunkte und Snapshot-Ablauf durchführen",
     response: {

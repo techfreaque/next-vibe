@@ -21,5 +21,14 @@ export const translations: typeof enTranslations = {
       description:
         "Użyj selektora poniżej, aby wybrać skill lub załadować zapisany ulubiony. Model zostanie automatycznie dobrany.",
     },
+    noResponse: "Brak odpowiedzi",
+    cli: {
+      submitting: "…",
+      promptPrefix: "› ",
+      skillPrefix: "skill ",
+      promptHint: "Enter: wyślij  ·  Esc: wyjdź  ·  Tab: zmień pole",
+      promptPlaceholder: "Wpisz prompt...",
+      skillLabel: "skill: {{skill}}",
+    },
   },
 };

@@ -16,7 +16,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
 import { DESKTOP_LIST_WINDOWS_ALIAS } from "./constants";
@@ -31,6 +31,7 @@ const { POST } = createEndpoint({
   path: ["desktop", "list-windows"],
   aliases: [DESKTOP_LIST_WINDOWS_ALIAS] as const,
   title: "list-windows.title",
+  titleShort: "list-windows.titleShort",
   description: "list-windows.description",
   category: "desktop",
   subCategory: "Windows",

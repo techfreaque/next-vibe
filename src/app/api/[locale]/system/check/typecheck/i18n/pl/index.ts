@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   // Main endpoint properties
   title: "Sprawdzanie typów TypeScript",
+  titleShort: "Sprawdź typy",
   description:
     "Uruchom sprawdzanie typów TypeScript dla określonych plików lub katalogów",
   category: "Sprawdzenia systemowe",

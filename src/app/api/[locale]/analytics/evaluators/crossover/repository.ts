@@ -5,6 +5,9 @@
 
 import "server-only";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
+
 import type {
   SignalEvent,
   TimeSeries,
@@ -36,5 +39,16 @@ export class CrossoverEvaluatorRepository {
       prevAAboveB = aAboveB;
     }
     return signals;
+  }
+
+  static handle(data: {
+    seriesA: TimeSeries;
+    seriesB: TimeSeries;
+  }): ResponseType<{ signals: SignalEvent[] }> {
+    const signals = CrossoverEvaluatorRepository.computeCrossover(
+      data.seriesA,
+      data.seriesB,
+    );
+    return success({ signals });
   }
 }

@@ -3,6 +3,7 @@ export const translations = {
     messaging: "Messaging",
   },
   title: "Messenger Accounts",
+  titleShort: "Accounts",
   description: "List all messenger accounts across all channels",
 
   fields: {

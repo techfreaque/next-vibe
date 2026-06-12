@@ -22,6 +22,7 @@ export const translations = {
   },
   get: {
     title: "Email Statistics",
+    titleShort: "Email Stats",
     description: "Retrieve comprehensive email statistics and metrics",
     form: {
       title: "Email Statistics Request",

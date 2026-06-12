@@ -41,6 +41,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "search", "kagi"],
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   dynamicTitle: ({ request }) => {
     if (request?.query) {
@@ -58,8 +59,8 @@ const { GET } = createEndpoint({
 
   // Credit cost - use calculated price from centralized pricing
   credits: FEATURE_COSTS.KAGI_SEARCH, // 1.95 credits per search
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiSearch",
+  category: "ai",
+  subCategory: "Search",
   tags: ["tags.search" as const, "tags.web" as const, "tags.ai" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

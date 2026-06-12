@@ -3,6 +3,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Wiadomości czatu od AI",
+    titleShort: "Wiadomości AI",
     description: "Liczba wiadomości asystenta AI na przedział rozdzielczości",
     fields: {
       resolution: {

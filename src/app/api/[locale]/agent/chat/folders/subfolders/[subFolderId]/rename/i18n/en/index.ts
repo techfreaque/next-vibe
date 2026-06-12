@@ -6,6 +6,7 @@ export const translations = {
 
   patch: {
     title: "Rename Folder",
+    titleShort: "Rename Folder",
     description: "Rename an existing folder",
     id: {
       label: "Folder ID",

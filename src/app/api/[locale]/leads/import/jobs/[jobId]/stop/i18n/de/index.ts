@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Import-Job stoppen",
+    titleShort: "Import stoppen",
     description: "Einen laufenden Import-Job stoppen",
     jobId: {
       label: "Job-ID",

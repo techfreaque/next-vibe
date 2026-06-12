@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Zahlungsstreitigkeiten",
+    titleShort: "Streitigkeiten",
     description: "Anzahl der Zahlungsstreitigkeiten pro Auflösungs-Bucket",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

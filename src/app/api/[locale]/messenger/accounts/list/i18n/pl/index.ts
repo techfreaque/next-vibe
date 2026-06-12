@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     messaging: "Messaging",
   },
   title: "Konta Messenger",
+  titleShort: "Konta",
   description: "Lista wszystkich kont messenger we wszystkich kanałach",
   fields: {
     channel: { label: "Kanał", description: "Filtruj według kanału" },
@@ -51,6 +53,9 @@ export const translations = {
     refresh: "Odśwież",
     emptyState: "Brak skonfigurowanych kont messenger",
     searchPlaceholder: "Szukaj kont...",
+    deleteConfirm: "Usunąć to konto?",
+    deleteConfirmYes: "Usuń",
+    deleteConfirmNo: "Anuluj",
   },
   errors: {
     validation: {

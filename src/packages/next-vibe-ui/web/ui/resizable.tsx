@@ -114,14 +114,9 @@ export function ResizableContainer({
         className={cn("relative h-full shrink-0", className)}
         key="sidebar"
         initial={false}
-        // Keep the width fixed; slide out using negative margin
         style={{ width }}
-        animate={{
-          marginLeft: collapsed ? -width : 0,
-        }}
-        transition={{
-          marginLeft: { duration: 0.3, ease: "easeInOut" },
-        }}
+        animate={{ marginLeft: collapsed ? -width : 0 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
       >
         {children}
         <ResizableHandle withHandle onMouseDown={handleMouseDown} />

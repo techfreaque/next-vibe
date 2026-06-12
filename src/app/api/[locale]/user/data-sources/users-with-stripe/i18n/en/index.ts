@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Users With Stripe",
+    titleShort: "Stripe Users",
     description:
       "Count of users with a Stripe customer ID per resolution bucket",
     fields: {

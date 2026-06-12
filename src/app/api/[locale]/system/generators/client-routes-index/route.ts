@@ -9,15 +9,15 @@ import definitions from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { ClientRoutesIndexGeneratorRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return ClientRoutesIndexGeneratorRepository.generateClientRoutesIndex(
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).ClientRoutesIndexGeneratorRepository.generateClientRoutesIndex(
         data,
         logger,
         t,
-      );
-    },
+      ),
   },
 });

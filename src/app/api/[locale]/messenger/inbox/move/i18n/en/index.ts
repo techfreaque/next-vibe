@@ -1,5 +1,6 @@
 export const translations = {
   title: "Move Message",
+  titleShort: "Move Message",
   description: "Move a message to a different folder",
   tag: "Inbox",
 

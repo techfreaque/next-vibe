@@ -14,7 +14,7 @@ import { Wallet } from "next-vibe-ui/ui/icons/Wallet";
 import {
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 

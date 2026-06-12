@@ -3,6 +3,9 @@ import type { JSX } from "react";
 import type { FieldPath, FieldValues } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
 
+import { CliFocusManager } from "@/packages/next-vibe-ui/cli/lib/focus-manager";
+import { parseClassesToInkProps } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
+
 import type {
   FormProps,
   FormFieldContextValue,
@@ -39,15 +42,25 @@ const SPACE = "\u0020";
 export function Form<TRequest extends FieldValues>({
   children,
   form,
+  className,
 }: FormProps<TRequest>): JSX.Element {
+  const { box } = parseClassesToInkProps(className);
+  const boxProps = { flexDirection: "column" as const, ...box };
+
   if (form) {
     return (
       <FormProvider {...form}>
-        <Box flexDirection="column">{children}</Box>
+        <CliFocusManager>
+          <Box {...boxProps}>{children}</Box>
+        </CliFocusManager>
       </FormProvider>
     );
   }
-  return <Box flexDirection="column">{children}</Box>;
+  return (
+    <CliFocusManager>
+      <Box {...boxProps}>{children}</Box>
+    </CliFocusManager>
+  );
 }
 
 export function FormField<

@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
 
   patch: {
     title: "Przenieś folder",
+    titleShort: "Przenieś folder",
     description: "Przenieś folder do innego folderu nadrzędnego",
     id: {
       label: "ID folderu",

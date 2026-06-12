@@ -123,6 +123,7 @@ export const translations: typeof enTranslations = {
       select: "Konto auswählen",
     },
     title: "Konto abrufen",
+    titleShort: "Konto",
     description: "Vollständige Details eines Kontos abrufen.",
     accountId: {
       label: "Konto-ID",
@@ -155,6 +156,7 @@ export const translations: typeof enTranslations = {
       select: "Periode auswählen",
     },
     title: "Periode abrufen",
+    titleShort: "Periode",
     description: "Details einer Buchungsperiode abrufen.",
     periodId: {
       label: "Perioden-ID",
@@ -187,6 +189,7 @@ export const translations: typeof enTranslations = {
       select: "Buchungssatz auswählen",
     },
     title: "Buchungssatz abrufen",
+    titleShort: "Buchungssatz",
     description: "Einen Buchungssatz mit allen Zeilen abrufen.",
     entryId: {
       label: "Buchungssatz-ID",
@@ -229,6 +232,7 @@ export const translations: typeof enTranslations = {
         "Unternehmens-ID eingeben und Filter anwenden, um Buchungen zu laden.",
     },
     title: "Buchungsjournal",
+    titleShort: "Journal",
     description:
       "Buchungen nach Unternehmen, Periode, Status, Quelle und Datum filtern",
     companyId: {
@@ -288,6 +292,7 @@ export const translations: typeof enTranslations = {
       difference: "Differenz",
     },
     title: "Buchung erstellen",
+    titleShort: "Neue Buchung",
     description: "Manuelle doppelte Buchführung. Soll muss Haben entsprechen.",
     companyId: {
       label: "Unternehmens-ID",
@@ -332,6 +337,7 @@ export const translations: typeof enTranslations = {
       back: "Zurück",
     },
     title: "Buchung buchen",
+    titleShort: "Buchen",
     description:
       "Entwurf zu GEBUCHT ändern. Nicht rückgängig machbar — Stornierung verwenden.",
     entryId: {
@@ -355,6 +361,7 @@ export const translations: typeof enTranslations = {
       viewReversalButton: "Gegenbuchung anzeigen",
     },
     title: "Buchung stornieren",
+    titleShort: "Stornieren",
     description:
       "Erstellt eine Gegenbuchung mit gespiegelten Soll- und Haben-Beträgen.",
     entryId: {
@@ -388,6 +395,7 @@ export const translations: typeof enTranslations = {
       totalCount: "Einträge",
     },
     title: "Kontoauszug",
+    titleShort: "Hauptbuch",
     description: "Alle Buchungszeilen eines Kontos mit laufendem Saldo",
     accountId: {
       label: "Konto-ID",
@@ -435,6 +443,7 @@ export const translations: typeof enTranslations = {
         "Unternehmens-ID eingeben und auf Ausführen klicken, um die Probebilanz zu erstellen.",
     },
     title: "Probebilanz",
+    titleShort: "Probebilanz",
     description:
       "Summe aller gebuchten Soll- und Haben-Beträge je Konto. Bestätigt den Buchungsausgleich.",
     companyId: {
@@ -527,6 +536,7 @@ export const translations: typeof enTranslations = {
         "Unternehmens-ID eingeben und auf Ausführen klicken, um die GuV zu erstellen.",
     },
     title: "Gewinn- und Verlustrechnung",
+    titleShort: "GuV",
     description:
       "Erträge vs. Aufwendungen im Berichtszeitraum. Zeigt Rohgewinn, Betriebsergebnis und Jahresüberschuss.",
     companyId: {
@@ -613,6 +623,7 @@ export const translations: typeof enTranslations = {
       selectCompany: "Firma auswählen, um die Bilanz anzuzeigen",
     },
     title: "Bilanz",
+    titleShort: "Bilanz",
     description:
       "Aktiva, Passiva und Eigenkapital zum Stichtag. Prüft, ob die Buchhaltungsgleichung stimmt.",
     companyId: {
@@ -686,6 +697,7 @@ export const translations: typeof enTranslations = {
         "Unternehmens-ID eingeben und auf Ausführen klicken, um den Forderungsbericht zu erstellen.",
     },
     title: "Forderungsalterung",
+    titleShort: "Forderungsalterung",
     description:
       "Offene Forderungen nach Fälligkeitsdauer. Zeigt genau, wo Liquidität festhängt.",
     companyId: {
@@ -786,6 +798,7 @@ export const translations: typeof enTranslations = {
         "Unternehmens-ID eingeben und auf Ausführen klicken, um den Steuerbericht zu erstellen.",
     },
     title: "Steuerauswertung",
+    titleShort: "Steuerbericht",
     description:
       "Vereinnahmte vs. abzugsfähige Mehrwertsteuer im Berichtszeitraum. Nettosteuerschuld auf einen Blick.",
     companyId: {

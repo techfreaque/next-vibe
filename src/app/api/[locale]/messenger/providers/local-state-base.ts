@@ -27,7 +27,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { messengerAccounts } from "../accounts/db";
 import type { MessageChannelValue } from "../accounts/enum";
 import { emails, messengerFolders } from "../messages/db";
-import { scopedTranslation as providerScopedTranslation } from "./i18n";
+import { scopedTranslation as providerScopedTranslation } from "../i18n";
 import type {
   InboxFolder,
   InboxMessage,

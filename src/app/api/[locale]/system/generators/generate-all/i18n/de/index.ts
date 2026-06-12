@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Alle generieren",
+    titleShort: "Alles generieren",
     description: "Alle Code-Generatoren ausführen",
     container: {
       title: "Konfiguration für Alle generieren",

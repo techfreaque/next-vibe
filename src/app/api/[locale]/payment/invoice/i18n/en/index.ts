@@ -11,6 +11,7 @@ export const translations = {
   },
   post: {
     title: "Invoice",
+    titleShort: "Invoice",
     description: "Invoice endpoint",
     form: {
       title: "Invoice Configuration",
@@ -78,6 +79,9 @@ export const translations = {
     success: {
       title: "Success",
       description: "Operation completed successfully",
+    },
+    widget: {
+      back: "Back",
     },
   },
   customerId: {

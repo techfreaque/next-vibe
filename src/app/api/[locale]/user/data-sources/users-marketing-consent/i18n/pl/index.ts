@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Użytkownicy ze zgodą marketingową",
+    titleShort: "Zgoda marketingowa",
     description: "Liczba użytkowników ze zgodą marketingową na przedział czasu",
     fields: {
       resolution: {

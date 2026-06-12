@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Open Accounting Period",
+    titleShort: "New Period",
     description: "Create a new accounting period for a company",
     companyId: {
       label: "Company ID",

@@ -29,6 +29,7 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   title: "title",
+  titleShort: "title",
   description: "description",
   category: "database",
   subCategory: "Tools",

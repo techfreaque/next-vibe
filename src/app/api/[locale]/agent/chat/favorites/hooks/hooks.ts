@@ -10,7 +10,7 @@ import { useMemo } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useWidgetUser } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetUser } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type { UseEndpointOptions } from "../../../../system/unified-interface/react/hooks/endpoint-types";
 import favoritesDefinition, { type FavoriteCard } from "../definition";

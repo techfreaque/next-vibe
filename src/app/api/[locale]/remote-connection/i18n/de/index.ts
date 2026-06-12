@@ -25,7 +25,7 @@ export const translations: typeof enTranslations = {
       benefit1:
         "Deine Erinnerungen synchronisieren sich automatisch zwischen diesem Gerät und deinem Cloud-Konto",
       benefit2: "KI-Tools von der Kommandozeile nutzen mit",
-      benefit2Code: "vibe --remote",
+      benefit2Code: "vibe --thea",
       benefit3: "Dein Cloud-Konto und deine lokale Instanz bleiben synchron",
     },
   },
@@ -156,6 +156,55 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Verbunden!",
       description: "Dein Konto ist jetzt mit der Remote-Instanz verbunden",
+    },
+  },
+  syncTriggerPull: {
+    title: "Sync-Pull auslösen",
+    titleShort: "Sync-Pull",
+    description:
+      "Sofortigen Pull von allen verbundenen Remote-Instanzen auslösen",
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Anfrage",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Verbindung zum Server fehlgeschlagen",
+      },
+      unauthorized: {
+        title: "Nicht angemeldet",
+        description: "Anmeldung erforderlich",
+      },
+      forbidden: {
+        title: "Zugriff verweigert",
+        description: "Admin-Rolle erforderlich",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Keine aktiven Verbindungen zum Synchronisieren",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Fehler beim Sync-Pull",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Du hast ungespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Ein Konflikt ist aufgetreten",
+      },
+    },
+    success: {
+      title: "Sync-Pull abgeschlossen",
+      description:
+        "Aktuelle Daten von allen verbundenen Remote-Instanzen gezogen",
     },
   },
   disconnect: {

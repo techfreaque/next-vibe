@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Window Min",
+    titleShort: "Win Min",
     description:
       "Rolling window minimum - tracks the lowest value in a fixed window",
     fields: {

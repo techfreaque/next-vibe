@@ -1,9 +1,11 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     messaging: "Messaging",
   },
   get: {
     title: "Wyświetl konto Messenger",
+    titleShort: "Pokaż konto",
     description: "Pobierz szczegóły konta messenger",
   },
   enums: {
@@ -67,6 +69,7 @@ export const translations = {
 
   delete: {
     title: "Usuń konto",
+    titleShort: "Usuń konto",
     description: "Trwale usuń to konto messenger",
     container: {
       title: "Usuń konto",
@@ -86,6 +89,7 @@ export const translations = {
   },
   put: {
     title: "Edytuj konto Messenger",
+    titleShort: "Edytuj konto",
     description: "Zaktualizuj ustawienia konta messenger",
     success: {
       title: "Konto zaktualizowane",

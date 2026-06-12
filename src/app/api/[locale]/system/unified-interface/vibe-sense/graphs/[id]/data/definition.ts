@@ -34,6 +34,7 @@ import { graphConfigSchema } from "../../../graph/schema";
 import React from "react";
 
 import { scopedTranslation } from "./i18n";
+import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 
 // Lazy import to avoid TDZ circular dependency in MCP context
 // (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")
@@ -46,6 +47,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["system", "unified-interface", "vibe-sense", "graphs", "[id]", "data"],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
   icon: "bar-chart-2",
   category: "analytics",
@@ -60,7 +62,9 @@ const { GET } = createEndpoint({
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: graphsListDefinitions.GET,
+        labelField: "name",
         label: "get.fields.id.label",
         description: "get.fields.id.description",
         hidden: true,

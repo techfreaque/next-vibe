@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz zadanie Cron",
+    titleShort: "Zadanie cron",
     description: "Pobierz pojedyncze zadanie cron według ID",
     container: {
       title: "Szczegóły zadania Cron",
@@ -71,6 +72,7 @@ export const translations: typeof enTranslations = {
   },
   put: {
     title: "Aktualizuj zadanie Cron",
+    titleShort: "Aktualizuj zadanie",
     description: "Zaktualizuj istniejące zadanie cron",
     container: {
       title: "Aktualizuj zadanie Cron",
@@ -219,6 +221,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Usuń zadanie Cron",
+    titleShort: "Usuń zadanie",
     description: "Usuń zadanie cron",
     container: {
       title: "Usuń zadanie Cron",

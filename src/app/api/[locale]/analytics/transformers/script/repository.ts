@@ -6,8 +6,14 @@
 
 import "server-only";
 
+import { GraphResolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/enum";
+
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
+
 import type {
   DataPoint,
+  Resolution,
   TimeSeries,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
@@ -55,5 +61,27 @@ export class ScriptTransformerRepository {
     } catch {
       return [];
     }
+  }
+
+  static handle(data: {
+    source: TimeSeries;
+    fn: string;
+    resolution?: Resolution | null;
+    lookback?: number | null;
+  }): ResponseType<{
+    result: TimeSeries;
+    meta: { actualResolution: Resolution; lookbackUsed: number };
+  }> {
+    const result = ScriptTransformerRepository.computeScript(
+      data.source,
+      data.fn,
+    );
+    return success({
+      result,
+      meta: {
+        actualResolution: data.resolution ?? GraphResolution.ONE_DAY,
+        lookbackUsed: data.lookback ?? 0,
+      },
+    });
   }
 }

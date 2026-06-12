@@ -2,10 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Zrób zrzut ekranu pulpitu",
+  titleShort: "Zrzut ekranu",
   dynamicTitle: "Zrzut: {{target}}",
   description: "Przechwyć zrzut ekranu pulpitu lub obszaru ekranu",
   form: {
-    label: "Zrób zrzut ekranu pulpitu",
+    label: "Zrób zrzut ekranu",
+    capturing: "Przechwytywanie…",
+    refresh: "Ponów zrzut",
     description:
       "Przechwyć zrzut ekranu całego pulpitu lub określonego obszaru",
     fields: {
@@ -100,5 +103,10 @@ export const translations: typeof enTranslations = {
   tags: {
     desktopAutomation: "Automatyzacja pulpitu",
     captureAutomation: "Automatyzacja przechwytywania",
+  },
+  widget: {
+    actionScreenshot: "Zrób zrzut ekranu",
+    actionAllMonitors: "Lista monitorów",
+    labelSaved: "Zapisano pod",
   },
 };

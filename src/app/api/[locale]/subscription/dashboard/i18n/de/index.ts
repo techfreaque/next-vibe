@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Abonnement-Übersicht",
+    titleShort: "Dashboard",
     description: "Dein Abonnement auf einen Blick",
     errors: {
       unauthorized: {

@@ -10,6 +10,7 @@ export const translations = {
   generate: {
     post: {
       title: "Generate Expo Indexes",
+      titleShort: "Expo Indexes",
       description:
         "Generate Expo Router compatibility wrappers for Next.js pages",
       response: {

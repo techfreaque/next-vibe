@@ -1,12 +1,1239 @@
-import { translations as logoutTranslations } from "../../logout/i18n/pl";
-import { translations as meTranslations } from "../../me/i18n/pl";
-import { translations as sessionTranslations } from "../../session/i18n/pl";
-import { translations as sessionsTranslations } from "../../sessions/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  logout: logoutTranslations,
-  me: meTranslations,
-  session: sessionTranslations,
-  sessions: sessionsTranslations,
+  logout: {
+    title: "Wylogowanie Użytkownika",
+    description: "Wylogowuje bieżącego użytkownika i unieważnia jego sesję",
+    category: "Zarządzanie Użytkownikami",
+    tag: "wylogowanie",
+    logoutButton: "Wyloguj",
+    loggingOut: "Wylogowywanie...",
+    response: {
+      title: "Odpowiedź Wylogowania",
+      description: "Odpowiedź wskazująca pomyślne wylogowanie",
+      success: "Sukces",
+      message: "Wiadomość",
+      sessionsCleaned: "Sesje wyczyszczone",
+      nextSteps: "Zalecane kolejne kroki po wylogowaniu",
+    },
+    errors: {
+      validation: {
+        title: "Błąd Walidacji",
+        description: "Żądanie wylogowania zawiera nieprawidłowe dane",
+      },
+      unauthorized: {
+        title: "Brak Autoryzacji",
+        description: "Musisz być zalogowany, aby się wylogować",
+      },
+      internal: {
+        title: "Wewnętrzny Błąd Serwera",
+        description: "Wystąpił błąd wewnętrzny podczas wylogowywania",
+      },
+      unknown: {
+        title: "Nieznany Błąd",
+        description: "Wystąpił nieoczekiwany błąd podczas wylogowywania",
+      },
+      session_deletion_failed: {
+        title: "Usuwanie Sesji Nie Powiodło Się",
+        description: "Nie udało się usunąć sesji użytkownika",
+      },
+      conflict: {
+        title: "Konflikt Wylogowania",
+        description: "Wystąpił konflikt podczas wylogowywania",
+      },
+      forbidden: {
+        title: "Zabronione",
+        description: "Akcja wylogowania jest zabroniona",
+      },
+      network_error: {
+        title: "Błąd Sieci",
+        description: "Błąd sieci podczas wylogowywania",
+      },
+      not_found: {
+        title: "Nie Znaleziono",
+        description: "Sesja nie została znaleziona",
+      },
+      server_error: {
+        title: "Błąd Serwera",
+        description: "Wewnętrzny błąd serwera podczas wylogowywania",
+      },
+      unsaved_changes: {
+        title: "Niezapisane Zmiany",
+        description: "Istnieją niezapisane zmiany",
+      },
+      invalid_user: {
+        title: "Nieprawidłowy Użytkownik",
+        description: "Użytkownik jest nieprawidłowy lub nie istnieje",
+      },
+    },
+    success: {
+      title: "Wylogowanie Pomyślne",
+      description: "Zostałeś pomyślnie wylogowany",
+      message: "Użytkownik został pomyślnie wylogowany",
+    },
+  },
+  me: {
+    // Main user profile routes - typed from English
+    get: {
+      title: "Pobierz profil użytkownika",
+      description: "Pobierz aktualne informacje o profilu użytkownika",
+      response: {
+        title: "Odpowiedź profilu użytkownika",
+        description: "Aktualne dane profilu użytkownika",
+        id: "ID użytkownika",
+        leadId: "ID leadu",
+        isPublic: "Profil publiczny",
+        email: "Adres e-mail",
+        privateName: "Nazwa prywatna",
+        publicName: "Nazwa publiczna",
+        locale: "Lokalizacja",
+        isActive: "Status aktywny",
+        emailVerified: "E-mail zweryfikowany",
+        requireTwoFactor: "Wymagana autoryzacja dwuskładnikowa",
+        marketingConsent: "Zgoda marketingowa",
+        userRoles: "Role użytkownika",
+        createdAt: "Utworzono",
+        updatedAt: "Zaktualizowano",
+        stripeCustomerId: "ID klienta Stripe",
+        bio: "Bio",
+        websiteUrl: "Strona internetowa",
+        twitterUrl: "X / Twitter",
+        youtubeUrl: "YouTube",
+        instagramUrl: "Instagram",
+        tiktokUrl: "TikTok",
+        githubUrl: "GitHub",
+        facebookUrl: "Facebook",
+        discordUrl: "Discord",
+        tribeUrl: "Tribe",
+        rumbleUrl: "Rumble",
+        odyseeUrl: "Odysee",
+        nostrUrl: "Nostr",
+        gabUrl: "Gab",
+        creatorSlug: "URL profilu",
+        creatorAccentColor: "Kolor akcentu",
+        creatorHeaderImageUrl: "Obraz nagłówka",
+        avatarUrl: "Zdjęcie profilowe",
+        user: {
+          title: "Informacje o użytkowniku",
+          description: "Szczegóły profilu użytkownika",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagana autoryzacja",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Dostęp zabroniony",
+        },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Profil użytkownika nie został znaleziony",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Wystąpił konflikt danych",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Wystąpił błąd sieci",
+        },
+        unsavedChanges: {
+          title: "Niezapisane zmiany",
+          description: "Istnieją niezapisane zmiany",
+        },
+        internal: {
+          title: "Błąd wewnętrzny",
+          description: "Wystąpił wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+      },
+      success: {
+        title: "Sukces",
+        description: "Profil pobrano pomyślnie",
+      },
+    },
+    update: {
+      title: "Aktualizuj profil użytkownika",
+      description: "Aktualizuj aktualne informacje o profilu użytkownika",
+      groups: {
+        basicInfo: {
+          title: "Podstawowe informacje",
+          description: "Zaktualizuj swoje podstawowe informacje profilowe",
+        },
+        profileDetails: {
+          title: "Szczegóły profilu",
+          description: "Zarządzaj szczegółami profilu i ustawieniami",
+        },
+        privacySettings: {
+          title: "Ustawienia prywatności",
+          description:
+            "Kontroluj, kto może zobaczyć informacje o Twoim profilu",
+        },
+        profileInfo: {
+          title: "Profil twórcy",
+          description:
+            "Bio, linki społecznościowe i branding dla stron Twoich skilli",
+        },
+      },
+      fields: {
+        email: {
+          label: "Adres e-mail",
+          description: "Twój adres e-mail",
+          placeholder: "Wprowadź swój adres e-mail",
+          help: "Twój adres e-mail będzie używany do powiadomień o koncie i komunikacji",
+          validation: {
+            invalid: "Wprowadź prawidłowy adres e-mail",
+          },
+        },
+        privateName: {
+          label: "Nazwa prywatna",
+          description: "Twoja nazwa wewnętrzna/prywatna",
+          placeholder: "Wprowadź swoją nazwę prywatną",
+          help: "Twoja prywatna nazwa jest używana wewnętrznie i do prywatnej komunikacji",
+          validation: {
+            minLength: "Nazwa prywatna musi mieć co najmniej 2 znaki",
+            maxLength: "Nazwa prywatna nie może przekraczać 50 znaków",
+          },
+        },
+        publicName: {
+          label: "Nazwa publiczna",
+          description: "Twoja publiczna nazwa wyświetlana",
+          placeholder: "Wprowadź swoją nazwę publiczną",
+          help: "Twoja publiczna nazwa będzie widoczna dla innych użytkowników",
+          validation: {
+            minLength: "Nazwa publiczna musi mieć co najmniej 2 znaki",
+            maxLength: "Nazwa publiczna nie może przekraczać 50 znaków",
+          },
+        },
+        imageUrl: {
+          label: "Zdjęcie profilowe",
+          description: "URL do twojego zdjęcia profilowego",
+          placeholder: "Wprowadź URL zdjęcia",
+          help: "Podaj URL do zdjęcia, które będzie wyświetlane jako twoje zdjęcie profilowe",
+          validation: {
+            invalid: "Podaj prawidłowy URL zdjęcia",
+          },
+        },
+        company: {
+          label: "Firma",
+          description: "Nazwa twojej firmy",
+          placeholder: "Wprowadź nazwę firmy",
+          help: "Nazwa firmy będzie wyświetlana w profilu",
+          validation: {
+            maxLength: "Nazwa firmy nie może przekraczać 100 znaków",
+          },
+        },
+        visibility: {
+          label: "Widoczność profilu",
+          description: "Kto może widzieć twój profil",
+          placeholder: "Wybierz ustawienie widoczności",
+          help: "Wybierz, kto może przeglądać twój profil: publiczny (wszyscy), prywatny (tylko ty) lub tylko kontakty",
+        },
+        marketingConsent: {
+          label: "Subskrybuj newsletter",
+          description:
+            "Sporadyczne aktualizacje o nowych modelach i funkcjach. Bez spamu, tylko to co ważne.",
+          placeholder: "Włącz e-maile marketingowe",
+          help: "Wybierz, czy chcesz otrzymywać e-maile marketingowe i komunikaty promocyjne",
+        },
+        bio: {
+          label: "Bio",
+          description: "Krótki opis o sobie",
+          placeholder: "Opowiedz nam o sobie...",
+          help: "Udostępnij krótki opis o sobie, który będzie widoczny w profilu",
+          validation: {
+            maxLength: "Bio nie może przekraczać 500 znaków",
+          },
+        },
+        websiteUrl: {
+          label: "Strona internetowa",
+          description: "Twoja strona osobista lub firmowa",
+          placeholder: "https://twojastrona.pl",
+        },
+        twitterUrl: {
+          label: "X / Twitter",
+          description: "URL Twojego profilu X (Twitter)",
+          placeholder: "https://x.com/twojhandle",
+        },
+        youtubeUrl: {
+          label: "YouTube",
+          description: "URL Twojego kanału YouTube",
+          placeholder: "https://youtube.com/@twójkanał",
+        },
+        instagramUrl: {
+          label: "Instagram",
+          description: "URL Twojego profilu Instagram",
+          placeholder: "https://instagram.com/twojhandle",
+        },
+        tiktokUrl: {
+          label: "TikTok",
+          description: "URL Twojego profilu TikTok",
+          placeholder: "https://tiktok.com/@twojhandle",
+        },
+        githubUrl: {
+          label: "GitHub",
+          description: "URL Twojego profilu GitHub",
+          placeholder: "https://github.com/twójlogin",
+        },
+        facebookUrl: {
+          label: "Facebook",
+          description: "URL Twojej strony lub profilu na Facebooku",
+          placeholder: "https://facebook.com/twojastrona",
+        },
+        discordUrl: {
+          label: "Discord",
+          description: "Link do Twojego serwera lub profilu Discord",
+          placeholder: "https://discord.gg/twójserwer",
+        },
+        tribeUrl: {
+          label: "Tribe",
+          description: "URL Twojej społeczności Tribe",
+          placeholder: "https://twojaspolecznosc.tribe.so",
+        },
+        rumbleUrl: {
+          label: "Rumble",
+          description: "URL Twojego kanalu Rumble",
+          placeholder: "https://rumble.com/c/twojkanal",
+        },
+        odyseeUrl: {
+          label: "Odysee",
+          description: "URL Twojego kanalu Odysee",
+          placeholder: "https://odysee.com/@twojkanal",
+        },
+        nostrUrl: {
+          label: "Nostr",
+          description: "Twoj profil Nostr lub adres npub",
+          placeholder: "https://primal.net/p/npub1...",
+        },
+        gabUrl: {
+          label: "Gab",
+          description: "URL Twojego profilu Gab",
+          placeholder: "https://gab.com/twojhandle",
+        },
+        creatorSlug: {
+          label: "URL profilu",
+          description:
+            "Twój unikalny adres profilu widoczny w publicznym linku",
+          placeholder: "jane-doe",
+          validation: {
+            invalid: "Tylko małe litery, cyfry i myślniki są dozwolone",
+          },
+        },
+        creatorAccentColor: {
+          label: "Kolor akcentu",
+          description: "Kolor hex dla brandingu strony skilla (opcjonalnie)",
+          placeholder: "#7c3aed",
+        },
+        creatorHeaderImageUrl: {
+          label: "Obraz nagłówka",
+          description: "URL obrazu bannera dla hero Twojej strony skilla",
+          placeholder: "https://twojastrona.pl/banner.jpg",
+        },
+      },
+      response: {
+        title: "Zaktualizowany profil",
+        description: "Twoje zaktualizowane informacje o profilu",
+        success: "Aktualizacja pomyślna",
+        message: "Twój profil został pomyślnie zaktualizowany",
+        id: "ID użytkownika",
+        leadId: "ID leadu",
+        isPublic: "Profil publiczny",
+        email: "Adres e-mail",
+        privateName: "Nazwa prywatna",
+        publicName: "Nazwa publiczna",
+        locale: "Lokalizacja",
+        isActive: "Status aktywny",
+        emailVerified: "E-mail zweryfikowany",
+        requireTwoFactor: "Wymagana autoryzacja dwuskładnikowa",
+        marketingConsent: "Zgoda marketingowa",
+        userRoles: "Role użytkownika",
+        createdAt: "Utworzono",
+        updatedAt: "Zaktualizowano",
+        stripeCustomerId: "ID klienta Stripe",
+        bio: "Bio",
+        websiteUrl: "Strona internetowa",
+        twitterUrl: "X / Twitter",
+        youtubeUrl: "YouTube",
+        instagramUrl: "Instagram",
+        tiktokUrl: "TikTok",
+        githubUrl: "GitHub",
+        facebookUrl: "Facebook",
+        discordUrl: "Discord",
+        tribeUrl: "Tribe",
+        rumbleUrl: "Rumble",
+        odyseeUrl: "Odysee",
+        nostrUrl: "Nostr",
+        gabUrl: "Gab",
+        creatorSlug: "URL profilu",
+        creatorAccentColor: "Kolor akcentu",
+        creatorHeaderImageUrl: "Obraz nagłówka",
+        user: "Zaktualizowane informacje o użytkowniku",
+        changesSummary: {
+          title: "Podsumowanie zmian",
+          description: "Podsumowanie zmian w profilu",
+          totalChanges: "Całkowite zmiany",
+          changedFields: "Zmienione pola",
+          verificationRequired: "Wymagana weryfikacja",
+          lastUpdated: "Ostatnio zaktualizowano",
+        },
+        nextSteps: "Następne kroki",
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagana autoryzacja",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Dostęp zabroniony",
+        },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Profil użytkownika nie został znaleziony",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Wystąpił konflikt danych",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Wystąpił błąd sieci",
+        },
+        unsavedChanges: {
+          title: "Niezapisane zmiany",
+          description: "Istnieją niezapisane zmiany",
+        },
+        internal: {
+          title: "Błąd wewnętrzny",
+          description: "Wystąpił wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+      },
+      success: {
+        title: "Sukces",
+        description: "Profil zaktualizowano pomyślnie",
+        nextSteps: "Zalecane następne kroki po aktualizacji profilu",
+      },
+    },
+    delete: {
+      title: "Usuń konto użytkownika",
+      description: "Trwale usuń swoje konto użytkownika",
+      response: {
+        title: "Status usunięcia",
+        description: "Potwierdzenie usunięcia konta",
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagana autoryzacja",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Dostęp zabroniony",
+        },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Konto użytkownika nie zostało znalezione",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Wystąpił konflikt danych",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Wystąpił błąd sieci",
+        },
+        unsavedChanges: {
+          title: "Niezapisane zmiany",
+          description: "Istnieją niezapisane zmiany",
+        },
+        internal: {
+          title: "Błąd wewnętrzny",
+          description: "Wystąpił wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+      },
+      success: {
+        title: "Sukces",
+        description: "Konto usunięto pomyślnie",
+      },
+    },
+    put: {
+      response: {
+        changedFields: {
+          item: "Zmienione pole",
+        },
+      },
+    },
+    category: "Profil użytkownika",
+    tag: "Profil użytkownika",
+    tags: {
+      profile: "profil",
+      user: "użytkownik",
+      account: "konto",
+    },
+
+    widget: {
+      save: "Zapisz profil",
+      saving: "Zapisywanie...",
+      editProfile: "Edytuj profil",
+      cancelEdit: "Anuluj",
+      memberSince: "Członek od",
+      profileCard: {
+        title: "Profil twórcy",
+        description: "Twoja publiczna tożsamość na platformie",
+      },
+      socialCard: {
+        title: "Social linki",
+        description: "Połącz swoje platformy",
+      },
+      emailCard: {
+        title: "Twoja lista e-mail",
+        description:
+          "Odwiedzający Twoją stronę skilla i profil twórcy mogą się zapisać. Lista jest Twoja - bez pośredników.",
+      },
+      previewCard: {
+        title: "Twój publiczny profil",
+        description: "Tak widzą cię inni",
+      },
+      noPreview: "Uzupełnij profil, aby zobaczyć podgląd",
+      noSocials: "Nie dodano jeszcze żadnych linków społecznościowych",
+      viewPublicProfile: "Zobacz publiczny profil",
+      profileUrl: "Twój link",
+      slugWarning:
+        "Zmiana tego adresu URL spowoduje, że wszystkie istniejące linki do Twojego profilu przestaną działać.",
+      bioPreview: "Podgląd",
+      bioEdit: "Edytuj",
+      skills: {
+        title: "Moje Skille",
+        chat: "Czatuj teraz",
+        add: "Dodaj do kolekcji",
+        public: "Społeczność",
+        showLess: "Pokaż mniej",
+      },
+      deleteAccount: {
+        dangerZone: "Strefa zagrożenia",
+        button: "Usuń konto",
+        confirmTitle: "Trwale usuń swoje konto",
+        confirmDescription:
+          "Twoje konto i wszystkie powiązane dane zostaną nieodwracalnie usunięte. Bez możliwości przywrócenia.",
+        confirmLabel: 'Wpisz "DELETE" aby potwierdzić',
+        confirmPlaceholder: "DELETE",
+        confirmButton: "Usuń moje konto na zawsze",
+        cancelButton: "Anuluj",
+        whatGetsDeleted: "Co zostanie usunięte:",
+        items: {
+          profile: "Twój profil i wszystkie ustawienia",
+          chats: "Cała historia czatów i wątki",
+          skills: "Wszystkie własne skille i konfiguracje",
+          files: "Wszystkie pliki cortex i wspomnienia",
+          subscriptions: "Aktywne subskrypcje",
+          credits: "Pozostałe kredyty",
+        },
+        deleting: "Usuwanie...",
+        success: "Konto usunięte. Przekierowanie...",
+      },
+    },
+
+    // Sub-routes
+    avatar: {
+      category: "Profil użytkownika",
+
+      tag: "awatar",
+      errors: {
+        user_not_found: "Użytkownik nie znaleziony",
+        failed_to_upload_avatar: "Nie udało się przesłać awatara",
+        failed_to_delete_avatar: "Nie udało się usunąć awatara",
+        invalid_file_type: "Nieprawidłowy typ pliku",
+        file_too_large: "Plik zbyt duży",
+      },
+      debug: {
+        uploadingUserAvatar: "Przesyłanie awatara użytkownika",
+        errorUploadingUserAvatar:
+          "Błąd podczas przesyłania awatara użytkownika",
+        deletingUserAvatar: "Usuwanie awatara użytkownika",
+        errorDeletingUserAvatar: "Błąd podczas usuwania awatara użytkownika",
+      },
+      success: {
+        uploaded: "Awatar przesłany pomyślnie",
+        deleted: "Awatar usunięty pomyślnie",
+        nextSteps: {
+          visible: "Twój awatar jest teraz widoczny w Twoim profilu",
+          update:
+            "Możesz go zaktualizować w dowolnym momencie w ustawieniach profilu",
+          default: "Twój profil teraz pokazuje domyślny awatar",
+          uploadNew:
+            "Możesz przesłać nowy awatar w dowolnym momencie w ustawieniach profilu",
+        },
+      },
+      upload: {
+        title: "Prześlij Awatar",
+        description: "Prześlij zdjęcie profilowe",
+        groups: {
+          fileUpload: {
+            title: "Przesyłanie Pliku",
+            description: "Wybierz i prześlij zdjęcie awatara",
+          },
+        },
+        fields: {
+          file: {
+            label: "Zdjęcie Awatara",
+            description: "Wybierz plik obrazu dla swojego awatara",
+            placeholder: "Wybierz plik obrazu...",
+            help: "Prześlij plik obrazu (JPG, PNG, GIF) do 5MB",
+            validation: {
+              maxSize: "Rozmiar pliku musi być mniejszy niż 5MB",
+              imageOnly: "Dozwolone są tylko pliki obrazów",
+              unsupportedFormat:
+                "Nieobsługiwany format obrazu. Użyj JPEG, PNG, WebP lub GIF.",
+            },
+          },
+        },
+        response: {
+          title: "Odpowiedź Przesyłania",
+          label: "Wynik Przesyłania",
+          description: "Odpowiedź przesyłania awatara",
+          success: "Przesyłanie Pomyślne",
+          message: "Twój awatar został pomyślnie przesłany",
+          avatarUrl: "URL Awatara",
+          uploadTime: "Czas Przesyłania",
+          nextSteps: {
+            item: "Następny Krok",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd Walidacji",
+            description: "Przesłany plik jest nieprawidłowy lub uszkodzony",
+          },
+          unauthorized: {
+            title: "Brak Autoryzacji",
+            description: "Musisz być zalogowany, aby przesłać awatar",
+          },
+          server: {
+            title: "Błąd Serwera",
+            description: "Nie udało się przetworzyć przesyłania awatara",
+          },
+          internal: {
+            title: "Błąd Wewnętrzny",
+            description: "Wystąpił wewnętrzny błąd serwera",
+          },
+          unknown: {
+            title: "Nieznany Błąd",
+            description: "Wystąpił nieoczekiwany błąd podczas przesyłania",
+          },
+          network: {
+            title: "Błąd Sieci",
+            description: "Wystąpił błąd sieci podczas przesyłania",
+          },
+          forbidden: {
+            title: "Zabronione",
+            description: "Nie masz uprawnień do przesyłania awatara",
+          },
+          notFound: {
+            title: "Nie Znaleziono",
+            description: "Żądany zasób nie został znaleziony",
+          },
+          unsaved: {
+            title: "Niezapisane Zmiany",
+            description: "Istnieją niezapisane zmiany",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Wystąpił konflikt podczas przesyłania",
+          },
+        },
+        success: {
+          title: "Awatar Przesłany",
+          description: "Twoje zdjęcie profilowe zostało pomyślnie przesłane",
+        },
+      },
+      delete: {
+        title: "Usuń Awatar",
+        description: "Usuń obecne zdjęcie profilowe",
+        response: {
+          title: "Odpowiedź Usuwania",
+          label: "Wynik Usuwania",
+          description: "Odpowiedź usuwania awatara",
+          success: "Usuwanie Pomyślne",
+          message: "Twój awatar został pomyślnie usunięty",
+          nextSteps: {
+            item: "Następny Krok",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd Walidacji",
+            description: "Żądanie usunięcia awatara jest nieprawidłowe",
+          },
+          unauthorized: {
+            title: "Brak Autoryzacji",
+            description: "Musisz być zalogowany, aby usunąć swój awatar",
+          },
+          server: {
+            title: "Błąd Serwera",
+            description: "Nie udało się usunąć awatara",
+          },
+          internal: {
+            title: "Błąd Wewnętrzny",
+            description: "Wystąpił wewnętrzny błąd serwera",
+          },
+          unknown: {
+            title: "Nieznany Błąd",
+            description: "Wystąpił nieoczekiwany błąd podczas usuwania",
+          },
+          network: {
+            title: "Błąd Sieci",
+            description: "Wystąpił błąd sieci podczas usuwania",
+          },
+          forbidden: {
+            title: "Zabronione",
+            description: "Nie masz uprawnień do usuwania tego awatara",
+          },
+          notFound: {
+            title: "Nie Znaleziono",
+            description: "Awatar do usunięcia nie został znaleziony",
+          },
+          unsaved: {
+            title: "Niezapisane Zmiany",
+            description: "Istnieją niezapisane zmiany",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Wystąpił konflikt podczas usuwania",
+          },
+        },
+        success: {
+          title: "Awatar Usunięty",
+          description: "Twoje zdjęcie profilowe zostało pomyślnie usunięte",
+        },
+      },
+    },
+    password: {
+      category: "Profil użytkownika",
+
+      title: "Zmień Hasło",
+      description: "Bezpiecznie zaktualizuj hasło do swojego konta",
+      tag: "zmiana-hasła",
+      debug: {
+        updatingPassword: "Aktualizowanie hasła",
+        errorUpdatingPassword: "Błąd podczas aktualizacji hasła",
+        settingPassword: "Ustawianie hasła",
+        errorSettingPassword: "Błąd podczas ustawiania hasła",
+      },
+      groups: {
+        currentCredentials: {
+          title: "Obecne Hasło",
+          description: "Zweryfikuj swoje obecne hasło, aby kontynuować",
+        },
+        newCredentials: {
+          title: "Nowe Hasło",
+          description: "Wybierz silne nowe hasło dla swojego konta",
+        },
+      },
+      currentPassword: {
+        label: "Obecne Hasło",
+        description: "Wprowadź swoje obecne hasło",
+        placeholder: "Wprowadź obecne hasło",
+        help: "Wprowadź swoje obecne hasło, aby zweryfikować swoją tożsamość przed zmianą",
+      },
+      newPassword: {
+        label: "Nowe Hasło",
+        description: "Wprowadź nowe hasło (minimum 8 znaków)",
+        placeholder: "Wprowadź nowe hasło",
+        help: "Wybierz silne hasło z co najmniej 8 znakami, w tym literami, cyframi i symbolami",
+      },
+      confirmPassword: {
+        label: "Potwierdź Hasło",
+        description: "Potwierdź swoje nowe hasło",
+        placeholder: "Potwierdź nowe hasło",
+        help: "Ponownie wprowadź nowe hasło, aby upewnić się, że zostało wpisane poprawnie",
+      },
+      twoFactorCode: {
+        label: "Kod Dwuskładnikowy",
+        description:
+          "Wprowadź kod uwierzytelniania dwuskładnikowego, jeśli jest włączony",
+        placeholder: "Wprowadź kod 2FA",
+      },
+      response: {
+        title: "Odpowiedź Zmiany Hasła",
+        description: "Odpowiedź na operację zmiany hasła",
+        success: "Hasło zostało pomyślnie zaktualizowane",
+        message: "Wiadomość o statusie",
+        securityTip: "Wskazówka bezpieczeństwa",
+        nextSteps: {
+          item: "Następne kroki",
+        },
+      },
+      validation: {
+        currentPassword: {
+          minLength: "Obecne hasło musi mieć co najmniej 8 znaków",
+        },
+        newPassword: {
+          minLength: "Nowe hasło musi mieć co najmniej 8 znaków",
+        },
+        confirmPassword: {
+          minLength: "Potwierdzenie hasła musi mieć co najmniej 8 znaków",
+        },
+        passwords: {
+          mismatch: "Hasła nie są zgodne",
+        },
+      },
+      errors: {
+        passwords_do_not_match: "Hasła nie pasują do siebie",
+        user_not_found: "Użytkownik nie znaleziony",
+        incorrect_password: "Nieprawidłowe hasło",
+        update_failed: "Nie udało się zaktualizować hasła",
+        token_creation_failed: "Nie udało się utworzyć tokenu hasła",
+        two_factor_code_required:
+          "Wymagany kod uwierzytelniania dwuskładnikowego",
+        invalid_two_factor_code:
+          "Nieprawidłowy kod uwierzytelniania dwuskładnikowego",
+        invalid_request: {
+          title: "Nieprawidłowe Żądanie",
+          description: "Żądanie zmiany hasła jest nieprawidłowe",
+        },
+        validation: {
+          title: "Błąd Walidacji",
+          description: "Sprawdź swoje dane i spróbuj ponownie",
+        },
+        unauthorized: {
+          title: "Brak Autoryzacji",
+          description: "Musisz być zalogowany, aby zmienić hasło",
+        },
+        server: {
+          title: "Błąd Serwera",
+          description:
+            "Nie udało się zaktualizować hasła z powodu błędu serwera",
+        },
+        unknown: {
+          title: "Nieznany Błąd",
+          description: "Wystąpił nieoczekiwany błąd podczas aktualizacji hasła",
+        },
+        network: {
+          title: "Błąd Sieci",
+          description: "Połączenie sieciowe nie powiodło się",
+        },
+        forbidden: {
+          title: "Dostęp Zabroniony",
+          description: "Nie masz uprawnień do wykonania tej czynności",
+        },
+        notFound: {
+          title: "Użytkownik Nie Znaleziony",
+          description: "Nie można znaleźć konta użytkownika",
+        },
+        unsavedChanges: {
+          title: "Niezapisane Zmiany",
+          description: "Masz niezapisane zmiany, które zostaną utracone",
+        },
+        conflict: {
+          title: "Konflikt Danych",
+          description: "Wystąpił konflikt podczas aktualizacji hasła",
+        },
+      },
+      success: {
+        updated: "Hasło zaktualizowane pomyślnie",
+        securityTip:
+          "Aby zwiększyć bezpieczeństwo, włącz uwierzytelnianie dwuskładnikowe",
+        nextSteps: {
+          logoutOther:
+            "Wszystkie inne sesje zostały wylogowane ze względów bezpieczeństwa",
+          enable2fa:
+            "Rozważ włączenie uwierzytelniania dwuskładnikowego dla lepszego bezpieczeństwa",
+        },
+        title: "Hasło Zaktualizowane",
+        description: "Twoje hasło zostało pomyślnie zaktualizowane",
+      },
+      update: {
+        success: {
+          title: "Hasło Zaktualizowane",
+          description: "Twoje hasło zostało pomyślnie zaktualizowane",
+        },
+        errors: {
+          unknown: {
+            title: "Nieznany Błąd",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas aktualizacji hasła",
+          },
+        },
+      },
+    },
+    addresses: {
+      category: "Adresy",
+      tag: "addresses",
+
+      list: {
+        title: "Moje adresy",
+        description: "Lista zapisanych adresów",
+        response: {
+          addresses: "Adresy",
+        },
+        widget: {
+          addAddress: "Dodaj adres",
+          edit: "Edytuj",
+          delete: "Usuń",
+          billing: "Rozliczeniowy",
+          delivery: "Dostawczy",
+          empty: "Brak zapisanych adresów",
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Nieprawidłowe żądanie",
+          },
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description: "Wymagane logowanie",
+          },
+          forbidden: { title: "Zabronione", description: "Brak dostępu" },
+          notFound: { title: "Nie znaleziono", description: "Brak adresów" },
+          conflict: { title: "Konflikt", description: "Konflikt danych" },
+          network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Są niezapisane zmiany",
+          },
+          internal: {
+            title: "Błąd serwera",
+            description: "Wewnętrzny błąd serwera",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieznany błąd",
+          },
+        },
+        success: { title: "Sukces", description: "Adresy pobrane" },
+      },
+
+      create: {
+        title: "Dodaj adres",
+        description: "Zapisz nowy adres na koncie",
+        fields: {
+          label: {
+            label: "Nazwa",
+            description: "Nazwij ten adres (np. Dom, Biuro)",
+            placeholder: "Dom",
+          },
+          fullName: {
+            label: "Imię i nazwisko",
+            description: "Osoba kontaktowa dla adresu",
+            placeholder: "Jan Kowalski",
+          },
+          company: {
+            label: "Firma",
+            description: "Nazwa firmy (opcjonalnie)",
+            placeholder: "Przykład Sp. z o.o.",
+          },
+          phone: {
+            label: "Telefon",
+            description: "Numer kontaktowy",
+            placeholder: "+48 22 000 00 00",
+          },
+          vatNumber: {
+            label: "NIP",
+            description: "Numer identyfikacji podatkowej VAT",
+            placeholder: "PL1234567890",
+          },
+          taxId: {
+            label: "REGON",
+            description: "Krajowy identyfikator podatkowy",
+            placeholder: "123456789",
+          },
+          addressLine1: {
+            label: "Adres (linia 1)",
+            description: "Ulica i numer",
+            placeholder: "ul. Przykładowa 1",
+          },
+          addressLine2: {
+            label: "Adres (linia 2)",
+            description: "Mieszkanie, piętro (opcjonalnie)",
+            placeholder: "m. 5",
+          },
+          city: {
+            label: "Miasto",
+            description: "Miasto",
+            placeholder: "Warszawa",
+          },
+          region: {
+            label: "Województwo / Region",
+            description: "Województwo lub region (opcjonalnie)",
+            placeholder: "Mazowieckie",
+          },
+          postalCode: {
+            label: "Kod pocztowy",
+            description: "Kod pocztowy",
+            placeholder: "00-001",
+          },
+          country: {
+            label: "Kraj",
+            description: "Kod kraju ISO 3166-1 alpha-2",
+            placeholder: "PL",
+          },
+          isDefaultBilling: {
+            label: "Domyślny adres rozliczeniowy",
+            description: "Użyj jako domyślny adres rozliczeniowy",
+          },
+          isDefaultDelivery: {
+            label: "Domyślny adres dostawy",
+            description: "Użyj jako domyślny adres dostawy",
+          },
+        },
+        response: {
+          id: "ID adresu",
+          label: "Nazwa",
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Sprawdź wymagane pola",
+          },
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description: "Wymagane logowanie",
+          },
+          forbidden: { title: "Zabronione", description: "Brak dostępu" },
+          notFound: {
+            title: "Nie znaleziono",
+            description: "Użytkownik nie znaleziony",
+          },
+          conflict: { title: "Konflikt", description: "Konflikt danych" },
+          network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Są niezapisane zmiany",
+          },
+          internal: {
+            title: "Błąd serwera",
+            description: "Wewnętrzny błąd serwera",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieznany błąd",
+          },
+        },
+        success: {
+          title: "Adres zapisany",
+          description: "Adres dodany do konta",
+        },
+        widget: {
+          saved: "Adres zapisany.",
+          backToAddresses: "Wróć do adresów",
+        },
+      },
+    },
+  },
+  session: {
+    enums: {
+      sessionErrorReason: {
+        noTokenInCookies: "Brak tokenu w ciasteczkach",
+      },
+    },
+    errors: {
+      session_not_found: "Sesja nie znaleziona",
+      session_lookup_failed: "Wyszukiwanie sesji nie powiodło się",
+      expired_sessions_delete_failed:
+        "Usuwanie wygasłych sesji nie powiodło się",
+      session_creation_failed: "Tworzenie sesji nie powiodło się",
+      session_creation_database_error:
+        "Błąd bazy danych podczas tworzenia sesji",
+      user_sessions_delete_failed:
+        "Usuwanie sesji użytkownika nie powiodło się",
+      expired: "Sesja wygasła",
+    },
+    post: {
+      title: "Tytuł",
+      description: "Opis endpointu",
+      form: {
+        title: "Konfiguracja",
+        description: "Skonfiguruj parametry",
+      },
+      response: {
+        title: "Odpowiedź",
+        description: "Dane odpowiedzi",
+      },
+      errors: {
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagana autoryzacja",
+        },
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Wystąpił wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Wystąpił błąd sieci",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Dostęp zabroniony",
+        },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Zasób nie został znaleziony",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Wystąpił konflikt danych",
+        },
+      },
+      success: {
+        title: "Sukces",
+        description: "Operacja zakończona pomyślnie",
+      },
+    },
+  },
+  sessions: {
+    category: "Użytkownicy",
+
+    list: {
+      title: "Moje sesje",
+      description: "Wyświetl wszystkie aktywne sesje dla Twojego konta",
+      tag: "Sesje",
+      response: {
+        sessions: "Sesje",
+      },
+      success: {
+        title: "Sesje pobrane",
+        description: "Twoje aktywne sesje zostały pobrane",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nieautoryzowany",
+          description: "Wymagane uwierzytelnienie",
+        },
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe żądanie",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+        network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
+        forbidden: { title: "Zabroniony", description: "Dostęp zabroniony" },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Zasób nie znaleziony",
+        },
+        conflict: { title: "Konflikt", description: "Konflikt danych" },
+      },
+    },
+    create: {
+      title: "Utwórz token sesji",
+      description: "Utwórz nazwany token sesji dla programowego dostępu",
+      tag: "Sesje",
+      form: {
+        name: "Nazwa tokena",
+        namePlaceholder: "np. Mój bot agenta",
+      },
+      response: {
+        token: "Token",
+        id: "ID sesji",
+        name: "Nazwa",
+        message: "Skopiuj ten token - nie zostanie pokazany ponownie",
+      },
+      success: {
+        title: "Sesja utworzona",
+        description: "Twój token sesji został utworzony",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nieautoryzowany",
+          description: "Wymagane uwierzytelnienie",
+        },
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe żądanie",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+        network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
+        forbidden: { title: "Zabroniony", description: "Dostęp zabroniony" },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Zasób nie znaleziony",
+        },
+        conflict: { title: "Konflikt", description: "Konflikt danych" },
+      },
+    },
+    revoke: {
+      title: "Unieważnij sesję",
+      description: "Unieważnij token sesji według ID",
+      tag: "Sesje",
+      response: {
+        message: "Sesja unieważniona",
+      },
+      success: {
+        title: "Sesja unieważniona",
+        description: "Sesja została unieważniona",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nieautoryzowany",
+          description: "Wymagane uwierzytelnienie",
+        },
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe żądanie",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Wewnętrzny błąd serwera",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+        network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
+        forbidden: { title: "Zabroniony", description: "Dostęp zabroniony" },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Sesja nie znaleziona",
+        },
+        conflict: { title: "Konflikt", description: "Konflikt danych" },
+      },
+    },
+  },
 };

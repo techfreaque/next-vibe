@@ -10,6 +10,7 @@ export const translations = {
 
   post: {
     title: "Create Favorite",
+    titleShort: "Add Favorite",
     description: "Create a new favorite character configuration",
     container: {
       title: "New Favorite",

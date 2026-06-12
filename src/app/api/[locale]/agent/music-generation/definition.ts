@@ -50,12 +50,14 @@ const { POST } = createEndpoint({
   path: ["agent", "music-generation"],
   aliases: [MUSIC_GEN_ALIAS],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
+  defaultWebPinned: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
 
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "music",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiGeneration",
+  category: "ai",
+  subCategory: "Generation",
   tags: ["tags.music", "tags.generation", "tags.ai"],
   dynamicTitle: ({ request }) => {
     const prompt = request?.prompt;

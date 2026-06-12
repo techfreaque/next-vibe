@@ -42,6 +42,7 @@ export const translations: typeof enTranslations = {
   vendorCreate: {
     post: {
       title: "Utwórz dostawcę",
+      titleShort: "Utwórz dostawcę",
       description: "Zarejestruj nowego dostawcę dla swojej firmy.",
       widget: {
         back: "Wróć",
@@ -184,7 +185,8 @@ export const translations: typeof enTranslations = {
 
   vendorList: {
     get: {
-      title: "Lista dostawców",
+      title: "Dostawcy",
+      titleShort: "Dostawcy",
       description: "Wyświetl wszystkich dostawców firmy.",
       widget: {
         back: "Wróć",
@@ -260,6 +262,7 @@ export const translations: typeof enTranslations = {
   vendorGet: {
     get: {
       title: "Pobierz dostawcę",
+      titleShort: "Szczegóły dostawcy",
       description: "Pobierz pełne dane dostawcy.",
       widget: {
         back: "Wróć",
@@ -338,6 +341,7 @@ export const translations: typeof enTranslations = {
   vendorUpdate: {
     patch: {
       title: "Aktualizuj dostawcę",
+      titleShort: "Zaktualizuj dostawcę",
       description: "Edytuj dane dostawcy.",
       widget: {
         backToVendor: "Powrót do dostawcy",
@@ -470,6 +474,7 @@ export const translations: typeof enTranslations = {
   vendorDeactivate: {
     post: {
       title: "Dezaktywuj dostawcę",
+      titleShort: "Dezaktywuj",
       description:
         "Oznacz dostawcę jako nieaktywnego. Istniejące zamówienia nie zostaną zmienione.",
       vendorId: {
@@ -530,6 +535,7 @@ export const translations: typeof enTranslations = {
   orderCreate: {
     post: {
       title: "Utwórz zamówienie zakupu",
+      titleShort: "Utwórz zamówienie",
       description: "Nowe zamówienie zakupu w statusie Szkic.",
       errors: {
         validation: {
@@ -651,7 +657,8 @@ export const translations: typeof enTranslations = {
 
   orderList: {
     get: {
-      title: "Lista zamówień zakupu",
+      title: "Zamówienia zakupu",
+      titleShort: "Zamówienia",
       description: "Lista zamówień zakupu firmy z opcjonalnym filtrem statusu.",
       widget: {
         newOrder: "Nowe zamówienie",
@@ -733,6 +740,7 @@ export const translations: typeof enTranslations = {
   orderGet: {
     get: {
       title: "Pobierz zamówienie zakupu",
+      titleShort: "Szczegóły zamówienia",
       description: "Pobierz zamówienie zakupu z pozycjami i historią odbioru.",
       widget: {
         back: "Wróć",
@@ -837,6 +845,7 @@ export const translations: typeof enTranslations = {
   orderUpdate: {
     patch: {
       title: "Aktualizuj zamówienie",
+      titleShort: "Zaktualizuj zamówienie",
       description: "Edytuj szkic zamówienia — pola i pozycje.",
       widget: { backToPO: "Powrót do zamówienia" },
       poId: { label: "ID zamówienia", description: "Zamówienie do edycji" },
@@ -955,6 +964,7 @@ export const translations: typeof enTranslations = {
   orderSend: {
     post: {
       title: "Wyślij zamówienie",
+      titleShort: "Wyślij zamówienie",
       description: "Oznacz zamówienie jako wysłane do dostawcy.",
       poId: { label: "ID zamówienia", description: "Zamówienie do wysłania" },
       widget: {
@@ -1015,6 +1025,7 @@ export const translations: typeof enTranslations = {
   orderConfirm: {
     post: {
       title: "Potwierdź zamówienie",
+      titleShort: "Potwierdź zamówienie",
       description: "Dostawca potwierdził — oznacz jako Potwierdzone.",
       poId: {
         label: "ID zamówienia",
@@ -1077,6 +1088,7 @@ export const translations: typeof enTranslations = {
   orderReceive: {
     post: {
       title: "Odbierz towar",
+      titleShort: "Przyjmij towary",
       description:
         "Zarejestruj odbiór towaru do zamówienia. Tworzy ruchy magazynowe.",
       widget: { backToPO: "Powrót do zamówienia" },
@@ -1159,6 +1171,7 @@ export const translations: typeof enTranslations = {
   orderConvertToBill: {
     post: {
       title: "Konwertuj do faktury",
+      titleShort: "Konwertuj na rachunek",
       description: "Utwórz fakturę zakupu z tego zamówienia.",
       widget: {
         back: "Wróć",
@@ -1222,6 +1235,7 @@ export const translations: typeof enTranslations = {
         lineAdded: "Pozycja dodana",
       },
       title: "Dodaj pozycję",
+      titleShort: "Dodaj linię",
       description: "Dodaj pozycję do zamówienia zakupu.",
       poId: {
         label: "ID zamówienia",
@@ -1306,12 +1320,17 @@ export const translations: typeof enTranslations = {
   orderLineRemove: {
     post: {
       title: "Usuń pozycję",
+      titleShort: "Usuń linię",
       description: "Usuń pozycję z zamówienia zakupu.",
       poId: {
         label: "ID zamówienia",
         description: "Zamówienie, z którego usuwana jest pozycja",
       },
       lineId: { label: "ID pozycji", description: "Pozycja do usunięcia" },
+      widget: {
+        backToOrder: "Powrót do zamówienia",
+        warning: "Pozycja zostanie trwale usunięta z zamówienia zakupu.",
+      },
       errors: {
         validation: {
           title: "Błąd walidacji",
@@ -1361,6 +1380,7 @@ export const translations: typeof enTranslations = {
   dashboard: {
     get: {
       title: "Przegląd zakupów",
+      titleShort: "Przegląd",
       description:
         "Aktualny stan zamówień zakupu i aktywności dostawców dla Twojej firmy.",
       widget: {
@@ -1435,6 +1455,7 @@ export const translations: typeof enTranslations = {
   orderCancel: {
     post: {
       title: "Anuluj zamówienie",
+      titleShort: "Anuluj zamówienie",
       description: "Anuluj szkic lub wysłane zamówienie zakupu.",
       poId: { label: "ID zamówienia", description: "Zamówienie do anulowania" },
       widget: {

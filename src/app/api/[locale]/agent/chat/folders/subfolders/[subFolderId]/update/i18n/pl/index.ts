@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
 
   patch: {
     title: "Aktualizuj folder",
+    titleShort: "Aktualizuj folder",
     description: "Zaktualizuj istniejący folder",
     container: {
       title: "Aktualizuj folder",

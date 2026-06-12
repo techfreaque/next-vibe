@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz ścieżkę konwersacji",
+    titleShort: "Ścieżka wiadomości",
     description: "Pobierz wiadomości wzdłuż określonej ścieżki konwersacji",
     container: {
       title: "Ścieżka konwersacji",

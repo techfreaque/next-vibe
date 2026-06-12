@@ -6,6 +6,7 @@ export const translations = {
   },
   post: {
     title: "Create User",
+    titleShort: "Create User",
     description: "Create a new user account",
     form: {
       title: "User Creation Form",
@@ -95,6 +96,14 @@ export const translations = {
       },
       leadId: {
         content: "Associated Lead ID",
+      },
+      country: {
+        label: "Country",
+        description: "User's country of residence",
+      },
+      language: {
+        label: "Language",
+        description: "User's preferred language",
       },
       email: {
         content: "Email Address",

@@ -20,7 +20,7 @@ import {
 
 import { scopedTranslation } from "../i18n";
 import { UserRole } from "../../../user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const ResetPasswordConfirmContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({
@@ -36,10 +36,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["user", "public", "reset-password", "confirm"],
   title: "confirm.title",
+  titleShort: "confirm.titleShort",
   description: "confirm.description",
   icon: "lock",
-  category: "userAuth",
-  subCategory: "userAuthLogin",
+  category: "account",
   tags: ["confirm.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: customWidgetObject({

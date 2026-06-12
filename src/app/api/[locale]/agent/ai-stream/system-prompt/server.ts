@@ -135,7 +135,7 @@ export async function loadPromptContextData(
 
   return {
     appName,
-    locale: language,
+    locale,
     languageName: countryInfo?.langName ?? language,
     countryName: countryInfo?.name ?? country,
     flag: countryInfo?.flag ?? "🌐",

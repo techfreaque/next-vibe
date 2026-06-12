@@ -10,6 +10,7 @@ export const translations = {
 
   get: {
     title: "Get Favorite",
+    titleShort: "Favorite",
     description: "Retrieve a specific favorite configuration",
     container: {
       title: "Favorite Details",
@@ -147,6 +148,7 @@ export const translations = {
   },
   patch: {
     title: "Update Favorite",
+    titleShort: "Update Favorite",
     description: "Update an existing favorite configuration",
     container: {
       title: "Edit Favorite",
@@ -426,6 +428,7 @@ export const translations = {
   },
   delete: {
     title: "Delete Favorite",
+    titleShort: "Delete Favorite",
     description: "Remove a favorite configuration",
     container: {
       title: "Delete Favorite",

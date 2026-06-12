@@ -10,9 +10,11 @@ import endpoints from "./definition";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: async ({ data, logger, user, t }) => {
-      const { LinuxUsersListRepository } = await import("./repository");
-      return LinuxUsersListRepository.list(data, logger, user, t);
-    },
+    handler: async ({ data, logger, user, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).LinuxUsersListRepository.list(data, logger, user, t),
   },
 });

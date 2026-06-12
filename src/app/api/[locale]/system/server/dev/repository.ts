@@ -16,11 +16,12 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
-  devFileLog,
+  appendRawToServerLog,
   truncateClientLogs,
-  truncateDevLog,
-  writeDevLogOfflineHint,
+  truncateServerLog,
+  writeServerLogOfflineHint,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
+import { formatLogPrefix } from "@/app/api/[locale]/system/unified-interface/shared/logger/logger-core";
 import {
   createNextjsFormatter,
   formatActionCommand,
@@ -46,15 +47,17 @@ import { scopedTranslation as dockerScopedTranslation } from "../../db/utils/doc
 import { DockerOperationsRepository } from "../../db/utils/docker-operations/repository";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { DbUtilsRepository } from "../../db/utils/repository";
+import { closeDatabase } from "../../db";
 import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/constants";
 import { ServerFramework } from "../enum";
 import {
   addPidToFile,
+  ATLAS_PID_FILE,
   cleanupPidFile,
   getPidOnPort,
+  HERMES_DEV_PID_FILE,
   killPreviousInstance,
   removePidFromFile,
-  VIBE_DEV_PID_FILE,
   writePidFile,
 } from "../pid";
 import type { DevRequestOutput } from "./definition";
@@ -69,6 +72,7 @@ export class DevRepository {
   private static log(msg: string): void {
     // eslint-disable-next-line no-console
     console.log(msg);
+    appendRawToServerLog(msg);
   }
 
   /** Extract port number from a URL string, returns undefined if not parseable */
@@ -112,6 +116,8 @@ export class DevRepository {
 
   private static runningProcesses: Map<string, ChildProcess> = new Map();
   private static shuttingDown = false;
+  /** Active PID file — set by execute() to support vibe --hermes dev (HERMES_DEV_PID_FILE) */
+  private static activePidFile: string = ATLAS_PID_FILE;
 
   /**
    * Perform hard database reset: stop containers, delete data, restart
@@ -124,6 +130,10 @@ export class DevRepository {
     const { promisify } = await import("node:util");
     const execAsync = promisify(exec);
 
+    // 0. Close any open DB pool connections so docker compose down doesn't
+    //    produce "Connection terminated unexpectedly" errors.
+    await closeDatabase(logger);
+
     // 1. Stop Docker containers
     logger.debug("Stopping Docker containers...");
     const { t: dockerT } = dockerScopedTranslation.scopedT(locale);
@@ -132,7 +142,7 @@ export class DevRepository {
       dockerT,
       "docker-compose-dev.yml",
       30000,
-      "vibe-dev",
+      "atlas",
     );
 
     if (!downResult.success) {
@@ -158,7 +168,7 @@ export class DevRepository {
       dockerT,
       "docker-compose-dev.yml",
       60000,
-      "vibe-dev",
+      "atlas",
     );
 
     if (!upResult.success) {
@@ -185,7 +195,7 @@ export class DevRepository {
       const { promisify } = await import("node:util");
       const execAsync = promisify(exec);
 
-      const volumeName = "vibe-dev_postgres_data";
+      const volumeName = "atlas_postgres_data";
       logger.debug(`Deleting postgres data volume: ${volumeName}...`);
 
       try {
@@ -272,11 +282,17 @@ export class DevRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<never> {
+    // vibe --hermes dev uses IS_PREVIEW_MODE=true to signal it targets the preview DB
+    const isLocalDev = process.env["IS_PREVIEW_MODE"] === "true";
+    DevRepository.activePidFile = isLocalDev
+      ? HERMES_DEV_PID_FILE
+      : ATLAS_PID_FILE;
+
     // Truncate log files at session start (VIBE_LOG_PATH controls whether active)
-    void truncateDevLog();
+    void truncateServerLog();
     void truncateClientLogs();
     // Guaranteed last-resort offline hint - process.on("exit") always fires, even on crash
-    process.on("exit", writeDevLogOfflineHint);
+    process.on("exit", writeServerLogOfflineHint);
 
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
     const port =
@@ -289,12 +305,12 @@ export class DevRepository {
     DevRepository.logStartupInfo(port, logger, data);
 
     // Kill any previous dev instance, then write our PID (including resolved port)
-    killPreviousInstance(VIBE_DEV_PID_FILE, logger);
-    writePidFile(VIBE_DEV_PID_FILE, logger, [], port);
+    killPreviousInstance(DevRepository.activePidFile, logger);
+    writePidFile(DevRepository.activePidFile, logger, [], port);
 
     // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately
     const earlyExitHandler = (): void => {
-      cleanupPidFile(VIBE_DEV_PID_FILE);
+      cleanupPidFile(DevRepository.activePidFile);
       process.exit(0);
     };
     process.on("SIGINT", earlyExitHandler);
@@ -315,6 +331,14 @@ export class DevRepository {
         data.profile,
         data.framework === ServerFramework.TANSTACK,
       );
+    }
+
+    // Enable fixture mode if requested (VIBE_FIXTURE_MODE intercepts external fetch calls)
+    if (data.fixtureMode) {
+      Object.assign(process.env, { VIBE_FIXTURE_MODE: "true" });
+      const { installFetchCacheIfEnabled } =
+        await import("@/app/api/[locale]/agent/ai-stream/testing/fetch-cache");
+      installFetchCacheIfEnabled();
     }
 
     // Shared abort controller: aborted by shutdown() so task runners stop cleanly
@@ -347,7 +371,9 @@ export class DevRepository {
     logger: EndpointLogger,
     data: DevRequestOutput,
   ): void {
-    logger.vibe(formatStartup("Starting Development Server", "⚡"));
+    DevRepository.log(
+      `${formatLogPrefix()}${formatStartup("Starting Development Server", "⚡")}`,
+    );
     DevRepository.log("");
     DevRepository.log(
       `  ${formatConfig("Port", port)}  ${formatHint("(--port=N)")}`,
@@ -391,6 +417,11 @@ export class DevRepository {
     DevRepository.log(
       `  ${formatConfig("Code Generators", data.skipGeneratorWatcher ? "DISABLED" : "ENABLED")} ${formatHint(data.skipGeneratorWatcher ? "(remove --skip-generator-watcher)" : "(--skip-generator-watcher)")}`,
     );
+    if (data.fixtureMode) {
+      DevRepository.log(
+        `  ${formatConfig("Fixture Mode", "ON")} ${formatHint("(VIBE_FIXTURE_MODE=true — external API calls cached to fixtures/http-cache/)")}`,
+      );
+    }
     DevRepository.log("");
     DevRepository.log(
       `  ${formatHint("💡 Edit src/app/api/[locale]/system/server/dev/definition.ts to change defaults")}`,
@@ -479,7 +510,7 @@ export class DevRepository {
                 new Error(generateResult.message ?? "Generation failed"),
                 logger,
               );
-              cleanupPidFile(VIBE_DEV_PID_FILE);
+              cleanupPidFile(DevRepository.activePidFile);
               process.exit(1);
             }
           }
@@ -490,7 +521,7 @@ export class DevRepository {
               new Error(migrateResult.message ?? "Migration failed"),
               logger,
             );
-            cleanupPidFile(VIBE_DEV_PID_FILE);
+            cleanupPidFile(DevRepository.activePidFile);
             process.exit(1);
           }
         }
@@ -514,7 +545,7 @@ export class DevRepository {
         error instanceof Error ? error : new Error(String(error)),
         logger,
       );
-      cleanupPidFile(VIBE_DEV_PID_FILE);
+      cleanupPidFile(DevRepository.activePidFile);
       process.exit(1);
     }
   }
@@ -549,7 +580,7 @@ export class DevRepository {
             new Error(generateResult.message ?? "Generation failed"),
             logger,
           );
-          cleanupPidFile(VIBE_DEV_PID_FILE);
+          cleanupPidFile(DevRepository.activePidFile);
           process.exit(1);
         }
       }
@@ -559,7 +590,7 @@ export class DevRepository {
           new Error(migrateResult.message ?? "Migration failed"),
           logger,
         );
-        cleanupPidFile(VIBE_DEV_PID_FILE);
+        cleanupPidFile(DevRepository.activePidFile);
         process.exit(1);
       }
     }
@@ -582,7 +613,7 @@ export class DevRepository {
       dockerT,
       "docker-compose-dev.yml",
       60000,
-      "vibe-dev",
+      "atlas",
     );
 
     if (!dbStartResult.success) {
@@ -662,14 +693,18 @@ export class DevRepository {
 
     // Save tty state now (before anything touches it) so we can restore on exit.
     // stty is POSIX-only; skip on Windows where it doesn't exist.
+    // Guard with [ -e /dev/tty ] first: when there is no controlling terminal
+    // (e.g. nohup / setsid / CI), the shell itself prints an error to stderr
+    // when it tries to open /dev/tty as an input redirect, even with 2>/dev/null.
     let savedTtyState: string | null = null;
     if (process.platform !== "win32") {
       try {
-        savedTtyState = execSync("stty -g </dev/tty 2>/dev/null", {
-          shell: "/bin/sh",
-        })
-          .toString()
-          .trim();
+        savedTtyState =
+          execSync("[ -e /dev/tty ] && stty -g </dev/tty 2>/dev/null || true", {
+            shell: "/bin/sh",
+          })
+            .toString()
+            .trim() || null;
       } catch {
         /* not a tty */
       }
@@ -713,9 +748,10 @@ export class DevRepository {
       }
       try {
         if (savedTtyState) {
-          execSync(`stty ${savedTtyState} </dev/tty 2>/dev/null`, {
-            shell: "/bin/sh",
-          });
+          execSync(
+            `[ -e /dev/tty ] && stty ${savedTtyState} </dev/tty 2>/dev/null || true`,
+            { shell: "/bin/sh" },
+          );
         }
       } catch {
         /* not a tty */
@@ -752,7 +788,7 @@ export class DevRepository {
       // cleanupPidFile is called just before each process.exit() below.
       if (viteClose) {
         const timer = setTimeout(() => {
-          cleanupPidFile(VIBE_DEV_PID_FILE);
+          cleanupPidFile(DevRepository.activePidFile);
           process.exit(code);
         }, 2000);
         void viteClose()
@@ -761,23 +797,23 @@ export class DevRepository {
           })
           .finally(() => {
             clearTimeout(timer);
-            cleanupPidFile(VIBE_DEV_PID_FILE);
+            cleanupPidFile(DevRepository.activePidFile);
             process.exit(code);
           });
       } else if (currentNext && !currentNext.killed) {
         // Wait for Next.js to exit before we do — otherwise it becomes an orphan
         // holding port 3100, causing "port already in use" on the next `vibe dev`.
         const exitTimer = setTimeout(() => {
-          cleanupPidFile(VIBE_DEV_PID_FILE);
+          cleanupPidFile(DevRepository.activePidFile);
           process.exit(code);
         }, 5000);
         currentNext.once("exit", () => {
           clearTimeout(exitTimer);
-          cleanupPidFile(VIBE_DEV_PID_FILE);
+          cleanupPidFile(DevRepository.activePidFile);
           setImmediate(() => process.exit(code));
         });
       } else {
-        cleanupPidFile(VIBE_DEV_PID_FILE);
+        cleanupPidFile(DevRepository.activePidFile);
         setImmediate(() => process.exit(code));
       }
     };
@@ -857,7 +893,7 @@ export class DevRepository {
             }
             DevRepository.killProcessOnPort(nextPort, logger);
             DevRepository.killProcessOnPort(wsPort, logger);
-            cleanupPidFile(VIBE_DEV_PID_FILE);
+            cleanupPidFile(DevRepository.activePidFile);
 
             // Give the process a moment to flush files, then open results
             setTimeout((): void => {
@@ -1012,7 +1048,7 @@ export class DevRepository {
 
       // Track child PID in PID file so it gets killed on next startup too
       if (nextProcess.pid) {
-        addPidToFile(VIBE_DEV_PID_FILE, nextProcess.pid);
+        addPidToFile(DevRepository.activePidFile, nextProcess.pid);
       }
 
       const formatNextjs = createNextjsFormatter(nextPort, port);
@@ -1022,7 +1058,7 @@ export class DevRepository {
             chunk.toString().replaceAll(String(nextPort), String(port)),
           );
           process.stdout.write(formatted);
-          void devFileLog(formatted.trimEnd());
+          void appendRawToServerLog(formatted);
         };
         nextProcess.stdout?.on("data", rewritePort);
         nextProcess.stderr?.on("data", rewritePort);
@@ -1030,19 +1066,19 @@ export class DevRepository {
         nextProcess.stdout?.on("data", (chunk: Buffer) => {
           const formatted = formatNextjs(chunk.toString());
           process.stdout.write(formatted);
-          void devFileLog(formatted.trimEnd());
+          void appendRawToServerLog(formatted);
         });
         nextProcess.stderr?.on("data", (chunk: Buffer) => {
           const formatted = formatNextjs(chunk.toString());
           process.stderr.write(formatted);
-          void devFileLog(formatted.trimEnd());
+          void appendRawToServerLog(formatted);
         });
       }
 
       nextProcess.on("exit", (code) => {
         // Remove child PID from PID file immediately on exit
         if (nextProcess.pid) {
-          removePidFromFile(VIBE_DEV_PID_FILE, nextProcess.pid);
+          removePidFromFile(DevRepository.activePidFile, nextProcess.pid);
         }
         // Free streams to allow GC
         nextProcess.stdout?.destroy();
@@ -1183,10 +1219,10 @@ export class DevRepository {
 
     // Only kill if this PID belongs to our project (recorded in our PID file)
     let ourPids: Set<number> = new Set();
-    if (existsSync(VIBE_DEV_PID_FILE)) {
+    if (existsSync(DevRepository.activePidFile)) {
       try {
         ourPids = new Set(
-          readFileSync(VIBE_DEV_PID_FILE, "utf-8")
+          readFileSync(DevRepository.activePidFile, "utf-8")
             .trim()
             .split("\n")
             .map(Number)

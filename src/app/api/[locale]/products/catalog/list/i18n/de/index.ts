@@ -14,7 +14,8 @@ export const translations: typeof enTranslations = {
     },
   },
   get: {
-    title: "Katalogprodukte auflisten",
+    title: "Produkte",
+    titleShort: "Produkte",
     description:
       "Alle Produkte in Ihrem Katalog abrufen. Nach Unternehmen, Kategorie, Typ oder Status filtern.",
     companyId: {

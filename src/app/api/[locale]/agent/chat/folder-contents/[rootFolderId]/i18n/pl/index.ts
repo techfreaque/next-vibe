@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Chat",
   tags: {
     folderContents: "Zawartość folderu",
@@ -14,6 +15,7 @@ export const translations = {
   },
   get: {
     title: "Pobierz zawartość folderu",
+    titleShort: "Zawartość folderu",
     description:
       "Pobierz scaloną listę folderów i wątków dla danego poziomu folderu",
     rootFolderId: {

@@ -130,6 +130,7 @@ export async function dev(
             createdAt: new Date(),
             updatedAt: new Date(),
             userRoles: [],
+            roles: [],
           };
           createdUsers.push(minimalUser);
         }
@@ -455,6 +456,7 @@ export async function test(
             createdAt: new Date(),
             updatedAt: new Date(),
             userRoles: [],
+            roles: [],
           } as StandardUserType;
         }
         return userResponse.data;
@@ -476,6 +478,7 @@ export async function test(
           createdAt: new Date(),
           updatedAt: new Date(),
           userRoles: [],
+          roles: [],
         } as StandardUserType;
       }
     }),

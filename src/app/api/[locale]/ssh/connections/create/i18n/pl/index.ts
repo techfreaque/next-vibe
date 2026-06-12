@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "SSH",
 
   enums: {
@@ -19,6 +20,7 @@ export const translations = {
 
   post: {
     title: "Utwórz połączenie SSH",
+    titleShort: "Utwórz połączenie",
     description:
       "Zapisz nowe połączenie SSH. Dane uwierzytelniające są szyfrowane przez AES-256-GCM.",
     fields: {

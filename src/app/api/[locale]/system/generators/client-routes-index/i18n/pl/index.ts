@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Generuj indeks tras klienta",
+    titleShort: "Trasy klienta",
     description: "Automatycznie generuj plik indeksu tras klienta",
     container: {
       title: "Generator indeksu tras klienta",

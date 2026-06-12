@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Dezaktywuj konto",
+    titleShort: "Dezaktywuj",
     description:
       "Miękka dezaktywacja konta. Nie można dezaktywować kont systemowych ani kont z zaksięgowanymi wierszami.",
     accountId: {

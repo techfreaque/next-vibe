@@ -21,7 +21,7 @@ import { useCallback, useState } from "react";
 import {
   useWidgetSelector,
   useWidgetTranslation,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { REFERRAL_CONFIG } from "../../config";

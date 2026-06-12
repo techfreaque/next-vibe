@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Neu bauen & Neustarten",
+    titleShort: "Neu bauen",
     description:
       "Anwendung neu bauen und den laufenden Next.js-Server hot-restarten. Führt 6 Schritte sequentiell aus: 1) Code-Generierung, 2) Vibe-Check (Code-Qualitäts-Gate), 3) Next.js-Produktions-Build, 4) Datenbank-Migrationen, 5) Datenbank-Seeding, 6) Hot-Restart via SIGUSR1. Der Vibe-Check blockiert den Build bei Fehlern - verwende 'vibe check' oder das MCP-Check-Tool für Details. WARNUNG: Die HTTP-Antwort kann abgeschnitten werden, da der Server vor Abschluss der Antwort neu startet.",
     form: {

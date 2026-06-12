@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "System Guard",
 
   title: "Guard Stoppen",
+  titleShort: "Guard stoppen",
   description: "Guard-Umgebungen für VSCode-Projekte stoppen",
   tag: "guard",
 

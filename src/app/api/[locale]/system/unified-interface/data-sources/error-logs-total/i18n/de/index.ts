@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Fehlerprotokolle Gesamt",
+    titleShort: "Protokolle gesamt",
     description: "Gesamte Fehlerprotokoll-Einträge pro Auflösungs-Bucket",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

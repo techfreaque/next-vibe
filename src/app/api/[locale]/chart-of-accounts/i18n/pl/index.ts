@@ -120,6 +120,7 @@ export const translations: typeof enTranslations = {
       select: "Wybierz konto",
     },
     title: "Pobierz konto",
+    titleShort: "Konto",
     description: "Pobierz pełne szczegóły pojedynczego konta.",
     accountId: {
       label: "ID konta",
@@ -152,6 +153,7 @@ export const translations: typeof enTranslations = {
       select: "Wybierz okres",
     },
     title: "Pobierz okres",
+    titleShort: "Okres",
     description: "Pobierz szczegóły pojedynczego okresu rozliczeniowego.",
     periodId: {
       label: "ID okresu",
@@ -184,6 +186,7 @@ export const translations: typeof enTranslations = {
       select: "Wybierz wpis dziennika",
     },
     title: "Pobierz wpis dziennika",
+    titleShort: "Wpis dziennika",
     description: "Pobierz pojedynczy wpis dziennika ze wszystkimi wierszami.",
     entryId: {
       label: "ID wpisu",
@@ -226,6 +229,7 @@ export const translations: typeof enTranslations = {
         "Podaj ID firmy powyżej i zastosuj filtry, aby załadować wpisy dziennika.",
     },
     title: "Dziennik księgowy",
+    titleShort: "Dziennik",
     description:
       "Przeglądaj zapisy dziennika z filtrami według firmy, okresu, statusu, źródła i daty",
     companyId: {
@@ -284,6 +288,7 @@ export const translations: typeof enTranslations = {
       difference: "Różnica",
     },
     title: "Utwórz zapis dziennika",
+    titleShort: "Nowy zapis",
     description:
       "Ręczny zapis podwójnego zapisu. Suma debetów musi być równa sumie kredytów.",
     companyId: {
@@ -329,6 +334,7 @@ export const translations: typeof enTranslations = {
       back: "Wstecz",
     },
     title: "Zaksięguj zapis",
+    titleShort: "Zaksięguj",
     description:
       "Zmień status SZKICU na ZAKSIĘGOWANY. Nieodwracalne — użyj Stornowania zamiast tego.",
     entryId: {
@@ -352,6 +358,7 @@ export const translations: typeof enTranslations = {
       viewReversalButton: "Pokaż zapis stornujący",
     },
     title: "Stornuj zapis",
+    titleShort: "Stornuj",
     description:
       "Utwórz zapis stornujący ze zwierciadlanymi debetami i kredytami.",
     entryId: {
@@ -385,6 +392,7 @@ export const translations: typeof enTranslations = {
       totalCount: "wpisów",
     },
     title: "Księga konta",
+    titleShort: "Księga konta",
     description: "Wszystkie pozycje dziennika dla konta z saldem bieżącym",
     accountId: {
       label: "ID konta",
@@ -428,6 +436,7 @@ export const translations: typeof enTranslations = {
         "Podaj ID firmy powyżej i kliknij Uruchom, aby wygenerować bilans próbny.",
     },
     title: "Bilans próbny",
+    titleShort: "Bilans próbny",
     description:
       "Suma zaksięgowanych debetów i kredytów na każdym koncie. Potwierdza, że księgi się bilansują.",
     companyId: {
@@ -518,6 +527,7 @@ export const translations: typeof enTranslations = {
         "Podaj ID firmy powyżej i kliknij Uruchom, aby wygenerować rachunek zysków i strat.",
     },
     title: "Rachunek zysków i strat",
+    titleShort: "RZiS",
     description:
       "Przychody vs. koszty w danym okresie. Pokazuje zysk brutto, operacyjny i netto.",
     companyId: {
@@ -598,6 +608,7 @@ export const translations: typeof enTranslations = {
       selectCompany: "Wybierz firmę, aby wyświetlić bilans",
     },
     title: "Bilans",
+    titleShort: "Bilans",
     description:
       "Aktywa, pasywa i kapitał własny na dany dzień. Weryfikuje równanie bilansowe.",
     companyId: {
@@ -668,6 +679,7 @@ export const translations: typeof enTranslations = {
         "Podaj ID firmy powyżej i kliknij Uruchom, aby wygenerować raport należności.",
     },
     title: "Starzenie należności",
+    titleShort: "Starzenie należności",
     description:
       "Niezapłacone faktury pogrupowane według dni przeterminowania. Pokazuje, gdzie tkwią pieniądze.",
     companyId: {
@@ -765,6 +777,7 @@ export const translations: typeof enTranslations = {
         "Podaj ID firmy powyżej i kliknij Uruchom, aby wygenerować raport podatkowy.",
     },
     title: "Raport podatkowy",
+    titleShort: "Raport VAT",
     description:
       "VAT należny vs. naliczony w danym okresie. Zobowiązanie VAT netto na jednym ekranie.",
     companyId: {

@@ -128,6 +128,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Pobierz foldery",
+    titleShort: "Foldery",
     description: "Pobierz wszystkie foldery dla bieżącego folderu głównego",
     rootFolderId: {
       label: "Folder główny",

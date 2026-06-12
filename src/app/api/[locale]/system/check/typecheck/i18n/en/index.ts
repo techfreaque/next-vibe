@@ -1,6 +1,7 @@
 export const translations = {
   // Main endpoint properties
   title: "TypeScript Type Check",
+  titleShort: "Type Check",
   description:
     "Run TypeScript type checking on specified files or directories. Use vibe-check for comprehensive checks (ESLint + Oxlint + TypeScript). Note: Default values are configurable in check.config.ts.",
   category: "System Checks",

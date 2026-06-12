@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   post: {
     title: "Nowy folder",
+    titleShort: "Nowy folder",
     description: "Utwórz folder.",
-    dynamicTitle: "{{path}}",
+    dynamicTitle: "Utworzono: {{path}}",
     status: {
       loading: "Tworzenie...",
       done: "Utworzono",

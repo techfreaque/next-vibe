@@ -47,7 +47,7 @@ import {
 import { USERS_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const UsersListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UsersListContainer })),
@@ -66,10 +66,11 @@ const { GET } = createEndpoint({
   defaultWebPinned: [UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort",
   description: "get.description" as const,
   icon: "users",
-  category: "userAuth",
-  subCategory: "userAdminManagement",
+  category: "account",
+  subCategory: "manageUsers",
   tags: ["tag" as const],
 
   fields: customWidgetObject({

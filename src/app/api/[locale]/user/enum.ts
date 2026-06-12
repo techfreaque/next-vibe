@@ -64,3 +64,26 @@ export const UserDetailLevelDB = [
   UserDetailLevel.STANDARD,
   UserDetailLevel.COMPLETE,
 ] as const;
+
+/**
+ * User Note Type enum for CRM activity log
+ */
+export const {
+  enum: UserNoteType,
+  options: UserNoteTypeOptions,
+  Value: UserNoteTypeValue,
+} = createEnumOptions(scopedTranslation, {
+  NOTE: "userNoteType.note",
+  CALL: "userNoteType.call",
+  EMAIL: "userNoteType.email",
+  MEETING: "userNoteType.meeting",
+  TASK: "userNoteType.task",
+});
+
+export const UserNoteTypeDB = [
+  UserNoteType.NOTE,
+  UserNoteType.CALL,
+  UserNoteType.EMAIL,
+  UserNoteType.MEETING,
+  UserNoteType.TASK,
+] as const;

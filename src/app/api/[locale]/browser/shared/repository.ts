@@ -51,6 +51,7 @@ type MCPArgValue =
 interface MCPToolParams {
   toolName: string;
   args: Record<string, MCPArgValue>;
+  instanceId?: string;
 }
 
 export class BrowserSharedRepository {
@@ -83,9 +84,11 @@ export class BrowserSharedRepository {
       const requestData: {
         tool: string;
         arguments?: string;
+        instanceId?: string;
       } = {
         tool: params.toolName as (typeof BrowserTool)[keyof typeof BrowserTool],
         arguments: JSON.stringify(params.args),
+        instanceId: params.instanceId,
       };
 
       const result = await BrowserRepository.executeTool(

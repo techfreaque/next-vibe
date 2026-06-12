@@ -31,6 +31,7 @@
  *   VibeFrame.mount({ serverUrl, endpoint, target });
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { ParentBridge } from "./bridge";
 import {
   checkDisplayFrequency,
@@ -568,13 +569,13 @@ async function fetchFrameConfig(
   }
 }
 
-function detectLocale(): string {
+function detectLocale(): CountryLanguage {
   const lang = navigator.language;
   if (lang.includes("-")) {
-    return lang;
+    return lang as CountryLanguage;
   }
 
-  const regionMap: Record<string, string> = {
+  const regionMap: Record<string, CountryLanguage> = {
     en: "en-US",
     de: "de-DE",
     pl: "pl-PL",

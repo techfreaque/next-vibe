@@ -6,6 +6,7 @@ export const translations = {
   },
   patch: {
     title: "Update Product",
+    titleShort: "Update Product",
     description: "Update fields on an existing catalog product.",
     productId: {
       label: "Product ID",

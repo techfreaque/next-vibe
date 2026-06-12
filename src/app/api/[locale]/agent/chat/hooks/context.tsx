@@ -169,7 +169,7 @@ const NULL_BOOT_VALUE: ChatBootValue = {
     expiresAt: null,
     capacity: 0,
   },
-  rootFolderPermissions: { canCreateThread: false, canCreateFolder: false },
+  rootFolderPermissions: { canCreateThread: true, canCreateFolder: true },
   initialFoldersData: null,
   initialThreadsData: null,
   initialRootFolderId: DefaultFolderId.PRIVATE,

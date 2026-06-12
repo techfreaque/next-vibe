@@ -1,0 +1,1 @@
+ALTER TABLE "remote_connections" ADD COLUMN "force_system_provider" boolean DEFAULT false NOT NULL;

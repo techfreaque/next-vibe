@@ -7,6 +7,7 @@ export const translations = {
 
   get: {
     title: "Get Cron Task Statistics",
+    titleShort: "Cron Stats",
     description: "Retrieve comprehensive statistics and metrics for cron tasks",
     tag: "Cron Statistics",
     form: {

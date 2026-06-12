@@ -3,6 +3,7 @@ export const translations = {
 
   list: {
     title: "My Sessions",
+    titleShort: "My Sessions",
     description: "List all active sessions for your account",
     tag: "Sessions",
     response: {
@@ -34,6 +35,7 @@ export const translations = {
   },
   create: {
     title: "Create Session Token",
+    titleShort: "Create Token",
     description: "Create a named session token for programmatic access",
     tag: "Sessions",
     form: {
@@ -72,6 +74,7 @@ export const translations = {
   },
   revoke: {
     title: "Revoke Session",
+    titleShort: "Revoke Session",
     description: "Revoke a session token by ID",
     tag: "Sessions",
     response: {

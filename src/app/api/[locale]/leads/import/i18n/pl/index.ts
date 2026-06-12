@@ -1,5 +1,3 @@
-import { translations as jobsTranslations } from "../../jobs/i18n/pl";
-import { translations as statusTranslations } from "../../status/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -12,6 +10,7 @@ export const translations: typeof enTranslations = {
   category: "Import danych",
   post: {
     title: "Importuj leady",
+    titleShort: "Import leadów",
     description: "Importuj leady z pliku CSV",
     form: {
       title: "Konfiguracja importu",
@@ -171,6 +170,7 @@ export const translations: typeof enTranslations = {
     tag: "Przetwarzanie importu",
     post: {
       title: "Przetwarzaj zadania importu",
+      titleShort: "Przetwórz import",
       description: "Przetwarzaj oczekujące zadania importu CSV",
       container: {
         title: "Konfiguracja przetwarzania importu",
@@ -250,8 +250,677 @@ export const translations: typeof enTranslations = {
       newImport: "Nowy import",
     },
   },
-  jobs: jobsTranslations,
-  status: statusTranslations,
+  jobs: {
+    jobId: {
+      category: "Import danych",
+      tags: {
+        leads: "Leady",
+        management: "Zarządzanie",
+      },
+
+      get: {
+        title: "Pobierz zadanie importu",
+        description: "Pobierz szczegóły konkretnego zadania importu",
+        actions: {
+          retry: "Ponów",
+          stop: "Zatrzymaj",
+          viewLeads: "Zobacz leady",
+        },
+        jobId: {
+          label: "ID zadania",
+          description: "Unikalny identyfikator zadania importu",
+        },
+        form: {
+          title: "Status zadania importu",
+          description: "Bieżący status i postęp zadania importu",
+        },
+        response: {
+          title: "Informacje o zadaniu",
+          description: "Bieżące szczegóły zadania importu",
+          info: {
+            title: "Informacje o zadaniu",
+            description: "Podstawowe szczegóły zadania",
+          },
+          id: {
+            content: "ID zadania",
+          },
+          fileName: {
+            content: "Nazwa pliku",
+          },
+          status: {
+            content: "Status zadania",
+          },
+          progress: {
+            title: "Postęp importu",
+            description: "Bieżący postęp importu i statystyki",
+          },
+          totalRows: {
+            content: "Łączna liczba wierszy",
+          },
+          processedRows: {
+            content: "Przetworzone wiersze",
+          },
+          successfulImports: {
+            content: "Udane importy",
+          },
+          failedImports: {
+            content: "Nieudane importy",
+          },
+          duplicateEmails: {
+            content: "Zduplikowane e-maile",
+          },
+          configuration: {
+            title: "Konfiguracja zadania",
+            description: "Bieżące ustawienia konfiguracji zadania",
+          },
+          currentBatchStart: {
+            content: "Start bieżącej partii",
+          },
+          batchSize: {
+            content: "Rozmiar partii",
+          },
+          retryCount: {
+            content: "Liczba ponowień",
+          },
+          maxRetries: {
+            content: "Maksymalna liczba ponowień",
+          },
+          error: {
+            content: "Komunikat błędu",
+          },
+          timestamps: {
+            title: "Znaczniki czasu zadania",
+            description: "Znaczniki czasu cyklu życia zadania",
+          },
+          createdAt: {
+            content: "Utworzono",
+          },
+          updatedAt: {
+            content: "Zaktualizowano",
+          },
+          startedAt: {
+            content: "Rozpoczęto",
+          },
+          completedAt: {
+            content: "Ukończono",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Podane ID zadania jest nieprawidłowe",
+          },
+          unauthorized: {
+            title: "Nieautoryzowany",
+            description: "Wymagane uwierzytelnienie do przeglądania zadań",
+          },
+          forbidden: {
+            title: "Dostęp zabroniony",
+            description: "Nie masz uprawnień do przeglądania tego zadania",
+          },
+          notFound: {
+            title: "Zadanie nie znalezione",
+            description: "Nie znaleziono zadania importu o podanym ID",
+          },
+          server: {
+            title: "Błąd serwera",
+            description: "Wystąpił błąd podczas pobierania zadania",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieoczekiwany błąd",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Nie można połączyć się z serwerem",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Masz niezapisane zmiany",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Wystąpił konflikt podczas pobierania zadania",
+          },
+        },
+        success: {
+          title: "Sukces",
+          description: "Zadanie importu zostało pomyślnie pobrane",
+        },
+      },
+      patch: {
+        title: "Zaktualizuj zadanie importu",
+        description: "Zaktualizuj ustawienia konfiguracji zadania importu",
+        jobId: {
+          label: "ID zadania",
+          description: "Unikalny identyfikator zadania importu",
+        },
+        form: {
+          title: "Zaktualizuj ustawienia zadania",
+          description: "Zmodyfikuj konfigurację zadania importu",
+        },
+        settings: {
+          title: "Ustawienia zadania",
+          description: "Ustawienia konfiguracji dla zadania importu",
+        },
+        batchSize: {
+          label: "Rozmiar partii",
+          description: "Liczba wierszy do przetworzenia w każdej partii",
+          placeholder: "100",
+        },
+        maxRetries: {
+          label: "Maksymalna liczba ponowień",
+          description:
+            "Maksymalna liczba prób ponowienia dla nieudanych wierszy",
+          placeholder: "3",
+        },
+        response: {
+          title: "Zaktualizowane informacje o zadaniu",
+          description: "Zaktualizowane szczegóły zadania importu",
+          info: {
+            title: "Informacje o zadaniu",
+            description: "Podstawowe szczegóły zadania",
+          },
+          id: {
+            content: "ID zadania",
+          },
+          fileName: {
+            content: "Nazwa pliku",
+          },
+          status: {
+            content: "Status zadania",
+          },
+          progress: {
+            title: "Postęp importu",
+            description: "Bieżący postęp importu i statystyki",
+          },
+          totalRows: {
+            content: "Łączna liczba wierszy",
+          },
+          processedRows: {
+            content: "Przetworzone wiersze",
+          },
+          successfulImports: {
+            content: "Udane importy",
+          },
+          failedImports: {
+            content: "Nieudane importy",
+          },
+          duplicateEmails: {
+            content: "Zduplikowane e-maile",
+          },
+          configuration: {
+            title: "Konfiguracja zadania",
+            description: "Bieżące ustawienia konfiguracji zadania",
+          },
+          currentBatchStart: {
+            content: "Start bieżącej partii",
+          },
+          batchSize: {
+            content: "Rozmiar partii",
+          },
+          retryCount: {
+            content: "Liczba ponowień",
+          },
+          maxRetries: {
+            content: "Maksymalna liczba ponowień",
+          },
+          error: {
+            content: "Komunikat błędu",
+          },
+          timestamps: {
+            title: "Znaczniki czasu zadania",
+            description: "Znaczniki czasu cyklu życia zadania",
+          },
+          createdAt: {
+            content: "Utworzono",
+          },
+          updatedAt: {
+            content: "Zaktualizowano",
+          },
+          startedAt: {
+            content: "Rozpoczęto",
+          },
+          completedAt: {
+            content: "Ukończono",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Podane dane są nieprawidłowe",
+          },
+          unauthorized: {
+            title: "Nieautoryzowany",
+            description: "Wymagane uwierzytelnienie do aktualizacji zadań",
+          },
+          forbidden: {
+            title: "Dostęp zabroniony",
+            description: "Nie masz uprawnień do aktualizacji tego zadania",
+          },
+          notFound: {
+            title: "Zadanie nie znalezione",
+            description: "Nie znaleziono zadania importu o podanym ID",
+          },
+          server: {
+            title: "Błąd serwera",
+            description: "Wystąpił błąd podczas aktualizacji zadania",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieoczekiwany błąd",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Nie można połączyć się z serwerem",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Masz niezapisane zmiany",
+          },
+          conflict: {
+            title: "Konflikt aktualizacji",
+            description:
+              "Zadanie zostało zmodyfikowane przez innego użytkownika",
+          },
+        },
+        success: {
+          title: "Sukces",
+          description: "Zadanie importu zostało pomyślnie zaktualizowane",
+        },
+      },
+      delete: {
+        title: "Usuń zadanie importu",
+        description: "Usuń konkretne zadanie importu",
+        jobId: {
+          label: "ID zadania",
+          description: "Unikalny identyfikator zadania importu do usunięcia",
+        },
+        form: {
+          title: "Usuń zadanie importu",
+          description: "Potwierdź usunięcie zadania importu",
+        },
+        response: {
+          title: "Wynik usunięcia",
+          description: "Wynik operacji usunięcia",
+          success: {
+            content: "Status sukcesu",
+          },
+          message: {
+            content: "Komunikat usunięcia",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Podane ID zadania jest nieprawidłowe",
+          },
+          unauthorized: {
+            title: "Nieautoryzowany",
+            description: "Wymagane uwierzytelnienie do usuwania zadań",
+          },
+          forbidden: {
+            title: "Dostęp zabroniony",
+            description: "Nie masz uprawnień do usunięcia tego zadania",
+          },
+          notFound: {
+            title: "Zadanie nie znalezione",
+            description: "Nie znaleziono zadania importu o podanym ID",
+          },
+          server: {
+            title: "Błąd serwera",
+            description: "Wystąpił błąd podczas usuwania zadania",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieoczekiwany błąd",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Nie można połączyć się z serwerem",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Masz niezapisane zmiany",
+          },
+          conflict: {
+            title: "Konflikt usuwania",
+            description:
+              "Nie można usunąć zadania, które jest obecnie przetwarzane",
+          },
+        },
+        success: {
+          title: "Sukces",
+          description: "Zadanie importu zostało pomyślnie usunięte",
+        },
+      },
+      retry: {
+        category: "Import danych",
+        tags: {
+          leads: "Leady",
+          management: "Zarządzanie",
+        },
+
+        post: {
+          title: "Ponów zadanie importu",
+          description: "Ponów nieudane zadanie importu",
+          jobId: {
+            label: "ID zadania",
+            description: "Unikalny identyfikator zadania importu do ponowienia",
+          },
+          form: {
+            title: "Ponów zadanie importu",
+            description: "Ponów nieudane zadanie importu",
+          },
+          response: {
+            title: "Wynik ponowienia",
+            description: "Wynik operacji ponowienia",
+            success: {
+              content: "Status sukcesu",
+            },
+            message: {
+              content: "Wiadomość o ponowieniu",
+            },
+          },
+          errors: {
+            validation: {
+              title: "Błąd walidacji",
+              description: "Podane ID zadania jest nieprawidłowe",
+            },
+            unauthorized: {
+              title: "Brak autoryzacji",
+              description: "Wymagana autoryzacja do ponowienia zadań",
+            },
+            forbidden: {
+              title: "Dostęp zabroniony",
+              description: "Nie masz uprawnień do ponowienia tego zadania",
+            },
+            notFound: {
+              title: "Zadanie nie znalezione",
+              description: "Nie znaleziono zadania importu o podanym ID",
+            },
+            server: {
+              title: "Błąd serwera",
+              description: "Wystąpił błąd podczas ponowienia zadania",
+            },
+            unknown: {
+              title: "Nieznany błąd",
+              description: "Wystąpił nieoczekiwany błąd",
+            },
+            network: {
+              title: "Błąd sieci",
+              description: "Nie można połączyć się z serwerem",
+            },
+            unsavedChanges: {
+              title: "Niezapisane zmiany",
+              description: "Masz niezapisane zmiany",
+            },
+            conflict: {
+              title: "Konflikt ponowienia",
+              description:
+                "Nie można ponowić zadania, które jest obecnie przetwarzane",
+            },
+          },
+          success: {
+            title: "Sukces",
+            description: "Zadanie importu zostało pomyślnie ponowione",
+          },
+        },
+        widget: {
+          title: "Ponów zadanie importu",
+          successMessage: "Ponowienie zadania zostało pomyślnie zainicjowane",
+        },
+      },
+      stop: {
+        category: "Import danych",
+        tags: {
+          leads: "Leady",
+          management: "Zarządzanie",
+        },
+
+        post: {
+          title: "Zatrzymaj zadanie importu",
+          description: "Zatrzymaj uruchomione zadanie importu",
+          jobId: {
+            label: "ID zadania",
+            description:
+              "Unikalny identyfikator zadania importu do zatrzymania",
+          },
+          form: {
+            title: "Zatrzymaj zadanie importu",
+            description: "Zatrzymaj uruchomione zadanie importu",
+          },
+          response: {
+            title: "Wynik zatrzymania",
+            description: "Wynik operacji zatrzymania",
+            success: {
+              content: "Status sukcesu",
+            },
+            message: {
+              content: "Wiadomość o zatrzymaniu",
+            },
+          },
+          errors: {
+            validation: {
+              title: "Błąd walidacji",
+              description: "Podane ID zadania jest nieprawidłowe",
+            },
+            unauthorized: {
+              title: "Brak autoryzacji",
+              description: "Wymagana autoryzacja do zatrzymania zadań",
+            },
+            forbidden: {
+              title: "Dostęp zabroniony",
+              description: "Nie masz uprawnień do zatrzymania tego zadania",
+            },
+            notFound: {
+              title: "Zadanie nie znalezione",
+              description: "Nie znaleziono zadania importu o podanym ID",
+            },
+            server: {
+              title: "Błąd serwera",
+              description: "Wystąpił błąd podczas zatrzymywania zadania",
+            },
+            unknown: {
+              title: "Nieznany błąd",
+              description: "Wystąpił nieoczekiwany błąd",
+            },
+            network: {
+              title: "Błąd sieci",
+              description: "Nie można połączyć się z serwerem",
+            },
+            unsavedChanges: {
+              title: "Niezapisane zmiany",
+              description: "Masz niezapisane zmiany",
+            },
+            conflict: {
+              title: "Konflikt zatrzymania",
+              description:
+                "Nie można zatrzymać zadania, które nie jest obecnie przetwarzane",
+            },
+          },
+          success: {
+            title: "Sukces",
+            description: "Zadanie importu zostało pomyślnie zatrzymane",
+          },
+        },
+        widget: {
+          title: "Zatrzymaj zadanie importu",
+          successMessage: "Zadanie zostało pomyślnie zatrzymane",
+        },
+      },
+      widget: {
+        status: {
+          title: "Status zadania importu",
+          loadingJobStatus: "Ładowanie statusu zadania…",
+          totalRows: "Łączna liczba wierszy",
+          processed: "Przetworzone",
+          imported: "Zaimportowane",
+          failed: "Nieudane",
+          duplicates: "Duplikaty",
+          progress: "Postęp",
+          configurationTitle: "Konfiguracja",
+          batchSize: "Rozmiar partii",
+          batchStart: "Start partii",
+          retries: "Ponowienia",
+          timestampsTitle: "Znaczniki czasu",
+          created: "Utworzono",
+          started: "Rozpoczęto",
+          completed: "Ukończono",
+          jobStatus: {
+            enums: {
+              csvImportJobStatus: {
+                pending: "Oczekujące",
+                processing: "W trakcie przetwarzania",
+                completed: "Ukończone",
+                failed: "Nieudane",
+              },
+            },
+          },
+        },
+        retry: {
+          title: "Powtórz zadanie importu",
+          loadingRetrying: "Powtarzanie zadania…",
+          successMessage: "Zadanie powtórzone pomyślnie",
+          failureMessage: "Powtarzanie nieudane",
+          viewJobStatus: "Zobacz status zadania",
+          viewLeads: "Zobacz leady",
+        },
+        stop: {
+          title: "Zatrzymaj zadanie importu",
+          loadingStopping: "Zatrzymywanie zadania…",
+          successMessage: "Zadanie zatrzymane pomyślnie",
+          failureMessage: "Zatrzymanie nieudane",
+          viewLeads: "Zobacz leady",
+          startNewImport: "Rozpocznij nowy import",
+        },
+      },
+    },
+  },
+  status: {
+    category: "Import danych",
+    tags: {
+      import: "Importuj",
+      jobs: "Zadania",
+      list: "Lista",
+    },
+
+    get: {
+      title: "Status Zadań Importu",
+      titleShort: "Zadania importu",
+      description: "Wyświetl i monitoruj zadania importu CSV",
+      form: {
+        title: "Filtry Zadań",
+        description: "Filtruj zadania importu według statusu i paginacji",
+      },
+      filters: {
+        title: "Filtry",
+        description: "Opcje filtrowania dla zadań importu",
+      },
+      status: {
+        label: "Status Zadania",
+        description: "Filtruj według statusu zadania",
+        placeholder: "Wybierz status",
+      },
+      limit: {
+        label: "Wyników na Stronę",
+        description: "Liczba zadań do zwrócenia",
+        placeholder: "50",
+      },
+      offset: {
+        label: "Przesunięcie Strony",
+        description: "Liczba zadań do pominięcia",
+        placeholder: "0",
+      },
+      response: {
+        title: "Zadania Importu",
+        description: "Lista zadań importu z ich aktualnym statusem",
+        items: {
+          title: "Lista Zadań",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Błąd Walidacji",
+          description: "Nieprawidłowe parametry filtrowania",
+        },
+        unauthorized: {
+          title: "Brak Autoryzacji",
+          description: "Wymagana autoryzacja do wyświetlania zadań importu",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Dostęp zabroniony dla zadań importu",
+        },
+        notFound: {
+          title: "Nie Znaleziono",
+          description: "Nie znaleziono zadań importu",
+        },
+        server: {
+          title: "Błąd Serwera",
+          description: "Wewnętrzny błąd serwera podczas pobierania zadań",
+        },
+        unknown: {
+          title: "Nieznany Błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+        network: {
+          title: "Błąd Sieci",
+          description: "Błąd sieci podczas pobierania zadań",
+        },
+        unsavedChanges: {
+          title: "Niezapisane Zmiany",
+          description: "Są niezapisane zmiany",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Wystąpił konflikt danych",
+        },
+      },
+      success: {
+        title: "Pobrano Zadania",
+        description: "Lista zadań importu została pobrana pomyślnie",
+      },
+    },
+    widget: {
+      status: {
+        pending: "Oczekujące",
+        running: "W toku",
+        completed: "Zakończone",
+        failed: "Nieudane",
+        stopped: "Zatrzymane",
+      },
+      filter: {
+        all: "Wszystkie",
+        pending: "Oczekujące",
+        running: "W toku",
+        completed: "Zakończone",
+        failed: "Nieudane",
+      },
+      progress: {
+        rows: "wierszy",
+      },
+      job: {
+        total: "Łącznie:",
+        processed: "Przetworzono:",
+        ok: "OK:",
+        fail: "Błąd:",
+        created: "Utworzono:",
+        done: "Gotowe:",
+      },
+      header: {
+        title: "Zadania Importu",
+        newImport: "Nowy Import",
+      },
+      loading: "Ładowanie zadań importu\u2026",
+      empty: {
+        title: "Nie znaleziono zadań importu",
+        withFilter: "Spróbuj innego filtra lub rozpocznij nowy import.",
+        withoutFilter: "Rozpocznij pierwszy import, aby go tutaj zobaczyć.",
+        newImport: "Nowy Import",
+      },
+    },
+  },
   csv: {
     post: {
       title: "Importuj Dane CSV",

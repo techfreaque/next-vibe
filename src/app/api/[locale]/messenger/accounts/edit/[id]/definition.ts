@@ -63,7 +63,7 @@ import {
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const MessengerAccountEditContainer = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -293,9 +293,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["messenger", "accounts", "edit", "[id]"],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.messengerAccounts",
+  category: "messenger",
+  subCategory: "Accounts",
   icon: "message-circle",
   tags: ["tags.messaging"],
   allowedRoles: [UserRole.ADMIN],
@@ -456,9 +457,10 @@ const { PUT } = createEndpoint({
   method: Methods.PUT,
   path: ["messenger", "accounts", "edit", "[id]"],
   title: "put.title",
+  titleShort: "put.titleShort",
   description: "put.description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.messengerAccounts",
+  category: "messenger",
+  subCategory: "Accounts",
   icon: "message-circle",
   tags: ["tags.messaging"],
   allowedRoles: [UserRole.ADMIN],
@@ -1008,9 +1010,10 @@ const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["messenger", "accounts", "edit", "[id]"],
   title: "delete.title",
+  titleShort: "delete.titleShort",
   description: "delete.description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.messengerAccounts",
+  category: "messenger",
+  subCategory: "Accounts",
   icon: "message-circle",
   tags: ["tags.messaging"],
   allowedRoles: [UserRole.ADMIN],

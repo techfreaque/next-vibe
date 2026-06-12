@@ -3,7 +3,7 @@ import { Text } from "ink";
 import terminalLink from "terminal-link";
 
 import type { ExternalLinkProps, LinkProps } from "../../web/ui/link";
-import { useCliPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useCliPlatform } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 function renderChildren(children: React.ReactNode): string {
   if (typeof children === "string") {

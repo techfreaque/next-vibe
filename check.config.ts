@@ -53,6 +53,7 @@ const features = {
   i18n: true, // Check for untranslated strings
   jsxCapitalization: true, // Enforce capitalized JSX components
   restrictedSyntax: true, // No throw, unknown, object types
+  boilerplate: true, // Enforce route.ts and i18n boilerplate patterns
   // TypeScript
   tsgo: true, // Use tsgo instead of tsc for type checking
   strictTypes: true, // Strict type checking rules
@@ -162,6 +163,9 @@ const oxlint: CheckConfig["oxlint"] = {
       ? ["@next-vibe/checker/oxlint-plugins/jsx-capitalization.ts"]
       : []),
     ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.ts"] : []),
+    ...(features.boilerplate
+      ? ["@next-vibe/checker/oxlint-plugins/boilerplate.ts"]
+      : []),
   ],
   categories: {
     correctness: "error",
@@ -608,6 +612,12 @@ const oxlint: CheckConfig["oxlint"] = {
           ],
         }
       : {}),
+    ...(features.boilerplate
+      ? {
+          "oxlint-plugin-boilerplate/route-pattern": ["error"],
+          "oxlint-plugin-boilerplate/i18n-pattern": ["error"],
+        }
+      : {}),
 
     // ── Next.js (enabled via nextjs flag) ─────────────────────
     ...(features.nextjs
@@ -799,6 +809,10 @@ const config = (): CheckConfig => {
               "jsx-capitalization",
             ]),
             "oxlint-plugin-i18n": createEslintStub(["no-literal-string"]),
+            "oxlint-plugin-boilerplate": createEslintStub([
+              "route-pattern",
+              "i18n-pattern",
+            ]),
             "@typescript-eslint": createEslintStub([
               "no-explicit-any",
               "no-unused-vars",
@@ -869,6 +883,10 @@ const config = (): CheckConfig => {
             ...(features.react ? { "react-hooks": reactHooksPlugin } : {}),
             i18next: createEslintStub(["no-literal-string"]),
             "oxlint-plugin-restricted": createEslintStub(["restricted-syntax"]),
+            "oxlint-plugin-boilerplate": createEslintStub([
+              "route-pattern",
+              "i18n-pattern",
+            ]),
             "@typescript-eslint": createEslintStub([
               "no-explicit-any",
               "no-unused-vars",

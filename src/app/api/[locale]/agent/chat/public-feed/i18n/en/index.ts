@@ -4,6 +4,7 @@ export const translations = {
   },
   get: {
     title: "Community Feed",
+    titleShort: "Community Feed",
     description: "Public threads shared with the community",
     sortMode: {
       label: "Sort Mode",

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Stosunek",
+    titleShort: "Stosunek",
     description:
       "Stosunek - dzieli serię A przez serię B, wyrównane według znacznika czasu",
     fields: {

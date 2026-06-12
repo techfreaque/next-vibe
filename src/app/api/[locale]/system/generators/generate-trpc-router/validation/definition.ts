@@ -33,9 +33,10 @@ import { scopedTranslation } from "./i18n";
 export const { POST } = createEndpoint({
   scopedTranslation,
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.devTools",
-  subCategory: "endpointCategories.devToolsGenerators",
+  category: "devTools",
+  subCategory: "Generators",
   tags: ["tags.trpc", "tags.validation"],
   icon: "code",
   allowedRoles: [

@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Leads List API Route Handler
  * Handles GET requests for listing leads with filtering and pagination

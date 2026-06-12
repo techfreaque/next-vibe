@@ -1,5 +1,5 @@
-/* eslint-disable i18next/no-literal-string */
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     cortex: "Cortex",
   },

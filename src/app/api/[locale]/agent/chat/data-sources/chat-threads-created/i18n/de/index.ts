@@ -3,6 +3,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Erstellte Chat-Threads",
+    titleShort: "Neue Threads",
     description: "Anzahl neuer Chat-Threads pro Auflösungs-Bucket",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

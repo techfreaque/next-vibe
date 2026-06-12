@@ -2,6 +2,7 @@ export const translations = {
   category: "Users",
 
   title: "Login Options",
+  titleShort: "Login Options",
   description: "Login configuration options",
   tag: "login-options",
   container: {

@@ -31,6 +31,7 @@ export const { POST } = createEndpoint({
   path: ["system", "unified-interface", "vibe-sense", "run-config"],
   aliases: [RUN_CONFIG_ALIAS],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "play",
   category: "analytics",

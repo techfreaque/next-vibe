@@ -2,16 +2,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { scopedTranslation } from "./i18n";
+import { buildDebugSystemPrompt } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
-      const { t } = scopedTranslation.scopedT(locale);
-      const { buildDebugSystemPrompt } = await import("./repository");
-      return buildDebugSystemPrompt({
+    handler: ({ data, user, locale, logger }) =>
+      buildDebugSystemPrompt({
         rootFolderId: data.rootFolderId,
         userMessage: data.userMessage,
         threadId: data.threadId,
@@ -20,8 +18,6 @@ export const { GET, tools } = endpointsHandler({
         user,
         locale,
         logger,
-        t,
-      });
-    },
+      }),
   },
 });

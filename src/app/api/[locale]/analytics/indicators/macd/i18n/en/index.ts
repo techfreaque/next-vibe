@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "MACD",
+    titleShort: "MACD",
     description:
       "Moving Average Convergence Divergence - trend-following momentum indicator",
     fields: {

@@ -155,6 +155,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Paket erstellen",
+    titleShort: "Paket bauen",
     description:
       "Umfassendes Build-Tool für CLI-Bundling, Vite-Builds, React/Tailwind und npm-Distribution",
     form: {

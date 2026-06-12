@@ -23,7 +23,7 @@ import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
 import { LOGIN_ALIAS } from "./constants";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const LoginFormContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LoginFormContainer }))
@@ -34,10 +34,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["user", "public", "login"],
   title: "title",
+  titleShort: "titleShort",
   description: "description",
   icon: "log-in",
-  category: "userAuth",
-  subCategory: "userAuthLogin",
+  category: "account",
   tags: ["tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   aliases: [LOGIN_ALIAS] as const,

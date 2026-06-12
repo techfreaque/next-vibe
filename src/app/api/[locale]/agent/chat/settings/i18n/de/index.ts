@@ -10,7 +10,8 @@ export const translations: typeof enTranslations = {
     FEMALE: "Weibliche Stimme",
   },
   get: {
-    title: "Chat-Einstellungen abrufen",
+    title: "Einstellungen",
+    titleShort: "Chat-Einstellungen",
     description: "Benutzereinstellungen und Präferenzen abrufen",
     errors: {
       validation: {
@@ -57,7 +58,8 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Chat-Einstellungen aktualisieren",
+    title: "Einstellungen speichern",
+    titleShort: "Einstellungen",
     description: "Benutzereinstellungen und Präferenzen aktualisieren",
     container: {
       title: "Chat-Einstellungen",
@@ -104,8 +106,7 @@ export const translations: typeof enTranslations = {
     searchProvider: {
       label: "Suchanbieter",
       description:
-        "Deine bevorzugte Suchmaschine. Auto wählt den günstigsten verfügbaren Anbieter.",
-      auto: "Automatisch",
+        "Deine bevorzugte Suchmaschine. Auto nutzt Brave wenn konfiguriert, sonst Kagi.",
     },
     codingAgent: {
       label: "Coding-Agent",

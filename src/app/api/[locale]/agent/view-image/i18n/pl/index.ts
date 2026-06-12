@@ -1,6 +1,8 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   post: {
     title: "Wyświetl obraz",
+    titleShort: "Wyświetl obraz",
     description:
       "Pobiera i wyświetla wcześniej przechwycony obraz na podstawie jego adresu URL. Użyj tego, aby ponownie przeanalizować zrzut ekranu lub obraz z wcześniejszego etapu rozmowy.",
     dynamicTitle: "Wyświetl: {{url}}",

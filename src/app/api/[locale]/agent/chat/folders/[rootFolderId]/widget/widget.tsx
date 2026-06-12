@@ -48,8 +48,8 @@ import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unifi
 import {
   useWidgetContext,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { useChatBootContext } from "../../../hooks/context";

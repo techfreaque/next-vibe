@@ -274,11 +274,13 @@ const { GET } = createEndpoint({
   path: ["leads", "stats"],
   aliases: [LEADS_STATS_ALIAS],
   title: "title",
+  titleShort: "titleShort",
   description: "description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   tags: ["tags.leads", "tags.statistics", "tags.analytics"],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
   icon: "bar-chart-3",
 
   fields: customWidgetObject({

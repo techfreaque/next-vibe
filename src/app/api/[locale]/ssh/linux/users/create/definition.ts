@@ -32,11 +32,12 @@ export const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["ssh", "linux", "users", "create"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "user-plus",
-  category: "endpointCategories.ssh",
-  subCategory: "endpointCategories.sshExecution",
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  category: "ssh",
+  subCategory: "Linux",
+  allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 
   fields: customWidgetObject({

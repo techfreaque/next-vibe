@@ -38,7 +38,7 @@ import {
 } from "../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const LeadsExportContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadsExportContainer })),
@@ -52,9 +52,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["leads", "export"],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   tags: ["tags.leads", "tags.export"],
   allowedRoles: [UserRole.ADMIN],
   icon: "download",

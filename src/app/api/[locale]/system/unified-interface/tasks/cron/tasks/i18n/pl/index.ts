@@ -25,6 +25,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Lista zadań Cron",
+    titleShort: "Zadania cron",
     description: "Pobierz listę zadań cron z opcjonalnym filtrowaniem",
     container: {
       title: "Lista zadań Cron",
@@ -159,6 +160,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Utwórz zadanie Cron",
+    titleShort: "Utwórz zadanie",
     description: "Utwórz nowe zadanie cron",
     container: {
       title: "Utwórz zadanie",

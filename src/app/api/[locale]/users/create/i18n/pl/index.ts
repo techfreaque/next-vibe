@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Utwórz użytkownika",
+    titleShort: "Utwórz użytkownika",
     description: "Utwórz nowe konto użytkownika",
     form: {
       title: "Formularz tworzenia użytkownika",
@@ -99,6 +100,14 @@ export const translations: typeof enTranslations = {
       },
       leadId: {
         content: "Powiązane ID leada",
+      },
+      country: {
+        label: "Kraj",
+        description: "Kraj zamieszkania użytkownika",
+      },
+      language: {
+        label: "Język",
+        description: "Preferowany język użytkownika",
       },
       email: {
         content: "Adres e-mail",

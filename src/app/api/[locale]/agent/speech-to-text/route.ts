@@ -20,6 +20,7 @@ export const { POST, tools } = endpointsHandler({
         user,
         locale,
         logger,
+        data.modelId,
       ),
   },
 });

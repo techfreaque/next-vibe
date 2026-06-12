@@ -3,6 +3,7 @@ export const translations = {
   description: "Manage email journey variant registrations",
   get: {
     title: "Journey Variants",
+    titleShort: "Journey Variants",
     description: "List all registered email journey variants",
     response: {
       id: "ID",
@@ -52,6 +53,7 @@ export const translations = {
   },
   post: {
     title: "Register Journey Variant",
+    titleShort: "New Variant",
     description: "Register a new email journey variant",
     fields: {
       variantKey: {
@@ -131,6 +133,7 @@ export const translations = {
   },
   patch: {
     title: "Update Journey Variant",
+    titleShort: "Edit Variant",
     description: "Update a registered email journey variant",
     fields: {
       id: {

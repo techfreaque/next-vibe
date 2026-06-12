@@ -8,11 +8,11 @@ import generateEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: generateEndpoints,
   [Methods.POST]: {
-    handler: async ({ logger }) => {
-      const { DatabaseGenerateRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return DatabaseGenerateRepository.runGenerate(logger);
-    },
+    handler: async ({ logger }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).DatabaseGenerateRepository.runGenerate(logger),
   },
 });

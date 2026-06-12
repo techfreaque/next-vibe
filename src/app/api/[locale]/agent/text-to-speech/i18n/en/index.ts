@@ -12,6 +12,7 @@ export const translations = {
 
   post: {
     title: "Text to Speech",
+    titleShort: "Text to Speech",
     description:
       "Convert text to natural-sounding speech using AI (~0.00052 credits per character)",
     form: {

@@ -22,8 +22,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { ImportJobStopContainer } from "../widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
+
+const ImportJobStopContainer = lazyWidget(() =>
+  import("../widget").then((m) => ({ default: m.ImportJobStopContainer })),
+);
 
 /**
  * Stop Import Job Endpoint (POST)
@@ -34,9 +38,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["leads", "import", "jobs", ":jobId", "stop"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsImport",
+  category: "leads",
+  subCategory: "Import",
   tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN] as const,
   icon: "x-circle",

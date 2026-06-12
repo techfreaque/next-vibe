@@ -1,6 +1,8 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   post: {
     title: "Embeddings nachfüllen",
+    titleShort: "Backfill",
     description: "Embeddings für alle Cortex-Knoten ohne Vektoren erzeugen.",
     status: {
       loading: "Einbetten...",

@@ -10,6 +10,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Wykonaj Pulse",
+    titleShort: "Wykonaj Pulse",
     description: "Wykonaj monitorowanie zdrowia pulse i wykonywanie zadań",
     container: {
       title: "Wykonanie Pulse",

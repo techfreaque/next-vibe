@@ -22,7 +22,7 @@ import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscript
 import subscriptionDefinition from "@/app/api/[locale]/subscription/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import remoteConnectionDefinition from "@/app/api/[locale]/user/remote-connection/list/definition";
+import remoteConnectionDefinition from "@/app/api/[locale]/remote-connection/list/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface SubscriptionPageClientProps {

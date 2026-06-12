@@ -1,8 +1,10 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   get: {
     title: "Szukaj",
+    titleShort: "Szukaj plików",
     description: "Znajdź pliki po nazwie lub treści. Przeszukuje wszystko.",
-    dynamicTitle: "{{query}}",
+    dynamicTitle: "Szukano: {{query}}",
     status: {
       loading: "Wyszukiwanie...",
       done: "Znaleziono",

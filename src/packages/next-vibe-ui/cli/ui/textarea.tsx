@@ -2,7 +2,8 @@ import TextInput from "ink-text-input";
 import { Text } from "ink";
 import type { JSX } from "react";
 
-import { useIsMcp } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { useCliFieldFocus } from "@/packages/next-vibe-ui/cli/lib/focus-manager";
 import type { TextareaProps } from "../../web/ui/textarea";
 
 export type {
@@ -22,7 +23,6 @@ export const textareaVariants = cva("");
 const BRACKET_OPEN = "\u005B";
 const BRACKET_CLOSE = "\u005D";
 
-const NOOP = (): void => undefined;
 const NOOP_BOOL = (): boolean => false;
 
 // Build a minimal synthetic event for textarea onChange
@@ -64,15 +64,20 @@ function makeChangeEvent(
   };
 }
 
+const NOOP = (): void => undefined;
+
 export function Textarea({
   placeholder,
   value,
   onChange,
   onChangeText,
+  onKeyDown,
   disabled,
   name,
 }: TextareaProps): JSX.Element | null {
+  // Hooks must be called unconditionally
   const isMcp = useIsMcp();
+  const isFocused = useCliFieldFocus(name ?? "textarea");
 
   if (isMcp) {
     return null;
@@ -90,15 +95,43 @@ export function Textarea({
     );
   }
 
-  // ink-text-input doesn't support multiline; render as single-line input
+  // ink-text-input doesn't support multiline; render as single-line input.
+  // Wire onSubmit (Enter key in ink-text-input) to fire a synthetic onKeyDown
+  // so web-style Enter-to-submit handlers work correctly in CLI.
+  // Focus prefix "▸ " survives ANSI stripping so agents can detect focus.
   return (
-    <TextInput
-      value={displayValue}
-      placeholder={placeholder ?? ""}
-      onChange={(text): void => {
-        onChangeText?.(text);
-        onChange?.(makeChangeEvent(name, text));
-      }}
-    />
+    <Text>
+      {isFocused ? "▸ " : "  "}
+      <TextInput
+        value={displayValue}
+        placeholder={placeholder ?? ""}
+        focus={isFocused}
+        onChange={(text): void => {
+          onChangeText?.(text);
+          onChange?.(makeChangeEvent(name, text));
+        }}
+        onSubmit={(): void => {
+          onKeyDown?.({
+            key: "Enter",
+            code: "Enter",
+            shiftKey: false,
+            ctrlKey: false,
+            altKey: false,
+            metaKey: false,
+            repeat: false,
+            location: 0,
+            bubbles: false,
+            cancelable: true,
+            defaultPrevented: false,
+            eventPhase: 0,
+            isTrusted: true,
+            timeStamp: Date.now(),
+            type: "keydown",
+            preventDefault: NOOP,
+            stopPropagation: NOOP,
+          });
+        }}
+      />
+    </Text>
   );
 }

@@ -12,6 +12,7 @@ export const translations = {
 
   delete: {
     title: "Delete Linux User",
+    titleShort: "Delete User",
     description: "Delete an OS user account from the host",
     fields: {
       removeHome: {

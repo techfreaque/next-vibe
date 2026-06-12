@@ -10,6 +10,7 @@ export const translations = {
   search: {
     get: {
       title: "Search Threads",
+      titleShort: "Search Threads",
       description:
         "Search across thread titles, previews, and system prompts using full-text search",
       container: {

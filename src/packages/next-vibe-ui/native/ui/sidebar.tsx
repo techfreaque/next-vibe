@@ -996,6 +996,12 @@ export interface SidebarLayoutProps {
   contentClassName?: string;
   topBarLeft?: ReactNode;
   topBarRight?: ReactNode;
+  /** localStorage key for persisting sidebar width (web-only, ignored on native) */
+  storageId?: string;
+  /** Default sidebar width in pixels (web-only, ignored on native) */
+  defaultWidth?: number;
+  /** Minimum sidebar width in pixels (web-only, ignored on native) */
+  minWidth?: number;
 }
 
 /**
@@ -1016,6 +1022,12 @@ export function SidebarLayout({
   sidebarClassName,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
   contentClassName, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only
+  storageId: _storageId,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only
+  defaultWidth: _defaultWidth,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only
+  minWidth: _minWidth,
   topBarLeft,
   topBarRight,
 }: SidebarLayoutProps): React.JSX.Element {

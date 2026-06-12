@@ -48,6 +48,7 @@ import {
   ViteMinifyOptions,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { BUILDER_ALIAS } from "./constants";
 
 /**
  * Package.json exports field schema
@@ -74,18 +75,19 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "builder"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.devTools",
-  subCategory: "endpointCategories.devToolsGenerators",
+  category: "devTools",
+  subCategory: "Generators",
   tags: ["tags.build", "tags.npm", "tags.vite"],
   icon: "package",
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.AI_TOOL_OFF,
     UserRole.WEB_OFF,
-    UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: ["builder", "package", "bundle"],
+  aliases: [BUILDER_ALIAS] as const,
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Route Handlers Generator",
+    titleShort: "Handlery tras",
     description: "Generate route-handlers.ts with dynamic imports",
     container: {
       title: "Route Handlers Generator Configuration",

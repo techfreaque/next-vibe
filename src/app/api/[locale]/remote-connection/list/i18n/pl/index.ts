@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Połączenia zdalne",
+    titleShort: "Połączenia",
     description: "Wylistuj wszystkie połączenia zdalne dla swojego konta",
     fields: {
       activeOnly: {

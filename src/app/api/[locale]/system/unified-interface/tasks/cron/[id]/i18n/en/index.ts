@@ -6,6 +6,7 @@ export const translations = {
   },
   get: {
     title: "Get Cron Task",
+    titleShort: "Cron Task",
     description: "Retrieve a single cron task by ID",
     container: {
       title: "Cron Task Details",
@@ -69,6 +70,7 @@ export const translations = {
   },
   put: {
     title: "Update Cron Task",
+    titleShort: "Update Task",
     description: "Update an existing cron task",
     container: {
       title: "Update Cron Task",
@@ -219,6 +221,7 @@ export const translations = {
   },
   delete: {
     title: "Delete Cron Task",
+    titleShort: "Delete Task",
     description: "Delete a cron task",
     container: {
       title: "Delete Cron Task",

@@ -23,9 +23,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "generators", "prompt-fragments"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.devTools",
-  subCategory: "endpointCategories.devToolsGenerators",
+  category: "devTools",
+  subCategory: "Generators",
   tags: ["post.title"],
   icon: "wand",
   allowedRoles: [

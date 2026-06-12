@@ -13,6 +13,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Aufgabe ausführen",
+    titleShort: "Task ausführen",
     description:
       "Eine einzelne Aufgabe per ID auslösen und das Ergebnis synchron erhalten",
     container: {

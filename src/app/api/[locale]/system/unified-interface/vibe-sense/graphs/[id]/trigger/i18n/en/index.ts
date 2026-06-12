@@ -3,6 +3,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Trigger Graph",
+    titleShort: "Trigger Graph",
     description: "Manually trigger on-demand graph execution",
     fields: {
       id: { label: "Graph ID", description: "UUID of the graph" },

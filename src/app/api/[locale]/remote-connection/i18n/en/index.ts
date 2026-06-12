@@ -22,7 +22,7 @@ export const translations = {
       benefit1:
         "Your memories automatically sync between this device and your cloud account",
       benefit2: "Run AI tools from the command line with",
-      benefit2Code: "vibe --remote",
+      benefit2Code: "vibe --thea",
       benefit3: "Your cloud account and local instance stay in sync",
     },
   },
@@ -153,6 +153,54 @@ export const translations = {
     success: {
       title: "Connected!",
       description: "Your account is now connected to the remote instance",
+    },
+  },
+  syncTriggerPull: {
+    title: "Trigger Sync Pull",
+    titleShort: "Sync Pull",
+    description:
+      "Trigger an immediate pull from all connected remote instances",
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "Invalid request",
+      },
+      network: {
+        title: "Network Error",
+        description: "Failed to connect to the server",
+      },
+      unauthorized: {
+        title: "Not Logged In",
+        description: "You must be logged in",
+      },
+      forbidden: {
+        title: "Access Denied",
+        description: "Admin role required",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "No active connections to sync",
+      },
+      server: {
+        title: "Server Error",
+        description: "An error occurred during sync pull",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "A conflict occurred",
+      },
+    },
+    success: {
+      title: "Sync Pull Complete",
+      description: "Pulled latest data from all connected remote instances",
     },
   },
   disconnect: {

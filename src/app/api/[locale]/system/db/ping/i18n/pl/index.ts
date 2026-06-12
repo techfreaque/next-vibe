@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   tag: "baza danych",
   post: {
     title: "Ping bazy danych",
+    titleShort: "Ping DB",
     description: "Sprawdź połączenie i stan bazy danych",
     form: {
       title: "Konfiguracja ping",

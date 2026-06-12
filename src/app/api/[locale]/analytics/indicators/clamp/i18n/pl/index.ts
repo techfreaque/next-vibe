@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Clamp",
+    titleShort: "Clamp",
     description:
       "Ograniczenie wartości do zakresu [min, max] - przycina wartości odstające",
     fields: {

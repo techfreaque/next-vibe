@@ -4,33 +4,22 @@
  */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  lookbackRequestField,
-  nodeMetaResponseField,
-  rangeRequestField,
-  resolutionRequestField,
-  timeSeriesResponseField,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { dataSourceWidget } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CHAT_MESSAGES_TOTAL_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
-const ChatMessagesTotalWidget = lazyWidget(() =>
-  import("./widget").then((m) => ({ default: m.ChatMessagesTotalWidget })),
-);
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "chat", "data-sources", "chat-messages-total"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
   category: "analytics",
@@ -39,31 +28,26 @@ const { POST } = createEndpoint({
   aliases: [CHAT_MESSAGES_TOTAL_ALIAS],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: customWidgetObject({
-    render: ChatMessagesTotalWidget,
-    noFormElement: true,
-    usage: { request: "data", response: true } as const,
-    children: {
-      resolution: resolutionRequestField(scopedTranslation, {
-        label: "post.fields.resolution.label",
-        description: "post.fields.resolution.description",
-      }),
-      range: rangeRequestField(scopedTranslation, {
-        label: "post.fields.range.label",
-        description: "post.fields.range.description",
-      }),
-      lookback: lookbackRequestField(scopedTranslation, {
-        label: "post.fields.lookback.label",
-        description: "post.fields.lookback.description",
-      }),
-      result: timeSeriesResponseField(scopedTranslation, {
-        label: "post.fields.result.label",
-        description: "post.fields.result.description",
-      }),
-      meta: nodeMetaResponseField(scopedTranslation, {
-        label: "post.fields.meta.label",
-        description: "post.fields.meta.description",
-      }),
+  fields: dataSourceWidget(scopedTranslation, {
+    resolution: {
+      label: "post.fields.resolution.label",
+      description: "post.fields.resolution.description",
+    },
+    range: {
+      label: "post.fields.range.label",
+      description: "post.fields.range.description",
+    },
+    lookback: {
+      label: "post.fields.lookback.label",
+      description: "post.fields.lookback.description",
+    },
+    result: {
+      label: "post.fields.result.label",
+      description: "post.fields.result.description",
+    },
+    meta: {
+      label: "post.fields.meta.label",
+      description: "post.fields.meta.description",
     },
   }),
 
@@ -117,8 +101,11 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        result: [],
-        meta: { actualResolution: "enums.resolution.1d", lookbackUsed: 0 },
+        result: [] as { timestamp: Date; value: number }[],
+        meta: {
+          actualResolution: "enums.resolution.1d" as const,
+          lookbackUsed: 0,
+        },
       },
     },
   },

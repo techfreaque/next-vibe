@@ -26,7 +26,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
 const EmailCampaignsConfigWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.EmailCampaignsConfigWidget })),
@@ -38,12 +38,14 @@ const { POST } = createEndpoint({
   path: ["leads", "campaigns", "email-campaigns"],
   aliases: ["email-campaigns"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsProcessing",
+  category: "newsletter",
+  subCategory: "emailCampaignsProcessing",
   icon: "mail",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: EmailCampaignsConfigWidget,
@@ -217,9 +219,10 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "mail",
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsProcessing",
+  category: "newsletter",
+  subCategory: "emailCampaignsProcessing",
   tags: ["tag"],
 
   fields: objectField(scopedTranslation, {

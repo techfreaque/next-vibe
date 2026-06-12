@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Favoriten neu anordnen",
+    titleShort: "Neu sortieren",
     description: "Reihenfolge Ihrer Favoriten-Konfigurationen aktualisieren",
     positions: {
       label: "Positionen",

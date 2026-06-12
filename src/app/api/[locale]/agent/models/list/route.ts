@@ -8,8 +8,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, logger, locale }) => {
-      return ModelsListRepository.getModels(data, user, logger, locale);
-    },
+    handler: ({ data, user, logger, locale }) =>
+      ModelsListRepository.getModels(data, user, logger, locale),
   },
 });

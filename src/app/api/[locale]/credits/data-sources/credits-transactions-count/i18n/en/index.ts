@@ -1,6 +1,7 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Txn Count",
     title: "Credits Transactions Count",
     description: "Total number of credit transactions per resolution bucket",
     fields: {

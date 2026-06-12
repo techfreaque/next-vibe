@@ -17,7 +17,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
 
 const ExportEnvWidget = lazyWidget(() =>
@@ -33,12 +33,14 @@ export const { GET } = createEndpoint({
     UserRole.CLI_OFF,
     UserRole.MCP_OFF,
     UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
   ] as const,
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "download" as const,
-  category: "endpointCategories.settings",
-  subCategory: "endpointCategories.settingsEnv",
+  category: "devTools",
+  subCategory: "settingsEnv",
   tags: ["get.tags.exportEnv" as const],
 
   fields: customWidgetObject({

@@ -5,13 +5,14 @@
  * MCP: Compact plain text summary
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import chalk from "chalk";
 import { Box, Text, useApp, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetLocale,
@@ -19,9 +20,9 @@ import {
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
-import type endpoints from "./definition";
+import endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";
 
 type Module = SystemSettingsGetResponseOutput["modules"][number];
@@ -287,40 +288,16 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
     setSaving(true);
     setSaveMsg(null);
     try {
-      const { RouteExecutionExecutor } =
-        await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
-      await RouteExecutionExecutor.executeGenericHandler({
-        toolName: "init",
-        data: { settings: edits },
-        urlPathParams: {},
+      const { RouteExecuteRepository } =
+        await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+      await RouteExecuteRepository.runInProcessTyped({
+        definition: endpoints.PATCH,
+        input: edits,
         user,
         locale,
         logger,
-        platform: platform as Parameters<
-          typeof RouteExecutionExecutor.executeGenericHandler
-        >[0]["platform"],
-        streamContext: {
-          rootFolderId: DefaultFolderId.BACKGROUND,
-          threadId: undefined,
-          aiMessageId: undefined,
-          skillId: undefined,
-          headless: undefined,
-          subAgentDepth: 0,
-          isRevival: undefined,
-
-          providerOverride: undefined,
-          currentToolMessageId: undefined,
-          callerToolCallId: undefined,
-          pendingToolMessages: undefined,
-          pendingTimeoutMs: undefined,
-          leafMessageId: undefined,
-          waitingForRemoteResult: undefined,
-          favoriteId: undefined,
-          abortSignal: new AbortController().signal,
-          callerCallbackMode: undefined,
-          onEscalatedTaskCancel: undefined,
-          escalateToTask: undefined,
-        },
+        platform: platform as Platform,
+        streamContext: makeHeadlessContext(),
       });
       setSaveMsg("Saved \u2713");
       setEdits({});
@@ -534,7 +511,7 @@ function UnbottledCliLoginField({
   onCredential,
 }: {
   currentField: Setting;
-  locale: string;
+  locale: CountryLanguage;
   t: (k: string) => string;
   onCredential: (credential: string) => void;
 }): JSX.Element {
@@ -730,40 +707,16 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
     setSaving(true);
     setSaveMsg(null);
     try {
-      const { RouteExecutionExecutor } =
-        await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
-      await RouteExecutionExecutor.executeGenericHandler({
-        toolName: "init",
-        data: { settings: toSave },
-        urlPathParams: {},
+      const { RouteExecuteRepository } =
+        await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+      await RouteExecuteRepository.runInProcessTyped({
+        definition: endpoints.PATCH,
+        input: toSave,
         user,
         locale,
         logger,
-        platform: platform as Parameters<
-          typeof RouteExecutionExecutor.executeGenericHandler
-        >[0]["platform"],
-        streamContext: {
-          rootFolderId: DefaultFolderId.BACKGROUND,
-          threadId: undefined,
-          aiMessageId: undefined,
-          skillId: undefined,
-          headless: undefined,
-          subAgentDepth: 0,
-          isRevival: undefined,
-
-          providerOverride: undefined,
-          currentToolMessageId: undefined,
-          callerToolCallId: undefined,
-          pendingToolMessages: undefined,
-          pendingTimeoutMs: undefined,
-          leafMessageId: undefined,
-          waitingForRemoteResult: undefined,
-          favoriteId: undefined,
-          abortSignal: new AbortController().signal,
-          callerCallbackMode: undefined,
-          onEscalatedTaskCancel: undefined,
-          escalateToTask: undefined,
-        },
+        platform: platform as Platform,
+        streamContext: makeHeadlessContext(),
       });
       setSaveMsg("Saved ✓");
     } catch {
@@ -1076,43 +1029,18 @@ export function SystemSettingsPatchWidget(): JSX.Element {
     }
     void (async (): Promise<void> => {
       try {
-        const { RouteExecutionExecutor } =
-          await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
-        const result = await RouteExecutionExecutor.executeGenericHandler({
-          toolName: "system-settings",
-          data: {},
-          urlPathParams: {},
+        const { RouteExecuteRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+        const result = await RouteExecuteRepository.runInProcessTyped({
+          definition: endpoints.GET,
           user,
           locale,
           logger,
-          platform: platform as Parameters<
-            typeof RouteExecutionExecutor.executeGenericHandler
-          >[0]["platform"],
-          streamContext: {
-            rootFolderId: DefaultFolderId.BACKGROUND,
-            threadId: undefined,
-            aiMessageId: undefined,
-            skillId: undefined,
-            headless: undefined,
-            subAgentDepth: 0,
-            isRevival: undefined,
-
-            providerOverride: undefined,
-            currentToolMessageId: undefined,
-            callerToolCallId: undefined,
-            pendingToolMessages: undefined,
-            pendingTimeoutMs: undefined,
-            leafMessageId: undefined,
-            waitingForRemoteResult: undefined,
-            favoriteId: undefined,
-            abortSignal: new AbortController().signal,
-            callerCallbackMode: undefined,
-            onEscalatedTaskCancel: undefined,
-            escalateToTask: undefined,
-          },
+          platform: platform as Platform,
+          streamContext: makeHeadlessContext(),
         });
         if (result.success) {
-          const value = result.data as SystemSettingsGetResponseOutput;
+          const value = result.data;
           // Always open wizard when invoked via `vibe init` - either because
           // onboarding is required, or because the user explicitly ran init.
           // When already configured, open wizard anyway (they asked for it).

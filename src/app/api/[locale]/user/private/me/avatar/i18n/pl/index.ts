@@ -31,6 +31,7 @@ export const translations: typeof enTranslations = {
   },
   upload: {
     title: "Prześlij Awatar",
+    titleShort: "Prześlij avatar",
     description: "Prześlij zdjęcie profilowe",
     groups: {
       fileUpload: {
@@ -113,6 +114,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Usuń Awatar",
+    titleShort: "Usuń avatar",
     description: "Usuń obecne zdjęcie profilowe",
     response: {
       title: "Odpowiedź Usuwania",

@@ -7,6 +7,7 @@ export const translations = {
   },
   get: {
     title: "Pobierz profil twórcy",
+    titleShort: "Profil twórcy",
     description: "Publiczny profil twórcy skilla z bio, linkami i skillami",
     form: {
       title: "Profil twórcy",

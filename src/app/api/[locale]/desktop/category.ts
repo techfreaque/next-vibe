@@ -3,11 +3,8 @@
  * Covers window management, interaction, screenshots, and accessibility.
  */
 
-import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
 import { DESKTOP_LIST_WINDOWS_ALIAS } from "@/app/api/[locale]/desktop/list-windows/constants";
-import { DESKTOP_CLICK_ALIAS } from "@/app/api/[locale]/desktop/click/constants";
-import { DESKTOP_SCREENSHOT_ALIAS } from "@/app/api/[locale]/desktop/take-screenshot/constants";
-import { DESKTOP_ACCESSIBILITY_ALIAS } from "@/app/api/[locale]/desktop/get-accessibility-tree/constants";
+import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
 
 export const category: CategoryDefinition = {
   key: "desktop",
@@ -42,7 +39,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Interaktion",
         "pl-PL": "Interakcja",
       },
-      defaultEntry: DESKTOP_CLICK_ALIAS,
     },
     Capture: {
       icon: "camera",
@@ -53,7 +49,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Erfassung",
         "pl-PL": "Przechwytywanie",
       },
-      defaultEntry: DESKTOP_SCREENSHOT_ALIAS,
     },
     Inspection: {
       icon: "eye",
@@ -64,7 +59,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Inspektion",
         "pl-PL": "Inspekcja",
       },
-      defaultEntry: DESKTOP_ACCESSIBILITY_ALIAS,
     },
   },
 };

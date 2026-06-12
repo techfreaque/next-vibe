@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Utworzone wspomnienia czatu",
+    titleShort: "Wspomnienia",
     description: "Nowe wspomnienia AI utworzone na przedział rozdzielczości",
     fields: {
       resolution: {

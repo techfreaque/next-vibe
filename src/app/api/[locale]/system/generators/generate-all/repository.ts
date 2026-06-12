@@ -20,6 +20,17 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import type { DirtyFlags, LiveIndex } from "../shared/live-index";
+import {
+  findGeneratorInputs,
+  type GeneratorKey,
+} from "../shared/find-generator-inputs";
+import {
+  isUnchanged,
+  markDone,
+  readGenState,
+  writeGenState,
+  type GenState,
+} from "../shared/gen-cache";
 import type {
   GenerateAllRequestOutput,
   GenerateAllResponseOutput,
@@ -40,6 +51,28 @@ export class GenerateAllRepository {
     let generatorsSkipped = 0;
     let functionalGeneratorsCompleted = false;
 
+    // Load persisted hash state once. Mutated in-place as generators succeed.
+    const genState: GenState = data.force ? {} : readGenState();
+
+    /**
+     * Returns the inputs for a generator and whether it can be skipped.
+     * Also increments generatorsSkipped when returning true.
+     */
+    const shouldSkip = (key: GeneratorKey, outputFile: string): boolean => {
+      if (data.force) {
+        return false;
+      }
+      const inputs = findGeneratorInputs(key);
+      return isUnchanged(key, inputs, outputFile, genState);
+    };
+
+    /**
+     * Called after a generator succeeds. Records its current fingerprint.
+     */
+    const recordDone = (key: GeneratorKey): void => {
+      markDone(key, findGeneratorInputs(key), genState);
+    };
+
     try {
       // Definition-scanning generators (endpoints-meta, endpoint, route-handlers,
       // client-routes-index) must run SEQUENTIALLY to avoid Bun TDZ race conditions.
@@ -49,8 +82,21 @@ export class GenerateAllRepository {
       // each module is fully initialized in Bun's cache before the next scan starts.
       const defScanResults: (string | null)[] = [];
 
+      // Check if the entire endpoints group can be skipped.
+      // All four sequential generators share the same inputs (definition.ts + route.ts).
+      const endpointsSkipped =
+        !data.skipEndpoints &&
+        shouldSkip(
+          "endpoints",
+          "src/app/api/[locale]/system/generated/endpoint.ts",
+        );
+      if (endpointsSkipped) {
+        generatorsSkipped += 4; // endpoints-meta, endpoint, route-handlers, remote-capabilities
+        defScanResults.push(null, null, null, null);
+      }
+
       // 1. Endpoints Meta Generator - Generate per-locale metadata for tools modal
-      if (!data.skipEndpoints) {
+      if (!data.skipEndpoints && !endpointsSkipped) {
         try {
           const { EndpointsMetaGeneratorRepository } =
             await import("../endpoints-meta/repository");
@@ -87,7 +133,7 @@ export class GenerateAllRepository {
       }
 
       // 1b. Endpoint Generator - Generate endpoint.ts with dynamic imports
-      if (!data.skipEndpoints) {
+      if (!data.skipEndpoints && !endpointsSkipped) {
         try {
           const { EndpointGeneratorRepository } =
             await import("../endpoint/repository");
@@ -122,7 +168,7 @@ export class GenerateAllRepository {
       }
 
       // 1b. Route Handlers Generator - Generate route-handlers.ts with dynamic imports
-      if (!data.skipEndpoints) {
+      if (!data.skipEndpoints && !endpointsSkipped) {
         try {
           const { RouteHandlersGeneratorRepository } =
             await import("../route-handlers/repository");
@@ -159,7 +205,7 @@ export class GenerateAllRepository {
       }
 
       // 1c. Client Route Handlers Generator - Generate route-handlers-client.ts with dynamic imports
-      if (!data.skipEndpoints) {
+      if (!data.skipEndpoints && !endpointsSkipped) {
         try {
           const { ClientRoutesIndexGeneratorRepository } =
             await import("../client-routes-index/repository");
@@ -195,6 +241,11 @@ export class GenerateAllRepository {
         }
       }
 
+      // If the sequential endpoint generators ran successfully, record the fingerprint.
+      if (!data.skipEndpoints && !endpointsSkipped) {
+        recordDone("endpoints");
+      }
+
       // Remaining generators run in parallel (they don't scan definition files,
       // or if they do, all definitions are now cached from the sequential phase above).
       const generatorPromises = [];
@@ -203,6 +254,15 @@ export class GenerateAllRepository {
       if (!data.skipSeeds) {
         generatorPromises.push(
           (async (): Promise<string | null> => {
+            if (
+              shouldSkip(
+                "seeds",
+                "src/app/api/[locale]/system/generated/seeds.ts",
+              )
+            ) {
+              generatorsSkipped++;
+              return null;
+            }
             try {
               const { SeedsGeneratorRepository } =
                 await import("../seeds/repository");
@@ -222,6 +282,7 @@ export class GenerateAllRepository {
               );
 
               if (result.success) {
+                recordDone("seeds");
                 generatorsRun++;
                 return "seeds";
               }
@@ -245,6 +306,15 @@ export class GenerateAllRepository {
       if (!data.skipTaskIndex) {
         generatorPromises.push(
           (async (): Promise<string | null> => {
+            if (
+              shouldSkip(
+                "task-index",
+                "src/app/api/[locale]/system/generated/tasks-index.ts",
+              )
+            ) {
+              generatorsSkipped++;
+              return null;
+            }
             try {
               const { TaskIndexGeneratorRepository } =
                 await import("../task-index/repository");
@@ -264,6 +334,7 @@ export class GenerateAllRepository {
                 );
 
               if (result.success) {
+                recordDone("task-index");
                 generatorsRun++;
                 return "task-index";
               }
@@ -287,6 +358,15 @@ export class GenerateAllRepository {
       // 3b. Skills Index Generator
       generatorPromises.push(
         (async (): Promise<string | null> => {
+          if (
+            shouldSkip(
+              "skills-index",
+              "src/app/api/[locale]/system/generated/skills-index.ts",
+            )
+          ) {
+            generatorsSkipped++;
+            return null;
+          }
           try {
             const { SkillsIndexGeneratorRepository } =
               await import("../skills-index/repository");
@@ -306,6 +386,7 @@ export class GenerateAllRepository {
               );
 
             if (result.success) {
+              recordDone("skills-index");
               generatorsRun++;
               return "skills-index";
             }
@@ -325,6 +406,15 @@ export class GenerateAllRepository {
       // 3c. Prompt Fragments Generator
       generatorPromises.push(
         (async (): Promise<string | null> => {
+          if (
+            shouldSkip(
+              "prompt-fragments",
+              "src/app/api/[locale]/system/generated/prompt-fragments.ts",
+            )
+          ) {
+            generatorsSkipped++;
+            return null;
+          }
           try {
             const { PromptFragmentsGeneratorRepository } =
               await import("../prompt-fragments/repository");
@@ -344,6 +434,7 @@ export class GenerateAllRepository {
               );
 
             if (result.success) {
+              recordDone("prompt-fragments");
               generatorsRun++;
               return "prompt-fragments";
             }
@@ -405,6 +496,15 @@ export class GenerateAllRepository {
       // 5. Email Templates Generator
       generatorPromises.push(
         (async (): Promise<string | null> => {
+          if (
+            shouldSkip(
+              "email-templates",
+              "src/app/api/[locale]/messenger/registry/generated.ts",
+            )
+          ) {
+            generatorsSkipped++;
+            return null;
+          }
           try {
             const { EmailTemplateGeneratorRepository } =
               await import("../email-templates/repository");
@@ -424,6 +524,7 @@ export class GenerateAllRepository {
               );
 
             if (result.success) {
+              recordDone("email-templates");
               generatorsRun++;
               return "email-templates";
             }
@@ -440,8 +541,8 @@ export class GenerateAllRepository {
         })(),
       );
 
-      // 6. Remote Capabilities Generator
-      if (!data.skipEndpoints) {
+      // 6. Remote Capabilities Generator (shares inputs with endpoints group)
+      if (!data.skipEndpoints && !endpointsSkipped) {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
@@ -478,11 +579,19 @@ export class GenerateAllRepository {
             }
           })(),
         );
+      } else if (!data.skipEndpoints && endpointsSkipped) {
+        generatorsSkipped++;
       }
 
       // 7. Env Generator
       generatorPromises.push(
         (async (): Promise<string | null> => {
+          if (
+            shouldSkip("env", "src/app/api/[locale]/system/generated/env.ts")
+          ) {
+            generatorsSkipped++;
+            return null;
+          }
           try {
             const { EnvGeneratorRepository } =
               await import("../env/repository");
@@ -500,6 +609,7 @@ export class GenerateAllRepository {
             );
 
             if (result.success) {
+              recordDone("env");
               generatorsRun++;
               return "env";
             }
@@ -516,9 +626,18 @@ export class GenerateAllRepository {
         })(),
       );
 
-      // 7b. Env Keys Generator
+      // 7b. Env Keys Generator (shares inputs with env generator)
       generatorPromises.push(
         (async (): Promise<string | null> => {
+          if (
+            shouldSkip(
+              "env",
+              "src/app/api/[locale]/system/generated/env-keys.ts",
+            )
+          ) {
+            generatorsSkipped++;
+            return null;
+          }
           try {
             const { EnvKeysGeneratorRepository } =
               await import("../env-keys/repository");
@@ -588,6 +707,10 @@ export class GenerateAllRepository {
       // 9. Agent Docs Generator (CLAUDE.md + AGENTS.md from vibe-coder skill)
       generatorPromises.push(
         (async (): Promise<string | null> => {
+          if (shouldSkip("agent-docs", "CLAUDE.md")) {
+            generatorsSkipped++;
+            return null;
+          }
           try {
             const { AgentDocsGeneratorRepository } =
               await import("../agent-docs/repository");
@@ -596,6 +719,7 @@ export class GenerateAllRepository {
               await AgentDocsGeneratorRepository.generateAgentDocs(logger);
 
             if (result.success) {
+              recordDone("agent-docs");
               generatorsRun++;
               return "agent-docs";
             }
@@ -612,9 +736,67 @@ export class GenerateAllRepository {
         })(),
       );
 
-      // 10. Graph Seeds Index Generator
+      // 10. Category Index Generator
       generatorPromises.push(
         (async (): Promise<string | null> => {
+          if (
+            shouldSkip(
+              "category-index",
+              "src/app/api/[locale]/system/generated/category-registry.ts",
+            )
+          ) {
+            generatorsSkipped++;
+            return null;
+          }
+          try {
+            const { CategoryIndexGeneratorRepository } =
+              await import("../category-index/repository");
+
+            const { scopedTranslation: categoryIndexI18n } =
+              await import("../category-index/i18n");
+            const { t: subT } = categoryIndexI18n.scopedT(locale);
+
+            const result =
+              await CategoryIndexGeneratorRepository.generateCategoryIndex(
+                {
+                  outputFile:
+                    "src/app/api/[locale]/system/generated/category-registry.ts",
+                  dryRun: false,
+                },
+                logger,
+                subT,
+              );
+
+            if (result.success) {
+              recordDone("category-index");
+              generatorsRun++;
+              return "category-index";
+            }
+            outputLines.push(
+              `❌ Category index generation failed: ${result.message}`,
+            );
+            return null;
+          } catch (error) {
+            outputLines.push(
+              `❌ Category index generator failed: ${parseError(error).message}`,
+            );
+            return null;
+          }
+        })(),
+      );
+
+      // 11. Graph Seeds Index Generator
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          if (
+            shouldSkip(
+              "graph-seeds-index",
+              "src/app/api/[locale]/system/generated/graph-seeds-index.ts",
+            )
+          ) {
+            generatorsSkipped++;
+            return null;
+          }
           try {
             const { GraphSeedsIndexGeneratorRepository } =
               await import("../graph-seeds-index/repository");
@@ -631,6 +813,7 @@ export class GenerateAllRepository {
               );
 
             if (result.success) {
+              recordDone("graph-seeds-index");
               generatorsRun++;
               return "graph-seeds-index";
             }
@@ -650,6 +833,16 @@ export class GenerateAllRepository {
       // 11. Skill Embeddings Generator (pre-compute embeddings for built-in skills)
       generatorPromises.push(
         (async (): Promise<string | null> => {
+          // Use skills-index.ts as a proxy output (embeddings live beside skill files)
+          if (
+            shouldSkip(
+              "skill-embeddings",
+              "src/app/api/[locale]/system/generated/skills-index.ts",
+            )
+          ) {
+            generatorsSkipped++;
+            return null;
+          }
           try {
             const { SkillEmbeddingsGeneratorRepository } =
               await import("../skill-embeddings/repository");
@@ -660,6 +853,7 @@ export class GenerateAllRepository {
               );
 
             if (result.success) {
+              recordDone("skill-embeddings");
               generatorsRun++;
               return "skill-embeddings";
             }
@@ -677,6 +871,8 @@ export class GenerateAllRepository {
       );
 
       // 12. Cortex Seeds Embeddings Generator (pre-compute embeddings for all cortex seeds)
+      // Note: cortex-templates has its own internal embedding cache; we still add a
+      // coarse outer skip based on skills-index to avoid even importing when nothing changed.
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
@@ -718,6 +914,11 @@ export class GenerateAllRepository {
       }
 
       functionalGeneratorsCompleted = completedGenerators.length > 0;
+
+      // Persist updated fingerprints for next run
+      if (!data.force) {
+        writeGenState(genState);
+      }
 
       return success({
         success: true,
@@ -1059,6 +1260,37 @@ export class GenerateAllRepository {
       skipped.push("prompt-fragments");
     }
 
+    if (dirty.categoryIndex) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          try {
+            const { CategoryIndexGeneratorRepository } =
+              await import("../category-index/repository");
+            const { scopedTranslation: i18n } =
+              await import("../category-index/i18n");
+            const { t } = i18n.scopedT(locale);
+            await CategoryIndexGeneratorRepository.generateCategoryIndex(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/category-registry.ts",
+                dryRun: false,
+              },
+              logger,
+              t,
+            );
+            ran.push("category-index");
+          } catch (error) {
+            logger.error(
+              "category-index failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+      );
+    } else {
+      skipped.push("category-index");
+    }
+
     // Seeds: only run when dirty.seeds AND explicitly not skipped
     // (seeds are expensive DB-related, only on startup)
     if (dirty.seeds) {
@@ -1108,6 +1340,7 @@ if (import.meta.main) {
       enableTrpc: false,
       skipTanstack: false,
       verbose: false,
+      force: false,
       outputDir: "src/app/api/[locale]/system/generated",
     },
     logger,

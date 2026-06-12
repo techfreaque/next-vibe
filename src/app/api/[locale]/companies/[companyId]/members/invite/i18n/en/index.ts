@@ -6,6 +6,7 @@ export const translations = {
   },
   post: {
     title: "Invite Member",
+    titleShort: "Invite Member",
     description: "Invite a registered user to the company by email",
     companyId: {
       label: "Company ID",

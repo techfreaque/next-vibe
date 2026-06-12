@@ -8,11 +8,11 @@ import deployPreviewEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: deployPreviewEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t }) => {
-      const { DeployPreviewRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return DeployPreviewRepository.preview(data, logger, t);
-    },
+    handler: async ({ data, logger, t }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).DeployPreviewRepository.preview(data, logger, t),
   },
 });

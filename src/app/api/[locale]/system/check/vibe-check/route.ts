@@ -14,15 +14,14 @@ import { VibeCheckRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: vibeCheckEndpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, platform, t, locale, streamContext }) => {
-      return VibeCheckRepository.execute(
+    handler: ({ data, logger, platform, t, locale, streamContext }) =>
+      VibeCheckRepository.execute(
         data,
         logger,
         platform,
         t,
         locale,
         streamContext.abortSignal,
-      );
-    },
+      ),
   },
 });

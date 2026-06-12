@@ -3,7 +3,7 @@ import { Text } from "ink";
 
 import type { TitleProps } from "../../web/ui/title";
 import { parseClassesToInkProps } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
-import { useIsMcp } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 export function Title({
   children,

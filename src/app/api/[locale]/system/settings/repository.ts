@@ -29,6 +29,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import type {
   SystemSettingsGetResponseOutput,
+  SystemSettingsPatchRequestInput,
+  SystemSettingsPatchResponseOutput,
   SystemSettingsPostRequestOutput,
   SystemSettingsPostResponseOutput,
 } from "./definition";
@@ -100,7 +102,7 @@ export class SystemSettingsRepository {
   }
 
   private static isDevMode(): boolean {
-    const devPidPath = join(process.cwd(), ".tmp", ".vibe-dev.pid");
+    const devPidPath = join(process.cwd(), ".tmp", ".atlas.pid");
     return existsSync(devPidPath);
   }
 
@@ -717,5 +719,23 @@ export class SystemSettingsRepository {
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
+  }
+
+  /**
+   * PATCH handler - assembles flat env key fields into settings record.
+   * Accepts raw data (one field per env key) and filters out empty values.
+   */
+  static patchSettings(
+    data: SystemSettingsPatchRequestInput,
+    logger: EndpointLogger,
+    t: SystemSettingsT,
+  ): Promise<ResponseType<SystemSettingsPatchResponseOutput>> {
+    const settings: Record<string, string> = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (typeof value === "string" && value.length > 0) {
+        settings[key] = value;
+      }
+    }
+    return SystemSettingsRepository.updateSettings({ settings }, logger, t);
   }
 }

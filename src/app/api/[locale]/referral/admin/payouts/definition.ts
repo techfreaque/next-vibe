@@ -29,7 +29,7 @@ import {
 } from "../../enum";
 import { scopedTranslation } from "../../i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const AdminPayoutsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.AdminPayoutsContainer })),
@@ -42,11 +42,12 @@ export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["referral", "admin", "payouts"],
-  title: "admin.payouts.get.title",
-  description: "admin.payouts.get.description",
-  category: "endpointCategories.referral",
-  subCategory: "endpointCategories.referralPayouts",
-  icon: "wallet",
+  title: "admin.payouts.get.title" as const,
+  titleShort: "admin.payouts.get.titleShort" as const,
+  description: "admin.payouts.get.description" as const,
+  category: "referral" as const,
+  subCategory: "Payouts" as const,
+  icon: "wallet" as const,
   tags: ["tags.referral", "tags.get"],
   allowedRoles: [UserRole.ADMIN] as const,
 
@@ -57,8 +58,8 @@ export const { GET } = createEndpoint({
       status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "admin.payouts.fields.status.label",
-        description: "admin.payouts.fields.status.description",
+        label: "admin.payouts.fields.status.label" as const,
+        description: "admin.payouts.fields.status.description" as const,
         schema: z.enum(PayoutStatusDB).optional(),
         options: PayoutStatusOptions,
       }),
@@ -96,40 +97,40 @@ export const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title",
-      description: "errors.notFound.description",
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.serverError.title",
-      description: "errors.serverError.description",
+      title: "errors.serverError.title" as const,
+      description: "errors.serverError.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.network.title",
-      description: "errors.network.description",
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.unauthorized.title",
-      description: "errors.unauthorized.description",
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title",
-      description: "errors.forbidden.description",
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.unknown.title",
-      description: "errors.unknown.description",
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.unsavedChanges.title",
-      description: "errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
   },
   successTypes: { title: "success.title", description: "success.description" },
@@ -142,11 +143,12 @@ export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["referral", "admin", "payouts"],
-  title: "admin.payouts.post.title",
-  description: "admin.payouts.post.description",
-  category: "endpointCategories.referral",
-  subCategory: "endpointCategories.referralPayouts",
-  icon: "wallet",
+  title: "admin.payouts.post.title" as const,
+  titleShort: "admin.payouts.post.titleShort" as const,
+  description: "admin.payouts.post.description" as const,
+  category: "referral" as const,
+  subCategory: "Payouts" as const,
+  icon: "wallet" as const,
   tags: ["tags.referral"],
   allowedRoles: [UserRole.ADMIN] as const,
 
@@ -159,29 +161,30 @@ export const { POST } = createEndpoint({
       requestId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "admin.payouts.fields.requestId.label",
-        description: "admin.payouts.fields.requestId.description",
+        label: "admin.payouts.fields.requestId.label" as const,
+        description: "admin.payouts.fields.requestId.description" as const,
         schema: z.string().uuid(),
       }),
       action: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "admin.payouts.fields.action.label",
-        description: "admin.payouts.fields.action.description",
+        label: "admin.payouts.fields.action.label" as const,
+        description: "admin.payouts.fields.action.description" as const,
         schema: z.enum(["approve", "reject", "complete"] as const),
       }),
       adminNotes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "admin.payouts.fields.adminNotes.label",
-        description: "admin.payouts.fields.adminNotes.description",
+        label: "admin.payouts.fields.adminNotes.label" as const,
+        description: "admin.payouts.fields.adminNotes.description" as const,
         schema: z.string().optional(),
       }),
       rejectionReason: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "admin.payouts.fields.rejectionReason.label",
-        description: "admin.payouts.fields.rejectionReason.description",
+        label: "admin.payouts.fields.rejectionReason.label" as const,
+        description:
+          "admin.payouts.fields.rejectionReason.description" as const,
         schema: z.string().optional(),
       }),
       success: responseField(scopedTranslation, {
@@ -209,40 +212,40 @@ export const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title",
-      description: "errors.notFound.description",
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.serverError.title",
-      description: "errors.serverError.description",
+      title: "errors.serverError.title" as const,
+      description: "errors.serverError.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.network.title",
-      description: "errors.network.description",
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.unauthorized.title",
-      description: "errors.unauthorized.description",
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title",
-      description: "errors.forbidden.description",
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.unknown.title",
-      description: "errors.unknown.description",
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.unsavedChanges.title",
-      description: "errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
   },
   successTypes: { title: "success.title", description: "success.description" },
@@ -253,4 +256,4 @@ export type AdminPayoutsGetRequestOutput = typeof GET.types.RequestOutput;
 export type AdminPayoutsPostRequestOutput = typeof POST.types.RequestOutput;
 export type AdminPayoutsPostResponseOutput = typeof POST.types.ResponseOutput;
 
-export default { GET, POST };
+export default { GET, POST } as const;

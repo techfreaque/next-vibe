@@ -46,6 +46,7 @@ import {
 import { scopedTranslation } from "./i18n";
 
 import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import leadsSearchDefinitions from "@/app/api/[locale]/leads/search/definition";
 
 const LeadDetailContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadDetailContainer })),
@@ -65,10 +66,11 @@ const { DELETE } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
 
   title: "delete.title",
+  titleShort: "delete.titleShort",
   description: "delete.description",
   icon: "trash",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   tags: ["tags.leads", "tags.management"],
 
   fields: objectField(scopedTranslation, {
@@ -87,7 +89,9 @@ const { DELETE } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: leadsSearchDefinitions.GET,
+        labelField: "email",
         label: "delete.id.label",
         description: "delete.id.description",
         hidden: true,
@@ -170,9 +174,10 @@ const { PATCH } = createEndpoint({
   method: Methods.PATCH,
   path: ["leads", "lead", "[id]"],
   title: "patch.title",
+  titleShort: "patch.titleShort",
   description: "patch.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "user",
@@ -198,7 +203,9 @@ const { PATCH } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: leadsSearchDefinitions.GET,
+        labelField: "email",
         label: "patch.id.label",
         description: "patch.id.description",
         hidden: true,
@@ -683,9 +690,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["leads", "lead", "[id]"],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "user",
@@ -697,7 +705,9 @@ const { GET } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: leadsSearchDefinitions.GET,
+        labelField: "email",
         label: "get.id.label",
         description: "get.id.description",
         disabled: true,

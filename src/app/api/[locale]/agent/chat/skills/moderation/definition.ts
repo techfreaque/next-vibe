@@ -42,10 +42,11 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "shield",
-  category: "endpointCategories.skills",
-  subCategory: "endpointCategories.skillsModeration",
+  category: "ai",
+  subCategory: "skillsModeration",
   tags: ["tags.moderation" as const],
 
   fields: customWidgetObject({
@@ -224,8 +225,8 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "shield",
-  category: "endpointCategories.skills",
-  subCategory: "endpointCategories.skillsModeration",
+  category: "ai",
+  subCategory: "skillsModeration",
   tags: ["tags.moderation" as const],
 
   fields: objectField(scopedTranslation, {

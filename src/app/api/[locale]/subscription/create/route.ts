@@ -2,6 +2,8 @@
  * Subscription Create API Route Handler
  */
 
+import "server-only";
+
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
@@ -12,13 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
-      return await SubscriptionRepository.createSubscription(
-        data,
-        user,
-        locale,
-        logger,
-      );
-    },
+    handler: async ({ data, user, locale, logger }) =>
+      SubscriptionRepository.createSubscription(data, user, locale, logger),
   },
 });

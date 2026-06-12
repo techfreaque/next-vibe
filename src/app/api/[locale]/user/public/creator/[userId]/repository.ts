@@ -89,7 +89,6 @@ export class CreatorProfileRepository {
               description: customSkills.description,
               icon: customSkills.icon,
               category: customSkills.category,
-              modelSelection: customSkills.modelSelection,
               ownershipType: customSkills.ownershipType,
               voteCount: customSkills.voteCount,
               trustLevel: customSkills.trustLevel,
@@ -149,7 +148,7 @@ export class CreatorProfileRepository {
             }))
           : [
               {
-                modelSelection: row.modelSelection,
+                modelSelection: variants?.[0]?.modelSelection,
                 variantId: null,
                 variantName: null,
                 isVariant: false,

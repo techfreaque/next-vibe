@@ -8,13 +8,12 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, logger, user, locale }) => {
-      return await ReceivablesAgingRepository.getReceivablesAging(
+    handler: async ({ data, logger, user, locale }) =>
+      ReceivablesAgingRepository.getReceivablesAging(
         data,
         logger,
         user,
         locale,
-      );
-    },
+      ),
   },
 });

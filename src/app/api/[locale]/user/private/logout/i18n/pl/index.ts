@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Wylogowanie Użytkownika",
+  titleShort: "Wyloguj",
   description: "Wylogowuje bieżącego użytkownika i unieważnia jego sesję",
   category: "Zarządzanie Użytkownikami",
   tag: "wylogowanie",

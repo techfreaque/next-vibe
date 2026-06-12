@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Session Cleanup",
+    titleShort: "Clean Sessions",
     description: "Clean up expired user sessions and tokens",
     tag: "Session Cleanup",
     container: {

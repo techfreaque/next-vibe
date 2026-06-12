@@ -1,5 +1,6 @@
 export const translations = {
   title: "Run Tests",
+  titleShort: "Run Tests",
   description: "Execute test suite with optional configurations",
   category: "Testing",
   tag: "Test",

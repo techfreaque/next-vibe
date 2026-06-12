@@ -10,6 +10,7 @@ export const translations: typeof enTranslations = {
   badge: "Benutzerdetails",
   get: {
     title: "Benutzer anzeigen",
+    titleShort: "Benutzer ansehen",
     description: "Detaillierte Informationen über einen Benutzer anzeigen",
     userId: {
       label: "Benutzer-ID",

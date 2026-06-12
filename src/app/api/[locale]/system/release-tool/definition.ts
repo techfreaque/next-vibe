@@ -31,7 +31,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import {
   requestDataArrayOptionalField,
   responseArrayOptionalField,
@@ -112,17 +112,18 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "release-tool"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.devTools",
-  subCategory: "endpointCategories.devToolsGenerators",
+  category: "devTools",
+  subCategory: "Generators",
   tags: ["tags.release"],
   icon: "rocket",
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.AI_TOOL_OFF,
     UserRole.WEB_OFF,
     UserRole.MCP_OFF,
-    UserRole.CLI_AUTH_BYPASS,
     UserRole.PRODUCTION_OFF,
   ] as const,
   aliases: ["release", "pub", "publish"],

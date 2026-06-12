@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "System",
   tags: {
     vibeFrame: "Vibe Frame",
@@ -8,6 +9,7 @@ export const translations = {
   },
   post: {
     title: "Konfiguracja Vibe Frame",
+    titleShort: "Vibe Frame",
     description:
       "Zwraca URL-e iframe dla żądanych integracji. Serwer odczytuje prawdziwe ciasteczka auth i tworzy krótkotrwałe tokeny wymiany.",
     container: {

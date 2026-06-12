@@ -1,5 +1,3 @@
-import { translations as retryTranslations } from "../../retry/i18n/de";
-import { translations as stopTranslations } from "../../stop/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -11,6 +9,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Import-Job abrufen",
+    titleShort: "Importauftrag",
     description: "Details eines bestimmten Import-Jobs abrufen",
     actions: {
       retry: "Wiederholen",
@@ -141,6 +140,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Import-Job aktualisieren",
+    titleShort: "Importauftrag bearbeiten",
     description: "Import-Job-Konfigurationseinstellungen aktualisieren",
     jobId: {
       label: "Job-ID",
@@ -283,6 +283,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Import-Job löschen",
+    titleShort: "Importauftrag löschen",
     description: "Einen bestimmten Import-Job löschen",
     jobId: {
       label: "Job-ID",
@@ -346,11 +347,165 @@ export const translations: typeof enTranslations = {
       description: "Import-Job erfolgreich gelöscht",
     },
   },
-  retry: retryTranslations,
-  stop: stopTranslations,
+  retry: {
+    category: "Datenimport",
+    tags: {
+      leads: "Leads",
+      management: "Verwaltung",
+    },
+
+    post: {
+      title: "Import-Job wiederholen",
+      description: "Einen fehlgeschlagenen Import-Job wiederholen",
+      jobId: {
+        label: "Job-ID",
+        description: "Eindeutige Kennung für den zu wiederholenden Import-Job",
+      },
+      form: {
+        title: "Import-Job wiederholen",
+        description: "Den fehlgeschlagenen Import-Job wiederholen",
+      },
+      response: {
+        title: "Wiederholungsergebnis",
+        description: "Ergebnis der Wiederholungsoperation",
+        success: {
+          content: "Erfolgsstatus",
+        },
+        message: {
+          content: "Wiederholungsnachricht",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Die angegebene Job-ID ist ungültig",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich, um Jobs zu wiederholen",
+        },
+        forbidden: {
+          title: "Zugriff verweigert",
+          description:
+            "Sie haben keine Berechtigung, diesen Job zu wiederholen",
+        },
+        notFound: {
+          title: "Job nicht gefunden",
+          description: "Kein Import-Job mit der angegebenen ID gefunden",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Beim Wiederholen des Jobs ist ein Fehler aufgetreten",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Verbindung zum Server nicht möglich",
+        },
+        unsavedChanges: {
+          title: "Nicht gespeicherte Änderungen",
+          description: "Sie haben nicht gespeicherte Änderungen",
+        },
+        conflict: {
+          title: "Wiederholungskonflikt",
+          description:
+            "Job kann nicht wiederholt werden, während er verarbeitet wird",
+        },
+      },
+      success: {
+        title: "Erfolg",
+        description: "Import-Job erfolgreich wiederholt",
+      },
+    },
+    widget: {
+      title: "Import-Job wiederholen",
+      successMessage: "Job-Wiederholung erfolgreich gestartet",
+    },
+  },
+  stop: {
+    category: "Datenimport",
+    tags: {
+      leads: "Leads",
+      management: "Verwaltung",
+    },
+
+    post: {
+      title: "Import-Job stoppen",
+      description: "Einen laufenden Import-Job stoppen",
+      jobId: {
+        label: "Job-ID",
+        description: "Eindeutige Kennung für den zu stoppenden Import-Job",
+      },
+      form: {
+        title: "Import-Job stoppen",
+        description: "Den laufenden Import-Job stoppen",
+      },
+      response: {
+        title: "Stoppergebnis",
+        description: "Ergebnis der Stoppoperation",
+        success: {
+          content: "Erfolgsstatus",
+        },
+        message: {
+          content: "Stoppnachricht",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Die angegebene Job-ID ist ungültig",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich, um Jobs zu stoppen",
+        },
+        forbidden: {
+          title: "Zugriff verweigert",
+          description: "Sie haben keine Berechtigung, diesen Job zu stoppen",
+        },
+        notFound: {
+          title: "Job nicht gefunden",
+          description: "Kein Import-Job mit der angegebenen ID gefunden",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Beim Stoppen des Jobs ist ein Fehler aufgetreten",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Verbindung zum Server nicht möglich",
+        },
+        unsavedChanges: {
+          title: "Nicht gespeicherte Änderungen",
+          description: "Sie haben nicht gespeicherte Änderungen",
+        },
+        conflict: {
+          title: "Stoppkonflikt",
+          description:
+            "Job kann nicht gestoppt werden, wenn er nicht verarbeitet wird",
+        },
+      },
+      success: {
+        title: "Erfolg",
+        description: "Import-Job erfolgreich gestoppt",
+      },
+    },
+    widget: {
+      title: "Import-Job stoppen",
+      successMessage: "Job erfolgreich gestoppt",
+    },
+  },
   widget: {
     status: {
       title: "Import-Job-Status",
+      jobId: "Job-ID",
       loadingJobStatus: "Job-Status wird geladen…",
       totalRows: "Gesamtzeilen",
       processed: "Verarbeitet",

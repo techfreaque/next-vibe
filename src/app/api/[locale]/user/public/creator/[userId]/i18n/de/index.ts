@@ -7,6 +7,7 @@ export const translations = {
   },
   get: {
     title: "Creator-Profil abrufen",
+    titleShort: "Creator-Profil",
     description:
       "Oeffentliches Creator-Profil mit Bio, Social-Links und Skills",
     form: {

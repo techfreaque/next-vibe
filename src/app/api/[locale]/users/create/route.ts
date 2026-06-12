@@ -7,11 +7,11 @@ import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
 import {
   userCreateAdminNotificationEmailTemplate,
   userCreateWelcomeEmailTemplate,
-} from "@/app/api/[locale]/user/public/signup/email";
-
+} from "../../user/public/signup/email";
 import definitions from "./definition";
 import { UserCreateRepository } from "./repository";
 
@@ -28,14 +28,7 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: true,
       },
     ],
-    handler: async ({ data, user, locale, logger, t }) => {
-      return await UserCreateRepository.createUser(
-        data,
-        user,
-        locale,
-        logger,
-        t,
-      );
-    },
+    handler: async ({ data, user, locale, logger, t }) =>
+      UserCreateRepository.createUser(data, user, locale, logger, t),
   },
 });

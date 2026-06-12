@@ -8,6 +8,7 @@ export const translations = {
   },
   post: {
     title: "Execute Pulse",
+    titleShort: "Execute Pulse",
     description: "Execute pulse health monitoring and task execution",
     container: {
       title: "Pulse Execution",

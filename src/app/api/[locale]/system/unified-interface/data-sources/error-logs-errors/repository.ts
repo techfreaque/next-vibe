@@ -22,7 +22,7 @@ import type {
   Resolution,
   TimeRange,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { errorLogs } from "../../tasks/error-monitor/db";
+import { errorLogs } from "@/app/api/[locale]/system/error-monitor/db";
 
 export class QueryErrorLogsErrorsRepository {
   static async queryErrorLogsErrors(data: {

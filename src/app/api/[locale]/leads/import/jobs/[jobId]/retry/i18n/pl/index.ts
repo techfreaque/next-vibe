@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Ponów zadanie importu",
+    titleShort: "Ponów import",
     description: "Ponów nieudane zadanie importu",
     jobId: {
       label: "ID zadania",

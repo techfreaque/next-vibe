@@ -3,6 +3,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Archive Graph",
+    titleShort: "Archive Graph",
     description: "Soft-delete a graph (deactivate and mark as archived)",
     fields: {
       id: { label: "Graph ID", description: "UUID of the graph to archive" },

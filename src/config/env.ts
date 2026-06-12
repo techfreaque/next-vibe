@@ -137,7 +137,7 @@ export const {
   VIBE_REMOTE_URL: {
     schema: z.string().url().default(DEFAULT_PROJECT_URL),
     example: DEFAULT_PROJECT_URL,
-    comment: "Remote server URL for `vibe --remote` CLI execution.",
+    comment: "Remote server URL for `vibe --thea` CLI execution.",
     commented: true,
     fieldType: "url",
   },
@@ -190,20 +190,44 @@ export const {
     commented: true,
     fieldType: "boolean",
   },
+  VIBE_LOG_TARGET: {
+    schema: z.enum(["file", "db", "none"]).optional(),
+    example: "file",
+    comment:
+      "Log persistence target. Auto-resolved from VIBE_SERVER_MODE if not set: atlas-dev/hermes-dev/mcp→file, hermes-prod→db. Values: 'file' (write to VIBE_LOG_PATH log files), 'db' (errors+warnings to error_logs table only, no file), 'none' (no persistence).",
+    commented: true,
+    fieldType: "select",
+    options: ["file", "db", "none"],
+  },
   VIBE_LOG_PATH: {
     schema: z
       .string()
       .optional()
       .default(".tmp")
-      .refine((v) => v === "false" || v.length > 0, {
-        message:
-          "VIBE_LOG_PATH must be a directory path or 'false' to disable file logging",
+      .refine((v) => v.length > 0, {
+        message: "VIBE_LOG_PATH must be a non-empty directory path",
       }),
     example: ".tmp",
     comment:
-      "Directory for server log files (vibe-start.log, vibe-dev.log, vibe-mcp.log). Defaults to .tmp. Set to an absolute or relative path to change location. Set to 'false' to disable file logging entirely. Auto-set by vibe dev/start if not configured.",
+      "Directory for server log files (.atlas.log, .hermes.log, .hermes-dev.log, .vibe-mcp.log). Only used when VIBE_LOG_TARGET=file. Defaults to .tmp. Set to an absolute or relative path to change location.",
     commented: true,
     fieldType: "log-path",
+  },
+  VIBE_LOG_FILE: {
+    schema: z.string().optional(),
+    example: false,
+    comment:
+      "Log filename within VIBE_LOG_PATH. Auto-resolved from VIBE_SERVER_MODE if not set: atlas-dev→.atlas.log, hermes-dev→.hermes-dev.log, hermes-prod→.hermes.log, mcp→.vibe-mcp.log. Override to send all modes to a custom file.",
+    commented: true,
+  },
+  VIBE_LOG_TIMESTAMP: {
+    schema: z.enum(["elapsed", "iso"]).optional(),
+    example: false,
+    comment:
+      "Timestamp format in log files. Auto-resolved from VIBE_SERVER_MODE if not set: elapsed (0.123s) for atlas-dev/hermes-dev, iso (HH:MM:SS.mmm) for hermes-prod/mcp. Only used when VIBE_LOG_TARGET=file.",
+    commented: true,
+    fieldType: "select",
+    options: ["elapsed", "iso"],
   },
   VIBE_DISABLE_PROXY: {
     schema: z

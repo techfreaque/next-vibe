@@ -83,11 +83,12 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import {
   scopedTranslation as chatScopedTranslation,
   type ChatT,
@@ -1113,6 +1114,7 @@ function FolderRow({
   const { t: tChat } = chatScopedTranslation.scopedT(locale);
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
   const activeFolderId = useChatNavigationStore((s) => s.currentSubFolderId);
+  const router = useRouter();
   const { initialSubFolderContentsData, initialSubFolderId } =
     useChatBootContext();
 
@@ -1123,7 +1125,21 @@ function FolderRow({
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
   const [newSubfolderDialogOpen, setNewSubfolderDialogOpen] = useState(false);
 
-  const isExpanded = activeFolderId === item.id;
+  // isExpanded: true when active folder is this folder OR any descendant of it
+  const isDescendantOrSelf = (
+    folderId: string | null,
+    ancestorId: string,
+  ): boolean => {
+    if (!folderId) {
+      return false;
+    }
+    if (folderId === ancestorId) {
+      return true;
+    }
+    const parent = allFolders.find((f) => f.id === folderId)?.parentId ?? null;
+    return isDescendantOrSelf(parent, ancestorId);
+  };
+  const isExpanded = isDescendantOrSelf(activeFolderId, item.id);
   const isActive = activeFolderId === item.id;
   const isDefault = isDefaultFolder(item.id);
   const isIncognito = activeRootFolderId === DefaultFolderId.INCOGNITO;
@@ -1174,7 +1190,12 @@ function FolderRow({
     if ("closest" in target && (target as Element).closest?.("button")) {
       return;
     }
-    handleToggleExpanded();
+    if (isExpanded) {
+      // Already in this folder — navigate to new thread without collapsing
+      handleCreateThreadInFolder();
+    } else {
+      handleToggleExpanded();
+    }
   };
 
   const handleCreateThreadInFolder = (): void => {
@@ -1346,6 +1367,27 @@ function FolderRow({
           requestData: { subFolderId: item.parentId ?? null, threadIds: null },
         },
       );
+      // Navigate away if currently inside the deleted folder
+      if (activeFolderId === item.id) {
+        setNavigation({
+          activeThreadId: NEW_MESSAGE_ID,
+          currentRootFolderId: activeRootFolderId,
+          currentSubFolderId: null,
+        });
+        window.history.pushState(
+          null,
+          "",
+          `/${locale}/threads/${activeRootFolderId}/${NEW_MESSAGE_ID}`,
+        );
+      }
+      // Navigate away if currently inside the deleted folder
+      if (activeFolderId === item.id) {
+        setNavigation({
+          currentRootFolderId: activeRootFolderId,
+          currentSubFolderId: null,
+        });
+        router.push(buildFolderUrl(locale, activeRootFolderId, null));
+      }
       if (isIncognito) {
         const { ChatFoldersRepositoryClient } =
           await import("../../folders/[rootFolderId]/repository-client");

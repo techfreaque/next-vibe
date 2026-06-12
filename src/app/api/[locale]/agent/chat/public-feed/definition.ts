@@ -61,10 +61,10 @@ const { GET } = createEndpoint({
   ] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "globe",
   category: "ai",
-  subCategory: "threadsManagement",
   tags: ["tags.publicFeed" as const],
 
   fields: customWidgetObject({

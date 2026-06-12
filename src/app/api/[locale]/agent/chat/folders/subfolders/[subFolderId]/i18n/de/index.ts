@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Chat",
   tags: {
     folders: "Ordner",
@@ -6,6 +7,7 @@ export const translations = {
 
   get: {
     title: "Ordner abrufen",
+    titleShort: "Unterordner",
     description: "Einen Ordner nach ID abrufen",
     container: {
       title: "Ordner",
@@ -72,6 +74,7 @@ export const translations = {
 
   delete: {
     title: "Ordner löschen",
+    titleShort: "Ordner löschen",
     description: "Einen Ordner nach ID löschen",
     container: {
       title: "Ordner löschen",

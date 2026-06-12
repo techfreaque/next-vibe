@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Awansuj do systemu",
+    titleShort: "Promuj wykres",
     description:
       "Awansuj graf admina do systemowego (tylko do odczytu, współdzielony)",
     fields: {

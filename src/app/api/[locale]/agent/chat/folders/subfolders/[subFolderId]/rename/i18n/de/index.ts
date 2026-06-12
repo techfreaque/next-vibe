@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
 
   patch: {
     title: "Ordner umbenennen",
+    titleShort: "Umbenennen",
     description: "Einen vorhandenen Ordner umbenennen",
     id: {
       label: "Ordner-ID",

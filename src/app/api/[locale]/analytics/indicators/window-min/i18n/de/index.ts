@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Fenster-Minimum",
+    titleShort: "Fenster-Min",
     description:
       "Gleitendes Fensterminimum - verfolgt den niedrigsten Wert in einem festen Fenster",
     fields: {

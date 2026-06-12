@@ -3,6 +3,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Utworzone linki udostępniania czatu",
+    titleShort: "Linki udostępniania",
     description:
       "Liczba utworzonych linków udostępniania wątków na przedział rozdzielczości",
     fields: {

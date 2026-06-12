@@ -1,9 +1,276 @@
-import { translations as engagementTranslations } from "../../engagement/i18n/en";
-import { translations as pixelTranslations } from "../../pixel/i18n/en";
-
 export const translations = {
-  engagement: engagementTranslations,
-  pixel: pixelTranslations,
+  engagement: {
+    category: "Lead Tracking",
+    tags: {
+      tracking: "Tracking",
+      engagement: "Engagement",
+    },
+    post: {
+      title: "Record Lead Engagement",
+      description: "Record a new engagement event for a lead",
+      form: {
+        title: "Lead Engagement Form",
+        description: "Record lead engagement details",
+      },
+      leadId: {
+        label: "Lead ID",
+        description: "Unique identifier for the lead",
+        placeholder: "Enter lead ID",
+        helpText: "UUID of the lead to track engagement for",
+      },
+      engagementType: {
+        label: "Engagement Type",
+        description: "Type of engagement event",
+        placeholder: "Select engagement type",
+        helpText: "The type of interaction or engagement",
+      },
+      campaignId: {
+        label: "Campaign ID",
+        description: "Associated campaign identifier",
+        placeholder: "Enter campaign ID",
+        helpText: "Optional campaign this engagement is part of",
+      },
+      metadata: {
+        label: "Metadata",
+        description: "Additional engagement metadata",
+        placeholder: "Enter metadata as JSON",
+        helpText: "Custom data about this engagement",
+      },
+      userId: {
+        label: "User ID",
+        description: "Associated user identifier",
+        placeholder: "Enter user ID",
+        helpText: "Optional user ID if lead is associated with a user",
+      },
+      response: {
+        id: "Engagement ID",
+        leadId: "Lead ID",
+        engagementType: "Engagement Type",
+        campaignId: "Campaign ID",
+        metadata: "Metadata",
+        timestamp: "Timestamp",
+        ipAddress: "IP Address",
+        userAgent: "User Agent",
+        createdAt: "Created At",
+        leadCreated: "Lead Created",
+        relationshipEstablished: "Relationship Established",
+      },
+      errors: {
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        validation: {
+          title: "Validation Error",
+          description: "Invalid request parameters",
+        },
+        server: {
+          title: "Server Error",
+          description: "Internal server error occurred",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unknown error occurred",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access forbidden",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "Resource not found",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "Data conflict occurred",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error occurred",
+        },
+        unsavedChanges: {
+          title: "Unsaved Changes",
+          description: "You have unsaved changes",
+        },
+      },
+      success: {
+        title: "Engagement Recorded",
+        description: "Lead engagement recorded successfully",
+      },
+    },
+    get: {
+      title: "Track Lead Click",
+      description: "Track lead click and redirect to target URL",
+      form: {
+        title: "Click Tracking Parameters",
+        description: "Parameters for click tracking and redirect",
+      },
+      id: {
+        label: "Lead ID",
+        description: "Unique identifier for the lead",
+        placeholder: "Enter lead ID",
+        helpText: "UUID of the lead to track click for",
+      },
+      stage: {
+        label: "Campaign Stage",
+        description: "Email campaign stage",
+        placeholder: "Select campaign stage",
+        helpText: "Optional campaign stage this click is part of",
+      },
+      source: {
+        label: "Lead Source",
+        description: "Source of the lead",
+        placeholder: "Select lead source",
+        helpText: "Source where the lead originated from",
+      },
+      url: {
+        label: "Target URL",
+        description: "URL to redirect to after tracking",
+        placeholder: "Enter target URL",
+        helpText: "The destination URL for redirection",
+      },
+      ref: {
+        label: "Reference ID",
+        description: "Reference identifier for tracking",
+        placeholder: "Enter reference ID",
+        helpText: "Optional reference ID for additional tracking context",
+      },
+      response: {
+        success: "Success",
+        redirectUrl: "Redirect URL",
+        leadId: "Lead ID",
+        campaignId: "Campaign ID",
+        engagementRecorded: "Engagement Recorded",
+        leadStatusUpdated: "Lead Status Updated",
+        isLoggedIn: "Is Logged In",
+      },
+      errors: {
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        validation: {
+          title: "Validation Error",
+          description: "Invalid request parameters",
+        },
+        server: {
+          title: "Server Error",
+          description: "Internal server error occurred",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unknown error occurred",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access forbidden",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "Resource not found",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "Data conflict occurred",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error occurred",
+        },
+        unsavedChanges: {
+          title: "Unsaved Changes",
+          description: "You have unsaved changes",
+        },
+      },
+      success: {
+        title: "Click Tracked",
+        description: "Lead click tracked successfully",
+      },
+    },
+    widget: {
+      post: {
+        headerTitle: "Record Engagement",
+        viewStatsTitle: "View Lead Statistics",
+        statsButton: "Stats",
+        loading: "Recording engagement\u2026",
+        successTitle: "Engagement Recorded",
+        successSubtitle: "successfully tracked",
+        event: "Event",
+        labels: {
+          engagementId: "Engagement ID",
+          type: "Type",
+          leadId: "Lead ID",
+          campaignId: "Campaign ID",
+          ipAddress: "IP Address",
+          recordedAt: "Recorded At",
+          leadCreated: "Lead Created",
+          leadCreatedYes: "Yes (new lead)",
+          leadCreatedNo: "No (existing)",
+          relationshipEst: "Relationship Est.",
+          relationshipYes: "Yes",
+          relationshipNo: "No",
+          metadata: "Metadata",
+        },
+        nextSteps: "Next steps:",
+        viewLeadButton: "View Lead",
+        leadStatsButton: "Lead Stats",
+        emptyTitle: "Track an Engagement Event",
+        emptyDescription:
+          "Fill in the form below and submit to record a new engagement event for a lead",
+        viewLeadStatsButton: "View Lead Stats",
+      },
+      get: {
+        headerTitle: "Click Tracking",
+        viewStatsTitle: "View Lead Statistics",
+        statsButton: "Stats",
+        loading: "Processing click tracking\u2026",
+        successTitle: "Click Tracked",
+        successSubtitle: "Engagement recorded and redirect URL ready",
+        failTitle: "Tracking Failed",
+        failSubtitle: "Could not record the click event",
+        labels: {
+          engagementLabel: "Engagement",
+          recorded: "Recorded",
+          notRecorded: "Not recorded",
+          leadStatusLabel: "Lead Status",
+          updated: "Updated",
+          unchanged: "Unchanged",
+          userLabel: "User",
+          loggedIn: "Logged in",
+          anonymous: "Anonymous",
+          leadId: "Lead ID",
+          campaignId: "Campaign ID",
+          redirectUrl: "Redirect URL",
+        },
+        nextSteps: "Next steps:",
+        openUrlButton: "Open URL",
+        viewLeadButton: "View Lead",
+        leadStatsButton: "Lead Stats",
+        emptyTitle: "Track a Click Event",
+        emptyDescription:
+          "Enter the tracking parameters below to record a click and retrieve the redirect URL",
+        viewLeadStatsButton: "View Lead Stats",
+      },
+    },
+    enums: {
+      engagementLevel: {
+        high: "High",
+        medium: "Medium",
+        low: "Low",
+        none: "None",
+      },
+    },
+    error: {
+      default: "An error occurred while processing the engagement",
+    },
+  },
+  pixel: {
+    category: "API Endpoint",
+    tags: {
+      pixel: "Pixel",
+    },
+    // Add endpoint-specific translations here
+  },
   existing: {
     found: "Existing lead tracking found",
   },

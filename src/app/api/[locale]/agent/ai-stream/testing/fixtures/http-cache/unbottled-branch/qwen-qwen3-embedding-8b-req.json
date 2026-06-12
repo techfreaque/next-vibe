@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The result returned by tool-help shows a categories array and a hint, but the tools array is empty ([]). The test requires a non-empty tools array. Let me check: the result says \"522 tools across 22 categories\" and \"matchedCount\":522, but \"tools\":[].\n\nWait, looking at the hint: \"Under 100 results shows tool names; under 5 shows full schemas.\" Since matchedCount is 522, which is over 100, it doesn't show tool names. So tools array is empty because there are too many results.\n\nThe user's instruction says: \"Check that the result contains a non-empty tools array and that each tool has a name and description.\"\n\nThe tools array is empty, so this fails. But wait — is this expected behavior? The hint explains that under 100 results it shows tool names. With 522 total tools, no tools are li\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nAssistant: <think> The user wants me to call tool-help with toolName='generate_image' and check that the result contains name, description, and parameters schema.</think>\n\nAssistant: <think> The result contains:\n- `name`: \"generate_image\"\n- `description`: \"Generate an image from a text prompt using AI\"\n- `parameters`: full JSON schema with properties like prompt, model, quality, size, aspectRatio, inputMediaUrl\n\nAll three are present. STEP_OK.</think> STEP_OK\n\nUser: [T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK",
+    "encoding_format": "float"
+  }
+}

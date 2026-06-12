@@ -23,7 +23,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { REBUILD_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -36,17 +36,20 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "server", "rebuild"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.server",
-  subCategory: "endpointCategories.serverManagement",
+  category: "devTools",
+  subCategory: "serverManagement",
   tags: ["tags.rebuild"],
   icon: "refresh-cw",
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.AI_TOOL_OFF,
     UserRole.WEB_OFF,
-    UserRole.CLI_AUTH_BYPASS,
   ],
+  // Local/dev mode only - generator includes ADMIN but constants.ts guards with LOCAL_MODE
+  defaultWebPinned: [UserRole.ADMIN] as const,
   aliases: [REBUILD_ALIAS, "re"],
 
   fields: customWidgetObject({

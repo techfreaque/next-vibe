@@ -43,6 +43,7 @@ export const translations = {
   },
   get: {
     title: "List Thread Messages",
+    titleShort: "Messages",
     description: "Retrieve all messages in a chat thread",
     container: {
       title: "Messages",
@@ -159,6 +160,7 @@ export const translations = {
   },
   post: {
     title: "Create Message",
+    titleShort: "Create Message",
     description: "Create a new message in a chat thread",
     form: {
       title: "New Message",

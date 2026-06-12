@@ -5,6 +5,16 @@
 
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "next-vibe-ui/ui/alert-dialog";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -13,7 +23,7 @@ import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 
 import {
   useWidgetContext,
@@ -59,14 +69,16 @@ const STATUS_COLORS: Record<string, string> = {
 function StatCard({
   label,
   value,
+  locale,
 }: {
   label: string;
   value: number | string;
+  locale: CountryLanguage;
 }): React.JSX.Element {
   return (
     <Div className="rounded-lg border p-3 text-center">
       <Div className="text-2xl font-bold tabular-nums">
-        {typeof value === "number" ? value.toLocaleString() : value}
+        {typeof value === "number" ? value.toLocaleString(locale) : value}
       </Div>
       <Div className="text-xs text-muted-foreground mt-1">{label}</Div>
     </Div>
@@ -76,9 +88,11 @@ function StatCard({
 function CodeRow({
   code,
   locale,
+  t,
 }: {
   code: ReferralCode;
   locale: CountryLanguage;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
   return (
     <Div className="flex items-start justify-between gap-3 py-3">
@@ -92,16 +106,22 @@ function CodeRow({
                 : "bg-muted text-muted-foreground"
             }
           >
-            {code.isActive ? "Active" : "Inactive"}
+            {code.isActive ? t("widget.codeActive") : t("widget.codeInactive")}
           </Badge>
         </Div>
         <Div className="text-sm text-muted-foreground">
           {code.ownerEmail || code.ownerName}
         </Div>
         <Div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <Span>{code.currentUses} clicks</Span>
-          <Span>{code.totalSignups} signups</Span>
-          <Span>{code.totalEarned.toLocaleString()} earned</Span>
+          <Span>
+            {code.currentUses} {t("widget.clicks")}
+          </Span>
+          <Span>
+            {code.totalSignups} {t("widget.signups")}
+          </Span>
+          <Span>
+            {code.totalEarned.toLocaleString(locale)} {t("widget.earned")}
+          </Span>
           <Span>{formatSimpleDate(code.createdAt, locale)}</Span>
         </Div>
       </Div>
@@ -138,7 +158,7 @@ function PayoutRow({
         </Div>
         <Div className="text-sm text-muted-foreground">
           <Span className="tabular-nums">
-            {payout.amountCents.toLocaleString()}
+            {payout.amountCents.toLocaleString(locale)}
           </Span>{" "}
           {payout.currency}
         </Div>
@@ -160,6 +180,7 @@ function PayoutRow({
         {payout.status === PayoutStatus.PENDING ? (
           <>
             <Button
+              type="button"
               size="sm"
               variant="outline"
               className="text-xs"
@@ -168,6 +189,7 @@ function PayoutRow({
               {t("widget.approve")}
             </Button>
             <Button
+              type="button"
               size="sm"
               variant="outline"
               className="text-xs text-destructive"
@@ -179,6 +201,7 @@ function PayoutRow({
         ) : null}
         {payout.status === PayoutStatus.APPROVED ? (
           <Button
+            type="button"
             size="sm"
             variant="outline"
             className="text-xs"
@@ -192,6 +215,11 @@ function PayoutRow({
   );
 }
 
+interface PendingAction {
+  requestId: string;
+  action: (typeof PayoutAction)[keyof typeof PayoutAction];
+}
+
 export function ReferralsContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
@@ -199,10 +227,14 @@ export function ReferralsContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
+  const { pop: goBack, canGoBack } = navigation;
   const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const data = useWidgetValue<typeof definition.GET>();
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(
+    null,
+  );
 
   const summary = data?.response?.summary;
   const codes = data?.response?.codes ?? [];
@@ -229,6 +261,15 @@ export function ReferralsContainer({
     requestId: string,
     action: (typeof PayoutAction)[keyof typeof PayoutAction],
   ): void => {
+    setPendingAction({ requestId, action });
+  };
+
+  const handleConfirm = (): void => {
+    if (!pendingAction) {
+      return;
+    }
+    const { requestId, action } = pendingAction;
+    setPendingAction(null);
     void (async (): Promise<void> => {
       const def = await import("./definition");
       navigation.push(def.POST, {
@@ -236,6 +277,12 @@ export function ReferralsContainer({
         popNavigationOnSuccess: 1,
       });
     })();
+  };
+
+  const handleDialogClose = (open: boolean): void => {
+    if (!open) {
+      setPendingAction(null);
+    }
   };
 
   if (isLoading) {
@@ -250,6 +297,18 @@ export function ReferralsContainer({
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b">
+        {canGoBack && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              goBack();
+            }}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        )}
         <Span className="font-semibold text-base mr-auto">
           {t("get.title")}
         </Span>
@@ -270,22 +329,27 @@ export function ReferralsContainer({
           <StatCard
             label={t("get.response.summary.totalCodes.label")}
             value={summary.totalCodes}
+            locale={locale}
           />
           <StatCard
             label={t("get.response.summary.totalSignups.label")}
             value={summary.totalSignups}
+            locale={locale}
           />
           <StatCard
             label={t("get.response.summary.totalEarned.label")}
             value={summary.totalEarned}
+            locale={locale}
           />
           <StatCard
             label={t("get.response.summary.totalPaidOut.label")}
             value={summary.totalPaidOut}
+            locale={locale}
           />
           <StatCard
             label={t("get.response.summary.pendingPayouts.label")}
             value={summary.pendingPayouts}
+            locale={locale}
           />
         </Div>
       ) : null}
@@ -318,7 +382,7 @@ export function ReferralsContainer({
         {codes.length > 0 ? (
           <Div className="divide-y">
             {codes.map((code) => (
-              <CodeRow key={code.code} code={code} locale={locale} />
+              <CodeRow key={code.code} code={code} locale={locale} t={t} />
             ))}
           </Div>
         ) : (
@@ -382,6 +446,27 @@ export function ReferralsContainer({
           </Div>
         </Div>
       )}
+
+      {/* Payout action confirmation dialog */}
+      <AlertDialog
+        open={pendingAction !== null}
+        onOpenChange={handleDialogClose}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("widget.confirm.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("widget.confirm.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("widget.confirm.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirm}>
+              {t("widget.confirm.proceed")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Div>
   );
 }

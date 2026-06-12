@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Campaign Stats API Route Handler
  */

@@ -5,6 +5,7 @@ export const translations = {
   },
   get: {
     title: "Get File",
+    titleShort: "Thread File",
     description: "Retrieve an uploaded file",
     success: {
       title: "File Retrieved",

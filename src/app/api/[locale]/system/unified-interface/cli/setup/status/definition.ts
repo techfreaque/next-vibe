@@ -20,6 +20,7 @@ import {
 
 import { UserRole } from "../../../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
+import { CLI_STATUS_ALIAS } from "./constants";
 
 /**
  * Setup Status Endpoint Definition
@@ -27,13 +28,14 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "terminal",
-  category: "endpointCategories.interfaces",
-  subCategory: "endpointCategories.interfacesCli",
+  category: "devTools",
+  subCategory: "interfacesCli",
   tags: ["post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
-  aliases: ["status", "setup:status"],
+  aliases: [CLI_STATUS_ALIAS] as const,
   method: Methods.POST,
   path: ["system", "setup", "status"],
   examples: {

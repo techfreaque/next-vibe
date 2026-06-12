@@ -17,6 +17,7 @@ export const translations = {
 
   get: {
     title: "SSH Connection",
+    titleShort: "SSH Connection",
     description: "View SSH connection details",
     fields: {
       id: { label: "Connection ID", description: "The connection to view" },
@@ -57,6 +58,7 @@ export const translations = {
   },
   patch: {
     title: "Update SSH Connection",
+    titleShort: "Update Connection",
     description: "Update SSH connection settings",
     fields: {
       id: { label: "Connection ID", description: "The connection to update" },
@@ -138,6 +140,7 @@ export const translations = {
   },
   delete: {
     title: "Delete SSH Connection",
+    titleShort: "Delete Connection",
     description: "Delete an SSH connection",
     fields: {
       id: { label: "Connection ID", description: "The connection to delete" },
@@ -189,5 +192,7 @@ export const translations = {
     deleteButton: "Delete Connection",
     testButton: "Test Connection",
     confirmDelete: "Delete this connection? This cannot be undone.",
+    mountsSection: "Mounted Directories",
+    manageMounts: "Manage Mounts",
   },
 };

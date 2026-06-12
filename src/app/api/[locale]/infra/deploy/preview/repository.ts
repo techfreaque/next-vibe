@@ -17,13 +17,13 @@ import type {
   DeployPreviewRequestOutput,
   DeployPreviewResponseOutput,
 } from "./definition";
-import type { DeployPreviewT } from "./i18n";
+import type { InfraT } from "../../i18n";
 
 export class DeployPreviewRepository {
   static async preview(
     data: DeployPreviewRequestOutput,
     logger: EndpointLogger,
-    t: DeployPreviewT,
+    t: InfraT,
   ): Promise<ResponseType<DeployPreviewResponseOutput>> {
     const start = Date.now();
 

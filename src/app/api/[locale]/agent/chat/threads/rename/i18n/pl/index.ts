@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Zmień nazwę wątku",
+    titleShort: "Zmień nazwę",
     description: "Zaktualizuj tytuł i podgląd wątku czatu",
     container: {
       title: "Zmień nazwę wątku",

@@ -4,12 +4,10 @@
  */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  LayoutType,
   Methods,
-  WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   lookbackRequestField,
@@ -23,24 +21,31 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { NEWSLETTER_CAMPAIGNS_SENT_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+const NewsletterCampaignsSentWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.NewsletterCampaignsSentWidget,
+  })),
+);
+
 const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [NEWSLETTER_CAMPAIGNS_SENT_ALIAS],
   method: Methods.POST,
   path: ["newsletter", "data-sources", "newsletter-campaigns-sent"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsDataSources",
-  subCategory: "endpointCategories.newsletterAnalytics",
+  category: "analytics",
+  subCategory: "newsletterData",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: NewsletterCampaignsSentWidget,
+    noFormElement: true,
+    usage: { request: "data", response: true } as const,
     children: {
       resolution: resolutionRequestField(scopedTranslation, {
         label: "post.fields.resolution.label",

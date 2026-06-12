@@ -1,4 +1,3 @@
-import { translations as rolesTranslations } from "../../roles/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -6,9 +5,160 @@ export const translations: typeof enTranslations = {
   tag: "Zarządzanie użytkownikami",
 
   id: {
-    roles: rolesTranslations.roles,
+    roles: {
+      post: {
+        title: "Dodaj rolę użytkownika",
+        description: "Przyznaj rolę do określonego konta użytkownika",
+        container: {
+          title: "Dodaj rolę",
+          description: "Wybierz rolę do przyznania temu użytkownikowi",
+        },
+        id: {
+          label: "ID użytkownika",
+          description:
+            "Unikalny identyfikator użytkownika, któremu ma być przyznana rola",
+          placeholder: "Wprowadź ID użytkownika...",
+        },
+        role: {
+          label: "Rola",
+          description: "Rola do przyznania użytkownikowi",
+          placeholder: "Wybierz rolę...",
+        },
+        submit: {
+          label: "Dodaj rolę",
+        },
+        response: {
+          roleId: {
+            content: "ID przypisania roli",
+          },
+          userId: {
+            content: "ID użytkownika",
+          },
+          assignedRole: {
+            content: "Przypisana rola",
+          },
+        },
+        errors: {
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description:
+              "Musisz być zalogowany, aby zarządzać rolami użytkowników",
+          },
+          validation: {
+            title: "Błąd walidacji",
+            description: "Podaj prawidłowe ID użytkownika i rolę",
+          },
+          forbidden: {
+            title: "Brak dostępu",
+            description:
+              "Tylko administratorzy mogą zarządzać rolami użytkowników",
+          },
+          notFound: {
+            title: "Użytkownik nie znaleziony",
+            description: "Nie można znaleźć podanego użytkownika",
+          },
+          conflict: {
+            title: "Rola już przypisana",
+            description: "Ten użytkownik ma już podaną rolę",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Nie można połączyć się z serwerem",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Masz niezapisane zmiany, które zostaną utracone",
+          },
+          server: {
+            title: "Błąd serwera",
+            description: "Nie można dodać roli z powodu błędu serwera",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieoczekiwany błąd podczas dodawania roli",
+          },
+        },
+        success: {
+          title: "Rola dodana",
+          description: "Rola została pomyślnie przyznana użytkownikowi",
+        },
+      },
+      delete: {
+        title: "Usuń rolę użytkownika",
+        description: "Odwołaj rolę od określonego konta użytkownika",
+        container: {
+          title: "Usuń rolę",
+          description: "Wybierz rolę do odwołania od tego użytkownika",
+        },
+        id: {
+          label: "ID użytkownika",
+          description:
+            "Unikalny identyfikator użytkownika, któremu ma być odwołana rola",
+          placeholder: "Wprowadź ID użytkownika...",
+        },
+        role: {
+          label: "Rola",
+          description: "Rola do odwołania od użytkownika",
+          placeholder: "Wybierz rolę...",
+        },
+        submit: {
+          label: "Usuń rolę",
+        },
+        response: {
+          success: {
+            content: "Rola usunięta",
+          },
+        },
+        errors: {
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description:
+              "Musisz być zalogowany, aby zarządzać rolami użytkowników",
+          },
+          validation: {
+            title: "Błąd walidacji",
+            description: "Podaj prawidłowe ID użytkownika i rolę",
+          },
+          forbidden: {
+            title: "Brak dostępu",
+            description:
+              "Tylko administratorzy mogą zarządzać rolami użytkowników",
+          },
+          notFound: {
+            title: "Użytkownik nie znaleziony",
+            description: "Nie można znaleźć podanego użytkownika",
+          },
+          conflict: {
+            title: "Błąd konfliktu",
+            description:
+              "Nie można usunąć roli z powodu istniejących zależności",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Nie można połączyć się z serwerem",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Masz niezapisane zmiany, które zostaną utracone",
+          },
+          server: {
+            title: "Błąd serwera",
+            description: "Nie można usunąć roli z powodu błędu serwera",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieoczekiwany błąd podczas usuwania roli",
+          },
+        },
+        success: {
+          title: "Rola usunięta",
+          description: "Rola została pomyślnie odwołana od użytkownika",
+        },
+      },
+    },
     get: {
       title: "Pobierz użytkownika",
+      titleShort: "Szczegóły użytkownika",
       description: "Pobierz szczegółowe informacje o konkretnym użytkowniku",
       container: {
         title: "Szczegóły użytkownika",
@@ -226,6 +376,7 @@ export const translations: typeof enTranslations = {
     },
     put: {
       title: "Aktualizuj użytkownika",
+      titleShort: "Zaktualizuj użytkownika",
       description: "Aktualizuj informacje o użytkowniku i szczegóły profilu",
       container: {
         title: "Aktualizuj użytkownika",
@@ -437,6 +588,7 @@ export const translations: typeof enTranslations = {
     },
     delete: {
       title: "Usuń użytkownika",
+      titleShort: "Usuń użytkownika",
       description: "Trwale usuń konto użytkownika",
       container: {
         title: "Usuń użytkownika",
@@ -539,6 +691,327 @@ export const translations: typeof enTranslations = {
       titleReferralCodes: "Kody polecenia i statystyki",
       titleSubscription: "Wyświetl subskrypcję",
       titleCopyUserId: "Kopiuj ID użytkownika",
+    },
+    getCrm: {
+      get: {
+        title: "Pobierz profil CRM użytkownika",
+        titleShort: "Profil CRM",
+        description: "Pobierz pola rozliczeniowe i liczbę notatek użytkownika",
+        fields: {
+          userId: {
+            label: "ID użytkownika",
+            description: "Użytkownik do pobrania",
+            placeholder: "UUID użytkownika",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Nieprawidłowe ID użytkownika",
+          },
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description: "Musisz być zalogowany",
+          },
+          forbidden: {
+            title: "Brak dostępu",
+            description: "Nie masz dostępu do danych CRM tego użytkownika",
+          },
+          notFound: {
+            title: "Nie znaleziono",
+            description: "Użytkownik nie istnieje",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Wystąpił konflikt",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Żądanie sieciowe nie powiodło się",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Są niezapisane zmiany",
+          },
+          internal: {
+            title: "Błąd wewnętrzny",
+            description: "Błąd serwera — spróbuj ponownie",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieoczekiwany błąd",
+          },
+        },
+        success: {
+          title: "Profil CRM załadowany",
+          description: "Dane CRM użytkownika pobrane",
+        },
+        widget: {
+          addNote: "Dodaj notatkę",
+          viewNotes: "Zobacz notatki",
+        },
+        response: {
+          id: "ID użytkownika",
+          email: "E-mail",
+          privateName: "Imię i nazwisko",
+          companyBillingName: "Firma / nazwa rozliczeniowa",
+          vatNumber: "Numer VAT",
+          taxId: "NIP / REGON",
+          phone: "Telefon",
+          addressLine1: "Adres (wiersz 1)",
+          addressLine2: "Adres (wiersz 2)",
+          city: "Miasto",
+          region: "Województwo / region",
+          postalCode: "Kod pocztowy",
+          billingCountry: "Kraj",
+          defaultCurrency: "Domyślna waluta",
+          paymentTermsDays: "Termin płatności (dni)",
+          notesCount: "Łączna liczba notatek",
+        },
+      },
+      tag: "CRM",
+    },
+    notesCreate: {
+      post: {
+        title: "Utwórz notatkę użytkownika",
+        titleShort: "Utwórz notatkę",
+        description:
+          "Dodaj notatkę CRM, log rozmowy, e-mail, spotkanie lub zadanie dla użytkownika",
+        fields: {
+          userId: {
+            label: "Użytkownik",
+            description: "Użytkownik, którego dotyczy ta notatka",
+            placeholder: "Wybierz użytkownika",
+          },
+          type: {
+            label: "Typ aktywności",
+            description: "Rodzaj rejestrowanej interakcji",
+            placeholder: "Wybierz typ",
+          },
+          content: {
+            label: "Treść",
+            description: "Szczegóły aktywności",
+            placeholder: "Opisz co się stało...",
+          },
+          isPrivate: {
+            label: "Prywatna",
+            description: "Prywatne notatki widoczne są tylko dla Ciebie",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Sprawdź pola i spróbuj ponownie",
+          },
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description: "Musisz być zalogowany",
+          },
+          forbidden: {
+            title: "Brak dostępu",
+            description: "Nie masz dostępu do tego użytkownika",
+          },
+          notFound: {
+            title: "Nie znaleziono",
+            description: "Użytkownik nie istnieje",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Wystąpił konflikt",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Żądanie sieciowe nie powiodło się",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Są niezapisane zmiany",
+          },
+          internal: {
+            title: "Błąd wewnętrzny",
+            description: "Błąd serwera — spróbuj ponownie",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieoczekiwany błąd",
+          },
+        },
+        success: {
+          title: "Notatka utworzona",
+          description: "Notatka została zapisana",
+        },
+        widget: {
+          created: "Notatka utworzona",
+          noteId: "ID notatki",
+          backToNotes: "Wróć do notatek",
+        },
+        response: {
+          id: "ID notatki",
+          userId: "ID użytkownika",
+          authorUserId: "ID autora",
+          type: "Typ",
+          content: "Treść",
+          isPrivate: "Prywatna",
+          createdAt: "Utworzono",
+          updatedAt: "Zaktualizowano",
+        },
+      },
+      tag: "CRM",
+    },
+    notesList: {
+      get: {
+        title: "Lista notatek użytkownika",
+        titleShort: "Notatki użytkownika",
+        description:
+          "Wyświetl notatki CRM dla użytkownika, z filtrowaniem po typie i widoczności",
+        fields: {
+          userId: {
+            label: "ID użytkownika",
+            description: "Czyje notatki wyświetlić",
+            placeholder: "UUID użytkownika",
+          },
+          type: {
+            label: "Typ",
+            description: "Filtruj po typie aktywności",
+            placeholder: "Wszystkie typy",
+          },
+          isPrivate: {
+            label: "Tylko prywatne",
+            description: "Pokaż tylko swoje prywatne notatki",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Sprawdź filtry i spróbuj ponownie",
+          },
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description: "Musisz być zalogowany",
+          },
+          forbidden: {
+            title: "Brak dostępu",
+            description: "Nie masz dostępu do tych notatek",
+          },
+          notFound: {
+            title: "Nie znaleziono",
+            description: "Użytkownik nie istnieje",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Wystąpił konflikt",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Żądanie sieciowe nie powiodło się",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Są niezapisane zmiany",
+          },
+          internal: {
+            title: "Błąd wewnętrzny",
+            description: "Błąd serwera — spróbuj ponownie",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieoczekiwany błąd",
+          },
+        },
+        success: {
+          title: "Notatki załadowane",
+          description: "Notatki pobrane pomyślnie",
+        },
+        widget: {
+          addNote: "Dodaj notatkę",
+          total: "Łącznie",
+          empty: "Brak notatek",
+          delete: "Usuń",
+          private: "Prywatna",
+          ago: "temu",
+        },
+        response: {
+          notes: "Notatki",
+          total: "Łącznie",
+          note: {
+            id: "ID notatki",
+            userId: "ID użytkownika",
+            authorUserId: "ID autora",
+            type: "Typ",
+            content: "Treść",
+            isPrivate: "Prywatna",
+            createdAt: "Utworzono",
+            updatedAt: "Zaktualizowano",
+          },
+        },
+      },
+      tag: "CRM",
+    },
+    noteDelete: {
+      post: {
+        title: "Usuń notatkę użytkownika",
+        titleShort: "Usuń notatkę",
+        description:
+          "Usuń notatkę CRM — tylko autor lub administrator może to zrobić",
+        fields: {
+          noteId: {
+            label: "ID notatki",
+            description: "Notatka do usunięcia",
+            placeholder: "UUID notatki",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Nieprawidłowe ID notatki",
+          },
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description: "Musisz być zalogowany",
+          },
+          forbidden: {
+            title: "Brak dostępu",
+            description: "Tylko autor lub administrator może usunąć tę notatkę",
+          },
+          notFound: {
+            title: "Nie znaleziono",
+            description: "Notatka nie istnieje",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Wystąpił konflikt",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Żądanie sieciowe nie powiodło się",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Są niezapisane zmiany",
+          },
+          internal: {
+            title: "Błąd wewnętrzny",
+            description: "Błąd serwera — spróbuj ponownie",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieoczekiwany błąd",
+          },
+        },
+        success: {
+          title: "Notatka usunięta",
+          description: "Notatka została trwale usunięta",
+        },
+        widget: {
+          warning: "Ta notatka zostanie trwale usunięta.",
+          deleted: "Notatka usunięta.",
+          backToNotes: "Wróć do notatek",
+        },
+        response: {
+          deleted: "Usunięta",
+        },
+      },
+      tag: "CRM",
     },
   },
 };

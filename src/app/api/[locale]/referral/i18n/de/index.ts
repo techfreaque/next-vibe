@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
   // GET endpoint (get referral code)
   get: {
     title: "Empfehlungscode abrufen",
+    titleShort: "Code abrufen",
     description: "Empfehlungscode-Details abrufen",
     form: {
       title: "Empfehlungscode-Details",
@@ -49,6 +50,7 @@ export const translations: typeof enTranslations = {
   // POST endpoint (create referral code)
   post: {
     title: "Empfehlungscode erstellen",
+    titleShort: "Code erstellen",
     description: "Neuen Empfehlungscode erstellen",
     form: {
       title: "Empfehlungscode erstellen",
@@ -84,6 +86,7 @@ export const translations: typeof enTranslations = {
   linkToLead: {
     post: {
       title: "Empfehlung mit Lead verknüpfen",
+      titleShort: "Lead verknüpfen",
       description: "Empfehlungscode vor der Anmeldung mit Lead verknüpfen",
       form: {
         title: "Empfehlungscode verknüpfen",
@@ -101,6 +104,7 @@ export const translations: typeof enTranslations = {
     list: {
       get: {
         title: "Empfehlungscodes auflisten",
+        titleShort: "Meine Codes",
         description: "Alle Ihre Empfehlungscodes mit Statistiken abrufen",
         form: {
           title: "Ihre Empfehlungscodes",
@@ -150,6 +154,7 @@ export const translations: typeof enTranslations = {
   stats: {
     get: {
       title: "Empfehlungsstatistiken",
+      titleShort: "Statistiken",
       description: "Ihre Empfehlungsprogramm-Statistiken abrufen",
       form: {
         title: "Ihre Empfehlungsstatistiken",
@@ -188,6 +193,7 @@ export const translations: typeof enTranslations = {
     list: {
       get: {
         title: "Empfehlungseinnahmen auflisten",
+        titleShort: "Einnahmen",
         description: "Ihre Empfehlungseinnahmen-Historie abrufen",
         form: {
           title: "Ihre Empfehlungseinnahmen",
@@ -273,10 +279,12 @@ export const translations: typeof enTranslations = {
     payouts: {
       get: {
         title: "Auszahlungsanfragen",
+        titleShort: "Auszahlungen",
         description: "Empfehlungs-Auszahlungsanfragen verwalten",
       },
       post: {
         title: "Auszahlung verarbeiten",
+        titleShort: "Auszahlung bearb.",
         description: "Auszahlungsanfrage genehmigen, ablehnen oder abschließen",
       },
       fields: {
@@ -315,10 +323,12 @@ export const translations: typeof enTranslations = {
   payout: {
     get: {
       title: "Ihre Einnahmen",
+      titleShort: "Meine Einnahmen",
       description: "Ihre Empfehlungseinnahmen und Auszahlungshistorie anzeigen",
     },
     post: {
       title: "Auszahlung beantragen",
+      titleShort: "Auszahlung anfragen",
       description: "Ihre Empfehlungseinnahmen auszahlen",
     },
     fields: {

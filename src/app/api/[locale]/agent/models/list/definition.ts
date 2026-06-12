@@ -21,7 +21,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ContentLevel, IntelligenceLevel } from "../../chat/skills/enum";
@@ -44,6 +44,7 @@ const { GET } = createEndpoint({
   ] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   dynamicTitle: ({ response }) => {
     if (response?.models) {
@@ -55,8 +56,8 @@ const { GET } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiInference",
+  category: "ai",
+  subCategory: "Inference",
   tags: ["tags.models" as const],
   aliases: [MODEL_LIST_ALIAS, "list-models"],
 

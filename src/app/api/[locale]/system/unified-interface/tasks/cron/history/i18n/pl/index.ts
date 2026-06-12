@@ -15,6 +15,7 @@ export const translations: typeof enTranslations = {
       monitoring: "Monitorowanie",
     },
     title: "Historia wykonań zadań",
+    titleShort: "Historia zadań",
     description: "Wyświetl historyczne rekordy wykonań zadań cron",
     fields: {
       taskId: {

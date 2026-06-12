@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   description: "Zatrzymaj wszystkie aktywne kampanie e-mailowe",
   post: {
     title: "Zatrzymaj wszystkie kampanie",
+    titleShort: "Zatrzymaj kampanie",
     description:
       "Natychmiast zatrzymaj wszystkie aktywne kampanie e-mailowe i anuluj oczekujące wysyłki",
     fields: {

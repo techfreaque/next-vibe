@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Environment Generator",
+    titleShort: "Env Generator",
     description: "Generate consolidated environment configuration files",
     form: {
       title: "Environment Configuration",

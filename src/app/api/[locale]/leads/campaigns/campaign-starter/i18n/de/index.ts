@@ -49,6 +49,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Kampagnenstarter",
+    titleShort: "Kampagne starten",
     description: "Kampagnen für neue Leads starten",
     errors: {
       unauthorized: {
@@ -111,6 +112,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Campaign-Starter-Konfiguration abrufen",
+    titleShort: "Kampagnenkonfiguration",
     description: "Campaign-Starter-Konfiguration laden",
     errors: {
       unauthorized: {
@@ -289,6 +291,15 @@ export const translations: typeof enTranslations = {
       advanced: "Erweitert",
       advancedDescription:
         "Task-Ausführungseinstellungen wie Priorität, Timeouts und Wiederholungsverhalten.",
+    },
+    days: {
+      mon: "Mo",
+      tue: "Di",
+      wed: "Mi",
+      thu: "Do",
+      fri: "Fr",
+      sat: "Sa",
+      sun: "So",
     },
   },
 };

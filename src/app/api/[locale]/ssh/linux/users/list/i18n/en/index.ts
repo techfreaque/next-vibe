@@ -16,6 +16,7 @@ export const translations = {
 
   get: {
     title: "List Linux Users",
+    titleShort: "Linux Users",
     description: "List OS user accounts on the host (uid >= 1000)",
     fields: {
       connectionId: {

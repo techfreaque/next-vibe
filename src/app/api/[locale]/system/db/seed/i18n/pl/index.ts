@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
   tag: "seed",
   post: {
     title: "Zasiew bazy danych",
+    titleShort: "Zasiej DB",
     description: "Wypełnij bazę danych danymi",
     form: {
       title: "Konfiguracja zasiewu",

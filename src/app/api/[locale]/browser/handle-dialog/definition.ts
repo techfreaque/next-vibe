@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,7 +31,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "handle-dialog"],
+  aliases: ["browser-handle-dialog"] as const,
   title: "handle-dialog.title",
+  titleShort: "handle-dialog.titleShort",
   description: "handle-dialog.description",
   dynamicTitle: ({ request }) => {
     if (request?.action) {
@@ -41,8 +44,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserInteraction",
+  category: "browser",
+  subCategory: "Interaction",
   icon: "message-square",
   tags: [
     "handle-dialog.tags.browserAutomation",
@@ -88,6 +91,8 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Optional prompt text to enter into the dialog"),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

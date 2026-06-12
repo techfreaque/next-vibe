@@ -3,6 +3,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   get: {
     title: "Graph Version History",
+    titleShort: "Graph Versions",
     description:
       "Get the version chain for a graph (ancestor walk via parentVersionId)",
     fields: {

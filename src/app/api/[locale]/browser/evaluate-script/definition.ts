@@ -22,8 +22,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { BROWSER_EVAL_ALIAS } from "./constants";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -33,7 +35,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "evaluate-script"],
+  aliases: [BROWSER_EVAL_ALIAS] as const,
   title: "evaluate-script.title",
+  titleShort: "evaluate-script.titleShort",
   description: "evaluate-script.description",
   dynamicTitle: ({ request }) => {
     const fn = request?.function;
@@ -46,8 +50,8 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserDevTools",
+  category: "browser",
+  subCategory: "DevTools",
   icon: "code",
   tags: [
     "evaluate-script.tags.browserAutomation",
@@ -101,6 +105,8 @@ const { POST } = createEndpoint({
           },
         }),
       ),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

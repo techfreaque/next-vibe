@@ -4,6 +4,7 @@ export const translations = {
     folders: "Folders",
   },
   title: "Create Folder",
+  titleShort: "New Folder",
   description: "Create a new folder",
   config: {
     folders: {

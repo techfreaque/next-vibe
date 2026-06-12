@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Use cortex-write to create /memories/spec-test/life-career.md with this exact content:\n\n---\npriority: 80\ntags: [life, career]\nlast-dreamed: 2026-04-23\n---\n\n## Current State\nBuilding unbottled.ai, a free-speech AI platform.\n\n## Goals\n- Short-term: Launch v1 with 50+ models\n- Medium-term: 10k users\n- Long-term: Become the default AI layer for open web\n\n## Blockers\nNone currently.\n\nAfter writing, confirm it was created and quote the path back.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
+    "encoding_format": "float"
+  }
+}

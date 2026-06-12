@@ -1,19 +1,16 @@
-/**
- * User Address Update/Delete Widget
- * Shows result for PATCH (update) and DELETE operations on a specific address.
- */
-
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
+import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import type { JSX } from "react";
 
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type definition from "./definition";
 
@@ -31,18 +28,16 @@ export function UserAddressPatchContainer(): JSX.Element {
   };
 
   if (!data) {
-    return <Div />;
+    return <LoadingBlock />;
   }
 
   return (
-    <Div className="space-y-4">
-      <Div className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
-        {t("update.widget.updated")}
-      </Div>
+    <WidgetShell>
+      <WidgetHeader title={t("update.success.title")} />
       <Button size="sm" variant="outline" onClick={handleBack}>
         {t("update.widget.backToAddresses")}
       </Button>
-    </Div>
+    </WidgetShell>
   );
 }
 
@@ -60,17 +55,15 @@ export function UserAddressDeleteContainer(): JSX.Element {
   };
 
   if (!data) {
-    return <Div />;
+    return <LoadingBlock />;
   }
 
   return (
-    <Div className="space-y-4">
-      <Div className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
-        {t("delete.widget.deleted")}
-      </Div>
+    <WidgetShell>
+      <WidgetHeader title={t("delete.success.title")} />
       <Button size="sm" variant="outline" onClick={handleBack}>
         {t("delete.widget.backToAddresses")}
       </Button>
-    </Div>
+    </WidgetShell>
   );
 }

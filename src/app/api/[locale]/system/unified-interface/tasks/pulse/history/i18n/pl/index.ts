@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "Zarządzanie zadaniami",
 
   tags: {
@@ -12,6 +13,7 @@ export const translations = {
 
   get: {
     title: "Historia wykonań Pulse",
+    titleShort: "Historia Pulse",
     description: "Przeglądaj historyczne cykle wykonań Pulse",
     fields: {
       startDate: {

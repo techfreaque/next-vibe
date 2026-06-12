@@ -1,4 +1,5 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   tags: {
     models: "Modelle",
   },
@@ -6,7 +7,8 @@ export const translations = {
     ai: "KI",
   },
   get: {
-    title: "KI-Modelle auflisten",
+    title: "Modelle",
+    titleShort: "KI-Modelle",
     description:
       "Alle verfügbaren KI-Modelle durchsuchen und filtern. Nach Typ, Inhaltsstufe, Intelligenz, Preis oder Fähigkeiten filtern.",
     dynamicTitle: "{{count}} Modelle",
@@ -119,12 +121,10 @@ export const translations = {
       supportsTools: "✓ Tools",
       noModels: "Keine Modelle entsprechen deinen Filtern.",
       allLabel: "Alle",
-      pageLabel: "Seite {{current}}/{{total}}",
       statsLabel: "{{matched}} von {{total}} Modellen",
-      statsLabelFiltered: "{{matched}} gefiltert",
       free: "Kostenlos",
       credits: "~{{cost}} Credits",
       ctx: "Kontext",
     },
   },
-} as const;
+};

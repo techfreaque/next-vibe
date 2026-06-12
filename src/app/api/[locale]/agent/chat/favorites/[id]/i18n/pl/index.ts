@@ -12,6 +12,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Pobierz ulubiony",
+    titleShort: "Ulubiony",
     description: "Pobierz konkretną ulubioną konfigurację",
     container: {
       title: "Szczegóły ulubionego",
@@ -149,6 +150,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Aktualizuj ulubiony",
+    titleShort: "Edytuj ulubiony",
     description: "Aktualizuj istniejącą ulubioną konfigurację",
     container: {
       title: "Edytuj ulubiony",
@@ -418,6 +420,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Usuń ulubiony",
+    titleShort: "Usuń ulubiony",
     description: "Usuń ulubioną konfigurację",
     container: {
       title: "Usuń ulubiony",

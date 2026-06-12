@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "System",
   get: {
     title: "Eksportuj środowisko produkcyjne",
+    titleShort: "Eksportuj env",
     description:
       "Generuje plik .env gotowy do wdrożenia z odszyfrowanymi wartościami, instrukcjami wdrożenia i listą kontrolną",
     tags: {

@@ -45,7 +45,7 @@ import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hoo
 import {
   useWidgetLogger,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

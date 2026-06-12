@@ -43,10 +43,11 @@ const { POST } = createEndpoint({
     "bollinger",
   ],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "activity",
-  category: "endpointCategories.analyticsIndicators",
-  subCategory: "endpointCategories.analyticsIndicators",
+  category: "analytics",
+  subCategory: "Indicators",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 

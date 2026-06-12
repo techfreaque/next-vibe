@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Graph archivieren",
+    titleShort: "Graph archivieren",
     description:
       "Graph weich loeschen (deaktivieren und als archiviert markieren)",
     fields: {

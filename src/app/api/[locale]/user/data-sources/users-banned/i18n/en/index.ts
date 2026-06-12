@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Users Banned",
+    titleShort: "Banned Users",
     description: "Count of banned users per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },

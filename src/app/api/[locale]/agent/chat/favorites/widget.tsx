@@ -28,6 +28,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Compass } from "next-vibe-ui/ui/icons/Compass";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
@@ -52,24 +53,25 @@ import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hoo
 import {
   arrayFieldPath,
   withValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
+} from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetContext,
   useWidgetNavigation,
   useWidgetSelector,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import IconWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/icon/widget";
-import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import IconWidget from "next-vibe-ui/unified/display-only/icon/widget";
+import TextWidget from "next-vibe-ui/unified/display-only/text/widget";
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 
 import { cn } from "../../../shared/utils";
-import BadgeWidget from "../../../system/unified-interface/unified-ui/widgets/display-only/badge/widget";
+import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
 import {
   Icon,
   type IconKey,
-} from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+} from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import { getTtsModelById } from "../../text-to-speech/models";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
@@ -226,6 +228,7 @@ const FullCard = React.memo(function FullCard({
   navigate,
   locale,
   isTouch,
+  isPickerMode,
   dragAttributes,
   dragListeners,
   logger,
@@ -238,6 +241,7 @@ const FullCard = React.memo(function FullCard({
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   locale: CountryLanguage;
   isTouch: boolean;
+  isPickerMode: boolean;
   dragAttributes: DraggableAttributes;
   dragListeners: DraggableSyntheticListeners;
   logger: ReturnType<typeof useWidgetContext>["logger"];
@@ -334,47 +338,49 @@ const FullCard = React.memo(function FullCard({
           )}
         </Div>
       </Div>
-      <Div
-        className={cn(
-          "absolute top-1 right-1 flex gap-0.5",
-          isTouch
-            ? "opacity-100"
-            : "opacity-0 group-hover:opacity-100 transition-opacity",
-        )}
-        onClick={(e) => e.stopPropagation()}
-      >
+      {!isPickerMode && (
         <Div
-          {...dragAttributes}
-          {...dragListeners}
-          className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+          className={cn(
+            "absolute top-1 right-1 flex gap-0.5",
+            isTouch
+              ? "opacity-100"
+              : "opacity-0 group-hover:opacity-100 transition-opacity",
+          )}
+          onClick={(e) => e.stopPropagation()}
         >
-          <Icon icon={"grip"} className="h-4 w-4" />
-        </Div>
-        {!isActive && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              void handleSelectFavorite(item);
-            }}
+          <Div
+            {...dragAttributes}
+            {...dragListeners}
+            className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
           >
-            <Zap className="h-4 w-4" />
-          </Button>
-        )}
-        {item.skillId !== NO_SKILL_ID && (
-          <AddVariantButton
-            skillId={item.skillId}
-            navigate={navigate}
-            logger={logger}
-            user={user}
-            locale={locale}
-          />
-        )}
-        <EditFavoriteButton item={item} navigate={navigate} />
-      </Div>
+            <Icon icon={"grip"} className="h-4 w-4" />
+          </Div>
+          {!isActive && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                void handleSelectFavorite(item);
+              }}
+            >
+              <Zap className="h-4 w-4" />
+            </Button>
+          )}
+          {item.skillId !== NO_SKILL_ID && (
+            <AddVariantButton
+              skillId={item.skillId}
+              navigate={navigate}
+              logger={logger}
+              user={user}
+              locale={locale}
+            />
+          )}
+          <EditFavoriteButton item={item} navigate={navigate} />
+        </Div>
+      )}
     </Div>
   );
 });
@@ -395,6 +401,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
   navigate,
   locale,
   isTouch,
+  isPickerMode,
 }: {
   item: FavoriteCard;
   index: number;
@@ -403,6 +410,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   locale: CountryLanguage;
   isTouch: boolean;
+  isPickerMode: boolean;
 }): React.JSX.Element {
   const variantLabel = getVariantLabel(item, locale);
   const {
@@ -528,39 +536,41 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
             ) : null}
           </Div>
         </Div>
-        {/* Action buttons - floating absolute overlay, visible on hover */}
-        <Div
-          className={cn(
-            "absolute top-0 right-0 flex gap-0.5 h-full items-center pr-0.5",
-            isTouch
-              ? "opacity-100"
-              : "opacity-0 group-hover/row:opacity-100 transition-opacity",
-          )}
-          onClick={(e) => e.stopPropagation()}
-        >
+        {/* Action buttons - floating absolute overlay, visible on hover (hidden in picker mode) */}
+        {!isPickerMode && (
           <Div
-            {...attributes}
-            {...listeners}
-            className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-7 w-7 rounded hover:bg-accent hover:text-accent-foreground transition-colors"
+            className={cn(
+              "absolute top-0 right-0 flex gap-0.5 h-full items-center pr-0.5",
+              isTouch
+                ? "opacity-100"
+                : "opacity-0 group-hover/row:opacity-100 transition-opacity",
+            )}
+            onClick={(e) => e.stopPropagation()}
           >
-            <Icon icon="grip" className="h-3 w-3" />
-          </Div>
-          {!isActive && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0 text-primary"
-              onClick={(e) => {
-                e.stopPropagation();
-                void handleSelectFavorite(item);
-              }}
+            <Div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-7 w-7 rounded hover:bg-accent hover:text-accent-foreground transition-colors"
             >
-              <Zap className="h-3 w-3" />
-            </Button>
-          )}
-          <EditFavoriteButton item={item} navigate={navigate} size="sm" />
-        </Div>
+              <Icon icon="grip" className="h-3 w-3" />
+            </Div>
+            {!isActive && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 text-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  void handleSelectFavorite(item);
+                }}
+              >
+                <Zap className="h-3 w-3" />
+              </Button>
+            )}
+            <EditFavoriteButton item={item} navigate={navigate} size="sm" />
+          </Div>
+        )}
       </Div>
     </Div>
   );
@@ -584,6 +594,7 @@ const SortableGroup = React.memo(function SortableGroup({
   locale,
   onItemDragEnd,
   isTouch,
+  isPickerMode,
   logger,
   user,
 }: {
@@ -595,6 +606,7 @@ const SortableGroup = React.memo(function SortableGroup({
   locale: CountryLanguage;
   onItemDragEnd: (groupId: string, event: DragEndEvent) => void;
   isTouch: boolean;
+  isPickerMode: boolean;
   logger: ReturnType<typeof useWidgetContext>["logger"];
   user: ReturnType<typeof useWidgetContext>["user"];
 }): React.JSX.Element {
@@ -625,6 +637,9 @@ const SortableGroup = React.memo(function SortableGroup({
     [group.id, onItemDragEnd],
   );
 
+  // Multi-variant groups collapse their rows - a click anywhere on the group toggles
+  const [variantsExpanded, setVariantsExpanded] = useState(false);
+
   const isModelOnly = group.skillId === NO_SKILL_ID;
   const isSingle = group.items.length === 1;
   const singleIsActive = isSingle && Boolean(group.items[0].activeBadge);
@@ -653,6 +668,7 @@ const SortableGroup = React.memo(function SortableGroup({
           navigate={navigate}
           locale={locale}
           isTouch={isTouch}
+          isPickerMode={isPickerMode}
           dragAttributes={attributes}
           dragListeners={listeners}
           logger={logger}
@@ -680,15 +696,21 @@ const SortableGroup = React.memo(function SortableGroup({
           "rounded-lg border overflow-hidden transition-colors",
           isSingle && !singleIsActive && "hover:bg-accent cursor-pointer",
           isSingle && singleIsActive && "bg-primary/5 border-primary/20",
+          !isSingle && "cursor-pointer",
         )}
         onClick={
           isSingle
             ? () => !singleIsActive && void handleSelectFavorite(group.items[0])
-            : undefined
+            : () => setVariantsExpanded((v) => !v)
         }
       >
         {/* Group header - matches full card layout */}
-        <Div className="group relative flex items-start gap-4 px-4 pt-4 pb-2">
+        <Div
+          className={cn(
+            "group relative flex items-start gap-4 px-4 pt-4",
+            isSingle || variantsExpanded ? "pb-2" : "pb-4",
+          )}
+        >
           <Div
             className={cn(
               "flex items-center justify-center rounded-lg w-12 h-12 shrink-0",
@@ -723,68 +745,86 @@ const SortableGroup = React.memo(function SortableGroup({
               </Span>
             ) : null}
           </Div>
-          <Div
-            className={cn(
-              "absolute top-1 right-1 flex gap-0.5",
-              isTouch
-                ? "opacity-100"
-                : "opacity-0 group-hover:opacity-100 transition-opacity",
-            )}
-          >
+          {!isSingle && (
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 shrink-0 self-center text-muted-foreground transition-transform",
+                variantsExpanded && "rotate-180",
+              )}
+            />
+          )}
+          {!isPickerMode && (
             <Div
-              {...attributes}
-              {...listeners}
-              className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+              className={cn(
+                "absolute top-1 right-1 flex gap-0.5",
+                isTouch
+                  ? "opacity-100"
+                  : "opacity-0 group-hover:opacity-100 transition-opacity",
+              )}
+              onClick={(e) => e.stopPropagation()}
             >
-              <Icon icon="grip" className="h-4 w-4" />
+              <Div
+                {...attributes}
+                {...listeners}
+                className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+              >
+                <Icon icon="grip" className="h-4 w-4" />
+              </Div>
+              <AddVariantButton
+                skillId={group.skillId}
+                navigate={navigate}
+                logger={logger}
+                user={user}
+                locale={locale}
+              />
+              <DeleteGroupButton
+                group={group}
+                logger={logger}
+                user={user}
+                locale={locale}
+              />
             </Div>
-            <AddVariantButton
-              skillId={group.skillId}
-              navigate={navigate}
-              logger={logger}
-              user={user}
-              locale={locale}
-            />
-            <DeleteGroupButton
-              group={group}
-              logger={logger}
-              user={user}
-              locale={locale}
-            />
-          </Div>
+          )}
         </Div>
 
-        {/* Variant rows - indented to align with text content past icon */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={group.items.map((item) => item.id)}
-            strategy={verticalListSortingStrategy}
+        {/* Variant rows - indented to align with text content past icon.
+            Multi-variant groups only render rows when expanded. */}
+        {(isSingle || variantsExpanded) && (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <Div className="border-t border-border/40 py-0.5 ml-[4.5rem] mr-3">
-              {group.items.map((item) => {
-                const globalIndex = allFavorites.findIndex(
-                  (f) => f.id === item.id,
-                );
-                return (
-                  <SortableVariantRow
-                    key={item.id}
-                    item={item}
-                    index={globalIndex}
-                    fieldChildren={fieldChildren}
-                    handleSelectFavorite={handleSelectFavorite}
-                    navigate={navigate}
-                    locale={locale}
-                    isTouch={isTouch}
-                  />
-                );
-              })}
-            </Div>
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={group.items.map((item) => item.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <Div
+                className="border-t border-border/40 py-0.5 ml-[4.5rem] mr-3"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {group.items.map((item) => {
+                  const globalIndex = allFavorites.findIndex(
+                    (f) => f.id === item.id,
+                  );
+                  return (
+                    <SortableVariantRow
+                      key={item.id}
+                      item={item}
+                      index={globalIndex}
+                      fieldChildren={fieldChildren}
+                      handleSelectFavorite={handleSelectFavorite}
+                      navigate={navigate}
+                      locale={locale}
+                      isTouch={isTouch}
+                      isPickerMode={isPickerMode}
+                    />
+                  );
+                })}
+              </Div>
+            </SortableContext>
+          </DndContext>
+        )}
       </Div>
     </Div>
   );
@@ -825,8 +865,15 @@ export function FavoritesListContainer({
   const favoriteSelectOverride = useFavoriteSelectOverride();
   const hideChrome = favoriteSelectOverride?.hideChrome ?? false;
 
+  const onPickRaw = usePickerCallback<{ id: string; name: string }>();
+  const isPickerMode = !!onPickRaw;
+
   const handleSelectFavorite = useCallback(
     async (item: FavoriteCard): Promise<void> => {
+      if (onPickRaw) {
+        onPickRaw({ id: item.id, name: item.name });
+        return;
+      }
       if (favoriteSelectOverride) {
         favoriteSelectOverride.onSelectFavorite(item);
         // Only close the model selector when not embedded in another panel
@@ -845,7 +892,7 @@ export function FavoritesListContainer({
       });
       useTourState.getState().setModelSelectorOpen(false);
     },
-    [favoriteSelectOverride, hideChrome, logger, locale, user],
+    [onPickRaw, favoriteSelectOverride, hideChrome, logger, locale, user],
   );
 
   const rawFavoritesList = useMemo(
@@ -1026,9 +1073,10 @@ export function FavoritesListContainer({
 
   return (
     <Div className="flex flex-col gap-0">
-      {/* Tab bar: My Favorites | Settings gear - hidden when embedded */}
-      {!hideChrome && (
-        <Div className="flex border-b border-border shrink-0">
+      {/* Tab bar: My Favorites | Settings gear - hidden when embedded or in picker mode.
+          Sticky so it stays visible while the surrounding container (popover) scrolls. */}
+      {!hideChrome && !isPickerMode && (
+        <Div className="flex border-b border-border sticky top-0 z-10 bg-popover">
           <Div className="flex-1 flex items-center justify-center gap-1.5 h-10 text-sm font-medium border-b-2 border-primary text-primary">
             <Star className="h-4 w-4" />
             {tFav("get.tabs.myFavorites")}
@@ -1054,8 +1102,9 @@ export function FavoritesListContainer({
         </Div>
       )}
 
-      {/* Favorites List - grouped by character */}
-      <Div className="px-4 pt-4 pb-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
+      {/* Favorites List - grouped by character.
+          Scroll is owned by the surrounding container (popover or page). */}
+      <Div className="px-4 pt-4 pb-4">
         {favoritesData === undefined ? (
           <Div className="h-[300px] flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -1093,12 +1142,8 @@ export function FavoritesListContainer({
                           {section.label}
                         </Span>
                         <Span className="text-xs text-muted-foreground/60">
-                          (
-                          {section.groups.reduce(
-                            (n, g) => n + g.items.length,
-                            0,
-                          )}
-                          )
+                          {/* Count skills (groups), not variants */}(
+                          {section.groups.length})
                         </Span>
                       </Div>
                     )}
@@ -1114,6 +1159,7 @@ export function FavoritesListContainer({
                           locale={locale}
                           onItemDragEnd={handleItemDragEnd}
                           isTouch={isTouch}
+                          isPickerMode={isPickerMode}
                           logger={logger}
                           user={user}
                         />

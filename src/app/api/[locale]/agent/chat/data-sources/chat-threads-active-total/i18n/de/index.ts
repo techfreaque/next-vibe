@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Aktive Chat-Threads Gesamt",
+    titleShort: "Aktive Threads",
     description:
       "Momentaufnahme der aktiven Chat-Threads pro Auflösungs-Bucket",
     fields: {

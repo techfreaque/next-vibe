@@ -34,10 +34,11 @@ const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["subscription", "cancel"],
   title: "delete.title" as const,
+  titleShort: "delete.titleShort" as const,
   description: "delete.description" as const,
   icon: "package-x",
-  category: "endpointCategories.payments",
-  subCategory: "endpointCategories.subscriptionManagement",
+  category: "payments",
+  subCategory: "Management",
   tags: ["tags.subscription" as const, "tags.cancel" as const],
   allowedRoles: [
     UserRole.CUSTOMER,

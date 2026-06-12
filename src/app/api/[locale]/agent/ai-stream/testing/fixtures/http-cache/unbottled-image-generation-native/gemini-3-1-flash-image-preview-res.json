@@ -1,0 +1,20 @@
+{
+  "type": "json",
+  "url": "http://localhost:3002/api/en-GLOBAL/agent/ai-stream/ws-provider/stream",
+  "status": 403,
+  "headers": {
+    "content-length": "175",
+    "content-type": "application/json",
+    "date": "Wed, 03 Jun 2026 19:08:01 GMT, Wed, 03 Jun 2026 19:08:01 GMT",
+    "vary": "sec-fetch-dest",
+    "set-cookie": "lead_id_3002=88908693-11f5-46e1-865d-1ed8c2186302; Max-Age=315360000; Path=/; HttpOnly; SameSite=Lax"
+  },
+  "body": {
+    "success": false,
+    "message": "Insufficient roles. User has: Public. Required: Admin, Customer, AI Tool Disabled",
+    "errorType": {
+      "errorKey": "errorTypes.forbidden",
+      "errorCode": 403
+    }
+  }
+}

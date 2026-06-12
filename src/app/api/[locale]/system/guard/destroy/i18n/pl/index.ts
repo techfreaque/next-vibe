@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Guard Systemu",
 
   title: "Zniszcz Guard",
+  titleShort: "Zniszcz guard",
   description: "Zniszcz środowiska guard i wyczyść zasoby",
   tag: "zarządzanie-guard",
   container: {

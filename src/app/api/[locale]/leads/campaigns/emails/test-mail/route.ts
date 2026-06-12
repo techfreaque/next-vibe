@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Test Email API Route Handler
  * POST /api/[locale]/leads/campaigns/emails/test-mail

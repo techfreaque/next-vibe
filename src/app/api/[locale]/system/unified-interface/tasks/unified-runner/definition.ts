@@ -32,10 +32,11 @@ const { POST } = createEndpoint({
   path: ["system", "unified-interface", "tasks", "unified-runner"],
   aliases: ["unified-runner", "task-runner", "runner"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "check-circle",
-  category: "endpointCategories.tasks",
-  subCategory: "endpointCategories.tasksCron",
+  category: "devTools",
+  subCategory: "tasksCron",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.MCP_OFF,

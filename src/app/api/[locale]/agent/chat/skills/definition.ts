@@ -33,7 +33,7 @@ import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/co
 import { iconSchema } from "../../../shared/types/common.schema";
 import { allModelDefinitions } from "../../models/all-models";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import createFavoriteDefinitions from "../favorites/create/definition";
 import { NO_SKILL_ID, SKILLS_LIST_ALIAS } from "./constants";
 import {
@@ -49,6 +49,7 @@ import {
 } from "./enum";
 
 import { scopedTranslation } from "./i18n";
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 const SkillsListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillsListContainer })),
@@ -94,6 +95,7 @@ const { GET } = createEndpoint({
   ] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   dynamicTitle: ({ response }) => {
     if (response?.sections) {
@@ -110,7 +112,6 @@ const { GET } = createEndpoint({
   },
   icon: "sparkles" as const,
   category: "ai",
-  subCategory: "skillsManagement",
   tags: ["tags.skills" as const],
 
   options: {
@@ -137,7 +138,9 @@ const { GET } = createEndpoint({
        */
       targetUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: usersListDefinitions.GET,
+        labelField: "email",
         label: "get.fields.targetUserId.label" as const,
         description: "get.fields.targetUserId.description" as const,
         schema: z.string().uuid().optional(),

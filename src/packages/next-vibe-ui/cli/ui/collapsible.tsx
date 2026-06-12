@@ -1,3 +1,4 @@
+/* eslint-disable oxlint-plugin-i18n/no-literal-string */
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
@@ -22,8 +23,17 @@ Collapsible.displayName = "Collapsible";
 
 export function CollapsibleTrigger({
   children,
+  asChild,
 }: CollapsibleTriggerProps): JSX.Element {
-  return <Text bold>▼ {children}</Text>;
+  if (asChild) {
+    return <>{children}</>;
+  }
+  return (
+    <Box>
+      <Text bold>{"▼ "}</Text>
+      {children}
+    </Box>
+  );
 }
 CollapsibleTrigger.displayName = "CollapsibleTrigger";
 

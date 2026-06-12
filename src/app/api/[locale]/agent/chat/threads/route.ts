@@ -13,21 +13,13 @@ export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, t, logger, locale }) => {
-      return await ThreadsRepository.listThreads(data, user, t, logger, locale);
-    },
+    handler: async ({ data, user, t, logger, locale }) =>
+      ThreadsRepository.listThreads(data, user, t, logger, locale),
     canSubscribe: ({ user }) => !!user.leadId,
   },
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, t, logger, locale }) => {
-      return await ThreadsRepository.createThread(
-        data,
-        user,
-        t,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ data, user, t, logger, locale }) =>
+      ThreadsRepository.createThread(data, user, t, logger, locale),
   },
 });

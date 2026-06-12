@@ -35,6 +35,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/incognito/event-persist";
 
 import { scopedTranslation } from "./i18n";
+import { CHAT_THREADS_ALIAS } from "./constants";
 
 const ThreadsListContainer = lazy(() =>
   import("./widget/widget").then((m) => ({ default: m.ThreadsListContainer })),
@@ -51,13 +52,14 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads"],
+  aliases: [CHAT_THREADS_ALIAS] as const,
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "message-square",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsManagement",
+  category: "ai",
   tags: ["tags.threads" as const],
 
   fields: customWidgetObject({
@@ -111,8 +113,8 @@ const { GET } = createEndpoint({
             label: "config.folders.incognito" as const,
           },
           {
-            value: DefaultFolderId.SUPPORT,
-            label: "config.folders.support" as const,
+            value: DefaultFolderId.REMOTE,
+            label: "config.folders.remote" as const,
           },
         ],
         schema: z
@@ -122,7 +124,7 @@ const { GET } = createEndpoint({
             DefaultFolderId.PUBLIC,
             DefaultFolderId.BACKGROUND,
             DefaultFolderId.INCOGNITO,
-            DefaultFolderId.SUPPORT,
+            DefaultFolderId.REMOTE,
           ])
           .describe(
             "Root folder to filter threads (incognito routed to route-client.ts via useClientRoute)",
@@ -515,8 +517,8 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "message-square-plus" as const,
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsManagement",
+  category: "ai",
+  subCategory: "threadsManagement",
   tags: ["tags.threads" as const],
 
   fields: objectField(scopedTranslation, {

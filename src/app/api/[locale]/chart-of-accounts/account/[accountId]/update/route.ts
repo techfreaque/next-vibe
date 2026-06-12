@@ -8,13 +8,7 @@ export const { PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
-      return await CoaAccountUpdateRepository.updateAccount(
-        data,
-        user.id,
-        logger,
-        locale,
-      );
-    },
+    handler: async ({ data, user, logger, locale }) =>
+      CoaAccountUpdateRepository.updateAccount(data, user.id, logger, locale),
   },
 });

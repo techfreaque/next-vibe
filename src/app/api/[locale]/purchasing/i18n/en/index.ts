@@ -41,6 +41,7 @@ export const translations = {
   vendorCreate: {
     post: {
       title: "Create Vendor",
+      titleShort: "Create Vendor",
       description: "Register a new supplier for your company.",
       widget: {
         back: "Back",
@@ -181,7 +182,8 @@ export const translations = {
   // Vendor list
   vendorList: {
     get: {
-      title: "List Vendors",
+      title: "Vendors",
+      titleShort: "Vendors",
       description: "List all vendors for a company.",
       widget: {
         back: "Back",
@@ -252,6 +254,7 @@ export const translations = {
   vendorGet: {
     get: {
       title: "Get Vendor",
+      titleShort: "Vendor Details",
       description: "Retrieve full details for a vendor.",
       widget: {
         back: "Back",
@@ -328,6 +331,7 @@ export const translations = {
   vendorUpdate: {
     patch: {
       title: "Update Vendor",
+      titleShort: "Update Vendor",
       description: "Update vendor details.",
       widget: {
         backToVendor: "Back to vendor",
@@ -465,6 +469,7 @@ export const translations = {
   vendorDeactivate: {
     post: {
       title: "Deactivate Vendor",
+      titleShort: "Deactivate",
       description:
         "Mark a vendor as inactive. Existing purchase orders are not affected.",
       vendorId: { label: "Vendor ID", description: "Vendor to deactivate" },
@@ -523,6 +528,7 @@ export const translations = {
   orderCreate: {
     post: {
       title: "Create Purchase Order",
+      titleShort: "Create Order",
       description: "Create a new purchase order in Draft status.",
       errors: {
         validation: {
@@ -648,7 +654,8 @@ export const translations = {
   // PO list
   orderList: {
     get: {
-      title: "List Purchase Orders",
+      title: "Purchase Orders",
+      titleShort: "Orders",
       description:
         "List purchase orders for a company with optional status filter.",
       widget: {
@@ -729,6 +736,7 @@ export const translations = {
   orderGet: {
     get: {
       title: "Get Purchase Order",
+      titleShort: "Order Details",
       description:
         "Retrieve a purchase order with all lines and receipt history.",
       widget: {
@@ -838,6 +846,7 @@ export const translations = {
   orderUpdate: {
     patch: {
       title: "Update Purchase Order",
+      titleShort: "Update Order",
       description: "Edit a Draft purchase order — fields and lines.",
       widget: {
         backToPO: "Back to Purchase Order",
@@ -962,6 +971,7 @@ export const translations = {
   orderSend: {
     post: {
       title: "Send Purchase Order",
+      titleShort: "Send Order",
       description: "Mark purchase order as Sent to vendor.",
       poId: {
         label: "Purchase Order ID",
@@ -1026,6 +1036,7 @@ export const translations = {
   orderConfirm: {
     post: {
       title: "Confirm Purchase Order",
+      titleShort: "Confirm Order",
       description:
         "Vendor has confirmed the purchase order — mark as Confirmed.",
       poId: {
@@ -1090,6 +1101,7 @@ export const translations = {
   orderReceive: {
     post: {
       title: "Receive Goods",
+      titleShort: "Receive Goods",
       description:
         "Record receipt of goods against a purchase order. Creates stock movements.",
       widget: {
@@ -1173,6 +1185,7 @@ export const translations = {
   orderConvertToBill: {
     post: {
       title: "Convert to Bill",
+      titleShort: "Convert to Bill",
       description: "Create an AP bill from this purchase order.",
       widget: {
         back: "Back",
@@ -1237,6 +1250,7 @@ export const translations = {
         lineAdded: "Line item added",
       },
       title: "Add Line Item",
+      titleShort: "Add Line",
       description: "Add a line item to a purchase order.",
       poId: {
         label: "Purchase Order ID",
@@ -1322,12 +1336,18 @@ export const translations = {
   orderLineRemove: {
     post: {
       title: "Remove Line Item",
+      titleShort: "Remove Line",
       description: "Remove a line item from a purchase order.",
       poId: {
         label: "Purchase Order ID",
         description: "Purchase order to remove a line from",
       },
       lineId: { label: "Line ID", description: "Line item to remove" },
+      widget: {
+        backToOrder: "Back to purchase order",
+        warning:
+          "This will permanently remove the line item from the purchase order.",
+      },
       errors: {
         validation: {
           title: "Validation Error",
@@ -1382,6 +1402,7 @@ export const translations = {
   dashboard: {
     get: {
       title: "Purchasing Overview",
+      titleShort: "Overview",
       description:
         "Live snapshot of purchase orders and supplier activity for your company.",
       widget: {
@@ -1453,6 +1474,7 @@ export const translations = {
   orderCancel: {
     post: {
       title: "Cancel Purchase Order",
+      titleShort: "Cancel Order",
       description: "Cancel a Draft or Sent purchase order.",
       poId: {
         label: "Purchase Order ID",

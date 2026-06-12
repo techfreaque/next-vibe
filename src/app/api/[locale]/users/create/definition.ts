@@ -35,8 +35,9 @@ import {
 
 import { dateSchema } from "../../shared/types/common.schema";
 import { scopedTranslation } from "./i18n";
+import leadsListDefinitions from "@/app/api/[locale]/leads/list/definition";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const UserCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UserCreateContainer })),
@@ -52,10 +53,11 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
   title: "post.title" as const,
+  titleShort: "post.titleShort",
   description: "post.description" as const,
   icon: "user-plus",
-  category: "userAuth",
-  subCategory: "userAdminManagement",
+  category: "account",
+  subCategory: "manageUsers",
   tags: ["tags.create" as const, "tags.admin" as const],
 
   fields: customWidgetObject({
@@ -182,7 +184,9 @@ const { POST } = createEndpoint({
           }),
           leadId: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.UUID,
+            fieldType: FieldDataType.ENTITY_PICKER,
+            listEndpoint: leadsListDefinitions.GET,
+            labelField: "email",
             label: "post.leadId.label" as const,
             description: "post.leadId.description" as const,
             helpText: "post.leadId.description" as const,

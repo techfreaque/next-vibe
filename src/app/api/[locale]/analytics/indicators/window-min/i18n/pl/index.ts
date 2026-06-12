@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Minimum okna",
+    titleShort: "Min okna",
     description:
       "Krocząca minimalna okna - śledzi najniższą wartość w stałym oknie",
     fields: {

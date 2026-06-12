@@ -2,6 +2,7 @@ export const translations = {
   category: "Information",
   get: {
     title: "Search the Web",
+    titleShort: "Web Search",
     dynamicTitle: "Search: {{query}}",
     description:
       "Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.",
@@ -88,6 +89,17 @@ export const translations = {
         title: "No search provider available",
         description:
           "No search API keys are configured. Set up Brave Search or Kagi in your .env file.",
+      },
+      noProviderAdmin: {
+        title:
+          "No search provider configured. Add BRAVE_SEARCH_API_KEY or KAGI_API_KEY to your .env file.",
+        description:
+          "Brave Search: https://api.search.brave.com/app/keys — Kagi: https://kagi.com/settings?p=api",
+      },
+      noProviderUser: {
+        title: "Web search is not available right now.",
+        description:
+          "The administrator hasn't configured a search provider yet.",
       },
       providerUnavailable: {
         title: "Search provider not available",

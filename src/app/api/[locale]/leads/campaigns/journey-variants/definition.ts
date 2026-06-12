@@ -22,12 +22,13 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import {
   CampaignTypeDB,
   CampaignTypeOptions,
 } from "../../../messenger/accounts/enum";
 import { scopedTranslation } from "./i18n";
+import { CAMPAIGN_JOURNEY_VARIANTS_ALIAS } from "./constants";
 const JourneyVariantsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.JourneyVariantsWidget })),
 );
@@ -119,13 +120,16 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["leads", "campaigns", "journey-variants"],
+  aliases: [CAMPAIGN_JOURNEY_VARIANTS_ALIAS] as const,
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsJourneys",
+  category: "newsletter",
+  subCategory: "emailCampaignsJourneys",
   icon: "git-branch",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: JourneyVariantsWidget,
@@ -205,9 +209,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["leads", "campaigns", "journey-variants"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsJourneys",
+  category: "newsletter",
+  subCategory: "emailCampaignsJourneys",
   icon: "plus",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],
@@ -393,9 +398,10 @@ const { PATCH } = createEndpoint({
   method: Methods.PATCH,
   path: ["leads", "campaigns", "journey-variants"],
   title: "patch.title",
+  titleShort: "patch.titleShort",
   description: "patch.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsJourneys",
+  category: "newsletter",
+  subCategory: "emailCampaignsJourneys",
   icon: "edit",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],

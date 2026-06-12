@@ -1,0 +1,1 @@
+ALTER TABLE "custom_skills" DROP COLUMN "model_selection";

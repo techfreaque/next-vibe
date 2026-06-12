@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Skript-Evaluator",
+    titleShort: "Skript",
     description:
       "Sandboxed benutzerdefinierte Auswertung über benutzerdefinierte Funktionskörper",
     fields: {

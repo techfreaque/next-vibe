@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Information",
   get: {
     title: "Im Web suchen",
+    titleShort: "Websuche",
     dynamicTitle: "Suche: {{query}}",
     description:
       "Durchsucht das Internet nach aktuellen Informationen, Nachrichten, Fakten oder Ereignissen. Leitet automatisch an deinen bevorzugten Suchanbieter weiter.",
@@ -91,6 +92,17 @@ export const translations: typeof enTranslations = {
         title: "Kein Suchanbieter verfügbar",
         description:
           "Keine Such-API-Schlüssel konfiguriert. Richte Brave Search oder Kagi in deiner .env-Datei ein.",
+      },
+      noProviderAdmin: {
+        title:
+          "Kein Suchanbieter konfiguriert. Füge BRAVE_SEARCH_API_KEY oder KAGI_API_KEY in deine .env-Datei ein.",
+        description:
+          "Brave Search: https://api.search.brave.com/app/keys — Kagi: https://kagi.com/settings?p=api",
+      },
+      noProviderUser: {
+        title: "Websuche ist gerade nicht verfügbar.",
+        description:
+          "Der Administrator hat noch keinen Suchanbieter eingerichtet.",
       },
       providerUnavailable: {
         title: "Suchanbieter nicht verfügbar",

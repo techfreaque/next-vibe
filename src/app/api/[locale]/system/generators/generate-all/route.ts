@@ -13,11 +13,11 @@ import generateAllEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: generateAllEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, locale }) => {
-      const { GenerateAllRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return GenerateAllRepository.generateAll(data, logger, locale);
-    },
+    handler: async ({ data, logger, locale }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).GenerateAllRepository.generateAll(data, logger, locale),
   },
 });

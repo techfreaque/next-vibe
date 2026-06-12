@@ -37,12 +37,13 @@ import { configScopedTranslation } from "@/config/i18n";
 import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as pageT } from "./i18n";
+import type { ReferralPageT } from "./i18n";
 import {
-  scopedTranslation as pageT,
   getCommissionRows,
   getReferralParams,
-} from "./i18n";
-import type { ReferralPageT, CommissionRow } from "./i18n";
+  type CommissionRow,
+} from "./i18n/utils";
 
 function ChainTable({
   t,

@@ -6,6 +6,7 @@ export const translations = {
   },
   post: {
     title: "Create Product",
+    titleShort: "Create Product",
     description: "Add a product or service to your catalog.",
     name: {
       label: "Product Name",

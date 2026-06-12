@@ -4,6 +4,7 @@
 
 export const translations = {
   title: "Send Message",
+  titleShort: "Send Message",
   description:
     "Send a message via any channel (Email, SMS, WhatsApp, Telegram)",
   category: "Messaging",

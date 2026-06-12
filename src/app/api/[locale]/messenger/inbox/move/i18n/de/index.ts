@@ -1,59 +1,73 @@
-export const translations = {
-  title: "Move Message",
-  description: "Move a message to a different folder",
-  tag: "Inbox",
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
+  title: "Nachricht verschieben",
+  titleShort: "Nachricht verschieben",
+  description: "Eine Nachricht in einen anderen Ordner verschieben",
+  tag: "Posteingang",
 
   container: {
-    title: "Move Message",
-    description: "Move a message from one folder to another",
+    title: "Nachricht verschieben",
+    description: "Nachricht von einem Ordner in einen anderen verschieben",
   },
 
   accountId: {
-    label: "Account",
-    description: "Messenger account",
-    placeholder: "Account UUID",
+    label: "Konto",
+    description: "Messenger-Konto",
+    placeholder: "Konto-UUID",
   },
   uid: {
-    label: "Message UID",
-    description: "The UID of the message to move",
+    label: "Nachrichten-UID",
+    description: "UID der zu verschiebenden Nachricht",
     placeholder: "12345",
   },
   fromFolder: {
-    label: "From Folder",
-    description: "Current folder path",
+    label: "Von Ordner",
+    description: "Aktueller Ordnerpfad",
     placeholder: "INBOX",
   },
   toFolder: {
-    label: "To Folder",
-    description: "Destination folder path",
-    placeholder: "Archive",
+    label: "Nach Ordner",
+    description: "Zielordnerpfad",
+    placeholder: "Archiv",
   },
 
-  moved: { label: "Moved" },
+  moved: { label: "Verschoben" },
 
   errors: {
-    validation: { title: "Validation Error", description: "Check your input" },
-    unauthorized: { title: "Unauthorized", description: "Login required" },
-    server: { title: "Server Error", description: "Internal server error" },
-    unknown: { title: "Unknown Error", description: "Unexpected error" },
-    forbidden: { title: "Forbidden", description: "Access denied" },
-    network: { title: "Network Error", description: "Network error" },
+    validation: {
+      title: "Ungültige Eingabe",
+      description: "Bitte Eingaben prüfen",
+    },
+    unauthorized: {
+      title: "Nicht angemeldet",
+      description: "Anmeldung erforderlich",
+    },
+    server: { title: "Serverfehler", description: "Interner Serverfehler" },
+    unknown: {
+      title: "Unbekannter Fehler",
+      description: "Ein unerwarteter Fehler ist aufgetreten",
+    },
+    forbidden: { title: "Kein Zugriff", description: "Zugriff verweigert" },
+    network: {
+      title: "Netzwerkfehler",
+      description: "Netzwerkfehler aufgetreten",
+    },
     notFound: {
-      title: "Account Not Found",
-      description: "Messenger account not found",
+      title: "Konto nicht gefunden",
+      description: "Messenger-Konto nicht gefunden",
     },
     conflict: {
-      title: "Conflict",
-      description: "Request conflicts with existing data",
+      title: "Konflikt",
+      description: "Anfrage steht im Konflikt mit vorhandenen Daten",
     },
     unsavedChanges: {
-      title: "Unsaved Changes",
-      description: "You have unsaved changes",
+      title: "Ungespeicherte Änderungen",
+      description: "Sie haben ungespeicherte Änderungen",
     },
   },
 
   success: {
-    title: "Message Moved",
-    description: "The message has been moved successfully",
+    title: "Nachricht verschoben",
+    description: "Die Nachricht wurde erfolgreich verschoben",
   },
 };

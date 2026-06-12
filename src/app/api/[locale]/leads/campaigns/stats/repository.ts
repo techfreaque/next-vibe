@@ -255,7 +255,7 @@ export class CampaignStatsRepository {
       );
 
       const quotaProgress: Array<{
-        locale: string;
+        locale: CountryLanguage;
         weeklyQuota: number;
         startedThisWeek: number;
         remaining: number;

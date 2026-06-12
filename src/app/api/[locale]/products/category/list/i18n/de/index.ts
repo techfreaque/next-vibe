@@ -7,7 +7,8 @@ export const translations: typeof enTranslations = {
     list: "Liste",
   },
   get: {
-    title: "Produktkategorien auflisten",
+    title: "Kategorien",
+    titleShort: "Kategorien",
     description:
       "Produktkategorien für ein Unternehmen oder einen Besitzer abrufen.",
     companyId: {

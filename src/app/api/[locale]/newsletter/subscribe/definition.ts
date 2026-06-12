@@ -31,9 +31,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["newsletter", "subscribe"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.newsletter",
-  subCategory: "endpointCategories.newsletterSubscriptions",
+  category: "newsletter",
+  subCategory: "Subscriptions",
   icon: "bell",
   tags: ["tags.newsletter", "tags.subscription"],
   allowedRoles: [

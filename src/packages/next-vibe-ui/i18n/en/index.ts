@@ -1,7 +1,76 @@
-import { translations as webTranslations } from "../../web/i18n/en";
-
 export const translations = {
-  web: webTranslations,
+  web: {
+    common: {
+      accessibility: {
+        srOnly: {
+          more: "More",
+          previousSlide: "Previous slide",
+          nextSlide: "Next slide",
+          previousPage: "Previous page",
+          nextPage: "Next page",
+          close: "Close",
+          toggleMenu: "Toggle menu",
+        },
+      },
+      actions: {
+        previous: "Previous",
+        next: "Next",
+      },
+      customValue: "Custom",
+      noOptionsFound: "No options found",
+      useCustomValue: "Use '{{value}}'",
+      addTags: "Add tags",
+      addCustomValue: "Add '{{value}}'",
+      required: "Required",
+      enterPhoneNumber: "Enter phone number",
+      unknownFieldType: "Unknown field type",
+      selectDate: "Select date",
+      other: "Other",
+      searchCountries: "Search countries...",
+      noCountryFound: "No country found",
+      preferred: "Preferred",
+      allCountries: "All Countries",
+    },
+    ui: {
+      markdown: {
+        thinking: "Thinking",
+        reasoningProcess: "Reasoning Process",
+        streaming: "(streaming...)",
+        copied: "Copied!",
+        copy: "Copy",
+        copyCode: "Copy code",
+      },
+      multiSelect: {
+        placeholder: "Select items...",
+        noResultsFound: "No results found",
+      },
+      iconPicker: {
+        selectIcon: "Select icon",
+        title: "Choose an Icon",
+        searchPlaceholder: "Search icons...",
+        showing: "Showing {{count}} icons",
+        categories: {
+          all: "All Icons",
+          general: "General",
+          ai: "AI & Technology",
+          education: "Education",
+          communication: "Communication",
+          science: "Science",
+          arts: "Arts & Media",
+          finance: "Finance",
+          lifestyle: "Lifestyle",
+          security: "Security",
+          programming: "Programming",
+          platforms: "Platforms",
+          aiProviders: "AI Providers",
+          media: "Media",
+          special: "Special",
+          navigation: "Navigation",
+          ui: "UI Elements",
+        },
+      },
+    },
+  },
   native: {
     ui: {
       autocompleteField: {

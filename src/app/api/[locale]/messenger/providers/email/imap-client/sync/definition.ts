@@ -25,7 +25,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const ImapSyncContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ImapSyncContainer })),
@@ -39,10 +39,12 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["messenger", "imap-client", "sync"],
+  aliases: ["messenger-imap-sync"] as const,
   title: "title",
+  titleShort: "titleShort",
   description: "description",
-  category: "endpointCategories.messenger",
-  subCategory: "endpointCategories.messengerProviders",
+  category: "messenger",
+  subCategory: "Providers",
   icon: "refresh-cw",
   tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN],

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Użytkownicy",
 
   title: "Opcje Logowania",
+  titleShort: "Opcje logowania",
   description: "Opcje konfiguracji logowania",
   tag: "opcje-logowania",
   container: {

@@ -40,7 +40,7 @@ import {
 import type { CsvImportJobStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const LeadsImportContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadsImportContainer })),
@@ -55,9 +55,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["leads", "import"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsImport",
+  category: "leads",
+  subCategory: "Import",
   tags: ["tags.import", "tags.csv", "tags.leads"],
   allowedRoles: [UserRole.ADMIN] as const,
   icon: "arrow-up",

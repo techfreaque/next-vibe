@@ -19,8 +19,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "../i18n";
+import { browserInstanceIdField } from "../shared/instance-id-field";
 
 const BrowserWidget = lazyWidget(() =>
   import("../shared/widget").then((m) => ({ default: m.BrowserToolWidget })),
@@ -30,10 +31,12 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["browser", "close-page"],
+  aliases: ["browser-close-page"] as const,
   title: "close-page.title",
+  titleShort: "close-page.titleShort",
   description: "close-page.description",
-  category: "endpointCategories.browser",
-  subCategory: "endpointCategories.browserPages",
+  category: "browser",
+  subCategory: "Pages",
   icon: "x-square",
   tags: [
     "close-page.tags.browserAutomation",
@@ -60,6 +63,8 @@ const { POST } = createEndpoint({
             "The ID of the page to close. Call list_pages to list pages.",
           ),
       }),
+
+      instanceId: browserInstanceIdField,
 
       // Response fields
       success: responseField(scopedTranslation, {

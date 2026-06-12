@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Env-Schlüssel generieren",
+    titleShort: "Umgebungsschlüssel",
     description:
       "Flache Env-Schlüssel-Metadatendatei für die Settings-Definition generieren",
     container: {

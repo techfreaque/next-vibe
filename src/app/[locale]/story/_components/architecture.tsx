@@ -445,7 +445,7 @@ function McpServerPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
         <P className="text-xs text-slate-400 leading-relaxed">
           {t("home.architecture.panelDetails.mcpServer.bodyPrefix")}{" "}
           <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
-            hermes-dev
+            atlas
           </Span>{" "}
           {t("home.architecture.panelDetails.mcpServer.bodyMiddle")}{" "}
           <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">

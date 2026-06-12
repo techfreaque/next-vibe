@@ -2,6 +2,7 @@ export const translations = {
   category: "Guard",
   post: {
     title: "Guard Status",
+    titleShort: "Guard Status",
     description: "Check guard environment status",
     tag: "Status",
     container: {

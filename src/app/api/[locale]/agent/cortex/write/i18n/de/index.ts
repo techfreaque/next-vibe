@@ -1,6 +1,8 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   post: {
     title: "Datei speichern",
+    titleShort: "Datei schreiben",
     description:
       "Datei anlegen oder überschreiben. Pfad und Inhalt angeben - fertig.",
     dynamicTitle: "Gespeichert: {{path}}",

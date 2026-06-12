@@ -12,9 +12,8 @@ import { CronQueueRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: async ({ data, user, locale, t, logger }) => {
-      return await CronQueueRepository.getQueue(data, user, locale, t, logger);
-    },
+    handler: async ({ data, user, locale, t, logger }) =>
+      CronQueueRepository.getQueue(data, user, locale, t, logger),
     canSubscribe: ({ user }) => !!user.id,
   },
 });

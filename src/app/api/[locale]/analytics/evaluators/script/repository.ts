@@ -5,6 +5,9 @@
 
 import "server-only";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
+
 import type {
   SignalEvent,
   TimeSeries,
@@ -46,5 +49,16 @@ export class ScriptEvaluatorRepository {
     } catch {
       return [];
     }
+  }
+
+  static handle(data: {
+    source: TimeSeries;
+    fn: string;
+  }): ResponseType<{ signals: SignalEvent[] }> {
+    const signals = ScriptEvaluatorRepository.computeScript(
+      data.source,
+      data.fn,
+    );
+    return success({ signals });
   }
 }

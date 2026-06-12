@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Formularübermittlungen von Leads",
+    titleShort: "Formularabsendungen",
     description: "Anzahl der Formularübermittlungs-Ereignisse pro Zeitfenster",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

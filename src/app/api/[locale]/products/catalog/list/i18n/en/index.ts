@@ -12,7 +12,8 @@ export const translations = {
     },
   },
   get: {
-    title: "List Catalog Products",
+    title: "Products",
+    titleShort: "Products",
     description:
       "Retrieve all products in your catalog. Filter by company, category, type, or active status.",
     companyId: {

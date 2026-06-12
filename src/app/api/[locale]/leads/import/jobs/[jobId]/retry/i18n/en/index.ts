@@ -7,6 +7,7 @@ export const translations = {
 
   post: {
     title: "Retry Import Job",
+    titleShort: "Retry Import",
     description: "Retry a failed import job",
     jobId: {
       label: "Job ID",

@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Próg",
+    titleShort: "Próg",
     description: "Uruchamia się, gdy wartość serii spełnia porównanie ze stałą",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },

@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Oxlint",
+  titleShort: "Oxlint",
   description: "Uruchom ESLint z konfiguracją Oxlint na swojej bazie kodu",
   category: "Sprawdzenia systemu",
   tag: "Oxlint",

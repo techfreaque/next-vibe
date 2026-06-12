@@ -1,6 +1,7 @@
 export const translations = {
   post: {
     title: "Move",
+    titleShort: "Move File",
     description: "Move or rename a file or folder.",
     dynamicTitle: "{{from}} → {{to}}",
     status: {

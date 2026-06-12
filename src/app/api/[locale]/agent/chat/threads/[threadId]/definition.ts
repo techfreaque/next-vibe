@@ -40,10 +40,11 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "message-square",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsManagement",
+  category: "ai",
+  subCategory: "threadsManagement",
   tags: ["tags.threads" as const],
 
   fields: objectField(scopedTranslation, {
@@ -287,8 +288,8 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "message-square",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsManagement",
+  category: "ai",
+  subCategory: "threadsManagement",
   tags: ["tags.threads" as const],
 
   fields: objectField(scopedTranslation, {
@@ -490,8 +491,8 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "message-square",
-  category: "endpointCategories.threads",
-  subCategory: "endpointCategories.threadsManagement",
+  category: "ai",
+  subCategory: "threadsManagement",
   tags: ["tags.threads" as const],
 
   fields: objectField(scopedTranslation, {

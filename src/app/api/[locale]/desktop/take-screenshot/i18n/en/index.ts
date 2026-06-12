@@ -1,9 +1,12 @@
 export const translations = {
   title: "Take Desktop Screenshot",
+  titleShort: "Screenshot",
   dynamicTitle: "Screenshot: {{target}}",
   description: "Capture a screenshot of the desktop or a screen region",
   form: {
-    label: "Take Desktop Screenshot",
+    label: "Take Screenshot",
+    capturing: "Capturing…",
+    refresh: "Retake",
     description:
       "Capture a screenshot of the full desktop or a specific region",
     fields: {
@@ -96,5 +99,10 @@ export const translations = {
   tags: {
     desktopAutomation: "Desktop Automation",
     captureAutomation: "Capture Automation",
+  },
+  widget: {
+    actionScreenshot: "Take Screenshot",
+    actionAllMonitors: "List Monitors",
+    labelSaved: "Saved to",
   },
 };

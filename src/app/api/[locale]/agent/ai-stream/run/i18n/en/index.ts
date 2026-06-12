@@ -19,5 +19,14 @@ export const translations = {
       description:
         "Use the selector below to choose a skill or load a saved favorite. The model resolves automatically.",
     },
+    noResponse: "No response",
+    cli: {
+      submitting: "…",
+      promptPrefix: "› ",
+      skillPrefix: "skill ",
+      promptHint: "enter: submit  ·  esc: exit  ·  tab: switch field",
+      promptPlaceholder: "Enter your prompt...",
+      skillLabel: "skill: {{skill}}",
+    },
   },
 };

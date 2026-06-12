@@ -3,11 +3,8 @@
  * Covers page navigation, interaction, inspection, and DevTools.
  */
 
-import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
 import { BROWSER_NEW_PAGE_ALIAS } from "@/app/api/[locale]/browser/new-page/constants";
-import { BROWSER_CLICK_ALIAS } from "@/app/api/[locale]/browser/click/constants";
-import { BROWSER_SCREENSHOT_ALIAS } from "@/app/api/[locale]/browser/take-screenshot/constants";
-import { BROWSER_EVAL_ALIAS } from "@/app/api/[locale]/browser/evaluate-script/constants";
+import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
 
 export const category: CategoryDefinition = {
   key: "browser",
@@ -42,7 +39,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Interaktion",
         "pl-PL": "Interakcja",
       },
-      defaultEntry: BROWSER_CLICK_ALIAS,
     },
     Inspection: {
       icon: "camera",
@@ -53,7 +49,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Inspektion",
         "pl-PL": "Inspekcja",
       },
-      defaultEntry: BROWSER_SCREENSHOT_ALIAS,
     },
     DevTools: {
       icon: "terminal",
@@ -64,7 +59,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Entwicklertools",
         "pl-PL": "Narzędzia Dev",
       },
-      defaultEntry: BROWSER_EVAL_ALIAS,
     },
   },
 };

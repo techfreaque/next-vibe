@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Opłacone faktury",
+    titleShort: "Opłacone faktury",
     description: "Liczba opłaconych faktur na przedział rozdzielczości",
     fields: {
       resolution: {

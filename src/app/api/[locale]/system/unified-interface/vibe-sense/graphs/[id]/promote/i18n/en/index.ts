@@ -3,6 +3,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Promote to System",
+    titleShort: "Promote Graph",
     description: "Promote an admin graph to system-owned (read-only, shared)",
     fields: {
       id: { label: "Graph ID", description: "UUID of the graph" },

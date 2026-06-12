@@ -17,8 +17,8 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
 import { DESKTOP_ACCESSIBILITY_ALIAS } from "./constants";
@@ -33,6 +33,7 @@ const { POST } = createEndpoint({
   path: ["desktop", "get-accessibility-tree"],
   aliases: [DESKTOP_ACCESSIBILITY_ALIAS] as const,
   title: "get-accessibility-tree.title",
+  titleShort: "get-accessibility-tree.titleShort",
   description: "get-accessibility-tree.description",
   dynamicTitle: ({ request }) => {
     if (request?.appName) {
@@ -99,7 +100,7 @@ const { POST } = createEndpoint({
         schema: z
           .boolean()
           .optional()
-          .default(false)
+          .default(true)
           .describe(
             "Include available actions per node (click, press, activate...). Adds detail but increases output size.",
           ),

@@ -2,6 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Window Sum",
+    titleShort: "Win Sum",
     description: "Rolling window sum - accumulates values over a fixed window",
     fields: {
       source: { label: "Source", description: "Input time series" },

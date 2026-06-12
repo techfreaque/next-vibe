@@ -1,10 +1,12 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations: typeof enTranslations = {
   category: "KI-Skills",
   tags: {
     moderation: "Moderation",
   },
   get: {
     title: "Gemeldete Skills",
+    titleShort: "Moderation",
     description: "Skills mit Meldungen, sortiert nach Anzahl der Meldungen",
     fields: {
       minReports: {
@@ -83,6 +85,7 @@ export const translations = {
   },
   patch: {
     title: "Skill moderieren",
+    titleShort: "Skill moderieren",
     description: "Gemeldeten Skill verbergen oder Meldungen zurücksetzen",
     fields: {
       id: {

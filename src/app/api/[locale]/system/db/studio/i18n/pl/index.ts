@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
   tag: "studio",
   post: {
     title: "Studio Bazy Danych",
+    titleShort: "Studio DB",
     description:
       "Otwórz studio bazy danych do wizualnego zarządzania bazą danych",
     form: {

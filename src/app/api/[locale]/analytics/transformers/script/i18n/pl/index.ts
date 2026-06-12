@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Skrypt",
+    titleShort: "Skrypt",
     description:
       "Skrypt - stosuje niestandardową funkcję w piaskownicy do serii czasowej",
     fields: {

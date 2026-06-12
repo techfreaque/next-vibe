@@ -21,6 +21,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { envClient } from "@/config/env-client";
+import { Environment } from "../../../shared/utils";
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { DEV_ALIASES } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -35,15 +37,16 @@ const { POST } = createEndpoint({
   path: ["system", "server", "dev"],
   aliases: DEV_ALIASES,
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.server",
-  subCategory: "endpointCategories.serverManagement",
+  category: "devTools",
+  subCategory: "serverManagement",
   tags: ["category"],
   icon: "code",
   allowedRoles: [
     UserRole.ADMIN,
-    UserRole.WEB_OFF,
     UserRole.CLI_AUTH_BYPASS,
+    UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
     UserRole.PRODUCTION_OFF,
   ],
@@ -151,6 +154,16 @@ const { POST } = createEndpoint({
         label: "post.fields.profile.title",
         description: "post.fields.profile.description",
         schema: z.boolean().default(false),
+      }),
+
+      fixtureMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.fixtureMode.title",
+        description: "post.fields.fixtureMode.description",
+        schema: z
+          .boolean()
+          .default(envClient.NODE_ENV === Environment.DEVELOPMENT),
       }),
 
       framework: requestField(scopedTranslation, {

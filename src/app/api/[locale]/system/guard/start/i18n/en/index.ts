@@ -1,5 +1,6 @@
 export const translations = {
   title: "Start Guard",
+  titleShort: "Start Guard",
   description: "Start guard environments for VSCode projects",
   tag: "Start",
   category: "Guard",

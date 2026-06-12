@@ -45,7 +45,7 @@ import {
 
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const TestEmailContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.TestEmailContainer })),
@@ -59,9 +59,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["leads", "campaigns", "emails", "test-mail"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.emailCampaigns",
-  subCategory: "endpointCategories.emailCampaignsProcessing",
+  category: "newsletter",
+  subCategory: "emailCampaignsProcessing",
   tags: ["tags.campaigns", "tags.leads"],
   allowedRoles: [UserRole.ADMIN],
   icon: "send",

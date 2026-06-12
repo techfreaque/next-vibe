@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Generuj indeks umiejętności",
+    titleShort: "Indeks umiejętności",
     description: "Generuj domyślny plik indeksu umiejętności",
     container: {
       title: "Generowanie indeksu umiejętności",

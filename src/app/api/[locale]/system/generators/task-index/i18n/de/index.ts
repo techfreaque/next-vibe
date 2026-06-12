@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Task-Index generieren",
+    titleShort: "Task-Index",
     description: "Task-Index-Dateien generieren",
     container: {
       title: "Task-Index-Generierung",

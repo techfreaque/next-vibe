@@ -33,6 +33,7 @@ const { POST } = createEndpoint({
   path: ["agent", "cortex", "write"],
   aliases: [CORTEX_WRITE_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,
   description: "post.description" as const,
@@ -57,8 +58,8 @@ const { POST } = createEndpoint({
   },
   icon: "edit",
   dynamicIcon: ({ request }) => resolveCortexIcon(request?.path),
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "ai",
+  subCategory: "Tools",
   tags: ["post.tags.cortex" as const],
   defaultExpanded: false,
 

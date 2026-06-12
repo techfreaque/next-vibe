@@ -3,6 +3,7 @@ export const translations = {
   description: "Leads currently active in email campaigns",
   get: {
     title: "Campaign Queue",
+    titleShort: "Campaign Queue",
     description: "View paginated list of leads currently in email campaigns",
     fields: {
       page: {

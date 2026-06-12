@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
 
   list: {
     title: "Grafy potokow",
+    titleShort: "Wykresy",
     description: "Lista wszystkich grafow widocznych dla biezacego uzytkownika",
     fields: {
       search: {

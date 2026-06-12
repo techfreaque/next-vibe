@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Fehlgeschlagene Zahlungen",
+    titleShort: "Zahlung fehlges.",
     description:
       "Abonnements mit fehlgeschlagenen Zahlungen pro Auflösungs-Bucket",
     fields: {

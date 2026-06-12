@@ -104,6 +104,19 @@ declare global {
   var __sharedMCP: MCPProcess | null | undefined;
   // eslint-disable-next-line no-var
   var __browserSessions: Map<string, SessionState> | undefined;
+  /**
+   * Global MCP startup mutex. Serializes the single chrome-devtools-mcp startup
+   * so concurrent first-callers don't each spawn their own process.
+   */
+  // eslint-disable-next-line no-var
+  var __mcpInitMutex: Promise<MCPProcess | null> | undefined;
+  /**
+   * Global tool-call mutex. Everything that touches chrome-devtools-mcp state
+   * (ensureSession + select_page + tool_call) runs inside this single lock.
+   * select_page is global state — the only safe model is full serialization.
+   */
+  // eslint-disable-next-line no-var
+  var __mcpToolMutex: Promise<void> | undefined;
 }
 
 function getSharedMCP(): MCPProcess | null {
@@ -194,7 +207,7 @@ function sendRaw(mcp: MCPProcess, req: MCPRequest): Promise<MCPResponse> {
   });
 }
 
-async function ensureMCP(logger: EndpointLogger): Promise<MCPProcess | null> {
+async function doEnsureMCP(logger: EndpointLogger): Promise<MCPProcess | null> {
   const existing = getSharedMCP();
   if (existing && isMCPAlive(existing)) {
     return existing;
@@ -236,6 +249,26 @@ async function ensureMCP(logger: EndpointLogger): Promise<MCPProcess | null> {
     mcp.proc.kill();
     return null;
   }
+}
+
+/**
+ * Get or start the single chrome-devtools-mcp process.
+ * Serialized via a global promise so concurrent first-callers don't each
+ * spawn their own process.
+ */
+async function ensureMCP(logger: EndpointLogger): Promise<MCPProcess | null> {
+  // Fast path: already alive, no lock needed.
+  const existing = getSharedMCP();
+  if (existing && isMCPAlive(existing)) {
+    return existing;
+  }
+  // Serialize startup: chain onto the global init mutex.
+  if (!globalThis.__mcpInitMutex) {
+    globalThis.__mcpInitMutex = doEnsureMCP(logger).finally(() => {
+      globalThis.__mcpInitMutex = undefined;
+    });
+  }
+  return globalThis.__mcpInitMutex;
 }
 
 // ---------------------------------------------------------------------------
@@ -519,73 +552,39 @@ function isSessionAlive(sessionId: string): boolean {
 }
 
 /**
- * Try to claim an existing unclaimed MCP page for this session instead of
- * opening a new tab. Prevents a second tab from appearing when Chrome already
- * has an idle page (e.g. the blank tab Chrome creates on startup, or tabs
- * left behind by dead CLI processes).
- *
- * Dead sessions (process gone) are evicted here so their tabs are available.
- * For duplicate URLs (e.g. multiple about:blank tabs) candidates are consumed
- * in order so each concurrent caller gets a distinct target.
+ * Close a Chrome tab directly via CDP HTTP endpoint (stable, not MCP integer IDs).
+ * Safe to call even if chrome-devtools-mcp has restarted.
  */
-async function claimExistingTab(
-  sessionId: string,
-  mcp: MCPProcess,
-  logger: EndpointLogger,
-): Promise<SessionState | null> {
-  const [mcpPages, cdpTargets] = await Promise.all([
-    listMCPPages(mcp),
-    listCDPTargets(),
-  ]);
-  if (mcpPages.length === 0) {
-    return null;
+async function closeCDPTab(targetId: string): Promise<void> {
+  try {
+    await fetch(
+      `http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}/json/close/${targetId}`,
+      { signal: AbortSignal.timeout(3000) },
+    );
+  } catch {
+    // Non-fatal — tab may already be gone.
   }
+}
 
-  // Evict sessions whose process is dead, then collect IDs claimed by live ones.
-  const claimedTargetIds = new Set<string>();
+/**
+ * Close orphan Chrome tabs left behind by dead sessions.
+ * Uses CDP target IDs (stable across MCP restarts) rather than MCP integer IDs.
+ * Must be called inside the global tool mutex.
+ */
+async function evictDeadSessions(logger: EndpointLogger): Promise<void> {
   for (const [sid, state] of sessions) {
-    if (sid === sessionId) {
+    if (isSessionAlive(sid)) {
       continue;
     }
-    if (!isSessionAlive(sid)) {
-      sessions.delete(sid);
-      logger.info("[Browser] Evicted dead session", { evictedSessionId: sid });
-      continue;
-    }
-    if (!state.cdpTargetId.startsWith("unknown-")) {
-      claimedTargetIds.add(state.cdpTargetId);
-    }
-  }
-
-  // Build a per-URL queue of unclaimed targets so duplicate URLs are consumed
-  // one-by-one rather than always resolving to the same first target.
-  const urlQueue = new Map<string, CDPTarget[]>();
-  for (const t of cdpTargets) {
-    if (claimedTargetIds.has(t.id)) {
-      continue;
-    }
-    const list = urlQueue.get(t.url) ?? [];
-    list.push(t);
-    urlQueue.set(t.url, list);
-  }
-
-  for (const page of mcpPages) {
-    const candidates = urlQueue.get(page.url);
-    if (!candidates?.length) {
-      continue;
-    }
-    const target = candidates.shift()!;
-    const state: SessionState = { cdpTargetId: target.id, mcpPageId: page.id };
-    sessions.set(sessionId, state);
-    saveSessions(sessions);
-    logger.info("[Browser] Claimed existing tab for new session", {
-      sessionId,
-      cdpTargetId: target.id,
-      mcpPageId: page.id,
+    logger.info("[Browser] Evicting dead session and closing its tab", {
+      evictedSessionId: sid,
+      cdpTargetId: state.cdpTargetId,
     });
-    return state;
+    sessions.delete(sid);
+    saveSessions(sessions);
+    // Close via CDP target ID — survives MCP process restarts.
+    await closeCDPTab(state.cdpTargetId);
   }
-  return null;
 }
 
 /**
@@ -665,33 +664,46 @@ async function createSessionTab(
   return state;
 }
 
+/**
+ * Ensure this session has a live Chrome tab.
+ * Must be called inside the global tool mutex.
+ *
+ * Design: one session = one dedicated tab. No tab sharing.
+ * Dead sessions are evicted and their tabs closed.
+ * If the session's tab is gone, a fresh one is created.
+ * If chrome-devtools-mcp restarted, the MCP integer ID is re-resolved from
+ * the stable CDP target ID.
+ *
+ * @param createIfMissing - When false, return null for unknown sessions instead
+ *   of creating a placeholder tab. Used by new_page which is its own session
+ *   initializer — creating a placeholder first would just produce an orphan tab.
+ */
 async function ensureSession(
   sessionId: string,
   mcp: MCPProcess,
   logger: EndpointLogger,
+  createIfMissing = true,
 ): Promise<SessionState | null> {
+  // Evict dead sessions and close their orphan tabs first.
+  await evictDeadSessions(logger);
+
   let state: SessionState | undefined | null = sessions.get(sessionId);
   const cdpTargets = await listCDPTargets();
 
   if (state) {
-    // Check whether the CDP target is still alive in Chrome.
     const knownTargetId = state.cdpTargetId;
-    const targetAlive =
-      knownTargetId.startsWith("unknown-") ||
-      cdpTargets.some((t) => t.id === knownTargetId);
+    const targetAlive = cdpTargets.some((t) => t.id === knownTargetId);
     if (!targetAlive) {
-      logger.warn("[Browser] Session CDP target closed, reopening", {
+      logger.warn("[Browser] Session tab closed externally, will reopen", {
         sessionId,
         lostTargetId: knownTargetId,
       });
       sessions.delete(sessionId);
       saveSessions(sessions);
       state = undefined;
-    } else if (!knownTargetId.startsWith("unknown-")) {
-      // Re-resolve MCP integer ID only if the stored ID is no longer valid
-      // (chrome-devtools-mcp restarted and reassigned IDs). Avoid re-resolving
-      // on every call: URL matching breaks when multiple tabs share the same URL
-      // (e.g. about:blank) and would map every session to the same page.
+    } else {
+      // Re-resolve MCP integer ID if chrome-devtools-mcp restarted
+      // (it reassigns integer IDs on each startup).
       const mcpPages = await listMCPPages(mcp);
       const storedIdStillValid = mcpPages.some(
         (p) => p.id === state!.mcpPageId,
@@ -704,27 +716,27 @@ async function ensureSession(
         );
         if (mcpId !== null) {
           state.mcpPageId = mcpId;
+          sessions.set(sessionId, state);
+          saveSessions(sessions);
+        } else {
+          // Can't find the tab in MCP — treat as gone.
+          sessions.delete(sessionId);
+          saveSessions(sessions);
+          state = undefined;
         }
       }
     }
   }
 
   if (!state) {
-    state =
-      (await claimExistingTab(sessionId, mcp, logger)) ??
-      (await createSessionTab(sessionId, mcp, logger));
+    if (!createIfMissing) {
+      return null;
+    }
+    state = await createSessionTab(sessionId, mcp, logger);
     if (!state) {
       return null;
     }
   }
-
-  // Select our page so all subsequent tool calls operate on it.
-  await sendRaw(mcp, {
-    jsonrpc: "2.0",
-    id: mcp.nextId++,
-    method: "tools/call",
-    params: { name: "select_page", arguments: { pageId: state.mcpPageId } },
-  });
 
   return state;
 }
@@ -768,16 +780,18 @@ const TOOL_NAME_MAP: Record<string, string> = {
 
 export class BrowserRepository {
   static async executeTool(
-    data: { tool: string; arguments?: string },
+    data: { tool: string; arguments?: string; instanceId?: string },
     t: BrowserT,
     logger: EndpointLogger,
     platform: Platform,
     threadId: string | undefined,
   ): Promise<ResponseType<MCPBridgeResponse> | ContentResponse> {
+    // instanceId (CLI-only field) overrides session routing when provided.
     // CLI invocations are short-lived (new PID per call). Use a single shared
     // session ID so all CLI calls reuse one stable tab instead of each creating
     // a new one. Every other platform (MCP, web, …) has a stable process PID.
-    const sessionId = isCliPlatform(platform) ? "cli" : env.VIBE_PID;
+    const sessionId =
+      data.instanceId ?? (isCliPlatform(platform) ? "cli" : env.VIBE_PID);
     logger.info("[Browser] Executing tool", {
       tool: data.tool,
       sessionId,
@@ -808,30 +822,60 @@ export class BrowserRepository {
 
       const mcpToolName = TOOL_NAME_MAP[data.tool] ?? data.tool;
 
-      // Acquire mutex: select_page + tool call are atomic.
+      // Single global mutex: ensureSession + select_page + tool_call are all
+      // atomic. select_page sets global state in chrome-devtools-mcp so there
+      // is no safe way to run any of this concurrently across sessions.
       let releaseMutex!: () => void;
       const acquired = new Promise<void>((resolve) => {
         releaseMutex = resolve;
       });
-      const prev = mcp.mutex;
-      mcp.mutex = prev.then(() => acquired);
+      const prev = globalThis.__mcpToolMutex ?? Promise.resolve();
+      globalThis.__mcpToolMutex = prev.then(() => acquired);
       await prev;
 
       try {
-        const state = await ensureSession(sessionId, mcp, logger);
-        if (!state) {
+        // new_page is its own session initializer — it opens the real tab directly.
+        // We must NOT create a placeholder about:blank tab first (that would be
+        // an extra tab that we'd have to clean up). Instead, we snapshot CDP targets
+        // before the call and diff after to identify the new tab.
+        //
+        // For all other tools, ensureSession creates a tab if none exists yet.
+        const isNewPage = mcpToolName === "new_page";
+
+        // For new_page with no existing session: don't pre-create a placeholder tab.
+        const s = await ensureSession(sessionId, mcp, logger, !isNewPage);
+
+        // Non-new_page tools require an existing session tab.
+        if (!isNewPage && !s) {
           return fail({
             message: t("repository.mcp.connect.failedToInitialize"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
           });
         }
 
-        // For close_page and select_page, inject the session's page ID when not
+        // Snapshot CDP targets before new_page so we can diff after to find the new tab.
+        const beforeIds = isNewPage
+          ? new Set((await listCDPTargets()).map((tgt) => tgt.id))
+          : null;
+
+        // Select our page before running the tool (establishes context in chrome-devtools-mcp).
+        // Skip for new_page when there is no session yet — nothing to select.
+        if (s) {
+          await sendRaw(mcp, {
+            jsonrpc: "2.0",
+            id: mcp.nextId++,
+            method: "tools/call",
+            params: { name: "select_page", arguments: { pageId: s.mcpPageId } },
+          });
+        }
+
+        // For close_page and select_page inject the session's page ID when not
         // explicitly provided so callers don't need to manage page IDs manually.
         const finalArgs =
+          s &&
           (mcpToolName === "close_page" || mcpToolName === "select_page") &&
           parsedArgs["pageId"] === undefined
-            ? { ...parsedArgs, pageId: state.mcpPageId }
+            ? { ...parsedArgs, pageId: s.mcpPageId }
             : parsedArgs;
 
         const resp = await sendRaw(mcp, {
@@ -856,45 +900,86 @@ export class BrowserRepository {
 
         const toolSuccess = !resp.error && !mcpResult?.isError;
 
-        // Tab-management tools (new_page, select_page, close_page) explicitly
-        // change which page is selected - the session tab should NOT follow.
-        // Only follow an unexpected page switch caused by navigation tools
-        // (e.g. clicking a link that opens in a new tab).
-        const isTabManagementTool =
+        // After new_page: record the new tab as this session's tab.
+        // Use before/after CDP diff (inside the lock) to identify the exact new target.
+        // If the session already had a tab (s != null), close it — each session owns
+        // exactly one tab; the old one is now an orphan.
+        if (toolSuccess && isNewPage && beforeIds) {
+          const text =
+            mcpResult?.content?.find((c) => c.type === "text")?.text ?? "";
+          const selectedMatch = /^(\d+):.*\[selected\]/m.exec(text);
+          if (selectedMatch) {
+            const newMcpPageId = parseInt(selectedMatch[1] ?? "0", 10);
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, 200);
+            });
+            const afterTargets = await listCDPTargets();
+            const newTarget = afterTargets.find(
+              (tgt) => !beforeIds.has(tgt.id),
+            );
+            // Close the old tab (if any) before updating session state.
+            if (s) {
+              await closeCDPTab(s.cdpTargetId);
+            }
+            const newState: SessionState = {
+              cdpTargetId: newTarget?.id ?? `unknown-${newMcpPageId}`,
+              mcpPageId: newMcpPageId,
+            };
+            sessions.set(sessionId, newState);
+            saveSessions(sessions);
+            logger.info("[Browser] Session tab replaced via new_page", {
+              sessionId,
+              mcpPageId: newMcpPageId,
+              cdpTargetId: newState.cdpTargetId,
+              closedOldTarget: s?.cdpTargetId ?? null,
+            });
+          }
+        }
+
+        // After close_page: evict session so next call creates a fresh tab.
+        // The MCP close_page call already closed the tab in Chrome; we just
+        // need to remove it from our session map.
+        if (toolSuccess && mcpToolName === "close_page" && s) {
+          sessions.delete(sessionId);
+          saveSessions(sessions);
+          logger.info("[Browser] Session tab closed, session evicted", {
+            sessionId,
+            cdpTargetId: s.cdpTargetId,
+          });
+        }
+
+        // For other tools: if the selected page changed unexpectedly
+        // (e.g. click opened a new tab), follow it.
+        const isNonFollowTool =
           mcpToolName === "new_page" ||
           mcpToolName === "select_page" ||
           mcpToolName === "close_page";
 
-        if (toolSuccess && !isTabManagementTool) {
+        if (toolSuccess && !isNonFollowTool && s) {
           const text =
             mcpResult?.content?.find((c) => c.type === "text")?.text ?? "";
           const selectedMatch = /^(\d+):.*\[selected\]/m.exec(text);
           if (selectedMatch) {
             const nowSelectedId = parseInt(selectedMatch[1] ?? "0", 10);
-            if (nowSelectedId !== state.mcpPageId) {
-              const oldTargetId = state.cdpTargetId;
-              // Resolve the new CDP target ID for the newly-selected MCP page.
+            if (nowSelectedId !== s.mcpPageId) {
               const nowTargets = await listCDPTargets();
               const nowSelectedUrl =
                 parsePageList(text).find((p) => p.id === nowSelectedId)?.url ??
                 "";
               const nowTarget = nowTargets.find(
-                (tgt) => tgt.url === nowSelectedUrl && tgt.id !== oldTargetId,
+                (tgt) => tgt.url === nowSelectedUrl && tgt.id !== s.cdpTargetId,
               );
-              state.mcpPageId = nowSelectedId;
+              s.mcpPageId = nowSelectedId;
               if (nowTarget) {
-                state.cdpTargetId = nowTarget.id;
+                s.cdpTargetId = nowTarget.id;
               }
-              sessions.set(sessionId, state);
+              sessions.set(sessionId, s);
               saveSessions(sessions);
-              logger.info(
-                "[Browser] Session tab followed unexpected page switch",
-                {
-                  sessionId: sessionId,
-                  mcpPageId: nowSelectedId,
-                  cdpTargetId: state.cdpTargetId,
-                },
-              );
+              logger.info("[Browser] Session followed unexpected page switch", {
+                sessionId,
+                mcpPageId: nowSelectedId,
+                cdpTargetId: s.cdpTargetId,
+              });
             }
           }
         }

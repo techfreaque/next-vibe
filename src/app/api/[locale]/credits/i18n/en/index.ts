@@ -44,6 +44,7 @@ export const translations = {
   expire: {
     post: {
       title: "Expire Credits",
+      titleShort: "Expire Credits",
       description: "Expire old subscription credits (called by cron)",
       tag: "expire",
       container: {
@@ -129,6 +130,7 @@ export const translations = {
   },
   get: {
     title: "Get Credit Balance",
+    titleShort: "Balance",
     description: "Retrieve current user's credit balance with breakdown",
     response: {
       title: "Credit Balance",
@@ -244,6 +246,7 @@ export const translations = {
   history: {
     get: {
       title: "Get Credit History",
+      titleShort: "Credit History",
       description: "Retrieve paginated credit transaction history",
       container: {
         title: "Credit History",
@@ -431,6 +434,7 @@ export const translations = {
   adminAdd: {
     post: {
       title: "Add Credits",
+      titleShort: "Add Credits",
       description: "Add credit packs to a user account (admin only)",
       tag: "admin",
       container: {

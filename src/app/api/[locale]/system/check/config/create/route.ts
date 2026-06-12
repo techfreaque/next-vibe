@@ -13,11 +13,11 @@ import configCreateEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: configCreateEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, t, platform, locale }) => {
-      const { ConfigCreateRepository } = await import(
-        /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-      );
-      return ConfigCreateRepository.execute(data, logger, t, platform, locale);
-    },
+    handler: async ({ data, logger, t, platform, locale }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
+        )
+      ).ConfigCreateRepository.execute(data, logger, t, platform, locale),
   },
 });

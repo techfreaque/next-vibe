@@ -7,6 +7,7 @@ export const translations = {
 
   get: {
     title: "Export Leads",
+    titleShort: "Export Leads",
     description: "Export leads data to file",
     form: {
       title: "Export Configuration",

@@ -6,7 +6,8 @@ export const translations = {
   },
 
   get: {
-    title: "List Leads",
+    title: "Leads",
+    titleShort: "Lead List",
     description: "Retrieve a paginated list of leads with filtering",
     createButton: {
       label: "Create Lead",

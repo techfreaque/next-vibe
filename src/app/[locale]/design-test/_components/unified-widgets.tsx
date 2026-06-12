@@ -61,8 +61,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const WIDGET_BASE =
-  "src/app/api/[locale]/system/unified-interface/unified-ui/widgets";
+const WIDGET_BASE = "src/packages/next-vibe-ui/unified";
 
 function WidgetCard({
   name,

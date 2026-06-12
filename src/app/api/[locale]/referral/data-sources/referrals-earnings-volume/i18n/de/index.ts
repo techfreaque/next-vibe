@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Empfehlungsverdienste",
+    titleShort: "Verdienste",
     description:
       "Summe der Empfehlungsverdienste in Cent pro Auflösungs-Bucket",
     fields: {

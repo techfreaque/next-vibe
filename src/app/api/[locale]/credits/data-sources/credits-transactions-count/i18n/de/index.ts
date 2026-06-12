@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
+    titleShort: "Transaktionen",
     title: "Kredit-Transaktionen Anzahl",
     description: "Gesamtanzahl der Kredittransaktionen pro Auflösungs-Bucket",
     fields: {

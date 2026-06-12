@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Generate Task Index",
+    titleShort: "Task Index",
     description: "Generate task index files",
     container: {
       title: "Task Index Generation",

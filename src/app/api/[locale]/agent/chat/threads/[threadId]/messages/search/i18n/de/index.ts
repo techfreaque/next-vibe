@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   search: {
     get: {
       title: "Search Messages",
+      titleShort: "Nachrichten suchen",
       description:
         "Search messages within a specific thread using full-text search",
       container: {

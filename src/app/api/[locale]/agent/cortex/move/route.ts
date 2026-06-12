@@ -8,8 +8,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger, t }) => {
-      return CortexMoveRepository.moveNode({
+    handler: async ({ data, user, locale, logger, t }) =>
+      CortexMoveRepository.moveNode({
         userId: user.id,
         user,
         locale,
@@ -17,7 +17,6 @@ export const { POST, tools } = endpointsHandler({
         to: data.to,
         logger,
         t,
-      });
-    },
+      }),
   },
 });

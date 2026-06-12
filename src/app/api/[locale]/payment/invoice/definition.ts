@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   requestField,
   responseField,
@@ -18,10 +19,15 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { InvoiceStatus } from "../enum";
 import { scopedTranslation } from "./i18n";
+
+const PaymentInvoiceWidgetLazy = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.PaymentInvoiceWidget })),
+);
 
 /**
  * POST endpoint for creating invoices
@@ -31,9 +37,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["payment", "invoice"],
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
-  category: "endpointCategories.payments",
-  subCategory: "endpointCategories.paymentTransactions",
+  category: "payments",
+  subCategory: "Transactions",
   icon: "receipt" as const,
   tags: [
     "tags.payment" as const,
@@ -42,12 +49,8 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.form.title" as const,
-    description: "post.form.description" as const,
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
+    render: PaymentInvoiceWidgetLazy,
     usage: { request: "data", response: true },
     children: {
       // REQUEST FIELDS
