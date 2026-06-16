@@ -8,6 +8,7 @@ import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -78,6 +79,8 @@ function StockItem({
   transferLabel,
   onAdjust,
   adjustLabel,
+  isPickerMode,
+  onPick,
 }: {
   row: StockRow;
   lowStockLabel: string;
@@ -92,6 +95,8 @@ function StockItem({
   transferLabel: string;
   onAdjust: (warehouseId: string, productId: string) => void;
   adjustLabel: string;
+  isPickerMode: boolean;
+  onPick: ((row: StockRow) => void) | undefined;
 }): JSX.Element {
   return (
     <Div
@@ -101,7 +106,8 @@ function StockItem({
           : row.isLowStock
             ? " border-l-2 border-l-amber-500"
             : ""
-      }`}
+      }${isPickerMode ? " cursor-pointer" : ""}`}
+      onClick={isPickerMode && onPick ? () => onPick(row) : undefined}
     >
       {/* Product + warehouse info */}
       <Div className="flex-1 min-w-0">
@@ -148,28 +154,32 @@ function StockItem({
         <Div className="w-24 flex justify-center">
           {stockStatusBadge(row, lowStockLabel, outOfStockLabel, statusOkLabel)}
         </Div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs shrink-0"
-          onClick={() => {
-            onAdjust(row.warehouseId, row.productId);
-          }}
-        >
-          {adjustLabel}
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs shrink-0"
-          onClick={() => {
-            onTransfer(row.warehouseId, row.productId);
-          }}
-        >
-          {transferLabel}
-        </Button>
+        {!isPickerMode && (
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs shrink-0"
+              onClick={() => {
+                onAdjust(row.warehouseId, row.productId);
+              }}
+            >
+              {adjustLabel}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs shrink-0"
+              onClick={() => {
+                onTransfer(row.warehouseId, row.productId);
+              }}
+            >
+              {transferLabel}
+            </Button>
+          </>
+        )}
       </Div>
     </Div>
   );
@@ -184,6 +194,8 @@ export function InventoryStockListWidget(
   const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const onPick = usePickerCallback<StockRow>();
+  const isPickerMode = !!onPick;
 
   const handleAdjust = (warehouseId: string, productId: string): void => {
     void (async (): Promise<void> => {
@@ -310,6 +322,8 @@ export function InventoryStockListWidget(
               adjustLabel={t("stockList.get.widget.adjust")}
               onTransfer={handleTransfer}
               transferLabel={t("stockList.get.widget.transfer")}
+              isPickerMode={isPickerMode}
+              onPick={onPick}
             />
           ))}
         </Div>

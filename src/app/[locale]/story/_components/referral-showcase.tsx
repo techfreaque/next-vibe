@@ -14,9 +14,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as referralScopedTranslation } from "@/app/[locale]/user/(account)/referral/i18n";
 import {
+  buildCommissionRows,
   getChainScenarios,
   getChainTotal,
-  getCommissionRows,
   getReferralParams,
 } from "@/app/[locale]/user/(account)/referral/i18n/utils";
 
@@ -386,7 +386,7 @@ function ChainBreakdown({
   params: Params;
 }): JSX.Element {
   const { t } = referralScopedTranslation.scopedT(locale);
-  const rows = getCommissionRows(locale);
+  const rows = buildCommissionRows(locale, t);
   const total = getChainTotal(locale);
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 

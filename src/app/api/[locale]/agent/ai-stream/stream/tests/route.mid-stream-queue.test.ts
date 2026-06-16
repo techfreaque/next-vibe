@@ -44,18 +44,11 @@ installFetchCache();
 
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
-import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { defaultLocale } from "@/i18n/core/config";
-import { eq } from "drizzle-orm";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
@@ -67,7 +60,13 @@ import {
   setFetchCacheContext,
   waitForInflightFetches,
 } from "../../testing/fetch-cache";
-import type { SlimMessage } from "../../testing/headless-test-runner";
+import {
+  fetchThreadMessages,
+  fetchThreadStreamingState,
+  getOrCreateFolder,
+  resolveUser,
+  type SlimMessage,
+} from "../../testing/headless-test-runner";
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 
 // ── Test timeouts ─────────────────────────────────────────────────────────────
@@ -76,35 +75,6 @@ import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 const TEST_TIMEOUT = 120_000;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-async function resolveAdminUser(): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await UserRepository.getUserByEmail(
-    env.VIBE_ADMIN_USER_EMAIL,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  const user = result.data;
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-    }),
-    db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-  ]);
-  if (!link) {
-    return null;
-  }
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-  return { isPublic: false, id: user.id, leadId: link.leadId, roles };
-}
 
 /** Walk parent chain from leafId back to root. Returns [root, ..., leaf]. */
 function walkChain(messages: SlimMessage[], leafId: string): string[] {
@@ -208,35 +178,22 @@ function assertStrictLinearChain(messages: SlimMessage[], label: string): void {
 async function waitForQueueProcessed(
   threadId: string,
   queuedMessageId: string,
+  user: JwtPrivatePayloadType,
   maxWaitMs = 90_000,
 ): Promise<SlimMessage[]> {
   const pollIntervalMs = 400;
   const start = Date.now();
   while (Date.now() - start < maxWaitMs) {
-    const [threadRow] = await db
-      .select({ streamingState: chatThreads.streamingState })
-      .from(chatThreads)
-      .where(eq(chatThreads.id, threadId));
+    const messages = await fetchThreadMessages(threadId, user);
+    const streamingState = await fetchThreadStreamingState(threadId, user);
 
-    const [queuedRow] = await db
-      .select({ metadata: chatMessages.metadata })
-      .from(chatMessages)
-      .where(eq(chatMessages.id, queuedMessageId));
-
-    const [ai2Row] = await db
-      .select({ id: chatMessages.id })
-      .from(chatMessages)
-      .where(eq(chatMessages.parentId, queuedMessageId));
-
-    const isIdle = threadRow?.streamingState === "idle";
-    const isStillQueued = queuedRow?.metadata?.isQueued === true;
-    const ai2Exists = ai2Row !== undefined;
+    const isIdle = streamingState === "idle";
+    const queuedMsg = messages.find((m) => m.id === queuedMessageId);
+    const isStillQueued = queuedMsg?.isQueued === true;
+    const ai2Exists = messages.some((m) => m.parentId === queuedMessageId);
 
     if (isIdle && !isStillQueued && ai2Exists) {
-      const { fetchThreadMessages } = await import(
-        "../../testing/headless-test-runner"
-      );
-      return fetchThreadMessages(threadId);
+      return messages;
     }
 
     await new Promise<void>((resolve) => {
@@ -250,33 +207,34 @@ async function waitForQueueProcessed(
   );
 }
 
-/** Assert the queued message is no longer marked isQueued in DB. */
+/** Assert the queued message is no longer marked isQueued via messages endpoint. */
 async function assertNotQueued(
+  threadId: string,
   messageId: string,
+  user: JwtPrivatePayloadType,
   label: string,
 ): Promise<void> {
-  const [row] = await db
-    .select({ metadata: chatMessages.metadata })
-    .from(chatMessages)
-    .where(eq(chatMessages.id, messageId));
+  const messages = await fetchThreadMessages(threadId, user);
+  const row = messages.find((m) => m.id === messageId);
   expect(
     row,
-    `[${label}] Queued message ${messageId} not found in DB`,
+    `[${label}] Queued message ${messageId} not found`,
   ).toBeDefined();
   expect(
-    row?.metadata?.isQueued,
+    row?.isQueued,
     `[${label}] Message ${messageId} still has isQueued=true after processing`,
   ).not.toBe(true);
 }
 
-/** Assert the thread is idle in DB. */
-async function assertThreadIdle(threadId: string, label: string): Promise<void> {
-  const [row] = await db
-    .select({ streamingState: chatThreads.streamingState })
-    .from(chatThreads)
-    .where(eq(chatThreads.id, threadId));
+/** Assert the thread is idle via the messages endpoint. */
+async function assertThreadIdle(
+  threadId: string,
+  user: JwtPrivatePayloadType,
+  label: string,
+): Promise<void> {
+  const streamingState = await fetchThreadStreamingState(threadId, user);
   expect(
-    row?.streamingState,
+    streamingState,
     `[${label}] Thread not idle after both streams completed`,
   ).toBe("idle");
 }
@@ -292,6 +250,7 @@ async function fireInteractiveStream(
   prompt: string,
   threadId: string,
   userMessageId: string,
+  subFolderId: string,
 ): Promise<void> {
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -299,7 +258,7 @@ async function fireInteractiveStream(
   const data: AiStreamPostRequestOutput = {
     operation: "send",
     rootFolderId: DefaultFolderId.BACKGROUND,
-    subFolderId: null,
+    subFolderId,
     threadId,
     userMessageId,
     parentMessageId: null,
@@ -345,6 +304,7 @@ async function enqueueSecondMessage(
   threadId: string,
   prompt: string,
   queuedMessageId: string,
+  subFolderId: string,
 ): Promise<void> {
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -352,7 +312,7 @@ async function enqueueSecondMessage(
   const data: AiStreamPostRequestOutput = {
     operation: "send",
     rootFolderId: DefaultFolderId.BACKGROUND,
-    subFolderId: null,
+    subFolderId,
     threadId,
     userMessageId: queuedMessageId,
     parentMessageId: null, // will be advanced by advanceQueuedMessages
@@ -391,6 +351,7 @@ async function enqueueSecondMessage(
 
 describe("Mid-Stream Queue - chain integrity", () => {
   let testUser: JwtPrivatePayloadType;
+  let midStreamQueueFolderId: string;
   let suiteFailed = false;
 
   function fit(
@@ -420,7 +381,7 @@ describe("Mid-Stream Queue - chain integrity", () => {
   }
 
   beforeAll(async () => {
-    const resolved = await resolveAdminUser();
+    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
     expect(
       resolved,
       `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
@@ -429,6 +390,10 @@ describe("Mid-Stream Queue - chain integrity", () => {
       return;
     }
     testUser = resolved;
+
+    // Create BACKGROUND/tests/mid-stream-queue subfolder for this suite.
+    const testsParentId = await getOrCreateFolder(testUser, DefaultFolderId.BACKGROUND, "tests");
+    midStreamQueueFolderId = await getOrCreateFolder(testUser, DefaultFolderId.BACKGROUND, "mid-stream-queue", testsParentId);
   }, TEST_TIMEOUT);
 
   // ── MQ1: Plain echo — queue via finally-block processor ───────────────────
@@ -452,7 +417,7 @@ describe("Mid-Stream Queue - chain integrity", () => {
         "No preamble, no explanation, no punctuation beyond that. " +
         "If you add anything else, the test FAILS.";
 
-      await fireInteractiveStream(testUser, stream1Prompt, thread1Id, user1MsgId);
+      await fireInteractiveStream(testUser, stream1Prompt, thread1Id, user1MsgId, midStreamQueueFolderId);
 
       // Stream 1 is now running (fire-and-forget). Enqueue stream 2 immediately.
       // StreamRegistry.isActive(thread1Id) must be true at this point for the
@@ -467,40 +432,31 @@ describe("Mid-Stream Queue - chain integrity", () => {
         "IMPORTANT: If you see any message that says QUEUED_DONE was already replied, " +
         "that means you have been called twice and the test FAILS.";
 
-      await enqueueSecondMessage(testUser, thread1Id, stream2Prompt, queued2MsgId);
+      await enqueueSecondMessage(testUser, thread1Id, stream2Prompt, queued2MsgId, midStreamQueueFolderId);
 
       // Wait until the queued message is processed AND ai2 exists.
       // waitForThreadIdle is not sufficient here — it may return during the brief
       // idle window between stream 1 ending and stream 2 starting.
-      const messages = await waitForQueueProcessed(thread1Id, queued2MsgId);
+      const messages = await waitForQueueProcessed(thread1Id, queued2MsgId, testUser);
 
       // ── MQ1 assertions ────────────────────────────────────────────────────
 
-      await assertThreadIdle(thread1Id, "MQ1");
-      await assertNotQueued(queued2MsgId, "MQ1");
+      await assertThreadIdle(thread1Id, testUser, "MQ1");
+      await assertNotQueued(thread1Id, queued2MsgId, testUser, "MQ1");
 
       // 1. assistant ai1 has parentId = user1MsgId
-      const [ai1Row] = await db
-        .select({ id: chatMessages.id, role: chatMessages.role, content: chatMessages.content })
-        .from(chatMessages)
-        .where(eq(chatMessages.parentId, user1MsgId));
+      const ai1Row = messages.find((m) => m.parentId === user1MsgId);
       expect(ai1Row, "MQ1: no assistant after user1").toBeDefined();
       expect(ai1Row!.role, "MQ1: child of user1 must be assistant").toBe("assistant");
       expect(ai1Row!.content, "MQ1: ai1 must contain ECHO_DONE").toContain("ECHO_DONE");
 
       // 2. queued user message exists
-      const [queuedRow] = await db
-        .select({ id: chatMessages.id, role: chatMessages.role })
-        .from(chatMessages)
-        .where(eq(chatMessages.id, queued2MsgId));
-      expect(queuedRow, "MQ1: queued user message not in DB").toBeDefined();
+      const queuedRow = messages.find((m) => m.id === queued2MsgId);
+      expect(queuedRow, "MQ1: queued user message not in messages").toBeDefined();
       expect(queuedRow!.role, "MQ1: queued message must be user").toBe("user");
 
       // 3. assistant ai2 has parentId = queued2MsgId — the critical assertion
-      const [ai2Row] = await db
-        .select({ id: chatMessages.id, role: chatMessages.role, content: chatMessages.content })
-        .from(chatMessages)
-        .where(eq(chatMessages.parentId, queued2MsgId));
+      const ai2Row = messages.find((m) => m.parentId === queued2MsgId);
       expect(ai2Row, "MQ1: no assistant after queued user message").toBeDefined();
       expect(ai2Row!.role, "MQ1: child of queued user must be assistant").toBe("assistant");
       expect(ai2Row!.content, "MQ1: ai2 must contain QUEUED_DONE").toContain("QUEUED_DONE");
@@ -571,7 +527,7 @@ describe("Mid-Stream Queue - chain integrity", () => {
         "Do NOT add any other text. Do NOT call any other tools. " +
         "If you deviate from these instructions the test FAILS immediately.";
 
-      await fireInteractiveStream(testUser, stream1Prompt, thread2Id, user1MsgId);
+      await fireInteractiveStream(testUser, stream1Prompt, thread2Id, user1MsgId, midStreamQueueFolderId);
 
       // Enqueue the second message immediately after stream 1 starts.
       // In the tool-loop path, this will be picked up by prepareStep before
@@ -585,44 +541,32 @@ describe("Mid-Stream Queue - chain integrity", () => {
         "If you add anything else, the test FAILS. " +
         "CRITICAL: Do NOT call any tools. A tool call here would cause the test to fail.";
 
-      await enqueueSecondMessage(testUser, thread2Id, stream2Prompt, queued2MsgId);
+      await enqueueSecondMessage(testUser, thread2Id, stream2Prompt, queued2MsgId, midStreamQueueFolderId);
 
       // Wait until the queued message is processed AND ai2 exists.
-      const messages = await waitForQueueProcessed(thread2Id, queued2MsgId);
+      const messages = await waitForQueueProcessed(thread2Id, queued2MsgId, testUser);
 
       // ── MQ2 assertions ────────────────────────────────────────────────────
 
-      await assertThreadIdle(thread2Id, "MQ2");
-      await assertNotQueued(queued2MsgId, "MQ2");
+      await assertThreadIdle(thread2Id, testUser, "MQ2");
+      await assertNotQueued(thread2Id, queued2MsgId, testUser, "MQ2");
 
       // 1. user1 exists with no parent (root)
-      const [user1Row] = await db
-        .select({ id: chatMessages.id, parentId: chatMessages.parentId })
-        .from(chatMessages)
-        .where(eq(chatMessages.id, user1MsgId));
-      expect(user1Row, "MQ2: user1 not in DB").toBeDefined();
+      const user1Row = messages.find((m) => m.id === user1MsgId);
+      expect(user1Row, "MQ2: user1 not in messages").toBeDefined();
 
       // 2. assistant ai1 has parentId = user1MsgId
-      const [ai1Row] = await db
-        .select({ id: chatMessages.id, role: chatMessages.role })
-        .from(chatMessages)
-        .where(eq(chatMessages.parentId, user1MsgId));
+      const ai1Row = messages.find((m) => m.parentId === user1MsgId);
       expect(ai1Row, "MQ2: no assistant after user1").toBeDefined();
       expect(ai1Row!.role, "MQ2: child of user1 must be assistant").toBe("assistant");
 
       // 3. queued user message exists
-      const [queuedRow] = await db
-        .select({ id: chatMessages.id, role: chatMessages.role, parentId: chatMessages.parentId })
-        .from(chatMessages)
-        .where(eq(chatMessages.id, queued2MsgId));
-      expect(queuedRow, "MQ2: queued user message not in DB").toBeDefined();
+      const queuedRow = messages.find((m) => m.id === queued2MsgId);
+      expect(queuedRow, "MQ2: queued user message not in messages").toBeDefined();
       expect(queuedRow!.role, "MQ2: queued message must be user").toBe("user");
 
       // 4. assistant ai2 has parentId = queued2MsgId — the critical assertion
-      const [ai2Row] = await db
-        .select({ id: chatMessages.id, role: chatMessages.role, content: chatMessages.content })
-        .from(chatMessages)
-        .where(eq(chatMessages.parentId, queued2MsgId));
+      const ai2Row = messages.find((m) => m.parentId === queued2MsgId);
       expect(ai2Row, "MQ2: no assistant after queued user message").toBeDefined();
       expect(ai2Row!.role, "MQ2: child of queued user must be assistant").toBe("assistant");
       expect(ai2Row!.content, "MQ2: ai2 must contain QUEUED_TOOL_DONE").toContain("QUEUED_TOOL_DONE");

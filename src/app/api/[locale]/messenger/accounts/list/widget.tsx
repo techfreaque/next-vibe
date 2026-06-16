@@ -20,6 +20,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -68,11 +69,13 @@ function AccountRow({
   account,
   onEdit,
   onDelete,
+  isPickerMode,
   t,
 }: {
   account: MessengerAccount;
   onEdit: (account: MessengerAccount) => void;
   onDelete: (account: MessengerAccount) => void;
+  isPickerMode: boolean;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
   const locale = useWidgetLocale();
@@ -139,31 +142,35 @@ function AccountRow({
         </Div>
       </Div>
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete(account);
-        }}
-        className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
-        title={t("widget.deleteConfirm")}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
+      {!isPickerMode && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(account);
+          }}
+          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
+          title={t("widget.deleteConfirm")}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      )}
     </Div>
   );
 }
 
 export function MessengerAccountsListContainer(): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
-  const { push: navigate } = useWidgetNavigation();
+  const { push: navigate, pop } = useWidgetNavigation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
   const t = useWidgetTranslation<typeof definition.GET>();
   const enumT = accountsScopedTranslation.scopedT(locale).t;
   const onSubmit = useWidgetOnSubmit();
+  const onPick = usePickerCallback<MessengerAccount>();
+  const isPickerMode = !!onPick;
 
   const activeChannel: typeof MessengerChannelFilterValue =
     form.watch("channel") ?? MessengerChannelFilter.ANY;
@@ -183,6 +190,11 @@ export function MessengerAccountsListContainer(): React.JSX.Element {
 
   const handleEdit = useCallback(
     (account: MessengerAccount): void => {
+      if (isPickerMode && onPick) {
+        onPick(account);
+        pop();
+        return;
+      }
       navigate(messengerAccountEditDefinition.PUT, {
         urlPathParams: { id: account.id },
         prefillFromGet: true,
@@ -190,7 +202,7 @@ export function MessengerAccountsListContainer(): React.JSX.Element {
         popNavigationOnSuccess: 1,
       });
     },
-    [navigate],
+    [isPickerMode, onPick, pop, navigate],
   );
 
   const handleDelete = useCallback(
@@ -255,61 +267,69 @@ export function MessengerAccountsListContainer(): React.JSX.Element {
           )}
         </Span>
         <Div className="flex-1" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleGraphs}
-          title={t("widget.graphs")}
-          className="gap-1"
-        >
-          <GitBranch className="h-4 w-4" />
-          <Span className="hidden sm:inline text-xs">{t("widget.graphs")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="default"
-          size="sm"
-          onClick={handleCreate}
-          className="gap-1"
-        >
-          <Plus className="h-4 w-4" />
-          {t("widget.create")}
-        </Button>
-      </Div>
-
-      {/* Channel filter tabs */}
-      <Div className="flex items-center gap-1 px-4 pt-3 pb-1 overflow-x-auto scrollbar-none">
-        {MessengerChannelFilterOptions.map((opt) => {
-          const isActive = activeChannel === opt.value;
-          return (
+        {!isPickerMode && (
+          <>
             <Button
-              key={opt.value}
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => handleChannelTab(opt.value)}
-              className={cn(
-                "flex-shrink-0 inline-flex items-center px-3 py-1 h-7 rounded-full text-xs font-medium border transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-transparent text-muted-foreground border-border hover:bg-accent",
-              )}
+              onClick={handleGraphs}
+              title={t("widget.graphs")}
+              className="gap-1"
             >
-              {enumT(opt.label)}
+              <GitBranch className="h-4 w-4" />
+              <Span className="hidden sm:inline text-xs">
+                {t("widget.graphs")}
+              </Span>
             </Button>
-          );
-        })}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              title={t("widget.refresh")}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={handleCreate}
+              className="gap-1"
+            >
+              <Plus className="h-4 w-4" />
+              {t("widget.create")}
+            </Button>
+          </>
+        )}
       </Div>
+
+      {/* Channel filter tabs — full mode only */}
+      {!isPickerMode && (
+        <Div className="flex items-center gap-1 px-4 pt-3 pb-1 overflow-x-auto scrollbar-none">
+          {MessengerChannelFilterOptions.map((opt) => {
+            const isActive = activeChannel === opt.value;
+            return (
+              <Button
+                key={opt.value}
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleChannelTab(opt.value)}
+                className={cn(
+                  "flex-shrink-0 inline-flex items-center px-3 py-1 h-7 rounded-full text-xs font-medium border transition-colors",
+                  isActive
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-transparent text-muted-foreground border-border hover:bg-accent",
+                )}
+              >
+                {enumT(opt.label)}
+              </Button>
+            );
+          })}
+        </Div>
+      )}
 
       {/* Search */}
       <Div className="px-4 pt-2 pb-2 flex items-center gap-2 border-b">
@@ -343,6 +363,7 @@ export function MessengerAccountsListContainer(): React.JSX.Element {
                 account={account}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                isPickerMode={isPickerMode}
                 t={t}
               />
             ))}
@@ -350,22 +371,24 @@ export function MessengerAccountsListContainer(): React.JSX.Element {
         ) : (
           <Div className="text-center text-muted-foreground py-12">
             <Div className="mb-4">{t("widget.emptyState")}</Div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleCreate}
-              className="gap-1"
-            >
-              <Plus className="h-4 w-4" />
-              {t("widget.create")}
-            </Button>
+            {!isPickerMode && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleCreate}
+                className="gap-1"
+              >
+                <Plus className="h-4 w-4" />
+                {t("widget.create")}
+              </Button>
+            )}
           </Div>
         )}
       </Div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
+      {/* Pagination — full mode only */}
+      {!isPickerMode && totalPages > 1 && (
         <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
           <Span>
             {currentPage} / {totalPages}

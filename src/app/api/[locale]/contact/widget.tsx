@@ -59,14 +59,6 @@ export function ContactFormWidget({
           <Mail className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">{t("title")}</Span>
         </Div>
-        <SubmitButtonWidget<typeof definition.POST>
-          field={{
-            text: "form.submitButton.label",
-            loadingText: "form.submitButton.loadingText",
-            icon: "send",
-            variant: "primary",
-          }}
-        />
       </Div>
 
       <Span className="text-sm text-muted-foreground">{t("description")}</Span>
@@ -79,10 +71,14 @@ export function ContactFormWidget({
       <SelectFieldWidget fieldName="priority" field={children.priority} />
       <TextareaFieldWidget fieldName="message" field={children.message} />
 
-      <Button type="submit" variant="default" className="w-full gap-2">
-        <Send className="h-4 w-4" />
-        {t("form.submitButton.label")}
-      </Button>
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{
+          text: "form.submitButton.label",
+          loadingText: "form.submitButton.loadingText",
+          icon: "send",
+          variant: "primary",
+        }}
+      />
     </Div>
   );
 }

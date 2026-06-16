@@ -13,6 +13,7 @@ import { useMemo, useState } from "react";
 
 import type { AnyModelId } from "@/app/api/[locale]/agent/models/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetLocale,
   useWidgetValue,
@@ -70,6 +71,7 @@ function ModelCard({
   t,
   nameClassName,
 }: {
+  onClick,
   model: ModelListItem;
   locale: Parameters<typeof ModelCreditDisplay>[0]["locale"];
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
@@ -170,6 +172,16 @@ function ModelGrid({
   models: ModelListItem[];
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
   locale: Parameters<typeof ModelCreditDisplay>[0]["locale"];
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
 }): JSX.Element {
   if (models.length === 0) {
     return (

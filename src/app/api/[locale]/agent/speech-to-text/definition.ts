@@ -8,6 +8,7 @@ import { lazy } from "react";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   requestField,
   responseField,
@@ -21,15 +22,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+const SpeechToTextContainer = lazy(() =>
+  import("./widget").then((m) => ({ default: m.SpeechToTextContainer })),
+);
+
 import { TRANSCRIBE_AUDIO_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+import { SttModelId } from "./models";
+import { DEFAULT_STT_MODEL_ID } from "./constants";
 
 /**
  * Speech-to-Text Endpoint (POST)
  * Transcribes audio to text using Eden AI
  */
-import { SttModelId } from "./models";
-import { DEFAULT_STT_MODEL_ID } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
@@ -41,20 +46,23 @@ const { POST } = createEndpoint({
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
   ],
+  defaultWebPinned: [
+    UserRole.ADMIN,
+    UserRole.CUSTOMER,
+    UserRole.PUBLIC,
+    UserRole.AI_TOOL_OFF,
+  ],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "mic",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiGeneration",
+  category: "ai",
+  subCategory: "Generation",
   tags: ["hotkey.tags.speech", "hotkey.tags.transcription", "hotkey.tags.ai"],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.form.title",
-    description: "post.form.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: SpeechToTextContainer,
+    usage: { request: "data", response: true } as const,
     children: {
       // === FILE UPLOAD SECTION ===
       fileUpload: objectField(scopedTranslation, {
@@ -100,6 +108,16 @@ const { POST } = createEndpoint({
               .max(20),
           }),
         },
+      }),
+
+      // === MODEL SELECTOR (managed by ModelSelectorTrigger in widget) ===
+      modelId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.model.label",
+        description: "post.model.description",
+        columns: 12,
+        schema: z.enum(SttModelId).default(DEFAULT_STT_MODEL_ID),
       }),
 
       // // === CONFIG FIELDS ===
@@ -230,12 +248,3 @@ const definitions = {
   POST,
 } as const;
 export default definitions;
-import { lazy } from "react";
-import { SttModelId } from "./models";
-import { DEFAULT_STT_MODEL_ID } from "./constants";
-import { lazy } from "react";
-import { SttModelId } from "./models";
-import { DEFAULT_STT_MODEL_ID } from "./constants";
-import { lazy } from "react";
-import { SttModelId } from "./models";
-import { DEFAULT_STT_MODEL_ID } from "./constants";

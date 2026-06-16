@@ -20,6 +20,7 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getCurrentUrl } from "next-vibe-ui/utils/browser";
 
 import {
   useChatNavigationStore,

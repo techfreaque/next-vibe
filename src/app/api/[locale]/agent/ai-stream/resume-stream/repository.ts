@@ -102,7 +102,11 @@ export class ResumeStreamRepository {
       // escalateToTask already set 'waiting' in DB; we just need to let the stream
       // finish its finally block before we attempt revival).
       let thread:
-        | { streamingState: string | null; rootFolderId: string | null }
+        | {
+            streamingState: string | null;
+            rootFolderId: string | null;
+            folderId: string | null;
+          }
         | undefined;
       const maxWaitMs = 3_000;
       const pollIntervalMs = 500;
@@ -112,6 +116,7 @@ export class ResumeStreamRepository {
           .select({
             streamingState: chatThreads.streamingState,
             rootFolderId: chatThreads.rootFolderId,
+            folderId: chatThreads.folderId,
           })
           .from(chatThreads)
           .where(eq(chatThreads.id, threadId))
@@ -184,6 +189,9 @@ export class ResumeStreamRepository {
       const threadRootFolderId =
         (thread?.rootFolderId as DefaultFolderId | null) ??
         DefaultFolderId.PRIVATE;
+      // The thread's subfolder rides along so revival turns route exactly
+      // like the original turn (REMOTE-folder threads relay to their instance).
+      const threadSubFolderId = thread?.folderId ?? undefined;
 
       logger.debug("[ResumeStream] State check", {
         threadId,
@@ -456,6 +464,7 @@ export class ResumeStreamRepository {
                 sequenceIdOverride: existingDeferred.sequenceId ?? undefined,
                 threadId: effectiveThreadId,
                 rootFolderId: threadRootFolderId,
+                subFolderId: threadSubFolderId,
                 subAgentDepth,
                 user,
                 locale,
@@ -733,6 +742,7 @@ export class ResumeStreamRepository {
               sequenceIdOverride: deferredSequenceId,
               threadId: effectiveThreadId,
               rootFolderId: threadRootFolderId,
+              subFolderId: threadSubFolderId,
               subAgentDepth,
               user,
               locale,
@@ -950,6 +960,7 @@ export class ResumeStreamRepository {
                 sequenceIdOverride: resolvedExisting?.sequenceId ?? undefined,
                 threadId: effectiveThreadId,
                 rootFolderId: threadRootFolderId,
+                subFolderId: threadSubFolderId,
                 subAgentDepth,
                 user,
                 locale,

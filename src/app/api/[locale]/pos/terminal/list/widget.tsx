@@ -9,6 +9,7 @@ import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -104,9 +105,16 @@ export function PosTerminalListWidget(
   const data = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
   const navigation = useWidgetNavigation();
+  const onPick = usePickerCallback<TerminalType>();
+  const isPickerMode = !!onPick;
 
   // Store terminal name in module-level map so session open widget can display it
   const handleOpenSession = (terminal: TerminalType): void => {
+    if (isPickerMode && onPick) {
+      onPick(terminal);
+      navigation.pop();
+      return;
+    }
     void (async (): Promise<void> => {
       posTerminalNameMap.set(terminal.id, terminal.name);
       const sessionDef = await import("../../session/open/definition");
@@ -178,14 +186,17 @@ export function PosTerminalListWidget(
             </Badge>
           ) : null}
         </Div>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={handleCreate}
-        >
-          + {t("terminalList.get.widget.createTerminal")}
-        </Button>
+        {!isPickerMode && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={handleCreate}
+          >
+            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+            + {t("terminalList.get.widget.createTerminal")}
+          </Button>
+        )}
       </Div>
 
       {/* Terminal list or empty state */}

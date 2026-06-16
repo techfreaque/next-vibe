@@ -1,5 +1,7 @@
 import "server-only";
 
+import { and, eq } from "drizzle-orm";
+
 import { db } from "@/app/api/[locale]/system/db";
 import {
   ErrorResponseTypes,
@@ -18,7 +20,9 @@ import { cortexNodes } from "../db";
 import { CortexNodeType, type CortexViewTypeValue } from "../enum";
 import {
   ensureParentDirs,
+  getMountPrefix,
   isValidPath,
+  isVirtualWritable,
   isWritablePath,
   normalizeToCanonicalPath,
   normalizePath,
@@ -39,7 +43,6 @@ interface MkdirParams {
 export class CortexMkdirRepository {
   static async createDirectory({
     userId,
-    user,
     locale,
     path: rawPath,
     viewType,
@@ -58,13 +61,32 @@ export class CortexMkdirRepository {
       });
     }
 
-    // Filesystem backend for preview-mode admin
-    if (!user.isPublic) {
-      const { isFilesystemMode } = await import("../fs-provider");
-      if (isFilesystemMode(user)) {
-        const { fsMkdir } = await import("../fs-provider/fs-mkdir");
-        return fsMkdir(path, createParents, { t });
+    // SSH virtual mount — create real directory on machine
+    if (isVirtualWritable(path)) {
+      const mountPrefix = getMountPrefix(path, locale);
+      if (mountPrefix === "/ssh") {
+        try {
+          const { mkdirSshPath } = await import("../mounts/ssh");
+          const ok = await mkdirSshPath(userId, path);
+          if (!ok) {
+            return fail({
+              message: t("post.errors.notFound.title"),
+              errorType: ErrorResponseTypes.NOT_FOUND,
+            });
+          }
+          return success({ responsePath: path, created: true });
+        } catch (error) {
+          logger.error("Cortex ssh mkdir failed", parseError(error), { path });
+          return fail({
+            message: t("post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
       }
+      return fail({
+        message: t("post.errors.forbidden.title"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
     }
 
     if (!isWritablePath(path, locale)) {
@@ -84,6 +106,17 @@ export class CortexMkdirRepository {
     try {
       const exists = await pathExists(userId, path);
       if (exists) {
+        // Dir already exists. If an explicit viewType was requested, apply it
+        // (so `mkdir --view kanban` on an existing dir sets the view); otherwise
+        // leave it untouched. Either way this is not a fresh creation.
+        if (viewType) {
+          await db
+            .update(cortexNodes)
+            .set({ viewType, updatedAt: new Date() })
+            .where(
+              and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, path)),
+            );
+        }
         return success({ responsePath: path, created: false });
       }
 
@@ -91,7 +124,10 @@ export class CortexMkdirRepository {
         await ensureParentDirs(userId, `${path}/placeholder`);
       }
 
-      // onConflictDoNothing: ensureParentDirs may have already created this dir
+      // ensureParentDirs above may have already materialized this dir row
+      // (without a viewType). Upsert so an explicit viewType is applied to the
+      // target dir whether the row pre-existed or not. When no viewType was
+      // requested, leave any existing viewType untouched (no-op on conflict).
       await db
         .insert(cortexNodes)
         .values({
@@ -102,11 +138,37 @@ export class CortexMkdirRepository {
           size: 0,
           viewType: viewType ?? null,
         })
-        .onConflictDoNothing();
+        .onConflictDoUpdate({
+          target: [cortexNodes.userId, cortexNodes.path],
+          set: viewType
+            ? { viewType, updatedAt: new Date() }
+            : { updatedAt: new Date() },
+        });
 
       logger.info(
         `Cortex mkdir: ${path}${viewType ? ` (viewType: ${viewType})` : ""}`,
       );
+
+      // WS-push sync: broadcast changed provider to connected remote instances
+      void (async (): Promise<void> => {
+        try {
+          const { serializeProviders } =
+            await import("@/app/api/[locale]/remote-connection/sync-provider");
+          const { broadcastSyncNotify } =
+            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+          const providerKey = path.startsWith("/memories")
+            ? "memories"
+            : "documents";
+          const syncPayloads = await serializeProviders(
+            [providerKey],
+            userId,
+            logger,
+          );
+          broadcastSyncNotify(userId, syncPayloads, logger);
+        } catch {
+          // Best-effort: cron fallback handles missed syncs
+        }
+      })();
 
       return success({ responsePath: path, created: true });
     } catch (error) {

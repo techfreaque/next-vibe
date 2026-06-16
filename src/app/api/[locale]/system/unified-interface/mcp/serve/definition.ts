@@ -120,6 +120,3 @@ export type MCPServeRequestInput = typeof POST.types.RequestInput;
 export type MCPServeRequestOutput = typeof POST.types.RequestOutput;
 export type MCPServeResponseInput = typeof POST.types.ResponseInput;
 export type MCPServeResponseOutput = typeof POST.types.ResponseOutput;
-import { MCP_ALIAS } from "./constants";
-import { MCP_ALIAS } from "./constants";
-import { MCP_ALIAS } from "./constants";

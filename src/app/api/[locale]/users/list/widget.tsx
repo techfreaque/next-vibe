@@ -389,130 +389,139 @@ export function UsersListContainer({
             </Span>
           )}
         </Span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleViewStats}
-          title={t("widget.userStatistics")}
-          className="gap-1"
-        >
-          <BarChart3 className="h-4 w-4" />
-          <Span className="hidden sm:inline text-xs">{t("widget.stats")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleGraphs}
-          title={t("widget.graphs")}
-          className="gap-1"
-        >
-          <GitBranch className="h-4 w-4" />
-          <Span className="hidden sm:inline text-xs">{t("widget.graphs")}</Span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
         {!isPickerMode && (
-          <Button
-            type="button"
-            variant="default"
-            size="sm"
-            onClick={handleCreate}
-            className="gap-1"
-          >
-            <UserPlus className="h-4 w-4" />
-            {t("widget.newUser")}
-          </Button>
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleViewStats}
+              title={t("widget.userStatistics")}
+              className="gap-1"
+            >
+              <BarChart3 className="h-4 w-4" />
+              <Span className="hidden sm:inline text-xs">
+                {t("widget.stats")}
+              </Span>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleGraphs}
+              title={t("widget.graphs")}
+              className="gap-1"
+            >
+              <GitBranch className="h-4 w-4" />
+              <Span className="hidden sm:inline text-xs">
+                {t("widget.graphs")}
+              </Span>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              title={t("widget.refresh")}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={handleCreate}
+              className="gap-1"
+            >
+              <UserPlus className="h-4 w-4" />
+              {t("widget.newUser")}
+            </Button>
+          </>
         )}
       </Div>
 
-      {/* Search */}
-      <Div className="px-4 pt-3 pb-1">
+      {/* Search — always visible */}
+      <Div className="px-4 pt-3 pb-2">
         <TextFieldWidget
           fieldName={"searchFilters.search"}
           field={children.searchFilters.children.search}
         />
       </Div>
 
-      {/* Status filter chips */}
-      <Div className="px-4 pt-2 pb-1 flex items-center gap-1.5 flex-wrap">
-        <Span className="text-xs text-muted-foreground select-none">
-          {t("widget.roleFilterLabel")}
-        </Span>
-        {statusChips.map((chip) => (
-          <Button
-            key={chip.value}
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => handleToggleStatus(chip.value)}
-            className={cn(
-              "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer",
-              activeStatuses.includes(chip.value)
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground",
-            )}
-          >
-            {chip.label}
-          </Button>
-        ))}
-      </Div>
+      {/* Status + role filter chips + sort — full mode only */}
+      {!isPickerMode && (
+        <>
+          <Div className="px-4 pb-1 flex items-center gap-1.5 flex-wrap">
+            <Span className="text-xs text-muted-foreground select-none">
+              {t("widget.roleFilterLabel")}
+            </Span>
+            {statusChips.map((chip) => (
+              <Button
+                key={chip.value}
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleToggleStatus(chip.value)}
+                className={cn(
+                  "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer",
+                  activeStatuses.includes(chip.value)
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground",
+                )}
+              >
+                {chip.label}
+              </Button>
+            ))}
+          </Div>
 
-      {/* Role filter chips */}
-      <Div className="px-4 pb-2 flex items-center gap-1.5 flex-wrap">
-        <Span className="text-xs text-muted-foreground select-none">
-          {t("widget.roleFilterLabel")}
-        </Span>
-        {roleChips.map((chip) => (
-          <Button
-            key={chip.value}
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => handleToggleRole(chip.value)}
-            className={cn(
-              "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer",
-              activeRoles.includes(chip.value)
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground",
-            )}
-          >
-            {chip.label}
-          </Button>
-        ))}
-      </Div>
+          <Div className="px-4 pb-2 flex items-center gap-1.5 flex-wrap">
+            <Span className="text-xs text-muted-foreground select-none">
+              {t("widget.roleFilterLabel")}
+            </Span>
+            {roleChips.map((chip) => (
+              <Button
+                key={chip.value}
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleToggleRole(chip.value)}
+                className={cn(
+                  "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer",
+                  activeRoles.includes(chip.value)
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground",
+                )}
+              >
+                {chip.label}
+              </Button>
+            ))}
+          </Div>
 
-      {/* Sort */}
-      <Div className="px-4 pb-2 grid grid-cols-2 gap-2">
-        <SelectFieldWidget
-          fieldName="sortingOptions.sortBy"
-          field={children.sortingOptions.children.sortBy}
-        />
-        <SelectFieldWidget
-          fieldName="sortingOptions.sortOrder"
-          field={children.sortingOptions.children.sortOrder}
-        />
-      </Div>
-      {hasActiveFilters && (
-        <Div className="px-4 pb-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-xs underline underline-offset-2 hover:text-foreground"
-            onClick={handleClearFilters}
-          >
-            {t("widget.clearFilters")}
-          </Button>
-        </Div>
+          <Div className="px-4 pb-2 grid grid-cols-2 gap-2">
+            <SelectFieldWidget
+              fieldName="sortingOptions.sortBy"
+              field={children.sortingOptions.children.sortBy}
+            />
+            <SelectFieldWidget
+              fieldName="sortingOptions.sortOrder"
+              field={children.sortingOptions.children.sortOrder}
+            />
+          </Div>
+
+          {hasActiveFilters && (
+            <Div className="px-4 pb-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs underline underline-offset-2 hover:text-foreground"
+                onClick={handleClearFilters}
+              >
+                {t("widget.clearFilters")}
+              </Button>
+            </Div>
+          )}
+        </>
       )}
 
       {/* User list */}
@@ -548,8 +557,8 @@ export function UsersListContainer({
         )}
       </Div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
+      {/* Pagination — full mode only */}
+      {!isPickerMode && totalPages > 1 && (
         <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
           <Span>
             {t("widget.paginationPage")} {currentPage}{" "}

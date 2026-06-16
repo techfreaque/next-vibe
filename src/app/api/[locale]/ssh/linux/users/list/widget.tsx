@@ -20,6 +20,7 @@ import {
 import { P } from "next-vibe-ui/ui/typography";
 import React, { useCallback } from "react";
 
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -32,6 +33,9 @@ export function LinuxUsersListContainer(): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const navigation = useWidgetNavigation();
   const value = useWidgetValue<typeof endpoints.GET>();
+  const onPick =
+    usePickerCallback<NonNullable<typeof value>["users"][number]>();
+  const isPickerMode = !!onPick;
   const isLoading = value === undefined;
   const users = value?.users ?? [];
 
@@ -52,10 +56,12 @@ export function LinuxUsersListContainer(): React.JSX.Element {
         <Span className="font-semibold text-sm mr-auto">
           {t("widget.title")}
         </Span>
-        <Button type="button" size="sm" onClick={handleCreate}>
-          <Plus className="h-3.5 w-3.5 mr-1" />
-          {t("widget.createButton")}
-        </Button>
+        {!isPickerMode && (
+          <Button type="button" size="sm" onClick={handleCreate}>
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            {t("widget.createButton")}
+          </Button>
+        )}
       </Div>
 
       {isLoading ? null : users.length === 0 ? (
@@ -88,7 +94,12 @@ export function LinuxUsersListContainer(): React.JSX.Element {
               {users.map((user) => (
                 <TableRow
                   key={user.username}
-                  className="border-b hover:bg-muted/20"
+                  className={`border-b hover:bg-muted/20${isPickerMode ? " cursor-pointer" : ""}`}
+                  onClick={
+                    isPickerMode && onPick
+                      ? (): void => onPick(user)
+                      : undefined
+                  }
                 >
                   <TableCell className="px-4 py-2 font-mono">
                     {user.username}

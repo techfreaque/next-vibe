@@ -137,11 +137,10 @@ describeStreamSuite({
   setup: setupUnbottled,
   teardown: teardownUnbottled,
   // Detach tasks (T5/T5b) run on the hermes remote instance (port 3002), not locally.
-  // wait-for-task on atlas cannot find tasks stored in hermes's DB, so skip.
-  skipWaitForTaskTest: true,
   // T10 (file attachments) and T11 (native image gen) require a live hermes at 3002
   // with a user that has Customer role. The test user only has Public role on hermes,
-  // so the cloud stream POST returns 403. Skip both until fixtures are re-recorded
   // with proper credentials.
-  skipAttachmentTests: true,
+  // Approval state lives on the local instance; the AI loop runs locally here, but
+  // this suite replays cheap recorded fixtures and none exist for the contact-form
+  // approval flows (CF1/CF2) — running them would fail on missing fixtures, so the
 });

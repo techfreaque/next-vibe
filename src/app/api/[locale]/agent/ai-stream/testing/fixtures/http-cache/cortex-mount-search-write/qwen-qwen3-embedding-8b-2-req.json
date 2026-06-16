@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/documents/search-test/quantum-flux.md\n\n# Quantum Flux Resonance\n\nThis document discusses quantum flux resonance in subatomic particle decay chains.\nKey concepts: quark entanglement, decoherence boundaries, Planck-scale interference.",
+    "encoding_format": "float"
+  }
+}

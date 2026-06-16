@@ -58,7 +58,9 @@ const { GET } = createEndpoint({
       // === URL PARAMETERS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "get.id.label" as const,
         description: "get.id.description" as const,
         columns: 12,
@@ -287,6 +289,7 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
+  titleShort: "patch.titleShort" as const,
   description: "patch.description" as const,
   icon: "message-square",
   category: "ai",
@@ -303,7 +306,9 @@ const { PATCH } = createEndpoint({
       // === URL PARAMETERS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "patch.id.label" as const,
         description: "patch.id.description" as const,
         columns: 12,
@@ -490,6 +495,7 @@ const { DELETE } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "delete.title" as const,
+  titleShort: "delete.titleShort" as const,
   description: "delete.description" as const,
   icon: "message-square",
   category: "ai",
@@ -506,7 +512,9 @@ const { DELETE } = createEndpoint({
       // === URL PARAMETERS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "delete.id.label" as const,
         description: "delete.id.description" as const,
         columns: 12,
@@ -653,6 +661,3 @@ export type ThreadDeleteUrlParamsTypeOutput =
 
 const definitions = { GET, PATCH, DELETE };
 export default definitions;
-import threadsDefinitions from "../definition";
-import threadsDefinitions from "../definition";
-import threadsDefinitions from "../definition";

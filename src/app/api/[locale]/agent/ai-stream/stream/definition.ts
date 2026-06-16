@@ -100,13 +100,14 @@ const { POST } = createEndpoint({
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
   ],
+  defaultWebPinned: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
   aliases: [AI_STREAM_ALIAS],
 
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "sparkles",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiInference",
+  category: "ai",
   tags: ["tags.streaming", "tags.chat", "tags.ai"],
 
   // No events - ai-stream emits to the messages channel directly.
@@ -190,7 +191,9 @@ const { POST } = createEndpoint({
       }),
       threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "post.threadId.label",
         description: "post.threadId.description",
         columns: 3,
@@ -437,22 +440,6 @@ const { POST } = createEndpoint({
               .refine((file) => file.size <= 25 * 1024 * 1024, {
                 message: "post.audioInput.validation.maxSize",
               })
-              .refine(
-                (file) => {
-                  // Note: Bun reports audio/webm recordings as "video/webm" (strips codecs param)
-                  const allowedTypes = [
-                    "audio/",
-                    "video/webm",
-                    "application/octet-stream",
-                  ];
-                  return allowedTypes.some((type) =>
-                    file.type.startsWith(type),
-                  );
-                },
-                {
-                  message: "post.audioInput.validation.audioOnly",
-                },
-              )
               .nullable()
               .optional(),
           }),
@@ -674,6 +661,3 @@ const definitions = {
 };
 
 export default definitions;
-import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
-import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
-import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";

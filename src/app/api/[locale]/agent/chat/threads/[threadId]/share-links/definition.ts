@@ -55,7 +55,9 @@ const { GET } = createEndpoint({
     children: {
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
@@ -211,6 +213,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "chat", "threads", "[threadId]", "share-links"],
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "plus",
   category: "ai",
@@ -226,7 +229,9 @@ const { POST } = createEndpoint({
     children: {
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
@@ -358,6 +363,7 @@ const { PATCH } = createEndpoint({
   method: Methods.PATCH,
   path: ["agent", "chat", "threads", "[threadId]", "share-links"],
   title: "patch.title" as const,
+  titleShort: "patch.titleShort" as const,
   description: "patch.description" as const,
   icon: "edit",
   category: "ai",
@@ -373,7 +379,9 @@ const { PATCH } = createEndpoint({
     children: {
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
@@ -506,6 +514,7 @@ const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["agent", "chat", "threads", "[threadId]", "share-links"],
   title: "delete.title" as const,
+  titleShort: "delete.titleShort" as const,
   description: "delete.description" as const,
   icon: "trash",
   category: "ai",
@@ -521,7 +530,9 @@ const { DELETE } = createEndpoint({
     children: {
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
@@ -687,6 +698,3 @@ export type ShareLinkRevokeUrlVariablesOutput =
 const definitions = { GET, POST, PATCH, DELETE };
 
 export default definitions;
-import threadsDefinitions from "../../definition";
-import threadsDefinitions from "../../definition";
-import threadsDefinitions from "../../definition";

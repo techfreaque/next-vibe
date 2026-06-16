@@ -25,9 +25,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { DEFAULT_STT_MODEL_ID } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
+import type { SttModelId } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { CreditRepository } from "../../credits/repository";
 import {
   CREDIT_VALUE_USD,
@@ -152,13 +153,15 @@ export class SpeechToTextRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    sttModelSelection?: SttModelSelection | null,
+    modelId?: SttModelId | null,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
     const t = sttScopedTranslation.scopedT(locale).t;
     const language = getLanguageFromLocale(locale);
 
-    // Resolve model: use caller-provided selection (from active favorite/skill cascade) or default
-    const selection = sttModelSelection ?? DEFAULT_STT_MODEL_SELECTION;
+    const selection = {
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: modelId ?? DEFAULT_STT_MODEL_ID,
+    } as const;
     const modelOption = getBestSttModel(selection, user);
 
     if (!modelOption) {

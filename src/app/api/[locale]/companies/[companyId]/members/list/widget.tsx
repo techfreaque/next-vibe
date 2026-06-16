@@ -9,6 +9,7 @@ import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import type { JSX } from "react";
 
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -40,6 +41,8 @@ function MemberRow({
   member,
   onUpdateRole,
   onRemove,
+  onPick,
+  isPickerMode,
   roleLabel,
   tUpdateRole,
   tRemove,
@@ -50,6 +53,8 @@ function MemberRow({
   member: Member;
   onUpdateRole: (memberId: string) => void;
   onRemove: (memberId: string) => void;
+  onPick: ((member: Member) => void) | undefined;
+  isPickerMode: boolean;
   roleLabel: string;
   tUpdateRole: string;
   tRemove: string;
@@ -58,7 +63,10 @@ function MemberRow({
   locale: string;
 }): JSX.Element {
   return (
-    <Div className="flex items-center gap-3 px-4 py-3 border-b last:border-b-0 hover:bg-muted/20 transition-colors">
+    <Div
+      className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 hover:bg-muted/20 transition-colors${isPickerMode ? " cursor-pointer" : ""}`}
+      onClick={isPickerMode && onPick ? () => onPick(member) : undefined}
+    >
       <Div className="flex-1 min-w-0">
         <Span className="text-sm font-medium block truncate">
           {member.name ?? member.email ?? `Member ${member.id.slice(0, 8)}`}
@@ -80,22 +88,26 @@ function MemberRow({
         >
           {roleLabel}
         </Span>
-        <Button
-          size="sm"
-          variant="ghost"
-          className="text-xs h-7 px-2"
-          onClick={() => onUpdateRole(member.id)}
-        >
-          {tUpdateRole}
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          className="text-xs h-7 px-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-          onClick={() => onRemove(member.id)}
-        >
-          {tRemove}
-        </Button>
+        {!isPickerMode && (
+          <>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-xs h-7 px-2"
+              onClick={() => onUpdateRole(member.id)}
+            >
+              {tUpdateRole}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-xs h-7 px-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => onRemove(member.id)}
+            >
+              {tRemove}
+            </Button>
+          </>
+        )}
       </Div>
     </Div>
   );
@@ -111,6 +123,9 @@ export function MembersListWidget(_props: {
   const locale = useWidgetLocale();
   const { t: tCompanies } = companiesScopedTranslation.scopedT(locale);
   const form = useWidgetForm<typeof definition.GET>();
+
+  const onPick = usePickerCallback<Member>();
+  const isPickerMode = !!onPick;
 
   const companyId = form?.watch("companyId") ?? "";
 
@@ -194,10 +209,12 @@ export function MembersListWidget(_props: {
               : t("get.widget.memberPlural")}
           </Span>
         </Div>
-        <Button size="sm" onClick={handleInvite} className="gap-1.5">
-          <UserPlus className="h-3.5 w-3.5" />
-          {t("get.widget.invite")}
-        </Button>
+        {!isPickerMode && (
+          <Button size="sm" onClick={handleInvite} className="gap-1.5">
+            <UserPlus className="h-3.5 w-3.5" />
+            {t("get.widget.invite")}
+          </Button>
+        )}
       </Div>
 
       {members.length === 0 ? (
@@ -211,10 +228,12 @@ export function MembersListWidget(_props: {
               {t("get.widget.empty.hint")}
             </Span>
           </Div>
-          <Button size="sm" onClick={handleInvite} className="gap-1.5">
-            <UserPlus className="h-3.5 w-3.5" />
-            {t("get.widget.empty.cta")}
-          </Button>
+          {!isPickerMode && (
+            <Button size="sm" onClick={handleInvite} className="gap-1.5">
+              <UserPlus className="h-3.5 w-3.5" />
+              {t("get.widget.empty.cta")}
+            </Button>
+          )}
         </Div>
       ) : (
         <Div className="rounded-md border overflow-hidden">
@@ -224,6 +243,8 @@ export function MembersListWidget(_props: {
               member={member}
               onUpdateRole={handleUpdateRole}
               onRemove={handleRemove}
+              onPick={onPick}
+              isPickerMode={isPickerMode}
               roleLabel={tCompanies(member.role)}
               tUpdateRole={t("get.widget.updateRole")}
               tRemove={t("get.widget.remove")}

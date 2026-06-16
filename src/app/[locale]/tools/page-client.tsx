@@ -124,7 +124,7 @@ export function ToolsPageClient({
   );
 
   return (
-    <Div className="flex flex-col h-dvh w-full overflow-hidden">
+    <Div className="flex flex-col h-dvh w-full">
       <EndpointsPage
         endpoint={helpDefinitions}
         locale={locale}

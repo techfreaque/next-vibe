@@ -9,6 +9,7 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
+import { openInNewTab } from "next-vibe-ui/utils/browser";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
@@ -195,6 +196,7 @@ export function WidgetChatInput({
         <Div className="relative mb-2 @sm:mb-3">
           <Textarea
             ref={inputRef}
+            name="prompt"
             value={content}
             onChange={(e) => onContentChange(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -282,7 +284,7 @@ export function WidgetChatInput({
                       variant="outline"
                       className="h-8 w-8 @sm:h-9 @sm:w-9"
                       onClick={() => {
-                        window.open(threadHref, "_blank");
+                        openInNewTab(threadHref);
                       }}
                     >
                       <ExternalLink className="h-4 w-4" />

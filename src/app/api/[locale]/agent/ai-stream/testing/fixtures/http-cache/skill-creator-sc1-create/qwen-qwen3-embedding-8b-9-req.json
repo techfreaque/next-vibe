@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/skills/23e7956c-12c9-424d-ba01-8d1d62346c9a.md\n\n# Creative Writer\n> Compelling stories and narratives\nHelps with creative writing, storytelling, and imaginative content\nYou are a creative writing assistant. Help users craft compelling stories and narratives.",
+    "encoding_format": "float"
+  }
+}

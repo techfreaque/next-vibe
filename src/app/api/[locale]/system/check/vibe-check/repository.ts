@@ -13,7 +13,10 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { isCliPlatform, Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import {
+  isCliPlatform,
+  Platform,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { env } from "@/config/env";
 
 import type { CheckVibeCheckT, CheckVibeCheckTranslationKey } from "./i18n";
@@ -181,7 +184,9 @@ export class VibeCheckRepository {
     );
 
     const typecheckMsg = `✓ TypeScript check completed with ${result.success ? result.data.items?.length : 0} issues`;
-    isCliPlatform(platform) ? logger.info(typecheckMsg) : logger.debug(typecheckMsg);
+    isCliPlatform(platform)
+      ? logger.info(typecheckMsg)
+      : logger.debug(typecheckMsg);
     return {
       type: "typecheck",
       result,
@@ -315,7 +320,9 @@ export class VibeCheckRepository {
           pathsToCheck.length === 0
             ? baseDir
             : pathsToCheck.map((p) => p || baseDir);
-        isCliPlatform(platform) ? logger.info("Starting Oxlint check...") : logger.debug("Starting Oxlint check...");
+        isCliPlatform(platform)
+          ? logger.info("Starting Oxlint check...")
+          : logger.debug("Starting Oxlint check...");
         promises.push(
           this.runOxlintCheck(
             Array.isArray(oxlintPaths) ? oxlintPaths : [oxlintPaths],
@@ -347,7 +354,9 @@ export class VibeCheckRepository {
           Array.isArray(eslintPaths) && eslintPaths.length === 1
             ? eslintPaths[0]
             : eslintPaths;
-        isCliPlatform(platform) ? logger.info("Starting ESLint check...") : logger.debug("Starting ESLint check...");
+        isCliPlatform(platform)
+          ? logger.info("Starting ESLint check...")
+          : logger.debug("Starting ESLint check...");
         promises.push(
           this.runEslintCheck(
             eslintPath,
@@ -381,7 +390,9 @@ export class VibeCheckRepository {
             : nonEmptyPaths.length === 1
               ? nonEmptyPaths[0]
               : nonEmptyPaths;
-        isCliPlatform(platform) ? logger.info("Starting TypeScript check...") : logger.debug("Starting TypeScript check...");
+        isCliPlatform(platform)
+          ? logger.info("Starting TypeScript check...")
+          : logger.debug("Starting TypeScript check...");
         promises.push(
           this.runTypecheckCheck(
             typecheckPath,

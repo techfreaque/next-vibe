@@ -8,8 +8,7 @@
 import "server-only";
 
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
-import { promises as fsp } from "node:fs";
+import { existsSync, promises as fsp } from "node:fs";
 import { resolve as resolvePath } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -20,6 +19,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { hasCustomDirective } from "@/app/api/[locale]/system/unified-interface/shared/utils/custom-directive";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils/parse-error";
@@ -82,46 +82,57 @@ const ROUTE_PATTERN = /(?:^|\/)route\.ts$/;
 const I18N_LANG_PATTERN = /\/i18n\/(?:en|de|pl)\/index\.ts$/;
 const I18N_INDEX_PATTERN = /\/i18n\/index\.ts$/;
 const GENERATED_PATTERN = /\/system\/generated\//;
+const FIXTURES_PATTERN =
+  /^src\/app\/api\/\[locale\]\/agent\/ai-stream\/testing\/fixtures\//;
+const APP_TANSTACK_PATTERN = /^src\/app-tanstack\//;
+const APP_NATIVE_PATTERN = /^src\/app-native\//;
 
 const SUPPRESSION_PATTERN =
   /eslint-disable|oxlint-disable|@ts-expect-error|@ts-ignore|@ts-nocheck/;
 
-// Matches the opening line of a TS/JS import statement
-const IMPORT_START_PATTERN = /^import[\s{"'*]/;
-// Matches the closing line of a multi-line import: } from "..."
+// Matches any import statement opener, including `import type`, `import * as`, side-effects, etc.
+// Must match the raw (non-trimmed) diff line content (after stripping the +/- sigil).
+const IMPORT_START_PATTERN =
+  /^import\s*(?:type\s+)?(?:\{|"[^"]*"|'[^']*'|\*|\w)/;
+
+// Matches the closing line of a multi-line import: `} from "..."` or `} from '...'`
+// Also handles `} from "..."` with optional trailing semicolon/comment.
 const IMPORT_CLOSE_PATTERN = /^}\s*from\s+["'`]/;
-// Matches continuation lines inside a multi-line import block (indented or closing brace)
-const IMPORT_CONTINUATION_PATTERN = /^[\s}]/;
 
 /**
- * Returns true if a single changed line belongs to an import statement.
- * Tracks state across lines via `insideMultilineImport` (passed by reference via object).
- * Works per-sigil (+ and - lines are evaluated independently so replacements work correctly).
+ * Returns true if a raw diff content line (sigil already stripped, NOT trimmed)
+ * belongs to an import statement. Tracks open-brace state across lines via `state`.
+ *
+ * Key design decisions:
+ *  - Lines are NOT trimStart()'d — indentation is used by IMPORT_CLOSE_PATTERN and
+ *    is present in real diff output.
+ *  - When inside a multi-line `import { ... }` block, every line is accepted until
+ *    `} from "..."` closes it — this covers identifiers, `type Foo,`, blank lines,
+ *    trailing commas, and inline comments safely.
+ *  - `inside` only becomes true after a confirmed `import {` opener that has no
+ *    closing `}` on the same line — so false-positives require the unusual pattern
+ *    of `} from "..."` appearing as a changed line in non-import code.
  */
-function isImportLine(
-  line: string,
-  state: { inside: boolean },
-): boolean {
+function isImportLine(line: string, state: { inside: boolean }): boolean {
   if (state.inside) {
-    if (IMPORT_CLOSE_PATTERN.test(line)) {
+    if (IMPORT_CLOSE_PATTERN.test(line.trimStart())) {
       state.inside = false;
       return true;
     }
-    if (IMPORT_CONTINUATION_PATTERN.test(line)) {
-      return true;
-    }
-    // Unexpected line while inside a multiline block — reset and re-evaluate
-    state.inside = false;
+    // Any line inside a `import { ... }` block is a valid import member line.
+    return true;
   }
 
   // `} from "..."` can appear as the start of a hunk when the `import {` opener
-  // didn't change — always treat it as an import line.
-  if (IMPORT_CLOSE_PATTERN.test(line)) {
+  // didn't change — treat it as an import line without entering `inside` state.
+  if (IMPORT_CLOSE_PATTERN.test(line.trimStart())) {
     return true;
   }
 
   if (IMPORT_START_PATTERN.test(line)) {
-    if (line.includes("{") && !line.includes("}")) {
+    // Enter multi-line state when `{` is opened but not yet closed on this line.
+    const afterImport = line.replace(/^import\s*(?:type\s+)?/, "");
+    if (afterImport.includes("{") && !afterImport.includes("}")) {
       state.inside = true;
     }
     return true;
@@ -131,21 +142,112 @@ function isImportLine(
 }
 
 /**
- * Returns true if every changed line in the array belongs to an import statement.
- * Evaluates + and - lines with independent state so replacements (- old + new) work correctly.
+ * Returns true if every changed line in the diff hunk belongs to an import statement.
+ * `+` and `-` lines are evaluated with independent state so replacements work correctly.
+ *
+ * Mid-block hunks (where `import {` opener wasn't changed, only members/closer were):
+ * If all changed lines of a given sigil end with `} from "..."` as the final changed line
+ * of that sigil, we treat the whole group as import lines. This is safe because
+ * `} from "..."` is unambiguous — it only appears as an import closer.
  */
 function allLinesAreImports(changedLines: string[]): boolean {
-  const removedState = { inside: true }; // start inside=true for mid-block hunks
-  const addedState = { inside: true };
+  // Separate + and - lines for independent evaluation
+  const removed = changedLines
+    .filter((l) => l.startsWith("-"))
+    .map((l) => l.slice(1));
+  const added = changedLines
+    .filter((l) => l.startsWith("+"))
+    .map((l) => l.slice(1));
 
-  for (const raw of changedLines) {
-    const sigil = raw[0];
-    const line = raw.slice(1).trimStart();
-    const state = sigil === "-" ? removedState : addedState;
-    if (!isImportLine(line, state)) {return false;}
+  return isLineGroupAllImports(removed) && isLineGroupAllImports(added);
+}
+
+/**
+ * Evaluate a group of same-sigil lines (already stripped of their sigil).
+ * Returns true if all lines in the group belong to import statements.
+ */
+function isLineGroupAllImports(lines: string[]): boolean {
+  if (lines.length === 0) {
+    return true;
+  }
+
+  const state = { inside: false };
+
+  const lastNonEmpty = [...lines].toReversed().find((l) => l.trim() !== "");
+
+  // Mid-block detection (with closer): if the last non-empty line is `} from "..."`,
+  // the entire group is a partial view into a multi-line import block.
+  if (
+    lastNonEmpty !== undefined &&
+    IMPORT_CLOSE_PATTERN.test(lastNonEmpty.trimStart())
+  ) {
+    return lines.every((l) => isMidBlockImportLine(l));
+  }
+
+  // Mid-block detection (no closer): a group of pure import-member lines where
+  // the closing `} from` line wasn't changed (e.g. removing a named export member).
+  // Safe to accept if every line is blank or matches the strict import-member pattern.
+  if (lines.every((l) => isStrictImportMemberLine(l))) {
+    return true;
+  }
+
+  for (const line of lines) {
+    if (!isImportLine(line, state)) {
+      return false;
+    }
   }
 
   return true;
+}
+
+/**
+ * Permissive check for lines inside a known import block (mid-block hunk with closer).
+ * Accepts indented lines, blank lines, `} from "..."`, and `import` openers.
+ */
+function isMidBlockImportLine(line: string): boolean {
+  const trimmed = line.trimStart();
+  if (trimmed === "") {
+    return true;
+  }
+  if (IMPORT_CLOSE_PATTERN.test(trimmed)) {
+    return true;
+  }
+  if (IMPORT_START_PATTERN.test(line)) {
+    return true;
+  }
+  if (/^\s/.test(line)) {
+    return true;
+  }
+  // Bare identifier / `type Foo` without indentation (some formatters omit it)
+  if (/^(?:type\s+)?[\w$][\w$,\s]*,?\s*$/.test(trimmed)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Strict check for a line that is an import block member with no surrounding closer.
+ * Only accepts: blank lines, indented lines that look like `Identifier,` or `type Foo,`.
+ * Rejects anything containing `=`, `(`, `;` outside a string, etc.
+ */
+function isStrictImportMemberLine(line: string): boolean {
+  const trimmed = line.trimStart();
+  if (trimmed === "") {
+    return true;
+  }
+  // Must be indented (import members are always indented in multi-line imports)
+  if (!/^\s/.test(line)) {
+    return false;
+  }
+  // Reject lines with assignment, function call, or statement terminators
+  if (/[=(;]/.test(trimmed)) {
+    return false;
+  }
+  // Accept: optional `type ` prefix, then identifier(s) with optional comma
+  if (/^(?:type\s+)?[\w$][\w$\s,]*,?\s*$/.test(trimmed)) {
+    return true;
+  }
+  return false;
 }
 
 function isBoilerplateCandidate(filePath: string): boolean {
@@ -153,8 +255,23 @@ function isBoilerplateCandidate(filePath: string): boolean {
     ROUTE_PATTERN.test(filePath) ||
     I18N_LANG_PATTERN.test(filePath) ||
     I18N_INDEX_PATTERN.test(filePath) ||
-    GENERATED_PATTERN.test(filePath)
+    GENERATED_PATTERN.test(filePath) ||
+    FIXTURES_PATTERN.test(filePath)
   );
+}
+
+/**
+ * Returns true if the file is in a generated-output directory (app-tanstack, app-native)
+ * and does NOT have a "use custom" directive — meaning it is safe to auto-stage.
+ */
+function isAutoStagedGeneratedOutput(filePath: string, cwd: string): boolean {
+  if (
+    !APP_TANSTACK_PATTERN.test(filePath) &&
+    !APP_NATIVE_PATTERN.test(filePath)
+  ) {
+    return false;
+  }
+  return !hasCustomDirective(resolvePath(cwd, filePath));
 }
 
 /** Parse a unified diff into header lines and hunk arrays. */
@@ -212,12 +329,14 @@ function hunkNewStart(hunkHeader: string): number {
  * Parse unified diff output for a single file and classify unstaged changes.
  *
  * Strategy:
- *  1. Get full diff (WC vs HEAD) — correct line numbers for `git apply --cached`.
- *  2. Get staged diff (index vs HEAD) — hunks already in the index.
- *  3. Subtract already-staged hunks from the full diff (by target-range start).
- *  4. Classify remaining hunks: import-only → patch; mixed → skip.
+ *  1. u0Unstaged = `git diff --unified=0 -- file` (WC vs index) — the true unstaged
+ *     hunks with line numbers relative to the current index. This is what we apply.
+ *  2. Classify each unstaged hunk: import-only or mixed.
+ *  3. If all hunks are import-only → importOnly=true, full-file stage.
+ *  4. If some are import-only → build patch from u0Unstaged import hunks for partial stage.
  *
- * Returns null if there are no unstaged changes to process.
+ * Using WC-vs-index (not WC-vs-HEAD) for the patch eliminates line-number mismatches
+ * when `git apply --cached` is used — the index IS the base, so hunks apply cleanly.
  */
 async function analyzeFileDiff(
   filePath: string,
@@ -226,91 +345,58 @@ async function analyzeFileDiff(
   importOnly: boolean;
   importHunksPatch: string | null;
 } | null> {
-  // U0: classify with zero context — each atomic change is its own hunk, so import
-  // changes near non-import changes aren't merged into a combined hunk.
-  // We apply U0 hunks with --unidiff-zero --3way so git tolerates zero context
-  // and handles index/HEAD drift without failing.
-  const [u0Full, u0Staged] = await Promise.all([
-    runCommandCapture(
-      "git",
-      ["diff", "HEAD", "--unified=0", "--", filePath],
-      cwd,
-    ),
-    runCommandCapture(
-      "git",
-      ["diff", "--cached", "HEAD", "--unified=0", "--", filePath],
-      cwd,
-    ),
-  ]);
+  // WC vs index: exactly the unstaged changes, with line numbers relative to the index.
+  // This is the correct base for `git apply --cached`.
+  const u0Unstaged = await runCommandCapture(
+    "git",
+    ["diff", "--unified=0", "--", filePath],
+    cwd,
+  );
 
-  if (!u0Full.trim()) {
+  if (!u0Unstaged.trim()) {
     return null;
   }
 
-  const u0Parsed = parseDiff(u0Full);
+  const u0Parsed = parseDiff(u0Unstaged);
   if (!u0Parsed || u0Parsed.hunks.length === 0) {
     return null;
   }
 
-  // Build set of already-staged hunk starts (U0) so we don't re-classify staged hunks
-  const stagedStarts = new Set<number>();
-  if (u0Staged.trim()) {
-    const stagedParsed = parseDiff(u0Staged);
-    if (stagedParsed) {
-      for (const hunk of stagedParsed.hunks) {
-        const start = hunkNewStart(hunk[0] ?? "");
-        if (start >= 0) {
-          stagedStarts.add(start);
-        }
-      }
-    }
-  }
-
-  // Classify U0 hunks: import-only vs non-import, excluding already-staged
-  const importOnlyU0Starts = new Set<number>();
+  // Classify each unstaged hunk: import-only vs mixed
+  const importOnlyStarts = new Set<number>();
   let hasNonImportHunk = false;
-  let hasUnstagedHunk = false;
 
   for (const hunk of u0Parsed.hunks) {
     const start = hunkNewStart(hunk[0] ?? "");
-    if (stagedStarts.has(start)) {
-      continue;
-    } // already in index
-    hasUnstagedHunk = true;
-
     const changedLines = hunk
       .slice(1)
       .filter((l) => l.startsWith("+") || l.startsWith("-"));
     if (allLinesAreImports(changedLines) && changedLines.length > 0) {
-      importOnlyU0Starts.add(start);
+      importOnlyStarts.add(start);
     } else {
       hasNonImportHunk = true;
     }
   }
 
-  if (!hasUnstagedHunk) {
-    return null;
-  }
-
-  const importOnly = !hasNonImportHunk && importOnlyU0Starts.size > 0;
+  const importOnly = !hasNonImportHunk && importOnlyStarts.size > 0;
 
   if (importOnly) {
     return { importOnly: true, importHunksPatch: null };
   }
 
-  if (importOnlyU0Starts.size === 0) {
+  if (importOnlyStarts.size === 0) {
     return { importOnly: false, importHunksPatch: null };
   }
 
-  // Build patch from the U0 import-only hunks directly.
-  // We use --unidiff-zero on the apply side so zero-context hunks are accepted,
-  // and --3way so git can handle index/HEAD drift without failing.
-  const importOnlyU0Hunks = u0Parsed.hunks.filter((hunk) => {
+  // Build patch from import-only unstaged hunks.
+  // Applied with --unidiff-zero (zero-context hunks ok) and without --3way
+  // since the patch base IS the index — no drift to resolve.
+  const importOnlyHunks = u0Parsed.hunks.filter((hunk) => {
     const start = hunkNewStart(hunk[0] ?? "");
-    return importOnlyU0Starts.has(start);
+    return importOnlyStarts.has(start);
   });
 
-  const patchLines = [...u0Parsed.headerLines, ...importOnlyU0Hunks.flat(), ""];
+  const patchLines = [...u0Parsed.headerLines, ...importOnlyHunks.flat(), ""];
   return { importOnly: false, importHunksPatch: patchLines.join("\n") };
 }
 
@@ -325,14 +411,7 @@ async function applyPatchToIndex(
   return new Promise((resolve) => {
     const proc = spawn(
       "git",
-      [
-        "apply",
-        "--cached",
-        "--3way",
-        "--unidiff-zero",
-        "--whitespace=nowarn",
-        "-",
-      ],
+      ["apply", "--cached", "--unidiff-zero", "--whitespace=nowarn", "-"],
       { cwd, stdio: ["pipe", "pipe", "pipe"] },
     );
     let stderr = "";
@@ -563,6 +642,9 @@ export class VibeStageRepository {
       for (const { file, analysis } of diffAnalyses) {
         if (isBoilerplateCandidate(file)) {
           boilerplateCandidates.push(file);
+        } else if (isAutoStagedGeneratedOutput(file, cwd)) {
+          // app-tanstack / app-native without "use custom" → stage unconditionally
+          importOnlyFiles.push(file);
         } else if (analysis?.importOnly) {
           importOnlyFiles.push(file);
         } else if (analysis?.importHunksPatch) {
@@ -610,7 +692,7 @@ export class VibeStageRepository {
           const { ok, error } = await applyPatchToIndex(patch, cwd);
           if (ok) {
             partiallyStaged.push(file);
-            logger.info(`[VIBE-STAGE] Partially staged (imports) ${file}`);
+            logger.debug(`[VIBE-STAGE] Partially staged (imports) ${file}`);
           } else {
             logger.warn(
               `[VIBE-STAGE] Failed to apply import patch for ${file}: ${error}`,
@@ -626,7 +708,7 @@ export class VibeStageRepository {
       // git add full files unless dry run
       if (!data.dryRun && staged.length > 0) {
         await runCommand("git", ["add", "--", ...staged], cwd);
-        logger.info(`[VIBE-STAGE] Staged ${String(staged.length)} files`);
+        logger.debug(`[VIBE-STAGE] Staged ${String(staged.length)} files`);
       }
 
       const message =

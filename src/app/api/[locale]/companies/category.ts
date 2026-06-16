@@ -19,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "business",
   icon: "building",
   order: 35,
-  defaultEntry: COMPANIES_LIST_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: COMPANIES_LIST_ALIAS,
+    [UserPermissionRole.CUSTOMER]: COMPANIES_LIST_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     "Company Management": {
       icon: "building",

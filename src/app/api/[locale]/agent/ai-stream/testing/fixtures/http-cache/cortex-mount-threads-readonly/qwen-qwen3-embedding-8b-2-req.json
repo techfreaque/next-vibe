@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: [tool:cortex-read] {\"path\":\"/threads/cron/test-create-a-new-skill-and-a-favorite-for-it-4124e221-0a93-44f5-92a5-05847794858e.md\"}\n\nTool: [result:cortex-read] {\"size\":455476,\"content\":\"---\\nthreadId: \\\"4124e221-0a93-44f5-92a5-05847794858e\\\"\\ntitle: \\\"[TEST] Create a new skill AND a favorite for it....\\\"\\nstatus: \\\"enums.threadStatus.active\\\"\\nrootFolder: \\\"cron\\\"\\ncreated: \\\"2026-06-16T19:14:24.205Z\\\"\\nupdated: \\\"2026-06-16T19:14:25.506Z\\\"\\n---\\n\\n**User*\n\nSystem: [Context: ID:294dee90 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 16, 19:15]\n\nAssistant: File read successfully: `test-create-a-new-skill-and-a-favorite-for-it-4124e221-0a93-44f5-92a5-05847794858e.md`\n\n- **Frontmatter present:** Yes. Contains `threadId`, `title`, `status`, `rootFolder`, `created`, `updated`.\n- **Conversation body present:** Yes. Contains user prompts and assistant tool-call/response blocks.\n- **threadId from frontmatter:** `4124e221-0a93-44f5-92a5-05847794858e`\n\nVERDICT: PASS\n\nSystem: [Context: ID:5cc47213 | Posted:Jun 16, 19:15]\n\nUser: Try to use cortex-write to create a file at /threads/test-file.md with content \"test\". Report exactly what error you get. Do not retry.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (19)\n│   ├── [📌] critical-note.md\n│   │   This is a PINNED critical note. It must ALWAYS appear in the system prompt, never trimmed.\n│   ├── t2-cheap-test [89%]\n│   │   T2_CHEAP_OK\n│   ├── life-career-moved.md\n│   │   Building unbottled.ai, a free-speech AI platform. · ## Goals · - Short-term: Launch v1 with 50+ models · - Medium-term: 10k users · - Long-term: Become the default AI layer for open web · ## Blockers · None currently.\n│   ├── name.md\n│   │   <\n\nSystem: [Context: ID:c8f6249b | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 16, 19:15]",
+    "encoding_format": "float"
+  }
+}

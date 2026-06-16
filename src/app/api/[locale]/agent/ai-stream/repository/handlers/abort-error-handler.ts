@@ -30,10 +30,7 @@ import {
   type StreamAbortError,
 } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
-import {
-  clearStreamingState,
-  setStreamingStateWaiting,
-} from "../core/stream-registry";
+import { clearStreamingState } from "../core/stream-registry";
 
 /**
  * Flatten a ModelMessage into a plain string the way the model actually sees it.

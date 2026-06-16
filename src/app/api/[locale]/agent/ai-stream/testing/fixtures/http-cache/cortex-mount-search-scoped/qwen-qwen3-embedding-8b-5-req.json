@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-cortex-write-to-create----9bec7667-e361-45a7-a307-815cd4bf3dea.md\n\n# Use cortex-write to create...\nFolder: cron\nPreview: <think> The search returned 20 results total. The first result is the file we created: Path: /documents/search-test/quan…",
+    "encoding_format": "float"
+  }
+}

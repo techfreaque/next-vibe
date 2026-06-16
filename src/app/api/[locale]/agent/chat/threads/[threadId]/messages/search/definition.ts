@@ -240,6 +240,3 @@ export type MessageSearchUrlVariablesOutput =
  * Export definitions
  */
 export default { GET };
-import threadsDefinitions from "../../../definition";
-import threadsDefinitions from "../../../definition";
-import threadsDefinitions from "../../../definition";

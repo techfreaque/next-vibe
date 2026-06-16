@@ -1816,18 +1816,24 @@ export function GraphChartView(): React.JSX.Element {
   const lastResolutionRef = useRef<Resolution>(GraphResolution.ONE_DAY);
   const panBackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
-  const spacerRef = useRef<HTMLDivElement>(null);
+  const toolbarLeftRef = useRef<HTMLDivElement>(null);
+  const toolbarRightRef = useRef<HTMLDivElement>(null);
   const [pickerAvailableWidth, setPickerAvailableWidth] = useState(9999);
 
   useEffect((): (() => void) => {
-    const el = spacerRef.current;
-    if (!el) {
+    const toolbar = toolbarRef.current;
+    if (!toolbar) {
       return (): void => undefined;
     }
-    const obs = new ResizeObserver((entries) => {
-      setPickerAvailableWidth(entries[0]?.contentRect.width ?? 0);
-    });
-    obs.observe(el);
+    const compute = (): void => {
+      const totalW = toolbar.clientWidth;
+      const leftW = toolbarLeftRef.current?.offsetWidth ?? 0;
+      const rightW = toolbarRightRef.current?.offsetWidth ?? 0;
+      // 16px gap budget (px-3 * 2 + some gap)
+      setPickerAvailableWidth(Math.max(0, totalW - leftW - rightW - 16));
+    };
+    const obs = new ResizeObserver(compute);
+    obs.observe(toolbar);
     return (): void => obs.disconnect();
   }, []);
 
@@ -2334,88 +2340,97 @@ export function GraphChartView(): React.JSX.Element {
       {/* Toolbar */}
       <Div
         ref={toolbarRef}
-        className="flex items-center gap-2 px-3 h-11 border-b bg-background/95 shrink-0 relative"
+        className="flex items-center gap-2 px-3 h-11 border-b bg-background/95 shrink-0"
       >
-        {/* Back */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleBack}
-          className="h-7 gap-1.5 px-2 shrink-0 text-xs"
+        {/* Left group: back + graph info + version nav */}
+        <Div
+          ref={toolbarLeftRef}
+          className="flex items-center gap-2 shrink-0 min-w-0 overflow-hidden"
         >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          {t("get.widget.back")}
-        </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleBack}
+            className="h-7 gap-1.5 px-2 shrink-0 text-xs"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            {t("get.widget.back")}
+          </Button>
 
-        {/* Graph name + status */}
-        {graph && (
-          <>
-            <Div className="h-4 w-px bg-border shrink-0" />
-            <Span className="font-semibold text-sm truncate min-w-0 shrink">
-              {graph.name}
-            </Span>
-            <Badge
-              variant={graph.isActive ? "default" : "secondary"}
-              className={cn(
-                "text-[10px] px-1.5 py-0 h-5 shrink-0",
-                graph.isActive &&
-                  "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 dark:text-emerald-400",
-              )}
-            >
-              {graph.isActive
-                ? t("get.widget.active")
-                : t("get.widget.inactive")}
-            </Badge>
-          </>
-        )}
-
-        {/* Version prev/next navigation */}
-        {versionChain.length > 1 && (
-          <>
-            <Div className="h-4 w-px bg-border shrink-0" />
-            <Div className="flex items-center gap-0" title="Version history">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleVersionPrev}
-                disabled={!prevVersionId}
-                className="h-7 w-7 p-0"
-                title="Older version (back in time)"
+          {graph && (
+            <>
+              <Div className="h-4 w-px bg-border shrink-0" />
+              <Span className="font-semibold text-sm truncate min-w-0">
+                {graph.name}
+              </Span>
+              <Badge
+                variant={graph.isActive ? "default" : "secondary"}
+                className={cn(
+                  "text-[10px] px-1.5 py-0 h-5 shrink-0",
+                  graph.isActive &&
+                    "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 dark:text-emerald-400",
+                )}
               >
-                <ChevronLeft className="h-3.5 w-3.5" />
-              </Button>
-              <Div className="flex items-center gap-0.5 px-1">
-                <History className="h-3 w-3 text-muted-foreground/50" />
-                <Span className="text-[10px] text-muted-foreground/70 tabular-nums">
-                  {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-                  {`${String(currentVersionIndex >= 0 ? currentVersionIndex + 1 : versionChain.length)}/${String(versionChain.length)}`}
-                </Span>
+                {graph.isActive
+                  ? t("get.widget.active")
+                  : t("get.widget.inactive")}
+              </Badge>
+            </>
+          )}
+
+          {versionChain.length > 1 && (
+            <>
+              <Div className="h-4 w-px bg-border shrink-0" />
+              <Div
+                className="flex items-center gap-0 shrink-0"
+                title="Version history"
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleVersionPrev}
+                  disabled={!prevVersionId}
+                  className="h-7 w-7 p-0"
+                  title="Older version (back in time)"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </Button>
+                <Div className="flex items-center gap-0.5 px-1">
+                  <History className="h-3 w-3 text-muted-foreground/50" />
+                  <Span className="text-[10px] text-muted-foreground/70 tabular-nums">
+                    {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                    {`${String(currentVersionIndex >= 0 ? currentVersionIndex + 1 : versionChain.length)}/${String(versionChain.length)}`}
+                  </Span>
+                </Div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleVersionNext}
+                  disabled={!nextVersionId}
+                  className="h-7 w-7 p-0"
+                  title="Newer version (forward in time)"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Button>
               </Div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleVersionNext}
-                disabled={!nextVersionId}
-                className="h-7 w-7 p-0"
-                title="Newer version (forward in time)"
-              >
-                <ChevronRight className="h-3.5 w-3.5" />
-              </Button>
-            </Div>
-          </>
-        )}
+            </>
+          )}
+        </Div>
 
-        <Div ref={spacerRef} className="flex-1" />
+        {/* Center: resolution picker - fills remaining space, picker adapts to it */}
+        <Div className="flex-1 flex items-center justify-end min-w-0">
+          <ResolutionPicker
+            value={resolution}
+            onChange={handleResolutionChange}
+            availableWidth={pickerAvailableWidth}
+          />
+        </Div>
 
-        {/* Resolution picker */}
-        <ResolutionPicker
-          value={resolution}
-          onChange={handleResolutionChange}
-          availableWidth={pickerAvailableWidth}
-        />
-
-        {/* Action buttons */}
-        <Div className="flex items-center gap-0.5 shrink-0">
+        {/* Right group: action buttons */}
+        <Div
+          ref={toolbarRightRef}
+          className="flex items-center gap-0.5 shrink-0"
+        >
           {isLoading && (
             <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground mr-1" />
           )}

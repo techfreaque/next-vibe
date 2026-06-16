@@ -224,6 +224,7 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
+  titleShort: "patch.titleShort" as const,
   description: "patch.description" as const,
   icon: "shield",
   category: "ai",
@@ -238,7 +239,9 @@ const { PATCH } = createEndpoint({
     children: {
       id: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: skillsDefinitions.GET,
+        labelField: "name",
         label: "patch.fields.id.label" as const,
         description: "patch.fields.id.description" as const,
         columns: 12,

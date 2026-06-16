@@ -16,6 +16,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -146,6 +147,9 @@ export function SubscriptionListContainer({
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
 
+  const onPick = usePickerCallback<Subscription>();
+  const isPickerMode = !!onPick;
+
   const data = useWidgetValue<typeof definition.GET>();
   const subscriptionList = data?.response?.subscriptions ?? [];
   const isLoading = data === null || data === undefined;
@@ -176,17 +180,21 @@ export function SubscriptionListContainer({
   }, [navigate]);
 
   const handleRowClick = useCallback(
-    (subscriptionId: string): void => {
+    (subscription: Subscription): void => {
+      if (isPickerMode && onPick) {
+        onPick(subscription);
+        return;
+      }
       void (async (): Promise<void> => {
         // Navigate to company subscription detail page using subscription id
         const companyGetDef =
           await import("../../company/[companyId]/get/definition");
         navigate(companyGetDef.default.GET, {
-          urlPathParams: { companyId: subscriptionId },
+          urlPathParams: { companyId: subscription.id },
         });
       })();
     },
-    [navigate],
+    [isPickerMode, onPick, navigate],
   );
 
   return (
@@ -202,62 +210,66 @@ export function SubscriptionListContainer({
             </Span>
           )}
         </Span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleViewStats}
-          title={t("widget.viewStats")}
-          className="gap-1"
-        >
-          <BarChart3 className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        {!isPickerMode && (
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleViewStats}
+              title={t("widget.viewStats")}
+              className="gap-1"
+            >
+              <BarChart3 className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              title={t("widget.refresh")}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </>
+        )}
       </Div>
 
-      {/* Search */}
-      <Div className="px-4 pt-3 pb-1">
-        <TextFieldWidget
-          fieldName={"searchFilters.search"}
-          field={children.searchFilters.children.search}
-        />
-      </Div>
-
-      {/* Filters */}
-      <Div className="px-4 pt-2 pb-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-        <MultiSelectFieldWidget
-          fieldName="searchFilters.status"
-          field={children.searchFilters.children.status}
-        />
-        <SelectFieldWidget
-          fieldName="searchFilters.interval"
-          field={children.searchFilters.children.interval}
-        />
-        <SelectFieldWidget
-          fieldName="searchFilters.provider"
-          field={children.searchFilters.children.provider}
-        />
-      </Div>
-
-      {/* Sort */}
-      <Div className="px-4 pb-2 grid grid-cols-2 gap-2">
-        <SelectFieldWidget
-          fieldName="sortingOptions.sortBy"
-          field={children.sortingOptions.children.sortBy}
-        />
-        <SelectFieldWidget
-          fieldName="sortingOptions.sortOrder"
-          field={children.sortingOptions.children.sortOrder}
-        />
-      </Div>
+      {/* Search + filters + sort — full mode only */}
+      {!isPickerMode && (
+        <>
+          <Div className="px-4 pt-3 pb-1">
+            <TextFieldWidget
+              fieldName={"searchFilters.search"}
+              field={children.searchFilters.children.search}
+            />
+          </Div>
+          <Div className="px-4 pt-2 pb-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <MultiSelectFieldWidget
+              fieldName="searchFilters.status"
+              field={children.searchFilters.children.status}
+            />
+            <SelectFieldWidget
+              fieldName="searchFilters.interval"
+              field={children.searchFilters.children.interval}
+            />
+            <SelectFieldWidget
+              fieldName="searchFilters.provider"
+              field={children.searchFilters.children.provider}
+            />
+          </Div>
+          <Div className="px-4 pb-2 grid grid-cols-2 gap-2">
+            <SelectFieldWidget
+              fieldName="sortingOptions.sortBy"
+              field={children.sortingOptions.children.sortBy}
+            />
+            <SelectFieldWidget
+              fieldName="sortingOptions.sortOrder"
+              field={children.sortingOptions.children.sortOrder}
+            />
+          </Div>
+        </>
+      )}
 
       {/* Subscription list */}
       <Div className="px-4 pb-2 overflow-y-auto max-h-[min(700px,calc(100dvh-340px))]">
@@ -273,7 +285,7 @@ export function SubscriptionListContainer({
                 subscription={subscription}
                 locale={locale}
                 t={t}
-                onClick={() => handleRowClick(subscription.id)}
+                onClick={() => handleRowClick(subscription)}
               />
             ))}
           </Div>
@@ -284,8 +296,8 @@ export function SubscriptionListContainer({
         )}
       </Div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
+      {/* Pagination — full mode only */}
+      {!isPickerMode && totalPages > 1 && (
         <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
           <Span>
             {t("get.page.label")} {currentPage} / {totalPages} ({totalCount})

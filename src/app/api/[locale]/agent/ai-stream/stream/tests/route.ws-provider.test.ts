@@ -3,7 +3,8 @@
  *
  * Tests the ws-provider transport mode:
  *
- *   1. atlas sets transportMode='ws-provider' on the connection to hermes.
+ *   1. atlas sets transportMode='ws-provider' + isInferenceProvider=true on the
+ *      connection to hermes, so hermes's AI loop handles all inference.
  *   2. When a stream request arrives, atlas's stream-relay POSTs to hermes's
  *      /ws-provider/stream endpoint and subscribes to the thread channel via WS.
  *   3. Hermes runs the AI loop; when the AI calls a tool, hermes emits
@@ -20,9 +21,11 @@
  *   WP1  — basic stream runs to completion; thread is idle; messages in atlas DB
  *   WP2  — AI calls tool-execute-request; atlas executes and sends result; AI continues
  *
- * Standalone suite (WP3/WP4):
+ * Standalone suite (WP3–WP6):
  *   WP3  — threadMirrorMode=both → thread + messages exist in atlas DB
  *   WP4  — provider stateless: prod DB has ZERO chatMessages for the thread
+ *   WP5  — tool roundtrip completed: atlas DB has a TOOL message with non-null result
+ *   WP6  — hermes ran the AI loop: final AI message contains expected marker text
  *
  * PREREQUISITES
  * ─────────────
@@ -39,21 +42,33 @@ globalThis.AI_SDK_LOG_WARNINGS = false;
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
-import { and, eq, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
 import { setFetchCacheContext } from "../../testing/fetch-cache";
-import { runTestStream } from "../../testing/headless-test-runner";
-import { resolveDevUser, resolveRemoteUrl } from "../../testing/remote-setup";
+import {
+  fetchThreadMessages,
+  getOrCreateFolder,
+  runTestStream,
+} from "../../testing/headless-test-runner";
+import {
+  failSuitePrerequisites,
+  isHermesInFixtureMode,
+  resolveDevUser,
+  resolveRemoteUrl,
+} from "../../testing/remote-setup";
 import { describeStreamSuite } from "./route-base.test";
 
 const _remoteUrl = await resolveRemoteUrl();
+const _isFixtureMode = isHermesInFixtureMode();
 
 const HERMES_INSTANCE_ID = "hermes";
 
@@ -79,18 +94,21 @@ async function setupWsProviderConnection(
   // toolSource='local', threadMirrorMode='both' by default.
   await connectToHermes(testUser, _remoteUrl ?? "http://localhost:3002");
 
-  // Switch to ws-provider transport mode.
-  // atlas will POST to hermes's /ws-provider/stream; hermes runs the AI loop
-  // and dispatches tool-execute-request back to atlas via WS.
-  await db
-    .update(remoteConnections)
-    .set({ transportMode: "ws-provider", updatedAt: new Date() })
-    .where(
-      and(
-        eq(remoteConnections.userId, testUser.id),
-        eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-      ),
-    );
+  // Switch to ws-provider transport mode and mark hermes as inference provider.
+  // isInferenceProvider=true means hermes handles ALL inference for this connection —
+  // no routing-rule match required. atlas will POST to hermes's /ws-provider/stream
+  // and hermes dispatches tool-execute-request back to atlas via WS.
+  const connByIdDef =
+    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+  await RouteExecuteRepository.runInProcessTyped({
+    definition: connByIdDef.default.PATCH,
+    input: { isInferenceProvider: true, forceSystemProvider: true },
+    urlPathParams: { instanceId: HERMES_INSTANCE_ID },
+    user: testUser,
+    locale: defaultLocale,
+    platform: Platform.AI,
+    logger: createEndpointLogger(false, Date.now(), defaultLocale),
+  });
 
   // Ensure capabilities are populated before tests run
   await triggerPull();
@@ -123,7 +141,7 @@ async function teardownWsProviderConnection(
   _mainProdUserId = null;
 }
 
-if (_remoteUrl) {
+if (_remoteUrl && _isFixtureMode) {
   // ── Main suite: full stream integration via describeStreamSuite ───────────────
   // Covers WP1 (basic stream) and WP2 (tool dispatch roundtrip) implicitly via
   // the T1 tool-help call in describeStreamSuite.
@@ -132,35 +150,36 @@ if (_remoteUrl) {
     cachePrefix: "ws-provider-",
     // No remoteInstanceId: tools execute on atlas (local) via tool-execute-request
     // roundtrip; the AI calls them via the request name directly (no execute-tool wrapper).
-    skipWaitForTaskTest: true,
     // Tool confirmations require local state. The AI runs on hermes remotely.
-    skipApprovalTests: true,
     // Attachment metadata is processed on the provider (hermes) side only.
-    skipAttachmentTests: true,
     // Credits are deducted on hermes (remote). Not visible in local testUser balance.
-    skipTokenMetadataAssertions: true,
     // System prompt is built locally (atlas) and sent in the ws-provider/stream POST.
     assertSystemPromptFromLocal: true,
     setup: setupWsProviderConnection,
     teardown: teardownWsProviderConnection,
   });
 
-  // ── WP3/WP4: Provider stateless — explicit prod DB assertions ─────────────────
-  // Separately verify the incognito guarantee: hermes (ws-provider) NEVER persists
-  // threads or messages. All persistence is on atlas.
+  // ── WP3–WP6: Provider stateless + tool roundtrip + AI loop assertions ─────────
+  // WP3/WP4: verify incognito guarantee — hermes never persists threads/messages.
+  // WP5: verify the tool-execute-request roundtrip completed successfully.
+  // WP6: verify hermes actually ran the AI loop (not just relayed).
 
-  describe(`WS-Provider — provider stateless, no prod DB writes (${_remoteUrl})`, () => {
+  describe(`WS-Provider — provider stateless + roundtrip assertions (${_remoteUrl})`, () => {
     let testUser: JwtPrivatePayloadType;
     let threadId: string;
+    let wp3Wp6FolderId: string;
 
     beforeAll(async () => {
       const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
       expect(
         resolved,
-        `WP3/WP4: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+        `WP3-WP6: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
-        return;
+        // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+        throw new Error(
+          `WP3-WP6 setup failed: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — cannot continue suite (run: vibe dev)`,
+        );
       }
       testUser = resolved;
 
@@ -168,28 +187,49 @@ if (_remoteUrl) {
       // calling again is idempotent (disconnects first, then reconnects).
       await setupWsProviderConnection(testUser);
 
-      // Run a minimal stream to produce a thread we can query about
-      setFetchCacheContext("ws-provider-wp3-wp4-");
+      // Create BACKGROUND/tests/ws-provider subfolder for this standalone suite.
+      const testsParentId = await getOrCreateFolder(
+        testUser,
+        DefaultFolderId.BACKGROUND,
+        "tests",
+      );
+      wp3Wp6FolderId = await getOrCreateFolder(
+        testUser,
+        DefaultFolderId.BACKGROUND,
+        "ws-provider",
+        testsParentId,
+      );
+
+      // Run a stream that forces a tool call (tool-help) so we can assert the
+      // tool-execute-request roundtrip completed and the AI continued correctly.
+      // The prompt asks the AI to call tool-help and report back with a marker,
+      // which proves hermes's AI loop ran AND the WS roundtrip produced a result.
+      setFetchCacheContext("ws-provider-wp3-wp6-");
       const streamResult = await runTestStream({
         prompt:
-          "Reply with exactly: WP_STATELESS_CHECK. No tools, no explanation.",
+          "Call the tool-help tool with query='tool-help' and then reply with EXACTLY: WP_ROUNDTRIP_COMPLETE. Nothing else.",
         user: testUser,
+        rootFolderId: DefaultFolderId.BACKGROUND,
+        subFolderId: wp3Wp6FolderId,
       });
 
       expect(
         streamResult.result.success,
-        "WP3/WP4 setup: stream must succeed",
+        "WP3-WP6 setup: stream must succeed",
       ).toBe(true);
 
       if (!streamResult.result.success) {
-        return;
+        // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+        throw new Error(
+          "WP3-WP6 setup failed: stream did not succeed — cannot continue suite",
+        );
       }
 
       threadId = streamResult.result.data.threadId ?? "";
 
       expect(
         streamResult.messages.length,
-        "WP3/WP4 setup: stream must produce at least one message",
+        "WP3-WP6 setup: stream must produce at least one message",
       ).toBeGreaterThan(0);
     }, 120_000);
 
@@ -202,21 +242,24 @@ if (_remoteUrl) {
     });
 
     it("WP3: threadMirrorMode=both → thread + messages exist in atlas DB", async () => {
-      const [thread] = await db
-        .select({ id: chatThreads.id })
-        .from(chatThreads)
-        .where(eq(chatThreads.id, threadId))
-        .limit(1);
+      const threadDef =
+        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+      const threadResult = await RouteExecuteRepository.runInProcessTyped({
+        definition: threadDef.default.GET,
+        input: { rootFolderId: DefaultFolderId.REMOTE },
+        urlPathParams: { threadId },
+        user: testUser,
+        locale: defaultLocale,
+        platform: Platform.AI,
+        logger: createEndpointLogger(false, Date.now(), defaultLocale),
+      });
 
       expect(
-        thread?.id,
+        threadResult.success,
         "WP3: thread must exist in atlas DB (threadMirrorMode=both)",
-      ).toBe(threadId);
+      ).toBe(true);
 
-      const msgs = await db
-        .select({ id: chatMessages.id })
-        .from(chatMessages)
-        .where(eq(chatMessages.threadId, threadId));
+      const msgs = await fetchThreadMessages(threadId, testUser);
 
       expect(
         msgs.length,
@@ -225,18 +268,67 @@ if (_remoteUrl) {
     }, 30_000);
 
     it("WP4: provider stateless → prod DB has ZERO chatMessages for the thread", async () => {
-      const { getProdDb } = await import("../../testing/remote-setup");
-      const pdb = getProdDb();
+      const { assertProdDbEmpty } = await import("../../testing/remote-setup");
+      await assertProdDbEmpty(threadId, "chat_messages");
+    }, 30_000);
 
-      const rows = await pdb.execute<{ id: string }>(
-        sql`SELECT id FROM chat_messages WHERE thread_id = ${threadId} LIMIT 1`,
+    it("WP5: tool roundtrip completed → atlas DB has TOOL message with non-null result", async () => {
+      // The tool-help call was dispatched from hermes to atlas via tool-execute-request.
+      // Atlas executed it locally and sent tool-execute-result back to hermes.
+      // The MessageDbWriter on atlas persists the tool message including metadata.result.
+      // Verify: at least one TOOL message exists, and its metadata.toolCall.result is non-null.
+      const msgs = await fetchThreadMessages(threadId, testUser);
+      const toolMsgs = msgs.filter((m) => m.role === ChatMessageRole.TOOL);
+
+      expect(
+        toolMsgs.length,
+        "WP5: expected at least one TOOL message in atlas DB for the tool-help call",
+      ).toBeGreaterThan(0);
+
+      // At least one tool message must have a completed result (not just pending)
+      const completedTool = toolMsgs.find(
+        (m) => m.toolCall?.result !== undefined && m.toolCall.result !== null,
       );
 
       expect(
-        rows.rows.length,
-        "WP4: hermes (ws-provider) must NOT persist messages in prod DB — " +
-          "provider-side incognito mode guarantees zero rows",
-      ).toBe(0);
+        completedTool,
+        "WP5: expected at least one TOOL message with non-null result — " +
+          "tool-execute-request roundtrip must have completed via WS",
+      ).toBeTruthy();
+    }, 30_000);
+
+    it("WP6: hermes ran the AI loop → final AI message contains expected marker", async () => {
+      // If hermes ran the AI loop correctly and the WS roundtrip delivered the tool result,
+      // the AI's final response must contain our requested marker.
+      const msgs = await fetchThreadMessages(threadId, testUser);
+      const assistantMsgs = msgs.filter(
+        (m) => m.role === ChatMessageRole.ASSISTANT && m.content !== null,
+      );
+
+      expect(
+        assistantMsgs.length,
+        "WP6: expected at least one assistant message in atlas DB",
+      ).toBeGreaterThan(0);
+
+      const markerMsg = assistantMsgs.find((m) =>
+        m.content?.includes("WP_ROUNDTRIP_COMPLETE"),
+      );
+
+      expect(
+        markerMsg,
+        "WP6: expected final AI message to contain 'WP_ROUNDTRIP_COMPLETE' — " +
+          "proves hermes ran the AI loop AND the WS tool roundtrip completed",
+      ).toBeTruthy();
     }, 30_000);
   });
+} else if (!_remoteUrl) {
+  failSuitePrerequisites(
+    "WS-Provider",
+    "hermes not running — start: vibe --hermes dev",
+  );
+} else if (!_isFixtureMode) {
+  failSuitePrerequisites(
+    "WS-Provider",
+    "hermes is running but not in fixture mode — restart: vibe --hermes dev --fixture-mode",
+  );
 }

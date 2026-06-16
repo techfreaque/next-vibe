@@ -71,26 +71,6 @@ export class CortexListRepository {
       });
     }
 
-    // Filesystem backend for preview-mode admin
-    if (!user.isPublic) {
-      const { isFilesystemMode } = await import("../fs-provider");
-      if (isFilesystemMode(user)) {
-        const mountPrefix = getMountPrefix(path, locale);
-        if (mountPrefix) {
-          // ensureMountPopulated is a no-op for virtual mounts (non-native)
-          const { ensureMountPopulated } =
-            await import("../fs-provider/fs-populate");
-          await ensureMountPopulated(mountPrefix, userId, logger);
-        } else {
-          // Root listing - create native dirs on disk
-          const { ensureDataRoot } = await import("../fs-provider/fs-populate");
-          await ensureDataRoot();
-        }
-        const { fsListDirectory } = await import("../fs-provider/fs-list");
-        return fsListDirectory(path, { t }, userId, locale);
-      }
-    }
-
     try {
       // Root listing: show all mount points + native writable prefixes
       if (path === "/") {
@@ -130,8 +110,15 @@ export class CortexListRepository {
 
       // Virtual mount listing
       if (mountPrefix && !isWritablePath(path, locale)) {
+        const isAdmin =
+          !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
         const { resolveVirtualList } = await import("../mounts/resolver");
-        const rawEntries = await resolveVirtualList(userId, path, mountPrefix);
+        const rawEntries = await resolveVirtualList(
+          userId,
+          path,
+          mountPrefix,
+          isAdmin,
+        );
         const entries: ListEntry[] = rawEntries.map((e) => ({
           name: e.name,
           entryPath: e.path,
@@ -243,6 +230,3 @@ export class CortexListRepository {
     }
   }
 }
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";

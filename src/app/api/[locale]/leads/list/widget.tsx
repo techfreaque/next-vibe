@@ -608,28 +608,26 @@ export function LeadsListContainer({
             <Users className="h-4 w-4" />
             <Span className="hidden @sm:inline">{t("widget.batch")}</Span>
           </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleRefresh}
+            title={t("widget.refresh")}
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            onClick={handleCreate}
+            className="gap-1"
+          >
+            <Plus className="h-4 w-4" />
+            {t("get.createButton.label")}
+          </Button>
         </>
-      )}
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={handleRefresh}
-        title={t("widget.refresh")}
-      >
-        <RefreshCw className="h-4 w-4" />
-      </Button>
-      {!isPickerMode && (
-        <Button
-          type="button"
-          variant="default"
-          size="sm"
-          onClick={handleCreate}
-          className="gap-1"
-        >
-          <Plus className="h-4 w-4" />
-          {t("get.createButton.label")}
-        </Button>
       )}
     </Div>
   );
@@ -645,91 +643,99 @@ export function LeadsListContainer({
         />
       </Div>
 
-      {/* Status quick-filter tabs */}
-      <Div className="flex items-center gap-1 px-4 pt-3 pb-1 flex-wrap">
-        {STATUS_TAB_VALUES.map((tab) => {
-          const isActive =
-            tab.value === null
-              ? activeStatuses.length === 0
-              : activeStatuses.includes(tab.value);
-          const count =
-            tab.value !== null ? (statusCounts[tab.value] ?? 0) : leads.length;
-          return (
-            <Button
-              key={tab.value ?? "all"}
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                if (tab.value === null) {
-                  form.setValue("statusFilters.status", []);
-                  form.setValue("paginationInfo.page", 1);
-                  if (onSubmit) {
-                    onSubmit();
+      {/* Status quick-filter tabs — full mode only */}
+      {!isPickerMode && (
+        <Div className="flex items-center gap-1 px-4 pt-3 pb-1 flex-wrap">
+          {STATUS_TAB_VALUES.map((tab) => {
+            const isActive =
+              tab.value === null
+                ? activeStatuses.length === 0
+                : activeStatuses.includes(tab.value);
+            const count =
+              tab.value !== null
+                ? (statusCounts[tab.value] ?? 0)
+                : leads.length;
+            return (
+              <Button
+                key={tab.value ?? "all"}
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  if (tab.value === null) {
+                    form.setValue("statusFilters.status", []);
+                    form.setValue("paginationInfo.page", 1);
+                    if (onSubmit) {
+                      onSubmit();
+                    }
+                  } else {
+                    handleToggleStatus(tab.value);
                   }
-                } else {
-                  handleToggleStatus(tab.value);
-                }
-              }}
-              className={cn(
-                "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors border",
-                isActive
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-transparent text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground",
-              )}
-            >
-              {t(tab.labelKey)}
-              {count > 0 && (
-                <Span
-                  className={cn(
-                    "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[10px] font-semibold",
-                    isActive
-                      ? "bg-primary-foreground/20 text-primary-foreground"
-                      : "bg-muted text-muted-foreground",
-                  )}
-                >
-                  {count}
-                </Span>
-              )}
-            </Button>
-          );
-        })}
-      </Div>
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors border",
+                  isActive
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-transparent text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground",
+                )}
+              >
+                {t(tab.labelKey)}
+                {count > 0 && (
+                  <Span
+                    className={cn(
+                      "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[10px] font-semibold",
+                      isActive
+                        ? "bg-primary-foreground/20 text-primary-foreground"
+                        : "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {count}
+                  </Span>
+                )}
+              </Button>
+            );
+          })}
+        </Div>
+      )}
 
-      {/* Search + Filters row */}
+      {/* Search — always visible; full filters only in normal mode */}
       <Div className="px-4 pt-2 pb-0 grid grid-cols-1 @sm:grid-cols-2 @md:grid-cols-3 gap-2">
         <TextFieldWidget
           fieldName="statusFilters.search"
           field={children.statusFilters.children.search}
         />
-        <MultiSelectFieldWidget
-          fieldName="statusFilters.source"
-          field={children.statusFilters.children.source}
-        />
-        <MultiSelectFieldWidget
-          fieldName="statusFilters.currentCampaignStage"
-          field={children.statusFilters.children.currentCampaignStage}
-        />
-        <MultiSelectFieldWidget
-          fieldName="locationFilters.country"
-          field={children.locationFilters.children.country}
-        />
-        <MultiSelectFieldWidget
-          fieldName="locationFilters.language"
-          field={children.locationFilters.children.language}
-        />
-        <SelectFieldWidget
-          fieldName="sortingOptions.sortBy"
-          field={children.sortingOptions.children.sortBy}
-        />
-        <SelectFieldWidget
-          fieldName="sortingOptions.sortOrder"
-          field={children.sortingOptions.children.sortOrder}
-        />
+        {!isPickerMode && (
+          <>
+            <MultiSelectFieldWidget
+              fieldName="statusFilters.source"
+              field={children.statusFilters.children.source}
+            />
+            <MultiSelectFieldWidget
+              fieldName="statusFilters.currentCampaignStage"
+              field={children.statusFilters.children.currentCampaignStage}
+            />
+            <MultiSelectFieldWidget
+              fieldName="locationFilters.country"
+              field={children.locationFilters.children.country}
+            />
+            <MultiSelectFieldWidget
+              fieldName="locationFilters.language"
+              field={children.locationFilters.children.language}
+            />
+            <SelectFieldWidget
+              fieldName="sortingOptions.sortBy"
+              field={children.sortingOptions.children.sortBy}
+            />
+            <SelectFieldWidget
+              fieldName="sortingOptions.sortOrder"
+              field={children.sortingOptions.children.sortOrder}
+            />
+          </>
+        )}
       </Div>
 
-      {/* Status breakdown subtitle */}
-      {!isLoading && leads.length > 0 && (
+      {/* Status breakdown subtitle — full mode only */}
+      {!isPickerMode && !isLoading && leads.length > 0 && (
         <Div className="px-4 pb-1 flex items-center gap-3 flex-wrap">
           {objectEntries(statusCounts)
             .toSorted(([, a], [, b]) => b - a)
@@ -808,8 +814,8 @@ export function LeadsListContainer({
         )}
       </Div>
 
-      {/* Pagination footer */}
-      {totalPages > 1 && (
+      {/* Pagination footer — full mode only */}
+      {!isPickerMode && totalPages > 1 && (
         <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
           <Span>
             {t("widget.pagination", {

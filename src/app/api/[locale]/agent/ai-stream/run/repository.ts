@@ -44,6 +44,15 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import {
+  getBestChatModel,
+  type ChatModelId,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  isFiltersSelection,
+  isManualSelection,
+} from "@/app/api/[locale]/agent/chat/skills/create/definition";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import type { HeadlessPreCall } from "../repository/headless";
 import { runHeadlessAiStream } from "../repository/headless";
 import type { AiStreamT } from "../stream/i18n";
@@ -138,6 +147,52 @@ export class AiStreamRunRepository {
         excludeMemories,
       } = data;
 
+      // Server-side enforce: at least one of favoriteId, skill, or model must be set.
+      // model is CLI-only (stripped by hiddenForPlatforms on all other platforms),
+      // so non-CLI callers must always supply favoriteId or skill.
+      if (!favoriteId && !skill && !model) {
+        return fail({
+          message: t("run.post.requireFavOrSkill"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
+      // Validate skill exists early — fail with a clear message rather than silently
+      // falling back. Catches the common mistake of passing a favorite slug to --skill.
+      // Also resolve model from skill's default variant when model not explicitly provided.
+      let resolvedModel: ChatModelId | undefined = model;
+      if (skill && skill !== NO_SKILL_ID) {
+        const skillCheck = await SkillsRepository.getSkillById(
+          { id: skill },
+          user,
+          logger,
+          locale,
+        );
+        if (!skillCheck.success) {
+          return fail({
+            message: t("run.post.skillNotFound", { skill }),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+        if (!resolvedModel) {
+          const { variantId } = parseSkillId(skill);
+          const variants = skillCheck.data.variants;
+          const variant = variants
+            ? variantId
+              ? variants.find((v) => v.id === variantId)
+              : (variants.find((v) => v.isDefault) ?? variants[0])
+            : null;
+          const varSel = variant?.modelSelection;
+          if (varSel) {
+            if (isManualSelection(varSel) && "manualModelId" in varSel) {
+              resolvedModel = varSel.manualModelId;
+            } else if (isFiltersSelection(varSel)) {
+              resolvedModel = getBestChatModel(varSel, user)?.id;
+            }
+          }
+        }
+      }
+
       const rootFolderId = rootFolderIdRaw ?? DefaultFolderId.BACKGROUND;
 
       // Derive thread mode from fields:
@@ -208,7 +263,7 @@ export class AiStreamRunRepository {
       }
 
       logger.debug("[AiStreamRun] Running headless stream", {
-        model,
+        model: resolvedModel,
         promptLength: prompt.length,
         preCallCount: preCallResults.length,
       });
@@ -368,7 +423,7 @@ export class AiStreamRunRepository {
 
       const streamResult = await runHeadlessAiStream({
         favoriteId: effectiveFavoriteId,
-        model,
+        model: resolvedModel,
         skill,
         prompt,
         favoriteConfig: headlessFavoriteConfig,

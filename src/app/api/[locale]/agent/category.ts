@@ -18,7 +18,11 @@ export const category: CategoryDefinition = {
   group: "ai",
   icon: "bot",
   order: 10,
-  defaultEntry: AI_STREAM_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: AI_STREAM_ALIAS,
+    [UserPermissionRole.CUSTOMER]: AI_STREAM_ALIAS,
+    [UserPermissionRole.PUBLIC]: AI_STREAM_ALIAS,
+  },
   subcategories: {
     Inference: {
       icon: "cpu",

@@ -91,6 +91,15 @@ export class EmailHandlingRepository {
                 return;
               }
 
+              // Template decided there is nothing to send in this context
+              // (e.g. optional confirmation, submitter left no address).
+              if ("skip" in resolved.data) {
+                logger.debug("Email skipped by template", {
+                  reason: resolved.data.reason,
+                });
+                return;
+              }
+
               const {
                 jsx,
                 toEmail,

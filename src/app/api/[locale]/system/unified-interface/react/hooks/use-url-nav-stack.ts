@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { NavigationStackEntry } from "../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { resolveEndpoint } from "../utils/resolve-endpoint";
+import { endpointToUrlSegment } from "../../shared/utils/path";
 import type { UseNavigationStackReturn } from "./use-navigation-stack";
 
 // ── Serialization ─────────────────────────────────────────────────────────────

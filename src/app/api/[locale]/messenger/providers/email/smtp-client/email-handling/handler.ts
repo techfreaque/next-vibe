@@ -7,6 +7,7 @@ import "server-only";
 
 import type {
   EmailRenderProps,
+  EmailRenderSkip,
   EmailResolvedData,
   ScopedTResult,
 } from "@/app/api/[locale]/messenger/registry/template";

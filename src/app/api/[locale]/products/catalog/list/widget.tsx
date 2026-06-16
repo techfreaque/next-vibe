@@ -300,8 +300,8 @@ export function CatalogListWidget(_props: {
         </Div>
       )}
 
-      {/* Filter bar */}
-      {form ? (
+      {/* Filter bar — full mode only */}
+      {!isPickerMode && form ? (
         <Div className="flex items-end gap-2 p-3 rounded-lg border bg-muted/20 flex-wrap">
           {/* Type filter */}
           <Div className="flex flex-col gap-1 min-w-[130px]">

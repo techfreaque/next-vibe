@@ -16,7 +16,11 @@ import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { resolveRemoteUrl } from "../../testing/remote-setup";
+import {
+  failSuitePrerequisites,
+  isHermesInFixtureMode,
+  resolveRemoteUrl,
+} from "../../testing/remote-setup";
 import { describeStreamSuite } from "./route-base.test";
 
 let _prodUserId: string | null = null;
@@ -77,29 +81,29 @@ async function teardownDirectConnection(
 }
 
 const _resolvedRemoteUrl = await resolveRemoteUrl();
-if (_resolvedRemoteUrl) {
+const _isFixtureMode = isHermesInFixtureMode();
+
+if (_resolvedRemoteUrl && _isFixtureMode) {
   describeStreamSuite({
     label: `AI Stream Integration - Direct (${_resolvedRemoteUrl}, transportMode='direct-http')`,
     cachePrefix: "direct-",
     // No remoteInstanceId: AI loop runs on hermes (loopLocation='server') via relay.
     // Tools execute locally on hermes — no execute-tool wrapper from the test side.
     // System prompt + tools are built on local client (atlas) and sent in relay POST.
-    // skipWaitForTaskTest: wait-for-task revival runs on remote, not mirrored locally.
-    skipWaitForTaskTest: true,
-    // skipApprovalTests: tool confirmations require local state; AI runs on remote.
-    skipApprovalTests: true,
-    // skipAttachmentTests: local user message has no attachment metadata in relay mode.
-    skipAttachmentTests: true,
     // Credits are deducted on hermes (remote) — not visible in local testUser balance.
-    skipTokenMetadataAssertions: true,
     // assertSystemPromptFromLocal: system prompt built locally; AI must report local instance ID.
     assertSystemPromptFromLocal: true,
     setup: setupDirectConnection,
     teardown: teardownDirectConnection,
   });
-} else {
-  process.stderr.write(
-    "[test skip] AI Stream Integration - Direct: remote server not running.\n" +
-      "  Start: vibe --hermes dev --fixture-mode  → http://localhost:3002\n",
+} else if (!_resolvedRemoteUrl) {
+  failSuitePrerequisites(
+    "AI Stream Integration - Direct",
+    "remote server not running — start: vibe --hermes dev --fixture-mode  → http://localhost:3002",
+  );
+} else if (!_isFixtureMode) {
+  failSuitePrerequisites(
+    "AI Stream Integration - Direct",
+    "hermes is running but not in fixture mode — restart: vibe --hermes dev --fixture-mode",
   );
 }

@@ -19,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "business",
   icon: "box",
   order: 50,
-  defaultEntry: INVENTORY_DASHBOARD_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: INVENTORY_DASHBOARD_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     "Inventory: Stock": {
       icon: "layers",

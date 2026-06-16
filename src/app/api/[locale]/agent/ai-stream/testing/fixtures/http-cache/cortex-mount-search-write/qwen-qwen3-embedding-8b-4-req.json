@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:1ba94029 | Posted:Jun 16, 19:20]\n\nUser: Use cortex-write to create /documents/search-test/quantum-flux.md with this content:\n\n# Quantum Flux Resonance\n\nThis document discusses quantum flux resonance in subatomic particle decay chains.\nKey concepts: quark entanglement, decoherence boundaries, Planck-scale interference.\n\nConfirm the file was created.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (19)\n│   ├── [📌] critical-note.md\n│   │   This is a PINNED critical note. It must ALWAYS appear in the system prompt, never trimmed.\n│   ├── t2-cheap-test [79%]\n│   │   T2_CHEAP_OK\n│   ├── life-career-moved.md\n│   │   Building unbottled.ai, a free-speech AI platform. · ## Goals · - Short-term: Launch v1 with 50+ models · - Medium-term: 10k users · - Long-term: Become the default AI layer for open web · ## Blockers · None currently.\n│   ├── name.md\n│   │   <\n\nSystem: [Context: ID:a3120759 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 16, 19:20]\n\nAssistant: [tool:cortex-write] {\"path\":\"/documents/search-test/quantum-flux.md\",\"content\":\"# Quantum Flux Resonance\\n\\nThis document discusses quantum flux resonance in subatomic particle decay chains.\\nKey concepts: quark entangle\n\nTool: [result:cortex-write] {\"responsePath\":\"/documents/search-test/quantum-flux.md\",\"size\":194,\"created\":true,\"updatedAt\":\"2026-06-16T19:20:47.806Z\",\"responseContent\":\"# Quantum Flux Resonance\\n\\nThis document discusses quantum flux resonance in subatomic particle decay chains.\\nKey concepts: quark entanglement, decoherence b\n\nAssistant: [tool:cortex-read] {\"path\":\"/documents/search-test/quantum-flux.md\"}\n\nTool: [result:cortex-read] {\"responsePath\":\"/documents/search-test/quantum-flux.md\",\"content\":\"# Quantum Flux Resonance\\n\\nThis document discusses quantum flux resonance in subatomic particle decay chains.\\nKey concepts: quark entanglement, decoherence boundaries, Planck-scale interference.\\n\",\"size\":194,\"truncated\":false,\"re",
+    "encoding_format": "float"
+  }
+}

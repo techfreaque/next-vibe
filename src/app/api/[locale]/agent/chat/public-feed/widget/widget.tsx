@@ -28,6 +28,7 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import { DefaultFolderId } from "../../config";
+import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import type definition from "../definition";
 import type { PublicFeedItem } from "../definition";

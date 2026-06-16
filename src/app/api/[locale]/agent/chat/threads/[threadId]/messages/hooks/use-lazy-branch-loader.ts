@@ -27,6 +27,7 @@ import { useChatStore } from "../../../../hooks/store";
 import messagesDefinitions from "../definition";
 import type { PathGetResponseOutput } from "../path/definition";
 import pathDefinitions from "../path/definition";
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 import { patchMessage, upsertMessage } from "./update-messages";
 
 interface LazyBranchLoaderReturn {

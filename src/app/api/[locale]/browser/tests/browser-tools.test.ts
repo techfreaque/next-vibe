@@ -282,7 +282,7 @@ describe("Browser Tools", () => {
     "B0: baseline — Chrome starts with 0 tabs",
     { timeout: TEST_TIMEOUT },
     async () => {
-      if (!chromeAvailable) return;
+      if (!chromeAvailable) {return;}
       await assertTabCount(tabBaseline, 0, "B0: no test tabs yet");
     },
   );

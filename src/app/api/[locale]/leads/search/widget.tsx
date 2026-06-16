@@ -359,44 +359,46 @@ export function LeadsSearchContainer({
 
       {/* ── Results ── */}
       <Div className="px-4 pb-2 overflow-y-auto max-h-[min(700px,calc(100dvh-260px))]">
-        {/* Status filter chips */}
-        <Div className="flex flex-wrap items-center gap-1.5 pt-3 pb-1">
-          <Span className="text-xs text-muted-foreground mr-0.5">
-            {t("widget.filterLabel")}
-          </Span>
-          {Object.values(LeadStatus).map((status) => {
-            const isActive = activeStatus === status;
-            return (
+        {/* Status filter chips — full mode only */}
+        {!isPickerMode && (
+          <Div className="flex flex-wrap items-center gap-1.5 pt-3 pb-1">
+            <Span className="text-xs text-muted-foreground mr-0.5">
+              {t("widget.filterLabel")}
+            </Span>
+            {Object.values(LeadStatus).map((status) => {
+              const isActive = activeStatus === status;
+              return (
+                <Button
+                  key={status}
+                  type="button"
+                  onClick={() => {
+                    toggleStatus(status);
+                  }}
+                  className={cn(
+                    "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border transition-all",
+                    isActive
+                      ? `${STATUS_COLORS[status] ?? "bg-primary text-primary-foreground"} border-transparent`
+                      : "bg-transparent border-border text-muted-foreground hover:border-foreground/40",
+                  )}
+                >
+                  {STATUS_LABEL_KEYS[status]
+                    ? t(STATUS_LABEL_KEYS[status])
+                    : status.replace(/_/g, " ")}
+                  {isActive && <X className="h-2.5 w-2.5" />}
+                </Button>
+              );
+            })}
+            {activeStatus && (
               <Button
-                key={status}
                 type="button"
-                onClick={() => {
-                  toggleStatus(status);
-                }}
-                className={cn(
-                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border transition-all",
-                  isActive
-                    ? `${STATUS_COLORS[status] ?? "bg-primary text-primary-foreground"} border-transparent`
-                    : "bg-transparent border-border text-muted-foreground hover:border-foreground/40",
-                )}
+                onClick={clearStatusFilter}
+                className="text-xs text-muted-foreground hover:text-foreground underline ml-1"
               >
-                {STATUS_LABEL_KEYS[status]
-                  ? t(STATUS_LABEL_KEYS[status])
-                  : status.replace(/_/g, " ")}
-                {isActive && <X className="h-2.5 w-2.5" />}
+                {t("widget.clearFilter")}
               </Button>
-            );
-          })}
-          {activeStatus && (
-            <Button
-              type="button"
-              onClick={clearStatusFilter}
-              className="text-xs text-muted-foreground hover:text-foreground underline ml-1"
-            >
-              {t("widget.clearFilter")}
-            </Button>
-          )}
-        </Div>
+            )}
+          </Div>
+        )}
 
         {/* Loading skeleton */}
         {isLoading && leads.length === 0 && (

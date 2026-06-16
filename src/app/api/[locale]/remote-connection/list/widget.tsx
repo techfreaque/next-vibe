@@ -38,8 +38,6 @@ import { useState } from "react";
 import { GITHUB_REPO_URL } from "@/config/constants";
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
-  useWidgetLocale,
-  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
@@ -473,7 +471,6 @@ function CloudView({
 // ─── Sync settings card (admin only, local only) ──────────────────────────────
 
 function SyncSettingsCard({
-  syncEnabled,
   t,
 }: {
   syncEnabled: boolean;
@@ -484,6 +481,18 @@ function SyncSettingsCard({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
 
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
   const handleToggle = async (): Promise<void> => {
     setIsToggling(true);
     try {
@@ -556,7 +565,6 @@ function SyncSettingsCard({
 function LocalView({
   connections,
   selfInstanceId,
-  syncEnabled,
   navigate,
   t,
   onPick,

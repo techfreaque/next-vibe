@@ -37,6 +37,11 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  SkillCategory,
+  SkillOwnershipType,
+} from "@/app/api/[locale]/agent/chat/skills/enum";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
@@ -289,7 +294,13 @@ async function dbGetNode(
       nodeType: cortexNodes.nodeType,
     })
     .from(cortexNodes)
-    .where(and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, path)));
+    .where(
+      and(
+        eq(cortexNodes.userId, userId),
+        eq(cortexNodes.path, path),
+        eq(cortexNodes.isDeleted, false),
+      ),
+    );
   return row ?? null;
 }
 
@@ -298,12 +309,16 @@ async function dbCountNodes(
   userId: string,
   pathPrefix: string,
 ): Promise<number> {
+  // Count only LIVE nodes. Native delete is a soft-delete (isDeleted=true
+  // tombstone kept for sync propagation), so a deleted subtree leaves rows that
+  // are no longer user-visible — exclude them, matching read/list/search.
   const rows = await db
     .select({ path: cortexNodes.path })
     .from(cortexNodes)
     .where(
       and(
         eq(cortexNodes.userId, userId),
+        eq(cortexNodes.isDeleted, false),
         like(cortexNodes.path, `${pathPrefix}%`),
       ),
     );
@@ -1285,12 +1300,18 @@ describe("Cortex Mount: /skills", () => {
         name: "Cortex Test Skill",
         description: "Temporary skill created by cortex AI test suite.",
         tagline: "Test skill",
-        icon: "Brain",
+        icon: "brain",
         systemPrompt:
           "You are a cortex test skill. Your only purpose is to be read and verified by the test suite. Do not use this skill in production.",
-        category: "ASSISTANT",
-        modelSelection: { modelId: "kimi-k2.6" },
-        ownershipType: "USER",
+        category: SkillCategory.ASSISTANT,
+        ownershipType: SkillOwnershipType.USER,
+        variants: [
+          {
+            id: "default",
+            modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
+            isDefault: true,
+          },
+        ],
       })
       .onConflictDoUpdate({
         target: [customSkillsTable.slug],
@@ -1322,8 +1343,10 @@ describe("Cortex Mount: /skills", () => {
         try {
           await fn();
         } catch (err) {
-          // oxlint-disable-next-line restricted-syntax
           suiteFailed = true;
+          // Re-throw so vitest marks the step failed (test harness, not a
+          // ResponseType path).
+          // oxlint-disable-next-line restricted-syntax
           throw err;
         }
       },
@@ -1364,7 +1387,18 @@ describe("Cortex Mount: /skills", () => {
       "S1: must have at least 1 skill (the test skill)",
     ).toBeGreaterThanOrEqual(1);
 
-    const names = entries.map((e: { name?: string }) => String(e.name ?? ""));
+    const names = entries.map((e) => {
+      if (
+        e !== null &&
+        typeof e === "object" &&
+        !Array.isArray(e) &&
+        "name" in e
+      ) {
+        const name = e.name;
+        return typeof name === "string" ? name : "";
+      }
+      return "";
+    });
     expect(
       names.some((n) => n.includes(testSkillSlug)),
       "S1: test skill must appear in listing",
@@ -1663,8 +1697,10 @@ describe("Cortex Mount: /searches and cortex-search", () => {
         try {
           await fn();
         } catch (err) {
-          // oxlint-disable-next-line restricted-syntax
           suiteFailed = true;
+          // Re-throw so vitest marks the step failed (test harness, not a
+          // ResponseType path).
+          // oxlint-disable-next-line restricted-syntax
           throw err;
         }
       },
@@ -1760,6 +1796,7 @@ describe("Cortex Mount: /searches and cortex-search", () => {
       ),
     );
     if (!allPaths.some((p) => p.includes("quantum-flux"))) {
+      // eslint-disable-next-line no-console
       console.warn(
         `SR2: quantum-flux not in top results - skipping (got: ${allPaths.slice(0, 3).join(", ")})`,
       );
@@ -1960,8 +1997,10 @@ describe("Cortex: /documents path operations and edge cases", () => {
         try {
           await fn();
         } catch (err) {
-          // oxlint-disable-next-line restricted-syntax
           suiteFailed = true;
+          // Re-throw so vitest marks the step failed (test harness, not a
+          // ResponseType path).
+          // oxlint-disable-next-line restricted-syntax
           throw err;
         }
       },
@@ -2251,7 +2290,7 @@ describe("Cortex System Prompt Injection", () => {
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: "background",
+        rootFolderId: DefaultFolderId.BACKGROUND,
         subFolderId: null,
         skillId: null,
         isIncognito: false,
@@ -2325,7 +2364,7 @@ describe("Cortex System Prompt Injection", () => {
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: "background",
+        rootFolderId: DefaultFolderId.BACKGROUND,
         subFolderId: null,
         skillId: null,
         isIncognito: false,
@@ -2390,7 +2429,7 @@ describe("Cortex System Prompt Injection", () => {
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: "background",
+        rootFolderId: DefaultFolderId.BACKGROUND,
         subFolderId: null,
         skillId: null,
         isIncognito: true, // <-- key flag
@@ -2423,7 +2462,7 @@ describe("Cortex System Prompt Injection", () => {
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: "background",
+        rootFolderId: DefaultFolderId.BACKGROUND,
         subFolderId: null,
         skillId: null,
         isIncognito: false,
@@ -2443,6 +2482,7 @@ describe("Cortex System Prompt Injection", () => {
 
       if (allFileEntries.length === 0) {
         // No embeddings available in this env - skip gracefully (same as SP5)
+        // eslint-disable-next-line no-console
         console.warn(
           "SP4: no relevant context returned (embeddings may be unavailable) - skipping",
         );
@@ -2488,7 +2528,7 @@ describe("Cortex System Prompt Injection", () => {
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: "background",
+        rootFolderId: DefaultFolderId.BACKGROUND,
         subFolderId: null,
         skillId: null,
         isIncognito: false,
@@ -2504,6 +2544,7 @@ describe("Cortex System Prompt Injection", () => {
       );
       if (allRelevant.length === 0) {
         // No embeddings available in this env - skip gracefully
+        // eslint-disable-next-line no-console
         console.warn(
           "SP5: no relevant context returned (embeddings may be unavailable) - skipping",
         );
@@ -2516,9 +2557,10 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      // Relevant results are shown inline in their mount section with score %
+      // Relevant results are shown inline in their mount section with a score
+      // badge in the current `[NN%]` format (see renderCortexTree).
       expect(prompt, "SP5: must show score % for relevant results").toMatch(
-        /\(\d+%\)/,
+        /\[\d+%\]/,
       );
     },
     SP_TIMEOUT,
@@ -2541,7 +2583,7 @@ describe("Cortex System Prompt Injection", () => {
         user: testUser,
         logger,
         locale: defaultLocale,
-        rootFolderId: "background",
+        rootFolderId: DefaultFolderId.BACKGROUND,
         subFolderId: null,
         skillId: null,
         isIncognito: false,

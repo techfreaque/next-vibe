@@ -259,9 +259,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "toolId"
-                      ],
+                      "required": ["toolId"],
                       "type": "object"
                     },
                     "type": "array"
@@ -273,12 +271,7 @@
               },
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "excludeMemories": {
@@ -310,9 +303,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "toolId"
-                      ],
+                      "required": ["toolId"],
                       "type": "object"
                     },
                     "type": "array"
@@ -340,9 +331,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "routeId"
-                      ],
+                      "required": ["routeId"],
                       "type": "object"
                     },
                     "type": "array"
@@ -385,9 +374,7 @@
                 ]
               }
             },
-            "required": [
-              "prompt"
-            ],
+            "required": ["prompt"],
             "type": "object"
           }
         },
@@ -402,12 +389,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "interactiveMode": {
@@ -423,19 +405,14 @@
               },
               "provider": {
                 "default": "claude-code",
-                "enum": [
-                  "claude-code",
-                  "open-code"
-                ],
+                "enum": ["claude-code", "open-code"],
                 "type": "string"
               },
               "taskTitle": {
                 "type": "string"
               }
             },
-            "required": [
-              "prompt"
-            ],
+            "required": ["prompt"],
             "type": "object"
           }
         },
@@ -450,12 +427,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "path": {
@@ -467,9 +439,7 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -484,12 +454,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "endLine": {
@@ -516,9 +481,7 @@
                 "type": "integer"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -533,12 +496,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "command": {
@@ -564,10 +522,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path",
-              "command"
-            ],
+            "required": ["path", "command"],
             "type": "object"
           }
         },
@@ -582,12 +537,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "path": {
@@ -609,12 +559,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "createParents": {
@@ -636,9 +581,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -653,12 +596,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "from": {
@@ -670,10 +608,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "from",
-              "to"
-            ],
+            "required": ["from", "to"],
             "type": "object"
           }
         },
@@ -688,12 +623,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "maxLines": {
@@ -706,9 +636,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path"
-            ],
+            "required": ["path"],
             "type": "object"
           }
         },
@@ -723,12 +651,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "maxResults": {
@@ -746,9 +669,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "query"
-            ],
+            "required": ["query"],
             "type": "object"
           }
         },
@@ -763,12 +684,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "path": {
@@ -789,12 +705,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "depth": {
@@ -822,12 +733,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "content": {
@@ -842,10 +748,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "path",
-              "content"
-            ],
+            "required": ["path", "content"],
             "type": "object"
           }
         },
@@ -860,12 +763,7 @@
             "properties": {
               "callbackMode": {
                 "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
-                "enum": [
-                  "detach",
-                  "wakeUp",
-                  "endLoop",
-                  "approve"
-                ],
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
                 "type": "string"
               },
               "category": {
@@ -940,13 +838,7 @@
             "properties": {
               "callbackMode": {
                 "default": "wait",
-                "enum": [
-                  "wait",
-                  "detach",
-                  "endLoop",
-                  "wakeUp",
-                  "approve"
-                ],
+                "enum": ["wait", "detach", "endLoop", "wakeUp", "approve"],
                 "type": "string"
               },
               "input": {
@@ -967,9 +859,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "toolName"
-            ],
+            "required": ["toolName"],
             "type": "object"
           }
         },
@@ -991,9 +881,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "taskId"
-            ],
+            "required": ["taskId"],
             "type": "object"
           }
         },

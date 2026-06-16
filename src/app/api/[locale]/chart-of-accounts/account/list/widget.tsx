@@ -441,14 +441,16 @@ export function CoaAccountListWidget(_props: {
           <Div className="flex flex-col gap-1">
             <Span className="text-sm font-medium">{t("get.widget.empty")}</Span>
           </Div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleSetup}
-          >
-            {t("get.widget.setupButton")}
-          </Button>
+          {!isPickerMode && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleSetup}
+            >
+              {t("get.widget.setupButton")}
+            </Button>
+          )}
         </Div>
       )}
     </Div>

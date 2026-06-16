@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-cortex-list-on-the-root-path-----to-see-all----4979c940-61c6-4751-8f8e-ddec363c4449.md\n\n# Use cortex-list on the root path \"/\" to see all...\nFolder: cron\nPreview: <think> The task is to list every entry from the root path \"/\" and identify which are virtual mounts vs native storage.…",
+    "encoding_format": "float"
+  }
+}

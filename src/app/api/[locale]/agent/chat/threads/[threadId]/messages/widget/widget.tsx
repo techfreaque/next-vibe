@@ -9,9 +9,19 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import React, { useContext, useMemo } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { buildMessagePath } from "@/app/[locale]/chat/lib/utils/thread-builder";
+import {
+  LAYOUT,
+  useInputHeight,
+} from "@/app/[locale]/chat/lib/config/constants";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
@@ -25,6 +35,7 @@ import {
 import { platform } from "@/config/env-client";
 
 import type definition from "../definition";
+import messagesDefinition from "../definition";
 import { LinearMessageView } from "./linear-view/view";
 import { ChatMessages } from "./messages";
 
@@ -35,9 +46,7 @@ import { ChatMessages } from "./messages";
  * which provides streaming, branch navigation, scroll management, all view modes,
  * and full interactive callbacks.
  *
-import messagesDefinition from "../definition";
  * When rendered standalone (ai-stream/run embeds): renders a read-only LinearMessageView.
-import messagesDefinition from "../definition";
  */
 export const MessagesWidget = React.memo(
   function MessagesWidget(): React.JSX.Element {
@@ -142,6 +151,3 @@ function ReadOnlyMessages(): React.JSX.Element {
     </Div>
   );
 }
-import messagesDefinition from "../definition";
-import messagesDefinition from "../definition";
-import messagesDefinition from "../definition";

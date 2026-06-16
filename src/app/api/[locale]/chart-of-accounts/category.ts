@@ -19,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "business",
   icon: "receipt",
   order: 30,
-  defaultEntry: ACCOUNTING_DASHBOARD_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: ACCOUNTING_DASHBOARD_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     Accounts: {
       icon: "book-open",

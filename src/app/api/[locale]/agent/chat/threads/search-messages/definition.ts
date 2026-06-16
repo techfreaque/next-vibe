@@ -35,13 +35,15 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads", "search-messages"],
+  aliases: [SEARCH_MESSAGES_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "search.get.title" as const,
+  titleShort: "search.get.titleShort" as const,
   description: "search.get.description" as const,
   icon: "search",
-  category: "endpointCategories.messages",
-  subCategory: "endpointCategories.messagesSearch",
+  category: "ai",
+  subCategory: "messagesSearch",
   tags: ["tags.messages" as const],
 
   errorTypes: {
@@ -281,6 +283,3 @@ export type GlobalMessageSearchResponseOutput = typeof GET.types.ResponseOutput;
  * Export definitions
  */
 export default { GET };
-import { SEARCH_MESSAGES_ALIAS } from "./constants";
-import { SEARCH_MESSAGES_ALIAS } from "./constants";
-import { SEARCH_MESSAGES_ALIAS } from "./constants";

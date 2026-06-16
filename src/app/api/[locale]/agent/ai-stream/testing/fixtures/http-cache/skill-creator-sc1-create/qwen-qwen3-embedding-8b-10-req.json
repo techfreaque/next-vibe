@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/skills/56339dac-9c23-45a1-9833-993faa527cb9.md\n\n# Code Reviewer\n> Expert code review and suggestions\nReviews code for bugs, performance issues, and best practices\nYou are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
+    "encoding_format": "float"
+  }
+}

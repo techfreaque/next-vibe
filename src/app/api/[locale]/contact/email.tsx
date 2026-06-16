@@ -511,6 +511,14 @@ export const adminContactFormEmailTemplate: EmailTemplateDefinition<
     const { t: contactT } = scopedTranslation.scopedT(locale);
     try {
       const resolvedEmail = requestData.email ?? "";
+      // The confirmation goes to the submitter - nothing to send when the
+      // form was submitted without an email address.
+      if (!resolvedEmail) {
+        return success({
+          skip: true as const,
+          reason: "contact form submitted without an email address",
+        });
+      }
       const templateProps: ContactFormProps = {
         name: requestData.name,
         email: resolvedEmail,

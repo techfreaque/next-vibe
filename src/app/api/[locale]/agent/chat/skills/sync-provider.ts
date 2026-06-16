@@ -9,18 +9,39 @@ import { and, asc, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { SyncProvider } from "@/app/api/[locale]/system/unified-interface/tasks/task-sync/sync-provider";
-import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  type SyncProvider,
+  toStandardCursor,
+} from "@/app/api/[locale]/remote-connection/sync-provider";
+import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import { customSkills } from "./db";
-import { SkillCategory, SkillOwnershipType } from "./enum";
-
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
+import type { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
 // ─── Wire Schema ─────────────────────────────────────────────────────────────
 
 const syncedSkillSchema = z.object({
   id: z.string().uuid(),
+
+import { customSkills, skillVariantSchema, type NewCustomSkill } from "./db";
+import {
+  SkillCategory,
+  SkillOwnershipType,
+  SkillTrustLevel,
+  SkillTrustLevelDB,
+  SkillType,
+  SkillStatus,
+} from "./enum";
+
   slug: z.string(),
   name: z.string(),
   description: z.string(),

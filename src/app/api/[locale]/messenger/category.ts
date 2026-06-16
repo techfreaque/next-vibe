@@ -19,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "comms",
   icon: "mail",
   order: 10,
-  defaultEntry: MESSENGER_ACCOUNTS_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: MESSENGER_ACCOUNTS_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     Accounts: {
       icon: "at-sign",

@@ -16,12 +16,18 @@
  *   2. cronTaskId present (goroutine) → reuse parent task ID for revival (exists on both instances)
  *   3. CLI/cron → detached spawn, no revival
  */
-
 import "server-only";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { eq } from "drizzle-orm";
 import { execSync, spawn } from "node:child_process";
 import { once } from "node:events";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
+import { db } from "@/app/api/[locale]/system/db";
+import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -29,12 +35,10 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-
+import type { RunRequestOutput, RunResponseOutput } from "./definition";
 import type { CodingAgentT } from "./i18n";
+import { claudeCodeConfig } from "./providers/claude-code/repository";
+import { openCodeConfig } from "./providers/open-code/repository";
 import type { CodingAgentRequest, CodingAgentResponse } from "./types";
 
 // ── Provider config ────────────────────────────────────────────────────────────
@@ -247,7 +251,7 @@ async function runBatch(
 
 async function getMcpInstanceName(userId: string): Promise<string> {
   const { RemoteConnectionRepository } =
-    await import("@/app/api/[locale]/user/remote-connection/repository");
+    await import("@/app/api/[locale]/remote-connection/repository");
   return RemoteConnectionRepository.getLocalInstanceId(userId);
 }
 
@@ -434,4 +438,42 @@ export async function runCodingAgent(
     output: `Interactive ${provider.bin} session launched.`,
     durationMs: Date.now() - start,
   });
+}
+
+export async function dispatchCodingAgent(
+  data: RunRequestOutput,
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+  t: CodingAgentT,
+  cronTaskId: string | undefined,
+  streamContext: ToolExecutionContext,
+): Promise<ResponseType<RunResponseOutput>> {
+  if (user.isPublic || !user.id) {
+    return fail({
+      message: t("codingAgent.run.post.errors.unauthorized.title"),
+      errorType: ErrorResponseTypes.UNAUTHORIZED,
+    });
+  }
+  const rows = await db
+    .select({ codingAgent: chatSettings.codingAgent })
+    .from(chatSettings)
+    .where(eq(chatSettings.userId, user.id))
+    .limit(1);
+
+  if (rows[0]?.codingAgent === "next-vibe-coder") {
+    return fail({
+      message: t("codingAgent.run.post.errors.vibeCoderRedirect.title"),
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
+  }
+
+  return runCodingAgent(
+    data.provider === "open-code" ? openCodeConfig : claudeCodeConfig,
+    data,
+    user.id,
+    logger,
+    t,
+    cronTaskId,
+    streamContext,
+  );
 }

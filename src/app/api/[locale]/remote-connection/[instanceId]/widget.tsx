@@ -23,20 +23,26 @@ import {
   AlertDialogTitle,
 } from "next-vibe-ui/ui/alert-dialog";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
+import { Switch } from "next-vibe-ui/ui/switch";
 import { DetailField, DetailGrid } from "next-vibe-ui/ui/detail-grid";
 import { Div } from "next-vibe-ui/ui/div";
 import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { SectionGroup } from "next-vibe-ui/ui/section-group";
 import { StatusPill } from "next-vibe-ui/ui/status-pill";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
-import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
-import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
-import { Switch } from "next-vibe-ui/ui/switch";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import { Code, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";

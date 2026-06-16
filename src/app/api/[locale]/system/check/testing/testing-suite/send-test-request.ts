@@ -13,22 +13,22 @@ import type {
   CreateApiEndpoint,
   InferResponseOutput,
 } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 
-import {
-  UserPermissionRole,
-  type UserRoleValue,
-} from "../../../../user/user-roles/enum";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "next-vibe-ui/unified/_shared/types";
+import {
+  UserPermissionRole,
+  type UserRoleValue,
+} from "../../../../user/user-roles/enum";
 import { scopedTranslation } from "../../i18n";
 
 /**
@@ -107,45 +107,18 @@ export async function sendTestRequest<
     // Create a test logger
     const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-    // Build the tool name from endpoint path and method
-    // Format: "user_public_login_POST" (underscores match generated route-handlers.ts)
-    // Strip brackets from path params: "[id]" → "id"
-    const toolName = `${endpoint.path.map((s) => s.replace(/^\[|\]$/g, "")).join("_")}_${endpoint.method}`;
+    const { RouteExecuteRepository } =
+      await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
 
-    // Execute using the shared route execution executor
-    // This is the same infrastructure used by CLI, MCP, and AI tools
-    const result = await RouteExecutionExecutor.executeGenericHandler<
-      typeof endpoint.types.ResponseOutput
-    >({
-      toolName,
-      data: data as Record<string, WidgetData>,
-      urlPathParams: urlPathParams as Record<string, WidgetData> | undefined,
+    // Execute using the shared route execution infrastructure
+    const result = await RouteExecuteRepository.runInProcessTyped({
+      definition: endpoint,
+      input: data,
+      urlPathParams: urlPathParams,
       user: testUser,
       locale: defaultLocale,
       logger,
-      platform: Platform.CLI, // Use CLI platform for testing
-      streamContext: {
-        rootFolderId: DefaultFolderId.BACKGROUND,
-        threadId: undefined,
-        aiMessageId: undefined,
-        skillId: undefined,
-        headless: undefined,
-        subAgentDepth: 0,
-        currentToolMessageId: undefined,
-        callerToolCallId: undefined,
-        pendingToolMessages: undefined,
-        pendingTimeoutMs: undefined,
-        leafMessageId: undefined,
-        waitingForRemoteResult: undefined,
-        favoriteId: undefined,
-        abortSignal: new AbortController().signal,
-        callerCallbackMode: undefined,
-        onEscalatedTaskCancel: undefined,
-        escalateToTask: undefined,
-        isRevival: undefined,
-
-        providerOverride: undefined,
-      },
+      platform: Platform.NEXT_API,
     });
 
     const { t } = scopedTranslation.scopedT(defaultLocale);

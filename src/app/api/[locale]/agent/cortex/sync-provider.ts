@@ -5,11 +5,15 @@ import "server-only";
  * Registers Cortex documents for cross-instance sync via the unified SyncProvider interface.
  */
 
-import { and, asc, eq, gt, inArray, notLike, or, sql } from "drizzle-orm";
+import { and, asc, eq, gt, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { SyncProvider } from "@/app/api/[locale]/system/unified-interface/tasks/task-sync/sync-provider";
+import {
+  type SyncProvider,
+  toStandardCursor,
+} from "@/app/api/[locale]/remote-connection/sync-provider";
+import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { cortexNodes } from "./db";
@@ -17,6 +21,7 @@ import { CortexNodeType, CortexSyncPolicy } from "./enum";
 
 // ─── Wire Schema ─────────────────────────────────────────────────────────────
 
+import { DOCUMENTS_PREFIX } from "./repository";
 const syncedDocumentSchema = z.object({
   syncId: z.string(),
   path: z.string(),

@@ -155,6 +155,3 @@ export function useNavigation(
     navigateToNewThread,
   };
 }
-import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
-import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
-import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";

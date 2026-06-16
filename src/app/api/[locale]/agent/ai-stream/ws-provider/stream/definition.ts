@@ -14,6 +14,11 @@ import {
   ChatModelIdOptions,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  type ChatMessage,
+  selectChatMessageSchema,
+} from "@/app/api/[locale]/agent/chat/db";
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,

@@ -116,7 +116,8 @@ export const translations: typeof enTranslations = {
         },
         requiresConfirmation: {
           label: "Wymaga potwierdzenia",
-          description: "Prawda, jeśli narzędzie musi czekać na potwierdzenie użytkownika",
+          description:
+            "Prawda, jeśli narzędzie musi czekać na potwierdzenie użytkownika",
         },
       },
       attachments: {

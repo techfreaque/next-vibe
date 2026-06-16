@@ -43,7 +43,7 @@ import { callEndpoint } from "@/app/api/[locale]/remote-connection/call-endpoint
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import {
   buildSyncPayloads,
-  computeSyncHashes,
+  collectCursors,
   ensureProvidersRegistered,
 } from "@/app/api/[locale]/remote-connection/sync-provider";
 import type { RemoteTarget } from "@/app/api/[locale]/remote-connection/transport";
@@ -60,7 +60,10 @@ import { defaultLocale } from "@/i18n/core/config";
 import { SkillCategory } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
+import {
+  ChatMessageRole,
+  ThreadStatus,
+} from "@/app/api/[locale]/agent/chat/enum";
 import { cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";
 import { resolveVirtualList, resolveVirtualRead } from "./mounts/resolver";
@@ -1136,7 +1139,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
       await ensureProvidersRegistered();
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-      const { perProvider: hashBefore } = await computeSyncHashes(devUser.id);
+      const cursorsBefore = await collectCursors(devUser.id);
 
       // Insert a memory node
       const isoSyncId = randomUUID();
@@ -1152,36 +1155,37 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
         tags: [],
       });
 
-      const { perProvider: hashAfter } = await computeSyncHashes(devUser.id);
+      const cursorsAfter = await collectCursors(devUser.id);
 
-      // Memories hash must change
-      expect(hashBefore["memories"], "M6: memories hash must change").not.toBe(
-        hashAfter["memories"],
-      );
-      // Skills hash must NOT change
-      expect(hashBefore["skills"], "M6: skills hash must be unchanged").toBe(
-        hashAfter["skills"],
-      );
+      // Memories cursor must advance
+      expect(
+        JSON.stringify(cursorsBefore["memories"]),
+        "M6: memories cursor must advance",
+      ).not.toBe(JSON.stringify(cursorsAfter["memories"]));
+      // Skills cursor must NOT change
+      expect(
+        JSON.stringify(cursorsBefore["skills"]),
+        "M6: skills cursor must be unchanged",
+      ).toBe(JSON.stringify(cursorsAfter["skills"]));
 
-      // Build payloads with old memories hash, current skills/documents hash
+      // Build payloads with old memories cursor, current skills/documents cursor
       const { syncPayloads } = await buildSyncPayloads(
         {
-          documents: hashAfter["documents"]!,
-          skills: hashAfter["skills"]!,
-          memories: hashBefore["memories"]!,
+          documents: cursorsAfter["documents"]!,
+          skills: cursorsAfter["skills"]!,
+          memories: cursorsBefore["memories"]!,
         },
         devUser.id,
         logger,
       );
 
+      // memories has a record newer than the stale cursor → non-empty payload.
       expect(
-        syncPayloads,
-        "M6: only memories must be in payload",
-      ).toHaveProperty("memories");
-      expect(
-        syncPayloads,
-        "M6: skills must NOT be in payload",
-      ).not.toHaveProperty("skills");
+        syncPayloads["memories"],
+        "M6: memories must carry records",
+      ).not.toBe("[]");
+      // skills cursor current → empty payload (no transfer).
+      expect(syncPayloads["skills"], "M6: skills must be empty").toBe("[]");
 
       // Cleanup
       await db
@@ -1625,15 +1629,12 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
       const { default: skillDef } =
         await import("@/app/api/[locale]/agent/chat/skills/[id]/definition");
-      // name is typed as SkillsTranslationKey in the definition due to i18n type constraint;
-      // cast to bypass in test context where we pass a real string.
-      const s2Input = {
-        name: "E2E Sync Skill Updated",
-        systemPrompt: "You are an updated E2E test skill.",
-      } as unknown as typeof skillDef.PATCH.types.RequestOutput;
       const result = await callEndpoint({
         definition: skillDef.PATCH,
-        input: s2Input,
+        input: {
+          name: "E2E Sync Skill Updated",
+          systemPrompt: "You are an updated E2E test skill.",
+        },
         urlPathParams: { id: prodSkillId },
         target: remoteTarget,
         locale: defaultLocale,
@@ -1682,7 +1683,6 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
         await import("@/app/api/[locale]/agent/chat/skills/[id]/definition");
       const result = await callEndpoint({
         definition: skillDef.DELETE,
-        input: {},
         urlPathParams: { id: prodSkillId },
         target: remoteTarget,
         locale: defaultLocale,
@@ -1730,8 +1730,6 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
         return;
       }
 
-      const reverseSlug = `${TEST_SKILL_SLUG}-reverse`;
-
       // Create skill on hermes via callEndpoint — hermes writes and WS-pushes to atlas
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
       const { default: skillCreateDef } =
@@ -1741,7 +1739,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
         input: {
           name: "Reverse Skill",
           tagline: "Reverse sync tagline",
-          icon: "test",
+          icon: "ai",
           description: "Reverse sync test skill for E2E",
           category: SkillCategory.ASSISTANT,
           isPublic: false,
@@ -1790,8 +1788,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       }
 
       await ensureProvidersRegistered();
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-      const { perProvider: hashBefore } = await computeSyncHashes(devUser.id);
+      const cursorsBefore = await collectCursors(devUser.id);
 
       const { customSkills } =
         await import("@/app/api/[locale]/agent/chat/skills/db");
@@ -1803,7 +1800,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
         slug: isoSlug,
         description: "For isolation test",
         systemPrompt: "Isolation.",
-        icon: "test",
+        icon: "ai",
         tagline: "iso",
         category: "enums.category.assistant",
         ownershipType: "enums.ownershipType.user",
@@ -1816,19 +1813,20 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
         ],
       });
 
-      const { perProvider: hashAfter } = await computeSyncHashes(devUser.id);
+      const cursorsAfter = await collectCursors(devUser.id);
 
-      expect(hashBefore["skills"], "S5: skills hash must change").not.toBe(
-        hashAfter["skills"],
-      );
       expect(
-        hashBefore["documents"],
-        "S5: documents hash must be unchanged",
-      ).toBe(hashAfter["documents"]);
+        JSON.stringify(cursorsBefore["skills"]),
+        "S5: skills cursor must advance",
+      ).not.toBe(JSON.stringify(cursorsAfter["skills"]));
       expect(
-        hashBefore["memories"],
-        "S5: memories hash must be unchanged",
-      ).toBe(hashAfter["memories"]);
+        JSON.stringify(cursorsBefore["documents"]),
+        "S5: documents cursor must be unchanged",
+      ).toBe(JSON.stringify(cursorsAfter["documents"]));
+      expect(
+        JSON.stringify(cursorsBefore["memories"]),
+        "S5: memories cursor must be unchanged",
+      ).toBe(JSON.stringify(cursorsAfter["memories"]));
 
       // Cleanup
       await db
@@ -2075,7 +2073,6 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
         await import("@/app/api/[locale]/agent/chat/skills/[id]/definition");
       const result = await callEndpoint({
         definition: skillDef.DELETE,
-        input: {},
         urlPathParams: { id: prodSkillId },
         target: remoteTarget,
         locale: defaultLocale,
@@ -2380,6 +2377,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
         input: {
           rootFolderId: DefaultFolderId.PRIVATE,
           title: reverseTitle,
+          model: ChatModelId.GPT_5_4_NANO,
         },
         target: remoteTarget,
         locale: defaultLocale,
@@ -2439,8 +2437,8 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
         id: biThreadId,
         userId: devUser.id,
         title: `${biTitle} DEV-NEWER`,
-        rootFolderId: "private",
-        status: "active",
+        rootFolderId: DefaultFolderId.PRIVATE,
+        status: ThreadStatus.ACTIVE,
         pinned: false,
         archived: false,
         tags: [],
@@ -2510,6 +2508,7 @@ describe("Mount hierarchy: /threads", () => {
         adminUser.id,
         "/threads",
         "/threads",
+        true,
       );
       expect(entries.length, "T1: must return root folders").toBeGreaterThan(0);
 
@@ -2530,6 +2529,7 @@ describe("Mount hierarchy: /threads", () => {
         adminUser.id,
         "/threads/private",
         "/threads",
+        true,
       );
       // May be empty if no threads exist, but should not throw
       expect(Array.isArray(entries), "T2: must return an array").toBe(true);
@@ -2560,6 +2560,7 @@ describe("Mount hierarchy: /threads", () => {
         adminUser.id,
         "/threads/private",
         "/threads",
+        true,
       );
       const threadFile = entries.find(
         (e) => e.nodeType === "file" && e.name.endsWith(".md"),
@@ -2575,6 +2576,8 @@ describe("Mount hierarchy: /threads", () => {
         adminUser.id,
         threadFile.path,
         "/threads",
+        true,
+        defaultLocale,
       );
       expect(result, "T3: must return read result").toBeTruthy();
       expect(result?.content, "T3: content must contain frontmatter").toContain(
@@ -2599,6 +2602,7 @@ describe("Mount hierarchy: /threads", () => {
         adminUser.id,
         "/threads/private",
         "/threads",
+        true,
       );
       const subfolder = rootEntries.find((e) => e.nodeType === "dir");
 
@@ -2612,6 +2616,7 @@ describe("Mount hierarchy: /threads", () => {
         adminUser.id,
         subfolder.path,
         "/threads",
+        true,
       );
       expect(
         Array.isArray(subEntries),
@@ -2671,6 +2676,7 @@ describe("Mount hierarchy: /favorites", () => {
         adminUser.id,
         "/favorites",
         "/favorites",
+        true,
       );
       expect(Array.isArray(entries), "F1: must return an array").toBe(true);
 
@@ -2693,6 +2699,7 @@ describe("Mount hierarchy: /favorites", () => {
         adminUser.id,
         "/favorites",
         "/favorites",
+        true,
       );
       if (entries.length === 0) {
         // eslint-disable-next-line no-console
@@ -2704,6 +2711,8 @@ describe("Mount hierarchy: /favorites", () => {
         adminUser.id,
         entries[0]!.path,
         "/favorites",
+        true,
+        defaultLocale,
       );
       expect(result, "F2: must return read result").toBeTruthy();
       expect(result?.content, "F2: content must contain frontmatter").toContain(
@@ -2742,6 +2751,7 @@ describe("Mount hierarchy: /tasks", () => {
         adminUser.id,
         "/tasks",
         "/tasks",
+        true,
       );
       expect(Array.isArray(entries), "TK1: must return an array").toBe(true);
 
@@ -2764,6 +2774,7 @@ describe("Mount hierarchy: /tasks", () => {
         adminUser.id,
         "/tasks",
         "/tasks",
+        true,
       );
       if (entries.length === 0) {
         // eslint-disable-next-line no-console
@@ -2775,6 +2786,8 @@ describe("Mount hierarchy: /tasks", () => {
         adminUser.id,
         entries[0]!.path,
         "/tasks",
+        true,
+        defaultLocale,
       );
       expect(result, "TK2: must return read result").toBeTruthy();
       expect(
@@ -2812,6 +2825,7 @@ describe("Mount hierarchy: /uploads", () => {
         adminUser.id,
         "/uploads",
         "/uploads",
+        true,
       );
       expect(Array.isArray(entries), "U1: must return an array").toBe(true);
 
@@ -2839,6 +2853,7 @@ describe("Mount hierarchy: /uploads", () => {
         adminUser.id,
         "/uploads/images",
         "/uploads",
+        true,
       );
       expect(Array.isArray(entries), "U2: must return an array").toBe(true);
 
@@ -2861,6 +2876,7 @@ describe("Mount hierarchy: /uploads", () => {
         adminUser.id,
         "/uploads/images",
         "/uploads",
+        true,
       );
       if (threadDirs.length === 0) {
         // eslint-disable-next-line no-console
@@ -2872,6 +2888,7 @@ describe("Mount hierarchy: /uploads", () => {
         adminUser.id,
         threadDirs[0]!.path,
         "/uploads",
+        true,
       );
       expect(Array.isArray(files), "U3: must return an array").toBe(true);
 
@@ -2894,6 +2911,7 @@ describe("Mount hierarchy: /uploads", () => {
         adminUser.id,
         "/uploads/images",
         "/uploads",
+        true,
       );
       if (threadDirs.length === 0) {
         // eslint-disable-next-line no-console
@@ -2905,6 +2923,7 @@ describe("Mount hierarchy: /uploads", () => {
         adminUser.id,
         threadDirs[0]!.path,
         "/uploads",
+        true,
       );
       if (files.length === 0) {
         // eslint-disable-next-line no-console
@@ -2916,6 +2935,8 @@ describe("Mount hierarchy: /uploads", () => {
         adminUser.id,
         files[0]!.path,
         "/uploads",
+        true,
+        defaultLocale,
       );
       expect(result, "U4: must return read result").toBeTruthy();
       expect(result?.content, "U4: content must contain frontmatter").toContain(
@@ -2954,6 +2975,7 @@ describe("Mount hierarchy: /searches", () => {
         adminUser.id,
         "/searches",
         "/searches",
+        true,
       );
       expect(Array.isArray(entries), "SR1: must return an array").toBe(true);
 
@@ -2979,6 +3001,7 @@ describe("Mount hierarchy: /searches", () => {
         adminUser.id,
         "/searches",
         "/searches",
+        true,
       );
       if (months.length === 0) {
         // eslint-disable-next-line no-console
@@ -2990,6 +3013,7 @@ describe("Mount hierarchy: /searches", () => {
         adminUser.id,
         months[0]!.path,
         "/searches",
+        true,
       );
       expect(Array.isArray(results), "SR2: must return an array").toBe(true);
 
@@ -3012,6 +3036,7 @@ describe("Mount hierarchy: /searches", () => {
         adminUser.id,
         "/searches",
         "/searches",
+        true,
       );
       if (months.length === 0) {
         // eslint-disable-next-line no-console
@@ -3023,6 +3048,7 @@ describe("Mount hierarchy: /searches", () => {
         adminUser.id,
         months[0]!.path,
         "/searches",
+        true,
       );
       if (results.length === 0) {
         // eslint-disable-next-line no-console
@@ -3034,6 +3060,8 @@ describe("Mount hierarchy: /searches", () => {
         adminUser.id,
         results[0]!.path,
         "/searches",
+        true,
+        defaultLocale,
       );
       expect(content, "SR3: must return read result").toBeTruthy();
       expect(
@@ -3067,7 +3095,12 @@ describe("Mount hierarchy: /gens", () => {
         return;
       }
 
-      const entries = await resolveVirtualList(adminUser.id, "/gens", "/gens");
+      const entries = await resolveVirtualList(
+        adminUser.id,
+        "/gens",
+        "/gens",
+        true,
+      );
       expect(Array.isArray(entries), "G1: must return an array").toBe(true);
 
       const names = entries.map((e) => e.name);
@@ -3089,6 +3122,7 @@ describe("Mount hierarchy: /gens", () => {
         adminUser.id,
         "/gens/images",
         "/gens",
+        true,
       );
       expect(Array.isArray(entries), "G2: must return an array").toBe(true);
 
@@ -3113,6 +3147,7 @@ describe("Mount hierarchy: /gens", () => {
         adminUser.id,
         "/gens/images",
         "/gens",
+        true,
       );
       if (months.length === 0) {
         // eslint-disable-next-line no-console
@@ -3124,6 +3159,7 @@ describe("Mount hierarchy: /gens", () => {
         adminUser.id,
         months[0]!.path,
         "/gens",
+        true,
       );
       expect(Array.isArray(gens), "G3: must return an array").toBe(true);
 
@@ -3145,6 +3181,7 @@ describe("Mount hierarchy: /gens", () => {
         adminUser.id,
         "/gens/images",
         "/gens",
+        true,
       );
       if (months.length === 0) {
         // eslint-disable-next-line no-console
@@ -3156,6 +3193,7 @@ describe("Mount hierarchy: /gens", () => {
         adminUser.id,
         months[0]!.path,
         "/gens",
+        true,
       );
       if (gens.length === 0) {
         // eslint-disable-next-line no-console
@@ -3167,6 +3205,8 @@ describe("Mount hierarchy: /gens", () => {
         adminUser.id,
         gens[0]!.path,
         "/gens",
+        true,
+        defaultLocale,
       );
       expect(content, "G4: must return read result").toBeTruthy();
       expect(
@@ -3200,7 +3240,12 @@ describe("Mount hierarchy: /ssh", () => {
         return;
       }
 
-      const entries = await resolveVirtualList(adminUser.id, "/ssh", "/ssh");
+      const entries = await resolveVirtualList(
+        adminUser.id,
+        "/ssh",
+        "/ssh",
+        true,
+      );
       expect(Array.isArray(entries), "SSH1: must return an array").toBe(true);
 
       for (const entry of entries) {
@@ -3222,6 +3267,7 @@ describe("Mount hierarchy: /ssh", () => {
         adminUser.id,
         "/ssh",
         "/ssh",
+        true,
       );
       if (connections.length === 0) {
         // eslint-disable-next-line no-console
@@ -3233,6 +3279,8 @@ describe("Mount hierarchy: /ssh", () => {
         adminUser.id,
         connections[0]!.path,
         "/ssh",
+        true,
+        defaultLocale,
       );
       expect(result, "SSH2: must return read result").toBeTruthy();
       expect(
@@ -3270,79 +3318,82 @@ describe("E2E Sync: hash engine cross-instance", () => {
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-      const { perProvider } = await computeSyncHashes(devUser.id);
 
-      // Simulate remote sends same hashes
+      // First serialize from null → each provider's true high-water cursor.
+      const first = await buildSyncPayloads({}, devUser.id, logger);
+      // Echo those cursors back.
       const { syncPayloads } = await buildSyncPayloads(
-        perProvider,
+        first.ourCursors,
         devUser.id,
         logger,
       );
 
-      expect(
-        Object.keys(syncPayloads).length,
-        "HE1: no payloads when hashes match",
-      ).toBe(0);
+      // Standard (updatedAt-gated) providers serve nothing at a current cursor.
+      // threads is excluded: REMOTE-folder threads are owner-authoritative and
+      // re-served unconditionally by design.
+      for (const key of ["documents", "skills", "memories", "favorites"]) {
+        expect(
+          syncPayloads[key],
+          `HE1: ${key} empty when cursor is current`,
+        ).toBe("[]");
+      }
     },
     SYNC_TIMEOUT,
   );
 
   it(
-    "HE2: only one provider changed → only that provider in payload",
+    "HE2: only one provider changed → only that provider transfers data",
     async () => {
       if (!devUser) {
         return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-      const { perProvider } = await computeSyncHashes(devUser.id);
+      const cursors = await collectCursors(devUser.id);
 
-      // Fake: documents hash is stale, skills+memories current
+      // Fake: documents cursor is stale (epoch), skills+memories current.
       const { syncPayloads } = await buildSyncPayloads(
         {
-          ...perProvider,
-          documents:
-            "0000000000000000000000000000000000000000000000000000000000000000",
+          ...cursors,
+          documents: { updatedAt: new Date(0).toISOString() },
         },
         devUser.id,
         logger,
       );
 
-      expect(syncPayloads, "HE2: documents must be in payload").toHaveProperty(
+      // documents stale → everything served (non-empty if any docs exist).
+      expect(syncPayloads, "HE2: documents key present").toHaveProperty(
         "documents",
       );
-      if (perProvider["skills"]) {
-        expect(
-          syncPayloads,
-          "HE2: skills must NOT be in payload",
-        ).not.toHaveProperty("skills");
-      }
+      // skills cursor current → empty payload.
+      expect(syncPayloads["skills"], "HE2: skills must be empty").toBe("[]");
     },
     SYNC_TIMEOUT,
   );
 
   it(
-    "HE3: all providers stale → all three payloads sent",
+    "HE3: all providers stale → all three payloads keyed",
     async () => {
       if (!devUser) {
         return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-      const zeroHash =
-        "0000000000000000000000000000000000000000000000000000000000000000";
+      const epoch = { updatedAt: new Date(0).toISOString() };
 
       const { syncPayloads } = await buildSyncPayloads(
-        { documents: zeroHash, skills: zeroHash, memories: zeroHash },
+        { documents: epoch, skills: epoch, memories: epoch },
         devUser.id,
         logger,
       );
 
-      expect(syncPayloads, "HE3: documents must be sent").toHaveProperty(
+      expect(syncPayloads, "HE3: documents must be keyed").toHaveProperty(
         "documents",
       );
-      expect(syncPayloads, "HE3: skills must be sent").toHaveProperty("skills");
-      expect(syncPayloads, "HE3: memories must be sent").toHaveProperty(
+      expect(syncPayloads, "HE3: skills must be keyed").toHaveProperty(
+        "skills",
+      );
+      expect(syncPayloads, "HE3: memories must be keyed").toHaveProperty(
         "memories",
       );
     },
@@ -3519,8 +3570,6 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
         skipCrossInstance("WS3");
         return;
       }
-
-      const wsSlug = `ws-push-skill-${RUN_ID}`;
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
       const { default: skillCreateDef } =

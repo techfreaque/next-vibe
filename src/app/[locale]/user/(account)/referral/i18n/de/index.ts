@@ -25,14 +25,12 @@ export const translations: typeof enTranslations = {
     chainSubtitle:
       "Jede Ebene ist die Hälfte der darüberliegenden. Einmalig aufgebaut - zahlt für immer.",
     youLabel: "Du",
-    whoLabels: [
-      "Du - wer auch immer sie direkt empfohlen hat",
-      "Skill-Ersteller (falls anders) oder dein Empfehler",
-      "Der Empfehler des Empfehlers",
-      "Ebene 4",
-      "Ebene 5",
-      "Ebene 6",
-    ],
+    whoLabel0: "Du - wer auch immer sie direkt empfohlen hat",
+    whoLabel1: "Skill-Ersteller (falls anders) oder dein Empfehler",
+    whoLabel2: "Der Empfehler des Empfehlers",
+    whoLabel3: "Ebene 4",
+    whoLabel4: "Ebene 5",
+    whoLabel5: "Ebene 6",
     colExample: "Beispiel ({{examplePrice}}/Monat)",
     tableNote:
       "Empfehlungslink: {{directPct}} pro Nutzer. Skill-Link: {{directPct}} direkt + {{skillBonusPct}} Skill-Bonus = {{skillPct}} pro Nutzer. Beides wiederkehrend, für immer.",

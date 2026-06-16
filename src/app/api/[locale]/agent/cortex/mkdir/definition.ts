@@ -34,8 +34,10 @@ const { POST } = createEndpoint({
   path: ["agent", "cortex", "mkdir"],
   aliases: [CORTEX_MKDIR_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "folder-plus",
   dynamicTitle: ({ request }) => {
@@ -58,8 +60,7 @@ const { POST } = createEndpoint({
       color: "bg-green-500/10 text-green-500",
     },
   },
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "cortex",
   tags: ["post.tags.cortex" as const],
   defaultExpanded: false,
 

@@ -1,6 +1,6 @@
 /**
  * Lead Detail & Edit Widgets
- * - LeadDetailContainer: Tabbed view (Overview + Details) for GET endpoint
+ * - LeadDetailContainer: Tabbed view (Overview + Details + Identity) for GET endpoint
  * - LeadEditContainer: Tabbed edit form for PATCH endpoint
  */
 
@@ -8,13 +8,12 @@
 
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { DetailField, DetailGrid } from "next-vibe-ui/ui/detail-grid";
 import { Div } from "next-vibe-ui/ui/div";
+import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
-import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
@@ -25,25 +24,25 @@ import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/External
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { Hash } from "next-vibe-ui/ui/icons/Hash";
 import { Info } from "next-vibe-ui/ui/icons/Info";
-import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
-import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
-import { MousePointer } from "next-vibe-ui/ui/icons/MousePointer";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Phone } from "next-vibe-ui/ui/icons/Phone";
 import { Save } from "next-vibe-ui/ui/icons/Save";
 import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Send } from "next-vibe-ui/ui/icons/Send";
-import { Tag } from "next-vibe-ui/ui/icons/Tag";
 import { Target } from "next-vibe-ui/ui/icons/Target";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
-import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { User } from "next-vibe-ui/ui/icons/User";
-import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { ExternalLink } from "next-vibe-ui/ui/link";
+import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
+import { MetricCard } from "next-vibe-ui/ui/metric-card";
+import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
+import { ProgressBlock } from "next-vibe-ui/ui/progress-block";
+import { ResultBanner } from "next-vibe-ui/ui/result-banner";
+import { SectionGroup } from "next-vibe-ui/ui/section-group";
 import {
   Select,
   SelectContent,
@@ -53,14 +52,18 @@ import {
 } from "next-vibe-ui/ui/select";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
+import { StatusPill } from "next-vibe-ui/ui/status-pill";
 import { Strong } from "next-vibe-ui/ui/strong";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import { P } from "next-vibe-ui/ui/typography";
+import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
+  useWidgetContext,
   useWidgetEndpointMutations,
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -69,7 +72,7 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { configScopedTranslation } from "@/config/i18n";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -136,26 +139,34 @@ function asLanguage(v: string): LanguageValue | undefined {
     : undefined;
 }
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const STATUS_COLORS: Record<string, string> = {
-  [LeadStatus.NEW]: "bg-info/10 text-info",
-  [LeadStatus.PENDING]: "bg-warning/10 text-warning",
-  [LeadStatus.CAMPAIGN_RUNNING]:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  [LeadStatus.WEBSITE_USER]:
-    "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  [LeadStatus.NEWSLETTER_SUBSCRIBER]:
-    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  [LeadStatus.IN_CONTACT]:
-    "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  [LeadStatus.SIGNED_UP]:
-    "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  [LeadStatus.SUBSCRIPTION_CONFIRMED]: "bg-success/10 text-success",
-  [LeadStatus.UNSUBSCRIBED]:
-    "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
+type PillVariant =
+  | "default"
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "muted";
+
+const STATUS_VARIANT: Record<string, PillVariant> = {
+  [LeadStatus.NEW]: "info",
+  [LeadStatus.PENDING]: "warning",
+  [LeadStatus.CAMPAIGN_RUNNING]: "default",
+  [LeadStatus.WEBSITE_USER]: "info",
+  [LeadStatus.NEWSLETTER_SUBSCRIBER]: "info",
+  [LeadStatus.IN_CONTACT]: "warning",
+  [LeadStatus.SIGNED_UP]: "success",
+  [LeadStatus.SUBSCRIPTION_CONFIRMED]: "success",
+  [LeadStatus.UNSUBSCRIBED]: "muted",
+};
+
+const DEVICE_VARIANT: Record<string, PillVariant> = {
+  [DeviceType.DESKTOP]: "info",
+  [DeviceType.MOBILE]: "success",
+  [DeviceType.TABLET]: "default",
+  [DeviceType.BOT]: "danger",
+  [DeviceType.UNKNOWN]: "muted",
 };
 
 const CAMPAIGN_FUNNEL_STAGE_KEYS = [
@@ -184,100 +195,6 @@ const CAMPAIGN_FUNNEL_STAGE_KEYS = [
 ];
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
-
-function InfoRow({
-  label,
-  value,
-  mono,
-}: {
-  label: string;
-  value?: string | number | null;
-  mono?: boolean;
-}): React.JSX.Element | null {
-  if (value === null || value === undefined || value === "") {
-    return null;
-  }
-  return (
-    <Div className="flex flex-col gap-0.5">
-      <P className="text-xs text-muted-foreground">{label}</P>
-      <P className={cn("text-sm", mono && "font-mono")}>{String(value)}</P>
-    </Div>
-  );
-}
-
-function StatBadge({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: string | number;
-  color?: string;
-}): React.JSX.Element {
-  return (
-    <Div className="flex flex-col items-center gap-1 p-3 rounded-lg border bg-card">
-      <Div
-        style={
-          color
-            ? {
-                color,
-                fontWeight: 700,
-                fontSize: "1.5rem",
-                fontVariantNumeric: "tabular-nums",
-              }
-            : {
-                fontWeight: 700,
-                fontSize: "1.5rem",
-                fontVariantNumeric: "tabular-nums",
-              }
-        }
-      >
-        {String(value)}
-      </Div>
-      <P className="text-xs text-muted-foreground text-center">{label}</P>
-    </Div>
-  );
-}
-
-function RateBar({
-  rate,
-  color,
-  label,
-}: {
-  rate: number;
-  color: string;
-  label: string;
-}): React.JSX.Element {
-  return (
-    <Div className="flex flex-col gap-1.5">
-      <Div className="flex items-center justify-between">
-        <P className="text-xs text-muted-foreground">{label}</P>
-        <Div
-          style={{
-            color,
-            fontWeight: 600,
-            fontSize: "0.75rem",
-            fontVariantNumeric: "tabular-nums",
-            display: "inline",
-          }}
-        >
-          {rate}%
-        </Div>
-      </Div>
-      <Div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-        <Div
-          style={{
-            width: `${Math.min(rate, 100)}%`,
-            height: "100%",
-            borderRadius: "9999px",
-            transition: "all 500ms",
-            backgroundColor: color,
-          }}
-        />
-      </Div>
-    </Div>
-  );
-}
 
 function CopyButton({
   text,
@@ -391,9 +308,10 @@ function LeadHeader({
   leadsT: LeadsT;
 }): React.JSX.Element {
   return (
-    <Card>
-      <CardContent className="pt-4">
-        <Div className="flex items-start gap-4">
+    <SectionGroup
+      title=""
+      subtitle={
+        <Div className="flex items-start gap-4 w-full">
           <Div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary flex-shrink-0">
             {(businessName ?? email ?? "?").slice(0, 2).toUpperCase()}
           </Div>
@@ -403,20 +321,13 @@ function LeadHeader({
                 {businessName ?? "—"}
               </Strong>
               {status && (
-                <Span
-                  className={cn(
-                    "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                    STATUS_COLORS[status] ?? "bg-gray-100 text-gray-800",
-                  )}
-                >
-                  {leadsT(status)}
-                </Span>
+                <StatusPill
+                  status={leadsT(status)}
+                  variant={STATUS_VARIANT[status] ?? "default"}
+                />
               )}
               {isConverted && (
-                <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                  <CheckCircle className="h-3 w-3" />
-                  {t("widget.converted")}
-                </Span>
+                <StatusPill status={t("widget.converted")} variant="success" />
               )}
             </Div>
             {contactName && (
@@ -442,8 +353,8 @@ function LeadHeader({
             )}
           </Div>
         </Div>
-      </CardContent>
-    </Card>
+      }
+    />
   );
 }
 
@@ -512,238 +423,203 @@ function OverviewTab({
   return (
     <Div className="flex flex-col gap-4">
       {/* Quick age & engagement bar */}
-      <Card>
-        <CardContent className="pt-4">
-          <Div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-            {leadAgeDays !== null && (
-              <Div className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                <Span>
-                  <Strong className="font-semibold text-foreground">
-                    {leadAgeDays}
-                  </Strong>{" "}
-                  {t("widget.daysOld")}
-                </Span>
-              </Div>
-            )}
-            {daysSinceEngagement !== null && (
-              <Div className="flex items-center gap-1">
-                <Activity className="h-3 w-3" />
-                <Span>
-                  {t("widget.lastEngaged")}{" "}
-                  <Strong className="font-semibold text-foreground">
-                    {daysSinceEngagement}d
-                  </Strong>{" "}
-                  {t("widget.ago")}
-                </Span>
-              </Div>
-            )}
-            {campaignTracking.emailJourneyVariant && (
-              <Div className="flex items-center gap-1">
-                <Info className="h-3 w-3" />
-                <Span>
-                  {t("widget.variant")}{" "}
-                  <Strong className="font-semibold text-foreground">
-                    {leadsT(campaignTracking.emailJourneyVariant)}
-                  </Strong>
-                </Span>
-              </Div>
-            )}
+      <Div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground rounded-lg border p-3">
+        {leadAgeDays !== null && (
+          <Div className="flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            <Span>
+              <Strong className="font-semibold text-foreground">
+                {leadAgeDays}
+              </Strong>{" "}
+              {t("widget.daysOld")}
+            </Span>
           </Div>
-        </CardContent>
-      </Card>
+        )}
+        {daysSinceEngagement !== null && (
+          <Div className="flex items-center gap-1">
+            <Activity className="h-3 w-3" />
+            <Span>
+              {t("widget.lastEngaged")}{" "}
+              <Strong className="font-semibold text-foreground">
+                {daysSinceEngagement}d
+              </Strong>{" "}
+              {t("widget.ago")}
+            </Span>
+          </Div>
+        )}
+        {campaignTracking.emailJourneyVariant && (
+          <Div className="flex items-center gap-1">
+            <Info className="h-3 w-3" />
+            <Span>
+              {t("widget.variant")}{" "}
+              <Strong className="font-semibold text-foreground">
+                {leadsT(campaignTracking.emailJourneyVariant)}
+              </Strong>
+            </Span>
+          </Div>
+        )}
+      </Div>
 
       {/* Quick actions */}
-      <Card>
-        <CardContent className="pt-4">
-          <P className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wide">
-            {t("widget.quickActions")}
-          </P>
-          <Div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onEdit}
-              className="gap-1.5"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-              {t("widget.editLead")}
-            </Button>
-            {basicInfo.email && (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={onSendTestEmail}
-                  className="gap-1.5"
-                >
-                  <Send className="h-3.5 w-3.5" />
-                  {t("widget.sendTestEmail")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={onViewInSearch}
-                  className="gap-1.5"
-                >
-                  <Search className="h-3.5 w-3.5" />
-                  {t("widget.viewInSearch")}
-                </Button>
-              </>
-            )}
-            {conversion.convertedUserId && (
+      <SectionGroup title={t("widget.quickActions")}>
+        <Div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onEdit}
+            className="gap-1.5"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            {t("widget.editLead")}
+          </Button>
+          {basicInfo.email && (
+            <>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => onViewUserProfile(conversion.convertedUserId!)}
+                onClick={onSendTestEmail}
                 className="gap-1.5"
               >
-                <User className="h-3.5 w-3.5" />
-                {t("widget.userProfile")}
+                <Send className="h-3.5 w-3.5" />
+                {t("widget.sendTestEmail")}
               </Button>
-            )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onViewInSearch}
+                className="gap-1.5"
+              >
+                <Search className="h-3.5 w-3.5" />
+                {t("widget.viewInSearch")}
+              </Button>
+            </>
+          )}
+          {conversion.convertedUserId && (
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={onDelete}
-              className="gap-1.5 text-destructive hover:text-destructive ml-auto"
+              onClick={() => onViewUserProfile(conversion.convertedUserId!)}
+              className="gap-1.5"
             >
-              <Trash2 className="h-3.5 w-3.5" />
-              {t("widget.delete")}
+              <User className="h-3.5 w-3.5" />
+              {t("widget.userProfile")}
             </Button>
-          </Div>
-        </CardContent>
-      </Card>
+          )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onDelete}
+            className="gap-1.5 text-destructive hover:text-destructive"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            {t("widget.delete")}
+          </Button>
+        </Div>
+      </SectionGroup>
 
       {/* Campaign funnel */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            {t("widget.campaignFunnel")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <CampaignFunnel
-            currentStage={campaignTracking.currentCampaignStage}
-          />
-          {campaignTracking.source && (
-            <Div className="mt-2 flex items-center gap-2">
-              <P className="text-xs text-muted-foreground">
-                {t("widget.sourceLabel")}
-              </P>
-              <Badge variant="outline" className="text-xs">
-                {leadsT(campaignTracking.source)}
-              </Badge>
-            </Div>
-          )}
-          {campaignTracking.lastEmailSentAt && (
-            <P className="text-xs text-muted-foreground mt-2">
-              {t("widget.lastEmailLabel")}{" "}
-              {formatSimpleDate(campaignTracking.lastEmailSentAt, locale)}
+      <SectionGroup title={t("widget.campaignFunnel")}>
+        <CampaignFunnel currentStage={campaignTracking.currentCampaignStage} />
+        {campaignTracking.source && (
+          <Div className="mt-2 flex items-center gap-2">
+            <P className="text-xs text-muted-foreground">
+              {t("widget.sourceLabel")}
             </P>
-          )}
-        </CardContent>
-      </Card>
+            <Badge variant="outline" className="text-xs">
+              {leadsT(campaignTracking.source)}
+            </Badge>
+          </Div>
+        )}
+        {campaignTracking.lastEmailSentAt && (
+          <P className="text-xs text-muted-foreground mt-2">
+            {t("widget.lastEmailLabel")}{" "}
+            {formatSimpleDate(campaignTracking.lastEmailSentAt, locale)}
+          </P>
+        )}
+      </SectionGroup>
 
       {/* Campaign performance */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            {t("widget.campaignPerformance")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Div className="grid grid-cols-3 gap-3 mb-4">
-            <StatBadge
-              label={t("widget.emailsSent")}
-              value={campaignTracking.emailsSent}
-              color="#2563eb"
+      <SectionGroup title={t("widget.campaignPerformance")}>
+        <MetricGrid columns={3}>
+          <MetricCard
+            label={t("widget.emailsSent")}
+            value={campaignTracking.emailsSent}
+            variant="info"
+          />
+          <MetricCard
+            label={t("widget.opened")}
+            value={engagement.emailsOpened}
+            variant="success"
+          />
+          <MetricCard
+            label={t("widget.clicked")}
+            value={engagement.emailsClicked}
+            variant="default"
+          />
+        </MetricGrid>
+        <Div className="flex flex-col gap-3 mt-3">
+          <ProgressBlock
+            value={openRate}
+            label={t("widget.openRate")}
+            variant={openRate > 50 ? "success" : "default"}
+          />
+          <ProgressBlock
+            value={clickRate}
+            label={t("widget.clickRate")}
+            variant={clickRate > 10 ? "success" : "default"}
+          />
+          {engagement.emailsOpened > 0 && (
+            <ProgressBlock
+              value={clickToOpenRate}
+              label={t("widget.clickToOpenRate")}
+              variant={clickToOpenRate > 20 ? "success" : "default"}
             />
-            <StatBadge
-              label={t("widget.opened")}
-              value={engagement.emailsOpened}
-              color="#16a34a"
-            />
-            <StatBadge
-              label={t("widget.clicked")}
-              value={engagement.emailsClicked}
-              color="#9333ea"
-            />
-          </Div>
-          <Div className="flex flex-col gap-3">
-            <RateBar
-              rate={openRate}
-              color="#16a34a"
-              label={t("widget.openRate")}
-            />
-            <RateBar
-              rate={clickRate}
-              color="#9333ea"
-              label={t("widget.clickRate")}
-            />
-            {engagement.emailsOpened > 0 && (
-              <RateBar
-                rate={clickToOpenRate}
-                color="#ea580c"
-                label={t("widget.clickToOpenRate")}
-              />
-            )}
-          </Div>
-        </CardContent>
-      </Card>
+          )}
+        </Div>
+      </SectionGroup>
 
       {/* Contact details */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <User className="h-4 w-4" />
-            {t("widget.contactDetails")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Div className="grid grid-cols-2 gap-3">
-            {contactDetails.phone && (
-              <Div className="flex items-center gap-2">
-                <Phone className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                <P className="text-sm">{contactDetails.phone}</P>
-                <CopyButton
-                  text={contactDetails.phone}
-                  label={t("widget.copyPhone")}
-                />
-              </Div>
-            )}
-            {contactDetails.website && (
-              <Div className="flex items-center gap-2">
-                <Globe className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                <ExternalLink
-                  href={contactDetails.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-info hover:underline truncate flex items-center gap-1"
-                >
-                  {contactDetails.website}
-                  <ExternalLinkIcon className="h-3 w-3 flex-shrink-0" />
-                </ExternalLink>
-              </Div>
-            )}
-            <InfoRow
-              label={t("widget.country")}
-              value={contactDetails.country}
-            />
-            <InfoRow
-              label={t("widget.language")}
-              value={contactDetails.language}
-            />
-          </Div>
-        </CardContent>
-      </Card>
+      <SectionGroup title={t("widget.contactDetails")}>
+        <DetailGrid columns={2}>
+          {contactDetails.phone && (
+            <Div className="flex items-center gap-2">
+              <Phone className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+              <P className="text-sm">{contactDetails.phone}</P>
+              <CopyButton
+                text={contactDetails.phone}
+                label={t("widget.copyPhone")}
+              />
+            </Div>
+          )}
+          {contactDetails.website && (
+            <Div className="flex items-center gap-2">
+              <Globe className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+              <ExternalLink
+                href={contactDetails.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-info hover:underline truncate flex items-center gap-1"
+              >
+                {contactDetails.website}
+                <ExternalLinkIcon className="h-3 w-3 flex-shrink-0" />
+              </ExternalLink>
+            </Div>
+          )}
+          <DetailField
+            label={t("widget.country")}
+            value={contactDetails.country}
+          />
+          <DetailField
+            label={t("widget.language")}
+            value={contactDetails.language}
+          />
+        </DetailGrid>
+      </SectionGroup>
     </Div>
   );
 }
@@ -765,193 +641,144 @@ function DetailsTab({
   return (
     <Div className="flex flex-col gap-4">
       {/* Engagement */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            {t("widget.engagement")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Div className="grid grid-cols-2 gap-3">
-            <Div className="flex items-center gap-2">
-              <BarChart2 className="h-3.5 w-3.5 text-success flex-shrink-0" />
-              <InfoRow
-                label={t("widget.emailsOpened")}
-                value={engagement.emailsOpened}
-              />
-            </Div>
-            <Div className="flex items-center gap-2">
-              <MousePointer className="h-3.5 w-3.5 text-purple-500 flex-shrink-0" />
-              <InfoRow
-                label={t("widget.emailsClicked")}
-                value={engagement.emailsClicked}
-              />
-            </Div>
-            {engagement.lastEngagementAt && (
-              <Div className="col-span-2">
-                <InfoRow
-                  label={t("widget.lastEngagement")}
-                  value={formatSimpleDate(engagement.lastEngagementAt, locale)}
-                />
-              </Div>
-            )}
-            {engagement.unsubscribedAt && (
-              <Div className="col-span-2 flex items-start gap-2">
-                <AlertTriangle className="h-3.5 w-3.5 text-destructive mt-0.5 flex-shrink-0" />
-                <Div>
-                  <P className="text-xs text-muted-foreground">
-                    {t("widget.unsubscribed")}
-                  </P>
-                  <P className="text-sm text-destructive">
-                    {formatSimpleDate(engagement.unsubscribedAt, locale)}
-                  </P>
-                </Div>
-              </Div>
-            )}
-          </Div>
-        </CardContent>
-      </Card>
+      <SectionGroup title={t("widget.engagement")}>
+        <DetailGrid columns={2}>
+          <DetailField
+            label={t("widget.emailsOpened")}
+            value={String(engagement.emailsOpened)}
+          />
+          <DetailField
+            label={t("widget.emailsClicked")}
+            value={String(engagement.emailsClicked)}
+          />
+          {engagement.lastEngagementAt && (
+            <DetailField
+              label={t("widget.lastEngagement")}
+              value={formatSimpleDate(engagement.lastEngagementAt, locale)}
+            />
+          )}
+        </DetailGrid>
+        {engagement.unsubscribedAt && (
+          <ResultBanner
+            variant="danger"
+            icon={<AlertTriangle className="h-3.5 w-3.5" />}
+            title={t("widget.unsubscribed")}
+            message={formatSimpleDate(engagement.unsubscribedAt, locale)}
+            className="mt-3"
+          />
+        )}
+      </SectionGroup>
 
       {/* Conversion */}
       {(conversion.signedUpAt ??
         conversion.convertedUserId ??
         conversion.subscriptionConfirmedAt ??
         conversion.convertedAt) && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Check className="h-4 w-4 text-success" />
-              {t("widget.conversion")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Div className="grid grid-cols-2 gap-3">
-              {conversion.signedUpAt && (
-                <InfoRow
-                  label={t("widget.signedUp")}
-                  value={formatSimpleDate(conversion.signedUpAt, locale)}
-                />
-              )}
-              {conversion.convertedAt && (
-                <InfoRow
-                  label={t("widget.convertedAt")}
-                  value={formatSimpleDate(conversion.convertedAt, locale)}
-                />
-              )}
-              {conversion.subscriptionConfirmedAt && (
-                <InfoRow
-                  label={t("widget.subscriptionConfirmed")}
-                  value={formatSimpleDate(
-                    conversion.subscriptionConfirmedAt,
-                    locale,
-                  )}
-                />
-              )}
-              {conversion.convertedUserId && (
-                <Div className="col-span-2">
-                  <P className="text-xs text-muted-foreground">
-                    {t("widget.convertedUserId")}
-                  </P>
-                  <Div className="flex items-center gap-1 mt-0.5">
-                    <P className="text-sm font-mono truncate">
-                      {conversion.convertedUserId}
-                    </P>
-                    <CopyButton
-                      text={conversion.convertedUserId}
-                      label={t("widget.copyUserId")}
-                    />
-                  </Div>
-                </Div>
-              )}
-            </Div>
-            {hasSubscription && (
-              <Div className="mt-3 pt-3 border-t flex items-center gap-2 p-2 rounded-lg bg-success/10 border border-success/30">
-                <CreditCard className="h-4 w-4 text-success" />
-                <P className="text-sm text-success font-medium">
-                  {t("widget.activeSubscriberSince")}{" "}
-                  {formatSimpleDate(
-                    conversion.subscriptionConfirmedAt!,
-                    locale,
-                  )}
-                </P>
-              </Div>
+        <SectionGroup title={t("widget.conversion")}>
+          <DetailGrid columns={2}>
+            {conversion.signedUpAt && (
+              <DetailField
+                label={t("widget.signedUp")}
+                value={formatSimpleDate(conversion.signedUpAt, locale)}
+              />
             )}
-          </CardContent>
-        </Card>
+            {conversion.convertedAt && (
+              <DetailField
+                label={t("widget.convertedAt")}
+                value={formatSimpleDate(conversion.convertedAt, locale)}
+              />
+            )}
+            {conversion.subscriptionConfirmedAt && (
+              <DetailField
+                label={t("widget.subscriptionConfirmed")}
+                value={formatSimpleDate(
+                  conversion.subscriptionConfirmedAt,
+                  locale,
+                )}
+              />
+            )}
+            {conversion.convertedUserId && (
+              <DetailField
+                label={t("widget.convertedUserId")}
+                value={conversion.convertedUserId}
+                mono
+                copyable
+              />
+            )}
+          </DetailGrid>
+          {hasSubscription && (
+            <ResultBanner
+              variant="success"
+              icon={<CreditCard className="h-4 w-4" />}
+              title={`${t("widget.activeSubscriberSince")} ${formatSimpleDate(
+                conversion.subscriptionConfirmedAt!,
+                locale,
+              )}`}
+              className="mt-3"
+            />
+          )}
+        </SectionGroup>
       )}
 
       {/* Notes & Metadata */}
       {(metadata.notes ?? Object.keys(metadata.metadata ?? {}).length > 0) && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Tag className="h-4 w-4" />
-              {t("widget.notesAndMetadata")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            {metadata.notes && (
+        <SectionGroup title={t("widget.notesAndMetadata")}>
+          {metadata.notes && (
+            <Div>
+              <P className="text-xs text-muted-foreground mb-1">
+                {t("widget.notes")}
+              </P>
+              <P className="text-sm whitespace-pre-wrap">{metadata.notes}</P>
+            </Div>
+          )}
+          {metadata.metadata && Object.keys(metadata.metadata).length > 0 && (
+            <>
+              <Separator className="my-3" />
               <Div>
-                <P className="text-xs text-muted-foreground mb-1">
-                  {t("widget.notes")}
+                <P className="text-xs text-muted-foreground mb-2">
+                  {t("widget.metadata")}
                 </P>
-                <P className="text-sm whitespace-pre-wrap">{metadata.notes}</P>
+                <DetailGrid columns={2}>
+                  {Object.entries(metadata.metadata).map(([key, val]) => (
+                    <DetailField key={key} label={key} value={String(val)} />
+                  ))}
+                </DetailGrid>
               </Div>
-            )}
-            {metadata.metadata && Object.keys(metadata.metadata).length > 0 && (
-              <>
-                <Separator />
-                <Div>
-                  <P className="text-xs text-muted-foreground mb-2">
-                    {t("widget.metadata")}
-                  </P>
-                  <Div className="grid grid-cols-2 gap-2">
-                    {Object.entries(metadata.metadata).map(([key, val]) => (
-                      <InfoRow key={key} label={key} value={String(val)} />
-                    ))}
-                  </Div>
-                </Div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+            </>
+          )}
+        </SectionGroup>
       )}
 
       {/* Timestamps */}
-      <Card>
-        <CardContent className="pt-4">
-          <Div className="grid grid-cols-2 gap-3">
-            <Div>
-              <P className="text-xs text-muted-foreground">
-                {t("widget.created")}
-              </P>
-              <P className="text-sm">
-                {formatSimpleDate(metadata.createdAt, locale)}
-              </P>
-              {daysSince(
-                metadata.createdAt instanceof Date
-                  ? metadata.createdAt
-                  : String(metadata.createdAt),
-              ) !== null && (
-                <P className="text-xs text-muted-foreground">
-                  (
-                  {daysSince(
-                    metadata.createdAt instanceof Date
-                      ? metadata.createdAt
-                      : String(metadata.createdAt),
-                  )}{" "}
-                  {t("widget.daysOld")})
-                </P>
-              )}
-            </Div>
-            <InfoRow
-              label={t("widget.lastUpdated")}
-              value={formatSimpleDate(metadata.updatedAt, locale)}
+      <SectionGroup title="">
+        <DetailGrid columns={2}>
+          <Div>
+            <DetailField
+              label={t("widget.created")}
+              value={formatSimpleDate(metadata.createdAt, locale)}
             />
+            {daysSince(
+              metadata.createdAt instanceof Date
+                ? metadata.createdAt
+                : String(metadata.createdAt),
+            ) !== null && (
+              <P className="text-xs text-muted-foreground">
+                (
+                {daysSince(
+                  metadata.createdAt instanceof Date
+                    ? metadata.createdAt
+                    : String(metadata.createdAt),
+                )}{" "}
+                {t("widget.daysOld")})
+              </P>
+            )}
           </Div>
-        </CardContent>
-      </Card>
+          <DetailField
+            label={t("widget.lastUpdated")}
+            value={formatSimpleDate(metadata.updatedAt, locale)}
+          />
+        </DetailGrid>
+      </SectionGroup>
     </Div>
   );
 }
@@ -975,286 +802,234 @@ function LinkedIdentitiesTab({
 }): React.JSX.Element {
   const { identity, lifecycle, linkedLeads, linkedUsers } = data;
 
-  const DEVICE_TYPE_COLORS: Record<string, string> = {
-    [DeviceType.DESKTOP]: "bg-info/10 text-info",
-    [DeviceType.MOBILE]: "bg-success/10 text-success",
-    [DeviceType.TABLET]:
-      "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-    [DeviceType.BOT]: "bg-destructive/10 text-destructive",
-    [DeviceType.UNKNOWN]:
-      "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
-  };
-
   return (
     <Div className="flex flex-col gap-4">
       {/* Device & Identity */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Monitor className="h-4 w-4" />
-            {t("widget.deviceIdentity")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Div className="grid grid-cols-2 gap-3">
-            {identity.ipAddress && (
-              <Div className="flex items-center gap-1 col-span-2">
-                <Div className="flex-1 min-w-0">
-                  <P className="text-xs text-muted-foreground">
-                    {t("widget.ipAddress")}
-                  </P>
-                  <P className="text-sm font-mono truncate">
-                    {identity.ipAddress}
-                  </P>
-                </Div>
-                <CopyButton
-                  text={identity.ipAddress}
-                  label={t("widget.copyIp")}
-                />
-              </Div>
-            )}
-            {identity.deviceType && (
-              <Div>
-                <P className="text-xs text-muted-foreground">
-                  {t("widget.deviceType")}
-                </P>
-                <Span
-                  className={cn(
-                    "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-0.5",
-                    DEVICE_TYPE_COLORS[identity.deviceType] ??
-                      "bg-gray-100 text-gray-800",
-                  )}
-                >
-                  {leadsT(identity.deviceType)}
-                </Span>
-              </Div>
-            )}
-            <InfoRow label={t("widget.browser")} value={identity.browser} />
-            <InfoRow label={t("widget.os")} value={identity.os} />
-            {identity.referralCode && (
-              <Div className="col-span-2">
-                <InfoRow
-                  label={t("widget.referralCode")}
-                  value={identity.referralCode}
+      <SectionGroup title={t("widget.deviceIdentity")}>
+        <DetailGrid columns={2}>
+          {identity.ipAddress && (
+            <Div className="flex items-center gap-1 col-span-2">
+              <Div className="flex-1 min-w-0">
+                <DetailField
+                  label={t("widget.ipAddress")}
+                  value={identity.ipAddress}
                   mono
+                  copyable
                 />
               </Div>
-            )}
-            {identity.userAgent && (
-              <Div className="col-span-2">
-                <P className="text-xs text-muted-foreground">
-                  {t("widget.userAgent")}
-                </P>
-                <P className="text-xs font-mono text-muted-foreground/80 mt-0.5 break-all leading-relaxed">
-                  {identity.userAgent}
-                </P>
-              </Div>
-            )}
-          </Div>
-        </CardContent>
-      </Card>
+            </Div>
+          )}
+          {identity.deviceType && (
+            <Div>
+              <P className="text-xs text-muted-foreground">
+                {t("widget.deviceType")}
+              </P>
+              <StatusPill
+                status={leadsT(identity.deviceType)}
+                variant={DEVICE_VARIANT[identity.deviceType] ?? "muted"}
+                className="mt-0.5"
+              />
+            </Div>
+          )}
+          <DetailField label={t("widget.browser")} value={identity.browser} />
+          <DetailField label={t("widget.os")} value={identity.os} />
+          {identity.referralCode && (
+            <DetailField
+              label={t("widget.referralCode")}
+              value={identity.referralCode}
+              mono
+              className="col-span-2"
+            />
+          )}
+          {identity.userAgent && (
+            <Div className="col-span-2">
+              <P className="text-xs text-muted-foreground">
+                {t("widget.userAgent")}
+              </P>
+              <P className="text-xs font-mono text-muted-foreground/80 mt-0.5 break-all leading-relaxed">
+                {identity.userAgent}
+              </P>
+            </Div>
+          )}
+        </DetailGrid>
+      </SectionGroup>
 
       {/* Lifecycle timestamps */}
       {(lifecycle.bouncedAt ??
         lifecycle.invalidAt ??
         lifecycle.campaignStartedAt) && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              {t("widget.lifecycleTimestamps")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Div className="grid grid-cols-2 gap-3">
-              {lifecycle.campaignStartedAt && (
-                <InfoRow
-                  label={t("widget.campaignStartedAt")}
-                  value={formatSimpleDate(lifecycle.campaignStartedAt, locale)}
+        <SectionGroup title={t("widget.lifecycleTimestamps")}>
+          <DetailGrid columns={2}>
+            {lifecycle.campaignStartedAt && (
+              <DetailField
+                label={t("widget.campaignStartedAt")}
+                value={formatSimpleDate(lifecycle.campaignStartedAt, locale)}
+              />
+            )}
+            {lifecycle.bouncedAt && (
+              <Div className="flex items-start gap-2">
+                <AlertTriangle className="h-3.5 w-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
+                <DetailField
+                  label={t("widget.bouncedAt")}
+                  value={formatSimpleDate(lifecycle.bouncedAt, locale)}
                 />
-              )}
-              {lifecycle.bouncedAt && (
-                <Div className="flex items-start gap-2">
-                  <AlertTriangle className="h-3.5 w-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
-                  <InfoRow
-                    label={t("widget.bouncedAt")}
-                    value={formatSimpleDate(lifecycle.bouncedAt, locale)}
-                  />
-                </Div>
-              )}
-              {lifecycle.invalidAt && (
-                <Div className="flex items-start gap-2">
-                  <AlertCircle className="h-3.5 w-3.5 text-destructive mt-0.5 flex-shrink-0" />
-                  <InfoRow
-                    label={t("widget.invalidAt")}
-                    value={formatSimpleDate(lifecycle.invalidAt, locale)}
-                  />
-                </Div>
-              )}
-            </Div>
-          </CardContent>
-        </Card>
+              </Div>
+            )}
+            {lifecycle.invalidAt && (
+              <Div className="flex items-start gap-2">
+                <AlertCircle className="h-3.5 w-3.5 text-destructive mt-0.5 flex-shrink-0" />
+                <DetailField
+                  label={t("widget.invalidAt")}
+                  value={formatSimpleDate(lifecycle.invalidAt, locale)}
+                />
+              </Div>
+            )}
+          </DetailGrid>
+        </SectionGroup>
       )}
 
       {/* Linked Leads */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Link2 className="h-4 w-4" />
-            {t("widget.linkedLeadsSection")}
-            {linkedLeads.length > 0 && (
-              <Span className="ml-auto inline-flex items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold px-2 py-0.5">
-                {linkedLeads.length}
-              </Span>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {linkedLeads.length === 0 ? (
-            <P className="text-sm text-muted-foreground">
-              {t("widget.linkedLeadsEmpty")}
-            </P>
-          ) : (
-            <Div className="flex flex-col gap-3">
-              {linkedLeads.map((link) => (
-                <Div
-                  key={link.linkedLeadId}
-                  className="flex flex-col gap-1.5 p-3 rounded-lg border bg-muted/30"
-                >
-                  <Div className="flex items-center justify-between gap-2">
-                    <Div className="flex items-center gap-2 min-w-0">
-                      <User className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                      <Strong className="text-sm font-medium truncate">
-                        {link.businessName ?? link.email ?? "—"}
-                      </Strong>
-                      {link.status && (
-                        <Span
-                          className={cn(
-                            "inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium",
-                            STATUS_COLORS[link.status] ??
-                              "bg-gray-100 text-gray-800",
-                          )}
-                        >
-                          {leadsT(link.status)}
-                        </Span>
-                      )}
-                    </Div>
-                    <Div className="flex items-center gap-1 flex-shrink-0">
-                      <CopyButton
-                        text={link.linkedLeadId}
-                        label={t("widget.copyLinkedLeadId")}
+      <SectionGroup
+        title={t("widget.linkedLeadsSection")}
+        subtitle={
+          linkedLeads.length > 0 ? (
+            <StatusPill status={String(linkedLeads.length)} variant="info" />
+          ) : undefined
+        }
+      >
+        {linkedLeads.length === 0 ? (
+          <P className="text-sm text-muted-foreground">
+            {t("widget.linkedLeadsEmpty")}
+          </P>
+        ) : (
+          <Div className="flex flex-col gap-3">
+            {linkedLeads.map((link) => (
+              <Div
+                key={link.linkedLeadId}
+                className="flex flex-col gap-1.5 p-3 rounded-lg border bg-muted/30"
+              >
+                <Div className="flex items-center justify-between gap-2">
+                  <Div className="flex items-center gap-2 min-w-0">
+                    <User className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                    <Strong className="text-sm font-medium truncate">
+                      {link.businessName ?? link.email ?? "—"}
+                    </Strong>
+                    {link.status && (
+                      <StatusPill
+                        status={leadsT(link.status)}
+                        variant={STATUS_VARIANT[link.status] ?? "default"}
                       />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onViewLinkedLead(link.linkedLeadId)}
-                        className="h-6 px-1.5 gap-1 text-muted-foreground hover:text-foreground"
-                      >
-                        <ExternalLinkIcon className="h-3 w-3" />
-                      </Button>
-                    </Div>
+                    )}
                   </Div>
-                  {link.email && (
-                    <P className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Mail className="h-3 w-3 flex-shrink-0" />
-                      {link.email}
-                    </P>
-                  )}
-                  {link.ipAddress && (
-                    <P className="text-xs text-muted-foreground font-mono">
-                      {link.ipAddress}
-                    </P>
-                  )}
-                  <Div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-0.5">
-                    <Span>
-                      {t("widget.linkReason")}{" "}
-                      <Strong className="text-foreground">
-                        {link.linkReason}
-                      </Strong>
-                    </Span>
-                    <Span>
-                      {t("widget.linkedAt")}{" "}
-                      {formatSimpleDate(link.linkedAt, locale)}
-                    </Span>
+                  <Div className="flex items-center gap-1 flex-shrink-0">
+                    <CopyButton
+                      text={link.linkedLeadId}
+                      label={t("widget.copyLinkedLeadId")}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onViewLinkedLead(link.linkedLeadId)}
+                      className="h-6 px-1.5 gap-1 text-muted-foreground hover:text-foreground"
+                    >
+                      <ExternalLinkIcon className="h-3 w-3" />
+                    </Button>
                   </Div>
                 </Div>
-              ))}
-            </Div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Linked Users */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            {t("widget.linkedUsersSection")}
-            {linkedUsers.length > 0 && (
-              <Span className="ml-auto inline-flex items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold px-2 py-0.5">
-                {linkedUsers.length}
-              </Span>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {linkedUsers.length === 0 ? (
-            <P className="text-sm text-muted-foreground">
-              {t("widget.linkedUsersEmpty")}
-            </P>
-          ) : (
-            <Div className="flex flex-col gap-3">
-              {linkedUsers.map((link) => (
-                <Div
-                  key={link.userId}
-                  className="flex flex-col gap-1.5 p-3 rounded-lg border bg-muted/30"
-                >
-                  <Div className="flex items-center justify-between gap-2">
-                    <Div className="flex items-center gap-2 min-w-0">
-                      <Hash className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                      <Strong className="text-sm font-medium truncate">
-                        {link.publicName ?? link.email}
-                      </Strong>
-                    </Div>
-                    <Div className="flex items-center gap-1 flex-shrink-0">
-                      <CopyButton
-                        text={link.userId}
-                        label={t("widget.copyUserId2")}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onViewUserProfile(link.userId)}
-                        className="h-6 px-1.5 gap-1 text-muted-foreground hover:text-foreground"
-                      >
-                        <ExternalLinkIcon className="h-3 w-3" />
-                      </Button>
-                    </Div>
-                  </Div>
+                {link.email && (
                   <P className="text-xs text-muted-foreground flex items-center gap-1">
                     <Mail className="h-3 w-3 flex-shrink-0" />
                     {link.email}
                   </P>
-                  <Div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-0.5">
-                    <Span>
-                      {t("widget.linkReason")}{" "}
-                      <Strong className="text-foreground">
-                        {link.linkReason}
-                      </Strong>
-                    </Span>
-                    <Span>
-                      {t("widget.linkedAt")}{" "}
-                      {formatSimpleDate(link.linkedAt, locale)}
-                    </Span>
+                )}
+                {link.ipAddress && (
+                  <P className="text-xs text-muted-foreground font-mono">
+                    {link.ipAddress}
+                  </P>
+                )}
+                <Div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-0.5">
+                  <Span>
+                    {t("widget.linkReason")}{" "}
+                    <Strong className="text-foreground">
+                      {link.linkReason}
+                    </Strong>
+                  </Span>
+                  <Span>
+                    {t("widget.linkedAt")}{" "}
+                    {formatSimpleDate(link.linkedAt, locale)}
+                  </Span>
+                </Div>
+              </Div>
+            ))}
+          </Div>
+        )}
+      </SectionGroup>
+
+      {/* Linked Users */}
+      <SectionGroup
+        title={t("widget.linkedUsersSection")}
+        subtitle={
+          linkedUsers.length > 0 ? (
+            <StatusPill status={String(linkedUsers.length)} variant="info" />
+          ) : undefined
+        }
+      >
+        {linkedUsers.length === 0 ? (
+          <P className="text-sm text-muted-foreground">
+            {t("widget.linkedUsersEmpty")}
+          </P>
+        ) : (
+          <Div className="flex flex-col gap-3">
+            {linkedUsers.map((link) => (
+              <Div
+                key={link.userId}
+                className="flex flex-col gap-1.5 p-3 rounded-lg border bg-muted/30"
+              >
+                <Div className="flex items-center justify-between gap-2">
+                  <Div className="flex items-center gap-2 min-w-0">
+                    <Hash className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                    <Strong className="text-sm font-medium truncate">
+                      {link.publicName ?? link.email}
+                    </Strong>
+                  </Div>
+                  <Div className="flex items-center gap-1 flex-shrink-0">
+                    <CopyButton
+                      text={link.userId}
+                      label={t("widget.copyUserId2")}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onViewUserProfile(link.userId)}
+                      className="h-6 px-1.5 gap-1 text-muted-foreground hover:text-foreground"
+                    >
+                      <ExternalLinkIcon className="h-3 w-3" />
+                    </Button>
                   </Div>
                 </Div>
-              ))}
-            </Div>
-          )}
-        </CardContent>
-      </Card>
+                <P className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Mail className="h-3 w-3 flex-shrink-0" />
+                  {link.email}
+                </P>
+                <Div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-0.5">
+                  <Span>
+                    {t("widget.linkReason")}{" "}
+                    <Strong className="text-foreground">
+                      {link.linkReason}
+                    </Strong>
+                  </Span>
+                  <Span>
+                    {t("widget.linkedAt")}{" "}
+                    {formatSimpleDate(link.linkedAt, locale)}
+                  </Span>
+                </Div>
+              </Div>
+            ))}
+          </Div>
+        )}
+      </SectionGroup>
     </Div>
   );
 }
@@ -1270,6 +1045,7 @@ export function LeadDetailContainer(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState("overview");
 
   const fieldValue = useWidgetValue<typeof definition.GET>();
+  const { response } = useWidgetContext();
   const data = fieldValue?.lead;
   const leadId = data?.basicInfo?.id;
 
@@ -1358,69 +1134,97 @@ export function LeadDetailContainer(): React.JSX.Element {
   }, [navigation]);
 
   if (!fieldValue) {
+    if (response === undefined) {
+      return (
+        <WidgetShell>
+          <LoadingBlock message={t("widget.loading")} />
+        </WidgetShell>
+      );
+    }
+    // No id in URL — show picker so user can select a lead
     return (
-      <Div className="flex flex-col items-center justify-center py-16 text-center gap-4">
-        <Div className="rounded-full bg-muted p-4">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <WidgetShell>
+        <Div className="flex items-center justify-center h-full py-16">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => {
+              navigation.push(leadsSearchDefinitions.GET, {
+                renderInModal: true,
+                pickerCallback: (picked) => {
+                  const lead = picked as { id: string };
+                  navigation.replace(definition.GET, {
+                    urlPathParams: { id: lead.id },
+                  });
+                },
+              });
+            }}
+          >
+            <Search className="h-4 w-4" />
+            {t("widget.selectLead")}
+          </Button>
         </Div>
-        <P className="text-sm text-muted-foreground">{t("widget.loading")}</P>
-      </Div>
+      </WidgetShell>
     );
   }
 
   if (!data) {
     return (
-      <Div className="flex flex-col items-center justify-center py-16 text-center gap-4">
-        <Div className="rounded-full bg-muted p-4">
-          <AlertCircle className="h-8 w-8 text-muted-foreground" />
-        </Div>
-        <P className="text-sm text-muted-foreground">{t("widget.notFound")}</P>
-        <Button variant="outline" size="sm" onClick={handleBack}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("widget.back")}
-        </Button>
-      </Div>
+      <WidgetShell>
+        <EmptyBlock
+          icon={<AlertCircle className="h-8 w-8" />}
+          title={t("widget.notFound")}
+          action={{
+            label: t("widget.back"),
+            onClick: handleBack,
+          }}
+        />
+      </WidgetShell>
     );
   }
 
   const { basicInfo, conversion } = data;
 
+  const headerActions = (
+    <Div className="flex items-center gap-1">
+      <Button variant="ghost" size="sm" onClick={handleEdit} className="gap-1">
+        <Pencil className="h-4 w-4" />
+        <Span className="hidden @sm:inline">{t("widget.edit")}</Span>
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleDelete}
+        className="gap-1 text-destructive hover:text-destructive"
+      >
+        <Trash2 className="h-4 w-4" />
+        <Span className="hidden @sm:inline">{t("widget.delete")}</Span>
+      </Button>
+    </Div>
+  );
+
   return (
-    <Div className="flex flex-col gap-0 pb-6">
+    <WidgetShell padding="none">
       {/* Top action bar */}
-      <Div className="flex items-center gap-2 p-4 border-b sticky top-0 bg-background z-10">
-        <Button variant="outline" size="sm" onClick={handleBack}>
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          {t("widget.back")}
-        </Button>
-        <Div className="flex-1 min-w-0">
-          <P className="font-semibold text-base truncate">
-            {basicInfo.businessName ??
-              basicInfo.email ??
-              t("widget.leadFallbackTitle")}
-          </P>
-        </Div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleEdit}
-          className="gap-1"
-        >
-          <Pencil className="h-4 w-4" />
-          {t("widget.edit")}
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleDelete}
-          className="gap-1 text-destructive hover:text-destructive"
-        >
-          <Trash2 className="h-4 w-4" />
-          {t("widget.delete")}
-        </Button>
+      <Div className="px-4 pt-4">
+        <WidgetHeader
+          title={
+            basicInfo.businessName ??
+            basicInfo.email ??
+            t("widget.leadFallbackTitle")
+          }
+          backButton={
+            <Button variant="outline" size="sm" onClick={handleBack}>
+              {t("widget.back")}
+            </Button>
+          }
+          actions={headerActions}
+        />
       </Div>
 
-      <Div className="px-4 pt-4 flex flex-col gap-4">
+      <Div className="px-4 pt-4 pb-6 flex flex-col gap-4">
         <LeadHeader
           businessName={basicInfo.businessName}
           email={basicInfo.email}
@@ -1480,7 +1284,7 @@ export function LeadDetailContainer(): React.JSX.Element {
           </TabsContent>
         </Tabs>
       </Div>
-    </Div>
+    </WidgetShell>
   );
 }
 
@@ -1652,61 +1456,66 @@ export function LeadEditContainer(): React.JSX.Element {
   // Show success only after an actual submit (not from GET prefill data populating field.value)
   const showSuccess = submittedSuccessfully && !isSubmitting;
 
+  const headerActions = (
+    <Div className="flex items-center gap-1">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={handleDelete}
+        className="gap-1 text-destructive hover:text-destructive"
+      >
+        <Trash2 className="h-4 w-4" />
+        <Span className="hidden @sm:inline">{t("widget.delete")}</Span>
+      </Button>
+      <Button
+        type="button"
+        variant="default"
+        size="sm"
+        onClick={handleSubmit}
+        disabled={isSubmitting}
+        className="gap-1"
+      >
+        {isSubmitting ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Save className="h-4 w-4" />
+        )}
+        {isSubmitting
+          ? t("patch.submitButton.loadingText")
+          : t("patch.submitButton.label")}
+      </Button>
+    </Div>
+  );
+
   return (
-    <Div className="flex flex-col gap-0 pb-6">
+    <WidgetShell padding="none">
       {/* Top action bar */}
-      <Div className="flex items-center gap-2 p-4 border-b sticky top-0 bg-background z-10">
-        <Button type="button" variant="outline" size="sm" onClick={handleBack}>
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          {t("widget.back")}
-        </Button>
-        <Div className="flex-1 min-w-0">
-          <P className="font-semibold text-base truncate">
-            {t("patch.form.title")}
-          </P>
-        </Div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleDelete}
-          className="gap-1 text-destructive hover:text-destructive"
-        >
-          <Trash2 className="h-4 w-4" />
-          {t("widget.delete")}
-        </Button>
-        <Button
-          type="button"
-          variant="default"
-          size="sm"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="gap-1"
-        >
-          {isSubmitting ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-          {isSubmitting
-            ? t("patch.submitButton.loadingText")
-            : t("patch.submitButton.label")}
-        </Button>
+      <Div className="px-4 pt-4">
+        <WidgetHeader
+          title={t("patch.form.title")}
+          backButton={
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleBack}
+            >
+              {t("widget.back")}
+            </Button>
+          }
+          actions={headerActions}
+        />
       </Div>
 
-      <Div className="px-4 pt-4 flex flex-col gap-4">
+      <Div className="px-4 pt-4 pb-6 flex flex-col gap-4">
         {/* Success: show after actual PATCH submission completes */}
         {showSuccess && (
-          <Card className="border-success/30 bg-success/10">
-            <CardContent className="pt-3 pb-3">
-              <Div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-success" />
-                <P className="text-sm text-success font-medium">
-                  {t("patch.success.description")}
-                </P>
-              </Div>
-            </CardContent>
-          </Card>
+          <ResultBanner
+            variant="success"
+            icon={<CheckCircle className="h-4 w-4" />}
+            title={t("patch.success.description")}
+          />
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -1722,196 +1531,192 @@ export function LeadEditContainer(): React.JSX.Element {
 
           {/* Basic Info tab */}
           <TabsContent value="basic" className="mt-4">
-            <Card>
-              <CardContent className="pt-4 flex flex-col gap-4">
-                <Div className="grid grid-cols-2 gap-4">
-                  <FormField label={t("patch.email.label")}>
-                    <Input
-                      type="email"
-                      placeholder={t("patch.email.placeholder")}
-                      value={form.watch("email") ?? ""}
-                      onChangeText={(v) => form.setValue("email", v)}
-                    />
-                  </FormField>
-                  <FormField label={t("patch.businessName.label")}>
-                    <Input
-                      placeholder={t("patch.businessName.placeholder")}
-                      value={form.watch("businessName") ?? ""}
-                      onChangeText={(v) => form.setValue("businessName", v)}
-                    />
-                  </FormField>
-                  <FormField label={t("patch.contactName.label")}>
-                    <Input
-                      placeholder={t("patch.contactName.placeholder")}
-                      value={form.watch("contactName") ?? ""}
-                      onChangeText={(v) => form.setValue("contactName", v)}
-                    />
-                  </FormField>
-                  <FormField label={t("patch.status.label")}>
-                    <Select
-                      value={form.watch("status") ?? ""}
-                      onValueChange={(v) => {
-                        const parsed = asLeadStatus(v);
-                        if (parsed !== undefined) {
-                          form.setValue("status", parsed);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t("patch.status.placeholder")}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LeadStatusOptions.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            {leadsT(opt.label)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormField>
-                  <FormField label={t("patch.phone.label")}>
-                    <Input
-                      type="tel"
-                      placeholder={t("patch.phone.placeholder")}
-                      value={form.watch("phone") ?? ""}
-                      onChangeText={(v) => form.setValue("phone", v)}
-                    />
-                  </FormField>
-                  <FormField label={t("patch.website.label")}>
-                    <Input
-                      type="url"
-                      placeholder={t("patch.website.placeholder")}
-                      value={form.watch("website") ?? ""}
-                      onChangeText={(v) => form.setValue("website", v)}
-                    />
-                  </FormField>
-                  <FormField label={t("patch.country.label")}>
-                    <Select
-                      value={form.watch("country") ?? ""}
-                      onValueChange={(v) => {
-                        const parsed = asCountry(v);
-                        if (parsed !== undefined) {
-                          form.setValue("country", parsed);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t("patch.country.placeholder")}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {CountriesOptions.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            {tGlobal(opt.label)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormField>
-                  <FormField label={t("patch.language.label")}>
-                    <Select
-                      value={form.watch("language") ?? ""}
-                      onValueChange={(v) => {
-                        const parsed = asLanguage(v);
-                        if (parsed !== undefined) {
-                          form.setValue("language", parsed);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t("patch.language.placeholder")}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LanguagesOptions.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            {tGlobal(opt.label)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormField>
-                </Div>
-              </CardContent>
-            </Card>
+            <SectionGroup title="">
+              <Div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
+                <FormField label={t("patch.email.label")}>
+                  <Input
+                    type="email"
+                    placeholder={t("patch.email.placeholder")}
+                    value={form.watch("email") ?? ""}
+                    onChangeText={(v) => form.setValue("email", v)}
+                  />
+                </FormField>
+                <FormField label={t("patch.businessName.label")}>
+                  <Input
+                    placeholder={t("patch.businessName.placeholder")}
+                    value={form.watch("businessName") ?? ""}
+                    onChangeText={(v) => form.setValue("businessName", v)}
+                  />
+                </FormField>
+                <FormField label={t("patch.contactName.label")}>
+                  <Input
+                    placeholder={t("patch.contactName.placeholder")}
+                    value={form.watch("contactName") ?? ""}
+                    onChangeText={(v) => form.setValue("contactName", v)}
+                  />
+                </FormField>
+                <FormField label={t("patch.status.label")}>
+                  <Select
+                    value={form.watch("status") ?? ""}
+                    onValueChange={(v) => {
+                      const parsed = asLeadStatus(v);
+                      if (parsed !== undefined) {
+                        form.setValue("status", parsed);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={t("patch.status.placeholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LeadStatusOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {leadsT(opt.label)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField label={t("patch.phone.label")}>
+                  <Input
+                    type="tel"
+                    placeholder={t("patch.phone.placeholder")}
+                    value={form.watch("phone") ?? ""}
+                    onChangeText={(v) => form.setValue("phone", v)}
+                  />
+                </FormField>
+                <FormField label={t("patch.website.label")}>
+                  <Input
+                    type="url"
+                    placeholder={t("patch.website.placeholder")}
+                    value={form.watch("website") ?? ""}
+                    onChangeText={(v) => form.setValue("website", v)}
+                  />
+                </FormField>
+                <FormField label={t("patch.country.label")}>
+                  <Select
+                    value={form.watch("country") ?? ""}
+                    onValueChange={(v) => {
+                      const parsed = asCountry(v);
+                      if (parsed !== undefined) {
+                        form.setValue("country", parsed);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={t("patch.country.placeholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CountriesOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {tGlobal(opt.label)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField label={t("patch.language.label")}>
+                  <Select
+                    value={form.watch("language") ?? ""}
+                    onValueChange={(v) => {
+                      const parsed = asLanguage(v);
+                      if (parsed !== undefined) {
+                        form.setValue("language", parsed);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={t("patch.language.placeholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LanguagesOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {tGlobal(opt.label)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+              </Div>
+            </SectionGroup>
           </TabsContent>
 
           {/* Campaign tab */}
           <TabsContent value="campaign" className="mt-4">
-            <Card>
-              <CardContent className="pt-4 flex flex-col gap-4">
-                <Div className="grid grid-cols-2 gap-4">
-                  <FormField label={t("patch.source.label")}>
-                    <Select
-                      value={form.watch("source") ?? ""}
-                      onValueChange={(v) => {
-                        const parsed = asLeadSource(v);
-                        if (parsed !== undefined) {
-                          form.setValue("source", parsed);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t("patch.source.placeholder")}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LeadSourceOptions.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            {leadsT(opt.label)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormField>
-                  <FormField label={t("patch.currentCampaignStage.label")}>
-                    <Select
-                      value={form.watch("currentCampaignStage") ?? ""}
-                      onValueChange={(v) => {
-                        const parsed = asEmailCampaignStage(v);
-                        if (parsed !== undefined) {
-                          form.setValue("currentCampaignStage", parsed);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t(
-                            "patch.currentCampaignStage.placeholder",
-                          )}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {EmailCampaignStageOptions.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            {leadsT(opt.label)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormField>
-                </Div>
-                <FormField label={t("patch.notes.label")}>
-                  <Textarea
-                    className="min-h-[80px]"
-                    placeholder={t("patch.notes.placeholder")}
-                    value={form.watch("notes") ?? ""}
-                    onChange={(e) => form.setValue("notes", e.target.value)}
-                  />
+            <SectionGroup title="">
+              <Div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
+                <FormField label={t("patch.source.label")}>
+                  <Select
+                    value={form.watch("source") ?? ""}
+                    onValueChange={(v) => {
+                      const parsed = asLeadSource(v);
+                      if (parsed !== undefined) {
+                        form.setValue("source", parsed);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={t("patch.source.placeholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LeadSourceOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {leadsT(opt.label)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormField>
-              </CardContent>
-            </Card>
+                <FormField label={t("patch.currentCampaignStage.label")}>
+                  <Select
+                    value={form.watch("currentCampaignStage") ?? ""}
+                    onValueChange={(v) => {
+                      const parsed = asEmailCampaignStage(v);
+                      if (parsed !== undefined) {
+                        form.setValue("currentCampaignStage", parsed);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={t(
+                          "patch.currentCampaignStage.placeholder",
+                        )}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EmailCampaignStageOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {leadsT(opt.label)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+              </Div>
+              <FormField label={t("patch.notes.label")}>
+                <Textarea
+                  className="min-h-[80px]"
+                  placeholder={t("patch.notes.placeholder")}
+                  value={form.watch("notes") ?? ""}
+                  onChange={(e) => form.setValue("notes", e.target.value)}
+                />
+              </FormField>
+            </SectionGroup>
           </TabsContent>
 
           {/* Advanced tab */}
           <TabsContent value="advanced" className="mt-4">
-            <Card>
-              <CardContent className="pt-4 flex flex-col gap-4">
+            <SectionGroup title="">
+              <Div className="flex flex-col gap-4">
                 <FormField label={t("patch.convertedUserId.label")}>
                   <Input
                     placeholder={t("patch.convertedUserId.placeholder")}
@@ -1965,8 +1770,8 @@ export function LeadEditContainer(): React.JSX.Element {
                     }}
                   />
                 </FormField>
-              </CardContent>
-            </Card>
+              </Div>
+            </SectionGroup>
           </TabsContent>
         </Tabs>
 
@@ -1993,6 +1798,6 @@ export function LeadEditContainer(): React.JSX.Element {
           </Button>
         </Div>
       </Div>
-    </Div>
+    </WidgetShell>
   );
 }

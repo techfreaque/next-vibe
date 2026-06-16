@@ -7,6 +7,7 @@ import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -82,6 +83,8 @@ export function ProductCategoryListWidget(_props: {
   const data = useWidgetValue<typeof definition.GET>();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const onPick = usePickerCallback<Category>();
+  const isPickerMode = !!onPick;
 
   const handleCreate = (): void => {
     void (async (): Promise<void> => {
@@ -131,14 +134,16 @@ export function ProductCategoryListWidget(_props: {
             </Span>
           ) : null}
         </Div>
-        <Button
-          type="button"
-          size="sm"
-          variant="default"
-          onClick={handleCreate}
-        >
-          {labelAddCategory}
-        </Button>
+        {!isPickerMode && (
+          <Button
+            type="button"
+            size="sm"
+            variant="default"
+            onClick={handleCreate}
+          >
+            {labelAddCategory}
+          </Button>
+        )}
       </Div>
 
       {categories.length > 0 ? (
@@ -149,6 +154,11 @@ export function ProductCategoryListWidget(_props: {
                 category={parent}
                 isChild={false}
                 onClick={(): void => {
+                  if (isPickerMode && onPick) {
+                    onPick(parent);
+                    pop();
+                    return;
+                  }
                   void (async (): Promise<void> => {
                     const def = await import("../../catalog/list/definition");
                     navigate(def.default.GET, {
@@ -166,6 +176,11 @@ export function ProductCategoryListWidget(_props: {
                   category={child}
                   isChild
                   onClick={(): void => {
+                    if (isPickerMode && onPick) {
+                      onPick(child);
+                      pop();
+                      return;
+                    }
                     void (async (): Promise<void> => {
                       const def = await import("../../catalog/list/definition");
                       navigate(def.default.GET, {
@@ -194,6 +209,11 @@ export function ProductCategoryListWidget(_props: {
                 category={c}
                 isChild={false}
                 onClick={(): void => {
+                  if (isPickerMode && onPick) {
+                    onPick(c);
+                    pop();
+                    return;
+                  }
                   void (async (): Promise<void> => {
                     const def = await import("../../catalog/list/definition");
                     navigate(def.default.GET, {

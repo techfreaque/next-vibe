@@ -1,7 +1,10 @@
 /**
  * AI Stream Integration - Reverse WS (NAT: WS reverse connector)
  *
- * Tests the reverse WS connector path for remote tool calls behind NAT:
+ * Regular chat in the BACKGROUND folder: the AI loop runs on atlas and the
+ * prompts ask it to call tools on the remote via
+ * execute-tool(instanceId='hermes'). Hermes executes the tools over its
+ * reverse-WS connector and delivers results back.
  *
  *   1. execute-tool broadcasts tool-execute-request on
  *      system/tool-dispatch/{userId} (fire-and-forget over WS).
@@ -12,7 +15,7 @@
  *        - PATCH handler calls openConnection() which opens a persistent WS to atlas
  *        - On open: any pending tool-execute-request is re-broadcast (missed event recovery)
  *   3. Hermes WS connector receives tool-execute-request, executes the tool locally,
- *      POSTs /report back to atlas via direct HTTP.
+ *      replies inline on the socket (wait/endLoop) or POSTs /report (wakeUp/detach).
  *   4. /report → handleTaskCompletion → revival fires → thread returns to 'idle'.
  *
  * Setup forces transportMode='cloud-only' so the initial execute-tool call cannot
@@ -29,7 +32,11 @@ import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { and, eq } from "drizzle-orm";
-import { resolveRemoteUrl } from "../../testing/remote-setup";
+import {
+  failSuitePrerequisites,
+  isHermesInFixtureMode,
+  resolveRemoteUrl,
+} from "../../testing/remote-setup";
 import { describeStreamSuite } from "./route-base.test";
 
 const HERMES_INSTANCE_ID = "hermes";
@@ -49,18 +56,16 @@ async function setupReverseWsConnection(
   testUser: JwtPrivatePayloadType,
 ): Promise<void> {
   const {
-    connectToHermes,
-    disconnectFromHermes,
+    connectToHermesLocalAi,
     resolveProdUserId,
     resolveProdAdminToken,
     triggerPull,
   } = await import("../../testing/remote-setup");
 
-  // Idempotent: clean up any leftover connection from a previous failed run
-  await disconnectFromHermes(testUser.id);
-
-  // E2E: log into prod, register atlas on hermes, sync capabilities
-  await connectToHermes(testUser, PROD_URL);
+  // Local AI loop + remote tool execution: isDefault=false so nothing relays;
+  // the AI dispatches tools explicitly via execute-tool(instanceId='hermes').
+  // Includes idempotent disconnect of leftover connections.
+  await connectToHermesLocalAi(testUser, PROD_URL);
 
   // Ensure capabilities are populated before tests run
   await triggerPull();
@@ -68,12 +73,27 @@ async function setupReverseWsConnection(
   _prodUserId = await resolveProdUserId();
   _prodAdminToken = await resolveProdAdminToken(PROD_URL);
 
-  // Force cloud-only so the first execute-tool broadcast has no open WS channel.
-  // The thread enters 'waiting'. runReverseWsPulse then PATCHes to 'reverse-ws'
-  // which opens the connector and delivers the missed event.
+  // NAT simulation: close hermes's connector again and mark the local
+  // transport cloud-only so the first execute-tool broadcast has no open WS
+  // channel. The thread enters 'waiting'. runReverseWsPulse then PATCHes to
+  // 'reverse-ws' which opens the connector and delivers the missed event.
+  // cloud-only is an internal transport state (no public API) — set directly.
+  await fetch(
+    `${PROD_URL}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${_prodAdminToken}`,
+      },
+      body: JSON.stringify({ transportMode: "cloud-only" }),
+      signal: AbortSignal.timeout(10_000),
+    },
+  );
   await db
     .update(remoteConnections)
-    .set({ transportMode: "cloud-only" })
+    .set({ transportMode: "cloud-only" as "reverse-ws" })
     .where(
       and(
         eq(remoteConnections.userId, testUser.id),
@@ -204,28 +224,29 @@ async function runReverseWsPulse(threadId: string): Promise<void> {
 }
 
 const _resolvedRemoteUrl = await resolveRemoteUrl();
-if (_resolvedRemoteUrl) {
+const _isFixtureMode = isHermesInFixtureMode();
+
+if (_resolvedRemoteUrl && _isFixtureMode) {
   PROD_URL = _resolvedRemoteUrl;
   describeStreamSuite({
     label: `AI Stream Integration - Reverse WS (${_resolvedRemoteUrl}, NAT: WS reverse connector → hermes → /report)`,
     cachePrefix: "reverse-ws-",
-    // No remoteInstanceId: AI loop runs on hermes via relay (cloud-only → waiting → reverse-ws pulse).
+    // Local AI loop; prompts instruct execute-tool(instanceId='hermes').
     // Tools execute on hermes via the WS reverse connector.
     // pulse: opens reverse-ws connector on hermes, which picks up and executes the pending tool call.
-    skipWaitForTaskTest: true,
-    // skipApprovalTests: tool confirmations require local state; AI runs on remote.
-    skipApprovalTests: true,
-    // skipAttachmentTests: local user message has no attachment metadata in relay mode.
-    skipAttachmentTests: true,
-    // assertSystemPromptFromLocal: system prompt built on local client, sent in relay POST.
-    assertSystemPromptFromLocal: true,
+    remoteInstanceId: HERMES_INSTANCE_ID,
     setup: setupReverseWsConnection,
     teardown: teardownReverseWsConnection,
     pulse: runReverseWsPulse,
   });
-} else {
-  process.stderr.write(
-    "[test skip] AI Stream Integration - Reverse WS: remote server not running.\n" +
-      "  Start: vibe --hermes dev --fixture-mode  → http://localhost:3002\n",
+} else if (!_resolvedRemoteUrl) {
+  failSuitePrerequisites(
+    "AI Stream Integration - Reverse WS",
+    "remote server not running — start: vibe --hermes dev --fixture-mode  → http://localhost:3002",
+  );
+} else if (!_isFixtureMode) {
+  failSuitePrerequisites(
+    "AI Stream Integration - Reverse WS",
+    "hermes is running but not in fixture mode — restart: vibe --hermes dev --fixture-mode",
   );
 }

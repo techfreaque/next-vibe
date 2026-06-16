@@ -304,6 +304,9 @@ export const creditTransactions = pgTable(
     // Period tracking for free credit transactions
     freePeriodId: text("free_period_id"),
 
+    // Journal entry reference (set after accounting entry is posted)
+    journalEntryId: uuid("journal_entry_id"),
+
     // Rich metadata (typed per transaction type)
     metadata: jsonb("metadata")
       .$type<CreditTransactionMetadata>()

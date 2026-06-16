@@ -56,6 +56,8 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetOnSubmit,
+  useWidgetPlatform,
+  useWidgetResponseOnly,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
@@ -102,6 +104,9 @@ function useInputHeight(
       return;
     }
     if (!inputContainerRef.current) {
+      return;
+    }
+    if (typeof ResizeObserver === "undefined") {
       return;
     }
 
@@ -567,9 +572,17 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
     {
       read: {
         initialState: { pageSize: 500 },
+        formOptions: {
+          // Isolate this instance's form state from the outer help admin widget.
+          // Both use helpDefinitions so they'd otherwise share the same Zustand formId,
+          // causing this widget's mergedDefaultValues reset to overwrite the admin
+          // sidebar's queryParams (e.g. statsFilter:"pinned" → pageSize:500).
+          persistenceKey: "query-form-help-ai-run-internal",
+        },
         queryOptions: {
           refetchOnWindowFocus: false,
           staleTime: 5 * 60 * 1000,
+          queryKey: "help-ai-run-internal",
         },
       },
     },
@@ -643,27 +656,6 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   const skillValue = form.watch("skill") ?? "";
   const favoriteIdValue = form.watch("favoriteId") ?? "";
 
-  // Resolve model from skill when skill is selected but model not yet set
-  const skillHook = useSkill(skillValue || undefined, user, logger);
-  const skillData = skillHook.read?.data ?? null;
-
-  // When skill loads, auto-resolve and store the best model
-  useEffect(() => {
-    if (!skillData || modelValue) {
-      return;
-    }
-    const defaultVariant =
-      skillData.variants.find((v) => v.id === "default") ??
-      skillData.variants[0];
-    if (!defaultVariant?.modelSelection) {
-      return;
-    }
-    const resolved = getBestChatModel(defaultVariant.modelSelection, user);
-    if (resolved) {
-      form.setValue("model", resolved.id, { shouldDirty: false });
-    }
-  }, [skillData, modelValue, user, form]);
-
   const hasSelection = !!(skillValue || favoriteIdValue);
 
   const handleContentChange = useCallback(
@@ -676,8 +668,6 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   );
   const handleSkillChange = useCallback(
     (id: string) => {
-      // Clear resolved model so it gets re-resolved from the new skill
-      form.setValue("model", undefined, { shouldDirty: false });
       form.setValue("skill", id, { shouldDirty: true });
     },
     [form],
@@ -890,11 +880,87 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   );
 }
 
+// ─── CLI / MCP response render ───────────────────────────────────────────────
+
+function AiRunCliView(): JSX.Element {
+  const responseData = useWidgetValue<typeof definition.POST>();
+  const widgetPlatform = useWidgetPlatform();
+  const locale = useWidgetLocale();
+  const isMcp = widgetPlatform === Platform.MCP;
+  const { t } = runScopedTranslation.scopedT(locale);
+
+  if (!responseData?.text) {
+    return (
+      <Div>
+        <Span className="opacity-50">{t("widget.noResponse")}</Span>
+      </Div>
+    );
+  }
+
+  if (isMcp) {
+    // Compact AI-parseable output
+    const lines: string[] = [responseData.text];
+    if (
+      responseData.promptTokens !== null ||
+      responseData.completionTokens !== null
+    ) {
+      lines.push(
+        `tokens: ${responseData.promptTokens ?? 0} in / ${responseData.completionTokens ?? 0} out`,
+      );
+    }
+    if (responseData.creditCost !== null) {
+      lines.push(`cost: ${responseData.creditCost} credits`);
+    }
+    if (responseData.threadId) {
+      lines.push(`thread: ${responseData.threadId}`);
+    }
+    return (
+      <Div>
+        <P>{lines.join("\n")}</P>
+      </Div>
+    );
+  }
+
+  // CLI: human-readable with color
+  const meta: string[] = [];
+  if (
+    responseData.promptTokens !== null ||
+    responseData.completionTokens !== null
+  ) {
+    meta.push(
+      `${responseData.promptTokens ?? 0} → ${responseData.completionTokens ?? 0} tokens`,
+    );
+  }
+  if (responseData.creditCost !== null) {
+    meta.push(`${responseData.creditCost} credits`);
+  }
+  if (responseData.threadTitle) {
+    meta.push(`"${responseData.threadTitle}"`);
+  }
+
+  return (
+    <Div className="flex flex-col gap-1">
+      <P>{responseData.text}</P>
+      {meta.length > 0 && (
+        <Span className="opacity-50">{meta.join("  ·  ")}</Span>
+      )}
+    </Div>
+  );
+}
+
 // ─── Main Widget (entry point) ───────────────────────────────────────────────
 
 export function AiRunWidget({ field }: CustomWidgetProps): JSX.Element {
+  const widgetPlatform = useWidgetPlatform();
+  const responseOnly = useWidgetResponseOnly();
   const responseData = useWidgetValue<typeof definition.POST>();
   const threadId = responseData?.threadId ?? null;
+
+  // MCP or CLI non-interactive (responseOnly=true): compact text output only
+  if (widgetPlatform === Platform.MCP || responseOnly) {
+    return <AiRunCliView />;
+  }
+
   return (
     <ChatNavigationProvider
       activeThreadId={threadId}

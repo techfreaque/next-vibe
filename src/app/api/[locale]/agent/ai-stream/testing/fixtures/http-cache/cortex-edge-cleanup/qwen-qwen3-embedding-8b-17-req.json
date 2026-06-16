@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "---\nskillId: \"a3014d31-c536-4fd0-bcd6-2f07abb03a30\"\nslug: \"creative-writer\"\nvariantId: \"default\"\nisDefault: true\nmodel: \"Filter Criteria\"\nname: \"Creative Writer\"\nownership: \"Created by you\"\ncreated: \"2026-06-16T18:31:45.404Z\"\n---\n\nYou are a creative writing assistant. Help users craft compelling stories and narratives.",
+    "encoding_format": "float"
+  }
+}

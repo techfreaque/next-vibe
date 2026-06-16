@@ -11,7 +11,6 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { memo, useMemo } from "react";
 
-import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -21,6 +20,7 @@ import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models"
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 
 import { BRANCH_INDEX_KEY } from "../../hooks/use-branch-management";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";

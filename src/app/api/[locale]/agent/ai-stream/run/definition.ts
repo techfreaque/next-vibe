@@ -59,7 +59,14 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ],
+  defaultAiPinned: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+  ] as const,
+
   title: "run.post.title",
+  titleShort: "run.post.titleShort",
   description: "run.post.description",
   dynamicTitle: ({ request }) => {
     if (request?.prompt) {
@@ -83,8 +90,8 @@ const { POST } = createEndpoint({
   defaultExpanded: true,
 
   icon: "sparkles",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiInference",
+  category: "ai",
+  subCategory: "Inference",
   cli: {
     firstCliArgKey: "prompt",
   },
@@ -125,6 +132,17 @@ const { POST } = createEndpoint({
         description: "run.post.fields.model.description",
         options: ChatModelIdOptions,
         columns: 6,
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.REMOTE_SKILL,
+          Platform.TRPC,
+          Platform.NEXT_PAGE,
+          Platform.NEXT_API,
+          Platform.CRON,
+          Platform.ELECTRON,
+          Platform.FRAME,
+        ],
         schema: z.enum(ChatModelId).optional(),
       }),
 
@@ -135,7 +153,10 @@ const { POST } = createEndpoint({
         description: "run.post.fields.skill.description",
         placeholder: "run.post.fields.skill.placeholder",
         columns: 6,
-        schema: z.string().optional(),
+        schema: z
+          .string()
+          .optional()
+          .transform((v) => (v === "" ? undefined : v)),
       }),
 
       // ── User prompt ─────────────────────────────────────────────────────

@@ -11,7 +11,11 @@ import { db } from "@/app/api/[locale]/system/db";
 
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
-import { isEmbeddableMount, isNativePath, parseFrontmatter } from "../repository";
+import {
+  isEmbeddableMount,
+  isNativePath,
+  parseFrontmatter,
+} from "../repository";
 
 import { queueEmbedding } from "./auto-embed";
 import { computeEmbeddingHash } from "./service";

@@ -295,6 +295,7 @@ export class WsProviderStreamRepository {
     request?: NextRequest;
   }): Promise<ResponseType<WsProviderStreamPostResponseOutput>> {
     // Get AI stream translation function (needed for createAiStream and error messages)
+          aiToolCallId,
     const { scopedTranslation: aiStreamI18n } =
       await import("@/app/api/[locale]/agent/ai-stream/stream/i18n");
     const t: AiStreamT = aiStreamI18n.scopedT(locale).t;
@@ -408,12 +409,3 @@ export class WsProviderStreamRepository {
     }
   }
 }
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
-import { and, eq } from "drizzle-orm";
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
-import { and, eq } from "drizzle-orm";
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
-import { and, eq } from "drizzle-orm";

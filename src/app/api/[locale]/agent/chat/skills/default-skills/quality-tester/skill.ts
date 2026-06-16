@@ -3,14 +3,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { Skill } from "../../config";
 
-import {
-  AUDIO_VISION,
-  IMAGE_GEN,
-  MUSIC_GEN,
-  STT,
-  VIDEO_GEN,
-  VOICE,
-} from "../_shared/media-presets";
+import { ChatModelId } from "../../../../ai-stream/models";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -20,6 +13,14 @@ import {
   SkillCategory,
   SkillOwnershipType,
 } from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
 
 export const qualityTesterSkill: Skill = {
   id: "quality-tester",
@@ -84,10 +85,11 @@ If everything works, respond normally to the user. Only flag issues - don't narr
       audioVisionModelSelection: AUDIO_VISION.geminiFlash,
     },
     {
-      id: "budget",
-      variantName: "skills.qualityTester.variants.budget" as const,
+      id: "visual",
+      variantName: "skills.qualityTester.variants.visual" as const,
       modelSelection: {
-        selectionType: ModelSelectionType.FILTERS,
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.GEMINI_3_5_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.SMART,

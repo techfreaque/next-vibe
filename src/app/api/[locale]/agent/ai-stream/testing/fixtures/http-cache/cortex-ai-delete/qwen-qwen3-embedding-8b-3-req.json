@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: [tool:execute-tool] {\"input\":{\"to\":\"/documents/ai-test/renamed-notes.md\",\"from\":\"/documents/ai-test/notes.md\"},\"toolName\":\"cortex-move\",\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"responseTo\":\"/documents/ai-test/renamed-notes.md\",\"responseFrom\":\"/documents/ai-test/notes.md\",\"nodesAffected\":1}}\n\nAssistant: Move succeeded. 1 node affected.\n\n- Source: `/documents/ai-test/notes.md`\n- Destination: `/documents/ai-test/renamed-notes.md`\n\nVERDICT: PASS\n\nUser: Use cortex-delete to delete /documents/ai-test/ recursively. Confirm what was deleted and how many nodes were removed.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nAssistant: [tool:tool-help] {\"toolName\":\"cortex-delete\"}\n\nTool: [result:tool-help] {\"tools\":[{\"name\":\"cortex-delete\",\"title\":\"Delete\",\"titleShort\":\"Delete File\",\"description\":\"Remove a file or folder. Gone forever.\",\"id\":\"cortex-delete\",\"tags\":[\"Cortex\"],\"method\":\"DELETE\",\"category\":\"cortex\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electro\n\nAssistant: [tool:execute-tool] {\"toolName\":\"cortex-delete\",\"input\":{\"path\":\"/documents/ai-test/\",\"recursive\":true},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"responsePath\":\"/documents/ai-test\",\"nodesDeleted\":2}}",
+    "encoding_format": "float"
+  }
+}

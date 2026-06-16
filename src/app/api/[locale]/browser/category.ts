@@ -19,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "platform",
   icon: "globe",
   order: 10,
-  defaultEntry: BROWSER_NEW_PAGE_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: BROWSER_NEW_PAGE_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     Pages: {
       icon: "layout",

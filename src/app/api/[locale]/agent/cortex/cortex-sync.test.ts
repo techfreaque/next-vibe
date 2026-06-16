@@ -1,19 +1,19 @@
 /**
  * Cortex Cross-Instance Sync Integration Tests
  *
- * Tests the hash-first sync protocol between atlas (port 3000) and
+ * Tests the cursor-first sync protocol between atlas (port 3000) and
  * hermes (port 3001). Verifies:
  *
- *   1. Hash engine: computeProviderHash is deterministic + sensitive to changes
- *   2. Hash short-circuit: no payload when hashes match (one tiny request per tick)
+ *   1. Cursor engine: getCursor advances when a provider's data changes
+ *   2. Cursor short-circuit: no payload when cursors are current (tiny request per tick)
  *   3. Documents sync: write on dev, sync to hermes, verify on hermes DB
  *   4. Skills sync: create skill on dev, sync to hermes, verify on hermes DB
  *   5. Tombstone: delete on dev, sync → hermes deletes its copy
  *   6. Last-writer-wins: hermes has newer update, dev must keep hermes's version
  *   7. Behind-NAT mode: dev pulls from hermes (dev is not directly accessible)
  *   8. Direct-access mode: hermes pushes to dev (hermes IS directly accessible)
- *   9. Large cortex scalability: computeProviderHash handles 10k entries efficiently
- *  10. Per-provider isolation: documents hash change doesn't force skills resync
+ *   9. Large cortex scalability: getCursor handles 10k entries efficiently
+ *  10. Per-provider isolation: documents cursor change doesn't force skills resync
  *
  * PREREQUISITES
  * ─────────────
@@ -59,10 +59,9 @@ import { skillsSyncProvider } from "@/app/api/[locale]/agent/chat/skills/sync-pr
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
 import {
   buildSyncPayloads,
-  computeProviderHash,
-  computeSyncHashes,
+  collectCursors,
   ensureProvidersRegistered,
-  type SyncHashEntry,
+  type SyncProvider,
 } from "@/app/api/[locale]/remote-connection/sync-provider";
 import * as userSchema from "@/app/api/[locale]/user/db";
 import { cortexNodes } from "./db";
@@ -88,10 +87,13 @@ async function pollUntil<T>(
     if (result) {
       return result;
     }
-    await new Promise<void>((r) => {
-      setTimeout(r, 200);
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 200);
     });
   }
+  // Test helper: surface a clear timeout. (Not a ResponseType path — this is a
+  // vitest helper, where throwing fails the test as intended.)
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
   throw new Error(`[pollUntil] ${label}: timed out after ${timeoutMs}ms`);
 }
 
@@ -169,103 +171,22 @@ function getProdDb(): ProdDbConnection {
   };
 }
 
-// ── 1. Hash Engine Unit Tests (no network) ────────────────────────────────────
+/**
+ * Stable, comparable string of a provider's current cursor (its high-water
+ * mark). Replaces the old `computeProviderHash(getHashEntries(...))` change
+ * detector: when data changes, the cursor advances, so this string changes.
+ */
+async function providerCursorKey(
+  provider: SyncProvider,
+  userId: string,
+): Promise<string> {
+  return JSON.stringify(await provider.getCursor(userId));
+}
 
-describe("Sync hash engine (unit)", () => {
-  it("computeProviderHash: empty entries → stable non-empty hash", () => {
-    const hash = computeProviderHash([]);
-    expect(hash).toBeTruthy();
-    expect(typeof hash).toBe("string");
-    expect(hash.length).toBe(64); // sha256 hex
-  });
-
-  it("computeProviderHash: same entries → identical hash (deterministic)", () => {
-    const entries: SyncHashEntry[] = [
-      { syncId: "abc", updatedAt: new Date("2026-01-01T00:00:00Z") },
-      { syncId: "def", updatedAt: new Date("2026-01-02T00:00:00Z") },
-    ];
-    const h1 = computeProviderHash(entries);
-    const h2 = computeProviderHash(entries);
-    expect(h1).toBe(h2);
-  });
-
-  it("computeProviderHash: different order → same hash (order-independent)", () => {
-    const entries1: SyncHashEntry[] = [
-      { syncId: "abc", updatedAt: new Date("2026-01-01T00:00:00Z") },
-      { syncId: "def", updatedAt: new Date("2026-01-02T00:00:00Z") },
-    ];
-    const entries2: SyncHashEntry[] = [
-      { syncId: "def", updatedAt: new Date("2026-01-02T00:00:00Z") },
-      { syncId: "abc", updatedAt: new Date("2026-01-01T00:00:00Z") },
-    ];
-    expect(computeProviderHash(entries1)).toBe(computeProviderHash(entries2));
-  });
-
-  it("computeProviderHash: adding one entry changes the hash", () => {
-    const base: SyncHashEntry[] = [
-      { syncId: "abc", updatedAt: new Date("2026-01-01T00:00:00Z") },
-    ];
-    const extended: SyncHashEntry[] = [
-      ...base,
-      { syncId: "new", updatedAt: new Date("2026-01-03T00:00:00Z") },
-    ];
-    expect(computeProviderHash(base)).not.toBe(computeProviderHash(extended));
-  });
-
-  it("computeProviderHash: updating updatedAt for one entry changes the hash", () => {
-    const before: SyncHashEntry[] = [
-      { syncId: "abc", updatedAt: new Date("2026-01-01T00:00:00Z") },
-    ];
-    const after: SyncHashEntry[] = [
-      { syncId: "abc", updatedAt: new Date("2026-06-01T00:00:00Z") },
-    ];
-    expect(computeProviderHash(before)).not.toBe(computeProviderHash(after));
-  });
-
-  it("computeProviderHash: removing an entry changes the hash", () => {
-    const full: SyncHashEntry[] = [
-      { syncId: "abc", updatedAt: new Date("2026-01-01T00:00:00Z") },
-      { syncId: "def", updatedAt: new Date("2026-01-02T00:00:00Z") },
-    ];
-    const removed: SyncHashEntry[] = [
-      { syncId: "abc", updatedAt: new Date("2026-01-01T00:00:00Z") },
-    ];
-    expect(computeProviderHash(full)).not.toBe(computeProviderHash(removed));
-  });
-
-  it("computeProviderHash: large set (10k entries) completes in < 500ms", () => {
-    const largeEntries: SyncHashEntry[] = [...Array(10_000).keys()].map(
-      (i) => ({
-        syncId: `sync-id-${String(i).padStart(6, "0")}`,
-        updatedAt: new Date(Date.now() - i * 1000),
-      }),
-    );
-    const start = Date.now();
-    const hash = computeProviderHash(largeEntries);
-    const elapsed = Date.now() - start;
-    expect(hash).toBeTruthy();
-    expect(
-      elapsed,
-      `Hash of 10k entries took ${elapsed}ms - must be < 500ms`,
-    ).toBeLessThan(500);
-  });
-
-  it("computeProviderHash: 10k-entry hash is unique per content", () => {
-    const set1: SyncHashEntry[] = [...Array(10_000).keys()].map((i) => ({
-      syncId: `sync-${i}`,
-      updatedAt: new Date("2026-01-01T00:00:00Z"),
-    }));
-    const set2 = [...set1];
-    // Change just one entry's updatedAt
-    set2[5000] = {
-      syncId: `sync-5000`,
-      updatedAt: new Date("2026-12-01T00:00:00Z"),
-    };
-    expect(computeProviderHash(set1)).not.toBe(computeProviderHash(set2));
-  });
-});
-
-// ── 2. Hash short-circuit (unit) ─────────────────────────────────────────────
+// ── 1. Cursor short-circuit (unit) ───────────────────────────────────────────
+// Note: the legacy content-hash engine (computeProviderHash) was replaced by the
+// cursor-based protocol; per-provider change detection is now covered by the
+// cursor short-circuit tests below.
 
 describe("Sync hash short-circuit (unit)", () => {
   it(
@@ -282,23 +203,28 @@ describe("Sync hash short-circuit (unit)", () => {
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-      // Get the real current hashes
-      const { perProvider: localHashes } = await computeSyncHashes(
-        adminUser.id,
-      );
+      // First exchange: serialize from null → returns each provider's true
+      // high-water-mark cursor (derived from the served batch). Feeding THOSE
+      // cursors back is the real protocol round-trip.
+      const first = await buildSyncPayloads({}, adminUser.id, logger);
 
-      // Simulate: remote sends the SAME hashes back
+      // Second exchange: remote echoes the cursors from the first exchange.
       const { syncPayloads } = await buildSyncPayloads(
-        localHashes,
+        first.ourCursors,
         adminUser.id,
         logger,
       );
 
-      // When hashes match, no data should be transferred
-      expect(
-        Object.keys(syncPayloads).length,
-        "When hashes match, syncPayloads must be empty - no payload transferred",
-      ).toBe(0);
+      // Standard (updatedAt-gated) providers must now serve NOTHING — the
+      // returned cursor exactly excludes the served batch (no ms/µs boundary
+      // re-send). The threads provider is excluded: REMOTE-folder (mirrored)
+      // threads are owner-authoritative and re-served unconditionally by design.
+      for (const key of ["documents", "skills", "memories", "favorites"]) {
+        expect(
+          syncPayloads[key],
+          `When cursors are current, ${key} serializes an empty array`,
+        ).toBe("[]");
+      }
     },
     SYNC_TIMEOUT,
   );
@@ -315,36 +241,35 @@ describe("Sync hash short-circuit (unit)", () => {
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-      // Get real hashes
-      const { perProvider: localHashes } = await computeSyncHashes(
-        adminUser.id,
-      );
+      // Get real cursors
+      const localCursors = await collectCursors(adminUser.id);
 
-      // Simulate: remote has correct skills hash but stale documents hash
-      const fakeRemoteHashes: Record<string, string> = {
-        ...localHashes,
-        documents:
-          "0000000000000000000000000000000000000000000000000000000000000000", // deliberately wrong
+      // Simulate: remote has the current skills cursor but a stale documents
+      // cursor (epoch) → only documents has records newer than the cursor.
+      const fakeRemoteCursors = {
+        ...localCursors,
+        documents: { updatedAt: new Date(0).toISOString() },
       };
 
       const { syncPayloads } = await buildSyncPayloads(
-        fakeRemoteHashes,
+        fakeRemoteCursors,
         adminUser.id,
         logger,
       );
 
-      // Only 'documents' must be in the payload (skills hash matched → no skills data)
+      // documents must carry records (stale cursor → everything newer served).
       expect(syncPayloads).toHaveProperty("documents");
-      // skills must NOT be in the payload if its hash matched
-      if (localHashes["skills"] === fakeRemoteHashes["skills"]) {
-        expect(syncPayloads).not.toHaveProperty("skills");
-      }
+      // skills cursor matched → skills serializes an empty array (no transfer).
+      expect(
+        syncPayloads["skills"],
+        "skills cursor current → empty payload",
+      ).toBe("[]");
     },
     SYNC_TIMEOUT,
   );
 
   it(
-    "computeSyncHashes: returns perProvider record with documents + skills keys",
+    "collectCursors: returns per-provider cursors with documents + skills keys",
     async () => {
       await ensureProvidersRegistered();
 
@@ -353,13 +278,13 @@ describe("Sync hash short-circuit (unit)", () => {
         return;
       }
 
-      const { perProvider, rootHash } = await computeSyncHashes(adminUser.id);
+      const cursors = await collectCursors(adminUser.id);
 
-      expect(perProvider).toHaveProperty("documents");
-      expect(perProvider).toHaveProperty("skills");
-      expect(typeof perProvider["documents"]).toBe("string");
-      expect(typeof perProvider["skills"]).toBe("string");
-      expect(rootHash.length).toBe(64);
+      expect(cursors).toHaveProperty("documents");
+      expect(cursors).toHaveProperty("skills");
+      // Standard providers expose an updatedAt high-water mark.
+      expect(cursors["documents"]).toHaveProperty("updatedAt");
+      expect(cursors["skills"]).toHaveProperty("updatedAt");
     },
     SYNC_TIMEOUT,
   );
@@ -412,8 +337,9 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
         return;
       }
 
-      const hashBefore = computeProviderHash(
-        await documentsSyncProvider.getHashEntries(adminUser.id),
+      const cursorBefore = await providerCursorKey(
+        documentsSyncProvider,
+        adminUser.id,
       );
 
       // Insert a test node with a syncId
@@ -421,7 +347,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
         userId: adminUser.id,
         path: TEST_PATH,
         content:
-          "# Sync test\n\nThis node was created to test hash change detection.",
+          "# Sync test\n\nThis node was created to test cursor change detection.",
         size: 60,
         nodeType: "enums.nodeType.file",
         syncId: TEST_SYNC_ID,
@@ -429,26 +355,29 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
         tags: [],
       });
 
-      const hashAfter = computeProviderHash(
-        await documentsSyncProvider.getHashEntries(adminUser.id),
+      const cursorAfter = await providerCursorKey(
+        documentsSyncProvider,
+        adminUser.id,
       );
 
-      expect(hashBefore, "SU1: hash must change after node insertion").not.toBe(
-        hashAfter,
-      );
+      expect(
+        cursorBefore,
+        "SU1: cursor must advance after node insertion",
+      ).not.toBe(cursorAfter);
     },
     SYNC_TIMEOUT,
   );
 
   it(
-    "SU2: serializeToJson includes the inserted node",
+    "SU2: serializeFromCursor includes the inserted node",
     async () => {
       if (!adminUser) {
         return;
       }
 
-      const json = await documentsSyncProvider.serializeToJson(
+      const { json } = await documentsSyncProvider.serializeFromCursor(
         adminUser.id,
+        null,
         logger,
       );
       const parsed = JSON.parse(json) as Array<{
@@ -524,34 +453,39 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
   );
 
   it(
-    "SU4: hash of fakeProdUserId is empty (no nodes) - proves per-user isolation",
+    "SU4: cursor of fakeProdUserId is the epoch (no nodes) - per-user isolation",
     async () => {
       if (!adminUser) {
         return;
       }
 
       const fakeProdUserId = "00000000-0000-4001-ffff-000000000088";
-      const entries =
-        await documentsSyncProvider.getHashEntries(fakeProdUserId);
-      expect(entries.length, "SU4: new user must have no sync entries").toBe(0);
+      const { json } = await documentsSyncProvider.serializeFromCursor(
+        fakeProdUserId,
+        null,
+        logger,
+      );
+      expect(json, "SU4: new user must have no sync records").toBe("[]");
 
-      // Consistent hash for empty state
-      const h1 = computeProviderHash(entries);
-      const h2 = computeProviderHash([]);
-      expect(h1, "SU4: empty state must produce consistent hash").toBe(h2);
+      // A user with no nodes has the epoch high-water mark.
+      const cursor = await documentsSyncProvider.getCursor(fakeProdUserId);
+      expect(cursor, "SU4: empty state cursor is the epoch updatedAt").toEqual({
+        updatedAt: new Date(0).toISOString(),
+      });
     },
     SYNC_TIMEOUT,
   );
 
   it(
-    "SU5: updating a node's content changes its updatedAt → hash changes",
+    "SU5: updating a node's content advances its cursor (updatedAt)",
     async () => {
       if (!adminUser) {
         return;
       }
 
-      const hashBefore = computeProviderHash(
-        await documentsSyncProvider.getHashEntries(adminUser.id),
+      const cursorBefore = await providerCursorKey(
+        documentsSyncProvider,
+        adminUser.id,
       );
 
       // Touch the node (update its updatedAt)
@@ -568,28 +502,37 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
           ),
         );
 
-      const hashAfter = computeProviderHash(
-        await documentsSyncProvider.getHashEntries(adminUser.id),
+      const cursorAfter = await providerCursorKey(
+        documentsSyncProvider,
+        adminUser.id,
       );
 
       expect(
-        hashBefore,
-        "SU5: hash must change after updatedAt change",
-      ).not.toBe(hashAfter);
+        cursorBefore,
+        "SU5: cursor must advance after updatedAt change",
+      ).not.toBe(cursorAfter);
     },
     SYNC_TIMEOUT,
   );
 
   it(
-    "SU6: deleting a node changes the hash",
+    "SU6: deleting a node advances the cursor",
     async () => {
       if (!adminUser) {
         return;
       }
 
-      const hashBefore = computeProviderHash(
-        await documentsSyncProvider.getHashEntries(adminUser.id),
-      );
+      // Before: the node is part of the serialized payload.
+      const { json: jsonBefore } =
+        await documentsSyncProvider.serializeFromCursor(
+          adminUser.id,
+          null,
+          logger,
+        );
+      expect(
+        jsonBefore.includes(TEST_SYNC_ID),
+        "SU6: node must be served before deletion",
+      ).toBe(true);
 
       await db
         .delete(cortexNodes)
@@ -600,13 +543,19 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
           ),
         );
 
-      const hashAfter = computeProviderHash(
-        await documentsSyncProvider.getHashEntries(adminUser.id),
-      );
-
-      expect(hashBefore, "SU6: hash must change after node deletion").not.toBe(
-        hashAfter,
-      );
+      // After hard delete: the node is no longer served. (Cross-instance delete
+      // uses isDeleted tombstones — covered by SU7 — but a local hard delete
+      // simply drops the row from the payload.)
+      const { json: jsonAfter } =
+        await documentsSyncProvider.serializeFromCursor(
+          adminUser.id,
+          null,
+          logger,
+        );
+      expect(
+        jsonAfter.includes(TEST_SYNC_ID),
+        "SU6: node must NOT be served after deletion",
+      ).toBe(false);
     },
     SYNC_TIMEOUT,
   );
@@ -774,17 +723,16 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
   }, SYNC_TIMEOUT);
 
   it(
-    "SK1: skillsSyncProvider.getHashEntries returns stable hash",
+    "SK1: skillsSyncProvider.getCursor returns a stable cursor",
     async () => {
       if (!adminUser) {
         return;
       }
 
-      const entries = await skillsSyncProvider.getHashEntries(adminUser.id);
-      const h1 = computeProviderHash(entries);
-      const h2 = computeProviderHash(entries);
-      expect(h1, "SK1: skill hash must be deterministic").toBe(h2);
-      expect(typeof h1).toBe("string");
+      const c1 = await providerCursorKey(skillsSyncProvider, adminUser.id);
+      const c2 = await providerCursorKey(skillsSyncProvider, adminUser.id);
+      expect(c1, "SK1: skill cursor must be deterministic").toBe(c2);
+      expect(typeof c1).toBe("string");
     },
     SYNC_TIMEOUT,
   );
@@ -794,14 +742,15 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
   });
 
   it(
-    "SK3: skillsSyncProvider.serializeToJson returns valid JSON array",
+    "SK3: skillsSyncProvider.serializeFromCursor returns valid JSON array",
     async () => {
       if (!adminUser) {
         return;
       }
 
-      const json = await skillsSyncProvider.serializeToJson(
+      const { json } = await skillsSyncProvider.serializeFromCursor(
         adminUser.id,
+        null,
         logger,
       );
       expect(() => JSON.parse(json)).not.toThrow();
@@ -821,8 +770,9 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
         return;
       }
 
-      const json = await skillsSyncProvider.serializeToJson(
+      const { json } = await skillsSyncProvider.serializeFromCursor(
         adminUser.id,
+        null,
         logger,
       );
       const parsed = JSON.parse(json) as Array<{
@@ -846,14 +796,15 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
   );
 
   it(
-    "SK5: per-provider isolation - documents change does NOT affect skills hash",
+    "SK5: per-provider isolation - documents change does NOT affect skills cursor",
     async () => {
       if (!adminUser) {
         return;
       }
 
-      const skillHashBefore = computeProviderHash(
-        await skillsSyncProvider.getHashEntries(adminUser.id),
+      const skillCursorBefore = await providerCursorKey(
+        skillsSyncProvider,
+        adminUser.id,
       );
 
       // Touch a documents node (simulate a write)
@@ -869,15 +820,16 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
         tags: [],
       });
 
-      const skillHashAfter = computeProviderHash(
-        await skillsSyncProvider.getHashEntries(adminUser.id),
+      const skillCursorAfter = await providerCursorKey(
+        skillsSyncProvider,
+        adminUser.id,
       );
 
-      // Skills hash must be unchanged
+      // Skills cursor must be unchanged
       expect(
-        skillHashBefore,
-        "SK5: documents change must NOT change skills hash",
-      ).toBe(skillHashAfter);
+        skillCursorBefore,
+        "SK5: documents change must NOT change skills cursor",
+      ).toBe(skillCursorAfter);
 
       // Cleanup
       await db
@@ -1069,22 +1021,22 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
       }
 
       // Trigger pull again (nothing changed since SL1)
-      // The hash should match → zero payload bytes transferred
-      const { perProvider: hashBefore } = await computeSyncHashes(devUser.id);
+      // The cursors should match → zero payload bytes transferred
+      const cursorsBefore = await collectCursors(devUser.id);
 
       await triggerHermesPull(prodAdminToken);
 
-      const { perProvider: hashAfter } = await computeSyncHashes(devUser.id);
+      const cursorsAfter = await collectCursors(devUser.id);
 
-      // Dev-side hashes must be identical (nothing was written locally)
+      // Dev-side cursors must be identical (nothing was written locally)
       expect(
-        hashBefore["documents"],
-        "SL2: dev documents hash must be stable when nothing changed",
-      ).toBe(hashAfter["documents"]);
+        JSON.stringify(cursorsBefore["documents"]),
+        "SL2: dev documents cursor must be stable when nothing changed",
+      ).toBe(JSON.stringify(cursorsAfter["documents"]));
       expect(
-        hashBefore["skills"],
-        "SL2: dev skills hash must be stable when nothing changed",
-      ).toBe(hashAfter["skills"]);
+        JSON.stringify(cursorsBefore["skills"]),
+        "SL2: dev skills cursor must be stable when nothing changed",
+      ).toBe(JSON.stringify(cursorsAfter["skills"]));
     },
     SYNC_TIMEOUT,
   );
@@ -1184,7 +1136,7 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
           const r = await prodDb.execute<{ path: string }>(
             sql`SELECT path FROM cortex_nodes WHERE user_id = ${prodUserId} AND sync_id = ${TEST_SYNC_ID} AND (is_deleted IS NULL OR is_deleted = false) LIMIT 1`,
           );
-          return r.rows.length === 0 ? true : false;
+          return r.rows.length === 0;
         },
       );
 
@@ -1405,7 +1357,7 @@ describe("Sync: scalability and efficiency", () => {
   }, SYNC_TIMEOUT);
 
   it(
-    "SC1: getHashEntries for 1000+ nodes completes in < 2s",
+    "SC1: getCursor for 1000+ nodes completes in < 2s",
     async () => {
       if (!adminUser) {
         return;
@@ -1426,7 +1378,7 @@ describe("Sync: scalability and efficiency", () => {
       await db.insert(cortexNodes).values(batchNodes);
 
       const start = Date.now();
-      const entries = await documentsSyncProvider.getHashEntries(adminUser.id);
+      const cursor = await documentsSyncProvider.getCursor(adminUser.id);
       const elapsed = Date.now() - start;
 
       // Cleanup
@@ -1439,50 +1391,48 @@ describe("Sync: scalability and efficiency", () => {
           ),
         );
 
-      expect(entries.length, "SC1: must have returned entries").toBeGreaterThan(
-        0,
-      );
+      expect(cursor, "SC1: must return a cursor").toBeTruthy();
       expect(
         elapsed,
-        `SC1: getHashEntries took ${elapsed}ms - must be < 2000ms`,
+        `SC1: getCursor took ${elapsed}ms - must be < 2000ms`,
       ).toBeLessThan(2000);
     },
     SYNC_TIMEOUT,
   );
 
   it(
-    "SC2: computeSyncHashes runs both providers in parallel (no sequential bottleneck)",
+    "SC2: collectCursors runs both providers in parallel (no sequential bottleneck)",
     async () => {
       if (!adminUser) {
         return;
       }
 
       const start = Date.now();
-      const { perProvider } = await computeSyncHashes(adminUser.id);
+      const cursors = await collectCursors(adminUser.id);
       const elapsed = Date.now() - start;
 
-      expect(perProvider).toHaveProperty("documents");
-      expect(perProvider).toHaveProperty("skills");
+      expect(cursors).toHaveProperty("documents");
+      expect(cursors).toHaveProperty("skills");
 
       // If they ran sequentially, this would take ~2x the individual time.
       // In practice: < 500ms for realistic data sizes.
       expect(
         elapsed,
-        `SC2: computeSyncHashes took ${elapsed}ms - targeting < 3000ms`,
+        `SC2: collectCursors took ${elapsed}ms - targeting < 3000ms`,
       ).toBeLessThan(3000);
     },
     SYNC_TIMEOUT,
   );
 
   it(
-    "SC3: per-provider hash changes are independent (only changed provider triggers payload)",
+    "SC3: per-provider cursor changes are independent (only changed provider transfers data)",
     async () => {
       if (!adminUser) {
         return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-      const { perProvider: initial } = await computeSyncHashes(adminUser.id);
+      const initial = await collectCursors(adminUser.id);
 
       // Add a documents node
       const tempPath = `/documents/sync-isolation-check/node.md`;
@@ -1497,25 +1447,29 @@ describe("Sync: scalability and efficiency", () => {
         tags: [],
       });
 
-      const { perProvider: after } = await computeSyncHashes(adminUser.id);
+      const after = await collectCursors(adminUser.id);
 
-      // Documents hash must change, skills hash must NOT change
+      // Documents cursor must advance, skills cursor must NOT change
       expect(
-        initial["documents"],
-        "SC3: documents hash must change after insert",
-      ).not.toBe(after["documents"]);
-      expect(initial["skills"], "SC3: skills hash must be unchanged").toBe(
-        after["skills"],
-      );
+        JSON.stringify(initial["documents"]),
+        "SC3: documents cursor must advance after insert",
+      ).not.toBe(JSON.stringify(after["documents"]));
+      expect(
+        JSON.stringify(initial["skills"]),
+        "SC3: skills cursor must be unchanged",
+      ).toBe(JSON.stringify(after["skills"]));
 
-      // Build payloads using the OLD documents hash (simulate remote has stale docs hash)
+      // Build payloads with the OLD documents cursor (remote is behind on docs)
+      // but the CURRENT skills cursor → only documents carries records.
       const { syncPayloads } = await buildSyncPayloads(
         { documents: initial["documents"]!, skills: after["skills"]! },
         adminUser.id,
         logger,
       );
-      expect(syncPayloads).toHaveProperty("documents");
-      expect(syncPayloads).not.toHaveProperty("skills");
+      // documents has a newer record than the stale cursor → non-empty payload.
+      expect(syncPayloads["documents"]).not.toBe("[]");
+      // skills cursor current → empty payload (no transfer).
+      expect(syncPayloads["skills"], "SC3: skills must be empty").toBe("[]");
 
       // Cleanup
       await db

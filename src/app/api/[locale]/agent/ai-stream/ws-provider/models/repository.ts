@@ -9,6 +9,7 @@ import { chatModelOptions } from "@/app/api/[locale]/agent/ai-stream/models";
 import { imageGenModelOptions } from "@/app/api/[locale]/agent/image-generation/models";
 import { getModelPrice } from "@/app/api/[locale]/agent/models/all-models";
 import {
+  ApiProvider,
   isModelProviderAvailable,
   type AnyModelOption,
   modelProviders,

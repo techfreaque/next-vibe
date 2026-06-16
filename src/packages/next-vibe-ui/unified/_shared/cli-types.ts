@@ -21,10 +21,6 @@ import type {
   FieldUsageConfig,
 } from "./types";
 
-// Re-export for convenience
-// Re-export for convenience
-export type { FieldUsageConfig };
-
 /**
  * Ink form state management (simplified version of UseFormReturn)
  * Unlike React Hook Form which uses Path<T> branded types, this accepts plain strings

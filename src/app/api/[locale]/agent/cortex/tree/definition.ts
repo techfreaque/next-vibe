@@ -33,8 +33,13 @@ const { GET } = createEndpoint({
   path: ["agent", "cortex", "tree"],
   aliases: [CORTEX_TREE_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-
+  defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  cli: {
+    firstCliArgKey: "path",
+  },
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "folder-tree",
   dynamicTitle: ({ request }) => {
@@ -57,8 +62,7 @@ const { GET } = createEndpoint({
       color: "bg-green-500/10 text-green-500",
     },
   },
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "cortex",
   tags: ["get.tags.cortex" as const],
   defaultExpanded: true,
 

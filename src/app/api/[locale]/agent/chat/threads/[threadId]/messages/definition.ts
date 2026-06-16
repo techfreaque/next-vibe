@@ -37,6 +37,7 @@ import {
   finishIncognitoThreadIfIncognito,
 } from "@/app/api/[locale]/agent/chat/incognito/event-persist";
 
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 import { scopedTranslation } from "./i18n";
 import { THREAD_MESSAGES_ALIAS } from "./constants";
 import threadsDefinitions from "../../definition";
@@ -243,10 +244,11 @@ const { GET } = createEndpoint({
       },
       operation: "merge" as const,
       onEvent: async (ctx) => {
-        if (typeof window !== "undefined") {
-          const url = new URL(window.location.href);
+        const currentHref = getCurrentUrl();
+        if (currentHref) {
+          const url = new URL(currentHref);
           url.searchParams.delete("message");
-          window.history.replaceState(null, "", url.toString());
+          silentReplaceState(url.toString());
         }
         const rootFolderId =
           typeof ctx.requestData["rootFolderId"] === "string"
@@ -492,7 +494,9 @@ const { GET } = createEndpoint({
       // === URL PARAMS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "get.threadId.label" as const,
         description: "get.threadId.description" as const,
         schema: z.uuid(),
@@ -742,6 +746,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "message-circle",
   category: "ai",
@@ -797,7 +802,9 @@ const { POST } = createEndpoint({
       // === URL PARAMS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "post.threadId.label" as const,
         schema: z.uuid(),
       }),
@@ -937,6 +944,3 @@ export type MessageCreateResponseOutput = typeof POST.types.ResponseOutput;
  * Export definitions
  */
 export default { GET, POST } as const;
-import threadsDefinitions from "../../definition";
-import threadsDefinitions from "../../definition";
-import threadsDefinitions from "../../definition";

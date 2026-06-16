@@ -352,6 +352,7 @@ export async function runHeadlessAiStream(
     if (favoriteId) {
       const userId = "id" in user ? (user.id as string) : undefined;
       if (userId) {
+    compactTriggerOverride,
         const resolved = await resolveFavorite(
           favoriteId,
           userId,
@@ -624,6 +625,7 @@ export async function runHeadlessAiStream(
       mediaModelOverrides,
       providerOverride,
       parentAbortSignal,
+      compactTriggerOverride,
     });
 
     if (!result.success) {

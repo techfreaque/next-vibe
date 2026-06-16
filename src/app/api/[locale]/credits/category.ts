@@ -18,7 +18,11 @@ export const category: CategoryDefinition = {
   group: "business",
   icon: "coins",
   order: 15,
-  defaultEntry: CREDITS_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: CREDITS_ALIAS,
+    [UserPermissionRole.CUSTOMER]: CREDITS_ALIAS,
+    [UserPermissionRole.PUBLIC]: CREDITS_ALIAS,
+  },
   subcategories: {
     Credits: {
       icon: "coins",

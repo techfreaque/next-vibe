@@ -19,14 +19,6 @@ import type { Skill } from "../../config";
 import { tool } from "../../config";
 
 import {
-  AUDIO_VISION,
-  IMAGE_GEN,
-  MUSIC_GEN,
-  STT,
-  VIDEO_GEN,
-  VOICE,
-} from "../_shared/media-presets";
-import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
@@ -35,6 +27,14 @@ import {
   SkillCategory,
   SkillOwnershipType,
 } from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
 
 /**
  * The vibe-coder systemPrompt is the SINGLE SOURCE OF TRUTH for project instructions.

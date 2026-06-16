@@ -1,307 +1,510 @@
 /**
- * cortexFragment / memory section rendering unit tests
+ * Unit tests for the cortex system-prompt rendering functions.
+ *
+ * Pure functions only - no DB, no async, deterministic.
  *
  * Covers:
- * - Empty workspace message
- * - Sort order (pinned first, then relevant by score)
- * - Pinned files always present (📌 marker), never trimmed
- * - Equal-trim for unpinned files
- * - Grouping by /memories/<subfolder>/
- * - buildThreadsSection budget cap
- * - buildTasksSection rendering
+ * - cleanExcerpt: frontmatter stripping, heading stripping, newline/whitespace
+ *   collapse, trimming, empty input.
+ * - renderCortexTree: empty workspace, files + dirs, nesting, pin/score/badge
+ *   markers, hidden counts, extra leaf lines (uploads/searches/gens).
+ * - cortexFragment.build: unavailable note, empty-workspace notice, language
+ *   note, embedded tree, identity/metadata.
  */
 
 import { describe, expect, it } from "vitest";
 
 import {
-  budgetToChars,
+  cleanExcerpt,
   cortexFragment,
-  DEFAULT_CORTEX_BUDGET,
+  renderCortexTree,
   type CortexData,
-  type CortexMemory,
-  type CortexRelevantNode,
-  type MountContent,
-  type TrimmedDirNode,
+  type CortexDirEntry,
+  type CortexFileEntry,
 } from "./prompt";
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Factory helpers (typed against the real current types) ────────────────────
 
-function makeMemory(
-  partial: Partial<CortexMemory> & { path: string },
-): CortexMemory {
+function makeFile(
+  partial: Partial<CortexFileEntry> & { path: string; displayName: string },
+): CortexFileEntry {
   return {
-    content: "Some content here.",
-    priority: 0,
-    tags: [],
-    createdAt: "2026-01-01T00:00:00Z",
+    kind: "file",
+    excerpt: "",
     ...partial,
   };
 }
 
-function makeMountContent(partial?: Partial<MountContent>): MountContent {
+function makeDir(
+  partial: Partial<CortexDirEntry> & { path: string; displayName: string },
+): CortexDirEntry {
   return {
-    pinned: [],
-    relevant: [],
-    recent: [],
+    kind: "dir",
     totalCount: 0,
+    children: [],
+    hiddenCount: 0,
     ...partial,
   };
 }
 
-function makeData(partial: Partial<CortexData>): CortexData {
+function makeData(partial?: Partial<CortexData>): CortexData {
   return {
+    unavailableNote: "",
+    tree: [],
     threadCounts: {},
     totalThreads: 0,
     uploadCount: 0,
     searchCount: 0,
+    genCount: 0,
     taskCount: 0,
-    memories: makeMountContent(),
-    documents: { ...makeMountContent(), trimmedDirs: [] as TrimmedDirNode[] },
-    threads: { relevant: [], totalCount: 0 },
-    skills: makeMountContent(),
-    tasks: { items: [], totalCount: 0 },
     ...partial,
   };
 }
 
-function buildFragment(partial: Partial<CortexData>): string {
-  return cortexFragment.build(makeData(partial));
+function buildFragment(partial?: Partial<CortexData>): string {
+  const result = cortexFragment.build(makeData(partial));
+  // build never returns null for CortexData, but the type allows it.
+  return result ?? "";
 }
 
-// ── Empty workspace ───────────────────────────────────────────────────────────
+// ── cleanExcerpt ──────────────────────────────────────────────────────────────
 
-describe("empty workspace", () => {
-  it("shows empty workspace notice when nothing exists", () => {
-    const result = buildFragment({});
-    expect(result).toContain("Empty workspace");
+describe("cleanExcerpt", () => {
+  it("returns plain text untouched (trimmed)", () => {
+    expect(cleanExcerpt("Hello world")).toBe("Hello world");
   });
 
-  it("does not show empty notice when memories exist", () => {
-    const pinned = [makeMemory({ path: "/memories/identity/name.md" })];
-    const result = buildFragment({
-      memories: makeMountContent({ totalCount: 1, pinned }),
-    });
-    expect(result).not.toContain("Empty workspace");
+  it("returns empty string for empty input", () => {
+    expect(cleanExcerpt("")).toBe("");
+  });
+
+  it("trims surrounding whitespace", () => {
+    expect(cleanExcerpt("  padded text  ")).toBe("padded text");
+  });
+
+  it("strips YAML frontmatter", () => {
+    const input = "---\ntitle: Foo\npinned: true\n---\nActual body text";
+    expect(cleanExcerpt(input)).toBe("Actual body text");
+  });
+
+  it("strips a leading markdown heading", () => {
+    const input = "# My Heading\nBody after heading";
+    expect(cleanExcerpt(input)).toBe("Body after heading");
+  });
+
+  it("strips multi-level leading heading (###)", () => {
+    expect(cleanExcerpt("### Deep heading\nbody")).toBe("body");
+  });
+
+  it("collapses internal newlines into ' · ' separators", () => {
+    expect(cleanExcerpt("line one\nline two\nline three")).toBe(
+      "line one · line two · line three",
+    );
+  });
+
+  it("collapses repeated blank lines into a single separator", () => {
+    expect(cleanExcerpt("first\n\n\nsecond")).toBe("first · second");
+  });
+
+  it("collapses runs of whitespace into single spaces", () => {
+    expect(cleanExcerpt("too     many    spaces")).toBe("too many spaces");
+  });
+
+  it("strips frontmatter and heading together", () => {
+    const input = "---\ntitle: X\n---\n# Title\nThe content body here";
+    expect(cleanExcerpt(input)).toBe("The content body here");
+  });
+
+  it("does not strip a heading that is not at the start", () => {
+    // After frontmatter strip the body begins with 'Intro', so the '#' line
+    // in the middle is not a leading heading and survives (joined by ' · ').
+    const input = "Intro line\n# Not leading\nmore";
+    expect(cleanExcerpt(input)).toBe("Intro line · # Not leading · more");
+  });
+
+  it("handles content that is only frontmatter (empty body)", () => {
+    expect(cleanExcerpt("---\ntitle: only\n---\n")).toBe("");
   });
 });
 
-// ── Memory sort order ─────────────────────────────────────────────────────────
+// ── renderCortexTree: empty / leaf cases ──────────────────────────────────────
 
-describe("memory sort order", () => {
-  it("pinned memories appear before relevant", () => {
-    const pinned = [
-      makeMemory({ path: "/memories/identity/pinned.md", pinned: true }),
-    ];
-    const relevant: CortexRelevantNode[] = [
-      {
-        path: "/memories/identity/relevant.md",
-        excerpt: "Relevant content",
-        score: 0.95,
-      },
-    ];
-    const result = buildFragment({
-      memories: makeMountContent({ totalCount: 2, pinned, relevant }),
-    });
-    const memoriesSection = result.slice(result.indexOf("/memories"));
-    const pinnedPos = memoriesSection.indexOf("pinned.md");
-    const relevantPos = memoriesSection.indexOf("relevant.md");
-    expect(pinnedPos).toBeLessThan(relevantPos);
+describe("renderCortexTree - empty and leaf cases", () => {
+  it("renders only the root line for a completely empty workspace", () => {
+    expect(renderCortexTree(makeData())).toBe("/ (cortex)");
   });
 
-  it("higher score relevant appears before lower", () => {
-    const relevant: CortexRelevantNode[] = [
-      { path: "/memories/identity/low.md", excerpt: "Low score", score: 0.3 },
-      { path: "/memories/identity/high.md", excerpt: "High score", score: 0.9 },
-    ];
-    const result = buildFragment({
-      memories: makeMountContent({ totalCount: 2, relevant }),
-    });
-    const memoriesSection = result.slice(result.indexOf("/memories"));
-    // relevant is rendered in provided order - caller sorts by score desc
-    const highPos = memoriesSection.indexOf("high.md");
-    const lowPos = memoriesSection.indexOf("low.md");
-    // The relevant array is rendered in insertion order;
-    // low appears first because it's at index 0
-    expect(lowPos).toBeLessThan(highPos);
-  });
-});
-
-// ── Pinned memory marker ──────────────────────────────────────────────────────
-
-describe("pinned memory marker", () => {
-  it("pinned memory gets 📌 marker in output", () => {
-    const pinned = [
-      makeMemory({ path: "/memories/identity/critical.md", pinned: true }),
-    ];
-    const result = buildFragment({
-      memories: makeMountContent({ totalCount: 1, pinned }),
-    });
-    expect(result).toContain("📌");
-  });
-
-  it("recent memory does not get 📌 marker", () => {
-    const recent = [makeMemory({ path: "/memories/identity/normal.md" })];
-    const result = buildFragment({
-      memories: makeMountContent({ totalCount: 1, recent }),
-    });
-    expect(result).not.toContain("📌");
-  });
-
-  it("pinned memory content is not truncated even with tiny budget", () => {
-    const longContent = "A".repeat(500);
-    const pinned = [
-      makeMemory({
-        path: "/memories/identity/pinned.md",
-        content: longContent,
-        pinned: true,
-      }),
-    ];
-    // Use tiny budget - pinned should still show full content
+  it("omits dirs with zero totalCount and no children", () => {
     const data = makeData({
-      memories: makeMountContent({ totalCount: 1, pinned }),
+      tree: [makeDir({ path: "/memories", displayName: "memories/" })],
     });
-    data.budget = { ...DEFAULT_CORTEX_BUDGET, memories: 1 }; // 4 chars budget
-    const result = cortexFragment.build(data);
-    expect(result).toContain(longContent);
+    expect(renderCortexTree(data)).toBe("/ (cortex)");
   });
-});
 
-// ── Equal trim for unpinned ───────────────────────────────────────────────────
-
-describe("equal trim for unpinned memories", () => {
-  it("recent memories are truncated when over budget", () => {
-    const bigContent = "B".repeat(5000);
-    const recent = Array.from({ length: 20 }, (_, i) =>
-      makeMemory({
-        path: `/memories/identity/big${String(i)}.md`,
-        content: bigContent,
-      }),
+  it("appends uploads/searches/gens leaf lines at root", () => {
+    const data = makeData({ uploadCount: 3, searchCount: 2, genCount: 1 });
+    const out = renderCortexTree(data);
+    expect(out).toBe(
+      [
+        "/ (cortex)",
+        "├── /uploads/ (3 - images, documents, audio, video)",
+        "├── /searches/ (2 - by month)",
+        "└── /gens/ (1 - images, audio, video)",
+      ].join("\n"),
     );
-    const result = buildFragment({
-      memories: makeMountContent({ totalCount: 20, recent }),
-    });
-    // Content should be truncated (… ellipsis)
-    expect(result).toContain("…");
   });
 
-  it("small memories fit within budget without truncation", () => {
-    const smallContent = "Small content.";
-    const recent: CortexMemory[] = [
-      makeMemory({ path: "/memories/identity/a.md", content: smallContent }),
-      makeMemory({ path: "/memories/identity/b.md", content: smallContent }),
-    ];
-    const result = buildFragment({
-      memories: makeMountContent({ totalCount: 2, recent }),
-    });
-    // Both contents should appear
-    expect(result.split(smallContent).length - 1).toBe(2);
-  });
-});
-
-// ── Threads section ───────────────────────────────────────────────────���───────
-
-describe("threads section", () => {
-  it("is empty when totalThreads is 0", () => {
-    const result = buildFragment({ totalThreads: 0 });
-    // The footer always mentions /threads/ - check for the section header format
-    expect(result).not.toMatch(/\/threads\/\s*\(\d+/);
-  });
-
-  it("shows thread header with counts", () => {
-    const result = buildFragment({
-      totalThreads: 5,
-      threadCounts: { private: 3, shared: 2 },
-      threads: { relevant: [], totalCount: 5 },
-    });
-    expect(result).toContain("/threads/");
-    expect(result).toContain("private: 3");
-  });
-
-  it("shows relevant thread chunks when provided", () => {
-    const relevant: CortexRelevantNode[] = [
-      {
-        path: "/threads/private/2026-04-23-planning.md",
-        excerpt: "We discussed the cortex spec improvements",
-        score: 0.92,
-      },
-    ];
-    const result = buildFragment({
-      totalThreads: 1,
-      threadCounts: { private: 1 },
-      threads: { relevant, totalCount: 1 },
-    });
-    expect(result).toContain("cortex spec improvements");
-    expect(result).toContain("92%");
-  });
-
-  it("caps thread excerpts at budget", () => {
-    const longExcerpt = "X".repeat(300);
-    const relevant: CortexRelevantNode[] = [
-      {
-        path: "/threads/private/test.md",
-        excerpt: longExcerpt,
-        score: 0.8,
-      },
-    ];
-    const result = buildFragment({
-      totalThreads: 1,
-      threadCounts: { private: 1 },
-      threads: { relevant, totalCount: 1 },
-    });
-    // Should be truncated with ellipsis
-    expect(result).toContain("…");
-    // Should not contain the full 300-char string
-    expect(result).not.toContain(longExcerpt);
-  });
-});
-
-// ── Tasks section ─────────────────────────────────────────────────────────────
-
-describe("tasks section", () => {
-  it("is empty when taskCount is 0", () => {
-    const result = buildFragment({ taskCount: 0 });
-    expect(result).not.toContain("/tasks/");
-  });
-
-  it("shows summary when taskCount > 0 but no task items", () => {
-    const result = buildFragment({
-      taskCount: 3,
-      tasks: { items: [], totalCount: 3 },
-    });
-    expect(result).toContain("/tasks/ (3");
-  });
-
-  it("renders task items with name and schedule", () => {
-    const items = [{ name: "dreamer", schedule: "0 3 * * *", enabled: true }];
-    const result = buildFragment({
-      taskCount: 1,
-      tasks: { items, totalCount: 1 },
-    });
-    expect(result).toContain("/tasks/ (1");
-    expect(result).toContain("dreamer");
-  });
-
-  it("shows hidden count when taskCount exceeds items length", () => {
-    const items = [{ name: "dreamer", schedule: "0 3 * * *", enabled: true }];
-    const result = buildFragment({
-      taskCount: 5,
-      tasks: { items, totalCount: 5 },
-    });
-    expect(result).toContain("+4 more");
-  });
-});
-
-// ── Budget utility ───────────────────────────────────────────────────────────
-
-describe("budgetToChars", () => {
-  it("converts tokens to chars at 4x rate", () => {
-    expect(budgetToChars(100)).toBe(400);
-    expect(budgetToChars(0)).toBe(0);
-  });
-
-  it("default budget memories converts correctly", () => {
-    expect(budgetToChars(DEFAULT_CORTEX_BUDGET.memories)).toBe(
-      DEFAULT_CORTEX_BUDGET.memories * 4,
+  it("omits a leaf line whose count is zero", () => {
+    const out = renderCortexTree(makeData({ uploadCount: 5 }));
+    expect(out).toBe(
+      "/ (cortex)\n└── /uploads/ (5 - images, documents, audio, video)",
     );
+    expect(out).not.toContain("/searches/");
+    expect(out).not.toContain("/gens/");
+  });
+});
+
+// ── renderCortexTree: dirs + files ────────────────────────────────────────────
+
+describe("renderCortexTree - dirs and files", () => {
+  it("renders a dir header with its totalCount and a single file child", () => {
+    const file = makeFile({
+      path: "/memories/identity/name.md",
+      displayName: "name.md",
+      excerpt: "User is called Max",
+    });
+    const dir = makeDir({
+      path: "/memories",
+      displayName: "memories/",
+      totalCount: 1,
+      children: [file],
+    });
+    const out = renderCortexTree(makeData({ tree: [dir] }));
+    expect(out).toBe(
+      [
+        "/ (cortex)",
+        "└── memories/ (1)",
+        "    └── name.md",
+        "        User is called Max",
+      ].join("\n"),
+    );
+  });
+
+  it("renders a file with no excerpt on a single line", () => {
+    const file = makeFile({
+      path: "/memories/a.md",
+      displayName: "a.md",
+    });
+    const dir = makeDir({
+      path: "/memories",
+      displayName: "memories/",
+      totalCount: 1,
+      children: [file],
+    });
+    const out = renderCortexTree(makeData({ tree: [dir] }));
+    expect(out).toBe("/ (cortex)\n└── memories/ (1)\n    └── a.md");
+  });
+
+  it("uses countNote in place of totalCount when present", () => {
+    const dir = makeDir({
+      path: "/threads",
+      displayName: "threads/",
+      totalCount: 48,
+      countNote: "48 · 4 archived",
+      children: [],
+    });
+    const out = renderCortexTree(makeData({ tree: [dir] }));
+    expect(out).toContain("threads/ (48 · 4 archived)");
+  });
+
+  it("renders multiple dirs with branch then last connectors", () => {
+    const memDir = makeDir({
+      path: "/memories",
+      displayName: "memories/",
+      totalCount: 1,
+      children: [makeFile({ path: "/memories/a.md", displayName: "a.md" })],
+    });
+    const docDir = makeDir({
+      path: "/documents",
+      displayName: "documents/",
+      totalCount: 1,
+      children: [makeFile({ path: "/documents/b.md", displayName: "b.md" })],
+    });
+    const out = renderCortexTree(makeData({ tree: [memDir, docDir] }));
+    expect(out).toBe(
+      [
+        "/ (cortex)",
+        "├── memories/ (1)",
+        "│   └── a.md",
+        "└── documents/ (1)",
+        "    └── b.md",
+      ].join("\n"),
+    );
+  });
+
+  it("renders +N more when a dir hides children", () => {
+    const dir = makeDir({
+      path: "/memories",
+      displayName: "memories/",
+      totalCount: 5,
+      children: [makeFile({ path: "/memories/a.md", displayName: "a.md" })],
+      hiddenCount: 4,
+    });
+    const out = renderCortexTree(makeData({ tree: [dir] }));
+    expect(out).toBe(
+      [
+        "/ (cortex)",
+        "└── memories/ (5)",
+        "    ├── a.md",
+        "    └── +4 more",
+      ].join("\n"),
+    );
+  });
+
+  it("renders a pinned file with the 📌 marker and no score", () => {
+    const file = makeFile({
+      path: "/memories/critical.md",
+      displayName: "critical.md",
+      pinned: true,
+      score: 0.99,
+    });
+    const dir = makeDir({
+      path: "/memories",
+      displayName: "memories/",
+      totalCount: 1,
+      children: [file],
+    });
+    const out = renderCortexTree(makeData({ tree: [dir] }));
+    expect(out).toContain("[📌] critical.md");
+    // pinned suppresses the score badge
+    expect(out).not.toContain("%");
+  });
+
+  it("renders a score percentage for unpinned scored files", () => {
+    const file = makeFile({
+      path: "/memories/relevant.md",
+      displayName: "relevant.md",
+      score: 0.834,
+    });
+    const dir = makeDir({
+      path: "/memories",
+      displayName: "memories/",
+      totalCount: 1,
+      children: [file],
+    });
+    const out = renderCortexTree(makeData({ tree: [dir] }));
+    expect(out).toContain("relevant.md [83%]");
+  });
+
+  it("renders favored and created badges", () => {
+    const dir = makeDir({
+      path: "/skills",
+      displayName: "skills/",
+      totalCount: 3,
+      children: [
+        makeFile({
+          path: "/skills/x.md",
+          displayName: "x.md",
+          favored: true,
+          created: true,
+        }),
+        makeFile({ path: "/skills/y.md", displayName: "y.md", favored: true }),
+        makeFile({ path: "/skills/z.md", displayName: "z.md", created: true }),
+      ],
+    });
+    const out = renderCortexTree(makeData({ tree: [dir] }));
+    expect(out).toContain("x.md (★ created)");
+    expect(out).toContain("y.md (★)");
+    expect(out).toContain("z.md (created)");
+  });
+});
+
+// ── renderCortexTree: nesting (sub-directories) ───────────────────────────────
+
+describe("renderCortexTree - nested sub-directories", () => {
+  it("renders a sub-dir header with file count and its file children", () => {
+    const subDir = makeDir({
+      path: "/documents/inbox",
+      displayName: "inbox/",
+      totalCount: 2,
+      children: [
+        makeFile({ path: "/documents/inbox/a.md", displayName: "a.md" }),
+        makeFile({ path: "/documents/inbox/b.md", displayName: "b.md" }),
+      ],
+    });
+    const docDir = makeDir({
+      path: "/documents",
+      displayName: "documents/",
+      totalCount: 2,
+      children: [subDir],
+    });
+    const out = renderCortexTree(makeData({ tree: [docDir] }));
+    expect(out).toBe(
+      [
+        "/ (cortex)",
+        "└── documents/ (2)",
+        "    └── inbox/ (2 files)",
+        "        ├── a.md",
+        "        └── b.md",
+      ].join("\n"),
+    );
+  });
+
+  it("renders +N more inside a sub-dir with hidden children", () => {
+    const subDir = makeDir({
+      path: "/documents/inbox",
+      displayName: "inbox/",
+      totalCount: 10,
+      children: [
+        makeFile({ path: "/documents/inbox/a.md", displayName: "a.md" }),
+      ],
+      hiddenCount: 9,
+    });
+    const docDir = makeDir({
+      path: "/documents",
+      displayName: "documents/",
+      totalCount: 10,
+      children: [subDir],
+    });
+    const out = renderCortexTree(makeData({ tree: [docDir] }));
+    expect(out).toContain("inbox/ (10 files)");
+    expect(out).toContain("+9 more");
+  });
+});
+
+// ── renderCortexTree: special characters ──────────────────────────────────────
+
+describe("renderCortexTree - special characters", () => {
+  it("preserves special characters in display names and excerpts", () => {
+    const file = makeFile({
+      path: "/memories/weird-name (v2).md",
+      displayName: "weird-name (v2).md",
+      excerpt: "Excerpt with emoji 🚀 and symbols <>&",
+    });
+    const dir = makeDir({
+      path: "/memories",
+      displayName: "memories/",
+      totalCount: 1,
+      children: [file],
+    });
+    const out = renderCortexTree(makeData({ tree: [dir] }));
+    expect(out).toContain("weird-name (v2).md");
+    expect(out).toContain("Excerpt with emoji 🚀 and symbols <>&");
+  });
+});
+
+// ── cortexFragment metadata ───────────────────────────────────────────────────
+
+describe("cortexFragment metadata", () => {
+  it("has the expected id, placement and priority", () => {
+    expect(cortexFragment.id).toBe("cortex");
+    expect(cortexFragment.placement).toBe("trailing");
+    expect(cortexFragment.priority).toBe(190);
+  });
+});
+
+// ── cortexFragment.build: unavailable ─────────────────────────────────────────
+
+describe("cortexFragment.build - unavailable", () => {
+  it("returns only the unavailable note when set", () => {
+    const out = buildFragment({
+      unavailableNote: "Cortex is disabled in incognito mode.",
+    });
+    expect(out).toBe("## Cortex\nCortex is disabled in incognito mode.");
+  });
+});
+
+// ── cortexFragment.build: empty workspace ─────────────────────────────────────
+
+describe("cortexFragment.build - empty workspace", () => {
+  it("shows the empty-workspace notice when nothing exists", () => {
+    const out = buildFragment();
+    expect(out).toContain("Empty workspace");
+    expect(out).toContain("/memories/identity/ right now");
+  });
+
+  it("respects custom locale memories root in the empty notice", () => {
+    const out = buildFragment({
+      localeRoots: { memories: "/erinnerungen", documents: "/dokumente" },
+    });
+    expect(out).toContain("/erinnerungen/identity/ right now");
+  });
+
+  it("does not show the empty notice when memories exist", () => {
+    const memDir = makeDir({
+      path: "/memories",
+      displayName: "memories/",
+      totalCount: 1,
+      children: [
+        makeFile({
+          path: "/memories/identity/name.md",
+          displayName: "name.md",
+          pinned: true,
+        }),
+      ],
+    });
+    const out = buildFragment({ tree: [memDir] });
+    expect(out).not.toContain("Empty workspace");
+  });
+
+  it("does not show the empty notice when only uploads exist", () => {
+    const out = buildFragment({ uploadCount: 1 });
+    expect(out).not.toContain("Empty workspace");
+  });
+});
+
+// ── cortexFragment.build: structure and content ───────────────────────────────
+
+describe("cortexFragment.build - structure and content", () => {
+  it("includes the cortex header and tool aliases", () => {
+    const out = buildFragment();
+    expect(out).toContain("## Cortex (Your Persistent Brain)");
+    expect(out).toContain("cortex-write");
+    expect(out).toContain("cortex-read");
+    expect(out).toContain("cortex-search");
+    expect(out).toContain("cortex-list");
+  });
+
+  it("embeds the rendered tree from renderCortexTree", () => {
+    const dir = makeDir({
+      path: "/memories",
+      displayName: "memories/",
+      totalCount: 1,
+      children: [
+        makeFile({
+          path: "/memories/a.md",
+          displayName: "a.md",
+          excerpt: "hello",
+        }),
+      ],
+    });
+    const data = makeData({ tree: [dir] });
+    const out = cortexFragment.build(data) ?? "";
+    expect(out).toContain(renderCortexTree(data));
+    expect(out).toContain("memories/ (1)");
+  });
+
+  it("includes the language note only when languageName is set", () => {
+    const withLang = buildFragment({ languageName: "German" });
+    expect(withLang).toContain(
+      "Write all content in German - the user's language.",
+    );
+    const withoutLang = buildFragment();
+    expect(withoutLang).not.toContain("the user's language");
+  });
+
+  it("uses locale roots in the writable paths note", () => {
+    const out = buildFragment({
+      localeRoots: { memories: "/erinnerungen", documents: "/dokumente" },
+      languageName: "German",
+    });
+    expect(out).toContain("/erinnerungen/ (knowledge)");
+    expect(out).toContain("/dokumente/ (working files)");
+  });
+
+  it("defaults writable paths to /memories and /documents", () => {
+    const out = buildFragment();
+    expect(out).toContain("/memories/ (knowledge)");
+    expect(out).toContain("/documents/ (working files)");
   });
 });

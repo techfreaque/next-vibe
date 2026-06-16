@@ -235,13 +235,15 @@ export function ConnectionsListContainer(_props: {
         />
       ) : (
         <>
-          <MetricGrid columns={2}>
-            <MetricCard
-              label={t("widget.title")}
-              value={connections.length}
-              variant="info"
-            />
-          </MetricGrid>
+          {!isPickerMode && (
+            <MetricGrid columns={2}>
+              <MetricCard
+                label={t("widget.title")}
+                value={connections.length}
+                variant="info"
+              />
+            </MetricGrid>
+          )}
 
           <Div className="flex flex-col gap-2">
             {connections.map((conn) => (

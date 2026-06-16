@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-cortex-list-to-list-the-directory-at----fe8ac3f6-c459-46e5-a8e6-7e81fb0a8a33.md\n\n# Use cortex-list to list the directory at...\nFolder: cron\nPreview: <think> The task is to list the directory at /threads and report the root folders seen. The tool call succeeded. The ent…",
+    "encoding_format": "float"
+  }
+}

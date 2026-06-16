@@ -16,6 +16,11 @@
 
 "use client";
 
+import {
+  getCurrentUrl,
+  silentPushState,
+  silentReplaceState,
+} from "next-vibe-ui/utils/browser";
 import type { JSX, ReactNode } from "react";
 import { createContext, useContext, useRef } from "react";
 import type { StoreApi } from "zustand";

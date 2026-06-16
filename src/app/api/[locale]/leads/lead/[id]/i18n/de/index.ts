@@ -711,6 +711,7 @@ export const translations: typeof enTranslations = {
     copyIp: "IP",
     copyLinkedLeadId: "Lead-ID",
     copyUserId2: "Benutzer-ID",
+    selectLead: "Lead auswählen",
   },
   delete: {
     title: "Lead löschen",

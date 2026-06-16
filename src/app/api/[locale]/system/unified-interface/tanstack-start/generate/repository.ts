@@ -42,6 +42,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { hasCustomDirective } from "@/app/api/[locale]/system/unified-interface/shared/utils/custom-directive";
 import { findFilesByName } from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 

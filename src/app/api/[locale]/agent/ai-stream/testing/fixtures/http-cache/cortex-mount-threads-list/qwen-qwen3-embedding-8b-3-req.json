@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-cortex-list-to-list-the-directory-at----12334a01-3686-44c9-845e-839664af9c8a.md\n\n# Use cortex-list to list the directory at...\nFolder: cron",
+    "encoding_format": "float"
+  }
+}

@@ -28,6 +28,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "next-vibe-ui/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import { useEffect, useMemo, useState } from "react";
 
@@ -40,6 +47,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetNavigation,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
@@ -49,6 +57,7 @@ import { SeparatorWidget } from "next-vibe-ui/unified/display-only/separator/wid
 import TextWidget from "next-vibe-ui/unified/display-only/text/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 
 import { cn } from "../../../shared/utils";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
@@ -56,21 +65,17 @@ import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/sele
 
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import { useAddToFavorites } from "../favorites/create/hooks";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { useChatFavorites } from "../favorites/hooks/hooks";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { useChatSettings } from "../settings/hooks";
+import { parseSkillId } from "../slugify";
 import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
 import type { SkillListItem } from "./definition";
 import { SkillOwnershipType, SkillSourceFilter, SkillTrustLevel } from "./enum";
 
-import { parseSkillId } from "../slugify";
 /**
-import { parseSkillId } from "../slugify";
  * Props for custom widget
-import { parseSkillId } from "../slugify";
  */
 interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
@@ -89,11 +94,14 @@ export function SkillsListContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
   const skillsData = useWidgetValue<typeof definition.GET>();
+  const platform = useWidgetPlatform();
+  const onPick = usePickerCallback<{ id: string; name: string }>();
   const isTouch = useTouchDevice();
+  const pathname = usePathname();
   const [isFullPage, setIsFullPage] = useState(false);
   useEffect(() => {
-    setIsFullPage(window.location.pathname.includes("/skills"));
-  }, []);
+    setIsFullPage(pathname.includes("/skills"));
+  }, [pathname]);
   const isPublic = user.isPublic;
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const searchQuery = form.watch("query") ?? "";
@@ -102,6 +110,38 @@ export function SkillsListContainer({
   const setModelSelectorOpen = useTourState(
     (state) => state.setModelSelectorOpen,
   );
+
+  // CLI picker mode: render a keyboard-navigable Select instead of the full card UI.
+  // onPick is set when this list was pushed via navigation.push with a pickerCallback.
+  if (onPick && platform !== undefined && isCliPlatform(platform)) {
+    const allSkills = skillsData?.sections.flatMap((s) => s.skills) ?? [];
+    return (
+      <Select
+        onValueChange={(id) => {
+          const skill = allSkills.find(
+            (s) => parseSkillId(s.skillId).skillId === id,
+          );
+          if (skill) {
+            onPick({ id, name: skill.name });
+          }
+        }}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder={t("get.search.placeholder")} />
+        </SelectTrigger>
+        <SelectContent>
+          {allSkills.map((skill) => {
+            const id = parseSkillId(skill.skillId).skillId;
+            return (
+              <SelectItem key={id} value={id}>
+                {skill.name}
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+    );
+  }
 
   // Read active favorite from settings so activate state reflects correctly
   const { settings } = useChatSettings(user, logger);
@@ -174,7 +214,10 @@ export function SkillsListContainer({
       {
         sectionIcon: "search" as const,
         sectionTitle: t("get.search.results"),
-        sectionCount: ranked.length,
+        // Count unique skills - variants of the same skill are separate items
+        sectionCount: new Set(
+          ranked.map((s) => parseSkillId(s.skillId).skillId),
+        ).size,
         skills: ranked,
       },
     ];
@@ -222,7 +265,7 @@ export function SkillsListContainer({
         </Div>
 
         {/* Signup Prompt */}
-        <Div className="border-t border-border p-6 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
+        <Div className="border-t border-border p-6">
           <Div className="max-w-md mx-auto flex flex-col gap-6 text-center">
             <Div className="text-xl font-semibold">
               {t("get.signupPrompt.title")}
@@ -265,12 +308,15 @@ export function SkillsListContainer({
   // Loading state - show spinner that fills the scrollable area
   if (!skillsData) {
     return (
-      <Div
-        className={`flex flex-col gap-0${isFullPage ? "" : " h-[min(800px,calc(100dvh-100px))]"}`}
-      >
+      <Div className="flex flex-col gap-0">
         {/* Top Actions: Back + Create + Fullscreen */}
         {!isOnboarding && (
-          <Div className="flex flex-row gap-2 px-4 py-4 shrink-0">
+          <Div
+            className={cn(
+              "flex flex-row gap-2 px-4 py-4 sticky top-0 z-10",
+              isFullPage ? "bg-card" : "bg-popover",
+            )}
+          >
             <NavigateButtonWidget field={children.backButton} />
             <Div className="ml-auto flex items-center gap-2">
               <Button
@@ -294,8 +340,8 @@ export function SkillsListContainer({
           </Div>
         )}
 
-        {/* Loading Spinner - fills the scrollable space */}
-        <Div className="border-t border-border flex-1 flex items-center justify-center min-h-0">
+        {/* Loading Spinner */}
+        <Div className="border-t border-border flex items-center justify-center py-16">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </Div>
       </Div>
@@ -304,12 +350,16 @@ export function SkillsListContainer({
 
   // Both public and authenticated users see the same skill list
   return (
-    <Div
-      className={`flex flex-col gap-0${isFullPage ? "" : " h-[min(800px,calc(100dvh-100px))]"}`}
-    >
-      {/* Top Actions: Back + Create + Fullscreen */}
+    <Div className="flex flex-col gap-0">
+      {/* Top Actions: Back + Create + Fullscreen - sticky so it stays visible
+          while the surrounding container (popover or page) scrolls */}
       {!isOnboarding && (
-        <Div className="flex flex-row gap-2 px-4 py-4 shrink-0">
+        <Div
+          className={cn(
+            "flex flex-row gap-2 px-4 py-4 sticky top-0 z-10",
+            isFullPage ? "bg-card" : "bg-popover",
+          )}
+        >
           <NavigateButtonWidget field={children.backButton} />
           <Div className="ml-auto flex items-center gap-2">
             <Button
@@ -333,10 +383,8 @@ export function SkillsListContainer({
         </Div>
       )}
 
-      {/* Scrollable Content */}
-      <Div
-        className={`border-t border-border flex-1${isFullPage ? "" : " overflow-y-auto"}`}
-      >
+      {/* Content - scroll is owned by the surrounding container (popover or page) */}
+      <Div className="border-t border-border">
         <Div className="p-4">
           {/* Onboarding Success Banner */}
           {isOnboarding && companionSkill && (
@@ -542,7 +590,7 @@ export function SkillsListContainer({
 
       {/* Onboarding Sticky Bottom Section */}
       {isOnboarding && (
-        <Div className="flex flex-row gap-2 px-4 py-4 shrink-0 border-t">
+        <Div className="flex flex-row gap-2 px-4 py-4 border-t sticky bottom-0 z-10 bg-popover">
           <Button
             type="button"
             variant="outline"
@@ -778,6 +826,8 @@ export function VariantGroupCard({
   favoritesByVariant: Record<string, string[]>;
   activeFavoriteId: string | null;
 }): React.JSX.Element {
+  const onPick = usePickerCallback<{ id: string; name: string }>();
+  const [variantsExpanded, setVariantsExpanded] = useState(false);
   const first = items[0];
   if (!first) {
     return <></>;
@@ -803,11 +853,15 @@ export function VariantGroupCard({
       <Div className="flex items-start gap-3 p-3">
         <Div
           className="flex items-start gap-3 flex-1 cursor-pointer"
-          onClick={() =>
-            navigate(skillDetailDefinitions.GET, {
-              urlPathParams: { id: skillId },
-            })
-          }
+          onClick={() => {
+            if (onPick) {
+              onPick({ id: skillId, name: first.name });
+            } else {
+              navigate(skillDetailDefinitions.GET, {
+                urlPathParams: { id: skillId },
+              });
+            }
+          }}
         >
           <Div className="flex-shrink-0 pt-0.5">
             <IconWidget
@@ -880,30 +934,51 @@ export function VariantGroupCard({
         )}
       </Div>
 
+      {/* Variants toggle - rows are collapsed by default */}
+      <Button
+        type="button"
+        variant="ghost"
+        size="unset"
+        className="w-full flex items-center justify-start gap-2 px-3 py-2 border-t border-border/40 rounded-none text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+        onClick={(e) => {
+          e.stopPropagation();
+          setVariantsExpanded((v) => !v);
+        }}
+      >
+        <ChevronDown
+          className={cn(
+            "h-3.5 w-3.5 transition-transform",
+            variantsExpanded && "rotate-180",
+          )}
+        />
+        <Span>{t("get.card.showVariants", { count: items.length })}</Span>
+      </Button>
+
       {/* Variant rows - one per variant */}
-      {items.map((variant, vIdx) => {
-        const variantFavoriteIds = variant.isVariant
-          ? getFavoriteIdsForVariant(favoritesByVariant, variant)
-          : allFavoriteIds;
-        return (
-          <VariantRow
-            key={`${variant.skillId}-${vIdx}`}
-            char={variant}
-            skillId={skillId}
-            idx={idx}
-            vIdx={vIdx}
-            fieldDefs={fieldDefs}
-            navigate={navigate}
-            logger={logger}
-            user={user}
-            locale={locale}
-            isTouch={isTouch}
-            t={t}
-            favoriteIds={variantFavoriteIds}
-            activeFavoriteId={activeFavoriteId}
-          />
-        );
-      })}
+      {variantsExpanded &&
+        items.map((variant, vIdx) => {
+          const variantFavoriteIds = variant.isVariant
+            ? getFavoriteIdsForVariant(favoritesByVariant, variant)
+            : allFavoriteIds;
+          return (
+            <VariantRow
+              key={`${variant.skillId}-${vIdx}`}
+              char={variant}
+              skillId={skillId}
+              idx={idx}
+              vIdx={vIdx}
+              fieldDefs={fieldDefs}
+              navigate={navigate}
+              logger={logger}
+              user={user}
+              locale={locale}
+              isTouch={isTouch}
+              t={t}
+              favoriteIds={variantFavoriteIds}
+              activeFavoriteId={activeFavoriteId}
+            />
+          );
+        })}
     </Div>
   );
 }
@@ -944,6 +1019,7 @@ export function VariantRow({
   const isActive =
     activeFavoriteId !== null && favoriteIds.includes(activeFavoriteId);
   const [showActions, setShowActions] = useState(false);
+  const onPick = usePickerCallback<{ id: string; name: string }>();
 
   return (
     <Div
@@ -954,11 +1030,15 @@ export function VariantRow({
       {/* Row content */}
       <Div
         className="flex items-center gap-2 px-3 py-2 cursor-pointer ml-9 hover:bg-muted/30 transition-colors"
-        onClick={() =>
-          navigate(skillDetailDefinitions.GET, {
-            urlPathParams: { id: skillId },
-          })
-        }
+        onClick={() => {
+          if (onPick) {
+            onPick({ id: skillId, name: char.name });
+          } else {
+            navigate(skillDetailDefinitions.GET, {
+              urlPathParams: { id: skillId },
+            });
+          }
+        }}
       >
         {/* Variant name */}
         {char.variantName && (
@@ -1143,6 +1223,7 @@ export function SkillCard({
   const isActive =
     activeFavoriteId !== null && favoriteIds.includes(activeFavoriteId);
   const [showActions, setShowActions] = useState(false);
+  const onPick = usePickerCallback<{ id: string; name: string }>();
 
   return (
     <Div
@@ -1162,9 +1243,13 @@ export function SkillCard({
       <Div
         className="flex items-start gap-3 p-3 cursor-pointer"
         onClick={() => {
-          navigate(skillDetailDefinitions.GET, {
-            urlPathParams: { id: charBaseId },
-          });
+          if (onPick) {
+            onPick({ id: charBaseId, name: char.name });
+          } else {
+            navigate(skillDetailDefinitions.GET, {
+              urlPathParams: { id: charBaseId },
+            });
+          }
         }}
       >
         {/* Icon */}

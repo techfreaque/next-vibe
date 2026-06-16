@@ -25,14 +25,12 @@ export const translations: typeof enTranslations = {
     chainSubtitle:
       "Każdy poziom to połowa wyższego. Zbudowany raz przy rejestracji - płaci wiecznie.",
     youLabel: "Ty",
-    whoLabels: [
-      "Ty - ktokolwiek polecił ich bezpośrednio",
-      "Twórca skilla (jeśli inny) lub Twój polecający",
-      "Polecający ich polecającego",
-      "Poziom 4",
-      "Poziom 5",
-      "Poziom 6",
-    ],
+    whoLabel0: "Ty - ktokolwiek polecił ich bezpośrednio",
+    whoLabel1: "Twórca skilla (jeśli inny) lub Twój polecający",
+    whoLabel2: "Polecający ich polecającego",
+    whoLabel3: "Poziom 4",
+    whoLabel4: "Poziom 5",
+    whoLabel5: "Poziom 6",
     colExample: "Przykład (plan {{examplePrice}}/mies.)",
     tableNote:
       "Link polecający: {{directPct}} od użytkownika. Link do skilla: {{directPct}} bezpośrednio + {{skillBonusPct}} bonus za skill = {{skillPct}} od użytkownika. Oba cyklicznie, wiecznie.",

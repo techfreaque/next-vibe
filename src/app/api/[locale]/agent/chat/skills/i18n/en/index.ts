@@ -1707,6 +1707,7 @@ export const translations = {
       variants: {
         kimi: "Kimi",
         budget: "Budget",
+        visual: "Visual",
       },
     },
   },

@@ -332,6 +332,17 @@ export class ThreadByIdRepository {
         });
       }
 
+      // Collect message ids BEFORE the cascade delete — materialized cortex
+      // index rows for /searches and /gens embed the messageId (not threadId),
+      // so we need them to clean up those mounts after the thread is gone.
+      const { chatMessages } = await import("../../db");
+      const threadMessageIds = (
+        await db
+          .select({ id: chatMessages.id })
+          .from(chatMessages)
+          .where(eq(chatMessages.threadId, threadId))
+      ).map((m) => m.id);
+
       // Delete the thread (cascade will handle messages)
       const [deletedThread] = await db
         .delete(chatThreads)
@@ -339,6 +350,34 @@ export class ThreadByIdRepository {
         .returning();
 
       logger.debug("Thread deleted successfully", { threadId });
+
+      // Clean up materialized cortex index rows for this thread so search never
+      // surfaces orphaned embeddings. /threads and /uploads paths embed the
+      // threadId; /searches and /gens embed the per-message id.
+      const ownerId = deletedThread.userId;
+      void (async (): Promise<void> => {
+        if (!ownerId) {
+          return; // cortex is user-scoped; lead-owned threads have no nodes
+        }
+        try {
+          const { removeVirtualNodesByEntityId } =
+            await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+          await removeVirtualNodesByEntityId(ownerId, "/threads", threadId);
+          await removeVirtualNodesByEntityId(ownerId, "/uploads", threadId);
+          for (const messageId of threadMessageIds) {
+            await removeVirtualNodesByEntityId(ownerId, "/searches", messageId);
+            await removeVirtualNodesByEntityId(ownerId, "/gens", messageId);
+          }
+        } catch (cleanupError) {
+          logger.warn("[thread-delete] cortex cleanup failed", {
+            threadId,
+            error:
+              cleanupError instanceof Error
+                ? cleanupError.message
+                : String(cleanupError),
+          });
+        }
+      })();
 
       // Emit WS events so all open tabs remove the thread from their lists immediately
       const emitThreads = createEndpointEmitter(

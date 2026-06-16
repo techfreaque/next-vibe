@@ -19,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "platform",
   icon: "monitor",
   order: 30,
-  defaultEntry: DESKTOP_LIST_WINDOWS_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: DESKTOP_LIST_WINDOWS_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     Windows: {
       icon: "layout",

@@ -18,6 +18,7 @@ import {
 } from "react";
 
 import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 import { Logo } from "@/app/[locale]/_components/logo";
 import {
   DOM_IDS,
@@ -1035,12 +1036,12 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   });
 
   return (
-    <Div className="relative h-full">
+    <Div className="flex flex-col flex-1 min-h-0 relative">
       <Div
         ref={messagesContainerRef}
         id={DOM_IDS.MESSAGES_CONTAINER}
         className={cn(
-          "h-full overflow-y-auto",
+          "flex-1 min-h-0 overflow-y-auto",
           "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full",
         )}
       >

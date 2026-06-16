@@ -19,7 +19,7 @@
  * Folder hierarchy per run:
  *   - BACKGROUND root → "e2e-cortex-remote" folder → thread per run (shared across same file)
  *   - PRIVATE root   → "e2e-cortex-remote" folder → thread per run (scenario A)
- *   - REMOTE root    → hermes subfolder             → thread per run (scenario B)
+ *   - REMOTE root    → hermes → tests → cortex-remote → thread per run (scenario B)
  *
  * Each scenario reuses a single shared thread across its test steps (branching for context).
  *
@@ -52,13 +52,16 @@ import { defaultLocale } from "@/i18n/core/config";
 import { setFetchCacheContext } from "../../testing/fetch-cache";
 import {
   fetchThreadMessages,
+  getOrCreateFolder,
   runTestStream,
   toolResultRecord,
 } from "../../testing/headless-test-runner";
 import {
   connectToHermes,
   disconnectFromHermes,
+  failSuitePrerequisites,
   HERMES_INSTANCE_ID,
+  isHermesInFixtureMode,
   resolveDevUser,
   resolveProdUserId,
   resolveRemoteUrl,
@@ -72,7 +75,10 @@ import {
 const CACHE_PREFIX = "cortex-remote-";
 
 /** Test folder name under each root (keeps threads out of the global root) */
-const TEST_FOLDER_NAME = "e2e-cortex-remote";
+const TEST_FOLDER_NAME = "cortex-remote";
+
+/** Test case subfolder name under REMOTE/hermes/tests/ for scenario B */
+const REMOTE_TEST_CASE_NAME = "cortex-remote";
 
 const TEST_TIMEOUT = 120_000;
 
@@ -83,50 +89,25 @@ let _prodUserId: string | null = null;
 
 /** Subfolder under PRIVATE root for scenario A threads */
 let privateTestFolderId: string;
-/** Subfolder for hermes under REMOTE root for scenario B threads */
+/** Instance subfolder for hermes under REMOTE root (REMOTE/hermes) */
+let remoteHermesInstanceFolderId: string;
+/** Test case subfolder for scenario B threads (REMOTE/hermes/tests/cortex-remote) */
 let remoteHermesFolderId: string;
 
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
-async function getOrCreateFolder(
-  userId: string,
-  rootFolderId: DefaultFolderId,
-  name: string,
-  parentId: string | null = null,
-): Promise<string> {
-  const [existing] = await db
-    .select({ id: chatFolders.id })
-    .from(chatFolders)
-    .where(
-      and(
-        eq(chatFolders.userId, userId),
-        eq(chatFolders.rootFolderId, rootFolderId),
-        eq(chatFolders.name, name),
-        parentId
-          ? eq(chatFolders.parentId, parentId)
-          : isNull(chatFolders.parentId),
-      ),
-    )
-    .limit(1);
-
-  if (existing) {
-    return existing.id;
-  }
-
-  const [inserted] = await db
-    .insert(chatFolders)
-    .values({ userId, rootFolderId, name, parentId })
-    .returning({ id: chatFolders.id });
-
-  return inserted!.id;
-}
-
 const _resolvedRemoteUrl = await resolveRemoteUrl();
+const _isFixtureMode = isHermesInFixtureMode();
 
 if (!_resolvedRemoteUrl) {
-  process.stderr.write(
-    "[test skip] AI Stream - Cross-Instance Cortex: remote server not running.\n" +
-      "  Start: vibe --hermes dev --fixture-mode  → http://localhost:3002\n",
+  failSuitePrerequisites(
+    "AI Stream - Cross-Instance Cortex",
+    "remote server not running — start: vibe --hermes dev --fixture-mode  → http://localhost:3002",
+  );
+} else if (!_isFixtureMode) {
+  failSuitePrerequisites(
+    "AI Stream - Cross-Instance Cortex",
+    "hermes is running but not in fixture mode — restart: vibe --hermes dev --fixture-mode",
   );
 } else {
   describe("AI Stream Integration - Cross-Instance Cortex (direct-http)", () => {
@@ -148,40 +129,39 @@ if (!_resolvedRemoteUrl) {
       _prodUserId = await resolveProdUserId();
 
       // ── Create test folders ──
-      // Scenario A: PRIVATE root → e2e-cortex-remote folder
+      // Scenario A: PRIVATE root → tests → cortex-remote
+      const privateTestsParentId = await getOrCreateFolder(
+        testUser,
+        DefaultFolderId.PRIVATE,
+        "tests",
+      );
       privateTestFolderId = await getOrCreateFolder(
-        testUser.id,
+        testUser,
         DefaultFolderId.PRIVATE,
         TEST_FOLDER_NAME,
+        privateTestsParentId,
       );
 
-      // Scenario B: REMOTE root → hermes subfolder (named after instanceId)
-      // The hermes subfolder is normally created by the connect flow or by the user.
-      // We create it here if absent so routing via folderId works.
-      remoteHermesFolderId = await getOrCreateFolder(
-        testUser.id,
+      // Scenario B: REMOTE root → hermes/tests/cortex-remote (nested test case subfolder)
+      // connectToHermes() already created REMOTE/hermes and set isDefault=true on the
+      // connection — streams in any REMOTE subfolder route to hermes automatically.
+      remoteHermesInstanceFolderId = await getOrCreateFolder(
+        testUser,
         DefaultFolderId.REMOTE,
         HERMES_INSTANCE_ID,
       );
-
-      // Register the REMOTE hermes folder in routingRules so streams routed to
-      // it resolve to the hermes connection (loopLocation='server' → hermes runs AI).
-      await db
-        .update(remoteConnections)
-        .set({
-          routingRules: {
-            folderIds: [remoteHermesFolderId],
-            handlesModelProviders: [],
-            isDefault: false,
-          },
-          updatedAt: new Date(),
-        })
-        .where(
-          and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-          ),
-        );
+      const remoteTestsParentId = await getOrCreateFolder(
+        testUser,
+        DefaultFolderId.REMOTE,
+        "tests",
+        remoteHermesInstanceFolderId,
+      );
+      remoteHermesFolderId = await getOrCreateFolder(
+        testUser,
+        DefaultFolderId.REMOTE,
+        REMOTE_TEST_CASE_NAME,
+        remoteTestsParentId,
+      );
     }, TEST_TIMEOUT);
 
     afterAll(async () => {
@@ -349,7 +329,7 @@ if (!_resolvedRemoteUrl) {
         async () => {
           setFetchCacheContext(`${CACHE_PREFIX}b1`);
 
-          // Stream into the REMOTE root, hermes subfolder.
+          // Stream into REMOTE/hermes/tests/cortex-remote.
           // routingRules.folderIds contains remoteHermesFolderId → resolves to hermes connection.
           // loopLocation='server' → hermes runs the AI loop.
           // toolSource='local' → atlas sends tool schemas to hermes.
@@ -419,26 +399,37 @@ if (!_resolvedRemoteUrl) {
           }
 
           // Verify the thread exists locally (threadMirrorMode='both' from connectToHermes)
-          const [localThread] = await db
-            .select({
-              id: chatThreads.id,
-              rootFolderId: chatThreads.rootFolderId,
-            })
-            .from(chatThreads)
-            .where(eq(chatThreads.id, sharedThreadId));
+          const threadDef =
+            await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+          const localThreadResult =
+            await RouteExecuteRepository.runInProcessTyped({
+              definition: threadDef.default.GET,
+              input: { rootFolderId: DefaultFolderId.REMOTE },
+              urlPathParams: { threadId: sharedThreadId },
+              user: testUser,
+              locale: defaultLocale,
+              platform: Platform.AI,
+              logger: createEndpointLogger(false, Date.now(), defaultLocale),
+            });
 
           expect(
-            localThread,
-            `Thread ${sharedThreadId} must exist in local DB (threadMirrorMode='both')`,
+            localThreadResult.success,
+            `Thread ${sharedThreadId} must exist in local DB (threadMirrorMode='both'): ${!localThreadResult.success ? localThreadResult.message : ""}`,
           ).toBeTruthy();
 
+          const localThreadRow = localThreadResult.success
+            ? localThreadResult.data
+            : null;
           expect(
-            localThread?.rootFolderId,
+            localThreadRow?.["rootFolderId"],
             "Thread must be in REMOTE root folder",
           ).toBe(DefaultFolderId.REMOTE);
 
           // Verify messages are mirrored locally
-          const localMessages = await fetchThreadMessages(sharedThreadId);
+          const localMessages = await fetchThreadMessages(
+            sharedThreadId,
+            testUser,
+          );
           expect(
             localMessages.length,
             "Thread must have messages mirrored locally",

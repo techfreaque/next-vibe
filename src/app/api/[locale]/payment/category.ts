@@ -19,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "business",
   icon: "credit-card",
   order: 10,
-  defaultEntry: PAYMENT_DASHBOARD_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: PAYMENT_DASHBOARD_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     Transactions: {
       icon: "receipt",

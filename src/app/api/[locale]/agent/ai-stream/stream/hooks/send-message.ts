@@ -20,6 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
 

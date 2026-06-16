@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";

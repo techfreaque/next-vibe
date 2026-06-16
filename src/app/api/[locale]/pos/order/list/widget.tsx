@@ -235,24 +235,26 @@ export function PosOrderListWidget(
         )}
       </Div>
 
-      {/* Status filter tabs */}
-      <Div className="flex gap-1 border-b pb-2">
-        {STATUS_FILTERS.map((filter) => {
-          const isActive = activeStatus === filter.value;
-          return (
-            <Button
-              key={filter.value ?? "all"}
-              type="button"
-              size="sm"
-              variant={isActive ? "default" : "ghost"}
-              className="h-7 px-3 text-xs"
-              onClick={() => handleFilterChange(filter.value)}
-            >
-              {t(filter.labelKey)}
-            </Button>
-          );
-        })}
-      </Div>
+      {/* Status filter tabs — full mode only */}
+      {!isPickerMode && (
+        <Div className="flex gap-1 border-b pb-2">
+          {STATUS_FILTERS.map((filter) => {
+            const isActive = activeStatus === filter.value;
+            return (
+              <Button
+                key={filter.value ?? "all"}
+                type="button"
+                size="sm"
+                variant={isActive ? "default" : "ghost"}
+                className="h-7 px-3 text-xs"
+                onClick={() => handleFilterChange(filter.value)}
+              >
+                {t(filter.labelKey)}
+              </Button>
+            );
+          })}
+        </Div>
+      )}
 
       {/* Order list or empty */}
       {orders.length === 0 ? (

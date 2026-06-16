@@ -19,7 +19,7 @@ import {
   getDocumentTemplates,
   getLocaleRoots,
   getMemoryTemplates,
-} from "./seeds/index";
+} from "./seeds/templates";
 
 const LOCALES = ["en-US", "de-DE", "pl-PL"] as const;
 

@@ -49,7 +49,6 @@ import {
 } from "../constants";
 import { type SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
-import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
 import listDef0 from "../definition";
 

@@ -706,6 +706,7 @@ export const translations = {
     copyIp: "IP",
     copyLinkedLeadId: "lead ID",
     copyUserId2: "user ID",
+    selectLead: "Select Lead",
   },
   delete: {
     title: "Delete Lead",

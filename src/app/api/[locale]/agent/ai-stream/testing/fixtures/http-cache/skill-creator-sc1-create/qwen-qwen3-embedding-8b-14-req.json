@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/skills/a3ba9beb-7519-471b-af31-ed9973aece37.md\n\n# Test Skill Route Suite Updated\n> Updated tagline for test\nUpdated description for integration test\nYou are an updated test assistant.",
+    "encoding_format": "float"
+  }
+}

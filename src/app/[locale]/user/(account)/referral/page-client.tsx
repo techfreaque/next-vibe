@@ -40,7 +40,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as pageT } from "./i18n";
 import type { ReferralPageT } from "./i18n";
 import {
-  getCommissionRows,
+  buildCommissionRows,
   getReferralParams,
   type CommissionRow,
 } from "./i18n/utils";
@@ -112,7 +112,7 @@ export function ReferralPageClient({
 }): JSX.Element {
   const { t } = pageT.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
-  const commissionRows = getCommissionRows(locale);
+  const commissionRows = buildCommissionRows(locale, t);
   const p = getReferralParams(locale);
 
   return (

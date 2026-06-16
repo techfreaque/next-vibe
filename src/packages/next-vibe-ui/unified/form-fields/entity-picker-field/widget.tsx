@@ -23,7 +23,7 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import { useRef, type JSX } from "react";
+import { useRef, useState, type JSX } from "react";
 
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
@@ -72,11 +72,15 @@ export function EntityPickerFieldWidget<
   // If it was, the value came from navigation context — hide the picker entirely.
   const initiallyFilledRef = useRef<boolean>(isFilled);
 
+  // Human-readable label for the selected item (set when user picks from list).
+  const [pickedLabel, setPickedLabel] = useState<string | undefined>(undefined);
+
   if (initiallyFilledRef.current) {
     return null;
   }
 
   const name: string = fieldName;
+  const labelField = field.labelField ?? "name";
 
   const handleOpen = (): void => {
     navigation.push(field.listEndpoint, {
@@ -84,6 +88,12 @@ export function EntityPickerFieldWidget<
       pickerCallback: (value: WidgetData) => {
         const picked = value as Record<string, string>;
         form?.setValue(name, picked["id"] ?? String(value));
+        const label =
+          picked[labelField] ??
+          picked["name"] ??
+          picked["title"] ??
+          picked["label"];
+        setPickedLabel(label ?? undefined);
       },
       pickerLabelField: field.labelField,
     });
@@ -97,7 +107,7 @@ export function EntityPickerFieldWidget<
     if (isFilled) {
       return (
         <Span className="text-sm">
-          {resolvedLabel}: {String(currentValue)}
+          {resolvedLabel}: {pickedLabel ?? String(currentValue)}
         </Span>
       );
     }
@@ -112,18 +122,26 @@ export function EntityPickerFieldWidget<
   // Web / interactive CLI — always visible (field was empty on first render)
   if (isFilled) {
     return (
-      <Div className="flex items-center gap-2">
-        <Badge
-          variant="secondary"
-          className="bg-info/10 text-info border-info/20"
-        >
-          {String(currentValue)}
-        </Badge>
+      <Div className="flex items-center gap-2 min-w-0">
+        <Div className="flex items-center gap-1.5 min-w-0 flex-1">
+          <Badge
+            variant="secondary"
+            className="bg-primary/8 text-primary border-primary/20 font-medium max-w-[260px] truncate"
+          >
+            {pickedLabel ?? String(currentValue)}
+          </Badge>
+          {pickedLabel && (
+            <Span className="text-xs text-muted-foreground font-mono truncate hidden sm:inline">
+              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+              {String(currentValue).slice(0, 8)}…
+            </Span>
+          )}
+        </Div>
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          className="text-xs h-auto py-0.5 px-2"
+          className="text-xs h-7 px-2 shrink-0 text-muted-foreground hover:text-foreground"
           onClick={handleOpen}
         >
           {widgetT("widgets.formFields.entityPicker.change")}
@@ -133,17 +151,17 @@ export function EntityPickerFieldWidget<
   }
 
   return (
-    <Div className="flex flex-col gap-1">
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="w-full justify-start"
-        onClick={handleOpen}
-      >
-        {widgetT("widgets.formFields.entityPicker.select")} {resolvedLabel}
-      </Button>
-    </Div>
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="w-full justify-start text-muted-foreground hover:text-foreground gap-2"
+      onClick={handleOpen}
+    >
+      {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+      <Span className="text-base leading-none opacity-50">+</Span>
+      {widgetT("widgets.formFields.entityPicker.select")} {resolvedLabel}
+    </Button>
   );
 }
 
@@ -183,13 +201,24 @@ export function EntityPickerField<TValue extends WidgetData>({
     currentValue !== undefined && currentValue !== null && currentValue !== "";
 
   const initiallyFilledRef = useRef<boolean>(isFilled);
+  const [pickedLabel, setPickedLabel] = useState<string | undefined>(
+    displayValue,
+  );
 
+  const resolvedLabelField = labelField ?? "name";
   const listToolName = getPreferredToolName(listEndpoint);
 
   const handleOpen = (): void => {
     navigation.push(listEndpoint, {
       renderInModal: true,
       pickerCallback: (value: WidgetData) => {
+        const picked = value as Record<string, string>;
+        const extractedLabel =
+          picked[resolvedLabelField] ??
+          picked["name"] ??
+          picked["title"] ??
+          picked["label"];
+        setPickedLabel(extractedLabel ?? undefined);
         onSelect(value as TValue);
       },
       pickerLabelField: labelField,
@@ -201,7 +230,7 @@ export function EntityPickerField<TValue extends WidgetData>({
     if (isFilled) {
       return (
         <Span className="text-sm">
-          {label}: {displayValue ?? String(currentValue)}
+          {label}: {pickedLabel ?? displayValue ?? String(currentValue)}
         </Span>
       );
     }
@@ -220,21 +249,31 @@ export function EntityPickerField<TValue extends WidgetData>({
 
   // Web / interactive CLI — always visible once shown
   if (isFilled) {
+    const shownLabel = pickedLabel ?? displayValue;
+    const shownId = String(currentValue);
     return (
-      <Div className="flex items-center gap-2">
-        <Span className="text-sm text-muted-foreground">{label}:</Span>
-        <Badge
-          variant="secondary"
-          className="bg-info/10 text-info border-info/20"
-        >
-          {displayValue ?? String(currentValue)}
-        </Badge>
+      <Div className="flex items-center gap-2 min-w-0">
+        <Span className="text-sm text-muted-foreground shrink-0">{label}:</Span>
+        <Div className="flex items-center gap-1.5 min-w-0 flex-1">
+          <Badge
+            variant="secondary"
+            className="bg-primary/8 text-primary border-primary/20 font-medium max-w-[200px] truncate"
+          >
+            {shownLabel ?? shownId}
+          </Badge>
+          {shownLabel && (
+            <Span className="text-xs text-muted-foreground font-mono truncate hidden sm:inline">
+              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+              {shownId.slice(0, 8)}…
+            </Span>
+          )}
+        </Div>
         {allowChange && (
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="text-xs h-auto py-0.5 px-2"
+            className="text-xs h-7 px-2 shrink-0 text-muted-foreground hover:text-foreground"
             onClick={handleOpen}
           >
             {widgetT("widgets.formFields.entityPicker.change")}
@@ -245,17 +284,16 @@ export function EntityPickerField<TValue extends WidgetData>({
   }
 
   return (
-    <Div className="flex flex-col gap-1">
-      <Span className="text-sm text-muted-foreground">{label}</Span>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="w-full justify-start"
-        onClick={handleOpen}
-      >
-        {widgetT("widgets.formFields.entityPicker.select")} {label}
-      </Button>
-    </Div>
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="w-full justify-start text-muted-foreground hover:text-foreground gap-2"
+      onClick={handleOpen}
+    >
+      {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+      <Span className="text-base leading-none opacity-50">+</Span>
+      {widgetT("widgets.formFields.entityPicker.select")} {label}
+    </Button>
   );
 }

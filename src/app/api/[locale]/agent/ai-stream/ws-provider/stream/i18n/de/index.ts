@@ -115,7 +115,8 @@ export const translations: typeof enTranslations = {
         },
         requiresConfirmation: {
           label: "Bestätigung erforderlich",
-          description: "Wahr, wenn das Tool auf Benutzerbestätigung warten muss",
+          description:
+            "Wahr, wenn das Tool auf Benutzerbestätigung warten muss",
         },
       },
       attachments: {

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----61fa7137-1b3d-4f06-a3ff-ea8552c8a337.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\nPreview: <think>The deletion succeeded. 2 nodes were deleted (the folder /documents/ai-test/ and its child file renamed-notes.md)…",
+    "encoding_format": "float"
+  }
+}

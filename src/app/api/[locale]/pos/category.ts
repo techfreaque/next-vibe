@@ -19,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "business",
   icon: "shopping-cart",
   order: 45,
-  defaultEntry: POS_DASHBOARD_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: POS_DASHBOARD_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     "POS: Orders": {
       icon: "shopping-bag",

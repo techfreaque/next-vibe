@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:fc004b50 | Posted:Jun 16, 19:19]\n\nUser: Call cortex-tree with path=/skills and depth=2. You MUST call the tool - do not rely on any prior context. Report the exact tree output and count how many .md files are listed.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (19)\n│   ├── [📌] critical-note.md\n│   │   This is a PINNED critical note. It must ALWAYS appear in the system prompt, never trimmed.\n│   ├── t2-cheap-test [83%]\n│   │   T2_CHEAP_OK\n│   ├── life-career-moved.md\n│   │   Building unbottled.ai, a free-speech AI platform. · ## Goals · - Short-term: Launch v1 with 50+ models · - Medium-term: 10k users · - Long-term: Become the default AI layer for open web · ## Blockers · None currently.\n│   ├── name.md\n│   │   <\n\nSystem: [Context: ID:662b1e9d | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 16, 19:19]\n\nAssistant: [tool:cortex-tree] {\"path\":\"/skills\",\"depth\":5}\n\nTool: [result:cortex-tree] {\"tree\":\"skills/\\n├── code-reviewer-2.md\\n├── code-reviewer-4.md\\n├── code-reviewer-3.md\\n├── cortex-test-skill-fixture.md\\n├── creative-writer-2.md\\n├── creative-writer.md\\n├── test-chef-bot.md\\n├── test-skill-high-vote-published.md\\n├── test-skill-high-vote-published-turbo.md\\n├── test-skill-layou",
+    "encoding_format": "float"
+  }
+}

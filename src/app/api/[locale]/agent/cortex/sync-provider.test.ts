@@ -2,9 +2,9 @@
  * Cortex Sync Provider unit tests
  *
  * Tests the documentsSyncProvider logic without a live DB:
- * - getHashEntries filters by syncPolicy (SYNC or null only)
+ * - serializeFromCursor filters by syncPolicy (SYNC or null only)
  * - Nodes without syncId are excluded
- * - serializeToJson round-trips cleanly through the Zod schema
+ * - serializeFromCursor round-trips cleanly through the Zod schema
  * - upsertFromJson last-writer-wins on updatedAt
  * - upsertFromJson tombstone (isDeleted) deletes local record
  * - CortexSyncPolicy.LOCAL nodes are excluded from sync
@@ -37,7 +37,9 @@ const syncedDocumentSchema = z.object({
 
 type SyncedDocument = z.infer<typeof syncedDocumentSchema>;
 
-function makeDoc(partial: Partial<SyncedDocument> & { syncId: string }): SyncedDocument {
+function makeDoc(
+  partial: Partial<SyncedDocument> & { syncId: string },
+): SyncedDocument {
   return {
     path: "/memories/identity/name.md",
     content: "Max",
@@ -61,6 +63,7 @@ describe("syncedDocumentSchema", () => {
   it("requires syncId", () => {
     const doc = makeDoc({ syncId: "abc" });
     const { syncId: _removed, ...rest } = doc;
+    void _removed;
     expect(() => syncedDocumentSchema.parse(rest)).toThrow();
   });
 
@@ -103,14 +106,18 @@ describe("syncedDocumentSchema", () => {
 // ── Sync policy filtering logic ───────────────────────────────────────────────
 
 describe("sync policy filtering", () => {
-  // Mirrors the WHERE clause in getHashEntries:
+  // Mirrors the WHERE clause in serializeFromCursor:
   // syncPolicy IS NULL OR syncPolicy = CortexSyncPolicy.SYNC
   function shouldSync(
     syncPolicy: string | null | undefined,
     syncId: string | null,
   ): boolean {
-    if (!syncId) {return false;}
-    if (syncPolicy === null || syncPolicy === undefined) {return true;}
+    if (!syncId) {
+      return false;
+    }
+    if (syncPolicy === null || syncPolicy === undefined) {
+      return true;
+    }
     return syncPolicy === CortexSyncPolicy.SYNC;
   }
 
@@ -138,14 +145,11 @@ describe("sync policy filtering", () => {
 
 // ── Last-writer-wins merge logic ──────────────────────────────────────────────
 
-describe("last-writer-wins merge", () => {
-  function shouldUpdate(
-    remoteUpdatedAt: string,
-    localUpdatedAt: Date,
-  ): boolean {
-    return new Date(remoteUpdatedAt).getTime() > localUpdatedAt.getTime();
-  }
+function shouldUpdate(remoteUpdatedAt: string, localUpdatedAt: Date): boolean {
+  return new Date(remoteUpdatedAt).getTime() > localUpdatedAt.getTime();
+}
 
+describe("last-writer-wins merge", () => {
   it("remote newer than local → update", () => {
     expect(
       shouldUpdate("2026-06-01T00:00:00Z", new Date("2026-01-01T00:00:00Z")),
@@ -225,10 +229,10 @@ describe("documentsSyncProvider registration", () => {
     expect(documentsSyncProvider.key).toBe("documents");
   });
 
-  it("implements the SyncProvider interface (getHashEntries, serializeToJson, upsertFromJson)", async () => {
+  it("implements the SyncProvider interface (getCursor, serializeFromCursor, upsertFromJson)", async () => {
     const { documentsSyncProvider } = await import("./sync-provider");
-    expect(typeof documentsSyncProvider.getHashEntries).toBe("function");
-    expect(typeof documentsSyncProvider.serializeToJson).toBe("function");
+    expect(typeof documentsSyncProvider.getCursor).toBe("function");
+    expect(typeof documentsSyncProvider.serializeFromCursor).toBe("function");
     expect(typeof documentsSyncProvider.upsertFromJson).toBe("function");
   });
 });

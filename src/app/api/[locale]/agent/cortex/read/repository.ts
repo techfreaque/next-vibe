@@ -20,17 +20,16 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CortexNodeType } from "../enum";
 import {
-  getNode,
   getMountPrefix,
+  getNode,
   isValidPath,
   isVirtualWritable,
   isWritablePath,
-  normalizeToCanonicalPath,
   normalizePath,
+  normalizeToCanonicalPath,
 } from "../repository";
 import type { CortexReadT } from "./i18n";
 
-import type { CortexReadT } from "./i18n";
 interface ReadParams {
   userId: string;
   user: JwtPrivatePayloadType;
@@ -70,82 +69,12 @@ export class CortexReadRepository {
       });
     }
 
-    // Filesystem backend for preview-mode admin
-    if (!user.isPublic) {
-      const { isFilesystemMode } = await import("../fs-provider");
-      if (isFilesystemMode(user)) {
-        const mountPrefix = getMountPrefix(path, locale);
-        // Virtual mounts are not on disk - delegate to virtual resolver inline
-        if (mountPrefix && !isWritablePath(path, locale)) {
-          return CortexReadRepository.readVirtualMount(
-            userId,
-            path,
-            mountPrefix,
-            maxLines,
-            logger,
-            t,
-          );
-        }
-        // Native paths (memories, documents) - use filesystem
-        if (mountPrefix) {
-          const { ensureMountPopulated } =
-            await import("../fs-provider/fs-populate");
-          await ensureMountPopulated(mountPrefix, userId, logger);
-        }
-        const { fsReadFile } = await import("../fs-provider/fs-read");
-        const fsResult = await fsReadFile(path, maxLines, { t });
-        if (fsResult.success) {
-          return fsResult;
-        }
-        // Non-NOT_FOUND error (e.g. FORBIDDEN, INTERNAL) - return immediately
-        if (fsResult.errorType !== ErrorResponseTypes.NOT_FOUND) {
-          return fsResult;
-        }
-        // NOT_FOUND on disk - check virtual templates (memories/documents only)
-        const { getAllTemplates } = await import("../seeds/templates");
-        if (path.startsWith("/memories/")) {
-          const templates = getAllTemplates(locale);
-          const template = templates.find(
-            (item) => item.seedOnlyNew && item.path === path,
-          );
-          if (template) {
-            const content = template.content;
-            return success({
-              responsePath: path,
-              content,
-              size: Buffer.byteLength(content, "utf8"),
-              truncated: false,
-              readonly: false,
-              nodeType: "file",
-              updatedAt: new Date().toISOString(),
-            });
-          }
-        } else if (path.startsWith("/documents/")) {
-          const templates = getAllTemplates(locale);
-          const template = templates.find(
-            (item) => item.updateIfUnchanged && item.path === path,
-          );
-          if (template) {
-            const content = template.content;
-            return success({
-              responsePath: path,
-              content,
-              size: Buffer.byteLength(content, "utf8"),
-              truncated: false,
-              readonly: false,
-              nodeType: "file",
-              updatedAt: new Date().toISOString(),
-            });
-          }
-        }
-        return fsResult; // genuine NOT_FOUND
-      }
-    }
-
     const mountPrefix = getMountPrefix(path, locale);
 
     // Virtual mount reads - delegate to mount resolvers
     if (mountPrefix && !isWritablePath(path, locale)) {
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
       return CortexReadRepository.readVirtualMount(
         userId,
         path,
@@ -153,6 +82,8 @@ export class CortexReadRepository {
         maxLines,
         logger,
         t,
+        isAdmin,
+        locale,
       );
     }
 
@@ -242,16 +173,29 @@ export class CortexReadRepository {
     maxLines: number | undefined,
     logger: EndpointLogger,
     t: CortexReadT,
+    isAdmin: boolean,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ReadResult>> {
     try {
       // Dynamic import to avoid pulling in all mount code at module load
       const { resolveVirtualRead } = await import("../mounts/resolver");
-      const result = await resolveVirtualRead(userId, path, mountPrefix);
+      const result = await resolveVirtualRead(
+        userId,
+        path,
+        mountPrefix,
+        isAdmin,
+        locale,
+      );
 
       if (!result) {
         // Path may be a directory in the virtual mount - render a listing summary
         const { resolveVirtualList } = await import("../mounts/resolver");
-        const entries = await resolveVirtualList(userId, path, mountPrefix);
+        const entries = await resolveVirtualList(
+          userId,
+          path,
+          mountPrefix,
+          isAdmin,
+        );
         // Treat as a dir if it has entries OR if it's a known dir path (mount root or subdir)
         const isKnownDir =
           path === mountPrefix || path.startsWith(`${mountPrefix}/`);
@@ -312,6 +256,3 @@ export class CortexReadRepository {
     }
   }
 }
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";

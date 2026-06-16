@@ -16,8 +16,9 @@
  *          - Final assistant message appears AFTER the compacting message
  *          - Stream completes successfully (not aborted)
  *
- * compactTrigger is injected via favoriteConfig (no DB writes needed).
- * null = revert to platform default (32k) for C1.
+ * Tests use the real quality-tester__kimi favorite (created in beforeAll if absent).
+ * C1/C2 temporarily patch compactTrigger=5000 on the fav and restore null after.
+ * This lets the user override the fav via the UI — the test only changes compactTrigger.
  *
  * Cache bust: delete fixtures/http-cache/compacting-* to force new LLM calls.
  */
@@ -34,62 +35,73 @@ installFetchCache();
 
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { db } from "@/app/api/[locale]/system/db";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { defaultLocale } from "@/i18n/core/config";
-import { eq } from "drizzle-orm";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "../../constants";
 import {
   fetchThreadMessages,
+  getOrCreateFolder,
+  resolveUser,
   runTestStream,
   type SlimMessage,
 } from "../../testing/headless-test-runner";
 import { setFetchCacheContext } from "../../testing/fetch-cache";
 import { env } from "@/config/env";
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/**
+ * Temporarily set compactTrigger on a favorite. Returns an async function that
+ * restores the original value (whatever was there before the patch).
+ * Usage: const restore = await withFavCompactTrigger(favId, user, 5000);
+ * try { ... } finally { await restore(); }
+ */
+async function withFavCompactTrigger(
+  favoriteId: string,
+  user: JwtPrivatePayloadType,
+  value: number,
+): Promise<() => Promise<void>> {
+  const userId = "id" in user ? String(user.id) : "";
+  const { resolveFavoriteConfig } = await import(
+    "@/app/api/[locale]/agent/chat/favorites/repository"
+  );
+  const patchDef = await import(
+    "@/app/api/[locale]/agent/chat/favorites/[id]/definition"
+  ).then((m) => m.default.PATCH);
+
+  // Read original value before patching
+  const original = await resolveFavoriteConfig(favoriteId, userId);
+  const originalCompactTrigger = original?.compactTrigger ?? null;
+
+  await RouteExecuteRepository.runInProcessTyped({
+    definition: patchDef,
+    input: { urlPathParams: { id: favoriteId }, compactTrigger: value },
+    user,
+    locale: defaultLocale,
+    platform: Platform.AI,
+  });
+
+  return async () => {
+    await RouteExecuteRepository.runInProcessTyped({
+      definition: patchDef,
+      input: { urlPathParams: { id: favoriteId }, compactTrigger: originalCompactTrigger },
+      user,
+      locale: defaultLocale,
+      platform: Platform.AI,
+    });
+  };
+}
+
 // ── Test timeouts ─────────────────────────────────────────────────────────────
 
 /** Allow ample time for multi-step tool loops */
 const TEST_TIMEOUT = 300_000;
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-async function resolveAdminUser(): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await UserRepository.getUserByEmail(
-    env.VIBE_ADMIN_USER_EMAIL,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  const user = result.data;
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-    }),
-    db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-  ]);
-  if (!link) {
-    return null;
-  }
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-  return { isPublic: false, id: user.id, leadId: link.leadId, roles };
-}
 
 /**
  * Build the full ordered chain by following parentId links from root → leaf.
@@ -181,6 +193,8 @@ function assertStrictLinearChain(messages: SlimMessage[], label: string): void {
 
 describe("Compacting - context management", () => {
   let testUser: JwtPrivatePayloadType;
+  let compactingFolderId: string;
+  let mainFavoriteId: string;
   let suiteFailed = false;
 
   function fit(name: string, fn: () => Promise<void>, timeout?: number): void {
@@ -203,7 +217,7 @@ describe("Compacting - context management", () => {
   }
 
   beforeAll(async () => {
-    const resolved = await resolveAdminUser();
+    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
     expect(
       resolved,
       `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
@@ -212,6 +226,46 @@ describe("Compacting - context management", () => {
       return;
     }
     testUser = resolved;
+
+    // Create BACKGROUND/tests/compacting subfolder for this suite.
+    const testsParentId = await getOrCreateFolder(testUser, DefaultFolderId.BACKGROUND, "tests");
+    compactingFolderId = await getOrCreateFolder(testUser, DefaultFolderId.BACKGROUND, "compacting", testsParentId);
+
+    // ── Resolve quality-tester__kimi favorite ──
+    // Use existing fav if present (respects user overrides). Create only if absent.
+    const [favsDef, favoriteCreateDef] = await Promise.all([
+      import("@/app/api/[locale]/agent/chat/favorites/definition").then((m) => m.default.GET),
+      import("@/app/api/[locale]/agent/chat/favorites/create/definition").then((m) => m.default.POST),
+    ]);
+    const favsResult = await RouteExecuteRepository.runInProcessTyped({
+      definition: favsDef,
+      input: { pageSize: 500 },
+      user: testUser,
+      locale: defaultLocale,
+      platform: Platform.AI,
+    });
+    const favsList = favsResult.success && Array.isArray(favsResult.data?.["favorites"])
+      ? (favsResult.data["favorites"] as Record<string, unknown>[])
+      : [];
+    const existingMain = favsList.find(
+      (f) => String(f["skillId"] ?? "").startsWith("quality-tester__"),
+    );
+    if (existingMain?.["id"]) {
+      mainFavoriteId = String(existingMain["id"]);
+    } else {
+      const createResult = await RouteExecuteRepository.runInProcessTyped({
+        definition: favoriteCreateDef,
+        input: { skillId: "quality-tester__kimi" },
+        user: testUser,
+        locale: defaultLocale,
+        platform: Platform.AI,
+      });
+      expect(createResult.success, `Failed to create quality-tester__kimi fav: ${!createResult.success ? createResult.message : ""}`).toBe(true);
+      if (!createResult.success) {
+        return;
+      }
+      mainFavoriteId = String(createResult.data?.["id"] ?? "");
+    }
 
     // Top up credits so fixture-cached runs never hit the credit gate.
     // 500cr floor matches route-base.test.ts convention.
@@ -258,6 +312,10 @@ describe("Compacting - context management", () => {
     async () => {
       setFetchCacheContext("compacting-first-tool");
 
+      // Temporarily lower compactTrigger on the fav to force mid-stream compacting.
+      // Restored to its original value after the test regardless of outcome.
+      const restoreC1 = await withFavCompactTrigger(mainFavoriteId, testUser, 5_000);
+      try {
       // Moderate padding to ensure the context is heavy enough for compacting
       // to fire (same mechanism as C2 but with less padding to distinguish).
       const contextPadding = [...Array(3).keys()]
@@ -266,29 +324,6 @@ describe("Compacting - context management", () => {
             `Context block ${String(i + 1)}: This is filler text to increase the prompt token count for the C1 mid-stream compacting test. The compacting mechanism fires when accumulated context exceeds the threshold after multiple tool call round-trips. `,
         )
         .join("");
-
-      const favoriteConfig = {
-        id: "test-c1-mid-stream-compacting",
-        skillId: "quality-tester",
-        modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
-        voiceModelSelection: null,
-        sttModelSelection: null,
-        imageVisionModelSelection: null,
-        videoVisionModelSelection: null,
-        audioVisionModelSelection: null,
-        imageGenModelSelection: null,
-        musicGenModelSelection: null,
-        videoGenModelSelection: null,
-        availableTools: [{ toolId: "tool-help", requiresConfirmation: false }],
-        pinnedTools: [{ toolId: "tool-help", requiresConfirmation: false }],
-        deniedTools: null,
-        // Same threshold as C2 (proven to work). Lower padding than C2 so the
-        // initial context is lighter — compacting still fires at step 5 (minimum
-        // eligible step given RECENT_TURNS_TO_KEEP=8) but with less history compacted.
-        compactTrigger: 5_000,
-        memoryLimit: null,
-        promptAppend: null,
-      } as const;
 
       const { result, messages } = await runTestStream({
         prompt:
@@ -299,8 +334,9 @@ describe("Compacting - context management", () => {
           `After ALL 5 tool calls are complete, respond with ONLY the word: C1_PASS if all tools returned results, or C1_FAIL:<reason> if anything went wrong. ` +
           `Do NOT add any other text.`,
         user: testUser,
-        skill: "quality-tester",
-        favoriteConfig,
+        favoriteId: mainFavoriteId,
+        rootFolderId: DefaultFolderId.BACKGROUND,
+        subFolderId: compactingFolderId,
       });
 
       expect(result.success, "C1: stream must succeed").toBe(true);
@@ -354,6 +390,9 @@ describe("Compacting - context management", () => {
           `C1: chain[${String(i)}] createdAt must be >= chain[${String(i - 1)}] createdAt (UI sort order broken)`,
         ).toBeGreaterThanOrEqual(c1Chain[i - 1]!.createdAt.getTime());
       }
+      } finally {
+        await restoreC1();
+      }
     },
     TEST_TIMEOUT,
   );
@@ -371,29 +410,10 @@ describe("Compacting - context management", () => {
     async () => {
       setFetchCacheContext("compacting-mid-stream");
 
-      const favoriteConfig = {
-        id: "test-compacting-override",
-        skillId: "quality-tester",
-        modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
-        voiceModelSelection: null,
-        sttModelSelection: null,
-        imageVisionModelSelection: null,
-        videoVisionModelSelection: null,
-        audioVisionModelSelection: null,
-        imageGenModelSelection: null,
-        musicGenModelSelection: null,
-        videoGenModelSelection: null,
-        availableTools: [{ toolId: "tool-help", requiresConfirmation: false }],
-        pinnedTools: [{ toolId: "tool-help", requiresConfirmation: false }],
-        deniedTools: null,
-        // Low threshold forces mid-stream compacting without triggering pre-stream.
-        // Pre-stream estimate for new thread: system+tools+user ≈ 3600 tokens (< 5000).
-        // After 3+ tool round-trips the step messages exceed 5000 → compacting fires.
-        compactTrigger: 5000,
-        memoryLimit: null,
-        promptAppend: null,
-      } as const;
-
+      // Temporarily lower compactTrigger on the fav to force mid-stream compacting.
+      // Restored to its original value after the test regardless of outcome.
+      const restoreC2 = await withFavCompactTrigger(mainFavoriteId, testUser, 5_000);
+      try {
       // ── Turn 1: tool loop → mid-stream compacting → COMPACT_DONE ─────────────
       // 5 sequential tool-help calls build enough history to cross the 5000-token
       // threshold mid-stream. RECENT_TURNS_TO_KEEP=8 means we need ≥9 afterFirst
@@ -414,8 +434,9 @@ describe("Compacting - context management", () => {
           `After ALL 5 tool calls are complete, respond with ONLY the word: COMPACT_DONE. ` +
           `Do NOT add any other text. COMPACT_DONE is the ONLY acceptable final response.`,
         user: testUser,
-        skill: "quality-tester",
-        favoriteConfig,
+        favoriteId: mainFavoriteId,
+        rootFolderId: DefaultFolderId.BACKGROUND,
+        subFolderId: compactingFolderId,
       });
 
       expect(turn1.result.success, "C2-T1: turn 1 stream must succeed").toBe(true);
@@ -449,9 +470,8 @@ describe("Compacting - context management", () => {
           "[C2-FOLLOWUP] Respond with ONLY the word: FOLLOWUP_DONE. " +
           "No preamble, no tools, no punctuation beyond that.",
         user: testUser,
-        skill: "quality-tester",
+        favoriteId: mainFavoriteId,
         threadId: threadId!,
-        favoriteConfig,
       });
 
       expect(turn2.result.success, "C2-T2: turn 2 stream must succeed").toBe(true);
@@ -509,7 +529,7 @@ describe("Compacting - context management", () => {
 
       // ── DB persistence: re-fetch and confirm compacting survives both turns ───
       if (threadId) {
-        const freshMessages = await fetchThreadMessages(threadId);
+        const freshMessages = await fetchThreadMessages(threadId, testUser);
         assertStrictLinearChain(freshMessages, "C2-fresh");
         const persistedCompacting = freshMessages.find((m) => m.isCompacting);
         expect(
@@ -520,6 +540,34 @@ describe("Compacting - context management", () => {
           persistedCompacting!.id,
           "C2-fresh: persisted compacting id must match turn-1 compacting id",
         ).toBe(t1CompactMsg.id);
+
+        // ── Compacting quality assertions (all compacting messages in thread) ──
+        const allCompacting = freshMessages.filter((m) => m.isCompacting);
+        expect(
+          allCompacting.length,
+          "C2-quality: thread must have at least one compacting message",
+        ).toBeGreaterThanOrEqual(1);
+
+        for (const cm of allCompacting) {
+          // Content must be a meaningful summary: ≥500 chars (~125 tokens minimum)
+          expect(
+            (cm.content ?? "").length,
+            `C2-quality: compacting msg ${cm.id} content must be ≥500 chars (meaningful summary, not empty or stub)`,
+          ).toBeGreaterThanOrEqual(500);
+
+          // Input tokens must be reasonable — sanity guard against runaway context
+          expect(
+            cm.promptTokens,
+            `C2-quality: compacting msg ${cm.id} must have promptTokens recorded`,
+          ).not.toBeNull();
+          expect(
+            cm.promptTokens!,
+            `C2-quality: compacting msg ${cm.id} input tokens must be ≤50k`,
+          ).toBeLessThanOrEqual(50_000);
+        }
+      }
+      } finally {
+        await restoreC2();
       }
     },
     TEST_TIMEOUT,

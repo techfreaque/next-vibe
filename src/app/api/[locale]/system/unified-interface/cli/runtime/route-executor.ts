@@ -4,7 +4,19 @@
  * Handles CLI-specific concerns: argument parsing, interactive forms, output formatting
  */
 
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
+import type { RemoteCallData } from "@/app/api/[locale]/remote-connection/dispatch";
+import {
+  AUTH_TOKEN_COOKIE_NAME,
+  LEAD_ID_COOKIE_NAME,
+} from "@/config/constants";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";

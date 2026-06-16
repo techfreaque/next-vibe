@@ -792,7 +792,7 @@ export class BrowserRepository {
     // a new one. Every other platform (MCP, web, …) has a stable process PID.
     const sessionId =
       data.instanceId ?? (isCliPlatform(platform) ? "cli" : env.VIBE_PID);
-    logger.info("[Browser] Executing tool", {
+    logger.debug("[Browser] Executing tool", {
       tool: data.tool,
       sessionId,
     });

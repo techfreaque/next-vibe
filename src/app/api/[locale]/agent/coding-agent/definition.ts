@@ -36,6 +36,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "coding-agent"],
   title: "codingAgent.run.post.title",
+  titleShort: "codingAgent.run.post.titleShort",
   description: "codingAgent.run.post.description",
   dynamicTitle: ({ request }) => {
     if (request?.prompt) {
@@ -51,10 +52,12 @@ const { POST } = createEndpoint({
     return undefined;
   },
   icon: "terminal",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "ai",
+  subCategory: "Tools",
   tags: ["codingAgent.tags.tasks" as const],
   allowedRoles: [UserRole.ADMIN],
+  defaultAiPinned: [UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.ADMIN] as const,
   aliases: [CODING_AGENT_ALIAS, "claude-code", "claude", "open-code"],
 
   // No stream timeout - sessions can run indefinitely

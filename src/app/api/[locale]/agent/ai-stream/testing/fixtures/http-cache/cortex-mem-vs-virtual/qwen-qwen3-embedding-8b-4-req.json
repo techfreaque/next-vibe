@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/i-need-to-test-write-isolation--first--try----b3ef4a61-e372-4527-beb9-9017a2fce1d0.md\n\n# I need to test write isolation. First, try...\nFolder: cron",
+    "encoding_format": "float"
+  }
+}

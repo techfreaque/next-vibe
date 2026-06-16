@@ -1,0 +1,806 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "authorization": "[redacted]",
+    "content-type": "application/json",
+    "http-referer": "https://unbottled.ai",
+    "user-agent": "ai-sdk/openrouter/2.5.1 ai-sdk/provider-utils/4.0.1 runtime/bun/1.3.14",
+    "x-openrouter-categories": "general-chat,roleplay,personal-agent",
+    "x-title": "Unbottled AI"
+  },
+  "body": {
+    "messages": [
+      {
+        "content": [
+          {
+            "cache_control": {
+              "ttl": "1h",
+              "type": "ephemeral"
+            },
+            "text": "# unbottled.ai - Automated Agent\n\n**Current Date:** 2026-06-16\n\nYou are an automated AI agent running on unbottled.ai. No human is present - you are executing a programmatic task. Complete the task fully, then emit your final response and stop. Only your last non-tool-call message is returned to the requester; anything sent alongside a tool call is discarded.\n\n## unbottled.ai\n\n- **Models:** 134 — Claude, GPT, Gemini, Llama, and UncensoredLM v1.2, FreedomGPT Liberty, Gab AI Arya, Venice Uncensored 1.1.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Free tier:** 20 credits/month via browser ID - no account needed.\n- **Subscription:** $8/month → 800 credits. **Credit packs:** $5 → 500 permanent credits.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).\n\n## Automated Execution Context\n\n**⚠ Only your LAST message (no tool call) is returned to the caller. Any text you emit alongside a tool call is silently discarded.**\n\nNo user watching. Complete the task. No follow-up questions. No pleasantries.\n\nThis thread lives in the **background** folder - standard home for scheduled sub agents and tasks.\n- If the task fails, state clearly why.\n- State your result once, at the end, without preamble.\n\n## Output Language\n\nRespond in English (en-GLOBAL) unless the task explicitly specifies otherwise.\n\n## Current Context\n\n- **Folder:** cron - Background task conversations - AI agent background runs triggered by ai-run or tasks. Visible to the owning user\n\n## Desktop Control — Linux/KDE Wayland\nMonitors:\n  DP-1 [PRIMARY]: 1440×2560 @(3734,92)\n  DP-3: 2294×960 @(1440,1200)\n  HDMI-A-1: 1920×1200 @(1667,0)\n  DP-2: 1440×2560 @(0,92)\n\nYou can fully control this desktop. Act fast — don't narrate, just do.\n**KDE shortcuts & power-user knowledge:**\n- **Alt+F2** → KRunner (launch apps, run commands, calc, unit convert). Fastest way to open anything.\n- **Alt+F4** → close focused window. **Super+D** → show desktop.\n- **Super+PageUp/Down** → maximize/minimize. **Super+Left/Right** → snap window to half screen.\n- **Ctrl+F1–F4** → switch virtual desktops.\n- **KRunner commands:** type `=2+2` to calculate, `define word` to look up, `shell: cmd` to run a terminal command.\n- **System Settings:** `systemsettings` or Alt+F2 → \"System Settings\".\n- **kscreen-doctor -o** → live monitor layout with scale/rotation. `kscreen-doctor output.NAME.enable` to toggle a monitor.\n- **qdbus6 org.kde.KWin` → KWin scripting bus. Use it for advanced window management.\n- **kdesu` → GUI sudo dialog (triggers a polkit prompt). Better than CLI sudo for GUI apps.\n- **Dolphin** = file manager. **Konsole** = terminal. **Spectacle** = screenshot tool.\n- **kwriteconfig6 / kreadconfig6** → read/write KDE config files without restarting apps.\n- Notification popups appear bottom-right; interact with `click` at that region or dismiss with `press-key` Escape.\n\n**Tool names** (use `tool-help` to get schema before first call to each):\n| Tool | Key params |\n|------|-----------|\n| `desktop_take-screenshot_POST` | `monitorName` (default: DP-1) |\n| `desktop_list-windows_POST` | — returns windowId, title, monitor per window |\n| `desktop_list-monitors_POST` | — live monitor layout |\n| `desktop_get-focused-window_POST` | — active window id/title |\n| `desktop_focus-window_POST` | `windowId` or `title` or `pid` |\n| `desktop_move-window-to-monitor_POST` | `windowId`/`title`/`pid` + `monitorName`/`monitorIndex` |\n| `desktop_get-accessibility-tree_POST` | `appName`, `maxDepth` (3–5) |\n| `desktop_click_POST` | `x`, `y` (logical pixels, absolute) |\n| `desktop_type-text_POST` | `text` |\n| `desktop_press-key_POST` | `key` (e.g. \"ctrl+c\", \"super+d\", \"alt+f2\") |\n| `desktop_move-mouse_POST` | `x`, `y` |\n| `desktop_scroll_POST` | `x`, `y`, `direction`, `amount` |\n\n**Rules:**\n- Coordinates are logical pixels matching monitor positions above.\n- Screenshot after every interaction to verify state. Use `monitorName` to target the right screen.\n- To find click targets: `get-accessibility-tree` → read bbox → click center.\n- `list-windows` first when you need a windowId — it includes which monitor each window is on.\n- Parallel tool calls where safe (e.g. screenshot + list-windows simultaneously).\n\n## Tool Execution\n\n**Schema first:** Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.\n\n**callbackMode** (optional on every tool, default: omit = synchronous):\n\n- **omit** (default) — synchronous, result inline, loop continues\n- **`\"detach\"`** — fire-and-forget, returns `{taskId}`, use `wait-for-task` later if needed\n- **`\"wakeUp\"`** — fire-and-forget, result auto-injected when ready, do NOT call `wait-for-task`\n- **`\"wait\"`** — block for a remote task\n- **`\"endLoop\"`** — end the entire turn after this batch (use ONLY when fully done)\n- **`\"approve\"`** — pause for user confirmation\n\nFast tools (search, lookup, schema) → always omit. Async only for operations taking minutes.\n\n## Media capabilities\n- Images: GPT-5 Image Mini available. Use `tool-help` with `toolName=\"generate_image\"` to get the full schema, then call it via `execute-tool`.\n- Music/audio: Sonauto Song available. Use `tool-help` with `toolName=\"generate_music\"` to get the full schema, then call it via `execute-tool`.\n- Video: Veo 3.1 Fast available. Use `tool-help` with `toolName=\"generate_video\"` to get the full schema, then call it via `execute-tool`.\n\n## Output Format\n\nUse plain, structured text. Markdown is fine for readability; avoid decorative formatting. Be concise and complete.\n\n## Web\n\nYou can search the web and read URLs:\n- `web-search` - search query → results (auto-selects user's preferred engine)\n- `fetch-url` - any URL → markdown content\nFor JS-heavy sites or interactive pages, the local version of unbottled includes full browser automation.\n\n## Contact Support\nTool: `contact-form` - use for bugs, billing, complaints, or anything needing a human.\nAlways confirm before submitting (show what will be sent). Never submit silently. Pass `callbackMode: \"endLoop\"` - terminal action, always last.\nIf user seems frustrated or stuck, offer: \"Want me to ping our support team?\"\nUser is logged in - leave email field empty.\n\n## Your Role\n\nYou are an AI assistant on a platform where users pay credits per interaction. Do what the user asks.\n\nWhile doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.\n\nHARD STOP - if any of these happen, stop and report instead of retrying or working around it:\n- A tool returns an error, empty result, or nonsensical output\n- Same failure happens twice\n- A generated result (image/music/video) is missing, broken URL, or clearly wrong\n- Credit cost seems unreasonable for what was done\n- You see raw IDs, internal field names, JSON blobs, or stack traces in anything user-facing\n- A tool name, description, or parameter is confusing or misleading\n- An error message doesn't tell the user what to do about it\n- You hit a dead end with no path forward\n\nFailure report format:\n1. What the user asked for\n2. What actually happened\n3. Exact error text, tool name, or result\n4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)\n\nIf everything works, respond normally to the user. Only flag issues - don't narrate the process.\n\n## System Context\n\n- **Instance:** Cloud production (unbottled.ai)\n- **URL:** http://localhost:3000\n- **Instance ID:** atlas\n- **Environment:** development (NODE_ENV=development)\n- **Models available:** 134\n- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.\n\n**Your role:** Local dev companion. Help with development, execute delegated tasks, process work from production.\n- Server: http://localhost:3000 (also: dev hot-reload server for UI testing)\n- Check the **cron dashboard** for tasks delegated from production.\n\n**Task routing:** Tasks with `targetInstance` matching `atlas` run here.\n\n## SSH / Machines\n\n1 machine configured (SSH connections + remote instances).\n\n**Execute commands:** `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` — persistent terminal with tracked cwd.\n**Browse files:** `cortex-list(path=\"/ssh/<machine>/\")` — remote filesystem. `cortex-read(path=\"/ssh/<machine>/etc/hosts\")` — read file via SFTP.\n**Active terminals:** `cortex-terminals` — list all terminals with cwd. Sessions persist between calls.\n**Connections:** `cortex-list(path=\"/ssh\")` — all machines. Remote instances appear alongside SSH connections.",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:4512a3cc | Posted:Jun 16, 19:13]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "Use cortex-list to list the directory at /threads. Tell me what root folders you see (private, cron, shared, public, or similar). List every entry name you receive.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
+        "role": "user"
+      },
+      {
+        "content": "",
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"path\":\"/threads\"}",
+              "name": "cortex-list"
+            },
+            "id": "functions.cortex-list:0",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"entries\":[{\"entryPath\":\"/threads/private\",\"name\":\"private\",\"nodeType\":\"dir\",\"size\":null,\"updatedAt\":\"2026-06-16T19:13:53.745Z\"},{\"entryPath\":\"/threads/shared\",\"name\":\"shared\",\"nodeType\":\"dir\",\"size\":null,\"updatedAt\":\"2026-06-16T19:13:53.745Z\"},{\"entryPath\":\"/threads/public\",\"name\":\"public\",\"nodeType\":\"dir\",\"size\":null,\"updatedAt\":\"2026-06-16T19:13:53.745Z\"},{\"entryPath\":\"/threads/cron\",\"name\":\"cron\",\"nodeType\":\"dir\",\"size\":null,\"updatedAt\":\"2026-06-16T19:13:53.745Z\"}],\"responsePath\":\"/threads\",\"total\":4}",
+        "name": "cortex-list",
+        "role": "tool",
+        "tool_call_id": "functions.cortex-list:0"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:4672ff48 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 16, 19:14]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "The `/threads` directory contains 4 root folders:\n\n- private\n- shared\n- public\n- cron\n\nVERDICT: PASS",
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:622b9e2c | Posted:Jun 16, 19:14]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "Use cortex-list on /threads/cron to find a thread file (it will end in .md). Then use cortex-read to read it. Confirm the file has frontmatter with threadId and a conversation body. Quote the threadId from the frontmatter.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
+        "role": "user"
+      },
+      {
+        "content": [
+          {
+            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (19)\n│   ├── [📌] critical-note.md\n│   │   This is a PINNED critical note. It must ALWAYS appear in the system prompt, never trimmed.\n│   ├── t2-cheap-test [89%]\n│   │   T2_CHEAP_OK\n│   ├── life-career-moved.md [66%]\n│   │   Building unbottled.ai, a free-speech AI platform. · ## Goals · - Short-term: Launch v1 with 50+ models · - Medium-term: 10k users · - Long-term: Become the default AI layer for open web · ##…\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── skills.md\n│   │   <!-- Your technical and professional skills. What you're expert in, what you're learning. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── background.md\n│   │   <!-- Your background, experience, and how you got here. Shapes context for every interaction. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (30)\n├── skills/ (10 created)\n│   ├── Updated Code Reviewer (code-reviewer) (created)\n│   │   Updated system prompt\n│   ├── Code Reviewer (code-reviewer-4) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-2) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-3) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Code Reviewer (code-reviewer-2) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── [TEST SKILL] Unlisted Skill (test-skill-unlisted-skill) (created)\n│   ├── [TEST SKILL] Minimal Draft (test-skill-minimal-draft) (created)\n│   ├── [TEST SKILL] Layout Preview Bot (test-skill-layout-preview-bot) (created)\n│   │   If someone is chatting with you, something has gone wrong. Apologize and redirect them to a real ski\n│   ├── [TEST SKILL] High-Vote Published (test-skill-high-vote-published) (created)\n│   │   Very impressive.\n│   ├── d8021d85-b839-4ac3-81f8-ad2f9955457d [71%]\n│   ├── 2600251a-efb7-4ee7-8097-d66d56033f99 [71%]\n│   ├── 60eefc7d-f992-43d1-a0c9-03e57ffd1127 [71%]\n│   ├── 868db177-5cd8-4250-a900-26b418b4ec75 [71%]\n│   └── 8699e6f3-5842-4e25-a274-8a6ed306a415 [71%]\n└── favorites/ (7)\n    ├── quality-tester\n    │   model: skill:quality-tester\n    ├── My Technical\n    │   model: skill:technical\n    ├── thea-2\n    │   model: skill:thea\n    ├── My Technical\n    │   model: skill:technical\n    ├── thea-3\n    │   model: skill:thea\n    ├── My Technical\n    │   model: skill:technical\n    └── thea-4\n        model: skill:thea\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:29dd97cc | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 16, 19:14]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": " ",
+        "reasoning": " The user wants me to:\n1. Use cortex-list on /threads/cron to find a thread file ending in .md\n2. Use cortex-read to read it\n3. Confirm it has frontmatter with threadId and a conversation body\n4. Quote the threadId from the frontmatter\n\nLet me start by listing /threads/cron.",
+        "reasoning_details": [
+          {
+            "format": "unknown",
+            "index": 0,
+            "text": " The user wants me to:\n1. Use cortex-list on /threads/cron to find a thread file ending in .md\n2. Use cortex-read to read it\n3. Confirm it has frontmatter with threadId and a conversation body\n4. Quote the threadId from the frontmatter\n\nLet me start by listing /threads/cron.",
+            "type": "reasoning.text"
+          }
+        ],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"path\":\"/threads/cron\"}",
+              "name": "cortex-list"
+            },
+            "id": "functions.cortex-list:1",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": "{\"entries\":[{\"entryPath\":\"/threads/cron/test-create-a-new-skill-and-a-favorite-for-it-4124e221-0a93-44f5-92a5-05847794858e.md\",\"name\":\"test-create-a-new-skill-and-a-favorite-for-it-4124e221-0a93-44f5-92a5-05847794858e.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T19:14:25.506Z\"},{\"entryPath\":\"/threads/cron/use-cortex-list-to-list-the-directory-at-12334a01-3686-44c9-845e-839664af9c8a.md\",\"name\":\"use-cortex-list-to-list-the-directory-at-12334a01-3686-44c9-845e-839664af9c8a.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T19:14:09.719Z\"},{\"entryPath\":\"/threads/cron/use-cortex-list-to-list-the-directory-at-93595f50-807e-4d65-9c70-d0338e08e1b7.md\",\"name\":\"use-cortex-list-to-list-the-directory-at-93595f50-807e-4d65-9c70-d0338e08e1b7.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T19:13:32.243Z\"},{\"entryPath\":\"/threads/cron/use-the-cortex-write-tool-to-create-a-file-at-32a8d868-4426-4fe7-b155-54aab89ba1f1.md\",\"name\":\"use-the-cortex-write-tool-to-create-a-file-at-32a8d868-4426-4fe7-b155-54aab89ba1f1.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T19:13:32.145Z\"},{\"entryPath\":\"/threads/cron/test-create-a-new-skill-and-a-favorite-for-it-7e0a8fad-dcb2-4e87-aab9-f0110474ea2b.md\",\"name\":\"test-create-a-new-skill-and-a-favorite-for-it-7e0a8fad-dcb2-4e87-aab9-f0110474ea2b.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T18:32:21.761Z\"},{\"entryPath\":\"/threads/cron/test-create-a-new-skill-and-a-favorite-for-it-03b29ccc-4583-4e35-ac54-2d283ee84ade.md\",\"name\":\"test-create-a-new-skill-and-a-favorite-for-it-03b29ccc-4583-4e35-ac54-2d283ee84ade.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T18:32:09.466Z\"},{\"entryPath\":\"/threads/cron/test-create-a-new-skill-and-a-favorite-for-it-f31932b1-0a7b-46c5-967d-59ea92c3af43.md\",\"name\":\"test-create-a-new-skill-and-a-favorite-for-it-f31932b1-0a7b-46c5-967d-59ea92c3af43.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T18:31:53.456Z\"},{\"entryPath\":\"/threads/cron/test-create-a-new-skill-and-a-favorite-for-it-d17cfe06-90e6-4feb-88f2-11a43654a9c2.md\",\"name\":\"test-create-a-new-skill-and-a-favorite-for-it-d17cfe06-90e6-4feb-88f2-11a43654a9c2.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T18:31:45.315Z\"},{\"entryPath\":\"/threads/cron/i-need-to-test-write-isolation-first-try-b3ef4a61-e372-4527-beb9-9017a2fce1d0.md\",\"name\":\"i-need-to-test-write-isolation-first-try-b3ef4a61-e372-4527-beb9-9017a2fce1d0.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T17:35:02.670Z\"},{\"entryPath\":\"/threads/cron/use-cortex-write-twice-1-create-5fddb462-c5ad-4199-bcb4-05a1a33bb3b9.md\",\"name\":\"use-cortex-write-twice-1-create-5fddb462-c5ad-4199-bcb4-05a1a33bb3b9.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T17:35:02.061Z\"},{\"entryPath\":\"/threads/cron/use-cortex-list-on-memories-life-report-all-3dce3218-8226-4ad0-bf4d-88cc649a978d.md\",\"name\":\"use-cortex-list-on-memories-life-report-all-3dce3218-8226-4ad0-bf4d-88cc649a978d.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T17:35:00.180Z\"},{\"entryPath\":\"/threads/cron/use-cortex-write-to-create-5ad53247-967f-48bc-b584-c6b6e1528f86.md\",\"name\":\"use-cortex-write-to-create-5ad53247-967f-48bc-b584-c6b6e1528f86.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T17:34:58.632Z\"},{\"entryPath\":\"/threads/cron/use-cortex-list-on-memories-to-list-its-d3cdb800-0984-4f49-ab5c-6e09b42649e8.md\",\"name\":\"use-cortex-list-on-memories-to-list-its-d3cdb800-0984-4f49-ab5c-6e09b42649e8.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T17:34:56.906Z\"},{\"entryPath\":\"/threads/cron/i-need-to-test-write-isolation-first-try-1302c812-9a08-4f35-9c5c-843aeaf0eb73.md\",\"name\":\"i-need-to-test-write-isolation-first-try-1302c812-9a08-4f35-9c5c-843aeaf0eb73.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:56:21.713Z\"},{\"entryPath\":\"/threads/cron/use-cortex-write-twice-1-create-3ea28398-21f6-4b32-b0bb-a90e612bd883.md\",\"name\":\"use-cortex-write-twice-1-create-3ea28398-21f6-4b32-b0bb-a90e612bd883.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:56:21.089Z\"},{\"entryPath\":\"/threads/cron/use-cortex-list-on-memories-life-report-all-5b2bf791-0c4a-4a09-85b2-53d59bb3eb42.md\",\"name\":\"use-cortex-list-on-memories-life-report-all-5b2bf791-0c4a-4a09-85b2-53d59bb3eb42.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:56:19.181Z\"},{\"entryPath\":\"/threads/cron/use-cortex-write-to-create-07558bf3-b09e-43cd-9f53-babced727190.md\",\"name\":\"use-cortex-write-to-create-07558bf3-b09e-43cd-9f53-babced727190.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:56:17.642Z\"},{\"entryPath\":\"/threads/cron/use-cortex-list-on-memories-to-list-its-aeeef48f-5329-48e5-abeb-4c5aaf6f6702.md\",\"name\":\"use-cortex-list-on-memories-to-list-its-aeeef48f-5329-48e5-abeb-4c5aaf6f6702.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:56:15.892Z\"},{\"entryPath\":\"/threads/cron/i-need-to-test-write-isolation-first-try-80da95ca-2fa2-489d-b656-7404546bf667.md\",\"name\":\"i-need-to-test-write-isolation-first-try-80da95ca-2fa2-489d-b656-7404546bf667.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:56:06.944Z\"},{\"entryPath\":\"/threads/cron/i-need-to-test-write-isolation-first-try-35270459-564b-4092-883e-bb231ecabe81.md\",\"name\":\"i-need-to-test-write-isolation-first-try-35270459-564b-4092-883e-bb231ecabe81.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:56:01.609Z\"},{\"entryPath\":\"/threads/cron/use-cortex-write-twice-1-create-f61a807d-6809-4543-9ea7-edb1d9b4d30f.md\",\"name\":\"use-cortex-write-twice-1-create-f61a807d-6809-4543-9ea7-edb1d9b4d30f.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:55:58.766Z\"},{\"entryPath\":\"/threads/cron/use-cortex-list-on-memories-life-report-all-8b73b676-db7a-47b4-8254-e8257bed9eb3.md\",\"name\":\"use-cortex-list-on-memories-life-report-all-8b73b676-db7a-47b4-8254-e8257bed9eb3.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:55:56.603Z\"},{\"entryPath\":\"/threads/cron/use-cortex-write-to-create-9953aa27-2eae-4032-b7df-db6c2739196f.md\",\"name\":\"use-cortex-write-to-create-9953aa27-2eae-4032-b7df-db6c2739196f.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:55:55.049Z\"},{\"entryPath\":\"/threads/cron/use-cortex-list-on-memories-to-list-its-97455af3-90f3-4f12-8d52-66820e98990b.md\",\"name\":\"use-cortex-list-on-memories-to-list-its-97455af3-90f3-4f12-8d52-66820e98990b.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:55:53.305Z\"},{\"entryPath\":\"/threads/cron/use-cortex-write-twice-1-create-d422ba3b-9f6d-4ba2-9e95-d55c25855cc7.md\",\"name\":\"use-cortex-write-twice-1-create-d422ba3b-9f6d-4ba2-9e95-d55c25855cc7.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:55:50.035Z\"},{\"entryPath\":\"/threads/cron/use-cortex-list-on-memories-life-report-all-d31a6538-e3a3-40e6-be25-aef9ee048100.md\",\"name\":\"use-cortex-list-on-memories-life-report-all-d31a6538-e3a3-40e6-be25-aef9ee048100.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:53:41.282Z\"},{\"entryPath\":\"/threads/cron/use-cortex-write-to-create-76c49c80-f81d-4f66-9ff3-f61c7f51e75e.md\",\"name\":\"use-cortex-write-to-create-76c49c80-f81d-4f66-9ff3-f61c7f51e75e.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:53:22.733Z\"},{\"entryPath\":\"/threads/cron/use-cortex-list-on-memories-to-list-its-cb0431b9-3151-48da-b111-8f17575f7293.md\",\"name\":\"use-cortex-list-on-memories-to-list-its-cb0431b9-3151-48da-b111-8f17575f7293.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:53:20.912Z\"},{\"entryPath\":\"/threads/cron/use-cortex-write-to-create-46c4fca9-220b-468a-96e1-ba2eb454f93f.md\",\"name\":\"use-cortex-write-to-create-46c4fca9-220b-468a-96e1-ba2eb454f93f.md\",\"nodeType\":\"file\",\"size\":null,\"updatedAt\":\"2026-06-16T16:50:17.774Z\"}],\"responsePath\":\"/threads/cron\",\"total\":29}",
+        "name": "cortex-list",
+        "role": "tool",
+        "tool_call_id": "functions.cortex-list:1"
+      }
+    ],
+    "model": "moonshotai/kimi-k2.6",
+    "stream": true,
+    "temperature": 0.7,
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "function": {
+          "description": "Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.",
+          "name": "ai-run",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "appendThreadId": {
+                "anyOf": [
+                  {
+                    "const": "",
+                    "type": "string"
+                  },
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                ]
+              },
+              "availableTools": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "properties": {
+                        "requiresConfirmation": {
+                          "default": false,
+                          "type": "boolean"
+                        },
+                        "toolId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["toolId"],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "excludeMemories": {
+                "default": false,
+                "type": "boolean"
+              },
+              "favoriteId": {
+                "type": "string"
+              },
+              "instructions": {
+                "type": "string"
+              },
+              "maxTurns": {
+                "default": 150,
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer"
+              },
+              "pinnedTools": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "properties": {
+                        "requiresConfirmation": {
+                          "default": false,
+                          "type": "boolean"
+                        },
+                        "toolId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["toolId"],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "preCalls": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "properties": {
+                        "args": {
+                          "additionalProperties": {},
+                          "default": {},
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "routeId": {
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": ["routeId"],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "prompt": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "rootFolderId": {
+                "default": "cron",
+                "enum": [
+                  "private",
+                  "shared",
+                  "public",
+                  "incognito",
+                  "cron",
+                  "remote"
+                ],
+                "type": "string"
+              },
+              "skill": {
+                "type": "string"
+              },
+              "subFolderId": {
+                "anyOf": [
+                  {
+                    "const": "",
+                    "type": "string"
+                  },
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "required": ["prompt"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.",
+          "name": "coding-agent",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "interactiveMode": {
+                "default": false,
+                "type": "boolean"
+              },
+              "model": {
+                "type": "string"
+              },
+              "prompt": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "provider": {
+                "default": "claude-code",
+                "enum": ["claude-code", "open-code"],
+                "type": "string"
+              },
+              "taskTitle": {
+                "type": "string"
+              }
+            },
+            "required": ["prompt"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Remove a file or folder. Gone forever.",
+          "name": "cortex-delete",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "recursive": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": ["path"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Change part of a file. Find text and replace it, or edit specific lines.",
+          "name": "cortex-edit",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "endLine": {
+                "maximum": 9007199254740991,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "find": {
+                "type": "string"
+              },
+              "newContent": {
+                "type": "string"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "replace": {
+                "type": "string"
+              },
+              "startLine": {
+                "maximum": 9007199254740991,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": ["path"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Run a shell command on a machine. Only works on /ssh/ paths. Persistent terminal — cwd carries over between calls. New sessions start in the default mount directory if configured.",
+          "name": "cortex-exec",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "command": {
+                "maxLength": 10000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "terminalId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "timeoutMs": {
+                "maximum": 300000,
+                "minimum": 1,
+                "type": "number"
+              },
+              "workingDir": {
+                "type": "string"
+              }
+            },
+            "required": ["path", "command"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "See what's in a folder.",
+          "name": "cortex-list",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "path": {
+                "default": "/",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Create a folder.",
+          "name": "cortex-mkdir",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "createParents": {
+                "default": true,
+                "type": "boolean"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "viewType": {
+                "enum": [
+                  "enums.viewType.list",
+                  "enums.viewType.kanban",
+                  "enums.viewType.calendar",
+                  "enums.viewType.grid",
+                  "enums.viewType.wiki"
+                ],
+                "type": "string"
+              }
+            },
+            "required": ["path"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Move or rename a file or folder.",
+          "name": "cortex-move",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "from": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "to": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["from", "to"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Open any file - your notes, threads, memories, skills, or tasks.",
+          "name": "cortex-read",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "maxLines": {
+                "maximum": 10000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["path"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Find files by name or content. Searches everything.",
+          "name": "cortex-search",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "maxResults": {
+                "default": 20,
+                "maximum": 50,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "default": "/",
+                "type": "string"
+              },
+              "query": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["query"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "List active terminal sessions with current working directories.",
+          "name": "cortex-terminals",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "See the full folder structure at a glance. For /ssh/ paths, shows machines and mount summaries — use cortex-list or cortex-exec to navigate deeper.",
+          "name": "cortex-tree",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "depth": {
+                "default": 5,
+                "maximum": 10,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "default": "/",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Save a file. Give it a path and content - done.",
+          "name": "cortex-write",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "createParents": {
+                "default": true,
+                "type": "boolean"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["path", "content"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
+          "name": "tool-help",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": ["detach", "wakeUp", "endLoop", "approve"],
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "instanceId": {
+                "type": "string"
+              },
+              "page": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pageSize": {
+                "maximum": 1000,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "query": {
+                "type": "string"
+              },
+              "toolName": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+          "name": "execute-tool",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "definitions": {
+              "__schema0": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  },
+                  {},
+                  {},
+                  {
+                    "items": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                ]
+              }
+            },
+            "properties": {
+              "callbackMode": {
+                "default": "wait",
+                "enum": ["wait", "detach", "endLoop", "wakeUp", "approve"],
+                "type": "string"
+              },
+              "input": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "default": {},
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "instanceId": {
+                "type": "string"
+              },
+              "toolName": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["toolName"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "function": {
+          "description": "Wait on a pending background task. Returns the result immediately if already completed, or pauses the AI stream until the task finishes (wakeUp mechanism).",
+          "name": "wait-for-task",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "taskId": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": ["taskId"],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ]
+  }
+}

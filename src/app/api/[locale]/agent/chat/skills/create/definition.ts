@@ -67,6 +67,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   dynamicTitle: ({ request }) => {
     if (request?.name && typeof request.name === "string") {

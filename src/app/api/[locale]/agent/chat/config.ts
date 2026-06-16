@@ -7,6 +7,7 @@ import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
 import {
   CORTEX_DELETE_ALIAS,
   CORTEX_EDIT_ALIAS,
+  CORTEX_EXEC_ALIAS,
   CORTEX_LIST_ALIAS,
   CORTEX_MKDIR_ALIAS,
   CORTEX_MOVE_ALIAS,
@@ -27,7 +28,6 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 /**
  * Default folder IDs
  * These are special system folder IDs that exist outside the database

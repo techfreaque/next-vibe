@@ -19,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "business",
   icon: "shopping-bag",
   order: 55,
-  defaultEntry: PURCHASING_DASHBOARD_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: PURCHASING_DASHBOARD_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     "Purchasing: Orders": {
       icon: "file-plus",

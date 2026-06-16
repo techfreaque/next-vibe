@@ -23,7 +23,11 @@ import "server-only";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { createBatchingEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
+import {
+  broadcastLiveMessageEvent,
+  createBatchingEmitter,
+} from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
+import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

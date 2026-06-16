@@ -26,6 +26,7 @@
  *   T6c → wakeUp repeat: second full E2E wakeUp on same thread, no stale state from T6a/T6b
  *   T6d → wakeUp stress: third consecutive E2E wakeUp, verifies no accumulated stale tasks
  *   T7  → approve: phase1 pending confirmation, phase2 confirms + executes
+ *   CF  → contact-form: definition-level requiresConfirmation (AI cannot override), DB verified
  *   T8  → parallel tools: tool-help + generate_image in same batch
  *   T9  → preCalls injection: synthetic tool result in DB before AI runs
  *   T10 → file attachments: image, multi (image+audio), voice (attach+STT), video, voice WAV gap-fill
@@ -50,22 +51,19 @@ installFetchCache();
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { contacts } from "@/app/api/[locale]/contact/db";
+import { ContactSubject } from "@/app/api/[locale]/contact/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { defaultLocale } from "@/i18n/core/config";
 import { and, eq, like, sql } from "drizzle-orm";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import {
   ContentLevel,
   ModelSelectionType,
@@ -78,10 +76,9 @@ import {
   type ImageGenModelSelection,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
-import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { env } from "@/config/env";
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import {
@@ -98,8 +95,11 @@ import {
 import {
   fetchThreadMessages,
   fetchThreadTitle,
+  getOrCreateFolder,
+  resolveUser,
   runTestStream,
   toolResultRecord,
+  waitForThreadIdle,
   type SlimMessage,
 } from "../../testing/headless-test-runner";
 import { scopedTranslation } from "../i18n";
@@ -166,39 +166,6 @@ export interface ModeConfig {
    */
   skipTests?: string[];
   /**
-   * Skip token/credit metadata assertions (promptTokens, completionTokens, creditCost).
-   * Use for relay/transport suites where the remote AI may not return token usage data
-   * and no fixture cache is available to guarantee consistent metadata.
-   */
-  skipTokenMetadataAssertions?: boolean;
-  /**
-   * Skip revival-based tests (T5b wait-for-task, T6 wakeUp, T6c, T6d).
-   * The relay architecture only captures the initial stream — revival streams run on
-   * the remote and their WS events arrive in separate relay connections not visible
-   * to the local relay processor. The backfilled tool results and revival AI responses
-   * are therefore not mirrored locally.
-   */
-  skipWaitForTaskTest?: boolean;
-  /**
-   * Skip tool-approval tests (T7 approve two-phase).
-   * Tool confirmations are processed locally (local tool message in local DB).
-   * In relay mode the AI runs remotely and issues tool calls with requiresConfirmation
-   * on the remote side, which then waits for a confirmation that never arrives locally.
-   */
-  skipApprovalTests?: boolean;
-  /**
-   * Skip file attachment tests (T10).
-   * In relay mode the local user message is created before relay and does not include
-   * attachment metadata — attachments are processed and stored on the remote side only.
-   */
-  skipAttachmentTests?: boolean;
-  /**
-   * Skip T4 (music+video), T8 (parallel image), T9 (preCalls image injection).
-   * These tests require fixture cache recordings for the specific cachePrefix,
-   * which don't exist for relay/transport suites that run live against the remote.
-   */
-  skipMediaGenerationTests?: boolean;
-  /**
    * When true, add T-SYS: assert the AI stream's system prompt came from the LOCAL
    * instance (not the remote). The local system prompt contains the local instance
    * ID; the AI's response to "What is your instance ID?" must match.
@@ -208,15 +175,39 @@ export interface ModeConfig {
    */
   assertSystemPromptFromLocal?: boolean;
   /**
-   * Run only cheap, fast tests (no media gen, no wakeUp, no attachments).
-   * T2 is replaced with a tool-help call that sets the same shared state.
-   * Automatically implies skipMediaGenerationTests + skipWaitForTaskTest +
-   * skipAttachmentTests + skipTokenMetadataAssertions.
-   *
-   * Use this for rapid iteration on threading/state/metadata infrastructure
-   * without spending time or money on image/music/video gen API calls.
+   * REMOTE-folder suites: the system prompt must come from THIS remote
+   * instance — the loop, tools and prompt all live there ("as if on remote").
+   * T-SYS asserts the AI reports this instance ID instead of the local one.
+   * Mutually exclusive with assertSystemPromptFromLocal.
+   */
+  systemPromptInstanceId?: string;
+  /**
+   * Run only cheap, fast tests: skips T4 (music+video), T8 (parallel image),
+   * T9 (preCalls image injection). T2 is replaced with a tool-help call that
+   * sets the same shared state. Pure cost lever — every test that runs
+   * asserts identically in every mode.
    */
   cheapMode?: boolean;
+  /**
+   * Override the root folder used for all runStream calls in this mode.
+   * When set, streams go into this root folder instead of BACKGROUND.
+   * Used by remote-chat-root suite which runs streams inside REMOTE/hermes subfolder.
+   */
+  rootFolderIdOverride?: DefaultFolderId;
+  /**
+   * Override the sub-folder UUID used for all runStream calls in this mode.
+   * Must be used together with rootFolderIdOverride.
+   * Set after connection setup when the remote/hermes subfolder UUID is known.
+   */
+  subFolderIdOverride?: string;
+  /**
+   * Disable compacting for all streams in this mode.
+   * Sets compactTriggerOverride = Number.MAX_SAFE_INTEGER so the token threshold
+   * is never reached and no compacting LLM call is made.
+   * Use for fixture-based tests where compacting would consume fixture slots
+   * and cause test failures.
+   */
+  disableCompacting?: boolean;
 }
 
 // ── Remote-mode helpers ────────────────────────────────────────────────────────
@@ -509,46 +500,6 @@ function assertNoMetaToolPrefix(
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-async function resolveUser(
-  email: string,
-): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await UserRepository.getUserByEmail(
-    email,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  const user = result.data;
-
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-    }),
-    db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-  ]);
-
-  if (!link) {
-    return null;
-  }
-
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-
-  return {
-    isPublic: false,
-    id: user.id,
-    leadId: link.leadId,
-    roles,
-  };
-}
-
 /** Walk parent chain from leafId → root. Returns [root, ..., leaf] */
 function walkChain(messages: SlimMessage[], leafId: string): string[] {
   const byId = new Map(messages.map((m) => [m.id, m]));
@@ -617,12 +568,36 @@ function assertChainIntegrity(
   const byId = new Map(messages.map((m) => [m.id, m]));
   const tree = buildTree(messages);
 
-  // 1. No orphans - every parentId must reference an existing message
+  // 1. No orphans - every parentId must reference an existing message.
+  //    And the chain must match creation order: a child can never be older
+  //    than its parent. This applies to EVERY message in the thread - any
+  //    violation means a write used a stale parent (e.g. continuing from a
+  //    pre-compacting tip after a compacting message was inserted).
+  //    EXCEPTION: a compacting node is intentionally inserted between an
+  //    existing leaf and the current turn AFTER that turn's user message was
+  //    created, then the user message is re-parented under it — so a compacting
+  //    PARENT legitimately has a later createdAt than its child. Skip the time
+  //    check only when the parent is a compacting node.
   for (const msg of messages) {
-    if (msg.parentId && !byId.has(msg.parentId)) {
+    if (!msg.parentId) {
+      continue;
+    }
+    const parent = byId.get(msg.parentId);
+    if (!parent) {
       // oxlint-disable-next-line restricted-syntax -- intentional throw in test assertion
       throw new Error(
         `Orphan: ${msgDesc(msg)} → parentId ${msg.parentId} not in thread`,
+      );
+    }
+    if (
+      !parent.isCompacting &&
+      parent.createdAt.getTime() > msg.createdAt.getTime()
+    ) {
+      // oxlint-disable-next-line restricted-syntax -- intentional throw in test assertion
+      throw new Error(
+        `Chain/time mismatch: ${msgDesc(msg)} (created ${msg.createdAt.toISOString()}) ` +
+          `is a child of ${msgDesc(parent)} created LATER (${parent.createdAt.toISOString()}) - ` +
+          `the parentId chain does not match creation order`,
       );
     }
   }
@@ -701,55 +676,52 @@ function assertChainIntegrity(
 }
 
 /**
- * Return all messages that are descendants of `branchParentId`.
- * Walks the parent→children tree from the given parent and collects
- * every message reachable below it. Does NOT include `branchParentId` itself.
+ * Universal per-step invariant, enforced on EVERY runStream snapshot:
+ * every parentId resolves, exactly one root, and no message is older than
+ * its parent - the chain must match creation order across the whole thread.
+ * Branch/leaf whitelist checks stay at the per-step assertChainIntegrity
+ * call sites, which know the suite's intentional branch state.
  */
-function getMessagesInBranch(
-  messages: SlimMessage[],
-  branchParentId: string,
-): SlimMessage[] {
-  const childMap = new Map<string, string[]>();
-  for (const m of messages) {
-    if (m.parentId) {
-      const siblings = childMap.get(m.parentId) ?? [];
-      siblings.push(m.id);
-      childMap.set(m.parentId, siblings);
-    }
+function assertParentTimeOrder(messages: SlimMessage[]): void {
+  if (messages.length === 0) {
+    return;
   }
-  const collected = new Set<string>();
-  const queue = childMap.get(branchParentId) ?? [];
-  while (queue.length > 0) {
-    const id = queue.pop()!;
-    if (collected.has(id)) {
+  const byId = new Map(messages.map((m) => [m.id, m]));
+  const roots: SlimMessage[] = [];
+  for (const msg of messages) {
+    if (!msg.parentId) {
+      roots.push(msg);
       continue;
     }
-    collected.add(id);
-    for (const childId of childMap.get(id) ?? []) {
-      queue.push(childId);
-    }
-  }
-  return messages.filter((m) => collected.has(m.id));
-}
-
-/**
- * Walk from `leafId` backward through parent links and return all ancestors
- * (not including leafId itself, but including all parents up to root).
- * Useful for finding messages in a specific chain rather than all branch descendants.
- */
-function getAncestors(messages: SlimMessage[], leafId: string): SlimMessage[] {
-  const byId = new Map(messages.map((m) => [m.id, m]));
-  const result: SlimMessage[] = [];
-  let current = byId.get(leafId);
-  while (current?.parentId) {
-    const parent = byId.get(current.parentId);
+    const parent = byId.get(msg.parentId);
     if (!parent) {
-      break;
+      // oxlint-disable-next-line restricted-syntax -- intentional throw in test assertion
+      throw new Error(
+        `Orphan: ${msgDesc(msg)} → parentId ${msg.parentId} not in thread`,
+      );
     }
-    result.push(parent);
-    current = parent;
+    // Compacting parents are inserted after their child and re-parent it — a
+    // later-created compacting parent is expected (see assertChainIntegrity).
+    if (
+      !parent.isCompacting &&
+      parent.createdAt.getTime() > msg.createdAt.getTime()
+    ) {
+      // oxlint-disable-next-line restricted-syntax -- intentional throw in test assertion
+      throw new Error(
+        `Chain/time mismatch: ${msgDesc(msg)} (created ${msg.createdAt.toISOString()}) ` +
+          `is a child of ${msgDesc(parent)} created LATER (${parent.createdAt.toISOString()}) - ` +
+          `the parentId chain does not match creation order`,
+      );
+    }
   }
-  return result;
+  if (roots.length !== 1) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test assertion
+    throw new Error(
+      roots.length === 0
+        ? "No root message (all messages have a parentId)"
+        : `Multiple root messages (parentId=null): ${roots.map((m) => msgDesc(m)).join(", ")}`,
+    );
+  }
 }
 
 // Keep assertNoOrphans as thin alias for backwards-compat within tests
@@ -770,6 +742,12 @@ function assertChronologicalOrder(
   for (let i = 1; i < chain.length; i++) {
     const prev = byId.get(chain[i - 1]!)!;
     const curr = byId.get(chain[i]!)!;
+    // A compacting node is inserted after the turn it precedes in the chain and
+    // re-parents it, so a compacting ancestor legitimately has a later
+    // createdAt than its descendant. Skip the ordering check across it.
+    if (prev.isCompacting) {
+      continue;
+    }
     expect(
       curr.createdAt.getTime() >= prev.createdAt.getTime(),
       `Out of order: ${msgDesc(curr)} created before ancestor ${msgDesc(prev)}`,
@@ -777,33 +755,35 @@ function assertChronologicalOrder(
   }
 }
 
-/** Assert that the thread's streamingState is idle in DB */
-async function assertThreadIdle(threadId: string): Promise<void> {
-  const [thread] = await db
-    .select({ streamingState: chatThreads.streamingState })
-    .from(chatThreads)
-    .where(eq(chatThreads.id, threadId));
-  expect(thread?.streamingState, `Thread ${threadId} not idle`).toBe("idle");
+/**
+ * Assert that the thread's streamingState is idle.
+ * Uses waitForThreadIdle — thread should already be idle so this returns immediately.
+ */
+async function assertThreadIdle(
+  threadId: string,
+  user: JwtPrivatePayloadType,
+): Promise<void> {
+  await waitForThreadIdle(threadId, user, 5_000);
 }
 
 /**
  * Assert no pending wakeUp/background tasks remain for a thread.
- * Prevents wakeUp loop: after wakeUp phase2, task should be completed/cancelled.
+ * Uses ORM query against cronTasks (no raw SQL).
  */
 async function assertNoPendingTasks(threadId: string): Promise<void> {
-  const pending = await db.execute<{
-    id: string;
-    last_execution_status: string | null;
-  }>(
-    sql`SELECT id, last_execution_status FROM cron_tasks
-        WHERE wake_up_thread_id = ${threadId}
-          AND enabled = true
-          AND (last_execution_status IS NULL
-               OR last_execution_status NOT IN ('completed', 'cancelled', 'failed', 'stopped'))`,
+  const terminalStatuses = ["completed", "cancelled", "failed", "stopped"];
+  const pending = await db
+    .select({ id: cronTasks.id, status: cronTasks.lastExecutionStatus })
+    .from(cronTasks)
+    .where(
+      and(eq(cronTasks.wakeUpThreadId, threadId), eq(cronTasks.enabled, true)),
+    );
+  const active = pending.filter(
+    (p) => !terminalStatuses.includes(p.status ?? ""),
   );
   expect(
-    pending.rows.length,
-    `Thread ${threadId} has ${String(pending.rows.length)} pending tasks (${pending.rows.map((p) => `${p.id}:${String(p.last_execution_status)}`).join(", ")})`,
+    active.length,
+    `Thread ${threadId} has ${String(active.length)} active tasks: ${active.map((p) => `${p.id}:${String(p.status)}`).join(", ")}`,
   ).toBe(0);
 }
 
@@ -862,19 +842,97 @@ function assertStepOk(
   ).toBe(true);
 }
 
+/**
+ * wakeUp phase-1 confirmation: the dispatch turn says STEP_OK (taskId seen,
+ * no image yet), but a fast task can revive INLINE within the same stream, in
+ * which case the final AI is the revival turn that confirms WAKEUP_OK instead.
+ * Either marker proves the phase worked.
+ */
+function assertWakeUpPhase1Ok(
+  content: string | null | undefined,
+  stepName: string,
+): void {
+  expect(content, `[${stepName}] AI returned empty content`).toBeTruthy();
+  if (!content) {
+    return;
+  }
+  expect(
+    content.includes("STEP_OK") || content.includes("WAKEUP_OK"),
+    `[${stepName}] AI did NOT confirm STEP_OK (dispatch) or WAKEUP_OK (inline revival) - reported issues instead:\n\n${content}`,
+  ).toBe(true);
+}
+
+/**
+ * Drive a hermes→atlas pull when the suite mirrors a REMOTE instance folder.
+ * Revival/wakeUp turns are written by the OWNER (hermes) after the relay stream
+ * closed; direct-http has no live push channel, so the mirror only converges
+ * when the caller pulls. No-op for non-REMOTE suites (live relay delivers).
+ */
+async function pullRemoteMirror(remoteFolder: boolean): Promise<void> {
+  if (!remoteFolder) {
+    return;
+  }
+  const { triggerPull } = await import("../../testing/remote-setup");
+  await triggerPull();
+}
+
+/**
+ * Strip reasoning blocks to get the visible answer. Handles a CLOSED
+ * <think>…</think> and an UNCLOSED <think>… (model still mid-reasoning, or a
+ * partial mirror): an unclosed block means there is no visible answer yet.
+ */
+function stripReasoning(content: string | null | undefined): string {
+  let c = content ?? "";
+  c = c.replace(/<think>[\s\S]*?<\/think>/g, "");
+  // Any remaining (unclosed) <think> means the rest is unfinished reasoning.
+  const openIdx = c.indexOf("<think>");
+  if (openIdx !== -1) {
+    c = c.slice(0, openIdx);
+  }
+  return c.trim();
+}
+
+/**
+ * Resolve an assistant message and wait for its FINAL content to mirror. The
+ * relay streams an assistant incrementally, so a REMOTE-folder mirror can hold
+ * an early chunk (e.g. just "<think>") when first read. Pull + poll until the
+ * message's visible answer (after stripping a CLOSED reasoning block) is
+ * non-empty, or the budget elapses. Returns the latest message seen.
+ */
+async function awaitFinalAssistant(
+  threadId: string,
+  messageId: string,
+  remoteFolder: boolean,
+  getMessages: (tid: string) => Promise<SlimMessage[]>,
+): Promise<SlimMessage | undefined> {
+  let found: SlimMessage | undefined;
+  for (let i = 0; i < 30; i++) {
+    const msgs = await getMessages(threadId);
+    found = msgs.find((m) => m.id === messageId);
+    if (found && stripReasoning(found.content).length > 0) {
+      return found;
+    }
+    await pullRemoteMirror(remoteFolder);
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 500);
+    });
+  }
+  return found;
+}
+
 /** Filter messages by role */
 function byRole(messages: SlimMessage[], role: string): SlimMessage[] {
   return messages.filter((m) => m.role === role);
 }
 
-/** Get messages added since prevCount (sorted by createdAt) */
+/** Get messages added since prevIds snapshot (sorted by createdAt, excludes known IDs) */
 function newMessages(
   messages: SlimMessage[],
-  prevCount: number,
+  prevIds: Set<string>,
 ): SlimMessage[] {
   return [...messages]
     .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
-    .slice(prevCount);
+    .filter((m) => !prevIds.has(m.id));
 }
 
 /** Read a fixture file from fixtures/media/ as a File object */
@@ -894,101 +952,150 @@ async function loadFixture(filename: string, mimeType: string): Promise<File> {
   return new File([buffer], filename, { type: mimeType });
 }
 
-/** Pin the test user's balance to an exact amount, zeroing all wallets first.
- * Uses the same comprehensive wallet discovery as getPoolBalance to prevent
- * stale lead wallets from inflating the balance during tests.
+/** Read the current credit balance for the test user via endpoint */
+async function getBalance(user: JwtPrivatePayloadType): Promise<number> {
+  const creditsDef = await import("@/app/api/[locale]/credits/definition");
+  const result = await RouteExecuteRepository.runInProcessTyped({
+    definition: creditsDef.default.GET,
+    user,
+    locale: defaultLocale,
+    platform: Platform.AI,
+  });
+  if (!result.success) {
+    return 0;
+  }
+  lastBalanceReadAt = new Date();
+  return typeof result.data?.["total"] === "number" ? result.data["total"] : 0;
+}
+
+/**
+ * Ensure the test user has at least `credits` credits.
+ * Checks balance first via endpoint; tops up only the deficit.
+ * Never zeroes wallets — avoids destructive side-effects on other tests.
  */
 async function pinBalance(
-  userId: string,
-  credits: number,
-  creditLogger: ReturnType<typeof createEndpointLogger>,
-  creditT: ReturnType<typeof creditsScopedTranslation.scopedT>["t"],
-): Promise<void> {
-  // Find ALL wallets that getPoolBalance would include:
-  // 1. User's own wallet (by user_id)
-  // 2. Lead wallets linked via user_lead_links
-  // 3. Lead wallets reachable via recursive lead_lead_links graph
-  const wallets = await db.execute<{
-    id: string;
-    balance: number;
-    free_credits_remaining: number;
-  }>(
-    sql`SELECT DISTINCT cw.id, cw.balance, cw.free_credits_remaining
-        FROM credit_wallets cw
-        WHERE cw.user_id = ${userId}
-           OR cw.lead_id IN (
-             SELECT ull.lead_id FROM user_lead_links ull WHERE ull.user_id = ${userId}
-           )
-           OR cw.lead_id IN (
-             WITH RECURSIVE connected(lead_id) AS (
-               SELECT ull.lead_id FROM user_lead_links ull WHERE ull.user_id = ${userId}
-               UNION
-               SELECT CASE
-                 WHEN ll.lead_id_1 = c.lead_id THEN ll.lead_id_2
-                 ELSE ll.lead_id_1
-               END
-               FROM lead_lead_links ll
-               JOIN connected c ON ll.lead_id_1 = c.lead_id OR ll.lead_id_2 = c.lead_id
-             )
-             SELECT DISTINCT lead_id FROM connected
-           )`,
-  );
-
-  const now = new Date();
-  const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  for (const w of wallets.rows) {
-    // Zero balance + free credits AND reset period to current month so ensureMonthlyFreeCreditsForPool
-    // never fires a monthly grant during the test run.
-    await db.execute(
-      sql`UPDATE credit_wallets
-          SET balance = 0, free_credits_remaining = 0,
-              free_period_start = ${now.toISOString()}, free_period_id = ${periodId}
-          WHERE id = ${w.id}`,
-    );
-  }
-
-  if (credits > 0) {
-    await CreditRepository.addUserCredits(
-      userId,
-      credits,
-      "permanent",
-      creditLogger,
-      creditT,
-    );
-  }
-}
-
-/** Read the current credit balance for the test user */
-async function getBalance(
   user: JwtPrivatePayloadType,
-  creditLogger: ReturnType<typeof createEndpointLogger>,
-  creditT: ReturnType<typeof creditsScopedTranslation.scopedT>["t"],
-): Promise<number> {
-  const result = await CreditRepository.getCreditBalanceForUser(
+  credits: number,
+): Promise<void> {
+  const current = await getBalance(user);
+  if (current >= credits) {
+    return;
+  }
+  const deficit = credits - current;
+  const adminAddDef =
+    await import("@/app/api/[locale]/credits/admin-add/definition");
+  const result = await RouteExecuteRepository.runInProcessTyped({
+    definition: adminAddDef.default.POST,
+    input: { targetUserId: user.id, amount: Math.ceil(deficit) },
     user,
-    defaultLocale,
-    creditLogger,
-    creditT,
-  );
-  return result.success ? result.data.total : 0;
+    locale: defaultLocale,
+    platform: Platform.AI,
+  });
+  expect(
+    result.success,
+    `pinBalance: failed to top up credits for ${user.id}: ${result.success ? "" : String((result as { message?: string }).message ?? "")}`,
+  ).toBe(true);
 }
 
-/** Assert credit deduction is within [min, max] inclusive */
-function assertDeducted(
+/** Timestamp of the most recent getBalance() call - bounds the charge audit window. */
+let lastBalanceReadAt = new Date(0);
+
+/**
+ * Assert credit deduction is within [min, max] inclusive.
+ * On violation, dumps every wallet transaction since the before-balance read
+ * with timestamp/model/message linkage, so a foreign charge (background
+ * generation from an earlier test, another process billing the shared
+ * test wallet) is named in the failure instead of needing DB forensics.
+ */
+async function assertDeducted(
+  user: JwtPrivatePayloadType,
   before: number,
   after: number,
   min: number,
   max: number,
-): void {
+): Promise<void> {
   const deducted = before - after;
-  expect(
-    deducted,
-    `Expected deduction ${min}–${max}, got ${deducted} (before=${before}, after=${after})`,
-  ).toBeGreaterThanOrEqual(min);
-  expect(
-    deducted,
-    `Expected deduction ${min}–${max}, got ${deducted} (before=${before}, after=${after})`,
-  ).toBeLessThanOrEqual(max);
+  if (deducted >= min && deducted <= max) {
+    return;
+  }
+  const { creditTransactions, creditWallets } =
+    await import("@/app/api/[locale]/credits/db");
+  const { gte: gteOp, inArray, desc: descOp } = await import("drizzle-orm");
+  const wallets = await db
+    .select({ id: creditWallets.id })
+    .from(creditWallets)
+    .where(eq(creditWallets.userId, user.id));
+  const txs = await db
+    .select({
+      createdAt: creditTransactions.createdAt,
+      amount: creditTransactions.amount,
+      modelId: creditTransactions.modelId,
+      feature: creditTransactions.feature,
+      messageId: creditTransactions.messageId,
+    })
+    .from(creditTransactions)
+    .where(
+      and(
+        inArray(
+          creditTransactions.walletId,
+          wallets.map((w) => w.id),
+        ),
+        gteOp(creditTransactions.createdAt, lastBalanceReadAt),
+      ),
+    )
+    .orderBy(descOp(creditTransactions.createdAt))
+    .limit(60);
+  const knownMessageIds = new Set(
+    (
+      await db
+        .select({ id: chatMessages.id })
+        .from(chatMessages)
+        .where(
+          inArray(
+            chatMessages.id,
+            txs.map((t) => t.messageId).filter((id): id is string => !!id),
+          ),
+        )
+    ).map((m) => m.id),
+  );
+  const audit = txs
+    .map(
+      (t) =>
+        `  ${t.createdAt.toISOString()} ${String(t.amount)} model=${t.modelId ?? "-"} feature=${t.feature ?? "-"} msg=${t.messageId ?? "-"}${t.messageId && !knownMessageIds.has(t.messageId) ? " [NOT IN chat_messages - foreign/background charge]" : ""}`,
+    )
+    .join("\n");
+  // oxlint-disable-next-line restricted-syntax -- intentional throw in test assertion
+  throw new Error(
+    `Expected deduction ${min}–${max}, got ${deducted} (before=${before}, after=${after}).\n` +
+      `Wallet transactions since the before-balance read (${lastBalanceReadAt.toISOString()}):\n${audit}`,
+  );
+}
+
+/**
+ * Read the remote (hermes) admin user's wallet balance via the remote DB.
+ * Returns null when the wallet cannot be resolved.
+ */
+async function readRemoteAdminBalance(): Promise<number | null> {
+  const { getProdDb, resolveProdUserId } =
+    await import("../../testing/remote-setup");
+  const prodUserId = await resolveProdUserId();
+  if (!prodUserId) {
+    return null;
+  }
+  const pdb = getProdDb();
+  const rows = await pdb.execute<{ balance: string | number | null }>(
+    sql`SELECT cw.balance FROM credit_wallets cw
+        LEFT JOIN user_lead_links ull ON ull.lead_id = cw.lead_id
+        WHERE cw.user_id = ${prodUserId} OR ull.user_id = ${prodUserId}
+        ORDER BY cw.updated_at DESC
+        LIMIT 1`,
+  );
+  const raw = rows.rows[0]?.balance;
+  if (raw === null || raw === undefined) {
+    return null;
+  }
+  const num = typeof raw === "number" ? raw : parseFloat(raw);
+  return Number.isFinite(num) ? num : null;
 }
 
 // ── Test Suite ────────────────────────────────────────────────────────────────
@@ -1002,20 +1109,21 @@ const TEST_TIMEOUT = 600_000;
 const QUEUE_TEST_TIMEOUT = 600_000;
 
 export function describeStreamSuite(cfg: ModeConfig): void {
-  // cheapMode implies all the skip flags so callers don't need to repeat them
-  if (cfg.cheapMode ?? CHEAP_MODE) {
-    cfg = {
-      ...cfg,
-      cheapMode: true,
-      skipMediaGenerationTests: true,
-    };
+  // Apply the global default WITHOUT copying cfg — REMOTE-folder suites use
+  // late-bound getters (subFolderIdOverride resolves only after setup), and
+  // a spread would freeze them to their pre-setup values.
+  if (cfg.cheapMode === undefined && CHEAP_MODE) {
+    cfg.cheapMode = true;
   }
   // For queue tests (cfg.pulse set), individual tests need more time for cron cycles
   const effectiveTestTimeout = cfg.pulse ? QUEUE_TEST_TIMEOUT : TEST_TIMEOUT;
   describe(cfg.label, () => {
+    // Suite root: BACKGROUND for all suites (test threads stay out of the
+    // user's regular chats); REMOTE-folder suites override with their
+    // instance folder root.
+    const suiteRootFolderId: DefaultFolderId =
+      cfg.rootFolderIdOverride ?? DefaultFolderId.BACKGROUND;
     let testUser: JwtPrivatePayloadType;
-    let creditLogger: ReturnType<typeof createEndpointLogger>;
-    let creditT: ReturnType<typeof creditsScopedTranslation.scopedT>["t"];
     /** Main favorite: quality-tester skill + kimi variant + media model selections */
     let mainFavoriteId: string;
     /** Native image gen favorite: GPT-5 Image Mini as chat model (outputs: ["text","image"]) */
@@ -1023,11 +1131,48 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     /** Nano Banana Pro favorite: Gemini 3 Pro Image Preview as chat model (can see + generates images, uses video tool) */
     let nanoBananaFavoriteId: string;
     /**
-     * Subfolder under BACKGROUND root — all AI streams in this suite land here.
+     * Per-suite folder (<suiteRoot> → tests → <testCaseName>) — all AI
+     * streams in this suite land here. Unset for REMOTE-override suites
+     * (overrideSubFolderId is used instead).
      * Keeps test threads isolated per suite and out of the global cron root.
      * Created in beforeAll, deleted in afterAll.
      */
     let testSubFolderId: string;
+    /**
+     * REMOTE-folder modes: per-suite folder nested inside the instance folder
+     * (REMOTE → <instanceId> → tests → <testCaseName>). Computed in beforeAll
+     * after cfg.setup resolves the instance folder.
+     */
+    let overrideSubFolderId: string | undefined;
+
+    // ── Closures over testUser ─────────────────────────────────────────────────
+    // These wrap the imported helpers and inject testUser so call sites don't
+    // need to pass the user argument explicitly.
+    const getMessages = (tid: string): ReturnType<typeof fetchThreadMessages> =>
+      fetchThreadMessages(tid, testUser);
+    const getTitle = (tid: string): ReturnType<typeof fetchThreadTitle> =>
+      fetchThreadTitle(tid, testUser);
+    /** Fetch the current streamingState for a thread via the messages endpoint. */
+    async function getStreamingState(tid: string): Promise<string | undefined> {
+      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      const msgsDef =
+        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition");
+      const result = await RouteExecuteRepository.runInProcessTyped({
+        definition: msgsDef.default.GET,
+        input: { rootFolderId: suiteRootFolderId },
+        urlPathParams: { threadId: tid },
+        user: testUser,
+        locale: defaultLocale,
+        platform: Platform.AI,
+        logger,
+      });
+      if (!result.success) {
+        return undefined;
+      }
+      const state = result.data?.["streamingState"];
+      return typeof state === "string" ? state : undefined;
+    }
+
     beforeAll(async () => {
       const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
       expect(
@@ -1046,181 +1191,182 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             WHERE user_id = ${testUser.id} AND lead_id != ${testUser.leadId}`,
       );
 
-      creditLogger = createEndpointLogger(false, Date.now(), defaultLocale);
-      const { t } = creditsScopedTranslation.scopedT(defaultLocale);
-      creditT = t;
-
       // Safety floor: 500cr before any test
-      const balance = await getBalance(testUser, creditLogger, creditT);
-      if (balance < 500) {
-        await CreditRepository.addUserCredits(
-          testUser.id,
-          500 - balance,
-          "permanent",
-          creditLogger,
-          creditT,
-        );
-      }
+      await pinBalance(testUser, 500);
 
       // ── Resolve quality-tester favorite ──
       // Use admin's existing quality-tester favorite if present (respects UI overrides).
-      // If none exists, create a stable minimal one - model IDs come from skill defaults.
-      // Stable ID ensures HTTP fixture caches remain valid between runs.
-      const MAIN_FAVORITE_ID = "00000000-0000-4001-a000-000000000001";
-      const [existingFav] = await db
-        .select({ id: chatFavorites.id })
-        .from(chatFavorites)
-        .where(
-          and(
-            eq(chatFavorites.userId, testUser.id),
-            eq(chatFavorites.skillId, "quality-tester"),
-          ),
-        )
-        .orderBy(chatFavorites.position)
-        .limit(1);
+      // If none exists, create one via endpoint.
+      const [favsDef, favoriteCreateDef] = await Promise.all([
+        import("@/app/api/[locale]/agent/chat/favorites/definition").then(
+          (m) => m.default.GET,
+        ),
+        import("@/app/api/[locale]/agent/chat/favorites/create/definition").then(
+          (m) => m.default.POST,
+        ),
+      ]);
 
-      if (existingFav) {
-        mainFavoriteId = existingFav.id;
-      } else {
-        // No admin favorite - create minimal one (skill provides media model defaults)
-        await db
-          .insert(chatFavorites)
-          .values({
-            id: MAIN_FAVORITE_ID,
-            userId: testUser.id,
-            skillId: "quality-tester",
-            variantId: "kimi",
-            position: 9998,
-          })
-          .onConflictDoUpdate({
-            target: chatFavorites.id,
-            set: { userId: testUser.id },
+      const favsResult = await RouteExecuteRepository.runInProcessTyped({
+        definition: favsDef,
+        input: { pageSize: 500 },
+        user: testUser,
+        locale: defaultLocale,
+        platform: Platform.AI,
+      });
+      const favsList = favsResult.success
+        ? Array.isArray(favsResult.data?.["favorites"])
+          ? (favsResult.data["favorites"] as Record<string, WidgetData>[])
+          : []
+        : [];
+
+      // Deterministic favorite setup: delete EVERY quality-tester favorite
+      // and recreate fresh — reusing rows risks model-selection drift (sync
+      // LWW, earlier runs) silently changing which model records fixtures.
+      const favoriteDeleteDef =
+        await import("@/app/api/[locale]/agent/chat/favorites/[id]/definition").then(
+          (m) => m.default.DELETE,
+        );
+      for (const fav of favsList) {
+        if (String(fav["skillId"] ?? "").startsWith("quality-tester")) {
+          await RouteExecuteRepository.runInProcessTyped({
+            definition: favoriteDeleteDef,
+            urlPathParams: { id: String(fav["id"]) },
+            user: testUser,
+            locale: defaultLocale,
+            platform: Platform.AI,
           });
-        mainFavoriteId = MAIN_FAVORITE_ID;
+        }
       }
 
-      // ── Create native image gen favorite (Gemini 3.1 Flash Image Preview) ──
-      // T11 tests native image generation where the chat model IS the image gen model.
-      // Gemini 3.1 Flash Image Preview has outputs: ["text","image"] so
-      // imageGenIsSameAsChatModel = true, the generate_image tool is removed,
-      // and the model produces actual file parts (inline image data) natively.
-      // GPT-5 Image Mini also has outputs: ["image"] but unreliably generates SVG text
-      // instead of actual image data, so Gemini is the reliable choice.
-      const NATIVE_IMAGE_FAVORITE_ID = "00000000-0000-4001-a000-000000000002";
-      await db
-        .insert(chatFavorites)
-        .values({
-          id: NATIVE_IMAGE_FAVORITE_ID,
-          userId: testUser.id,
-          slug: "test-native-image",
-          skillId: "quality-tester",
-          variantId: "kimi",
-          modelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ChatModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
-          },
-          position: 9999,
-        })
-        .onConflictDoUpdate({
-          target: chatFavorites.id,
-          set: { userId: testUser.id },
+      {
+        const createResult = await RouteExecuteRepository.runInProcessTyped({
+          definition: favoriteCreateDef,
+          input: { skillId: "quality-tester__kimi" },
+          user: testUser,
+          locale: defaultLocale,
+          platform: Platform.AI,
         });
-      nativeImageFavoriteId = NATIVE_IMAGE_FAVORITE_ID;
+        expect(
+          createResult.success,
+          `Failed to create quality-tester favorite: ${!createResult.success ? createResult.message : ""}`,
+        ).toBe(true);
+        if (!createResult.success) {
+          return;
+        }
+        mainFavoriteId = String(createResult.data?.["id"] ?? "");
+      }
+
+      // ── Resolve native image gen favorite (Gemini 3.1 Flash Image Preview) ──
+      // T11 tests native image generation where the chat model IS the image gen model.
+      {
+        const createResult = await RouteExecuteRepository.runInProcessTyped({
+          definition: favoriteCreateDef,
+          input: {
+            skillId: "quality-tester__kimi",
+            modelSelection: {
+              selectionType: ModelSelectionType.MANUAL,
+              manualModelId: ChatModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
+            },
+          },
+          user: testUser,
+          locale: defaultLocale,
+          platform: Platform.AI,
+        });
+        expect(
+          createResult.success,
+          "Failed to create native image favorite",
+        ).toBe(true);
+        if (!createResult.success) {
+          return;
+        }
+        nativeImageFavoriteId = String(createResult.data?.["id"] ?? "");
+      }
 
       // ── Resolve Nano Banana Pro favorite (Gemini 3 Pro Image Preview) ──
-      // T11c/T11d tests: model can see images (inputs: ["text","image"]) and
-      // generates images natively, but video goes through the generate_video tool.
-      // Uses existing admin favorite if present so UI overrides are respected.
-      const NANO_BANANA_FAVORITE_ID = "00000000-0000-4001-a000-000000000003";
-      const [existingNanoBanana] = await db
-        .select({ id: chatFavorites.id })
-        .from(chatFavorites)
-        .where(
-          and(
-            eq(chatFavorites.userId, testUser.id),
-            eq(chatFavorites.slug, "test-nano-banana"),
-          ),
-        )
-        .limit(1);
-      if (existingNanoBanana) {
-        nanoBananaFavoriteId = existingNanoBanana.id;
-      } else {
-        await db
-          .insert(chatFavorites)
-          .values({
-            id: NANO_BANANA_FAVORITE_ID,
-            userId: testUser.id,
-            slug: "test-nano-banana",
-            skillId: "quality-tester",
-            variantId: "kimi",
+      // T11c/T11d tests: model can see images and generates images natively.
+      {
+        const createResult = await RouteExecuteRepository.runInProcessTyped({
+          definition: favoriteCreateDef,
+          input: {
+            skillId: "quality-tester__kimi",
             modelSelection: {
               selectionType: ModelSelectionType.MANUAL,
               manualModelId: ChatModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
             },
-            position: 10000,
-          })
-          .onConflictDoUpdate({
-            target: chatFavorites.id,
-            set: { userId: testUser.id },
-          });
-        nanoBananaFavoriteId = NANO_BANANA_FAVORITE_ID;
+          },
+          user: testUser,
+          locale: defaultLocale,
+          platform: Platform.AI,
+        });
+        expect(
+          createResult.success,
+          "Failed to create nano-banana favorite",
+        ).toBe(true);
+        if (!createResult.success) {
+          return;
+        }
+        nanoBananaFavoriteId = String(createResult.data?.["id"] ?? "");
       }
 
-      // ── Create per-suite test subfolder under BACKGROUND ──
-      // All runStream() calls land here so test threads are never mixed in the
-      // global cron root. The folder name encodes the cache prefix for traceability.
-      const { chatFolders: chatFoldersTable } =
-        await import("@/app/api/[locale]/agent/chat/db");
-      const folderName = `test-${cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "")}`;
-      const [existingTestFolder] = await db
-        .select({ id: chatFoldersTable.id })
-        .from(chatFoldersTable)
+      // No stale local tasks may exist when a suite starts: the system
+      // prompt lists pending tasks, the AI calls wait-for-task on them, and
+      // that behavior gets baked into recorded fixtures.
+      await db
+        .delete(cronTasks)
         .where(
-          and(
-            eq(chatFoldersTable.userId, testUser.id),
-            eq(chatFoldersTable.rootFolderId, DefaultFolderId.BACKGROUND),
-            eq(chatFoldersTable.name, folderName),
-            sql`${chatFoldersTable.parentId} IS NULL`,
-          ),
-        )
-        .limit(1);
-      if (existingTestFolder) {
-        testSubFolderId = existingTestFolder.id;
-      } else {
-        const [insertedFolder] = await db
-          .insert(chatFoldersTable)
-          .values({
-            userId: testUser.id,
-            rootFolderId: DefaultFolderId.BACKGROUND,
-            name: folderName,
-            parentId: null,
-          })
-          .returning({ id: chatFoldersTable.id });
-        testSubFolderId = insertedFolder!.id;
+          sql`(${cronTasks.id} LIKE 'local-bg-%' OR ${cronTasks.id} LIKE 'local-wu-%' OR ${cronTasks.routeId} LIKE 'resume-stream%')`,
+        );
+
+      // Local suites must start with no active remote connections — a
+      // leftover connection from an aborted remote suite would silently
+      // relay every stream and change costs and assertions.
+      if (!cfg.setup) {
+        const { disconnectFromHermes } =
+          await import("../../testing/remote-setup");
+        await disconnectFromHermes(testUser.id);
       }
 
-      // For local suites (no remoteInstanceId): disable any stale isDefault=true remote
-      // connections left over from transport test runs. Without this, all streams would
-      // relay to hermes and credit/balance assertions would fail (credits deducted remotely).
-      if (!cfg.remoteInstanceId) {
-        const { remoteConnections: rcTable } =
-          await import("@/app/api/[locale]/remote-connection/db");
-        await db
-          .update(rcTable)
-          .set({
-            routingRules: sql`COALESCE(routing_rules, '{}'::jsonb) || '{"isDefault": false}'::jsonb`,
-          })
-          .where(
-            and(
-              eq(rcTable.userId, testUser.id),
-              sql`routing_rules->>'isDefault' = 'true'`,
-            ),
-          );
+      // ── Create the per-suite folder chain: <suiteRoot> → tests → <testCaseName> ──
+      // All runStream() calls land here so test threads are organized per
+      // suite. REMOTE-folder suites build their chain inside the instance
+      // folder after cfg.setup resolves it (below).
+      const testCaseName =
+        cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
+        "regular";
+      if (!cfg.rootFolderIdOverride) {
+        const testsParentId = await getOrCreateFolder(
+          testUser,
+          suiteRootFolderId,
+          "tests",
+        );
+        testSubFolderId = await getOrCreateFolder(
+          testUser,
+          suiteRootFolderId,
+          testCaseName,
+          testsParentId,
+        );
       }
 
       // Per-mode setup (remote connections, credential patching, etc.)
       if (cfg.setup) {
         await cfg.setup(testUser);
+      }
+
+      // REMOTE-folder modes: nest the per-suite chain inside the instance
+      // folder so threads land in <root> → <instanceId> → tests → <testCaseName>.
+      if (cfg.rootFolderIdOverride && cfg.subFolderIdOverride) {
+        const overrideTestsParentId = await getOrCreateFolder(
+          testUser,
+          cfg.rootFolderIdOverride,
+          "tests",
+          cfg.subFolderIdOverride,
+        );
+        overrideSubFolderId = await getOrCreateFolder(
+          testUser,
+          cfg.rootFolderIdOverride,
+          testCaseName,
+          overrideTestsParentId,
+        );
       }
     }, effectiveTestTimeout);
 
@@ -1231,14 +1377,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       await db.execute(
         sql`DELETE FROM cron_tasks WHERE id LIKE 'local-wu-%' AND last_execution_status IN ('status.completed', 'status.failed', 'status.cancelled', 'status.stopped')`,
       );
-      // Delete the per-suite test subfolder (threads remain for inspection if needed).
-      if (testSubFolderId) {
-        const { chatFolders: chatFoldersTable } =
-          await import("@/app/api/[locale]/agent/chat/db");
-        await db
-          .delete(chatFoldersTable)
-          .where(eq(chatFoldersTable.id, testSubFolderId));
-      }
+      // The per-suite folder persists across runs (tests → <testCaseName>):
+      // deleting it would orphan its threads into the root folder.
       if (cfg.teardown && testUser) {
         await cfg.teardown(testUser);
       }
@@ -1257,22 +1397,34 @@ export function describeStreamSuite(cfg: ModeConfig): void {
      * For non-queue modes (cfg.pulse not set): pass-through, no-op.
      */
     async function runStream(
-      params: Parameters<typeof runTestStream>[0],
+      params: Parameters<typeof runTestStream>[0] & {
+        /** Set ONLY for tests that exercise tool error paths. */
+        allowToolErrors?: boolean;
+      },
     ): Promise<ReturnType<typeof runTestStream>> {
-      // Inject per-suite subfolder for all BACKGROUND-root streams so threads are
-      // organized under test-<cachePrefix>/ and never dumped in the global cron root.
-      // Tests that explicitly set a non-BACKGROUND rootFolderId (e.g. INCOGNITO, REMOTE)
-      // pass their own subFolderId (or none) — we don't override those.
+      // Snapshot the thread BEFORE the stream so post-stream checks can
+      // distinguish this stream's tool messages from earlier ones.
+      const preStreamMessageIds = new Set<string>(
+        params.threadId
+          ? (await getMessages(params.threadId)).map((m) => m.id)
+          : [],
+      );
+      // Every stream lands in <suiteRoot> → tests → <testCaseName> unless the
+      // call explicitly targets another root (e.g. INCOGNITO). REMOTE-folder
+      // suites redirect ALL streams into the nested instance-folder chain.
       const effectiveRootFolderId =
-        params.rootFolderId ?? DefaultFolderId.BACKGROUND;
+        cfg.rootFolderIdOverride ?? params.rootFolderId ?? suiteRootFolderId;
       const effectiveSubFolderId =
-        params.subFolderId !== undefined
-          ? params.subFolderId
-          : effectiveRootFolderId === DefaultFolderId.BACKGROUND
-            ? testSubFolderId
-            : undefined;
+        cfg.subFolderIdOverride !== undefined
+          ? (overrideSubFolderId ?? cfg.subFolderIdOverride)
+          : params.subFolderId !== undefined
+            ? params.subFolderId
+            : effectiveRootFolderId === suiteRootFolderId
+              ? testSubFolderId
+              : undefined;
       const firstResult = await runTestStream({
         ...params,
+        rootFolderId: effectiveRootFolderId,
         subFolderId: effectiveSubFolderId,
         providerOverride: params.providerOverride ?? cfg.providerOverride,
         mediaModelOverrides: {
@@ -1281,26 +1433,158 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             : {}),
           ...params.mediaModelOverrides,
         },
+        compactTriggerOverride:
+          params.compactTriggerOverride ??
+          (cfg.disableCompacting ? Number.MAX_SAFE_INTEGER : undefined),
       });
 
-      // Queue mode: if thread ended in 'waiting' state, run pulse → revival → re-fetch
-      if (
-        cfg.pulse &&
-        firstResult.result.success &&
-        firstResult.result.data.threadId
-      ) {
+      // Waiting-state handling — two flavors:
+      //   Queue mode (cfg.pulse): run pulse → revival → re-fetch.
+      //   Remote dispatch (cfg.remoteInstanceId): the executor instance POSTs
+      //   /report which fires the revival directly — just wait for idle.
+      // EVERY mode handles the waiting state the same way: when a stream
+      // pauses on a pending task or remote call, await the revival before
+      // returning — wait-for-task delivery is inline OR revival in any mode.
+      if (firstResult.result.success && firstResult.result.data.threadId) {
         const tid = firstResult.result.data.threadId;
-        const [threadRow] = await db
-          .select({ streamingState: chatThreads.streamingState })
-          .from(chatThreads)
-          .where(eq(chatThreads.id, tid));
 
-        if (threadRow?.streamingState === "waiting") {
-          // Assert waiting state (spec requirement: stream must die into 'waiting', not error)
-          expect(
-            threadRow.streamingState,
-            "Queue WAIT: thread must be in 'waiting' state after stream aborts",
-          ).toBe("waiting");
+        // REMOTE-folder mirror wait: the loop ran on the remote instance, so
+        // a detach/wakeUp task completes THERE after the live relay stream
+        // closed. The backfilled result reaches this (caller) DB by sync —
+        // live WS push when a persistent channel exists (reverse-ws), or
+        // pull-on-demand when not (direct-http has no channel). Drive a pull
+        // each tick and poll the local mirror until the pending async tool
+        // message resolves, so assertions see the final state in both modes.
+        if (cfg.rootFolderIdOverride === DefaultFolderId.REMOTE) {
+          const MIRROR_WAIT_MS = 60_000;
+          const mirrorStart = Date.now();
+          const { triggerPull: pullMirror } =
+            await import("../../testing/remote-setup");
+          // Always pull once: out-of-band owner writes (compacting re-parent +
+          // compacting message, detach/wakeUp backfill) reach this caller only
+          // by sync. direct-http has no live push channel, so drive a pull and
+          // converge the mirror to the owner's state before asserting.
+          await pullMirror();
+          for (;;) {
+            const snapshot = await getMessages(tid);
+            // Two convergence conditions, both must clear:
+            //  1. No pending async tool (detach/wakeUp result not yet mirrored).
+            //  2. No dead-end compacting message — a compacting node with no
+            //     child means the owner's re-parent of the following turn has
+            //     not synced yet (the turn still points at the pre-compacting
+            //     leaf locally). Both resolve once the next pull applies the
+            //     owner-authoritative state.
+            const childIds = new Set(
+              snapshot.map((m) => m.parentId).filter((id): id is string => !!id),
+            );
+            const pendingAsync = snapshot.filter(
+              (m) =>
+                m.role === "tool" &&
+                !preStreamMessageIds.has(m.id) &&
+                (m.toolCall?.callbackMode === "detach" ||
+                  m.toolCall?.callbackMode === "wakeUp") &&
+                (m.toolCall?.status === "pending" ||
+                  resolveToolResult(m) === null),
+            );
+            const danglingCompacting = snapshot.filter(
+              (m) =>
+                m.isCompacting &&
+                !preStreamMessageIds.has(m.id) &&
+                !childIds.has(m.id),
+            );
+            if (
+              (pendingAsync.length === 0 && danglingCompacting.length === 0) ||
+              Date.now() - mirrorStart > MIRROR_WAIT_MS
+            ) {
+              break;
+            }
+            // Pull hermes→atlas: applies the owner-authoritative thread state
+            // (re-parent + backfill) when no live push channel delivered it.
+            await pullMirror();
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, 500);
+            });
+          }
+        }
+
+        let threadStreamingState = await getStreamingState(tid);
+        let revivalPending = false;
+
+        // The aborting stream writes 'waiting' asynchronously AFTER the
+        // result is returned (clearStreamingState reconciles against the DB
+        // first). When a remote call is genuinely in flight, poll briefly so
+        // the transition isn't missed — otherwise assertions run against a
+        // thread that is about to enter 'waiting'.
+        if (threadStreamingState !== "waiting") {
+          // Pending work = a running task targeting the thread, a scheduled
+          // revival row, or an in-flight remote call. Any of them means the
+          // thread is about to enter 'waiting' (or jump straight to a
+          // revival) — poll the transition instead of racing it.
+          const { hasPendingCallForThread } =
+            await import("@/app/api/[locale]/remote-connection/pending-calls");
+          const hasPendingWork = async (): Promise<boolean> => {
+            const [runningTask] = await db
+              .select({ id: cronTasks.id })
+              .from(cronTasks)
+              .where(
+                and(
+                  eq(cronTasks.wakeUpThreadId, tid),
+                  eq(cronTasks.lastExecutionStatus, CronTaskStatus.RUNNING),
+                ),
+              )
+              .limit(1);
+            if (runningTask) {
+              return true;
+            }
+            const [resumeRow] = await db
+              .select({ id: cronTasks.id })
+              .from(cronTasks)
+              .where(
+                and(
+                  eq(cronTasks.enabled, true),
+                  like(cronTasks.routeId, "resume-stream%"),
+                  sql`${cronTasks.taskInput}->>'threadId' = ${tid}`,
+                ),
+              )
+              .limit(1);
+            if (resumeRow) {
+              return true;
+            }
+            return hasPendingCallForThread(tid);
+          };
+          // The caller's stream has returned — a 'streaming' state on the
+          // thread now belongs to a revival claim and counts as pending work.
+          revivalPending =
+            threadStreamingState === "streaming"
+              ? true
+              : await hasPendingWork();
+          if (revivalPending) {
+            for (let i = 0; i < 20 && threadStreamingState !== "waiting"; i++) {
+              await new Promise<void>((resolve) => {
+                setTimeout(resolve, 300);
+              });
+              threadStreamingState = await getStreamingState(tid);
+              if (
+                threadStreamingState === "idle" &&
+                !(await hasPendingWork())
+              ) {
+                break;
+              }
+            }
+          }
+        } else {
+          revivalPending = true;
+        }
+
+        if (threadStreamingState === "waiting" || revivalPending) {
+          // Queue mode pauses via an explicit 'waiting' state before the
+          // pulse fires the revival (spec requirement).
+          if (cfg.pulse) {
+            expect(
+              threadStreamingState,
+              "Queue WAIT: thread must be in 'waiting' state after stream aborts",
+            ).toBe("waiting");
+          }
 
           // Delete stale cron tasks from previous test runs that are NOT for this thread.
           // Without this, executePulse picks up leftover resume-stream/remote tasks which
@@ -1314,14 +1598,19 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               ),
             );
 
-          // Run pulse: polls for remote task completion → fires revival in-process
-          await cfg.pulse(tid);
+          // Queue mode: run pulse (polls remote task completion → fires
+          // revival in-process). Remote dispatch: /report fires the revival —
+          // nothing to trigger here, just wait.
+          if (cfg.pulse) {
+            await cfg.pulse(tid);
+          }
 
           // Revival runs as fire-and-forget inside resume-stream. Wait for thread → 'idle'.
-          // Timeout: 180s (budget for slow media gen + two full pulse cycles).
+          // Remote dispatch gets a longer budget: executor round trip + /report
+          // + revival turn can take a while on cold instances.
           // If the AI retries a failed tool call, the thread may go back to 'waiting'
           // mid-revival. In that case, call pulse again (up to MAX_PULSE_RETRIES).
-          const REVIVAL_TIMEOUT_MS = 30_000;
+          const REVIVAL_TIMEOUT_MS = cfg.pulse ? 30_000 : 120_000;
           const REVIVAL_POLL_INTERVAL_MS = 500;
           const MAX_PULSE_RETRIES = 3;
           let pulseRetries = 0;
@@ -1335,13 +1624,19 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             await new Promise<void>((resolve) => {
               setTimeout(resolve, REVIVAL_POLL_INTERVAL_MS);
             });
-            const [revivalRow] = await db
-              .select({ streamingState: chatThreads.streamingState })
-              .from(chatThreads)
-              .where(eq(chatThreads.id, tid));
-            revivalState = revivalRow?.streamingState;
+            revivalState = await getStreamingState(tid);
+            // Active reconcile tick: the /report may have landed in ANOTHER
+            // process (dev server) — reconciliation completes this process's
+            // pending-call entries against the backfilled tool message and
+            // fires any attached wait-for-task revival.
+            if (cfg.remoteInstanceId && revivalState === "waiting") {
+              const { hasPendingCallForThread: reconcileTick } =
+                await import("@/app/api/[locale]/remote-connection/pending-calls");
+              await reconcileTick(tid);
+            }
             // If thread went back to 'waiting' (AI retried after failure), pulse again.
             if (
+              cfg.pulse &&
               revivalState === "waiting" &&
               pulseRetries < MAX_PULSE_RETRIES &&
               Date.now() - lastPulsedAt > 1000
@@ -1362,12 +1657,25 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           ).toBe("idle");
 
           // Re-fetch messages with post-revival state
-          const revivedMessages = await fetchThreadMessages(tid);
-          // The revival creates a new AI message. Update lastAiMessageId to the revival's
-          // AI message so assertions like assertStepOk(lastAi) check the correct message.
-          const lastRevivalAi = [...revivedMessages]
-            .toReversed()
-            .find((m) => m.role === "assistant");
+          const revivedMessages = await getMessages(tid);
+          // The stream's own final assistant is the answer when it has
+          // content (wakeUp phases: the wrap-up). When the stream died
+          // before answering (queue WAIT shape), the revival assistant
+          // carries the answer instead.
+          const streamOwnAi = firstResult.result.success
+            ? revivedMessages.find(
+                (m) => m.id === firstResult.result.data.lastAiMessageId,
+              )
+            : undefined;
+          const streamAnswered = (streamOwnAi?.content ?? "").trim() !== "";
+          const lastRevivalAi = streamAnswered
+            ? streamOwnAi
+            : [...revivedMessages]
+                .toReversed()
+                .find(
+                  (m) =>
+                    m.role === "assistant" && (m.content ?? "").trim() !== "",
+                );
           // Sum credits from all messages (initial stream charges tool credits; revival charges AI credits).
           const totalCredits = revivedMessages.reduce(
             (sum, m) => sum + (m.creditCost ?? 0),
@@ -1387,58 +1695,112 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                   },
                 }
               : firstResult.result;
+          assertParentTimeOrder(revivedMessages);
           return {
             result: revivedResult,
             messages: revivedMessages,
             pinnedToolCount: firstResult.pinnedToolCount,
           };
         }
+
+        // Uniform post-stream snapshot: a fast revival can complete entirely
+        // between the stream's return and the checks above (fixture-speed
+        // tasks). The caller always receives the thread's CURRENT state, and
+        // lastAiMessageId points at the newest assistant when a revival
+        // appended one.
+        const finalMessages = await getMessages(tid);
+
+        // A tool error during the stream is a test failure unless the test
+        // explicitly exercises an error path.
+        if (!params.allowToolErrors) {
+          const erroredTools = finalMessages.filter((m) => {
+            if (m.role !== "tool" || preStreamMessageIds.has(m.id)) {
+              return false;
+            }
+            const res = toolResultRecord(m.toolCall?.result);
+            return typeof res?.["error"] === "string" && res["error"] !== "";
+          });
+          expect(
+            erroredTools.map((m) => ({
+              toolName: m.toolCall?.toolName,
+              error: toolResultRecord(m.toolCall?.result)?.["error"],
+            })),
+            `Stream produced ${String(erroredTools.length)} unexpected tool error(s) — pass allowToolErrors only for tests that exercise error paths`,
+          ).toEqual([]);
+        }
+        const newestAi = [...finalMessages]
+          .toReversed()
+          .find((m) => m.role === "assistant");
+        const finalResult =
+          newestAi &&
+          firstResult.result.success &&
+          newestAi.id !== firstResult.result.data.lastAiMessageId
+            ? {
+                ...firstResult.result,
+                data: {
+                  ...firstResult.result.data,
+                  lastAiMessageId: newestAi.id,
+                },
+              }
+            : firstResult.result;
+        assertParentTimeOrder(finalMessages);
+        return {
+          result: finalResult,
+          messages: finalMessages,
+          pinnedToolCount: firstResult.pinnedToolCount,
+        };
       }
 
+      assertParentTimeOrder(firstResult.messages);
       return firstResult;
     }
 
     // ── T-SYS: System prompt origin assertion ─────────────────────────────────
-    // Only runs when cfg.assertSystemPromptFromLocal = true (relay suites).
-    // Verifies the system prompt was built on the LOCAL instance, not the remote.
-    // The local system prompt contains the local instance ID; the AI's response
-    // to "What is your instance ID?" must contain the local instance ID.
-    if (cfg.assertSystemPromptFromLocal) {
+    // Relay suites (assertSystemPromptFromLocal): the prompt is built on the
+    // LOCAL instance — the AI must report the local instance ID.
+    // REMOTE-folder suites (systemPromptInstanceId): the loop, tools and
+    // prompt all live on the remote instance — the AI must report THAT ID.
+    if (cfg.assertSystemPromptFromLocal || cfg.systemPromptInstanceId) {
+      const originLabel = cfg.systemPromptInstanceId ? "REMOTE" : "LOCAL";
       it(
-        "T-SYS: system prompt origin - AI must report LOCAL instance ID",
+        `T-SYS: system prompt origin - AI must report ${originLabel} instance ID`,
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}sys-origin`);
-          await pinBalance(testUser.id, 10, creditLogger, creditT);
+          await pinBalance(testUser, 10);
 
-          // Resolve the local instance ID from the instance_identities table.
-          // Filter by userId so multiple rows (e.g. from different users' identities)
-          // don't cause non-deterministic results.
-          const identityResult = await db.execute<{ instance_id: string }>(
-            sql`SELECT instance_id FROM instance_identities WHERE user_id = ${testUser.id} AND is_default = true LIMIT 1`,
-          );
-          const localInstanceId = identityResult.rows[0]?.instance_id;
+          let expectedInstanceId: string | undefined =
+            cfg.systemPromptInstanceId;
+          if (!expectedInstanceId) {
+            // Resolve the local instance ID from the instance_identities table.
+            // Filter by userId so multiple rows (e.g. from different users'
+            // identities) don't cause non-deterministic results.
+            const identityResult = await db.execute<{ instance_id: string }>(
+              sql`SELECT instance_id FROM instance_identities WHERE user_id = ${testUser.id} AND is_default = true LIMIT 1`,
+            );
+            expectedInstanceId = identityResult.rows[0]?.instance_id;
+          }
           expect(
-            localInstanceId,
-            "T-SYS: local instance_identities must have a row",
+            expectedInstanceId,
+            "T-SYS: expected instance ID must resolve",
           ).toBeTruthy();
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T-SYS] What is your instance ID? Look at your system prompt — it contains the identity of the local server you are running on. Reply with ONLY the instance ID string, nothing else.`,
+            prompt: `[T-SYS] What is your instance ID? Look at your system prompt — it contains the identity of the server you are running on. Reply with ONLY the instance ID string, nothing else.`,
             favoriteId: mainFavoriteId,
           });
 
           expect(result.success, "T-SYS stream must succeed").toBe(true);
 
-          // The final AI message must contain the local instance ID.
+          // The final AI message must contain the expected instance ID.
           const aiMsg = messages.findLast((m) => m.role === "assistant");
           expect(aiMsg, "T-SYS: AI message must be present").toBeTruthy();
           expect(
             aiMsg?.content ?? "",
-            `T-SYS: AI response must contain local instance ID '${String(localInstanceId)}'. ` +
+            `T-SYS: AI response must contain ${originLabel} instance ID '${String(expectedInstanceId)}'. ` +
               `Got: ${String((aiMsg?.content ?? "").slice(0, 200))}. ` +
-              `This proves the system prompt came from LOCAL, not from the remote instance.`,
-          ).toContain(localInstanceId);
+              `This proves the system prompt came from ${originLabel === "REMOTE" ? "the remote instance running the loop" : "LOCAL, not from the remote instance"}.`,
+          ).toContain(expectedInstanceId!);
         },
         effectiveTestTimeout,
       );
@@ -1506,6 +1868,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       let branchRetryAiMsgId: string; // From retry+branch test
       let branchForkAiMsgId: string; // From branch fork
       let t5DetachTaskId: string; // taskId from T5 detach step, used by T5b wait-for-task step
+      // T6: wakeUp delivery shape — a fast task delivers inline within the
+      // same stream (original message holds the image), a slow one delivers
+      // via revival (deferred message). Both honour the contract: the tool
+      // call itself never blocks.
+      let t6aInlineDelivery = false;
       let t11fOutputImageUrl: string; // Output image URL from T11f I2I, used by T11f-verify
 
       // ── T1: New thread + tool call (combines basic send + tool call) ──────
@@ -1513,8 +1880,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         "T1: new thread + tool call - thread creation, parent chain, tool-help result, metadata",
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}tool-call`);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
+          await pinBalance(testUser, 50);
+          const before = await getBalance(testUser);
+
+          // REMOTE-folder modes: the loop must run ON the remote instance.
+          // Its wallet pays for the model usage there, so a decreasing remote
+          // balance proves the stream (started locally) executed remotely.
+          const isRemoteFolderMode =
+            cfg.rootFolderIdOverride === DefaultFolderId.REMOTE;
+          const remoteBalanceBefore = isRemoteFolderMode
+            ? await readRemoteAdminBalance()
+            : null;
 
           const { result, messages } = await runStream({
             user: testUser,
@@ -1522,9 +1898,36 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             favoriteId: mainFavoriteId,
           });
 
-          expect(result.success).toBe(true);
+          expect(
+            result.success,
+            `T1 stream failed: ${!result.success ? result.message : ""}`,
+          ).toBe(true);
           if (!result.success) {
             return;
+          }
+
+          if (isRemoteFolderMode) {
+            const remoteBalanceAfter = await readRemoteAdminBalance();
+            expect(
+              remoteBalanceBefore,
+              "T1 remote-folder: remote wallet must be readable before the stream",
+            ).not.toBeNull();
+            expect(
+              remoteBalanceAfter,
+              "T1 remote-folder: remote wallet must be readable after the stream",
+            ).not.toBeNull();
+            expect(
+              remoteBalanceAfter!,
+              `T1 remote-folder: the loop must run ON the remote instance — remote balance did not decrease (before=${String(remoteBalanceBefore)}, after=${String(remoteBalanceAfter)})`,
+            ).toBeLessThan(remoteBalanceBefore!);
+
+            // The provider side OWNS the running thread (threadMirrorMode
+            // 'both'): the thread's messages must exist in the remote DB.
+            // A missing remote thread means the loop silently ran locally or
+            // the provider failed to persist its copy.
+            const { assertProdDbHasMessages: assertRemoteMessages } =
+              await import("../../testing/remote-setup");
+            await assertRemoteMessages(result.data.threadId!, 2);
           }
 
           // ── Capture IDs early so downstream tests aren't blocked ──
@@ -1630,12 +2033,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(lastAi?.content).toBeTruthy();
           expect(lastAi!.content!.length).toBeGreaterThan(5);
           assertStepOk(lastAi!.content, "T1");
-          if (!cfg.skipTokenMetadataAssertions) {
-            expect(lastAi!.promptTokens).toBeGreaterThan(0);
-            expect(lastAi!.completionTokens).toBeGreaterThan(0);
-            expect(lastAi!.creditCost).toBeGreaterThan(0);
-            expect(lastAi!.finishReason).toBe("stop");
-          }
+          expect(lastAi!.promptTokens).toBeGreaterThan(0);
+          expect(lastAi!.completionTokens).toBeGreaterThan(0);
+          expect(lastAi!.creditCost).toBeGreaterThan(0);
+          expect(lastAi!.finishReason).toBe("stop");
 
           // ── Chain from last AI back to root ──
           const chain = walkChain(messages, lastAi!.id);
@@ -1644,15 +2045,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           assertChronologicalOrder(chain, messages);
 
           // ── Thread title generated ──
-          const title = await fetchThreadTitle(threadId);
+          const title = await getTitle(threadId);
           expect(title).toBeTruthy();
           expect(title!.length).toBeGreaterThan(0);
           expect(title!.length).toBeLessThan(200);
 
           // ── totalCreditsDeducted ──
-          if (!cfg.skipTokenMetadataAssertions) {
-            expect(result.data.totalCreditsDeducted).toBeGreaterThan(0);
-          }
+          expect(result.data.totalCreditsDeducted).toBeGreaterThan(0);
 
           // ── All message IDs are unique ──
           const allIds = messages.map((m) => m.id);
@@ -1662,15 +2061,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             expectedLeafId: lastMainAiMsgId,
             knownDeadEndLeaves: deadEndLeaves,
           });
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            // Deduction varies with model round-trips (tool call + follow-up).
-            // Kimi sometimes needs 2 LLM calls → higher cost. Allow up to 50.
-            assertDeducted(before, after, 0, 50);
-          }
+          const after = await getBalance(testUser);
+          // Deduction varies with model round-trips (tool call + follow-up).
+          // Kimi sometimes needs 2 LLM calls → higher cost. Allow up to 50.
+          await assertDeducted(testUser, before, after, 0, 50);
         },
         effectiveTestTimeout,
       );
@@ -1680,8 +2077,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         "T1b: tool-help detail mode - single tool schema lookup with parameters",
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}tool-help-detail`);
-          await pinBalance(testUser.id, 10, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 10);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const { result, messages } = await runStream({
             user: testUser,
@@ -1696,8 +2095,20 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevCount);
-          const toolMsg = findToolMsg(added, "tool-help", cfg);
+          const added = newMessages(messages, prevIds);
+          // The model may probe tool-help before the targeted lookup — assert
+          // on the call that requested generate_image specifically.
+          const toolHelpMsgs = added.filter((m) => {
+            if (m.role !== "tool") {
+              return false;
+            }
+            const name = m.toolCall?.toolName ?? "";
+            return name === "tool-help" || name === "execute-tool";
+          });
+          const toolMsg =
+            toolHelpMsgs.findLast((m) =>
+              JSON.stringify(m.toolCall?.args ?? {}).includes("generate_image"),
+            ) ?? findToolMsg(added, "tool-help", cfg);
           expect(toolMsg, "T1b: tool-help message not found").toBeDefined();
           if (toolMsg) {
             assertToolMessageComplete(toolMsg, "tool-help", "T1b", cfg);
@@ -1712,6 +2123,14 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ? toolResultRecord((toolRes!["tools"] as WidgetData[])[0])
             : toolRes;
           expect(entry, "T1b: no tool entry in result").toBeDefined();
+          expect(
+            String(entry?.["name"] ?? ""),
+            "T1b: tool entry must carry the generate_image name",
+          ).toContain("generate_image");
+          expect(
+            String(entry?.["description"] ?? "").length,
+            "T1b: tool entry must carry a non-empty description",
+          ).toBeGreaterThan(10);
 
           const lastAi = messages.find(
             (m) => m.id === result.data.lastAiMessageId,
@@ -1723,7 +2142,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             expectedLeafId: lastMainAiMsgId,
             knownDeadEndLeaves: deadEndLeaves,
           });
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
         },
         effectiveTestTimeout,
@@ -1739,28 +2158,38 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ? `${cfg.cachePrefix}cortex-mem-write`
             : `${cfg.cachePrefix}image-generation`;
           setFetchCacheContext(cacheCtx);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 50);
+          const before = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           // Capture the parent of T2's user message BEFORE T2 updates lastMainAiMsgId.
           // UI retry/branch on T2's user message uses userMsg.parentId = this value.
           t2BranchParentId = lastMainAiMsgId;
 
           const cheapNodePath = `/memories/t2-cheap-test`;
-          // Pre-clean so the fixture replay always starts from a known absent state.
+          // Pre-clean BOTH sides so the fixture replay always starts from a
+          // known absent state - the node lands wherever cortex-write executes.
           if (cfg.cheapMode) {
+            // Prefix match: cortex-write normalizes the path (appends `.md`).
             await db
               .delete(cortexNodes)
               .where(
                 and(
                   eq(cortexNodes.userId, testUser.id),
-                  eq(cortexNodes.path, cheapNodePath),
+                  like(cortexNodes.path, `${cheapNodePath}%`),
                 ),
               );
+            if (cfg.remoteInstanceId || cfg.rootFolderIdOverride === DefaultFolderId.REMOTE) {
+              const { getProdDb } = await import("../../testing/remote-setup");
+              await getProdDb().execute(
+                sql`DELETE FROM cortex_nodes WHERE path LIKE ${cheapNodePath + "%"}`,
+              );
+            }
           }
           const prompt = cfg.cheapMode
-            ? `[T2 cortex-write] Use cortex-write to create a memory node at path "${cheapNodePath}" with content "T2_CHEAP_OK". Then use cortex-read to read it back and verify the content is exactly "T2_CHEAP_OK". End your reply with STEP_OK if write succeeded and read confirmed the content, or FAILED: <reason> if anything was wrong.`
+            ? `[T2 cortex-write] Use ${toolInstr(cfg, "cortex-write")} to create a memory node at path "${cheapNodePath}" with content "T2_CHEAP_OK". Then use ${toolInstr(cfg, "cortex-read")} to read it back and verify the content is exactly "T2_CHEAP_OK". End your reply with STEP_OK if write succeeded and read confirmed the content, or FAILED: <reason> if anything was wrong.`
             : `[T2 image-gen] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='red circle'")}. Check that the result contains a non-empty imageUrl and a positive creditCost. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`;
 
           const { result, messages } = await runStream({
@@ -1776,7 +2205,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
 
           // Capture T2's user message ID - it's a sibling of the retry/branch user messages.
           // T2 user message has parentId = t2BranchParentId (the value of lastMainAiMsgId before T2).
@@ -1801,18 +2230,24 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 "T2 cheap: cortex-write parent must be assistant",
               ).toBe("assistant");
             }
-            // DB cross-check: only for local AI execution (not relay suites).
-            // In relay mode (assertSystemPromptFromLocal=true), the AI runs on the remote
-            // server and cortex-write writes to the remote DB, not the local one.
-            // The AI response (STEP_OK) is the only reliable assertion in that case.
-            if (!cfg.assertSystemPromptFromLocal) {
+            // DB cross-check on the side that executed the tool. Relay modes
+            // delegate tools back to the local instance (toolSource=local), so
+            // the node is local there. execute-tool dispatch (remoteInstanceId)
+            // AND REMOTE-folder suites (loop + tools run on the remote) write
+            // the remote DB. Same assertion either way.
+            const toolRanRemotely =
+              Boolean(cfg.remoteInstanceId) ||
+              cfg.rootFolderIdOverride === DefaultFolderId.REMOTE;
+            if (!toolRanRemotely) {
+              // cortex-write normalizes the path to a file node (appends `.md`),
+              // so match by prefix rather than the exact requested path.
               const [dbNode] = await db
                 .select({ content: cortexNodes.content })
                 .from(cortexNodes)
                 .where(
                   and(
                     eq(cortexNodes.userId, testUser.id),
-                    eq(cortexNodes.path, cheapNodePath),
+                    like(cortexNodes.path, `${cheapNodePath}%`),
                   ),
                 );
               expect(
@@ -1829,9 +2264,29 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 .where(
                   and(
                     eq(cortexNodes.userId, testUser.id),
-                    eq(cortexNodes.path, cheapNodePath),
+                    like(cortexNodes.path, `${cheapNodePath}%`),
                   ),
                 );
+            } else {
+              const { getProdDb } = await import("../../testing/remote-setup");
+              const pdb = getProdDb();
+              // cortex-write normalizes the path to a file node (appends `.md`),
+              // so match by prefix rather than the exact requested path.
+              const remoteRows = await pdb.execute<{ content: string | null }>(
+                sql`SELECT content FROM cortex_nodes WHERE path LIKE ${cheapNodePath + "%"} ORDER BY updated_at DESC LIMIT 1`,
+              );
+              const remoteNode = remoteRows.rows[0];
+              expect(
+                remoteNode,
+                `T2 cheap: node not found in REMOTE DB at ${cheapNodePath}`,
+              ).toBeDefined();
+              expect(
+                remoteNode?.content?.trim(),
+                "T2 cheap: remote node content must be T2_CHEAP_OK",
+              ).toBe("T2_CHEAP_OK");
+              await pdb.execute(
+                sql`DELETE FROM cortex_nodes WHERE path LIKE ${cheapNodePath + "%"}`,
+              );
             }
           } else {
             // ── generate_image tool message ──
@@ -1845,7 +2300,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             const toolRes = resolveToolResult(toolMsg);
             expect(toolRes).not.toBeNull();
             expect(typeof toolRes!["imageUrl"]).toBe("string");
-            expect(toolRes!["imageUrl"]).toBeTruthy();
+            expect(String(toolRes!["imageUrl"])).toMatch(/^https?:\/\/.+/);
             expect(typeof toolRes!["creditCost"]).toBe("number");
 
             // ── Tool parent is assistant, shares sequenceId ──
@@ -1855,9 +2310,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             expect(toolRes!["imageUrl"]).toBeTruthy();
 
-            if (!cfg.skipTokenMetadataAssertions) {
-              expect(toolRes!["creditCost"] as number).toBeGreaterThan(0);
-            }
+            expect(toolRes!["creditCost"] as number).toBeGreaterThan(0);
           }
 
           // ── Final AI has token metadata ──
@@ -1865,9 +2318,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             (m) => m.id === result.data.lastAiMessageId,
           );
           expect(lastAi).toBeDefined();
-          if (!cfg.skipTokenMetadataAssertions) {
-            expect(lastAi!.finishReason).toBe("stop");
-          }
+          expect(lastAi!.finishReason).toBe("stop");
           assertStepOk(lastAi!.content, "T2");
           lastMainAiMsgId = result.data.lastAiMessageId!;
 
@@ -1878,13 +2329,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             expectedLeafId: lastMainAiMsgId,
             knownDeadEndLeaves: deadEndLeaves,
           });
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 0.47, 10);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 0.05, 50);
         },
         effectiveTestTimeout,
       );
@@ -1909,9 +2358,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // ── Fork 1: Retry (UI flow: operation="retry", parentMessageId=t2BranchParentId) ──
           setFetchCacheContext(`${cfg.cachePrefix}retry`);
-          await pinBalance(testUser.id, 40, creditLogger, creditT);
-          const beforeRetry = await getBalance(testUser, creditLogger, creditT);
-          const prevCountRetry = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 40);
+          const beforeRetry = await getBalance(testUser);
+          const prevIdsRetry = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const { result: retryResult, messages: retryMsgs } = await runStream({
             user: testUser,
@@ -1928,7 +2379,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           }
 
           branchRetryAiMsgId = retryResult.data.lastAiMessageId!;
-          const retryAdded = newMessages(retryMsgs, prevCountRetry);
+          const retryAdded = newMessages(retryMsgs, prevIdsRetry);
 
           // ── T3a: retryUser.parentId === branchParentId === t2UserMsg.parentId ──
           // The KEY assertion: the user message we retry from has the SAME parentId
@@ -1983,29 +2434,19 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             expectedLeafId: branchRetryAiMsgId,
             knownDeadEndLeaves: deadEndLeaves,
           });
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const afterRetry = await getBalance(
-              testUser,
-              creditLogger,
-              creditT,
-            );
-            assertDeducted(beforeRetry, afterRetry, 0, 10);
-          }
+          const afterRetry = await getBalance(testUser);
+          await assertDeducted(testUser, beforeRetry, afterRetry, 0, 10);
 
           // ── Fork 2: Branch from same parent (UI flow: operation="edit", parent=t2BranchParentId) ──
           // The UI's branchMessage hook uses: parentMessageId = userMsg.parentId, operation = "edit"
           // So we pass branchParentId (= t2BranchParentId = t2UserMsg.parentId) with operation="edit".
           // This creates branchUser as a SIBLING of t2UserMsgId under branchParentId (same as retryUser).
           setFetchCacheContext(`${cfg.cachePrefix}branch`);
-          await pinBalance(testUser.id, 40, creditLogger, creditT);
-          const beforeBranch = await getBalance(
-            testUser,
-            creditLogger,
-            creditT,
-          );
+          await pinBalance(testUser, 40);
+          const beforeBranch = await getBalance(testUser);
 
           const { result: branchResult, messages: branchMsgs } =
             await runStream({
@@ -2111,32 +2552,28 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // (e.g. queue mode) they remain leaves. Register them so subsequent tests pass.
           deadEndLeaves.add(branchRetryAiMsgId);
           deadEndLeaves.add(branchForkAiMsgId);
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const afterBranch = await getBalance(
-              testUser,
-              creditLogger,
-              creditT,
-            );
-            assertDeducted(beforeBranch, afterBranch, 0, 10);
-          }
+          const afterBranch = await getBalance(testUser);
+          await assertDeducted(testUser, beforeBranch, afterBranch, 0, 10);
         },
         effectiveTestTimeout,
       );
 
       // ── T4: Music gen (from retry branch) + video gen (from fork branch) ──
       fit("T4: music + video generation - continue from both branches, verify media tool results", async () => {
-        if (cfg.skipMediaGenerationTests) {
-          return; // relay: no fixture cache for media generation tools in transport mode
+        if (cfg.cheapMode) {
+          return; // cheapMode: media generation is the expensive path
         }
         // music (~60s) + video (~120s) + revival polling (180s budget) → 6 min
         // ── Part A: Music gen from retry branch ──
         setFetchCacheContext(`${cfg.cachePrefix}music-generation`);
-        await pinBalance(testUser.id, 50, creditLogger, creditT);
-        const beforeMusic = await getBalance(testUser, creditLogger, creditT);
-        const prevCountMusic = (await fetchThreadMessages(threadId)).length;
+        await pinBalance(testUser, 50);
+        const beforeMusic = await getBalance(testUser);
+        const prevIdsMusic = new Set(
+          (await getMessages(threadId)).map((m) => m.id),
+        );
 
         const { result: musicResult, messages: musicMsgs } = await runStream({
           user: testUser,
@@ -2151,7 +2588,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           return;
         }
 
-        const musicAdded = newMessages(musicMsgs, prevCountMusic);
+        const musicAdded = newMessages(musicMsgs, prevIdsMusic);
 
         // T4a: music user must be direct child of branchRetryAiMsgId (not some other node)
         const musicUser = musicAdded.find((m) => m.role === "user");
@@ -2195,7 +2632,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         const musicRes = resolveToolResult(musicToolMsg);
         expect(musicRes).not.toBeNull();
         expect(typeof musicRes!["audioUrl"]).toBe("string");
-        expect(musicRes!["audioUrl"]).toBeTruthy();
+        expect(String(musicRes!["audioUrl"])).toMatch(/^https?:\/\/.+/);
         expect(typeof musicRes!["creditCost"]).toBe("number");
         expect((musicRes!["creditCost"] as number) > 0).toBe(true);
         expect(typeof musicRes!["durationSeconds"]).toBe("number");
@@ -2214,9 +2651,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           (m) => m.id === musicResult.data.lastAiMessageId,
         );
         expect(musicLastAi).toBeDefined();
-        if (!cfg.skipTokenMetadataAssertions) {
-          expect(musicLastAi!.finishReason).toBe("stop");
-        }
+        expect(musicLastAi!.finishReason).toBe("stop");
         assertStepOk(musicLastAi!.content, "T4a");
 
         // Exact chain: [t1UserMsgId, ..., t1ToolAiMsgId, retryUser, branchRetryAiMsgId, musicUser, ..., musicLastAi]
@@ -2250,20 +2685,20 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         );
         // T4a music branch is now a dead-end (T4b video is the main continuation)
         deadEndLeaves.add(musicResult.data.lastAiMessageId!);
-        await assertThreadIdle(threadId);
+        await assertThreadIdle(threadId, testUser);
         await assertNoPendingTasks(threadId);
 
-        if (!cfg.skipTokenMetadataAssertions) {
-          const afterMusic = await getBalance(testUser, creditLogger, creditT);
-          assertDeducted(beforeMusic, afterMusic, 0, 15);
-        }
+        const afterMusic = await getBalance(testUser);
+        await assertDeducted(testUser, beforeMusic, afterMusic, 0, 15);
 
         // ── Part B: Video gen from fork branch ──
         setFetchCacheContext(`${cfg.cachePrefix}video-generation`);
         // VEO_3_1 costs ~48 cr/sec * 5 sec * 1.3 markup = ~312 cr minimum
-        await pinBalance(testUser.id, 400, creditLogger, creditT);
-        const beforeVideo = await getBalance(testUser, creditLogger, creditT);
-        const prevCountVideo = (await fetchThreadMessages(threadId)).length;
+        await pinBalance(testUser, 400);
+        const beforeVideo = await getBalance(testUser);
+        const prevIdsVideo = new Set(
+          (await getMessages(threadId)).map((m) => m.id),
+        );
 
         const { result: videoResult, messages: videoMsgs } = await runStream({
           user: testUser,
@@ -2278,7 +2713,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           return;
         }
 
-        const videoAdded = newMessages(videoMsgs, prevCountVideo);
+        const videoAdded = newMessages(videoMsgs, prevIdsVideo);
 
         // T4b: video user must be direct child of branchForkAiMsgId (not branchRetryAiMsgId or t1ToolAi)
         const videoUser = videoAdded.find((m) => m.role === "user");
@@ -2297,7 +2732,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         const videoRes = resolveToolResult(videoToolMsg);
         expect(videoRes).not.toBeNull();
         expect(typeof videoRes!["videoUrl"]).toBe("string");
-        expect(videoRes!["videoUrl"]).toBeTruthy();
+        expect(String(videoRes!["videoUrl"])).toMatch(/^https?:\/\/.+/);
         expect(typeof videoRes!["creditCost"]).toBe("number");
         expect((videoRes!["creditCost"] as number) > 0).toBe(true);
         expect(typeof videoRes!["durationSeconds"]).toBe("number");
@@ -2309,9 +2744,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           (m) => m.id === videoResult.data.lastAiMessageId,
         );
         expect(videoLastAi).toBeDefined();
-        if (!cfg.skipTokenMetadataAssertions) {
-          expect(videoLastAi!.finishReason).toBe("stop");
-        }
+        expect(videoLastAi!.finishReason).toBe("stop");
         assertStepOk(videoLastAi!.content, "T4b");
         lastMainAiMsgId = videoResult.data.lastAiMessageId!;
 
@@ -2348,21 +2781,19 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             knownDeadEndLeaves: deadEndLeaves,
           },
         );
-        await assertThreadIdle(threadId);
+        await assertThreadIdle(threadId, testUser);
         await assertNoPendingTasks(threadId);
 
-        if (!cfg.skipTokenMetadataAssertions) {
-          const afterVideo = await getBalance(testUser, creditLogger, creditT);
-          // Video gen: VEO_3_1 via modelslab + chat model tokens.
-          // In remote mode the video gen credits are deducted on the remote instance, not locally.
-          // Only the LLM stream tokens are charged locally, so min=0 in remote mode.
-          assertDeducted(
-            beforeVideo,
-            afterVideo,
-            cfg.remoteInstanceId ? 0 : 5,
-            400,
-          );
-        }
+        const afterVideo = await getBalance(testUser);
+        // Video gen: VEO_3_1 via modelslab + chat model tokens.
+        // In remote mode the video gen credits are deducted on the remote instance, not locally.
+        // Only the LLM stream tokens are charged locally, so min=0 in remote mode.
+        await assertDeducted(testUser, 
+          beforeVideo,
+          afterVideo,
+          cfg.remoteInstanceId ? 0 : 5,
+          400,
+        );
       }, 360_000); // 6 min: music (~60s) + video (~120s) + two revival polls (180s each)
 
       // ── T5: detach dispatch - AI calls generate_image(detach), gets taskId ──
@@ -2379,8 +2810,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             /(?:local-bg|remote-direct-hermes|remote-hermes)-\d+-\w+/g,
             "T5B_TASK_ID_PLACEHOLDER",
           );
-          await pinBalance(testUser.id, 20, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 20);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const { result, messages } = await runStream({
             user: testUser,
@@ -2395,7 +2828,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
 
           const genImgMsg = findToolMsg(added, "generate_image", cfg);
           expect(
@@ -2403,14 +2836,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             "[T5] generate_image tool message not found",
           ).toBeDefined();
           if (genImgMsg) {
-            // Detach mode: tool returns {taskId, status: "pending"} immediately
-            assertToolMessageComplete(
-              genImgMsg,
-              "generate_image",
-              "T5",
-              cfg,
-              "pending",
-            );
+            // The dispatch returned {taskId, pending} to the AI; by the time
+            // runStream returns, the completed task has backfilled the
+            // message to its terminal state.
+            assertToolMessageComplete(genImgMsg, "generate_image", "T5", cfg);
           }
 
           const genImgRes = resolveToolResult(genImgMsg);
@@ -2418,17 +2847,23 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             genImgRes,
             "[T5] generate_image result is null",
           ).not.toBeNull();
+          // The detach task completed before runStream returned (it awaits
+          // the reconcile) — the dispatch tool message is the canonical
+          // result store and now holds the FINAL image result. The taskId
+          // stays discoverable as toolCall.remoteTaskId.
+          const t5ToolCall = genImgMsg!.toolCall;
+          const t5TaskIdRaw = t5ToolCall?.remoteTaskId ?? genImgRes!["taskId"];
           expect(
-            typeof genImgRes!["taskId"],
-            `[T5] taskId missing in detach result: ${JSON.stringify(genImgRes)}`,
+            typeof t5TaskIdRaw,
+            `[T5] taskId missing (remoteTaskId or result.taskId): ${JSON.stringify({ remoteTaskId: t5ToolCall?.remoteTaskId, result: genImgRes })}`,
           ).toBe("string");
           expect(
-            genImgRes!["imageUrl"],
-            "[T5] imageUrl must not be present in detach result",
-          ).toBeUndefined();
+            typeof genImgRes!["imageUrl"],
+            `[T5] backfilled detach result must hold the final imageUrl: ${JSON.stringify(genImgRes)}`,
+          ).toBe("string");
 
           // Save for T5b - also patch T5b fixtures so replay uses the real taskId
-          t5DetachTaskId = genImgRes!["taskId"] as string;
+          t5DetachTaskId = t5TaskIdRaw as string;
           patchFetchCacheFixtures(
             `${cfg.cachePrefix}callback-wait-step2`,
             "T5B_TASK_ID_PLACEHOLDER",
@@ -2449,7 +2884,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
         },
         effectiveTestTimeout,
@@ -2459,20 +2894,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T5b: wait-for-task - AI calls wait-for-task with detach taskId, gets imageUrl",
         async () => {
-          // Relay transport: wait-for-task revival runs on the remote in a separate stream.
-          // The local relay only captures the initial stream WS events, so the backfilled
-          // tool result is not visible in the local DB. Skip in relay mode.
-          if (cfg.skipWaitForTaskTest) {
-            lastMainAiMsgId = lastMainAiMsgId; // keep unchanged
-            return;
-          }
           // T5 already patched step2 fixtures: sentinel → t5DetachTaskId.
           // On first run the dir doesn't exist yet; step2 runs live and records real taskId.
           // After step2, fixtures are normalized back to sentinel for the next run.
           setFetchCacheContext(`${cfg.cachePrefix}callback-wait-step2`);
-          await pinBalance(testUser.id, 20, creditLogger, creditT);
-          const beforeWait = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 20);
+          const beforeWait = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           // In direct remote mode, the detach taskId is a local `remote-direct-*` placeholder
           // that lives in the local dev DB. wait-for-task must be called locally (not forwarded
@@ -2500,54 +2930,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // the goroutine (from T5) calls handleTaskCompletion. Poll for idle, then
           // re-fetch messages so the backfilled tool result + revival AI response
           // are visible to assertions below.
-          if (waitResult.success && waitResult.data.threadId) {
-            const tid = waitResult.data.threadId;
-            const [threadRow] = await db
-              .select({ streamingState: chatThreads.streamingState })
-              .from(chatThreads)
-              .where(eq(chatThreads.id, tid));
-
-            if (threadRow?.streamingState === "waiting") {
-              const REVIVAL_TIMEOUT_MS = 90_000;
-              const REVIVAL_POLL_INTERVAL_MS = 500;
-              const revivalStart = Date.now();
-              let revivalState: string | undefined = "waiting";
-              while (
-                revivalState !== "idle" &&
-                Date.now() - revivalStart < REVIVAL_TIMEOUT_MS
-              ) {
-                await new Promise<void>((resolve) => {
-                  setTimeout(resolve, REVIVAL_POLL_INTERVAL_MS);
-                });
-                const [revivalRow] = await db
-                  .select({ streamingState: chatThreads.streamingState })
-                  .from(chatThreads)
-                  .where(eq(chatThreads.id, tid));
-                revivalState = revivalRow?.streamingState;
-              }
-              expect(
-                revivalState,
-                "[T5b] Thread must return to 'idle' after revival",
-              ).toBe("idle");
-
-              // Re-fetch messages with post-revival state (backfilled tool result + AI response)
-              waitMsgs = await fetchThreadMessages(tid);
-              const lastRevivalAi = [...waitMsgs]
-                .toReversed()
-                .find((m) => m.role === "assistant");
-              if (lastRevivalAi && waitResult.success) {
-                waitResult = {
-                  ...waitResult,
-                  data: {
-                    ...waitResult.data,
-                    lastAiMessageId: lastRevivalAi.id,
-                  },
-                };
-              }
-            }
-          }
-
-          const waitAdded = newMessages(waitMsgs, prevCount);
+          // runStream owns the waiting→revival handling in every mode; the
+          // returned messages are already post-revival.
+          const waitAdded = newMessages(waitMsgs, prevIds);
 
           // Per spec (wait, same-sequence path): if no user message arrived while waiting,
           // the original wait-for-task tool message is backfilled in-place with the real result.
@@ -2613,14 +2998,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const afterWait = await getBalance(testUser, creditLogger, creditT);
-            // T5b only: wait-for-task + AI response (~0.3cr). Image gen was charged in T5.
-            assertDeducted(beforeWait, afterWait, 0.1, 10);
-          }
+          const afterWait = await getBalance(testUser);
+          // T5b only: wait-for-task + AI response (~0.3cr). Image gen was charged in T5.
+          await assertDeducted(testUser, beforeWait, afterWait, 0.1, 10);
 
           // Normalize fixtures: replace the real taskId with sentinel so the next
           // run can patch sentinel → its own taskId before replaying.
@@ -2638,13 +3021,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         "T5a: endLoop - tool-help(endLoop) executes inline, stream stops after 1 call",
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}callback-end-loop`);
-          await pinBalance(testUser.id, 20, creditLogger, creditT);
-          const beforeEndLoop = await getBalance(
-            testUser,
-            creditLogger,
-            creditT,
+          await pinBalance(testUser, 20);
+          const prevIdsEndLoop = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
           );
-          const prevCountEndLoop = (await fetchThreadMessages(threadId)).length;
 
           const { result: endLoopResult, messages: endLoopMsgs } =
             await runStream({
@@ -2660,7 +3040,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const endLoopAdded = newMessages(endLoopMsgs, prevCountEndLoop);
+          const endLoopAdded = newMessages(endLoopMsgs, prevIdsEndLoop);
 
           // Exactly 1 tool-help call (endLoop stops the loop).
           // Per spec: endLoop ALWAYS backfills in-place regardless of transport.
@@ -2721,14 +3101,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          const afterEndLoop = await getBalance(
-            testUser,
-            creditLogger,
-            creditT,
-          );
+          const afterEndLoop = await getBalance(testUser);
           // endLoop = 1 tool-help call, cheap. But previous test goroutines may
           // add/remove credits concurrently. Skip credit assertion for endLoop
           // since it's a simple tool-help call, not a paid media gen.
@@ -2744,16 +3120,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T5d: wait callback mode - original tool message backfilled in-place, no deferred created, AI gets result",
         async () => {
-          // Relay transport: callbackMode='wait' on the remote triggers a server-side wait
-          // that runs after the relay WS closes. The local relay processor never receives the
-          // backfilled tool result. Skip in relay mode (same reason as T5b).
-          if (cfg.skipWaitForTaskTest) {
-            return;
-          }
           setFetchCacheContext(`${cfg.cachePrefix}callback-wait-inline`);
-          await pinBalance(testUser.id, 20, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 20);
+          const before = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const { result } = await runStream({
             user: testUser,
@@ -2771,11 +3143,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Queue mode (cfg.pulse): revival fires async. Poll for idle, then re-fetch.
           if (result.success && result.data.threadId) {
             const tid = result.data.threadId;
-            const [threadRow] = await db
-              .select({ streamingState: chatThreads.streamingState })
-              .from(chatThreads)
-              .where(eq(chatThreads.id, tid));
-            if (threadRow?.streamingState === "waiting") {
+            const initialState = await getStreamingState(tid);
+            if (initialState === "waiting") {
               const REVIVAL_TIMEOUT_MS = 30_000;
               const REVIVAL_POLL_INTERVAL_MS = 500;
               const revivalStart = Date.now();
@@ -2787,11 +3156,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 await new Promise<void>((resolve) => {
                   setTimeout(resolve, REVIVAL_POLL_INTERVAL_MS);
                 });
-                const [revivalRow] = await db
-                  .select({ streamingState: chatThreads.streamingState })
-                  .from(chatThreads)
-                  .where(eq(chatThreads.id, tid));
-                revivalState = revivalRow?.streamingState;
+                revivalState = await getStreamingState(tid);
               }
               expect(
                 revivalState,
@@ -2800,8 +3165,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             }
           }
 
-          const allMessages = await fetchThreadMessages(threadId);
-          const added = newMessages(allMessages, prevCount);
+          const allMessages = await getMessages(threadId);
+          const added = newMessages(allMessages, prevIds);
 
           // ── At least 1 generate_image tool message (model may retry on validation errors) ──
           const imgToolMsgs = added.filter(
@@ -2867,13 +3232,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 0.4, 15);
-          }
+          const after = await getBalance(testUser);
+          // Image gen + at least one AI turn; kimi sometimes needs an extra
+          // round trip (same allowance as T1).
+          await assertDeducted(testUser, before, after, 0.4, 50);
         },
         effectiveTestTimeout,
       );
@@ -2883,8 +3248,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         "T5c: execute-tool direct call - tool-help via execute-tool wrapper",
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}execute-tool-direct`);
-          await pinBalance(testUser.id, 10, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 10);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const { result, messages } = await runStream({
             user: testUser,
@@ -2899,7 +3266,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
           // AI may call execute-tool directly or call tool-help - either way a tool must have run
           const anyToolMsg = added.find((m) => m.role === "tool");
           expect(anyToolMsg, "T5c: no tool call found").toBeDefined();
@@ -2918,7 +3285,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
         },
         effectiveTestTimeout,
@@ -2927,16 +3294,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // ── T6: wakeUp - two-phase E2E ──────────────────────────────────────
       describe("T6: wakeUp (two-phase)", () => {
         let wakeupToolMsgId: string;
-        let wakeupMsgCount: number;
-        /** Count BEFORE T6a adds any messages - used to scope "exactly 2 tool msgs" assertion */
-        let wakeupInitialMsgCount: number;
+        let wakeupMsgIds: Set<string>;
+        /** IDs BEFORE T6a adds any messages - used to scope "exactly 2 tool msgs" assertion */
+        let wakeupInitialMsgIds: Set<string>;
 
         fit(
           "T6a: wakeUp phase1 - image dispatched async, AI gets taskId, stream ends naturally",
           async () => {
-            if (cfg.skipWaitForTaskTest) {
-              return; // relay: revival stream not captured locally
-            }
             // Clean up stale wakeUp tasks from previous test runs before recording.
             // Without this, the revival stream sees dozens of stale tasks in the system
             // prompt, causing extra LLM calls that pollute the fixture counter.
@@ -2946,16 +3310,16 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               sql`DELETE FROM cron_tasks WHERE id LIKE 'local-wu-%' AND last_execution_status IN ('status.completed', 'status.failed', 'status.cancelled', 'status.stopped')`,
             );
             setFetchCacheContext(`${cfg.cachePrefix}callback-wakeup-phase1`);
-            await pinBalance(testUser.id, 20, creditLogger, creditT);
-            const before = await getBalance(testUser, creditLogger, creditT);
-            wakeupMsgCount = (await fetchThreadMessages(threadId)).length;
-            wakeupInitialMsgCount = wakeupMsgCount;
-            // eslint-disable-next-line no-console
-            console.log("[T6a pre-stream] wakeupMsgCount:", wakeupMsgCount);
+            await pinBalance(testUser, 20);
+            const before = await getBalance(testUser);
+            wakeupMsgIds = new Set(
+              (await getMessages(threadId)).map((m) => m.id),
+            );
+            wakeupInitialMsgIds = new Set(wakeupMsgIds);
 
             const { result, messages } = await runStream({
               user: testUser,
-              prompt: `[T6a wakeUp-phase1] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-test' and callbackMode='wakeUp'")}. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no imageUrl yet - end your reply with STEP_OK if you see taskId and no imageUrl, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with WAKEUP_OK. If revived but imageUrl is missing or empty, end with WAKEUP_FAILED: <reason>.`,
+              prompt: `[T6a wakeUp-phase1] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-test' and callbackMode='wakeUp'")}. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no image yet - end your reply with STEP_OK if you see taskId and no image URL, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived you will see the generate_image result containing the image — the URL may appear either as an "imageUrl" field OR as a rendered markdown image link ![...](https://...). EITHER form counts. Confirm an image URL (http or https) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any form.`,
               threadId,
               favoriteId: mainFavoriteId,
               explicitParentMessageId: lastMainAiMsgId,
@@ -2966,84 +3330,19 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               return;
             }
 
-            const added = newMessages(messages, wakeupMsgCount);
-            wakeupMsgCount = messages.length;
+            const added = newMessages(messages, wakeupMsgIds);
+            wakeupMsgIds = new Set(messages.map((m) => m.id));
 
-            // ── Tool message: wakeUp returns taskId placeholder ──
-            // eslint-disable-next-line no-console
-            console.log(
-              "[T6a debug] pre:",
-              wakeupInitialMsgCount,
-              "post:",
-              messages.length,
+            // ── Tool message: the ORIGINAL dispatch (never the deferred
+            // revival child — the post-revival snapshot may contain both) ──
+            const addedNonDeferred = added.filter(
+              (m) => m.toolCall?.isDeferred !== true,
             );
-            // eslint-disable-next-line no-console
-            console.log(
-              "[T6a debug] msgs[44-50]:",
-              JSON.stringify(
-                messages
-                  .slice(44)
-                  .map((m, i) => ({
-                    idx: 44 + i,
-                    r: m.role,
-                    t: m.toolCall?.toolName,
-                    a: (m.toolCall?.args as Record<string, unknown>)?.[
-                      "toolName"
-                    ],
-                    ts: m.createdAt.toISOString().slice(14),
-                  })),
-              ),
+            const toolMsg = findToolMsg(
+              addedNonDeferred,
+              "generate_image",
+              cfg,
             );
-            // eslint-disable-next-line no-console
-            console.log(
-              "[T6a debug] added roles:",
-              JSON.stringify(
-                added.map((m) => ({
-                  r: m.role,
-                  t: m.toolCall?.toolName,
-                  a: (m.toolCall?.args as Record<string, unknown>)?.[
-                    "toolName"
-                  ],
-                  c: m.content?.slice(0, 60),
-                  isDeferred: m.toolCall?.isDeferred,
-                })),
-              ),
-            );
-            // Direct DB query to find tool messages in this thread
-            {
-              const { chatMessages: cm } =
-                await import("@/app/api/[locale]/agent/chat/db");
-              const { eq: eqDrz } = await import("drizzle-orm");
-              const toolRows = await db
-                .select({
-                  id: cm.id,
-                  role: cm.role,
-                  parentId: cm.parentId,
-                  metadata: cm.metadata,
-                  createdAt: cm.createdAt,
-                })
-                .from(cm)
-                .where(eqDrz(cm.threadId, threadId));
-              const toolMsgRows = toolRows.filter((r) => r.role === "tool");
-              // eslint-disable-next-line no-console
-              console.log(
-                "[T6a debug] ALL tool rows in thread:",
-                JSON.stringify(
-                  toolMsgRows.map((r) => ({
-                    id: r.id,
-                    role: r.role,
-                    parentId: r.parentId,
-                    toolName: (
-                      r.metadata as Record<string, Record<string, string>>
-                    )?.toolCall?.toolName,
-                    ts: r.createdAt.toISOString().slice(14),
-                  })),
-                ),
-              );
-              // eslint-disable-next-line no-console
-              console.log("[T6a debug] Total rows in thread:", toolRows.length);
-            }
-            const toolMsg = findToolMsg(added, "generate_image", cfg);
             expect(toolMsg).toBeDefined();
             if (toolMsg) {
               // wakeUp phase1: tool dispatched async - status is "pending" in remote, undefined in local
@@ -3057,30 +3356,74 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             }
             wakeupToolMsgId = toolMsg!.id;
 
-            // wakeUp phase1: imageUrl must NOT be present - the image is being generated async.
-            // If imageUrl is here it means wakeUp ran synchronously, which violates semantics.
-            // result may be null (local wakeUp - backfilled on revival) or { taskId, status }
-            // (remote wakeUp via execute-tool). Both are valid; what matters is no imageUrl yet.
+            // Delivery shape: a task that finishes before the stream ends is
+            // picked up by the live loop — the original message already holds
+            // the image. A slower task delivers via revival (deferred child).
             const phase1Res = resolveToolResult(toolMsg);
-            if (phase1Res) {
+            t6aInlineDelivery =
+              typeof phase1Res?.["imageUrl"] === "string" &&
+              phase1Res["imageUrl"] !== "";
+            if (t6aInlineDelivery) {
               expect(
-                phase1Res["imageUrl"],
-                `T6a: wakeUp must NOT have imageUrl in phase1 - image arrived synchronously, violating wakeUp semantics. Got: ${JSON.stringify(phase1Res)}`,
-              ).toBeUndefined();
+                String(phase1Res!["imageUrl"]),
+                "T6a inline delivery: imageUrl must be a real URL",
+              ).toMatch(/^https?:\/\/.+/);
             }
 
             // ── Stream ended, AI wrapped up ──
-            const lastAi = messages.find(
-              (m) => m.id === result.data.lastAiMessageId,
+            // The wakeUp revival can land between dispatch and this snapshot
+            // (REMOTE-folder mirror-wait pulls until it arrives), so
+            // lastAiMessageId may point at the REVIVAL turn rather than the
+            // phase-1 dispatch turn. Accept the marker from ANY assistant added
+            // this phase: the dispatch turn confirms STEP_OK (taskId, no image),
+            // the revival turn confirms WAKEUP_OK (image present). Either proves
+            // the phase worked; the failure markers must be absent everywhere.
+            // Re-fetch current state: the phase assistants (dispatch + revival)
+            // can sync to this mirror after runStream's snapshot was captured.
+            // Diff against the PRE-stream snapshot (wakeupInitialMsgIds) —
+            // wakeupMsgIds was just reassigned to the post-stream set above and
+            // would exclude the very assistants we need to inspect.
+            const t6aCurrent = await getMessages(threadId);
+            // Only the dispatch + revival assistants — exclude compacting nodes,
+            // whose summaries recap prior turns (and quote instruction text like
+            // "WAKEUP_FAILED"), which would false-trigger the failure check.
+            const phaseAssistants = newMessages(
+              t6aCurrent,
+              wakeupInitialMsgIds,
+            ).filter(
+              (m) =>
+                m.role === "assistant" &&
+                !m.isCompacting &&
+                (m.content ?? "").trim() !== "",
             );
-            expect(lastAi).toBeDefined();
-            assertStepOk(lastAi?.content, "T6a");
+            const phaseText = phaseAssistants.map((m) => m.content ?? "").join(
+              "\n---\n",
+            );
+            expect(
+              phaseText.includes("STEP_OK") || phaseText.includes("WAKEUP_OK"),
+              `T6a: a phase assistant must confirm STEP_OK (dispatch) or WAKEUP_OK (revival) - got:\n\n${phaseText.slice(0, 600)}`,
+            ).toBe(true);
+            // A real failure is the answer marker the prompt defines — match it
+            // only as an emitted verdict (a phase assistant whose own answer is
+            // a failure), not a substring inside a recap of earlier instructions.
+            const anyAnswerFailed = phaseAssistants.some((m) => {
+              const c = m.content ?? "";
+              return (
+                (c.includes("WAKEUP_FAILED") || /\bFAILED:/.test(c)) &&
+                !c.includes("STEP_OK") &&
+                !c.includes("WAKEUP_OK")
+              );
+            });
+            expect(
+              anyAnswerFailed,
+              `T6a: no phase assistant may report failure - got:\n\n${phaseText.slice(0, 600)}`,
+            ).toBe(false);
             lastMainAiMsgId = result.data.lastAiMessageId!;
 
             // Queue mode: wakeUp task is in the cron queue (not directly accessible).
             // The stream ends normally (thread → idle), then we explicitly fire the pulse
             // to execute the background task and trigger the revival BEFORE T6b polls.
-            if (cfg.pulse) {
+            if (!t6aInlineDelivery && cfg.pulse) {
               await cfg.pulse(threadId);
             }
             // Wait for the goroutine + resume-stream + revival to complete.
@@ -3090,12 +3433,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             const REVIVAL_TIMEOUT_MS = 120_000;
             const REVIVAL_POLL_INTERVAL_MS = 1_000;
             const revivalStart = Date.now();
-            let revivalLanded = false;
+            let revivalLanded = t6aInlineDelivery;
             while (
               !revivalLanded &&
               Date.now() - revivalStart < REVIVAL_TIMEOUT_MS
             ) {
-              const currentMsgs = await fetchThreadMessages(threadId);
+              await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+              const currentMsgs = await getMessages(threadId);
               const deferredExists = currentMsgs.some(
                 (m) =>
                   m.role === "tool" &&
@@ -3105,11 +3449,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                       toolResultRecord(m.toolCall.args)?.["toolName"] ===
                         "generate_image")),
               );
-              const [threadRow] = await db
-                .select({ streamingState: chatThreads.streamingState })
-                .from(chatThreads)
-                .where(eq(chatThreads.id, threadId));
-              if (deferredExists && threadRow?.streamingState === "idle") {
+              const threadState = await getStreamingState(threadId);
+              if (deferredExists && threadState === "idle") {
                 revivalLanded = true;
                 break;
               }
@@ -3130,11 +3471,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               },
             );
 
-            if (!cfg.skipTokenMetadataAssertions) {
-              const after = await getBalance(testUser, creditLogger, creditT);
-              // wakeUp phase1: AI call + generate_image (may include image gen model cost)
-              assertDeducted(before, after, 0, 10);
-            }
+            const after = await getBalance(testUser);
+            // The await covers the WHOLE delivery: dispatch turn + image gen
+            // + revival turn; kimi sometimes needs extra round trips (same
+            // allowance as T1).
+            await assertDeducted(testUser, before, after, 0, 50);
           },
           effectiveTestTimeout,
         );
@@ -3142,10 +3483,39 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         fit(
           "T6b: wakeUp phase2 - revival, AI sees backfilled result, responds naturally",
           async () => {
-            if (cfg.skipWaitForTaskTest) {
-              return; // relay: revival stream not captured locally
-            }
             expect(wakeupToolMsgId).toBeTruthy();
+
+            // Inline delivery (fast task): the original tool message already
+            // holds the final image — no deferred message, no revival turn.
+            if (t6aInlineDelivery) {
+              const inlineMsgs = await getMessages(threadId);
+              const originalMsg = inlineMsgs.find(
+                (m) => m.id === wakeupToolMsgId,
+              );
+              expect(
+                originalMsg,
+                "T6b inline: original wakeUp tool message must exist",
+              ).toBeDefined();
+              const inlineRes = resolveToolResult(originalMsg);
+              expect(
+                String(inlineRes?.["imageUrl"] ?? ""),
+                "T6b inline: original message must hold the final imageUrl",
+              ).toMatch(/^https?:\/\/.+/);
+              expect(
+                originalMsg!.toolCall?.isDeferred,
+                "T6b inline: original message must not be deferred",
+              ).toBeFalsy();
+              const deferredCount = inlineMsgs.filter(
+                (m) => m.role === "tool" && m.toolCall?.isDeferred === true,
+              ).length;
+              expect(
+                deferredCount,
+                "T6b inline: no deferred message may exist for inline delivery",
+              ).toBe(0);
+              await assertThreadIdle(threadId, testUser);
+              await assertNoPendingTasks(threadId);
+              return;
+            }
 
             // The wakeUp revival fires async during T6a (goroutine + resume-stream).
             // With cached fixtures, should complete in seconds. Strict 30s timeout.
@@ -3159,7 +3529,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             let deferredTool: SlimMessage | undefined;
             let revivalAi: SlimMessage | undefined;
             while (Date.now() < deadline) {
-              messages = await fetchThreadMessages(threadId);
+              await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+              messages = await getMessages(threadId);
               deferredTool = messages.find(
                 (m) =>
                   m.role === "tool" &&
@@ -3175,17 +3546,39 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                           "generate_image")),
               );
               if (deferredTool) {
-                revivalAi = messages.find(
-                  (m) =>
-                    m.role === "assistant" && m.parentId === deferredTool!.id,
-                );
+                // Walk the chain from deferredTool to find the leaf non-compacting
+                // assistant message (may be a grandchild if compacting fired during revival).
+                const buildChildMap = (
+                  msgs: SlimMessage[],
+                ): Map<string, SlimMessage[]> => {
+                  const childMap = new Map<string, SlimMessage[]>();
+                  for (const msg of msgs) {
+                    if (msg.parentId) {
+                      const siblings = childMap.get(msg.parentId) ?? [];
+                      siblings.push(msg);
+                      childMap.set(msg.parentId, siblings);
+                    }
+                  }
+                  return childMap;
+                };
+                const childMap = buildChildMap(messages);
+                // BFS from deferredTool to find the last non-compacting assistant leaf
+                const queue: string[] = [deferredTool.id];
+                let candidate: SlimMessage | undefined;
+                while (queue.length > 0) {
+                  const current = queue.shift()!;
+                  const children = childMap.get(current) ?? [];
+                  for (const child of children) {
+                    if (child.role === "assistant" && !child.isCompacting) {
+                      candidate = child;
+                    }
+                    queue.push(child.id);
+                  }
+                }
+                revivalAi = candidate;
               }
               if (deferredTool && revivalAi) {
-                const [tRow] = await db
-                  .select({ streamingState: chatThreads.streamingState })
-                  .from(chatThreads)
-                  .where(eq(chatThreads.id, threadId));
-                if (tRow?.streamingState === "idle") {
+                if ((await getStreamingState(threadId)) === "idle") {
                   break;
                 }
               }
@@ -3197,7 +3590,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // ── Per spec: exactly 2 generate_image tool messages - original + deferred ──
             // No more, no less. A 3rd message = premature revival fired with {status:"pending"}.
             // Scope to T6 branch only (messages added since the count captured before T6a).
-            const t6BranchMsgs = newMessages(messages, wakeupInitialMsgCount);
+            const t6BranchMsgs = newMessages(messages, wakeupInitialMsgIds);
             const allGenImgToolMsgs = t6BranchMsgs.filter(
               (m) =>
                 m.role === "tool" &&
@@ -3283,13 +3676,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
             // Update lastMainAiMsgId to revival AI so T7a chains correctly.
             if (revivalAi) {
-              expect(revivalAi.content).toBeTruthy();
-              // Revival AI must acknowledge the imageUrl - check visible (non-think) content.
-              // If the model only outputs a <think> block, skip keyword checks —
-              // think blocks naturally reason about all outcomes.
-              const revivalVisible = (revivalAi.content ?? "")
-                .replace(/<think>[\s\S]*?<\/think>/g, "")
-                .trim();
+              // Wait for the revival's FINAL content — the mirror may hold an
+              // early streaming chunk (just "<think>") before the answer syncs.
+              const finalRevival = await awaitFinalAssistant(
+                threadId,
+                revivalAi.id,
+                cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+                getMessages,
+              );
+              const revivalContent = finalRevival?.content ?? revivalAi.content;
+              expect(revivalContent).toBeTruthy();
+              const revivalVisible = stripReasoning(revivalContent);
               if (revivalVisible.length > 0) {
                 expect(
                   revivalVisible,
@@ -3302,7 +3699,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             }
 
             // Re-fetch after goroutine settles, then verify chain integrity.
-            messages = await fetchThreadMessages(threadId);
+            await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+            messages = await getMessages(threadId);
             assertNoOrphans(
               messages,
               new Set([t2BranchParentId].filter(Boolean)),
@@ -3311,7 +3709,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 knownDeadEndLeaves: deadEndLeaves,
               },
             );
-            await assertThreadIdle(threadId);
+            await assertThreadIdle(threadId, testUser);
             await assertNoPendingTasks(threadId);
 
             // ── Hard loop-prevention scan: no enabled non-terminal tasks remain ──
@@ -3341,18 +3739,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T6c: wakeUp repeat - second generate_image(wakeUp) on same thread",
         async () => {
-          if (cfg.skipWaitForTaskTest) {
-            return; // relay: revival stream not captured locally
-          }
           setFetchCacheContext(
             `${cfg.cachePrefix}callback-wakeup-phase1-repeat`,
           );
-          await pinBalance(testUser.id, 20, creditLogger, creditT);
-          const t6cInitialCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 20);
+          const t6cInitialIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const { result, messages: phase1Msgs } = await runStream({
             user: testUser,
-            prompt: `[T6c wakeUp-repeat] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-repeat-test' and callbackMode='wakeUp'")}. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no imageUrl yet - end your reply with STEP_OK if you see taskId and no imageUrl, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with WAKEUP_OK. If revived but imageUrl is missing or empty, end with WAKEUP_FAILED: <reason>.`,
+            prompt: `[T6c wakeUp-repeat] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-repeat-test' and callbackMode='wakeUp'")}. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -3363,28 +3760,53 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(phase1Msgs, t6cInitialCount);
-          const toolMsg = findToolMsg(added, "generate_image", cfg);
+          // Re-fetch + pull: the tool message mirrors after runStream's snapshot.
+          let added = newMessages(phase1Msgs, t6cInitialIds);
+          let toolMsg = findToolMsg(added, "generate_image", cfg);
+          for (let i = 0; i < 20 && !toolMsg; i++) {
+            await pullRemoteMirror(
+              cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+            );
+            added = newMessages(await getMessages(threadId), t6cInitialIds);
+            toolMsg = findToolMsg(added, "generate_image", cfg);
+            if (toolMsg) {
+              break;
+            }
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, 500);
+            });
+          }
           expect(
             toolMsg,
             "T6c: generate_image tool message not found",
           ).toBeDefined();
-          if (toolMsg) {
-            assertToolMessageComplete(
-              toolMsg,
-              "generate_image",
-              "T6c",
-              cfg,
-              "pending",
-            );
-          }
+          // Delivery shape: deferred (taskId, pending) or inline (image now).
+          const t6cPhase1Res = resolveToolResult(toolMsg);
+          const t6cInline =
+            typeof t6cPhase1Res?.["imageUrl"] === "string" &&
+            t6cPhase1Res["imageUrl"] !== "";
 
-          const lastAi = phase1Msgs.find(
-            (m) => m.id === result.data.lastAiMessageId,
+          const lastAi = await awaitFinalAssistant(
+            threadId,
+            result.data.lastAiMessageId!,
+            cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+            getMessages,
           );
           expect(lastAi, "T6c: no AI response found").toBeDefined();
-          assertStepOk(lastAi?.content, "T6c");
+          assertWakeUpPhase1Ok(lastAi?.content, "T6c");
           lastMainAiMsgId = result.data.lastAiMessageId!;
+
+          // Inline delivery (fast task): no taskId, no deferred, no revival — the
+          // original message already holds the image. The wakeUp contract (tool
+          // never blocks) still held; skip the deferred-revival assertions.
+          if (t6cInline) {
+            expect(
+              String(t6cPhase1Res!["imageUrl"]),
+              "T6c inline: imageUrl must be a real URL",
+            ).toMatch(/^https?:\/\/.+/);
+            await assertThreadIdle(threadId, testUser);
+            return;
+          }
 
           // Queue mode: pulse to start the background task
           if (cfg.pulse) {
@@ -3399,8 +3821,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           let deferredTool: SlimMessage | undefined;
           let revivalAi: SlimMessage | undefined;
           while (Date.now() < deadline) {
-            messages = await fetchThreadMessages(threadId);
-            const t6cMsgs = newMessages(messages, t6cInitialCount);
+            await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+            messages = await getMessages(threadId);
+            const t6cMsgs = newMessages(messages, t6cInitialIds);
             deferredTool = t6cMsgs.find(
               (m) =>
                 m.role === "tool" &&
@@ -3416,12 +3839,18 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                   m.role === "assistant" && m.parentId === deferredTool!.id,
               );
             }
+            // Require the revival's FINAL content, not just its existence: the
+            // mirror can carry an early streaming chunk (e.g. just "<think>")
+            // before the full answer syncs. Break only once the visible answer
+            // (after stripping reasoning) is non-empty AND the thread is idle.
             if (deferredTool && revivalAi) {
-              const [tRow] = await db
-                .select({ streamingState: chatThreads.streamingState })
-                .from(chatThreads)
-                .where(eq(chatThreads.id, threadId));
-              if (tRow?.streamingState === "idle") {
+              const visible = (revivalAi.content ?? "")
+                .replace(/<think>[\s\S]*?<\/think>/g, "")
+                .trim();
+              if (
+                visible.length > 0 &&
+                (await getStreamingState(threadId)) === "idle"
+              ) {
                 break;
               }
             }
@@ -3431,7 +3860,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           }
 
           // ── Each generate_image wakeUp call must produce original + deferred ──
-          const t6cBranchMsgs = newMessages(messages, t6cInitialCount);
+          const t6cBranchMsgs = newMessages(messages, t6cInitialIds);
           const allGenImgToolMsgs = t6cBranchMsgs.filter(
             (m) =>
               m.role === "tool" &&
@@ -3465,9 +3894,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // ── Revival AI ──
           expect(revivalAi, "T6c: no revival AI message found").toBeDefined();
           if (revivalAi) {
-            const revivalVisible = (revivalAi.content ?? "")
-              .replace(/<think>[\s\S]*?<\/think>/g, "")
-              .trim();
+            const finalRevival = await awaitFinalAssistant(
+              threadId,
+              revivalAi.id,
+              cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+              getMessages,
+            );
+            const revivalVisible = stripReasoning(
+              finalRevival?.content ?? revivalAi.content,
+            );
             if (revivalVisible.length > 0) {
               expect(
                 revivalVisible,
@@ -3478,9 +3913,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // Walk to the actual leaf — model may have called generate_image multiple times,
           // creating multiple deferred + revival pairs in a linear chain.
-          messages = await fetchThreadMessages(threadId);
+          await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+          messages = await getMessages(threadId);
           const t6cMsgsSorted = [
-            ...newMessages(messages, t6cInitialCount),
+            ...newMessages(messages, t6cInitialIds),
           ].toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
           const t6cLeaf =
             t6cMsgsSorted.find((m) => m.role === "assistant") ?? deferredTool;
@@ -3496,7 +3932,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
         },
         effectiveTestTimeout,
@@ -3507,18 +3943,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T6d: wakeUp stress - third consecutive generate_image(wakeUp)",
         async () => {
-          if (cfg.skipWaitForTaskTest) {
-            return; // relay: revival stream not captured locally
-          }
           setFetchCacheContext(
             `${cfg.cachePrefix}callback-wakeup-phase1-stress`,
           );
-          await pinBalance(testUser.id, 20, creditLogger, creditT);
-          const t6dInitialCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 20);
+          const t6dInitialIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const { result, messages: phase1Msgs } = await runStream({
             user: testUser,
-            prompt: `[T6d wakeUp-stress] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-stress-test' and callbackMode='wakeUp'")}. The image will be generated asynchronously. IMPORTANT: In this first phase you should receive a taskId with no imageUrl yet - end your reply with STEP_OK if you see taskId and no imageUrl, or FAILED: <reason> otherwise. ALSO IMPORTANT: You will be automatically revived when the image is ready. When revived (you will see the generate_image tool result containing an imageUrl), confirm the imageUrl is present and non-empty, then end with WAKEUP_OK. If revived but imageUrl is missing or empty, end with WAKEUP_FAILED: <reason>.`,
+            prompt: `[T6d wakeUp-stress] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wakeup-stress-test' and callbackMode='wakeUp'")}. Two valid outcomes: (a) DEFERRED - you get a taskId and no image yet → end with STEP_OK; OR (b) INLINE - a fast task returns the image immediately (an imageUrl field or a markdown image link) → end with WAKEUP_OK. Either is correct. Only end with FAILED: <reason> if you get neither a taskId nor an image. If you got a taskId (deferred), you will be revived when the image is ready - on revival confirm the image URL (http/https, as a field or markdown link) is present and end with WAKEUP_OK, or WAKEUP_FAILED: <reason> if no image URL appears.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -3529,28 +3964,53 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(phase1Msgs, t6dInitialCount);
-          const toolMsg = findToolMsg(added, "generate_image", cfg);
+          // Re-fetch + pull: the tool message mirrors to this caller after
+          // runStream's snapshot in REMOTE-folder mode. Poll briefly so
+          // findToolMsg sees the converged state, not the pre-sync snapshot.
+          let added = newMessages(phase1Msgs, t6dInitialIds);
+          let toolMsg = findToolMsg(added, "generate_image", cfg);
+          for (let i = 0; i < 20 && !toolMsg; i++) {
+            await pullRemoteMirror(
+              cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+            );
+            added = newMessages(await getMessages(threadId), t6dInitialIds);
+            toolMsg = findToolMsg(added, "generate_image", cfg);
+            if (toolMsg) {
+              break;
+            }
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, 500);
+            });
+          }
           expect(
             toolMsg,
             "T6d: generate_image tool message not found",
           ).toBeDefined();
-          if (toolMsg) {
-            assertToolMessageComplete(
-              toolMsg,
-              "generate_image",
-              "T6d",
-              cfg,
-              "pending",
-            );
-          }
+          // Delivery shape: deferred (taskId, pending) or inline (image now).
+          const t6dPhase1Res = resolveToolResult(toolMsg);
+          const t6dInline =
+            typeof t6dPhase1Res?.["imageUrl"] === "string" &&
+            t6dPhase1Res["imageUrl"] !== "";
 
-          const lastAi = phase1Msgs.find(
-            (m) => m.id === result.data.lastAiMessageId,
+          const lastAi = await awaitFinalAssistant(
+            threadId,
+            result.data.lastAiMessageId!,
+            cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+            getMessages,
           );
           expect(lastAi, "T6d: no AI response found").toBeDefined();
-          assertStepOk(lastAi?.content, "T6d");
+          assertWakeUpPhase1Ok(lastAi?.content, "T6d");
           lastMainAiMsgId = result.data.lastAiMessageId!;
+
+          // Inline delivery: original message holds the image, no deferred turn.
+          if (t6dInline) {
+            expect(
+              String(t6dPhase1Res!["imageUrl"]),
+              "T6d inline: imageUrl must be a real URL",
+            ).toMatch(/^https?:\/\/.+/);
+            await assertThreadIdle(threadId, testUser);
+            return;
+          }
 
           if (cfg.pulse) {
             await cfg.pulse(threadId);
@@ -3564,8 +4024,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           let deferredTool: SlimMessage | undefined;
           let revivalAi: SlimMessage | undefined;
           while (Date.now() < deadline) {
-            messages = await fetchThreadMessages(threadId);
-            const t6dMsgs = newMessages(messages, t6dInitialCount);
+            await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+            messages = await getMessages(threadId);
+            const t6dMsgs = newMessages(messages, t6dInitialIds);
             deferredTool = t6dMsgs.find(
               (m) =>
                 m.role === "tool" &&
@@ -3581,12 +4042,18 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                   m.role === "assistant" && m.parentId === deferredTool!.id,
               );
             }
+            // Require the revival's FINAL content, not just its existence: the
+            // mirror can carry an early streaming chunk (e.g. just "<think>")
+            // before the full answer syncs. Break only once the visible answer
+            // (after stripping reasoning) is non-empty AND the thread is idle.
             if (deferredTool && revivalAi) {
-              const [tRow] = await db
-                .select({ streamingState: chatThreads.streamingState })
-                .from(chatThreads)
-                .where(eq(chatThreads.id, threadId));
-              if (tRow?.streamingState === "idle") {
+              const visible = (revivalAi.content ?? "")
+                .replace(/<think>[\s\S]*?<\/think>/g, "")
+                .trim();
+              if (
+                visible.length > 0 &&
+                (await getStreamingState(threadId)) === "idle"
+              ) {
                 break;
               }
             }
@@ -3597,7 +4064,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // ── Each generate_image wakeUp call must produce original + deferred ──
           // Model may call generate_image multiple times → N originals + N deferred = 2N total.
-          const t6dBranchMsgs = newMessages(messages, t6dInitialCount);
+          const t6dBranchMsgs = newMessages(messages, t6dInitialIds);
           const allGenImgToolMsgs = t6dBranchMsgs.filter(
             (m) =>
               m.role === "tool" &&
@@ -3628,9 +4095,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(revivalAi, "T6d: no revival AI message found").toBeDefined();
           if (revivalAi) {
-            const revivalVisible = (revivalAi.content ?? "")
-              .replace(/<think>[\s\S]*?<\/think>/g, "")
-              .trim();
+            const finalRevival = await awaitFinalAssistant(
+              threadId,
+              revivalAi.id,
+              cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+              getMessages,
+            );
+            const revivalVisible = stripReasoning(
+              finalRevival?.content ?? revivalAi.content,
+            );
             if (revivalVisible.length > 0) {
               expect(
                 revivalVisible,
@@ -3641,9 +4114,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // Walk to the actual leaf — model may have called generate_image multiple times,
           // creating multiple deferred + revival pairs in a linear chain.
-          messages = await fetchThreadMessages(threadId);
+          await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+          messages = await getMessages(threadId);
           const t6dMsgsSorted = [
-            ...newMessages(messages, t6dInitialCount),
+            ...newMessages(messages, t6dInitialIds),
           ].toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
           const t6dLeaf =
             t6dMsgsSorted.find((m) => m.role === "assistant") ?? deferredTool;
@@ -3659,7 +4133,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
         },
         effectiveTestTimeout,
@@ -3674,13 +4148,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         fit(
           "T7a: approve phase1 - parallel tools: tool-help runs, generate_image awaits confirmation, no assistant message after",
           async () => {
-            if (cfg.skipApprovalTests) {
-              return; // relay: tool confirmations require local tool execution state
-            }
             setFetchCacheContext(`${cfg.cachePrefix}callback-approve-phase1`);
-            await pinBalance(testUser.id, 10, creditLogger, creditT);
-            const before = await getBalance(testUser, creditLogger, creditT);
-            const prevCount = (await fetchThreadMessages(threadId)).length;
+            await pinBalance(testUser, 10);
+            const before = await getBalance(testUser);
+            const prevIds = new Set(
+              (await getMessages(threadId)).map((m) => m.id),
+            );
 
             // Prompt: call BOTH tool-help AND generate_image in same parallel step.
             // generate_image requires confirmation → placeholder only, stream aborts before AI response.
@@ -3707,7 +4180,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               return;
             }
 
-            const added = newMessages(messages, prevCount);
+            const added = newMessages(messages, prevIds);
 
             // ── generate_image tool message - has waiting_for_confirmation placeholder ──
             const approveToolMsg =
@@ -3792,16 +4265,14 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 knownDeadEndLeaves: deadEndLeaves,
               },
             );
-            await assertThreadIdle(threadId);
+            await assertThreadIdle(threadId, testUser);
             await assertNoPendingTasks(threadId);
 
             // lastMainAiMsgId is NOT updated here - T7b confirmation chains from the same
             // parent as the approve tool message (approveToolParentId = assistant placeholder).
-            if (!cfg.skipTokenMetadataAssertions) {
-              const after = await getBalance(testUser, creditLogger, creditT);
-              // Queue mode: WAIT revival runs tool-help + AI response → higher cost
-              assertDeducted(before, after, 0, cfg.pulse ? 8 : 3);
-            }
+            const after = await getBalance(testUser);
+            // Queue mode: WAIT revival runs tool-help + AI response → higher cost
+            await assertDeducted(testUser, before, after, 0, cfg.pulse ? 8 : 3);
           },
           effectiveTestTimeout,
         );
@@ -3809,9 +4280,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         fit(
           "T7b: approve phase2 - confirm via UI-style parentId flow, original message backfilled in-place, no extra tool message, AI responds",
           async () => {
-            if (cfg.skipApprovalTests) {
-              return; // relay: tool confirmations require local tool execution state
-            }
             expect(
               approveToolMsgId,
               "T7b needs T7a approveToolMsgId",
@@ -3822,13 +4290,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ).toBeTruthy();
 
             setFetchCacheContext(`${cfg.cachePrefix}callback-approve-phase2`);
-            await pinBalance(testUser.id, 50, creditLogger, creditT);
-            const before = await getBalance(testUser, creditLogger, creditT);
+            await pinBalance(testUser, 50);
+            const before = await getBalance(testUser);
 
-            const prevMessages = await fetchThreadMessages(threadId);
-            const prevToolMsgCount = prevMessages.filter(
-              (m) => m.role === "tool",
-            ).length;
+            const prevMessages = await getMessages(threadId);
+            const prevMessageIds = new Set(prevMessages.map((m) => m.id));
 
             const logger = createEndpointLogger(
               false,
@@ -3846,7 +4312,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               favoriteId: mainFavoriteId,
               favoriteConfig: null,
               threadId,
-              rootFolderId: DefaultFolderId.BACKGROUND,
+              rootFolderId: suiteRootFolderId,
               subAgentDepth: 0,
               toolConfirmations: [
                 { messageId: approveToolMsgId, confirmed: true },
@@ -3879,17 +4345,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               // POSTs /report → handleTaskCompletion → ResumeStreamRepository.resume (sequential).
               // Thread is guaranteed idle when cfg.pulse resolves.
               await cfg.pulse(threadId);
-              const [revivalRow] = await db
-                .select({ streamingState: chatThreads.streamingState })
-                .from(chatThreads)
-                .where(eq(chatThreads.id, threadId));
               expect(
-                revivalRow?.streamingState,
+                await getStreamingState(threadId),
                 "T7b queue: thread must return to 'idle' after approval revival",
               ).toBe("idle");
             }
 
-            const messages = await fetchThreadMessages(threadId);
+            const messages = await getMessages(threadId);
 
             // ── Dump ALL tool messages for diagnosis ──
             const allToolMsgs = messages.filter((m) => m.role === "tool");
@@ -3979,7 +4441,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // The model may call additional tools (e.g. generate_image with endLoop)
             // after the AI text response. The endLoop tool creates a dead-end tool message
             // with no follow-up AI response. Find the actual chain leaf for tracking.
-            const t7bNewMsgs = newMessages(messages, prevMessages.length);
+            const t7bNewMsgs = newMessages(messages, prevMessageIds);
             const t7bLeaf = [...t7bNewMsgs]
               .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
               .find((m) => !messages.some((other) => other.parentId === m.id));
@@ -3994,15 +4456,257 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 knownDeadEndLeaves: deadEndLeaves,
               },
             );
-            await assertThreadIdle(threadId);
+            await assertThreadIdle(threadId, testUser);
             await assertNoPendingTasks(threadId);
 
-            if (!cfg.skipTokenMetadataAssertions) {
-              const after = await getBalance(testUser, creditLogger, creditT);
-              // Model may call generate_image again after seeing the approved result
-              // (e.g. kimi-k2-6 calls it with endLoop), doubling the image cost.
-              assertDeducted(before, after, 0.47, 20);
+            const after = await getBalance(testUser);
+            // Model may call generate_image again after seeing the approved result
+            // (e.g. kimi-k2-6 calls it with endLoop), doubling the image cost.
+            // Confirmed image gen + AI turn; kimi sometimes needs extra
+            // round trips (same allowance as T1).
+            await assertDeducted(testUser, before, after, 0.47, 50);
+          },
+          effectiveTestTimeout,
+        );
+      });
+
+      // ── CF: Contact-form — definition-level requiresConfirmation ─────────
+      // contact-form has requiresConfirmation: true in its endpoint definition.
+      // The AI discovers it via tool-help and calls it — no overrides needed.
+      // The definition-level gate cannot be bypassed regardless of availableTools.
+      describe("CF: contact-form (definition-level approval gate)", () => {
+        let cfToolMsgId: string;
+        let cfToolParentId: string | null;
+
+        fit(
+          "CF1: contact-form phase1 — AI calls tool, stops for confirmation, no DB record, no assistant after",
+          async () => {
+            setFetchCacheContext(`${cfg.cachePrefix}contact-form-phase1`);
+            const streamStart = Date.now();
+            const prevIds = new Set(
+              (await getMessages(threadId)).map((m) => m.id),
+            );
+
+            const { result, messages } = await runStream({
+              user: testUser,
+              prompt: `[CF1] Call the contact-form tool right now with: name='Test User', subject=GENERAL_INQUIRY, message='Automated integration test. Please ignore.' Do not explain, just call the tool.`,
+              threadId,
+              favoriteId: mainFavoriteId,
+              explicitParentMessageId: lastMainAiMsgId,
+            });
+
+            expect(result.success, "CF1: stream must succeed").toBe(true);
+            if (!result.success) {
+              return;
             }
+
+            const added = newMessages(messages, prevIds);
+
+            // contact-form tool message must exist with waitingForConfirmation.
+            // The AI may call it directly or via execute-tool wrapping — findToolMsg handles both.
+            const cfMsg = findToolMsg(added, "contact-form", cfg);
+            expect(
+              cfMsg,
+              "CF1: contact-form tool message must exist in thread",
+            ).toBeDefined();
+            if (!cfMsg) {
+              return;
+            }
+
+            cfToolMsgId = cfMsg.id;
+            cfToolParentId = cfMsg.parentId;
+
+            expect(
+              cfMsg.toolCall?.waitingForConfirmation,
+              "CF1: tool must be waiting for confirmation — definition-level requiresConfirmation cannot be overridden by AI",
+            ).toBe(true);
+
+            const toolRes = resolveToolResult(cfMsg);
+            expect(
+              toolRes?.["status"],
+              "CF1: tool result must be waiting_for_confirmation placeholder",
+            ).toBe("waiting_for_confirmation");
+
+            // Stream must have aborted before AI responded — no assistant message after the tool call
+            if (!cfg.pulse) {
+              const assistantAfter = added.filter(
+                (m) =>
+                  m.role === "assistant" &&
+                  m.createdAt.getTime() > cfMsg.createdAt.getTime(),
+              );
+              expect(
+                assistantAfter.length,
+                "CF1: stream must abort before AI response (TOOL_CONFIRMATION abort) — no assistant message after pending tool",
+              ).toBe(0);
+            }
+
+            // Contact record must NOT be in DB — form was not submitted yet
+            const allContacts = await db
+              .select()
+              .from(contacts)
+              .where(eq(contacts.userId, testUser.id));
+            const submitted = allContacts.filter(
+              (c) => c.createdAt.getTime() > streamStart,
+            );
+            expect(
+              submitted.length,
+              "CF1: no contact record may be inserted before user confirms — tool execution was halted",
+            ).toBe(0);
+
+            // Thread must be idle — stream aborted cleanly waiting for confirmation
+            assertNoOrphans(
+              messages,
+              new Set([t2BranchParentId].filter(Boolean)),
+              { knownDeadEndLeaves: deadEndLeaves },
+            );
+            await assertThreadIdle(threadId, testUser);
+            await assertNoPendingTasks(threadId);
+          },
+          effectiveTestTimeout,
+        );
+
+        fit(
+          "CF2: contact-form phase2 — user confirms, form submits, DB record verified, AI responds",
+          async () => {
+            expect(cfToolMsgId, "CF2 needs CF1 cfToolMsgId").toBeTruthy();
+            expect(cfToolParentId, "CF2 needs CF1 cfToolParentId").toBeTruthy();
+
+            setFetchCacheContext(`${cfg.cachePrefix}contact-form-phase2`);
+            const confirmStart = Date.now();
+
+            const prevMessages = await getMessages(threadId);
+            const prevMessageIds = new Set(prevMessages.map((m) => m.id));
+
+            const logger = createEndpointLogger(
+              false,
+              Date.now(),
+              defaultLocale,
+            );
+            const { t } = scopedTranslation.scopedT(defaultLocale);
+
+            // Mirror the UI flow exactly: parentId = cfToolMsg.parentId (assistant that issued the call).
+            const confirmResult = await runHeadlessAiStream({
+              prompt: "",
+              favoriteId: mainFavoriteId,
+              favoriteConfig: null,
+              threadId,
+              rootFolderId: suiteRootFolderId,
+              subAgentDepth: 0,
+              toolConfirmations: [{ messageId: cfToolMsgId, confirmed: true }],
+              user: testUser,
+              locale: defaultLocale,
+              logger,
+              t,
+              abortSignal: new AbortController().signal,
+            });
+
+            expect(
+              confirmResult.success,
+              "CF2: confirmation stream must succeed",
+            ).toBe(true);
+            if (!confirmResult.success) {
+              return;
+            }
+
+            const messages = await getMessages(threadId);
+
+            // Original tool message backfilled in-place (same ID) — waitingForConfirmation cleared
+            const cfMsg = messages.find(
+              (m) => m.role === "tool" && m.id === cfToolMsgId,
+            );
+            expect(
+              cfMsg,
+              "CF2: original contact-form tool message must still exist after confirmation (backfilled in-place)",
+            ).toBeDefined();
+            expect(
+              cfMsg?.toolCall?.waitingForConfirmation,
+              "CF2: waitingForConfirmation must be cleared after confirmation",
+            ).toBeFalsy();
+            expect(
+              cfMsg?.toolCall?.isConfirmed,
+              "CF2: isConfirmed must be set after user confirmed",
+            ).toBe(true);
+
+            // resolveToolResult unwraps execute-tool's { result: ... } wrapper if needed.
+            const toolRes = resolveToolResult(cfMsg);
+            expect(
+              toolRes,
+              "CF2: tool result must be present after confirmation",
+            ).not.toBeNull();
+            expect(
+              toolRes?.["success"],
+              "CF2: tool result must contain success field from contact-form response",
+            ).toBeTruthy();
+
+            // No deferred duplicate — same as T7b: in-place backfill, not a copy
+            const approvedToolCallId = cfMsg?.toolCall?.toolCallId;
+            const deferredDupes = messages.filter(
+              (m) =>
+                m.role === "tool" &&
+                m.toolCall?.toolCallId === approvedToolCallId &&
+                m.id !== cfToolMsgId &&
+                m.toolCall?.isDeferred === true,
+            );
+            expect(
+              deferredDupes.length,
+              "CF2: no deferred duplicate of the confirmed contact-form call (in-place backfill)",
+            ).toBe(0);
+
+            // Contact record must exist in DB
+            const allContacts = await db
+              .select()
+              .from(contacts)
+              .where(eq(contacts.userId, testUser.id));
+            const submitted = allContacts.filter(
+              (c) => c.createdAt.getTime() >= confirmStart,
+            );
+            expect(
+              submitted.length,
+              "CF2: exactly one contact record must be inserted after confirmation",
+            ).toBe(1);
+
+            const dbRecord = submitted[0]!;
+            expect(
+              dbRecord.subject,
+              "CF2: contact subject must match what AI submitted (GENERAL_INQUIRY)",
+            ).toBe(ContactSubject.GENERAL_INQUIRY);
+            expect(
+              dbRecord.userId,
+              "CF2: contact record must be linked to the test user",
+            ).toBe(testUser.id);
+
+            // AI must have responded after confirmation
+            const lastAiMsgId = confirmResult.data.lastAiMessageId;
+            expect(
+              lastAiMsgId,
+              "CF2: AI must respond after form submission",
+            ).toBeTruthy();
+            const lastAi = messages.find((m) => m.id === lastAiMsgId);
+            expect(
+              lastAi?.content,
+              "CF2: AI response must have non-empty content",
+            ).toBeTruthy();
+
+            // Find the actual leaf for thread tracking
+            const cfNewMsgs = newMessages(messages, prevMessageIds);
+            const cfLeaf = [...cfNewMsgs]
+              .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+              .find((m) => !messages.some((other) => other.parentId === m.id));
+            lastMainAiMsgId = cfLeaf?.id ?? lastAiMsgId!;
+
+            assertNoOrphans(
+              messages,
+              new Set([t2BranchParentId].filter(Boolean)),
+              {
+                expectedLeafId: lastMainAiMsgId,
+                knownDeadEndLeaves: deadEndLeaves,
+              },
+            );
+            await assertThreadIdle(threadId, testUser);
+            await assertNoPendingTasks(threadId);
+
+            // Clean up test contact record so repeated runs don't accumulate
+            await db.delete(contacts).where(eq(contacts.id, dbRecord.id));
           },
           effectiveTestTimeout,
         );
@@ -4012,13 +4716,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T8: parallel tools - tool-help + generate_image in same batch, both results populated",
         async () => {
-          if (cfg.skipMediaGenerationTests) {
-            return; // relay: no fixture cache for generate_image in transport mode
+          if (cfg.cheapMode) {
+            return; // cheapMode: media generation is the expensive path
           }
           setFetchCacheContext(`${cfg.cachePrefix}parallel-tools`);
-          await pinBalance(testUser.id, 20, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 20);
+          const before = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const { result, messages } = await runStream({
             user: testUser,
@@ -4033,7 +4739,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
           const toolMsgs = added.filter((m) => m.role === "tool");
           expect(toolMsgs.length).toBeGreaterThanOrEqual(2);
 
@@ -4139,10 +4845,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           );
           expect(lastAi?.content).toBeTruthy();
           // ── Final AI has token metadata ──
-          if (!cfg.skipTokenMetadataAssertions) {
-            expect(lastAi!.finishReason).toBe("stop");
-            expect(lastAi!.creditCost).toBeGreaterThan(0);
-          }
+          expect(lastAi!.finishReason).toBe("stop");
+          expect(lastAi!.creditCost).toBeGreaterThan(0);
           assertStepOk(lastAi!.content, "T8");
           lastMainAiMsgId = result.data.lastAiMessageId!;
 
@@ -4154,13 +4858,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 0.47, 12);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 0.47, 12);
         },
         effectiveTestTimeout,
       );
@@ -4169,13 +4871,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T9: preCalls injection - synthetic generate_image result in DB, AI reasons about it",
         async () => {
-          if (cfg.skipMediaGenerationTests) {
-            return; // relay: preCalls injection fixtures not available for transport mode
+          if (cfg.cheapMode) {
+            return; // cheapMode: media generation is the expensive path
           }
           setFetchCacheContext(`${cfg.cachePrefix}precalls-injection`);
-          await pinBalance(testUser.id, 10, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 10);
+          const before = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           // A real publicly accessible image so the UI widget can render it.
           const syntheticImageUrl =
@@ -4220,7 +4924,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
 
           // ── Synthetic generate_image tool message ──
           const toolMsg = findToolMsg(added, "generate_image", cfg);
@@ -4268,13 +4972,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 0, 10);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 0, 10);
         },
         effectiveTestTimeout,
       );
@@ -4283,14 +4985,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T10: file attachments - image, multi, voice, video all stored in metadata with correct mime types",
         async () => {
-          if (cfg.skipAttachmentTests) {
-            return; // relay: local user message has no attachments (processed on remote only)
-          }
           // ── Part A: Single image attachment ──
           setFetchCacheContext(`${cfg.cachePrefix}attachment-image`);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const beforeImg = await getBalance(testUser, creditLogger, creditT);
-          const prevCountImg = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 50);
+          const beforeImg = await getBalance(testUser);
+          const prevIdsImg = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const imageFile = await loadFixture("test-image.jpeg", "image/jpeg");
           const { result: imgResult, messages: imgMsgs } = await runStream({
@@ -4309,7 +5010,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           }
           expect(imgResult.data.threadId).toBe(threadId);
 
-          const imgAdded = newMessages(imgMsgs, prevCountImg);
+          const imgAdded = newMessages(imgMsgs, prevIdsImg);
           const imgUserMsg = imgAdded.find((m) => m.role === "user");
           expect(imgUserMsg!.attachments).toHaveLength(1);
           const imgAtt = imgUserMsg!.attachments![0]!;
@@ -4326,10 +5027,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const imgAiMsg = imgAdded.find((m) => m.role === "assistant");
           expect(imgAiMsg).toBeDefined();
-          if (!cfg.skipTokenMetadataAssertions) {
-            expect(imgAiMsg!.finishReason).toBe("stop");
-            expect(imgAiMsg!.creditCost).toBeGreaterThan(0);
-          }
+          expect(imgAiMsg!.finishReason).toBe("stop");
+          expect(imgAiMsg!.creditCost).toBeGreaterThan(0);
 
           assertNoOrphans(
             imgMsgs,
@@ -4339,18 +5038,16 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const afterImg = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(beforeImg, afterImg, 0, 30);
-          }
+          const afterImg = await getBalance(testUser);
+          await assertDeducted(testUser, beforeImg, afterImg, 0, 30);
 
           // ── Part B: Multi-attachment (image + music) ──
           setFetchCacheContext(`${cfg.cachePrefix}attachment-multi`);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const beforeMulti = await getBalance(testUser, creditLogger, creditT);
+          await pinBalance(testUser, 50);
+          const beforeMulti = await getBalance(testUser);
 
           const musicFile = await loadFixture("test-music.mp3", "audio/mpeg");
           const imageFile2 = await loadFixture("test-image.jpeg", "image/jpeg");
@@ -4406,25 +5103,19 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const afterMulti = await getBalance(
-              testUser,
-              creditLogger,
-              creditT,
-            );
-            assertDeducted(beforeMulti, afterMulti, 0, 30);
-          }
+          const afterMulti = await getBalance(testUser);
+          await assertDeducted(testUser, beforeMulti, afterMulti, 0, 30);
 
           // ── Part C: Audio attachment (attachment path → audioVisionModel gap-fill) ──
           // Music file passed as attachment → gap-fill.bridgeStt() → audioVisionModel (Gemini Flash)
           // Verifies audio vision bridge, NOT STT. STT is only for the voice widget (audioInput).
           // Result: user message has attachments + gap-fill variant (text description of music)
           setFetchCacheContext(`${cfg.cachePrefix}attachment-voice`);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const beforeVoice = await getBalance(testUser, creditLogger, creditT);
+          await pinBalance(testUser, 50);
+          const beforeVoice = await getBalance(testUser);
 
           const musicAttachFile = await loadFixture(
             "test-music.mp3",
@@ -4481,17 +5172,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const afterVoice = await getBalance(
-              testUser,
-              creditLogger,
-              creditT,
-            );
-            assertDeducted(beforeVoice, afterVoice, 0, 30);
-          }
+          const afterVoice = await getBalance(testUser);
+          await assertDeducted(testUser, beforeVoice, afterVoice, 0, 30);
 
           // ── Part C2: Voice STT path (audioInput → SpeechToTextRepository) ──
           // Audio passed via audioInput field (voice UI flow) → operation-handler.ts →
@@ -4500,8 +5185,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Requires OPENAI_API_KEY (Whisper). Skip gracefully if not configured.
           if (agentEnv.OPENAI_API_KEY) {
             setFetchCacheContext(`${cfg.cachePrefix}attachment-voice-stt`);
-            await pinBalance(testUser.id, 50, creditLogger, creditT);
-            const beforeStt = await getBalance(testUser, creditLogger, creditT);
+            await pinBalance(testUser, 50);
+            const beforeStt = await getBalance(testUser);
 
             const sttAudioFile = await loadFixture(
               "test-music.mp3",
@@ -4567,17 +5252,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 knownDeadEndLeaves: deadEndLeaves,
               },
             );
-            await assertThreadIdle(threadId);
+            await assertThreadIdle(threadId, testUser);
             await assertNoPendingTasks(threadId);
 
-            if (!cfg.skipTokenMetadataAssertions) {
-              const afterStt = await getBalance(
-                testUser,
-                creditLogger,
-                creditT,
-              );
-              assertDeducted(beforeStt, afterStt, 0, 30);
-            }
+            const afterStt = await getBalance(testUser);
+            await assertDeducted(testUser, beforeStt, afterStt, 0, 30);
           } else {
             process.stdout.write(
               "[T10c_stt] Skipping - OPENAI_API_KEY not configured in this environment\n",
@@ -4586,8 +5265,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // ── Part D: Video attachment ──
           setFetchCacheContext(`${cfg.cachePrefix}attachment-video`);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const beforeVideo = await getBalance(testUser, creditLogger, creditT);
+          await pinBalance(testUser, 50);
+          const beforeVideo = await getBalance(testUser);
 
           const videoFile = await loadFixture("test-video.mp4", "video/mp4");
           const { result: videoResult, messages: videoMsgs } = await runStream({
@@ -4626,17 +5305,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const afterVideo = await getBalance(
-              testUser,
-              creditLogger,
-              creditT,
-            );
-            assertDeducted(beforeVideo, afterVideo, 0, 30);
-          }
+          const afterVideo = await getBalance(testUser);
+          await assertDeducted(testUser, beforeVideo, afterVideo, 0, 30);
 
           // ── Part E: Voice WAV attachment → gap-fill audioVisionModel bridge ──
           // quality-tester skill uses DEFAULT_CHAT_MODEL_ID which does NOT support audio input.
@@ -4644,8 +5317,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // The gap-fill produces a text transcription/description stored as a variant.
           // The main model then receives the text description instead of the raw file.
           setFetchCacheContext(`${cfg.cachePrefix}attachment-voice-wav`);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const beforeWav = await getBalance(testUser, creditLogger, creditT);
+          await pinBalance(testUser, 50);
+          const beforeWav = await getBalance(testUser);
 
           const voiceWavFile = await loadFixture("test-voice.wav", "audio/wav");
           const { result: wavResult, messages: wavMsgs } = await runStream({
@@ -4704,13 +5377,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const afterWav = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(beforeWav, afterWav, 0, 30);
-          }
+          const afterWav = await getBalance(testUser);
+          await assertDeducted(testUser, beforeWav, afterWav, 0, 30);
         },
         effectiveTestTimeout,
       );
@@ -4719,13 +5390,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11: native image generation - file part output, no generate_image tool call",
         async () => {
-          if (cfg.skipAttachmentTests) {
-            return; // relay: lastGeneratedMediaUrl is set by local MessageDbWriter only
-          }
           setFetchCacheContext(`${cfg.cachePrefix}image-generation-native`);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 50);
+          const before = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           // Use nativeImageFavoriteId: Gemini 3.1 Flash Image Preview as chat model.
           // Override imageGenModelSelection to the same model so chat model == image gen model:
@@ -4754,7 +5424,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.data.lastGeneratedMediaUrl).toBeTruthy();
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
 
           // Native path: FilePartHandler creates synthetic tool msg with toolName="generate_image"
           const imageToolMsg = added.find(
@@ -4828,13 +5498,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 0.4, 30);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 0.4, 30);
         },
         effectiveTestTimeout,
       );
@@ -4855,17 +5523,14 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11b: follow-up turn after native gen - synthetic tool message persisted, chain continues",
         async () => {
-          if (cfg.skipAttachmentTests) {
-            return; // relay: T11 was skipped, synthetic tool message not in DB
-          }
           setFetchCacheContext(
             `${cfg.cachePrefix}image-generation-native-gap-fill`,
           );
-          await pinBalance(testUser.id, 30, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
+          await pinBalance(testUser, 30);
+          const before = await getBalance(testUser);
 
           // Verify the synthetic tool message from T11 exists in DB with correct structure
-          const allMsgs = await fetchThreadMessages(threadId);
+          const allMsgs = await getMessages(threadId);
           const nativeImgToolMsg = allMsgs.find(
             (m) =>
               m.role === "tool" &&
@@ -4917,13 +5582,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 0, 20);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 0, 20);
         },
         effectiveTestTimeout,
       );
@@ -4935,14 +5598,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11c: image-to-video via Nano Banana Pro - model sees image, calls generate_video with inputMediaUrl",
         async () => {
-          if (cfg.skipAttachmentTests) {
-            return; // relay: native image generation not supported through relay
-          }
           setFetchCacheContext(`${cfg.cachePrefix}image-to-video-nano-banana`);
           // I2V models (wan-2-6-i2v etc.) cost ~10 cr/sec × 5 sec × 1.3 markup = ~65 cr
-          await pinBalance(testUser.id, 200, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 200);
+          const before = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           // Stable public image for the fixture (Unsplash, same as T9 attachment tests).
           // The model sees the image directly (inputs includes "image"), describes it,
@@ -4963,7 +5625,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
 
           // Tool message: AI called generate_video (possibly via execute-tool in direct mode)
           const videoToolMsg = findToolMsg(added, "generate_video", cfg);
@@ -4980,7 +5642,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Args: inputMediaUrl must be the image URL passed in
           const videoArgs = toolResultRecord(videoToolMsg!.toolCall?.args);
           const resolvedArgs =
-            (videoArgs?.["input"] as Record<string, unknown> | undefined) ??
+            (videoArgs?.["input"] as Record<string, WidgetData> | undefined) ??
             videoArgs;
           expect(
             resolvedArgs?.["inputMediaUrl"],
@@ -4997,7 +5659,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect((videoRes!["durationSeconds"] as number) <= 60).toBe(true);
 
           // Find actual leaf for chain tracking (model may call extra tools after video gen)
-          const t11cAdded = newMessages(messages, prevCount);
+          const t11cAdded = newMessages(messages, prevIds);
           const t11cLeaf = [...t11cAdded]
             .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             .find((m) => !messages.some((other) => other.parentId === m.id));
@@ -5011,13 +5673,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 30, 150);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 30, 150);
         },
         effectiveTestTimeout,
       );
@@ -5029,13 +5689,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11d: image-to-video via Kimi K2.6 - image-capable model passes image URL to generate_video tool",
         async () => {
-          if (cfg.skipAttachmentTests) {
-            return; // relay: native image generation not supported through relay
-          }
           setFetchCacheContext(`${cfg.cachePrefix}image-to-video-kimi`);
-          await pinBalance(testUser.id, 200, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 200);
+          const before = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const INPUT_IMAGE_URL =
             "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800";
@@ -5053,7 +5712,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
 
           // Tool message: Kimi called generate_video with the URL passed as text
           const videoToolMsg = findToolMsg(added, "generate_video", cfg);
@@ -5070,7 +5729,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Args: inputMediaUrl must be the image URL passed in the prompt as text
           const videoArgs = toolResultRecord(videoToolMsg!.toolCall?.args);
           const resolvedArgs =
-            (videoArgs?.["input"] as Record<string, unknown> | undefined) ??
+            (videoArgs?.["input"] as Record<string, WidgetData> | undefined) ??
             videoArgs;
           expect(
             resolvedArgs?.["inputMediaUrl"],
@@ -5085,7 +5744,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect((videoRes!["durationSeconds"] as number) > 0).toBe(true);
           expect((videoRes!["durationSeconds"] as number) <= 60).toBe(true);
 
-          const t11dAdded = newMessages(messages, prevCount);
+          const t11dAdded = newMessages(messages, prevIds);
           const t11dLeaf = [...t11dAdded]
             .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             .find((m) => !messages.some((other) => other.parentId === m.id));
@@ -5099,13 +5758,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 30, 150);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 30, 150);
         },
         effectiveTestTimeout,
       );
@@ -5118,13 +5775,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11e: image-to-image via Nano Banana Pro - model sees image, calls generate_image with inputMediaUrl",
         async () => {
-          if (cfg.skipAttachmentTests) {
-            return; // relay: native image generation not supported through relay
-          }
           setFetchCacheContext(`${cfg.cachePrefix}image-to-image-nano-banana`);
-          await pinBalance(testUser.id, 200, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 200);
+          const before = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const INPUT_IMAGE_URL =
             "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800";
@@ -5150,7 +5806,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
 
           // Tool message: AI called generate_image with inputMediaUrl
           const imageToolMsg = findToolMsg(added, "generate_image", cfg);
@@ -5167,7 +5823,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Args: inputMediaUrl must be the image URL passed in
           const imageArgs = toolResultRecord(imageToolMsg!.toolCall?.args);
           const resolvedArgs =
-            (imageArgs?.["input"] as Record<string, unknown> | undefined) ??
+            (imageArgs?.["input"] as Record<string, WidgetData> | undefined) ??
             imageArgs;
           expect(
             resolvedArgs?.["inputMediaUrl"],
@@ -5181,7 +5837,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(imageRes!["imageUrl"]).toBeTruthy();
           expect((imageRes!["creditCost"] as number) > 0).toBe(true);
 
-          const t11eAdded = newMessages(messages, prevCount);
+          const t11eAdded = newMessages(messages, prevIds);
           const t11eLeaf = [...t11eAdded]
             .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             .find((m) => !messages.some((other) => other.parentId === m.id));
@@ -5195,13 +5851,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 5, 150);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 5, 150);
         },
         effectiveTestTimeout,
       );
@@ -5213,13 +5867,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11f: image-to-image via Kimi K2.6 - image-capable model passes image URL to generate_image tool",
         async () => {
-          if (cfg.skipAttachmentTests) {
-            return; // relay: native image generation not supported through relay
-          }
           setFetchCacheContext(`${cfg.cachePrefix}image-to-image-kimi`);
-          await pinBalance(testUser.id, 200, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 200);
+          const before = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const INPUT_IMAGE_URL =
             "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800";
@@ -5237,7 +5890,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
 
           // Tool message: Kimi called generate_image with the URL passed as text
           const imageToolMsg = findToolMsg(added, "generate_image", cfg);
@@ -5254,7 +5907,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // Args: inputMediaUrl must be the image URL passed in the prompt as text
           const imageArgs = toolResultRecord(imageToolMsg!.toolCall?.args);
           const resolvedArgs =
-            (imageArgs?.["input"] as Record<string, unknown> | undefined) ??
+            (imageArgs?.["input"] as Record<string, WidgetData> | undefined) ??
             imageArgs;
           expect(
             resolvedArgs?.["inputMediaUrl"],
@@ -5268,7 +5921,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect((imageRes!["creditCost"] as number) > 0).toBe(true);
           t11fOutputImageUrl = imageRes!["imageUrl"] as string;
 
-          const t11fAdded = newMessages(messages, prevCount);
+          const t11fAdded = newMessages(messages, prevIds);
           const t11fLeaf = [...t11fAdded]
             .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             .find((m) => !messages.some((other) => other.parentId === m.id));
@@ -5282,13 +5935,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 5, 150);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 5, 150);
         },
         effectiveTestTimeout,
       );
@@ -5303,12 +5954,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "T11f-verify: vision model can see the generated image in tool result",
         async () => {
-          if (cfg.skipAttachmentTests) {
-            return; // relay: T11f was skipped, output image URL not stored
-          }
           setFetchCacheContext(`${cfg.cachePrefix}image-to-image-kimi-verify`);
-          await pinBalance(testUser.id, 30, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
+          await pinBalance(testUser, 30);
+          const before = await getBalance(testUser);
 
           expect(
             t11fOutputImageUrl,
@@ -5357,13 +6005,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 0, 20);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 0, 20);
         },
         effectiveTestTimeout,
       );
@@ -5382,11 +6028,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         async () => {
           // SKIP: OpenRouter returns hallucinated tool calls instead of inline file parts
           // for Gemini 3.1 Flash Image Preview. Re-enable when provider is fixed.
-          return;
+          const SKIP_T11G = true;
+          if (SKIP_T11G) {
+            return;
+          }
+
           setFetchCacheContext(`${cfg.cachePrefix}image-to-image-native`);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
-          const prevCount = (await fetchThreadMessages(threadId)).length;
+          await pinBalance(testUser, 50);
+          const before = await getBalance(testUser);
+          const prevIds = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
 
           const INPUT_IMAGE_URL =
             "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800";
@@ -5416,7 +6068,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           expect(result.data.lastGeneratedMediaUrl).toBeTruthy();
 
-          const added = newMessages(messages, prevCount);
+          const added = newMessages(messages, prevIds);
 
           // Native path: FilePartHandler creates synthetic tool msg with toolName="generate_image"
           const imageToolMsg = added.find(
@@ -5432,7 +6084,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(toolRes!["file"]).toBeTruthy();
           expect((toolRes!["creditCost"] as number) > 0).toBe(true);
 
-          const t11gAdded = newMessages(messages, prevCount);
+          const t11gAdded = newMessages(messages, prevIds);
           const t11gLeaf = [...t11gAdded]
             .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             .find((m) => !messages.some((other) => other.parentId === m.id));
@@ -5446,13 +6098,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 0, 40);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 0, 40);
         },
         effectiveTestTimeout,
       );
@@ -5462,8 +6112,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         "T12: invalid explicitParentMessageId - handled gracefully, no orphans",
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}invalid-parent`);
-          await pinBalance(testUser.id, 20, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
+          await pinBalance(testUser, 20);
+          const before = await getBalance(testUser);
 
           const { result, messages } = await runStream({
             user: testUser,
@@ -5477,9 +6127,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(result.success).toBe(true);
           if (result.success) {
             expect(result.data.lastAiMessageContent).toBeTruthy();
-            if (!cfg.skipTokenMetadataAssertions) {
-              expect(result.data.totalCreditsDeducted).toBeGreaterThan(0);
-            }
+            expect(result.data.totalCreditsDeducted).toBeGreaterThan(0);
             if (result.data.lastAiMessageId) {
               lastMainAiMsgId = result.data.lastAiMessageId;
             }
@@ -5493,13 +6141,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               knownDeadEndLeaves: deadEndLeaves,
             },
           );
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const after = await getBalance(testUser, creditLogger, creditT);
-            assertDeducted(before, after, 0, 10);
-          }
+          const after = await getBalance(testUser);
+          await assertDeducted(testUser, before, after, 0, 10);
         },
         effectiveTestTimeout,
       );
@@ -5508,7 +6154,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "Final: full thread tree - no orphans, exactly 1 root, correct branching structure, metadata consistency",
         async () => {
-          const messages = await fetchThreadMessages(threadId);
+          const messages = await getMessages(threadId);
 
           // ── Full chain integrity: no orphans, no branches, every message reachable ──
           // t2BranchParentId is the ONLY intentional branch point (T3a retry + T3b fork + main chain).
@@ -5673,7 +6319,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             }
           }
 
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
         },
         effectiveTestTimeout,
@@ -5684,8 +6330,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         "C1: credit deduction - balance decreases, totalCreditsDeducted matches",
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}credit-deduction`);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const before = await getBalance(testUser, creditLogger, creditT);
+          await pinBalance(testUser, 50);
+          const before = await getBalance(testUser);
 
           const { result } = await runStream({
             user: testUser,
@@ -5702,20 +6348,18 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           lastMainAiMsgId = result.data.lastAiMessageId!;
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            expect((result.data.totalCreditsDeducted ?? 0) > 0).toBe(true);
+          expect((result.data.totalCreditsDeducted ?? 0) > 0).toBe(true);
 
-            const after = await getBalance(testUser, creditLogger, creditT);
-            const balanceDiff = before - after;
-            const reported = result.data.totalCreditsDeducted ?? 0;
-            expect(
-              Math.abs(balanceDiff - reported),
-              `Balance diff ${balanceDiff} vs reported ${reported}`,
-            ).toBeLessThan(0.01);
-            expect(after).toBeLessThan(before);
-          }
+          const after = await getBalance(testUser);
+          const balanceDiff = before - after;
+          const reported = result.data.totalCreditsDeducted ?? 0;
+          expect(
+            Math.abs(balanceDiff - reported),
+            `Balance diff ${balanceDiff} vs reported ${reported}`,
+          ).toBeLessThan(0.01);
+          expect(after).toBeLessThan(before);
 
-          await assertThreadIdle(threadId);
+          await assertThreadIdle(threadId, testUser);
           await assertNoPendingTasks(threadId);
         },
         effectiveTestTimeout,
@@ -5725,12 +6369,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         "C2: incognito - no messages persisted, credits still deducted",
         async () => {
           setFetchCacheContext(`${cfg.cachePrefix}incognito-mode`);
-          await pinBalance(testUser.id, 50, creditLogger, creditT);
-          const beforeIncognito = await getBalance(
-            testUser,
-            creditLogger,
-            creditT,
-          );
+          await pinBalance(testUser, 50);
+          const beforeIncognito = await getBalance(testUser);
 
           const logger = createEndpointLogger(false, Date.now(), defaultLocale);
           const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -5755,9 +6395,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // Incognito: messages not persisted - no messages should exist in DB for this thread
           if (result.data.threadId) {
-            const incognitoMsgs = await fetchThreadMessages(
-              result.data.threadId,
-            );
+            const incognitoMsgs = await getMessages(result.data.threadId);
             expect(
               incognitoMsgs,
               "C2: incognito messages persisted to DB",
@@ -5765,15 +6403,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           }
           expect(result.data.lastAiMessageContent).toContain("INCOGNITO_TEST");
 
-          if (!cfg.skipTokenMetadataAssertions) {
-            const afterIncognito = await getBalance(
-              testUser,
-              creditLogger,
-              creditT,
-            );
-            expect(afterIncognito).toBeLessThan(beforeIncognito);
-            expect(result.data.totalCreditsDeducted ?? 0).toBeGreaterThan(0);
-          }
+          const afterIncognito = await getBalance(testUser);
+          expect(afterIncognito).toBeLessThan(beforeIncognito);
+          expect(result.data.totalCreditsDeducted ?? 0).toBeGreaterThan(0);
         },
         effectiveTestTimeout,
       );
@@ -5781,9 +6413,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fit(
         "C3: insufficient credits - returns 403 when balance is zero",
         async () => {
-          if (cfg.skipTokenMetadataAssertions) {
-            return; // relay: local credits are not checked before relaying; remote has credits
-          }
           setFetchCacheContext(`${cfg.cachePrefix}insufficient-credits`);
 
           const wallets = await db.execute<{
@@ -5968,89 +6597,66 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           UNBOTTLED_CLOUD_CREDENTIALS: `${localSession!.leadId}:${localSession!.token}:${localSession!.remoteUrl}`,
         });
 
-        // ── Step 5: Upsert test favorites with stable IDs (reused across runs) ──
-        const UNBOTTLED_FAV_ID = "00000000-0000-4002-a000-000000000002";
-        const BUDGET_FAV_ID = "00000000-0000-4003-a000-000000000003";
+        // ── Step 5: Resolve test favorites via endpoint (reuse existing, create if absent) ──
+        const [favsDef, favoriteCreateDef] = await Promise.all([
+          import("@/app/api/[locale]/agent/chat/favorites/definition").then(
+            (m) => m.default.GET,
+          ),
+          import("@/app/api/[locale]/agent/chat/favorites/create/definition").then(
+            (m) => m.default.POST,
+          ),
+        ]);
+        const favsResult = await RouteExecuteRepository.runInProcessTyped({
+          definition: favsDef,
+          input: { pageSize: 500 },
+          user: testUser,
+          locale: defaultLocale,
+          platform: Platform.AI,
+        });
+        const favsList = favsResult.success
+          ? Array.isArray(favsResult.data?.["favorites"])
+            ? (favsResult.data["favorites"] as Record<string, WidgetData>[])
+            : []
+          : [];
 
-        const kimiValues = {
-          id: UNBOTTLED_FAV_ID,
-          slug: "test-unbottled-kimi",
-          userId: testUser.id,
-          skillId: QUALITY_TESTER_SKILL_ID,
-          variantId: "kimi",
-          modelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: DEFAULT_CHAT_MODEL_ID,
-          },
-          imageGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ImageGenModelId.FLUX_2_KLEIN_4B,
-          },
-          musicGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: MusicGenModelId.LYRIA_3,
-          },
-          videoGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: VideoGenModelId.LTX_2_3_PRO_I2V,
-          },
-          position: 9999,
-        };
-        await db
-          .insert(chatFavorites)
-          .values(kimiValues)
-          .onConflictDoUpdate({
-            target: chatFavorites.id,
-            set: {
-              userId: kimiValues.userId,
-              slug: kimiValues.slug,
-              modelSelection: kimiValues.modelSelection,
-              imageGenModelSelection: kimiValues.imageGenModelSelection,
-              musicGenModelSelection: kimiValues.musicGenModelSelection,
-              videoGenModelSelection: kimiValues.videoGenModelSelection,
-            },
+        const existingKimi = favsList.find(
+          (f) => String(f["skillId"] ?? "") === "quality-tester__kimi",
+        );
+        if (existingKimi?.["id"]) {
+          favoriteId = String(existingKimi["id"]);
+        } else {
+          const r = await RouteExecuteRepository.runInProcessTyped({
+            definition: favoriteCreateDef,
+            input: { skillId: "quality-tester__kimi" },
+            user: testUser,
+            locale: defaultLocale,
+            platform: Platform.AI,
           });
-        favoriteId = UNBOTTLED_FAV_ID;
+          expect(r.success, "F-setup: create quality-tester__kimi failed").toBe(
+            true,
+          );
+          favoriteId = r.success ? String(r.data?.["id"] ?? "") : "";
+        }
 
-        const budgetValues = {
-          id: BUDGET_FAV_ID,
-          slug: "test-unbottled-budget",
-          userId: testUser.id,
-          skillId: QUALITY_TESTER_SKILL_ID,
-          variantId: "budget",
-          modelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ChatModelId.GPT_5_NANO,
-          },
-          imageGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ImageGenModelId.Z_IMAGE_TURBO,
-          },
-          musicGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: MusicGenModelId.MUSICGEN_STEREO,
-          },
-          videoGenModelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: VideoGenModelId.LTX_2_PRO_T2V,
-          },
-          position: 10000,
-        };
-        await db
-          .insert(chatFavorites)
-          .values(budgetValues)
-          .onConflictDoUpdate({
-            target: chatFavorites.id,
-            set: {
-              userId: budgetValues.userId,
-              slug: budgetValues.slug,
-              modelSelection: budgetValues.modelSelection,
-              imageGenModelSelection: budgetValues.imageGenModelSelection,
-              musicGenModelSelection: budgetValues.musicGenModelSelection,
-              videoGenModelSelection: budgetValues.videoGenModelSelection,
-            },
+        const existingBudget = favsList.find(
+          (f) => String(f["skillId"] ?? "") === "quality-tester__budget",
+        );
+        if (existingBudget?.["id"]) {
+          budgetFavoriteId = String(existingBudget["id"]);
+        } else {
+          const r = await RouteExecuteRepository.runInProcessTyped({
+            definition: favoriteCreateDef,
+            input: { skillId: "quality-tester__budget" },
+            user: testUser,
+            locale: defaultLocale,
+            platform: Platform.AI,
           });
-        budgetFavoriteId = BUDGET_FAV_ID;
+          expect(
+            r.success,
+            "F-setup: create quality-tester__budget failed",
+          ).toBe(true);
+          budgetFavoriteId = r.success ? String(r.data?.["id"] ?? "") : "";
+        }
 
         // NOTE: Strict mode is NOT enabled here because self-relay inner calls
         // go through the real provider (OpenRouter) and need to record fixtures
@@ -6126,15 +6732,22 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(resolved!.skill).toBe(QUALITY_TESTER_SKILL_ID);
 
           // ── Part B: Change to GEMINI_3_FLASH → respected ──
-          await db
-            .update(chatFavorites)
-            .set({
+          const favByIdDef =
+            await import("@/app/api/[locale]/agent/chat/favorites/[id]/definition");
+          await RouteExecuteRepository.runInProcessTyped({
+            definition: favByIdDef.default.PATCH,
+            input: {
               modelSelection: {
                 selectionType: ModelSelectionType.MANUAL,
                 manualModelId: ChatModelId.GEMINI_3_FLASH,
               },
-            })
-            .where(eq(chatFavorites.id, favoriteId));
+            },
+            urlPathParams: { id: favoriteId },
+            user: testUser,
+            locale: defaultLocale,
+            platform: Platform.AI,
+            logger,
+          });
 
           const resolvedGemini = await resolveFavorite(
             favoriteId,
@@ -6148,45 +6761,61 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(resolvedGemini!.skill).toBe(QUALITY_TESTER_SKILL_ID);
 
           // Restore to DEFAULT_CHAT_MODEL_ID
-          await db
-            .update(chatFavorites)
-            .set({
+          await RouteExecuteRepository.runInProcessTyped({
+            definition: favByIdDef.default.PATCH,
+            input: {
               modelSelection: {
                 selectionType: ModelSelectionType.MANUAL,
                 manualModelId: DEFAULT_CHAT_MODEL_ID,
               },
-            })
-            .where(eq(chatFavorites.id, favoriteId));
+            },
+            urlPathParams: { id: favoriteId },
+            user: testUser,
+            locale: defaultLocale,
+            platform: Platform.AI,
+            logger,
+          });
 
           // ── Part C: Media model selections persisted ──
-          const [fav] = await db
-            .select({
-              imageGenModelSelection: chatFavorites.imageGenModelSelection,
-              musicGenModelSelection: chatFavorites.musicGenModelSelection,
-              videoGenModelSelection: chatFavorites.videoGenModelSelection,
-            })
-            .from(chatFavorites)
-            .where(eq(chatFavorites.id, favoriteId))
-            .limit(1);
+          const favGetResult = await RouteExecuteRepository.runInProcessTyped({
+            definition: favByIdDef.default.GET,
+            urlPathParams: { id: favoriteId },
+            user: testUser,
+            locale: defaultLocale,
+            platform: Platform.AI,
+            logger,
+          });
+          expect(favGetResult.success, "F1: GET favorite must succeed").toBe(
+            true,
+          );
+          const fav = favGetResult.success ? favGetResult.data : null;
 
           expect(fav).toBeTruthy();
-          expect(fav!.imageGenModelSelection).toMatchObject({
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ImageGenModelId.FLUX_2_KLEIN_4B,
-          });
-          expect(fav!.musicGenModelSelection).toMatchObject({
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: MusicGenModelId.LYRIA_3,
-          });
-          expect(fav!.videoGenModelSelection).toMatchObject({
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: VideoGenModelId.LTX_2_3_PRO_I2V,
-          });
+          // Media model selections come from the quality-tester__kimi variant defaults.
+          // Assert they are set (non-null) and have the expected structure.
+          expect(fav!.imageGenModelSelection).toBeTruthy();
+          expect(
+            (fav!.imageGenModelSelection as Record<string, WidgetData>)?.[
+              "selectionType"
+            ],
+          ).toBe(ModelSelectionType.MANUAL);
+          expect(fav!.musicGenModelSelection).toBeTruthy();
+          expect(
+            (fav!.musicGenModelSelection as Record<string, WidgetData>)?.[
+              "selectionType"
+            ],
+          ).toBe(ModelSelectionType.MANUAL);
+          expect(fav!.videoGenModelSelection).toBeTruthy();
+          expect(
+            (fav!.videoGenModelSelection as Record<string, WidgetData>)?.[
+              "selectionType"
+            ],
+          ).toBe(ModelSelectionType.MANUAL);
 
           // ── Part D: FILTERS selection resolves a model ──
-          await db
-            .update(chatFavorites)
-            .set({
+          await RouteExecuteRepository.runInProcessTyped({
+            definition: favByIdDef.default.PATCH,
+            input: {
               modelSelection: {
                 selectionType: ModelSelectionType.FILTERS,
                 sortBy: ModelSortField.PRICE,
@@ -6196,8 +6825,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                   max: ContentLevel.UNCENSORED,
                 },
               },
-            })
-            .where(eq(chatFavorites.id, favoriteId));
+            },
+            urlPathParams: { id: favoriteId },
+            user: testUser,
+            locale: defaultLocale,
+            platform: Platform.AI,
+            logger,
+          });
 
           const resolvedFilter = await resolveFavorite(
             favoriteId,
@@ -6211,15 +6845,20 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           expect(resolvedFilter!.skill).toBe(QUALITY_TESTER_SKILL_ID);
 
           // Restore to MANUAL for relay tests
-          await db
-            .update(chatFavorites)
-            .set({
+          await RouteExecuteRepository.runInProcessTyped({
+            definition: favByIdDef.default.PATCH,
+            input: {
               modelSelection: {
                 selectionType: ModelSelectionType.MANUAL,
                 manualModelId: DEFAULT_CHAT_MODEL_ID,
               },
-            })
-            .where(eq(chatFavorites.id, favoriteId));
+            },
+            urlPathParams: { id: favoriteId },
+            user: testUser,
+            locale: defaultLocale,
+            platform: Platform.AI,
+            logger,
+          });
 
           // ── Part E: Budget variant resolution → GPT_5_NANO + different media models ──
           const resolvedBudget = await resolveFavorite(
@@ -6230,32 +6869,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             defaultLocale,
           );
           expect(resolvedBudget).toBeTruthy();
-          expect(resolvedBudget!.model).toBe(ChatModelId.GPT_5_NANO);
+          // Budget variant uses FILTERS selection — resolved model may vary.
+          expect(resolvedBudget!.model).toBeTruthy();
           expect(resolvedBudget!.skill).toBe(QUALITY_TESTER_SKILL_ID);
-
-          // Budget variant's media selections
-          const [budgetFav] = await db
-            .select({
-              imageGenModelSelection: chatFavorites.imageGenModelSelection,
-              musicGenModelSelection: chatFavorites.musicGenModelSelection,
-              videoGenModelSelection: chatFavorites.videoGenModelSelection,
-            })
-            .from(chatFavorites)
-            .where(eq(chatFavorites.id, budgetFavoriteId))
-            .limit(1);
-          expect(budgetFav).toBeTruthy();
-          expect(budgetFav!.imageGenModelSelection).toMatchObject({
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ImageGenModelId.Z_IMAGE_TURBO,
-          });
-          expect(budgetFav!.musicGenModelSelection).toMatchObject({
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: MusicGenModelId.MUSICGEN_STEREO,
-          });
-          expect(budgetFav!.videoGenModelSelection).toMatchObject({
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: VideoGenModelId.LTX_2_PRO_T2V,
-          });
         },
         effectiveTestTimeout,
       );

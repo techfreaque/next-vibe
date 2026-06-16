@@ -29,6 +29,7 @@ installFetchCache();
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import {
@@ -38,20 +39,14 @@ import {
   ModelSortField,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { defaultLocale } from "@/i18n/core/config";
 import { eq } from "drizzle-orm";
 
 import { env } from "@/config/env";
 import { ChatModelId } from "../../models";
 import { setFetchCacheContext } from "../../testing/fetch-cache";
-import { runTestStream } from "../../testing/headless-test-runner";
+import { getOrCreateFolder, resolveUser, runTestStream } from "../../testing/headless-test-runner";
 
 const VIBE_CODER_FAVORITE_ID = "00000000-0000-4010-a000-000000000001";
 
@@ -59,48 +54,9 @@ let _prodUserId: string | null = null;
 let _savedCodingAgent: "claude-code" | "open-code" | "next-vibe-coder" | null =
   null;
 
-async function resolveUser(
-  email: string,
-): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await UserRepository.getUserByEmail(
-    email,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  const user = result.data;
-
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-    }),
-    db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-  ]);
-
-  if (!link) {
-    return null;
-  }
-
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-
-  return {
-    isPublic: false,
-    id: user.id,
-    leadId: link.leadId,
-    roles,
-  };
-}
-
 describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder setting)", () => {
   let testUser: JwtPrivatePayloadType;
+  let vibeCoderFolderId: string;
 
   beforeAll(async () => {
     const {
@@ -121,6 +77,10 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       return;
     }
     testUser = resolved;
+
+    // ── Create BACKGROUND/tests/vibe-coder subfolder ──
+    const testsParentId = await getOrCreateFolder(testUser, DefaultFolderId.BACKGROUND, "tests");
+    vibeCoderFolderId = await getOrCreateFolder(testUser, DefaultFolderId.BACKGROUND, "vibe-coder", testsParentId);
 
     // ── Save current codingAgent setting ──
     const [existing] = await db
@@ -213,6 +173,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       user: testUser,
       prompt: `[VC1 vibe-coder-delegation] You need to do a small coding task: find out what the current NODE_ENV is on this system. Delegate this task using the correct tool for coding work. End with STEP_OK once the result is back, or FAILED: <reason> if you didn't use the correct delegation tool or something went wrong.`,
       favoriteId: VIBE_CODER_FAVORITE_ID,
+      rootFolderId: DefaultFolderId.BACKGROUND,
+      subFolderId: vibeCoderFolderId,
     });
 
     expect(
@@ -289,6 +251,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       user: testUser,
       prompt: `[VC2 ssh-awareness] Using the vibe-coder skill directly: check what SSH connections are available using the appropriate tool. If there are no SSH connections, explain what the user needs to do and what the difference is between SSH connections and remote instances. End with STEP_OK if you found the answer (even if no connections exist), or FAILED: <reason> if you couldn't determine the SSH connection status.`,
       favoriteId: VIBE_CODER_FAVORITE_ID,
+      rootFolderId: DefaultFolderId.BACKGROUND,
+      subFolderId: vibeCoderFolderId,
     });
 
     expect(

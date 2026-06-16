@@ -283,109 +283,114 @@ export function EmailsListContainer({
         />
       </Div>
 
-      {/* Status filter tabs - scrollable */}
-      <Div className="flex items-center gap-1 px-4 pt-3 pb-1 overflow-x-auto scrollbar-none">
-        {STATUS_TABS.map((tab) => {
-          const isActive = activeStatus === tab.value;
-          const count =
-            tab.value === MessageStatusFilter.ANY
-              ? emails.length
-              : (statusCounts[tab.value] ?? 0);
-          return (
-            <Button
-              key={tab.value}
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => handleStatusTab(tab.value)}
-              className={cn(
-                "flex-shrink-0 inline-flex items-center gap-1 px-3 py-1 h-7 rounded-full text-xs font-medium transition-colors border",
-                isActive
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-transparent text-muted-foreground border-border hover:bg-accent",
-              )}
-            >
-              {t(tab.label)}
-              {count > 0 && (
-                <Span
+      {/* Status/type/channel filter tabs + search + sort — full mode only */}
+      {!isPickerMode && (
+        <>
+          {/* Status filter tabs - scrollable */}
+          <Div className="flex items-center gap-1 px-4 pt-3 pb-1 overflow-x-auto scrollbar-none">
+            {STATUS_TABS.map((tab) => {
+              const isActive = activeStatus === tab.value;
+              const count =
+                tab.value === MessageStatusFilter.ANY
+                  ? emails.length
+                  : (statusCounts[tab.value] ?? 0);
+              return (
+                <Button
+                  key={tab.value}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleStatusTab(tab.value)}
                   className={cn(
-                    "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[10px] font-semibold",
+                    "flex-shrink-0 inline-flex items-center gap-1 px-3 py-1 h-7 rounded-full text-xs font-medium transition-colors border",
                     isActive
-                      ? "bg-primary-foreground/20 text-primary-foreground"
-                      : "bg-muted text-muted-foreground",
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-transparent text-muted-foreground border-border hover:bg-accent",
                   )}
                 >
-                  {count}
-                </Span>
-              )}
-            </Button>
-          );
-        })}
-      </Div>
+                  {t(tab.label)}
+                  {count > 0 && (
+                    <Span
+                      className={cn(
+                        "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[10px] font-semibold",
+                        isActive
+                          ? "bg-primary-foreground/20 text-primary-foreground"
+                          : "bg-muted text-muted-foreground",
+                      )}
+                    >
+                      {count}
+                    </Span>
+                  )}
+                </Button>
+              );
+            })}
+          </Div>
 
-      {/* Type filter chips - scrollable */}
-      <Div className="flex items-center gap-1 px-4 pb-1 overflow-x-auto scrollbar-none">
-        {MessageTypeFilterOptions.map((tab) => {
-          const isActive = activeType === tab.value;
-          return (
-            <Button
-              key={tab.value}
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => handleTypeFilter(tab.value)}
-              className={cn(
-                "flex-shrink-0 inline-flex items-center px-2.5 py-1 h-7 rounded-full text-xs font-medium border transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-transparent text-muted-foreground border-border hover:bg-accent",
-              )}
-            >
-              {messagesT(tab.label)}
-            </Button>
-          );
-        })}
-      </Div>
+          {/* Type filter chips - scrollable */}
+          <Div className="flex items-center gap-1 px-4 pb-1 overflow-x-auto scrollbar-none">
+            {MessageTypeFilterOptions.map((tab) => {
+              const isActive = activeType === tab.value;
+              return (
+                <Button
+                  key={tab.value}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleTypeFilter(tab.value)}
+                  className={cn(
+                    "flex-shrink-0 inline-flex items-center px-2.5 py-1 h-7 rounded-full text-xs font-medium border transition-colors",
+                    isActive
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-transparent text-muted-foreground border-border hover:bg-accent",
+                  )}
+                >
+                  {messagesT(tab.label)}
+                </Button>
+              );
+            })}
+          </Div>
 
-      {/* Channel filter chips - scrollable */}
-      <Div className="flex items-center gap-1 px-4 pb-1 overflow-x-auto scrollbar-none">
-        {MessengerChannelFilterOptions.map((tab) => {
-          const isActive = activeChannel === tab.value;
-          return (
-            <Button
-              key={tab.value}
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => handleChannelFilter(tab.value)}
-              className={cn(
-                "flex-shrink-0 inline-flex items-center px-2.5 py-1 h-7 rounded-full text-xs font-medium border transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-transparent text-muted-foreground border-border hover:bg-accent",
-              )}
-            >
-              {t(tab.label)}
-            </Button>
-          );
-        })}
-      </Div>
+          {/* Channel filter chips - scrollable */}
+          <Div className="flex items-center gap-1 px-4 pb-1 overflow-x-auto scrollbar-none">
+            {MessengerChannelFilterOptions.map((tab) => {
+              const isActive = activeChannel === tab.value;
+              return (
+                <Button
+                  key={tab.value}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleChannelFilter(tab.value)}
+                  className={cn(
+                    "flex-shrink-0 inline-flex items-center px-2.5 py-1 h-7 rounded-full text-xs font-medium border transition-colors",
+                    isActive
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-transparent text-muted-foreground border-border hover:bg-accent",
+                  )}
+                >
+                  {t(tab.label)}
+                </Button>
+              );
+            })}
+          </Div>
 
-      {/* Search + sort */}
-      <Div className="px-4 pt-2 pb-2 grid grid-cols-1 @sm:grid-cols-3 gap-2 border-b">
-        <TextFieldWidget
-          fieldName="filters.search"
-          field={field.children.filters.children.search}
-        />
-        <SelectFieldWidget
-          fieldName="displayOptions.sortBy"
-          field={field.children.displayOptions.children.sortBy}
-        />
-        <SelectFieldWidget
-          fieldName="displayOptions.sortOrder"
-          field={field.children.displayOptions.children.sortOrder}
-        />
-      </Div>
+          {/* Search + sort */}
+          <Div className="px-4 pt-2 pb-2 grid grid-cols-1 @sm:grid-cols-3 gap-2 border-b">
+            <TextFieldWidget
+              fieldName="filters.search"
+              field={field.children.filters.children.search}
+            />
+            <SelectFieldWidget
+              fieldName="displayOptions.sortBy"
+              field={field.children.displayOptions.children.sortBy}
+            />
+            <SelectFieldWidget
+              fieldName="displayOptions.sortOrder"
+              field={field.children.displayOptions.children.sortOrder}
+            />
+          </Div>
+        </>
+      )}
 
       {/* Email list */}
       <Div className="px-4 pb-2">
@@ -457,8 +462,8 @@ export function EmailsListContainer({
         )}
       </Div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
+      {/* Pagination — full mode only */}
+      {!isPickerMode && totalPages > 1 && (
         <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
           <Span>
             {t("widget.page")} {currentPage} / {totalPages}

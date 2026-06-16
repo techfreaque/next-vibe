@@ -401,6 +401,7 @@ export async function setupAiStream(params: {
   // File upload promise for server threads (captured for SSE event emission)
   let fileUploadPromise:
     | Promise<{
+    compactTriggerOverride,
         success: boolean;
         userMessageId: string;
         attachments?: Array<{

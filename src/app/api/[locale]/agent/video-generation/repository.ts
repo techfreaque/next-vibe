@@ -13,7 +13,16 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { getVideoGenModelById } from "@/app/api/[locale]/agent/video-generation/models";
+import type { UnbottledCloudSession } from "@/app/api/[locale]/agent/env";
+import {
+  getUnbottledMediaSession,
+  isSelfRelayUrl,
+} from "@/app/api/[locale]/agent/shared/unbottled-media-relay";
+import {
+  getVideoGenModelById,
+  getVideoGenModelUnderlyingProvider,
+  type VideoGenModelOption,
+} from "@/app/api/[locale]/agent/video-generation/models";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -31,6 +40,7 @@ import type {
 } from "./definition";
 import type { VideoGenerationT } from "./i18n";
 import { generateVideoWithModelsLab } from "./providers/modelslab";
+import { generateVideoWithUnbottled } from "./providers/unbottled";
 
 interface MediaGenStreamContext {
   threadId?: string | undefined;
@@ -40,7 +50,6 @@ export class VideoGenerationRepository {
   /**
    * Generate a video from a text prompt
    */
-import { generateVideoWithUnbottled } from "./providers/unbottled";
   static async generateVideo(
     data: VideoGenerationPostRequestOutput,
     user: JwtPayloadType,
@@ -258,6 +267,3 @@ import { generateVideoWithUnbottled } from "./providers/unbottled";
     });
   }
 }
-import { generateVideoWithUnbottled } from "./providers/unbottled";
-import { generateVideoWithUnbottled } from "./providers/unbottled";
-import { generateVideoWithUnbottled } from "./providers/unbottled";

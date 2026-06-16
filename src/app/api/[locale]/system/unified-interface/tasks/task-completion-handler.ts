@@ -418,3 +418,5 @@ export async function handleTaskCompletion(params: {
     }
   }
 }
+        taskId,
+        callbackMode,

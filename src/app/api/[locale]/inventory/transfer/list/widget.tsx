@@ -237,58 +237,62 @@ export function InventoryTransferListWidget(
         )}
       </Div>
 
-      {/* Status tabs */}
-      <Div className="flex items-center gap-1 border-b pb-0 -mb-1 overflow-x-auto">
-        {STATUS_TABS.map((tab) => {
-          const count = countFor(tab);
-          const isActive = statusFilter === tab;
-          return (
-            <Button
-              key={tab}
-              type="button"
-              variant="ghost"
-              size="sm"
-              className={`h-8 px-3 text-xs rounded-none border-b-2 shrink-0 ${
-                isActive
-                  ? "border-b-foreground font-medium"
-                  : "border-b-transparent text-muted-foreground"
-              }`}
-              onClick={() => {
-                setStatusFilter(tab);
-              }}
-            >
-              {tab === "ALL"
-                ? t("transferList.get.widget.tabAll")
-                : tab === "DRAFT"
-                  ? t("transferList.get.widget.tabDraft")
-                  : tab === "IN_TRANSIT"
-                    ? t("transferList.get.widget.tabInTransit")
-                    : tab === "RECEIVED"
-                      ? t("transferList.get.widget.tabReceived")
-                      : t("transferList.get.widget.tabCancelled")}
-              {count > 0 ? (
-                <Span className="ml-1.5 text-xs font-normal tabular-nums opacity-60">
-                  {count}
-                </Span>
-              ) : null}
-            </Button>
-          );
-        })}
-      </Div>
+      {/* Status tabs — full mode only */}
+      {!isPickerMode && (
+        <Div className="flex items-center gap-1 border-b pb-0 -mb-1 overflow-x-auto">
+          {STATUS_TABS.map((tab) => {
+            const count = countFor(tab);
+            const isActive = statusFilter === tab;
+            return (
+              <Button
+                key={tab}
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={`h-8 px-3 text-xs rounded-none border-b-2 shrink-0 ${
+                  isActive
+                    ? "border-b-foreground font-medium"
+                    : "border-b-transparent text-muted-foreground"
+                }`}
+                onClick={() => {
+                  setStatusFilter(tab);
+                }}
+              >
+                {tab === "ALL"
+                  ? t("transferList.get.widget.tabAll")
+                  : tab === "DRAFT"
+                    ? t("transferList.get.widget.tabDraft")
+                    : tab === "IN_TRANSIT"
+                      ? t("transferList.get.widget.tabInTransit")
+                      : tab === "RECEIVED"
+                        ? t("transferList.get.widget.tabReceived")
+                        : t("transferList.get.widget.tabCancelled")}
+                {count > 0 ? (
+                  <Span className="ml-1.5 text-xs font-normal tabular-nums opacity-60">
+                    {count}
+                  </Span>
+                ) : null}
+              </Button>
+            );
+          })}
+        </Div>
+      )}
 
       {/* Transfer table */}
       {filteredRows.length > 0 ? (
         <Div className="rounded-lg border overflow-hidden">
-          <Div className="flex items-center gap-3 px-4 py-2 bg-muted/40 border-b text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            <Span className="flex-1">
-              {t("transferList.get.response.fromWarehouseName")}{" "}
-              {t("transferList.get.widget.arrowSeparator")}{" "}
-              {t("transferList.get.response.toWarehouseName")}
-            </Span>
-            <Span className="shrink-0">
-              {t("transferList.get.response.status")}
-            </Span>
-          </Div>
+          {!isPickerMode && (
+            <Div className="flex items-center gap-3 px-4 py-2 bg-muted/40 border-b text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <Span className="flex-1">
+                {t("transferList.get.response.fromWarehouseName")}{" "}
+                {t("transferList.get.widget.arrowSeparator")}{" "}
+                {t("transferList.get.response.toWarehouseName")}
+              </Span>
+              <Span className="shrink-0">
+                {t("transferList.get.response.status")}
+              </Span>
+            </Div>
+          )}
           {filteredRows.map((transfer) => (
             <TransferRow
               key={transfer.id}

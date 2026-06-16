@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The user wants me to delete /documents/ai-test/ recursively using cortex-delete. I need to check the schema first, then call it.</think>\n\nAssistant: <think>The user wants me to delete /documents/ai-test/ recursively using cortex-delete. I need to set recursive: true.</think>\n\nAssistant: - A file was created at `/documents/ai-test/notes.md` via `cortex-write` with the heading `# AI Test Notes` and content about AI testing cortex tool integration (initially 144 bytes).\n- The file was read via `cortex-read` and its exact content was quoted.\n- Via `cortex-edit`, the word `testing` was replaced with `validating` in the file (1 replacement made).\n- A second `cortex-read` confirmed the replacement: the line read `Key topics: validating, automation, cortex-write verification.` with no instance of `testing` remaining.\n- `cortex-tree` on `/documents/ai-test/` showed a single file `notes.md` (147 B) and zero directories.\n- The user tested recall without tools; the assistant correctly answered: path `/documents/ai-test/notes.md`, title `AI Test Notes`, replaced `testing` with `valida\n\nAssistant: <think>The deletion succeeded. 2 nodes were deleted (the folder /documents/ai-test/ and its child file renamed-notes.md). I need to confirm what was deleted and end with VERDICT: PASS.</think>Deleted `/documents/ai-test/` recursively. 2 nodes were removed (the folder itself and 1 file inside).\n\nVERDICT: PASS\n\nUser: Try to read /documents/ai-test/renamed-notes.md using cortex-read. It should not exist anymore. Report what error or status you receive.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
+    "encoding_format": "float"
+  }
+}

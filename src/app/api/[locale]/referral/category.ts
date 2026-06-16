@@ -19,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "business",
   icon: "share-2",
   order: 60,
-  defaultEntry: REFERRAL_STATS_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: REFERRAL_STATS_ALIAS,
+    [UserPermissionRole.CUSTOMER]: REFERRAL_STATS_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     Program: {
       icon: "share-2",

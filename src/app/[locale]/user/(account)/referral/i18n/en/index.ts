@@ -24,14 +24,12 @@ export const translations = {
     chainSubtitle:
       "Each level is half the one above. Built once at signup - pays forever.",
     youLabel: "You",
-    whoLabels: [
-      "You - whoever referred them directly",
-      "Skill creator (if different) or your referrer",
-      "Their referrer's referrer",
-      "Level 4",
-      "Level 5",
-      "Level 6",
-    ],
+    whoLabel0: "You - whoever referred them directly",
+    whoLabel1: "Skill creator (if different) or your referrer",
+    whoLabel2: "Their referrer's referrer",
+    whoLabel3: "Level 4",
+    whoLabel4: "Level 5",
+    whoLabel5: "Level 6",
     colExample: "Example ({{examplePrice}}/mo plan)",
     tableNote:
       "Referral link: {{directPct}} per user. Skill link: {{directPct}} direct + {{skillBonusPct}} skill bonus = {{skillPct}} per user. Both recurring, forever.",

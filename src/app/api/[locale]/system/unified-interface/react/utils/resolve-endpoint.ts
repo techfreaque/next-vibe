@@ -1,5 +1,6 @@
 "use client";
 
+import { PATH_SEPARATOR } from "../../shared/utils/path";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 
 /**
@@ -28,3 +29,4 @@ export async function resolveEndpoint(
   }
   return null;
 }
+
