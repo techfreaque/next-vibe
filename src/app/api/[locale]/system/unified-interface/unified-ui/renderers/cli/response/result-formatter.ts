@@ -16,7 +16,7 @@ import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.sche
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { EXECUTE_TOOL_ALIAS } from "../../../../ai/execute-tool/constants";
+import { EXECUTE_TOOL_ALIAS } from "../../../../execute-tool/constants";
 import type { RouteExecutionResult } from "../../../../cli/runtime/route-executor";
 import type { EndpointLogger } from "../../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
@@ -108,12 +108,22 @@ export async function prewarmLazyWidgets(
 
   // fields.render is the lazy component directly (customWidgetObject puts render at top level)
   const render = Reflect.get(fields, "render");
+  if (!render) {
+    return;
+  }
+
+  // lazyWidget() components: function with cliWidget + preload
   if (
-    render &&
-    typeof render === "object" &&
-    "_payload" in render &&
-    "_init" in render
+    typeof render === "function" &&
+    "cliWidget" in render &&
+    "preload" in render
   ) {
+    await (render as { preload: () => Promise<void> }).preload();
+    return;
+  }
+
+  // bare React.lazy objects
+  if (typeof render === "object" && "_payload" in render && "_init" in render) {
     await prewarmLazy(render as ReactLazyRef);
   }
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import { createContext, type ReactNode, useContext, useRef } from "react";
-import { createStore, useStore } from "zustand";
+import { createStore, useStore, type StoreApi } from "zustand";
 
 import type { NavigationStackEntry } from "../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
+import type { WidgetData } from "../../shared/types/json";
 
 /**
  * Navigation options
@@ -17,6 +18,16 @@ interface NavigationOptions<TEndpoint extends CreateApiEndpointAny> {
   renderInModal?: boolean;
   popNavigationOnSuccess?: number;
   onSuccessCallback?: () => void;
+  /**
+   * Picker callback — when set, the pushed widget is in "picker mode".
+   * Pass a typed callback; it will be carried as WidgetData in the stack entry.
+   */
+  pickerCallback?: (value: WidgetData) => void;
+  /**
+   * For CLI picker mode: the field name in each list item to use as the display label.
+   * e.g. "name" or "title". Falls back to heuristic if not set.
+   */
+  pickerLabelField?: string;
   replaceOnSuccess?: {
     endpoint: CreateApiEndpointAny;
     getUrlPathParams?: (
@@ -64,8 +75,8 @@ interface NavigationStackStore {
  * Create a new navigation stack store instance
  * Each context provider will have its own isolated store
  */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function createNavigationStackStore() {
+
+function createNavigationStackStore(): StoreApi<NavigationStackStore> {
   return createStore<NavigationStackStore>((set) => ({
     stack: [],
 
@@ -81,6 +92,8 @@ function createNavigationStackStore() {
         renderInModal = false,
         popNavigationOnSuccess,
         onSuccessCallback,
+        pickerCallback,
+        pickerLabelField,
         replaceOnSuccess,
         modalPosition,
       } = options;
@@ -94,6 +107,8 @@ function createNavigationStackStore() {
         renderInModal,
         popNavigationOnSuccess,
         onSuccessCallback,
+        pickerCallback,
+        pickerLabelField,
         replaceOnSuccess,
         modalPosition,
       };
@@ -126,6 +141,8 @@ function createNavigationStackStore() {
         renderInModal = false,
         popNavigationOnSuccess,
         onSuccessCallback,
+        pickerCallback,
+        pickerLabelField,
         replaceOnSuccess,
         modalPosition,
       } = options;
@@ -139,6 +156,8 @@ function createNavigationStackStore() {
         renderInModal,
         popNavigationOnSuccess,
         onSuccessCallback,
+        pickerCallback,
+        pickerLabelField,
         replaceOnSuccess,
         modalPosition,
       };

@@ -52,9 +52,9 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";

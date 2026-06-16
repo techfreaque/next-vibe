@@ -20,7 +20,7 @@ import { UserRole } from "../user/user-roles/enum";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const SubscriptionOverviewContainer = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -36,10 +36,11 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["subscription"],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
   icon: "crown",
-  category: "endpointCategories.payments",
-  subCategory: "endpointCategories.subscriptionManagement",
+  category: "payments",
+  subCategory: "Management",
   tags: ["tags.subscription", "tags.billing", "tags.get"],
   allowedRoles: [
     UserRole.CUSTOMER,

@@ -34,7 +34,7 @@ import {
   CronTaskStatus,
   CronTaskStatusDB,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 const WaitForTaskWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.WaitForTaskWidget })),

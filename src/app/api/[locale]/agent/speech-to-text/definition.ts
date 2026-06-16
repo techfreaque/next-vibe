@@ -4,6 +4,7 @@
  */
 
 import { z } from "zod";
+import { lazy } from "react";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -27,6 +28,8 @@ import { scopedTranslation } from "./i18n";
  * Speech-to-Text Endpoint (POST)
  * Transcribes audio to text using Eden AI
  */
+import { SttModelId } from "./models";
+import { DEFAULT_STT_MODEL_ID } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
@@ -227,3 +230,12 @@ const definitions = {
   POST,
 } as const;
 export default definitions;
+import { lazy } from "react";
+import { SttModelId } from "./models";
+import { DEFAULT_STT_MODEL_ID } from "./constants";
+import { lazy } from "react";
+import { SttModelId } from "./models";
+import { DEFAULT_STT_MODEL_ID } from "./constants";
+import { lazy } from "react";
+import { SttModelId } from "./models";
+import { DEFAULT_STT_MODEL_ID } from "./constants";

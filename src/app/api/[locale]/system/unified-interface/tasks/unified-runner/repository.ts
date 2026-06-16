@@ -438,7 +438,7 @@ export class UnifiedTaskRunnerRepository {
         });
       }
 
-      // If the handler manages its own lifecycle (e.g. interactive Claude Code sessions),
+      // If the handler manages its own lifecycle (e.g. interactive coding agent sessions),
       // leave the task as RUNNING - the handler will mark it done via complete-task.
       if (result.taskLifecycleManagedExternally) {
         UnifiedTaskRunnerRepository.logger!.info(

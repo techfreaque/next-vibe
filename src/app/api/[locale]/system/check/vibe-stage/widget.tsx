@@ -9,7 +9,13 @@
 
 "use client";
 
-import { CheckCircle2, GitBranch, Loader2, SkipForward } from "lucide-react";
+import {
+  CheckCircle2,
+  GitBranch,
+  GitMerge,
+  Loader2,
+  SkipForward,
+} from "lucide-react";
 
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
@@ -17,15 +23,15 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import {
   useWidgetEndpointMutations,
   useWidgetNavigation,
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type definition from "./definition";
 
@@ -33,37 +39,52 @@ import type definition from "./definition";
 // Sub-components
 // ============================================================
 
+type FileRowVariant = "staged" | "partial" | "skipped";
+
+const FILE_ROW_SIGIL: Record<FileRowVariant, string> = {
+  staged: "+",
+  partial: "~",
+  skipped: "!",
+};
+
+const FILE_ROW_SIGIL_CLASS: Record<FileRowVariant, string> = {
+  staged:
+    "text-emerald-600 dark:text-emerald-400 font-mono text-xs font-bold w-4 shrink-0",
+  partial:
+    "text-blue-600 dark:text-blue-400 font-mono text-xs font-bold w-4 shrink-0",
+  skipped:
+    "text-amber-600 dark:text-amber-400 font-mono text-xs font-bold w-4 shrink-0",
+};
+
+const FILE_ROW_BADGE_CLASS: Record<FileRowVariant, string> = {
+  staged:
+    "text-xs shrink-0 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-0",
+  partial:
+    "text-xs shrink-0 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-0",
+  skipped:
+    "text-xs shrink-0 border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-400",
+};
+
 function FileRow({
   path,
   variant,
   label,
 }: {
   path: string;
-  variant: "staged" | "skipped";
+  variant: FileRowVariant;
   label: string;
 }): React.JSX.Element {
-  const isStaged = variant === "staged";
   return (
     <Div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted/40 border border-border/50">
-      <Span
-        className={
-          isStaged
-            ? "text-emerald-600 dark:text-emerald-400 font-mono text-xs font-bold w-4 shrink-0"
-            : "text-amber-600 dark:text-amber-400 font-mono text-xs font-bold w-4 shrink-0"
-        }
-      >
-        {isStaged ? "+" : "!"}
+      <Span className={FILE_ROW_SIGIL_CLASS[variant]}>
+        {FILE_ROW_SIGIL[variant]}
       </Span>
       <Span className="font-mono text-xs text-foreground/80 flex-1 break-all">
         {path}
       </Span>
       <Badge
-        variant={isStaged ? "default" : "outline"}
-        className={
-          isStaged
-            ? "text-xs shrink-0 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-0"
-            : "text-xs shrink-0 border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-400"
-        }
+        variant={variant === "skipped" ? "outline" : "default"}
+        className={FILE_ROW_BADGE_CLASS[variant]}
       >
         {label}
       </Badge>
@@ -80,7 +101,7 @@ function FileSection({
 }: {
   title: string;
   files: string[];
-  variant: "staged" | "skipped";
+  variant: FileRowVariant;
   fileLabel: string;
   icon: React.ReactNode;
 }): React.JSX.Element {
@@ -128,9 +149,14 @@ export function VibeStageWidget(): React.JSX.Element {
   const endpointMutations = useWidgetEndpointMutations();
 
   const staged = data?.staged ?? [];
+  const partiallyStaged = data?.partiallyStaged ?? [];
   const skipped = data?.skipped ?? [];
   const hasResult = data !== null && data !== undefined;
-  const isEmpty = hasResult && staged.length === 0 && skipped.length === 0;
+  const isEmpty =
+    hasResult &&
+    staged.length === 0 &&
+    partiallyStaged.length === 0 &&
+    skipped.length === 0;
   const isDryRun = hasResult && !!data.message?.includes("Dry run");
   const isLoading = endpointMutations?.read?.isLoading ?? false;
 
@@ -172,8 +198,22 @@ export function VibeStageWidget(): React.JSX.Element {
       }
     }
 
-    if (skipped.length > 0) {
+    if (partiallyStaged.length > 0) {
       if (!isMcp && staged.length > 0) {
+        lines.push("");
+      }
+      if (!isMcp) {
+        lines.push(
+          `${t("widget.partiallyStaged")} (${String(partiallyStaged.length)} ${t("widget.partiallyStaged_count")}):`,
+        );
+      }
+      for (const f of partiallyStaged) {
+        lines.push(isMcp ? `~ ${f}` : `  ~ ${f}`);
+      }
+    }
+
+    if (skipped.length > 0) {
+      if (!isMcp && (staged.length > 0 || partiallyStaged.length > 0)) {
         lines.push("");
       }
       if (!isMcp) {
@@ -188,9 +228,16 @@ export function VibeStageWidget(): React.JSX.Element {
 
     if (!isMcp) {
       lines.push("");
-      lines.push(
-        `${String(staged.length)} ${t("widget.stagedCount")}, ${String(skipped.length)} ${t("widget.skippedCount")}`,
-      );
+      const parts = [
+        `${String(staged.length)} ${t("widget.stagedCount")}`,
+        ...(partiallyStaged.length > 0
+          ? [
+              `${String(partiallyStaged.length)} ${t("widget.partiallyStaged_count")}`,
+            ]
+          : []),
+        `${String(skipped.length)} ${t("widget.skippedCount")}`,
+      ];
+      lines.push(parts.join(", "));
     }
 
     return (
@@ -281,6 +328,17 @@ export function VibeStageWidget(): React.JSX.Element {
             }
           />
 
+          {/* Partially staged files */}
+          <FileSection
+            title={t("widget.partiallyStaged")}
+            files={partiallyStaged}
+            variant="partial"
+            fileLabel={t("widget.partialFile")}
+            icon={
+              <GitMerge className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            }
+          />
+
           {/* Skipped files */}
           <FileSection
             title={t("widget.skipped")}
@@ -294,13 +352,21 @@ export function VibeStageWidget(): React.JSX.Element {
 
           {/* Summary footer */}
           {!isEmpty && (
-            <Div className="flex items-center gap-3 pt-2 border-t border-border">
+            <Div className="flex items-center gap-3 pt-2 border-t border-border flex-wrap">
               <Span className="text-xs text-muted-foreground">
                 <Span className="font-semibold text-emerald-600 dark:text-emerald-400">
                   {String(staged.length)}
                 </Span>{" "}
                 {t("widget.stagedCount")}
               </Span>
+              {partiallyStaged.length > 0 && (
+                <Span className="text-xs text-muted-foreground">
+                  <Span className="font-semibold text-blue-600 dark:text-blue-400">
+                    {String(partiallyStaged.length)}
+                  </Span>{" "}
+                  {t("widget.partiallyStaged_count")}
+                </Span>
+              )}
               {skipped.length > 0 && (
                 <Span className="text-xs text-muted-foreground">
                   <Span className="font-semibold text-amber-600 dark:text-amber-400">
@@ -309,15 +375,16 @@ export function VibeStageWidget(): React.JSX.Element {
                   {t("widget.skippedCount")}
                 </Span>
               )}
-              {!isDryRun && staged.length > 0 && (
-                <Badge
-                  variant="default"
-                  className="ml-auto text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-0"
-                >
-                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                  {t("success.title")}
-                </Badge>
-              )}
+              {!isDryRun &&
+                (staged.length > 0 || partiallyStaged.length > 0) && (
+                  <Badge
+                    variant="default"
+                    className="ml-auto text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-0"
+                  >
+                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                    {t("success.title")}
+                  </Badge>
+                )}
             </Div>
           )}
         </Div>

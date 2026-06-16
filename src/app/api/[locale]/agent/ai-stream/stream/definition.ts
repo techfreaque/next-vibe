@@ -50,6 +50,7 @@ import { type ChatMessage, selectChatMessageSchema } from "../../chat/db";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../chat/enum";
 import { AI_STREAM_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
 
 const toolConfigItemSchema = z.object({
   toolId: z.string(),
@@ -673,3 +674,6 @@ const definitions = {
 };
 
 export default definitions;
+import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
+import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
+import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";

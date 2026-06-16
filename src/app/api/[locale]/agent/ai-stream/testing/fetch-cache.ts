@@ -38,6 +38,9 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { defaultLocale } from "@/i18n/core/config";
+import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "../../../system/unified-interface/shared/logger/server-logger";
 import { setClaudeCodeFixtureContext } from "./claude-code-fixture-store";
 
 // Optional WS fixture context sync - registered by ws-fixture.ts via registerWsContextHook()
@@ -59,6 +62,11 @@ export const HTTP_CACHE_DIR = join(
 let currentTestCase = "unknown";
 let strictMode = false;
 
+/** Current fixture context — relay calls forward it to fixture-mode servers. */
+export function getFetchCacheContext(): string {
+  return currentTestCase;
+}
+
 /** Call this at the top of each test to scope cache files to that test. */
 export function setFetchCacheContext(testCase: string): void {
   currentTestCase = slugify(testCase);
@@ -67,8 +75,6 @@ export function setFetchCacheContext(testCase: string): void {
   setClaudeCodeFixtureContext(testCase);
   // Keep WS fixture store in sync (registered by ws-fixture.ts when installed)
   wsContextHook?.(testCase);
-  // eslint-disable-next-line no-console
-  console.log(`[FetchCache] context set: ${currentTestCase}`);
 }
 
 /**
@@ -741,7 +747,13 @@ function buildResFile(
 
 let installed = false;
 
-export function installFetchCache(): void {
+export function installFetchCache(
+  logger: EndpointLogger = createEndpointLogger(
+    false,
+    Date.now(),
+    defaultLocale,
+  ),
+): void {
   if (installed) {
     return;
   }
@@ -787,7 +799,7 @@ export function installFetchCache(): void {
       // ── Cache hit ────────────────────────────────────────────────────────────
       if (existsSync(rp)) {
         // eslint-disable-next-line no-console
-        console.log("[FetchCache] HIT", {
+        logger.debug("[FetchCache] HIT", {
           rp: rp.split("/").slice(-3).join("/"),
           model: modelName,
           index: callIndex,
@@ -802,7 +814,7 @@ export function installFetchCache(): void {
         return replayFromCache(cached);
       }
       // eslint-disable-next-line no-console
-      console.log("[FetchCache] MISS", {
+      logger.debug("[FetchCache] MISS", {
         rp: rp.split("/").slice(-3).join("/"),
         model: modelName,
         index: callIndex,

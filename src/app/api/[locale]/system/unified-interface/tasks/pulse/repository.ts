@@ -41,7 +41,7 @@ import {
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { CallbackModeValue } from "../../ai/execute-tool/constants";
+import type { CallbackModeValue } from "../../execute-tool/constants";
 import { Platform } from "../../shared/types/platform";
 import { getFullPath } from "../../shared/utils/path";
 import { isCronTaskDue } from "../cron-formatter";
@@ -51,12 +51,11 @@ import { createTaskEmitters } from "../cron/emitter";
 import { CronTasksRepository } from "../cron/repository";
 import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
 import {
-  resolveTaskDisplayName,
   scopedTranslation,
   scopedTranslation as tasksScopedTranslation,
 } from "../i18n";
+import { resolveTaskDisplayName } from "../i18n-utils";
 import { handleTaskCompletion } from "../task-completion-handler";
-import { TaskSyncRepository } from "@/app/api/[locale]/remote-connection/sync/repository";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -429,7 +428,7 @@ export class PulseHealthRepository {
       const seenTaskIds = new Set<string>();
 
       // Two-pass approach: run scheduled tasks first, then pick up any tasks
-      // that were inserted during this pulse cycle (e.g. by task-sync/pull).
+      // that were inserted during this pulse cycle.
       // Pass 1: tasks that existed before the pulse started (respect schedule).
       // Pass 2: tasks created after pulseStart with no execution status yet
       //         (run-once delegated tasks - these are always due immediately).
@@ -439,7 +438,7 @@ export class PulseHealthRepository {
           .select()
           .from(cronTasksTable)
           .where(and(...whereConditions)),
-        // Pass 2: tasks created during this pulse (inserted by task-sync/pull etc.)
+        // Pass 2: tasks created during this pulse.
         // Fetched after pass 1 runs, so they exist in DB by the time we process them.
         // Using a lazy getter so it only executes after the first pass completes.
       ] as (typeof cronTasksTable.$inferSelect)[][];
@@ -637,26 +636,6 @@ export class PulseHealthRepository {
               `Pulse: ${!path ? "unknown routeId" : "no handler"} "${dbTask.routeId}" for task "${dbTask.displayName}"`,
             );
           } else {
-            // Fire-and-forget: notify remote that task is now RUNNING
-            if (dbTask.targetInstance) {
-              void TaskSyncRepository.pushStatusToRemote({
-                taskId: dbTask.id,
-                status: CronTaskStatus.RUNNING,
-                summary: "",
-                durationMs: null,
-                startedAt: startedAt.toISOString(),
-                serverTimezone:
-                  Intl.DateTimeFormat().resolvedOptions().timeZone,
-                executedByInstance: instanceId,
-                logger,
-              }).catch((err) => {
-                logger.warn("pushStatusToRemote (RUNNING) failed", {
-                  taskId: dbTask.id,
-                  error: String(err),
-                });
-              });
-            }
-
             try {
               const taskInput = dbTask.taskInput ?? {};
               const { urlPathParams, data } = await splitTaskArgs(
@@ -930,29 +909,6 @@ export class PulseHealthRepository {
                   });
                 });
               }
-
-              // Fire-and-forget: push final status to remote
-              if (dbTask.targetInstance) {
-                void TaskSyncRepository.pushStatusToRemote({
-                  taskId: dbTask.id,
-                  status: finalStatus,
-                  summary: finalMessage ?? "",
-                  durationMs: finalDurationMs,
-                  executionId: firstExecutionId ?? undefined,
-                  startedAt: startedAt.toISOString(),
-                  serverTimezone:
-                    Intl.DateTimeFormat().resolvedOptions().timeZone,
-                  executedByInstance: instanceId,
-                  ...(finalOutput ? { output: finalOutput } : {}),
-                  logger,
-                }).catch((err) => {
-                  logger.warn("pushStatusToRemote (final) failed", {
-                    taskId: dbTask.id,
-                    status: finalStatus,
-                    error: String(err),
-                  });
-                });
-              }
             } catch (unexpectedError) {
               // Catch-all: if something goes wrong outside the retry loop,
               // ensure the task doesn't stay stuck in RUNNING state forever
@@ -993,26 +949,6 @@ export class PulseHealthRepository {
                 };
                 emitTaskList("task-updated", failedPayload);
                 emitTaskQueue("task-updated", failedPayload);
-              }
-
-              // Fire-and-forget: push FAILED to remote so it doesn't stay stuck on RUNNING
-              if (dbTask.targetInstance) {
-                void TaskSyncRepository.pushStatusToRemote({
-                  taskId: dbTask.id,
-                  status: CronTaskStatus.FAILED,
-                  summary: parseError(unexpectedError).message,
-                  durationMs: null,
-                  startedAt: startedAt.toISOString(),
-                  serverTimezone:
-                    Intl.DateTimeFormat().resolvedOptions().timeZone,
-                  executedByInstance: instanceId,
-                  logger,
-                }).catch((err) => {
-                  logger.warn("pushStatusToRemote (FAILED catch-all) failed", {
-                    taskId: dbTask.id,
-                    error: String(err),
-                  });
-                });
               }
             }
           }

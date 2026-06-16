@@ -60,93 +60,25 @@ export const CHAT_CONSTANTS = {
 export const AGENT_MESSAGE_LENGTH = 40000; // TODO find a better way and also better error
 
 /**
- * Default AI tools for public (unauthenticated) users.
- * Only includes tools accessible to PUBLIC role.
- */
-export const DEFAULT_TOOL_IDS_PUBLIC = [
-  TOOL_HELP_ALIAS,
-  EXECUTE_TOOL_ALIAS,
-  WAIT_FOR_TASK_ALIAS,
-  AI_RUN_ALIAS,
-] as const;
-
-/**
- * Default AI tools for customer (authenticated non-admin) users.
- * Only essential cortex tools are pinned - rest discoverable via tool-help.
- */
-export const DEFAULT_TOOL_IDS_CUSTOMER = [
-  TOOL_HELP_ALIAS,
-  EXECUTE_TOOL_ALIAS,
-  WAIT_FOR_TASK_ALIAS,
-  CORTEX_READ_ALIAS,
-  CORTEX_WRITE_ALIAS,
-  CORTEX_EDIT_ALIAS,
-  CORTEX_LIST_ALIAS,
-  CORTEX_TREE_ALIAS,
-  CORTEX_MOVE_ALIAS,
-  CORTEX_DELETE_ALIAS,
-  CORTEX_MKDIR_ALIAS,
-  CORTEX_SEARCH_ALIAS,
-  AI_RUN_ALIAS,
-] as const;
-
-/**
- * Default AI tools for admin users.
- * Only essential cortex tools are pinned - rest discoverable via tool-help.
- */
-export const DEFAULT_TOOL_IDS_ADMIN = [
-  TOOL_HELP_ALIAS,
-  EXECUTE_TOOL_ALIAS,
-  WAIT_FOR_TASK_ALIAS,
-  CORTEX_READ_ALIAS,
-  CORTEX_WRITE_ALIAS,
-  CORTEX_EDIT_ALIAS,
-  CORTEX_LIST_ALIAS,
-  CORTEX_TREE_ALIAS,
-  CORTEX_MOVE_ALIAS,
-  CORTEX_DELETE_ALIAS,
-  CORTEX_MKDIR_ALIAS,
-  CORTEX_SEARCH_ALIAS,
-  CODING_AGENT_ALIAS,
-  AI_RUN_ALIAS,
-] as const;
-
-/**
  * Default remote tools made available (enabled) when a remote instance is connected.
  * These are unprefixed tool IDs - the instanceId prefix (e.g. "hermes__") is added
  * at connect time when writing into the user's availableTools setting.
- *
- * Mirrors DEFAULT_TOOL_IDS: same pinned/available distinction, same reset-to-defaults
- * behaviour. User can add/remove tools and promote any to pinned via the tool settings UI.
  */
 export const DEFAULT_REMOTE_TOOL_IDS = [
   CODING_AGENT_ALIAS,
-  SSH_EXEC_ALIAS,
-  SSH_FILES_READ_ALIAS,
-  SSH_FILES_WRITE_ALIAS,
+  CORTEX_EXEC_ALIAS,
 ] as const;
 
 /**
  * Default remote tools pinned into the AI context window on connect.
- * Empty by default - remote tools start as available-only (callable via execute-tool,
- * shown in help, but not auto-loaded into every AI context).
- * User can promote individual tools to pinned via the tool settings UI.
+ * Empty by default - remote tools start as available-only.
  */
 export const DEFAULT_REMOTE_PINNED_IDS: readonly string[] = [];
 
 /**
- * Additional tools pinned for local/admin instances (Hermes).
- * These are appended to DEFAULT_TOOL_IDS when running in local mode.
- */
-const LOCAL_ADMIN_EXTRA_TOOL_IDS = [
-  CODING_AGENT_ALIAS,
-  SQL_ALIAS,
-  REBUILD_ALIAS,
-] as const;
-
-/**
  * Convenience wrapper: derive role flags from a JWT payload and return the
- * role-appropriate default tool IDs.  Use this whenever you have a full user object.
+ * role-appropriate default AI-pinned tool IDs.
+ * Reads from the generated default-pins.ts - no manual alias lists needed.
  */
 export function getDefaultToolIdsForUser(
   user: JwtPayloadType,
@@ -159,10 +91,23 @@ export function getDefaultToolIdsForUser(
 }
 
 /**
+ * Convenience wrapper: return the role-appropriate default web-sidebar-pinned tool IDs.
+ */
+export function getDefaultWebPinnedIdsForUser(
+  user: JwtPayloadType,
+): readonly string[] {
+  const role = user.isPublic
+    ? UserRole.PUBLIC
+    : user.roles.includes(UserPermissionRole.ADMIN)
+      ? UserRole.ADMIN
+      : UserRole.CUSTOMER;
+  return DEFAULT_WEB_PINNED_IDS[role] ?? [];
+}
+
+/**
  * Folder-aware default pinned tool IDs.
  * Incognito and public folders strip all cortex tools from the defaults
  * because cortex requires authenticated server-side storage.
- * For all other folders, falls back to the standard role-based defaults.
  */
 export function getDefaultToolIdsForFolder(
   user: JwtPayloadType,
@@ -190,15 +135,9 @@ export function getDefaultToolIdsForFolder(
 }
 
 /**
- * Get the effective default pinned tool IDs based on user role and environment.
- *
- * Role-based defaults:
- * - ADMIN (or local mode): admin tool set + dev tools (claude-code, sql, rebuild, etc.)
- * - CUSTOMER (authenticated, non-admin): customer tool set (no claude-code)
- * - PUBLIC (unauthenticated): public tool set (ai-run, help only; search/fetch via prompt fragment)
- *
- * Pass `isAdmin=true` / `isCustomer=true` flags derived from the JWT payload roles.
- * When neither flag is provided, defaults to admin in local mode.
+ * Get the effective default AI-pinned tool IDs based on user role and environment.
+ * Reads from the generated default-pins.ts. In local mode, the ADMIN role already
+ * includes sql and rebuild from their defaultAiPinned flags.
  */
 export function getDefaultToolIds(
   isAdmin?: boolean,
@@ -206,16 +145,10 @@ export function getDefaultToolIds(
 ): readonly string[] {
   const effectiveAdmin = isAdmin ?? envClient.NEXT_PUBLIC_LOCAL_MODE;
   if (effectiveAdmin) {
-    if (envClient.NEXT_PUBLIC_LOCAL_MODE) {
-      return [
-        ...DEFAULT_TOOL_IDS_ADMIN,
-        ...LOCAL_ADMIN_EXTRA_TOOL_IDS.filter(Boolean),
-      ];
-    }
-    return DEFAULT_TOOL_IDS_ADMIN;
+    return DEFAULT_AI_PINNED_IDS[UserRole.ADMIN] ?? [];
   }
   if (isCustomer) {
-    return DEFAULT_TOOL_IDS_CUSTOMER;
+    return DEFAULT_AI_PINNED_IDS[UserRole.CUSTOMER] ?? [];
   }
-  return DEFAULT_TOOL_IDS_PUBLIC;
+  return DEFAULT_AI_PINNED_IDS[UserRole.PUBLIC] ?? [];
 }

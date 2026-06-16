@@ -1,0 +1,925 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "authorization": "[redacted]",
+    "content-type": "application/json",
+    "http-referer": "https://unbottled.ai",
+    "user-agent": "ai-sdk/openrouter/2.5.1 ai-sdk/provider-utils/4.0.1 runtime/bun/1.3.14",
+    "x-openrouter-categories": "general-chat,roleplay,personal-agent",
+    "x-title": "Unbottled AI"
+  },
+  "body": {
+    "messages": [
+      {
+        "content": [
+          {
+            "cache_control": {
+              "ttl": "1h",
+              "type": "ephemeral"
+            },
+            "text": "# unbottled.ai - Automated Agent\n\n**Current Date:** 2026-06-12\n\nYou are an automated AI agent running on unbottled.ai. No human is present - you are executing a programmatic task. Complete the task fully, then emit your final response and stop. Only your last non-tool-call message is returned to the requester; anything sent alongside a tool call is discarded.\n\n## unbottled.ai\n\n- **Models:** 134 — Claude, GPT, Gemini, Llama, and UncensoredLM v1.2, FreedomGPT Liberty, Gab AI Arya, Venice Uncensored 1.1.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Free tier:** 20 credits/month via browser ID - no account needed.\n- **Subscription:** $8/month → 800 credits. **Credit packs:** $5 → 500 permanent credits.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).\n\n## Automated Execution Context\n\n**⚠ Only your LAST message (no tool call) is returned to the caller. Any text you emit alongside a tool call is silently discarded.**\n\nNo user watching. Complete the task. No follow-up questions. No pleasantries.\n\nThis thread lives in the **background** folder - standard home for scheduled sub agents and tasks.\n- If the task fails, state clearly why.\n- State your result once, at the end, without preamble.\n\n## Output Language\n\nRespond in English (en-GLOBAL) unless the task explicitly specifies otherwise.\n\n## Current Context\n\n- **Folder:** cron - Background task conversations - AI agent background runs triggered by ai-run or tasks. Visible to the owning user\n\n## Desktop Control — Linux/KDE Wayland\nMonitors:\n  HDMI-A-1 [PRIMARY]: 1920×1200 @(1612,0)\n  DP-2: 1440×2560 @(0,0)\n  DP-3: 2294×960 @(1440,1200)\n\nYou can fully control this desktop. Act fast — don't narrate, just do.\n**KDE shortcuts & power-user knowledge:**\n- **Alt+F2** → KRunner (launch apps, run commands, calc, unit convert). Fastest way to open anything.\n- **Alt+F4** → close focused window. **Super+D** → show desktop.\n- **Super+PageUp/Down** → maximize/minimize. **Super+Left/Right** → snap window to half screen.\n- **Ctrl+F1–F4** → switch virtual desktops.\n- **KRunner commands:** type `=2+2` to calculate, `define word` to look up, `shell: cmd` to run a terminal command.\n- **System Settings:** `systemsettings` or Alt+F2 → \"System Settings\".\n- **kscreen-doctor -o** → live monitor layout with scale/rotation. `kscreen-doctor output.NAME.enable` to toggle a monitor.\n- **qdbus6 org.kde.KWin` → KWin scripting bus. Use it for advanced window management.\n- **kdesu` → GUI sudo dialog (triggers a polkit prompt). Better than CLI sudo for GUI apps.\n- **Dolphin** = file manager. **Konsole** = terminal. **Spectacle** = screenshot tool.\n- **kwriteconfig6 / kreadconfig6** → read/write KDE config files without restarting apps.\n- Notification popups appear bottom-right; interact with `click` at that region or dismiss with `press-key` Escape.\n\n**Tool names** (use `tool-help` to get schema before first call to each):\n| Tool | Key params |\n|------|-----------|\n| `desktop_take-screenshot_POST` | `monitorName` (default: HDMI-A-1) |\n| `desktop_list-windows_POST` | — returns windowId, title, monitor per window |\n| `desktop_list-monitors_POST` | — live monitor layout |\n| `desktop_get-focused-window_POST` | — active window id/title |\n| `desktop_focus-window_POST` | `windowId` or `title` or `pid` |\n| `desktop_move-window-to-monitor_POST` | `windowId`/`title`/`pid` + `monitorName`/`monitorIndex` |\n| `desktop_get-accessibility-tree_POST` | `appName`, `maxDepth` (3–5) |\n| `desktop_click_POST` | `x`, `y` (logical pixels, absolute) |\n| `desktop_type-text_POST` | `text` |\n| `desktop_press-key_POST` | `key` (e.g. \"ctrl+c\", \"super+d\", \"alt+f2\") |\n| `desktop_move-mouse_POST` | `x`, `y` |\n| `desktop_scroll_POST` | `x`, `y`, `direction`, `amount` |\n\n**Rules:**\n- Coordinates are logical pixels matching monitor positions above.\n- Screenshot after every interaction to verify state. Use `monitorName` to target the right screen.\n- To find click targets: `get-accessibility-tree` → read bbox → click center.\n- `list-windows` first when you need a windowId — it includes which monitor each window is on.\n- Parallel tool calls where safe (e.g. screenshot + list-windows simultaneously).\n\n## Tool Execution\n\n**Schema first:** Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.\n\n**callbackMode** (optional on every tool, default: omit = synchronous):\n\n- **omit** (default) — synchronous, result inline, loop continues\n- **`\"detach\"`** — fire-and-forget, returns `{taskId}`, use `wait-for-task` later if needed\n- **`\"wakeUp\"`** — fire-and-forget, result auto-injected when ready, do NOT call `wait-for-task`\n- **`\"wait\"`** — block for a remote task\n- **`\"endLoop\"`** — end the entire turn after this batch (use ONLY when fully done)\n- **`\"approve\"`** — pause for user confirmation\n\nFast tools (search, lookup, schema) → always omit. Async only for operations taking minutes.\n\n## Media capabilities\n- Images: GPT-5 Image Mini available. Use `tool-help` with `toolName=\"generate_image\"` to get the full schema, then call it via `execute-tool`.\n- Music/audio: Sonauto Song available. Use `tool-help` with `toolName=\"generate_music\"` to get the full schema, then call it via `execute-tool`.\n- Video: Veo 3.1 Fast available. Use `tool-help` with `toolName=\"generate_video\"` to get the full schema, then call it via `execute-tool`.\n\n## Output Format\n\nUse plain, structured text. Markdown is fine for readability; avoid decorative formatting. Be concise and complete.\n\n## Web\n\nYou can search the web and read URLs:\n- `web-search` - search query → results (auto-selects user's preferred engine)\n- `fetch-url` - any URL → markdown content\nFor JS-heavy sites or interactive pages, the local version of unbottled includes full browser automation.\n\n## Contact Support\nTool: `contact-form` - use for bugs, billing, complaints, or anything needing a human.\nAlways confirm before submitting (show what will be sent). Never submit silently. Pass `callbackMode: \"endLoop\"` - terminal action, always last.\nIf user seems frustrated or stuck, offer: \"Want me to ping our support team?\"\nUser is logged in - leave email field empty.\n\n## Your Role\n\nYou are an AI assistant on a platform where users pay credits per interaction. Do what the user asks.\n\nWhile doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.\n\nHARD STOP - if any of these happen, stop and report instead of retrying or working around it:\n- A tool returns an error, empty result, or nonsensical output\n- Same failure happens twice\n- A generated result (image/music/video) is missing, broken URL, or clearly wrong\n- Credit cost seems unreasonable for what was done\n- You see raw IDs, internal field names, JSON blobs, or stack traces in anything user-facing\n- A tool name, description, or parameter is confusing or misleading\n- An error message doesn't tell the user what to do about it\n- You hit a dead end with no path forward\n\nFailure report format:\n1. What the user asked for\n2. What actually happened\n3. Exact error text, tool name, or result\n4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)\n\nIf everything works, respond normally to the user. Only flag issues - don't narrate the process.\n\n## Coding Agent\n\nWhen delegating coding work, use the `ai-run` tool with the `vibe-coder` skill. Pass the full task description as the prompt. The vibe-coder skill carries the full project context and coding conventions.\n\n## System Context\n\n- **Instance:** Cloud production (unbottled.ai)\n- **URL:** http://localhost:3000\n- **Instance ID:** atlas\n- **Environment:** development (NODE_ENV=development)\n- **Models available:** 134\n- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.\n\n**Your role:** Local dev companion. Help with development, execute delegated tasks, process work from production.\n- Server: http://localhost:3000 (also: dev hot-reload server for UI testing)\n- Check the **cron dashboard** for tasks delegated from production.\n\n**Task routing:** Tasks with `targetInstance` matching `atlas` run here.\n\n## SSH / Machines\n\n1 machine configured (SSH connections + remote instances).\n\n**Execute commands:** `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` — persistent terminal with tracked cwd.\n**Browse files:** `cortex-list(path=\"/ssh/<machine>/\")` — remote filesystem. `cortex-read(path=\"/ssh/<machine>/etc/hosts\")` — read file via SFTP.\n**Active terminals:** `cortex-terminals` — list all terminals with cwd. Sessions persist between calls.\n**Connections:** `cortex-list(path=\"/ssh\")` — all machines. Remote instances appear alongside SSH connections.",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "Previous conversation summary:\n\n - A series of tool-system tests were executed, with most returning success markers (`STEP_OK` or `WAKEUP_OK`).\n- **tool-help tests**: Listing all tools and fetching the `generate_image` parameter schema both succeeded.\n- **cortex I/O test**: Wrote `T2_CHEAP_OK` to `/memories/t2-cheap-test` and verified it on read-back.\n- **generate_image calls** (all returned immediate synchronous results with `imageUrl` rather than async task IDs):\n  - `wait-for-task-test`: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/292fa830-8fd6-4c14-a833-d7a45984e3fe/0c27ff0e-9e42-4769-aa0f-91db2b0e341a.png`\n  - `wait-inline-test`: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/292fa830-8fd6-4c14-a833-d7a45984e3fe/c6ef47fc-bbdf-4fe3-b608-28dd9b3c3202.png`\n  - `wakeup-test`: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/292fa830-8fd6-4c14-a833-d7a45984e3fe/82e72460-39a4-4377-8e21-05e004906dc1.png`\n  - `wakeup-repeat-test`: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/292fa830-8fd6-4c14-a833-d7a45984e3fe/1749c9b5-8d5c-4e4e-89c5-e069e756c765.png`\n  - `wakeup-stress-test`: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/292fa830-8fd6-4c14-a833-d7a45984e3fe/f5025572-523b-488b-9801-8281665c7924.png`\n  - `approve-test`: `http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/292fa830-8fd6-4c14-a833-d7a45984e3fe/df4fc645-b124-4c89-a521-a7001950f90d.png`\n- **Async/callback anomalies**: Calls using `callbackMode='detach'`, `'wakeUp'`, and `'approve'` all returned completed results with `imageUrl` immediately, instead of returning task IDs or entering pending/approval states. The user still responded with expected success markers.\n- **wait-for-task test**: Called with taskId `local-bg-1781291974833-fucew7` and returned a nested result containing an `imageUrl`.\n- **execute-tool-direct test**: Calling `execute-tool` with `toolName='tool-help'` and empty input returned a valid tools list.\n- **endLoop test**: Calling `tool-help` with `callbackMode='endLoop'` returned a non-empty tools array and halted as expected.",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (16)\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── skills.md\n│   │   <!-- Your technical and professional skills. What you're expert in, what you're learning. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── background.md\n│   │   <!-- Your background, experience, and how you got here. Shapes context for every interaction. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   ├── notes/ (1 files)\n│   │   └── meeting.md\n│   ├── tasks/ (1 files)\n│   │   └── fix-auth.md\n│   ├── templates/ (5 files)\n│   │   ├── meeting-notes.md\n│   │   ├── project-brief.md\n│   │   ├── weekly-review.md\n│   │   ├── decision-log.md\n│   │   └── knowledge-article.md\n│   └── test-suite/ (2 files)\n│       ├── hello.md\n│       └── moved.md\n├── threads/ (private: 4 · 16 background)\n├── skills/ (10 created)\n│   ├── Updated Code Reviewer (code-reviewer) (created)\n│   │   Updated system prompt\n│   ├── Code Reviewer (code-reviewer-4) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-2) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-3) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Code Reviewer (code-reviewer-2) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── [TEST SKILL] Unlisted Skill (test-skill-unlisted-skill) (created)\n│   ├── [TEST SKILL] Minimal Draft (test-skill-minimal-draft) (created)\n│   └── [TEST SKILL] Layout Preview Bot (test-skill-layout-preview-bot) (created)\n│       If someone is chatting with you, something has gone wrong. Apologize and redirect them to a real ski\n├── tasks/ (2)\n│   ├── Dreaming\n│   │   0 2 * * * [disabled]\n│   └── Autopilot\n│       0 8 * * 1-5 [disabled]\n├── favorites/ (active: hermes-oracle)\n│   ├── thea-brilliant\n│   │   model:claude-sonnet-4.6 skill:thea\n│   ├── thea-cheap\n│   │   model:kimi-k2.6 skill:thea\n│   ├── thea-oracle\n│   │   model:gpt-55 skill:thea\n│   ├── thea-elon-tusk\n│   │   model:grok-4.3 skill:thea\n│   ├── thea-vision\n│   │   model:gemini-3.1-pro-preview-customtools skill:thea\n│   ├── thea-uncensored\n│   │   model:uncensored-lm-v1.2 skill:thea\n│   ├── vibe-coder-budget\n│   │   model:kimi-k2.6 skill:vibe-coder\n│   ├── vibe-coder-open\n│   │   model:deepseek-v4-pro skill:vibe-coder\n│   ├── vibe-coder-fast\n│   │   model:claude-sonnet-4.6 skill:vibe-coder\n│   ├── vibe-coder-max\n│   │   model:claude-opus-4.7 skill:vibe-coder\n│   └── +8 more\n└── /uploads/ (6 - images, documents, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:961f1896 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 12, 19:22]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": " ",
+        "reasoning": " The user wants me to act as a quality tester. Looking at the context, this appears to be a continuation of previous tool-system tests. The previous conversation summary shows various tests were executed (tool-help, cortex I/O, generate_image, async/callback tests, wait-for-task, execute-tool-direct, endLoop tests).\n\nI need to determine what the actual task is here. The context shows this is posted as a background task with skill \"quality-tester\". There doesn't seem to be an explicit new task in the provided context - just the system state and previous conversation summary.\n\nWait, looking more carefully at the context: \"Context: ID:961f1896 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 12, 19:22\" - this suggests I'm running as the quality-tester skill, but there's no explicit prompt or task description beyond the system context.\n\nGiven the previous conversation was about tool-system tests and this is a quality-tester skill run, perhaps I should:\n1. Check if there are any pending tasks or messages I should respond to\n2. Look at the cron dashboard for tasks\n3. Or perhaps this is a test run itself and I need to report status\n\nActually, looking at the \"Previous conversation summary\", it seems like the previous turn completed all the tests and the user (or system) hasn't given a new explicit instruction in this turn. The state boundary note says \"the following was captured before this turn and may reflect an earlier tool-loop state\".\n\nSince there's no explicit new user message with a task, and this is a background task in the cron folder, I should probably check if there's anything in the task queue or if I need to wait for something. But actually, the way this works is that the \"user message\" is essentially the context provided - there's no separate message.\n\nWait, re-reading the instructions: \"Complete the task fully, then emit your final response and stop.\" But I don't see a clear task. Let me check if there's something I missed.\n\nLooking at the context again - the previous conversation summary ends with \"endLoop test: Calling tool-help with callbackMode='endLoop' returned a non-empty tools array and halted as expected.\"\n\nThis seems like the previous session already completed. Now I'm in a new turn with skill \"quality-tester\". Without an explicit task, maybe I should:\n- Check the current state\n- Look for any tasks delegated to this instance\n- Or simply report that I'm ready for quality testing tasks\n\nActually, I think the most logical thing is that this is a scheduled/automated run of the quality-tester skill, and I should perform some quality tests. Given the previous session was testing tools, maybe I should continue with more comprehensive tests or check the system status.\n\nLet me check if there are any cron tasks or if the server is responding properly. I'll start by doing a quick health check of the system and maybe test a few more edge cases.\n\nBut wait - the instruction says \"No user watching. Complete the task. No follow-up questions. No pleasantries.\" and \"Only your LAST message (no tool call) is returned to the caller\". So I need to do something and then report.\n\nGiven the lack of explicit task, let me:\n1. Check the local server status\n2. Maybe run a quick comprehensive test of a few tools\n3. Report findings\n\nActually, looking at the context more carefully, maybe the \"task\" is implicit: I'm the quality-tester skill and I should test the system. Let me do a brief but meaningful test - perhaps test the desktop control tools since those haven't been tested yet according to the previous summary, or test the web search/fetch-url tools.\n\nLet me test a few things:\n1. web-search tool\n2. fetch-url tool  \n3. Maybe a desktop tool\n\nFirst, let me get the schemas for tools that weren't tested.",
+        "reasoning_details": [
+          {
+            "format": "unknown",
+            "index": 0,
+            "text": " The user wants me to act as a quality tester. Looking at the context, this appears to be a continuation of previous tool-system tests. The previous conversation summary shows various tests were executed (tool-help, cortex I/O, generate_image, async/callback tests, wait-for-task, execute-tool-direct, endLoop tests).\n\nI need to determine what the actual task is here. The context shows this is posted as a background task with skill \"quality-tester\". There doesn't seem to be an explicit new task in the provided context - just the system state and previous conversation summary.\n\nWait, looking more carefully at the context: \"Context: ID:961f1896 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 12, 19:22\" - this suggests I'm running as the quality-tester skill, but there's no explicit prompt or task description beyond the system context.\n\nGiven the previous conversation was about tool-system tests and this is a quality-tester skill run, perhaps I should:\n1. Check if there are any pending tasks or messages I should respond to\n2. Look at the cron dashboard for tasks\n3. Or perhaps this is a test run itself and I need to report status\n\nActually, looking at the \"Previous conversation summary\", it seems like the previous turn completed all the tests and the user (or system) hasn't given a new explicit instruction in this turn. The state boundary note says \"the following was captured before this turn and may reflect an earlier tool-loop state\".\n\nSince there's no explicit new user message with a task, and this is a background task in the cron folder, I should probably check if there's anything in the task queue or if I need to wait for something. But actually, the way this works is that the \"user message\" is essentially the context provided - there's no separate message.\n\nWait, re-reading the instructions: \"Complete the task fully, then emit your final response and stop.\" But I don't see a clear task. Let me check if there's something I missed.\n\nLooking at the context again - the previous conversation summary ends with \"endLoop test: Calling tool-help with callbackMode='endLoop' returned a non-empty tools array and halted as expected.\"\n\nThis seems like the previous session already completed. Now I'm in a new turn with skill \"quality-tester\". Without an explicit task, maybe I should:\n- Check the current state\n- Look for any tasks delegated to this instance\n- Or simply report that I'm ready for quality testing tasks\n\nActually, I think the most logical thing is that this is a scheduled/automated run of the quality-tester skill, and I should perform some quality tests. Given the previous session was testing tools, maybe I should continue with more comprehensive tests or check the system status.\n\nLet me check if there are any cron tasks or if the server is responding properly. I'll start by doing a quick health check of the system and maybe test a few more edge cases.\n\nBut wait - the instruction says \"No user watching. Complete the task. No follow-up questions. No pleasantries.\" and \"Only your LAST message (no tool call) is returned to the caller\". So I need to do something and then report.\n\nGiven the lack of explicit task, let me:\n1. Check the local server status\n2. Maybe run a quick comprehensive test of a few tools\n3. Report findings\n\nActually, looking at the context more carefully, maybe the \"task\" is implicit: I'm the quality-tester skill and I should test the system. Let me do a brief but meaningful test - perhaps test the desktop control tools since those haven't been tested yet according to the previous summary, or test the web search/fetch-url tools.\n\nLet me test a few things:\n1. web-search tool\n2. fetch-url tool  \n3. Maybe a desktop tool\n\nFirst, let me get the schemas for tools that weren't tested.",
+            "type": "reasoning.text"
+          }
+        ],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\":\"web-search\"}",
+              "name": "tool-help"
+            },
+            "id": "functions.tool-help:0",
+            "type": "function"
+          },
+          {
+            "function": {
+              "arguments": "{\"query\":\"fetch-url\"}",
+              "name": "tool-help"
+            },
+            "id": "functions.tool-help:1",
+            "type": "function"
+          },
+          {
+            "function": {
+              "arguments": "{\"query\":\"desktop\"}",
+              "name": "tool-help"
+            },
+            "id": "functions.tool-help:2",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"allAiToolIds\":[\"ai-run\",\"system-prompt-debug\",\"chat-downvotes-total\",\"chat-errors-total\",\"chat-memories-created\",\"chat-messages-by-ai\",\"chat-messages-by-user\",\"chat-messages-total\",\"chat-messages-with-attachments\",\"chat-share-links-created\",\"chat-threads-active-total\",\"chat-threads-created\",\"chat-tool-calls-total\",\"chat-unique-users\",\"chat-upvotes-total\",\"favorite-get\",\"favorite-update\",\"favorite-delete\",\"favorite-create\",\"favorites\",\"favorites-reorder\",\"folder-contents\",\"folder-create\",\"folders-list\",\"folder-permissions\",\"folder-get\",\"folder-delete\",\"folder-move\",\"agent_chat_folders_subfolders_subFolderId_permissions_GET\",\"agent_chat_folders_subfolders_subFolderId_permissions_PATCH\",\"folder-rename\",\"folder-update\",\"agent_chat_public-feed_GET\",\"chat-settings\",\"chat-settings-update\",\"skill-get\",\"skill-update\",\"skill-delete\",\"skill-publish\",\"skill-report\",\"skill-vote\",\"skill-create\",\"skills\",\"skill-moderation\",\"agent_chat_skills_moderation_PATCH\",\"agent_chat_threads_threadId_GET\",\"agent_chat_threads_threadId_PATCH\",\"agent_chat_threads_threadId_DELETE\",\"agent_chat_threads_threadId_messages_messageId_GET\",\"agent_chat_threads_threadId_messages_messageId_PATCH\",\"agent_chat_threads_threadId_messages_messageId_DELETE\",\"agent_chat_threads_threadId_messages_messageId_vote_POST\",\"thread-messages\",\"agent_chat_threads_threadId_messages_POST\",\"agent_chat_threads_threadId_messages_path_GET\",\"agent_chat_threads_threadId_messages_search_GET\",\"agent_chat_threads_threadId_permissions_GET\",\"agent_chat_threads_threadId_permissions_PATCH\",\"thread-share-links\",\"agent_chat_threads_threadId_share-links_POST\",\"agent_chat_threads_threadId_share-links_PATCH\",\"agent_chat_threads_threadId_share-links_DELETE\",\"agent-chat-threads\",\"agent_chat_threads_POST\",\"agent_chat_threads_rename_PATCH\",\"agent-search-messages\",\"agent-search-threads\",\"coding-agent\",\"cortex-delete\",\"cortex-edit\",\"cortex-embed-backfill\",\"cortex-exec\",\"cortex-list\",\"cortex-mkdir\",\"cortex-move\",\"cortex-read\",\"cortex-search\",\"cortex-terminals\",\"cortex-tree\",\"cortex-write\",\"describe_image\",\"describe_video\",\"fetch-url-content\",\"generate_image\",\"models\",\"generate_music\",\"brave-search\",\"kagi-search\",\"web-search\",\"generate_video\",\"agent-view-image\",\"vibe-sense-evaluator-and\",\"vibe-sense-evaluator-crossover\",\"vibe-sense-evaluator-not\",\"vibe-sense-evaluator-or\",\"vibe-sense-evaluator-script\",\"vibe-sense-evaluator-threshold\",\"vibe-sense-bollinger\",\"vibe-sense-clamp\",\"vibe-sense-delta\",\"vibe-sense-ema\",\"vibe-sense-macd\",\"vibe-sense-rsi\",\"vibe-sense-window-avg\",\"vibe-sense-window-max\",\"vibe-sense-window-min\",\"vibe-sense-window-sum\",\"vibe-sense-transformer-field-pick\",\"vibe-sense-transformer-json-path\",\"vibe-sense-transformer-merge\",\"vibe-sense-transformer-ratio\",\"vibe-sense-transformer-script\",\"browser-click\",\"browser-close-page\",\"browser-drag\",\"browser-emulate\",\"browser-eval\",\"browser-fill-form\",\"browser-fill\",\"browser-get-console-message\",\"browser-get-network-request\",\"browser-handle-dialog\",\"browser-hover\",\"browser-list-console-messages\",\"browser-list-network-requests\",\"browser-list-pages\",\"browser-navigate-page\",\"browser-new-page\",\"browser-performance-analyze-insight\",\"browser-performance-start-trace\",\"browser-performance-stop-trace\",\"browser-press-key\",\"browser-resize-page\",\"browser-select-page\",\"browser-screenshot\",\"browser-take-snapshot\",\"browser-upload-file\",\"browser-wait-for\",\"coa-account-deactivate\",\"coa-account-get\",\"coa-account-update\",\"coa-account-create\",\"coa-account-list\",\"accounting-dashboard\",\"coa-journal-entry-get\",\"coa-journal-post\",\"coa-journal-reverse\",\"coa-journal-create\",\"coa-journal-list\",\"coa-ledger\",\"coa-period-close\",\"coa-period-get\",\"coa-period-create\",\"coa-period-list\",\"coa-balance-sheet\",\"coa-profit-loss\",\"coa-receivables-aging\",\"coa-tax-report\",\"coa-trial-balance\",\"coa-setup\",\"companies_companyId_get_GET\",\"companies_companyId_members_memberId_remove_POST\",\"companies_companyId_members_memberId_update-role_PATCH\",\"companies_companyId_members_invite_POST\",\"company-members-list\",\"companies_companyId_onboard_POST\",\"companies_companyId_update_PATCH\",\"companies_create_POST\",\"companies-list\",\"contact-form\",\"credits_admin-add_POST\",\"credits-avg-transaction\",\"credits-balance-total\",\"credits-earned\",\"credits-expired\",\"credits-free-grants\",\"credits-free-pool-utilization\",\"credits-packs-created\",\"credits-purchased\",\"credits-refunded\",\"credits-spent-by-leads\",\"credits-spent-by-users\",\"credits-spent-total\",\"credits-subscription-revenue\",\"credits-transactions-count\",\"credits-transfer-volume\",\"credits-usage-with-feature\",\"credits-wallets-total\",\"credits-balance\",\"credits_history_GET\",\"credits-public-cap\",\"credits_purchase_POST\",\"desktop-click\",\"desktop-focus-window\",\"desktop-accessibility\",\"desktop-get-focused-window\",\"desktop-list-monitors\",\"desktop-list-windows\",\"desktop-move-mouse\",\"desktop-move-window-to-monitor\",\"desktop-press-key\",\"desktop-scroll\",\"desktop-screenshot\",\"desktop-type-text\",\"cluster-init\",\"cluster-status\",\"deploy-preview\",\"deploy\",\"scale\",\"inventory-dashboard\",\"inventory_stock_adjust_POST\",\"inventory_stock_issue_POST\",\"inventory-stock\",\"inventory_stock_receive_POST\",\"inventory_transfer_transferId_dispatch_POST\",\"inventory_transfer_transferId_get_GET\",\"inventory_transfer_transferId_receive_POST\",\"inventory_transfer_create_POST\",\"inventory-transfers\",\"inventory_warehouse_warehouseId_get_GET\",\"inventory_warehouse_warehouseId_update_PATCH\",\"inventory_warehouse_create_POST\",\"inventory-warehouses\",\"lead-magnet_captures_GET\",\"lead-magnet_config_GET\",\"lead-magnet_config_DELETE\",\"lead-magnet_providers_acumbamail_POST\",\"lead-magnet_providers_adobecampaign_POST\",\"lead-magnet_providers_cleverreach_POST\",\"lead-magnet_providers_connectif_POST\",\"lead-magnet_providers_datanext_POST\",\"lead-magnet_providers_edrone_POST\",\"lead-magnet_providers_emarsys_POST\",\"lead-magnet_providers_expertsender_POST\",\"lead-magnet_providers_freshmail_POST\",\"lead-magnet_providers_getresponse_POST\",\"lead-magnet_providers_google-sheets_POST\",\"lead-magnet_providers_google-sheets_sheets-list_GET\",\"lead-magnet_providers_klaviyo_POST\",\"lead-magnet_providers_mailup_POST\",\"lead-magnet_providers_mapp_POST\",\"lead-magnet_providers_platform-email_POST\",\"lead-magnet_providers_sailthru_POST\",\"lead-magnet_providers_salesmanago_POST\",\"lead-magnet_providers_shopify_POST\",\"lead-magnet_providers_spotler_POST\",\"lead-magnet_providers_youlead_POST\",\"leads_batch_PATCH\",\"leads_batch_DELETE\",\"leads_campaigns_bounce-processor_GET\",\"bounce-processor\",\"leads_campaigns_campaign-starter_GET\",\"campaign-starter\",\"leads_campaigns_email-campaigns_GET\",\"email-campaigns\",\"leads_campaigns_emails_test-mail_POST\",\"leads_campaigns_halt-all_POST\",\"campaign-journey-variants\",\"leads_campaigns_journey-variants_POST\",\"leads_campaigns_journey-variants_PATCH\",\"campaign-queue\",\"campaign-stats\",\"leads_create_POST\",\"leads-dashboard\",\"leads-active\",\"leads-bounced\",\"leads-campaign-running\",\"leads-converted\",\"leads-created\",\"leads-email-clicks\",\"leads-email-opens\",\"leads-emails-sent\",\"leads-engagements\",\"leads-form-submits\",\"leads-in-contact\",\"leads-newsletter-subscribers\",\"leads-unsubscribed\",\"leads-website-users\",\"leads-website-visits\",\"leads_export_GET\",\"leads-import\",\"leads_import_jobs_:jobId_GET\",\"leads_import_jobs_:jobId_PATCH\",\"leads_import_jobs_:jobId_DELETE\",\"leads_import_jobs_:jobId_retry_POST\",\"leads_import_jobs_:jobId_stop_POST\",\"leads_import_process_POST\",\"leads-import-status\",\"leads_lead_id_GET\",\"leads_lead_id_PATCH\",\"leads_lead_id_DELETE\",\"leads-list\",\"leads-search\",\"leads-stats\",\"messenger_accounts_create_POST\",\"messenger_accounts_edit_id_GET\",\"messenger_accounts_edit_id_PUT\",\"messenger_accounts_edit_id_DELETE\",\"messenger-accounts\",\"messenger-bounced\",\"messenger-clicked\",\"messenger-delivered\",\"messenger-opened\",\"messenger-sent\",\"messenger-total\",\"messenger_inbox_folders_GET\",\"messenger-inbox\",\"messenger_inbox_mark-read_POST\",\"messenger_inbox_move_POST\",\"messenger_messages_id_GET\",\"messenger-messages\",\"email-stats\",\"messenger_preview_render_POST\",\"messenger_preview_send-test_POST\",\"messenger-imap-sync\",\"messenger_send_POST\",\"newsletter-campaigns-sent\",\"newsletter-events-total\",\"newsletter-subscriptions-new\",\"newsletter-unsubscribes\",\"newsletter-status\",\"newsletter-subscribe\",\"newsletter-unsubscribe\",\"payment_bill_billId_approve_POST\",\"payment-bill-get\",\"payment_bill_billId_pay_POST\",\"payment_bill_create_POST\",\"payment_bill_line_add_POST\",\"payment-bill-list\",\"payment_checkout_POST\",\"payment_credit-note_create_POST\",\"payment-dashboard\",\"payments-count\",\"payments-disputes-count\",\"payments-failed\",\"payments-invoices-paid\",\"payments-methods-added\",\"payments-refund-count\",\"payments-refund-volume\",\"payments-revenue\",\"payment_estimate_estimateId_accept_POST\",\"payment_estimate_estimateId_convert-to-invoice_POST\",\"payment_estimate_estimateId_decline_POST\",\"payment_estimate_estimateId_duplicate_POST\",\"payment-estimate-get\",\"payment_estimate_estimateId_send_POST\",\"payment_estimate_create_POST\",\"payment_estimate_line_lineId_remove_POST\",\"payment_estimate_line_add_POST\",\"payment-estimate-list\",\"payment_invoice_invoiceId_duplicate_POST\",\"payment-invoice-get\",\"payment_invoice_invoiceId_public-view_GET\",\"payment_invoice_invoiceId_record-payment_POST\",\"payment_invoice_invoiceId_send-reminder_POST\",\"payment_invoice_invoiceId_send_POST\",\"payment_invoice_invoiceId_void_POST\",\"payment_invoice_create_POST\",\"payment_invoice_line_lineId_remove_POST\",\"payment_invoice_line_add_POST\",\"payment-invoice-list\",\"pos-dashboard\",\"pos_order_orderId_add-item_POST\",\"pos_order_orderId_add-payment_POST\",\"pos_order_orderId_complete_POST\",\"pos-order-get\",\"pos_order_orderId_remove-item_POST\",\"pos_order_orderId_void_POST\",\"pos_order_create_POST\",\"pos-order-list\",\"pos-product-lookup\",\"pos_session_sessionId_get_GET\",\"pos_session_close_POST\",\"pos-session-open\",\"pos_terminal_create_POST\",\"pos-terminals\",\"products_catalog_productId_deactivate_POST\",\"catalog-product-get\",\"products_catalog_productId_update_PATCH\",\"products_catalog_create_POST\",\"products-catalog-list\",\"products_category_create_POST\",\"products-category-list\",\"purchasing-dashboard\",\"purchasing_order_poId_cancel_POST\",\"purchasing_order_poId_confirm_POST\",\"purchasing_order_poId_convert-to-bill_POST\",\"purchasing_order_poId_get_GET\",\"purchasing_order_poId_receive_POST\",\"purchasing_order_poId_send_POST\",\"purchasing_order_poId_update_PATCH\",\"purchasing_order_create_POST\",\"purchasing_order_line_add_POST\",\"purchasing_order_line_remove_POST\",\"purchasing-orders\",\"purchasing_vendor_vendorId_deactivate_POST\",\"purchasing-vendor-get\",\"purchasing_vendor_vendorId_update_PATCH\",\"purchasing_vendor_create_POST\",\"purchasing-vendors\",\"referral_admin_payouts_GET\",\"referral_admin_payouts_POST\",\"referral_codes_list_GET\",\"referrals-codes-created\",\"referrals-conversion-rate\",\"referrals-earnings-volume\",\"referrals-lead-clicks\",\"referrals-payouts\",\"referrals-signups\",\"referral_POST\",\"referral_earnings_list_GET\",\"referral_payout_GET\",\"referral_payout_POST\",\"referral-stats\",\"remote-status\",\"remote-connection_instanceId_PATCH\",\"remote-connection_instanceId_DELETE\",\"remote-connect\",\"remote-connections\",\"remote-connection_register_POST\",\"rename-self\",\"system_unified-interface_tasks_task-sync_report_POST\",\"sync-trigger-pull\",\"ssh_connections_id_GET\",\"ssh_connections_id_PATCH\",\"ssh_connections_id_DELETE\",\"ssh-mount\",\"ssh-mount-update\",\"ssh-mount-delete\",\"ssh-mount-create\",\"ssh-mount-list\",\"ssh_connections_create_POST\",\"ssh-connections-list\",\"ssh_connections_test_POST\",\"ssh_linux_users_username_DELETE\",\"ssh_linux_users_create_POST\",\"ssh_linux_users_list_GET\",\"subscription-admin-list\",\"subscription-admin-purchases\",\"subscription-admin-referrals\",\"subscription_admin_referrals_POST\",\"subscription-admin-stats\",\"subscription-cancel\",\"subscription_company_companyId_get_GET\",\"subscription_company_companyId_list_GET\",\"subscription_create_POST\",\"subscription-dashboard\",\"subscriptions-active\",\"subscriptions-cancelled\",\"subscriptions-churned\",\"subscriptions-new\",\"subscriptions-payment-failed\",\"subscriptions-trialing\",\"subscription_GET\",\"subscription-update\",\"db-health\",\"error-logs\",\"update-error-log\",\"tool-help\",\"health\",\"system-settings\",\"unbottled-login\",\"init\",\"generate-key\",\"update\",\"cron-executions-failed\",\"cron-executions-succeeded\",\"cron-executions-total\",\"error-logs-errors\",\"error-logs-total\",\"error-logs-warnings\",\"execute-tool\",\"generate:expo\",\"generate:tanstack\",\"complete-task\",\"cron-get\",\"cron-update\",\"cron-delete\",\"system_unified-interface_tasks_cron_bulk_POST\",\"cron-history\",\"cron-queue\",\"cron-stats\",\"task-list\",\"cron-create\",\"execute-task\",\"wait-for-task\",\"system_unified-interface_vibe-sense_cleanup_POST\",\"system_unified-interface_vibe-sense_graphs_id_archive_POST\",\"system_unified-interface_vibe-sense_graphs_id_backtest_POST\",\"system_unified-interface_vibe-sense_graphs_id_data_GET\",\"system_unified-interface_vibe-sense_graphs_id_edit_PUT\",\"system_unified-interface_vibe-sense_graphs_id_promote_POST\",\"system_unified-interface_vibe-sense_graphs_id_trigger_POST\",\"system_unified-interface_vibe-sense_graphs_id_versions_GET\",\"vibe-sense-graphs\",\"system_unified-interface_vibe-sense_graphs_POST\",\"vibe-sense-run-config\",\"tax_rate_rateId_delete_POST\",\"tax_rate_rateId_update_PATCH\",\"tax_rate_create_POST\",\"tax_rate_list_GET\",\"tax_report_GET\",\"users-active-total\",\"users-banned\",\"users-email-verified\",\"users-login-attempts-failed\",\"users-login-attempts-total\",\"users-marketing-consent\",\"users-registered\",\"users-two-fa-enabled\",\"users-with-stripe\",\"user_private_me_addresses_addressId_PATCH\",\"user_private_me_addresses_addressId_DELETE\",\"user_private_me_addresses_GET\",\"user_private_me_addresses_POST\",\"user-me\",\"user_private_me_POST\",\"users_create_POST\",\"users-list\",\"users-stats\",\"users_user_id_GET\",\"users_user_id_PUT\",\"users_user_id_DELETE\",\"users_user_id_roles_POST\",\"users_user_id_roles_DELETE\",\"users-view\"],\"allowedCount\":526,\"cliAllowedCount\":607,\"currentEnv\":\"development\",\"currentPlatform\":\"ai\",\"hint\":\"Call as: execute-tool toolName=\\\"web-search\\\". CLI: vibe web-search [--field=value].\",\"matchedCount\":1,\"mcpAllowedCount\":601,\"mcpPinnedCount\":3,\"pinnedCount\":16,\"skillAllowedDefault\":null,\"skillPinnedDefault\":null,\"tools\":[{\"category\":\"ai\",\"credits\":0.65,\"description\":\"Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider.\",\"examples\":{\"inputs\":{\"default\":{\"query\":\"latest AI news\"},\"withOptions\":{\"freshness\":\"past_day\",\"maxResults\":10,\"query\":\"tech updates\"},\"withProvider\":{\"provider\":\"enums.provider.KAGI\",\"query\":\"quantum computing explained\"}},\"responses\":{\"default\":{\"results\":[{\"age\":\"2 hours ago\",\"snippet\":\"OpenAI announces the next generation of language models...\",\"source\":\"TechNews\",\"title\":\"Breaking: GPT-5 Announced\",\"url\":\"https://example.com/gpt5\"}],\"usedProvider\":\"enums.provider.BRAVE\"},\"withAiAnswer\":{\"output\":\"Quantum computing is a type of computing that uses quantum-mechanical phenomena...\",\"results\":[{\"snippet\":\"An introduction to quantum computing principles...\",\"title\":\"Quantum Computing Explained\",\"url\":\"https://example.com/quantum\"}],\"usedProvider\":\"enums.provider.KAGI\"}}},\"icon\":\"search\",\"id\":\"web-search\",\"method\":\"GET\",\"name\":\"web-search\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"properties\":{\"freshness\":{\"description\":\"Filter results by how recent they are. Brave only.\",\"enum\":[\"past_day\",\"past_week\",\"past_month\",\"past_year\"],\"type\":\"string\"},\"includeNews\":{\"default\":false,\"description\":\"Include news results for current events. Brave only.\",\"type\":\"boolean\"},\"maxResults\":{\"default\":5,\"description\":\"Number of results to return (1-10). Brave only.\",\"maximum\":10,\"minimum\":1,\"type\":\"number\"},\"provider\":{\"default\":\"enums.provider.BRAVE\",\"description\":\"Which search engine to use. Auto picks your default or the cheapest available.\",\"enum\":[\"enums.provider.AUTO\",\"enums.provider.BRAVE\",\"enums.provider.KAGI\"],\"type\":\"string\"},\"query\":{\"description\":\"Clear and specific search query. Use keywords rather than questions.\",\"maxLength\":400,\"minLength\":1,\"type\":\"string\"}},\"required\":[\"query\"],\"type\":\"object\"},\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Search\",\"tags\":[\"Search\",\"Web\",\"Internet\"],\"title\":\"Search the Web\",\"titleShort\":\"Web Search\"}],\"totalCount\":607,\"webPinnedCount\":72}",
+        "name": "tool-help",
+        "role": "tool",
+        "tool_call_id": "functions.tool-help:0"
+      },
+      {
+        "content": "{\"allAiToolIds\":[\"ai-run\",\"system-prompt-debug\",\"chat-downvotes-total\",\"chat-errors-total\",\"chat-memories-created\",\"chat-messages-by-ai\",\"chat-messages-by-user\",\"chat-messages-total\",\"chat-messages-with-attachments\",\"chat-share-links-created\",\"chat-threads-active-total\",\"chat-threads-created\",\"chat-tool-calls-total\",\"chat-unique-users\",\"chat-upvotes-total\",\"favorite-get\",\"favorite-update\",\"favorite-delete\",\"favorite-create\",\"favorites\",\"favorites-reorder\",\"folder-contents\",\"folder-create\",\"folders-list\",\"folder-permissions\",\"folder-get\",\"folder-delete\",\"folder-move\",\"agent_chat_folders_subfolders_subFolderId_permissions_GET\",\"agent_chat_folders_subfolders_subFolderId_permissions_PATCH\",\"folder-rename\",\"folder-update\",\"agent_chat_public-feed_GET\",\"chat-settings\",\"chat-settings-update\",\"skill-get\",\"skill-update\",\"skill-delete\",\"skill-publish\",\"skill-report\",\"skill-vote\",\"skill-create\",\"skills\",\"skill-moderation\",\"agent_chat_skills_moderation_PATCH\",\"agent_chat_threads_threadId_GET\",\"agent_chat_threads_threadId_PATCH\",\"agent_chat_threads_threadId_DELETE\",\"agent_chat_threads_threadId_messages_messageId_GET\",\"agent_chat_threads_threadId_messages_messageId_PATCH\",\"agent_chat_threads_threadId_messages_messageId_DELETE\",\"agent_chat_threads_threadId_messages_messageId_vote_POST\",\"thread-messages\",\"agent_chat_threads_threadId_messages_POST\",\"agent_chat_threads_threadId_messages_path_GET\",\"agent_chat_threads_threadId_messages_search_GET\",\"agent_chat_threads_threadId_permissions_GET\",\"agent_chat_threads_threadId_permissions_PATCH\",\"thread-share-links\",\"agent_chat_threads_threadId_share-links_POST\",\"agent_chat_threads_threadId_share-links_PATCH\",\"agent_chat_threads_threadId_share-links_DELETE\",\"agent-chat-threads\",\"agent_chat_threads_POST\",\"agent_chat_threads_rename_PATCH\",\"agent-search-messages\",\"agent-search-threads\",\"coding-agent\",\"cortex-delete\",\"cortex-edit\",\"cortex-embed-backfill\",\"cortex-exec\",\"cortex-list\",\"cortex-mkdir\",\"cortex-move\",\"cortex-read\",\"cortex-search\",\"cortex-terminals\",\"cortex-tree\",\"cortex-write\",\"describe_image\",\"describe_video\",\"fetch-url-content\",\"generate_image\",\"models\",\"generate_music\",\"brave-search\",\"kagi-search\",\"web-search\",\"generate_video\",\"agent-view-image\",\"vibe-sense-evaluator-and\",\"vibe-sense-evaluator-crossover\",\"vibe-sense-evaluator-not\",\"vibe-sense-evaluator-or\",\"vibe-sense-evaluator-script\",\"vibe-sense-evaluator-threshold\",\"vibe-sense-bollinger\",\"vibe-sense-clamp\",\"vibe-sense-delta\",\"vibe-sense-ema\",\"vibe-sense-macd\",\"vibe-sense-rsi\",\"vibe-sense-window-avg\",\"vibe-sense-window-max\",\"vibe-sense-window-min\",\"vibe-sense-window-sum\",\"vibe-sense-transformer-field-pick\",\"vibe-sense-transformer-json-path\",\"vibe-sense-transformer-merge\",\"vibe-sense-transformer-ratio\",\"vibe-sense-transformer-script\",\"browser-click\",\"browser-close-page\",\"browser-drag\",\"browser-emulate\",\"browser-eval\",\"browser-fill-form\",\"browser-fill\",\"browser-get-console-message\",\"browser-get-network-request\",\"browser-handle-dialog\",\"browser-hover\",\"browser-list-console-messages\",\"browser-list-network-requests\",\"browser-list-pages\",\"browser-navigate-page\",\"browser-new-page\",\"browser-performance-analyze-insight\",\"browser-performance-start-trace\",\"browser-performance-stop-trace\",\"browser-press-key\",\"browser-resize-page\",\"browser-select-page\",\"browser-screenshot\",\"browser-take-snapshot\",\"browser-upload-file\",\"browser-wait-for\",\"coa-account-deactivate\",\"coa-account-get\",\"coa-account-update\",\"coa-account-create\",\"coa-account-list\",\"accounting-dashboard\",\"coa-journal-entry-get\",\"coa-journal-post\",\"coa-journal-reverse\",\"coa-journal-create\",\"coa-journal-list\",\"coa-ledger\",\"coa-period-close\",\"coa-period-get\",\"coa-period-create\",\"coa-period-list\",\"coa-balance-sheet\",\"coa-profit-loss\",\"coa-receivables-aging\",\"coa-tax-report\",\"coa-trial-balance\",\"coa-setup\",\"companies_companyId_get_GET\",\"companies_companyId_members_memberId_remove_POST\",\"companies_companyId_members_memberId_update-role_PATCH\",\"companies_companyId_members_invite_POST\",\"company-members-list\",\"companies_companyId_onboard_POST\",\"companies_companyId_update_PATCH\",\"companies_create_POST\",\"companies-list\",\"contact-form\",\"credits_admin-add_POST\",\"credits-avg-transaction\",\"credits-balance-total\",\"credits-earned\",\"credits-expired\",\"credits-free-grants\",\"credits-free-pool-utilization\",\"credits-packs-created\",\"credits-purchased\",\"credits-refunded\",\"credits-spent-by-leads\",\"credits-spent-by-users\",\"credits-spent-total\",\"credits-subscription-revenue\",\"credits-transactions-count\",\"credits-transfer-volume\",\"credits-usage-with-feature\",\"credits-wallets-total\",\"credits-balance\",\"credits_history_GET\",\"credits-public-cap\",\"credits_purchase_POST\",\"desktop-click\",\"desktop-focus-window\",\"desktop-accessibility\",\"desktop-get-focused-window\",\"desktop-list-monitors\",\"desktop-list-windows\",\"desktop-move-mouse\",\"desktop-move-window-to-monitor\",\"desktop-press-key\",\"desktop-scroll\",\"desktop-screenshot\",\"desktop-type-text\",\"cluster-init\",\"cluster-status\",\"deploy-preview\",\"deploy\",\"scale\",\"inventory-dashboard\",\"inventory_stock_adjust_POST\",\"inventory_stock_issue_POST\",\"inventory-stock\",\"inventory_stock_receive_POST\",\"inventory_transfer_transferId_dispatch_POST\",\"inventory_transfer_transferId_get_GET\",\"inventory_transfer_transferId_receive_POST\",\"inventory_transfer_create_POST\",\"inventory-transfers\",\"inventory_warehouse_warehouseId_get_GET\",\"inventory_warehouse_warehouseId_update_PATCH\",\"inventory_warehouse_create_POST\",\"inventory-warehouses\",\"lead-magnet_captures_GET\",\"lead-magnet_config_GET\",\"lead-magnet_config_DELETE\",\"lead-magnet_providers_acumbamail_POST\",\"lead-magnet_providers_adobecampaign_POST\",\"lead-magnet_providers_cleverreach_POST\",\"lead-magnet_providers_connectif_POST\",\"lead-magnet_providers_datanext_POST\",\"lead-magnet_providers_edrone_POST\",\"lead-magnet_providers_emarsys_POST\",\"lead-magnet_providers_expertsender_POST\",\"lead-magnet_providers_freshmail_POST\",\"lead-magnet_providers_getresponse_POST\",\"lead-magnet_providers_google-sheets_POST\",\"lead-magnet_providers_google-sheets_sheets-list_GET\",\"lead-magnet_providers_klaviyo_POST\",\"lead-magnet_providers_mailup_POST\",\"lead-magnet_providers_mapp_POST\",\"lead-magnet_providers_platform-email_POST\",\"lead-magnet_providers_sailthru_POST\",\"lead-magnet_providers_salesmanago_POST\",\"lead-magnet_providers_shopify_POST\",\"lead-magnet_providers_spotler_POST\",\"lead-magnet_providers_youlead_POST\",\"leads_batch_PATCH\",\"leads_batch_DELETE\",\"leads_campaigns_bounce-processor_GET\",\"bounce-processor\",\"leads_campaigns_campaign-starter_GET\",\"campaign-starter\",\"leads_campaigns_email-campaigns_GET\",\"email-campaigns\",\"leads_campaigns_emails_test-mail_POST\",\"leads_campaigns_halt-all_POST\",\"campaign-journey-variants\",\"leads_campaigns_journey-variants_POST\",\"leads_campaigns_journey-variants_PATCH\",\"campaign-queue\",\"campaign-stats\",\"leads_create_POST\",\"leads-dashboard\",\"leads-active\",\"leads-bounced\",\"leads-campaign-running\",\"leads-converted\",\"leads-created\",\"leads-email-clicks\",\"leads-email-opens\",\"leads-emails-sent\",\"leads-engagements\",\"leads-form-submits\",\"leads-in-contact\",\"leads-newsletter-subscribers\",\"leads-unsubscribed\",\"leads-website-users\",\"leads-website-visits\",\"leads_export_GET\",\"leads-import\",\"leads_import_jobs_:jobId_GET\",\"leads_import_jobs_:jobId_PATCH\",\"leads_import_jobs_:jobId_DELETE\",\"leads_import_jobs_:jobId_retry_POST\",\"leads_import_jobs_:jobId_stop_POST\",\"leads_import_process_POST\",\"leads-import-status\",\"leads_lead_id_GET\",\"leads_lead_id_PATCH\",\"leads_lead_id_DELETE\",\"leads-list\",\"leads-search\",\"leads-stats\",\"messenger_accounts_create_POST\",\"messenger_accounts_edit_id_GET\",\"messenger_accounts_edit_id_PUT\",\"messenger_accounts_edit_id_DELETE\",\"messenger-accounts\",\"messenger-bounced\",\"messenger-clicked\",\"messenger-delivered\",\"messenger-opened\",\"messenger-sent\",\"messenger-total\",\"messenger_inbox_folders_GET\",\"messenger-inbox\",\"messenger_inbox_mark-read_POST\",\"messenger_inbox_move_POST\",\"messenger_messages_id_GET\",\"messenger-messages\",\"email-stats\",\"messenger_preview_render_POST\",\"messenger_preview_send-test_POST\",\"messenger-imap-sync\",\"messenger_send_POST\",\"newsletter-campaigns-sent\",\"newsletter-events-total\",\"newsletter-subscriptions-new\",\"newsletter-unsubscribes\",\"newsletter-status\",\"newsletter-subscribe\",\"newsletter-unsubscribe\",\"payment_bill_billId_approve_POST\",\"payment-bill-get\",\"payment_bill_billId_pay_POST\",\"payment_bill_create_POST\",\"payment_bill_line_add_POST\",\"payment-bill-list\",\"payment_checkout_POST\",\"payment_credit-note_create_POST\",\"payment-dashboard\",\"payments-count\",\"payments-disputes-count\",\"payments-failed\",\"payments-invoices-paid\",\"payments-methods-added\",\"payments-refund-count\",\"payments-refund-volume\",\"payments-revenue\",\"payment_estimate_estimateId_accept_POST\",\"payment_estimate_estimateId_convert-to-invoice_POST\",\"payment_estimate_estimateId_decline_POST\",\"payment_estimate_estimateId_duplicate_POST\",\"payment-estimate-get\",\"payment_estimate_estimateId_send_POST\",\"payment_estimate_create_POST\",\"payment_estimate_line_lineId_remove_POST\",\"payment_estimate_line_add_POST\",\"payment-estimate-list\",\"payment_invoice_invoiceId_duplicate_POST\",\"payment-invoice-get\",\"payment_invoice_invoiceId_public-view_GET\",\"payment_invoice_invoiceId_record-payment_POST\",\"payment_invoice_invoiceId_send-reminder_POST\",\"payment_invoice_invoiceId_send_POST\",\"payment_invoice_invoiceId_void_POST\",\"payment_invoice_create_POST\",\"payment_invoice_line_lineId_remove_POST\",\"payment_invoice_line_add_POST\",\"payment-invoice-list\",\"pos-dashboard\",\"pos_order_orderId_add-item_POST\",\"pos_order_orderId_add-payment_POST\",\"pos_order_orderId_complete_POST\",\"pos-order-get\",\"pos_order_orderId_remove-item_POST\",\"pos_order_orderId_void_POST\",\"pos_order_create_POST\",\"pos-order-list\",\"pos-product-lookup\",\"pos_session_sessionId_get_GET\",\"pos_session_close_POST\",\"pos-session-open\",\"pos_terminal_create_POST\",\"pos-terminals\",\"products_catalog_productId_deactivate_POST\",\"catalog-product-get\",\"products_catalog_productId_update_PATCH\",\"products_catalog_create_POST\",\"products-catalog-list\",\"products_category_create_POST\",\"products-category-list\",\"purchasing-dashboard\",\"purchasing_order_poId_cancel_POST\",\"purchasing_order_poId_confirm_POST\",\"purchasing_order_poId_convert-to-bill_POST\",\"purchasing_order_poId_get_GET\",\"purchasing_order_poId_receive_POST\",\"purchasing_order_poId_send_POST\",\"purchasing_order_poId_update_PATCH\",\"purchasing_order_create_POST\",\"purchasing_order_line_add_POST\",\"purchasing_order_line_remove_POST\",\"purchasing-orders\",\"purchasing_vendor_vendorId_deactivate_POST\",\"purchasing-vendor-get\",\"purchasing_vendor_vendorId_update_PATCH\",\"purchasing_vendor_create_POST\",\"purchasing-vendors\",\"referral_admin_payouts_GET\",\"referral_admin_payouts_POST\",\"referral_codes_list_GET\",\"referrals-codes-created\",\"referrals-conversion-rate\",\"referrals-earnings-volume\",\"referrals-lead-clicks\",\"referrals-payouts\",\"referrals-signups\",\"referral_POST\",\"referral_earnings_list_GET\",\"referral_payout_GET\",\"referral_payout_POST\",\"referral-stats\",\"remote-status\",\"remote-connection_instanceId_PATCH\",\"remote-connection_instanceId_DELETE\",\"remote-connect\",\"remote-connections\",\"remote-connection_register_POST\",\"rename-self\",\"system_unified-interface_tasks_task-sync_report_POST\",\"sync-trigger-pull\",\"ssh_connections_id_GET\",\"ssh_connections_id_PATCH\",\"ssh_connections_id_DELETE\",\"ssh-mount\",\"ssh-mount-update\",\"ssh-mount-delete\",\"ssh-mount-create\",\"ssh-mount-list\",\"ssh_connections_create_POST\",\"ssh-connections-list\",\"ssh_connections_test_POST\",\"ssh_linux_users_username_DELETE\",\"ssh_linux_users_create_POST\",\"ssh_linux_users_list_GET\",\"subscription-admin-list\",\"subscription-admin-purchases\",\"subscription-admin-referrals\",\"subscription_admin_referrals_POST\",\"subscription-admin-stats\",\"subscription-cancel\",\"subscription_company_companyId_get_GET\",\"subscription_company_companyId_list_GET\",\"subscription_create_POST\",\"subscription-dashboard\",\"subscriptions-active\",\"subscriptions-cancelled\",\"subscriptions-churned\",\"subscriptions-new\",\"subscriptions-payment-failed\",\"subscriptions-trialing\",\"subscription_GET\",\"subscription-update\",\"db-health\",\"error-logs\",\"update-error-log\",\"tool-help\",\"health\",\"system-settings\",\"unbottled-login\",\"init\",\"generate-key\",\"update\",\"cron-executions-failed\",\"cron-executions-succeeded\",\"cron-executions-total\",\"error-logs-errors\",\"error-logs-total\",\"error-logs-warnings\",\"execute-tool\",\"generate:expo\",\"generate:tanstack\",\"complete-task\",\"cron-get\",\"cron-update\",\"cron-delete\",\"system_unified-interface_tasks_cron_bulk_POST\",\"cron-history\",\"cron-queue\",\"cron-stats\",\"task-list\",\"cron-create\",\"execute-task\",\"wait-for-task\",\"system_unified-interface_vibe-sense_cleanup_POST\",\"system_unified-interface_vibe-sense_graphs_id_archive_POST\",\"system_unified-interface_vibe-sense_graphs_id_backtest_POST\",\"system_unified-interface_vibe-sense_graphs_id_data_GET\",\"system_unified-interface_vibe-sense_graphs_id_edit_PUT\",\"system_unified-interface_vibe-sense_graphs_id_promote_POST\",\"system_unified-interface_vibe-sense_graphs_id_trigger_POST\",\"system_unified-interface_vibe-sense_graphs_id_versions_GET\",\"vibe-sense-graphs\",\"system_unified-interface_vibe-sense_graphs_POST\",\"vibe-sense-run-config\",\"tax_rate_rateId_delete_POST\",\"tax_rate_rateId_update_PATCH\",\"tax_rate_create_POST\",\"tax_rate_list_GET\",\"tax_report_GET\",\"users-active-total\",\"users-banned\",\"users-email-verified\",\"users-login-attempts-failed\",\"users-login-attempts-total\",\"users-marketing-consent\",\"users-registered\",\"users-two-fa-enabled\",\"users-with-stripe\",\"user_private_me_addresses_addressId_PATCH\",\"user_private_me_addresses_addressId_DELETE\",\"user_private_me_addresses_GET\",\"user_private_me_addresses_POST\",\"user-me\",\"user_private_me_POST\",\"users_create_POST\",\"users-list\",\"users-stats\",\"users_user_id_GET\",\"users_user_id_PUT\",\"users_user_id_DELETE\",\"users_user_id_roles_POST\",\"users_user_id_roles_DELETE\",\"users-view\"],\"allowedCount\":526,\"cliAllowedCount\":607,\"currentEnv\":\"development\",\"currentPlatform\":\"ai\",\"hint\":\"Call as: execute-tool toolName=\\\"fetch-url-content\\\" (aliases: fetch, fetch-url). CLI: vibe fetch-url-content [--field=value].\",\"matchedCount\":1,\"mcpAllowedCount\":601,\"mcpPinnedCount\":3,\"pinnedCount\":16,\"skillAllowedDefault\":null,\"skillPinnedDefault\":null,\"tools\":[{\"aliases\":[\"fetch\",\"fetch-url\"],\"category\":\"ai\",\"credits\":0.13,\"description\":\"Fetch and extract content from any URL, converting it to readable markdown format. Use this when you need to read or analyze web page content.\",\"examples\":{\"inputs\":{\"blog\":{\"url\":\"https://blog.example.com/article\"},\"default\":{\"url\":\"https://example.com\"}},\"responses\":{\"blog\":{\"content\":\"# Article Title\\n\\nArticle content in markdown format...\",\"fetchedUrl\":\"https://blog.example.com/article\",\"message\":\"Successfully fetched content from: https://blog.example.com/article\",\"statusCode\":200,\"timeElapsed\":2345},\"default\":{\"content\":\"# Example Domain\\n\\nThis domain is for use in illustrative examples...\",\"fetchedUrl\":\"https://example.com\",\"message\":\"Successfully fetched content from: https://example.com\",\"statusCode\":200,\"timeElapsed\":1234}}},\"icon\":\"globe\",\"id\":\"fetch-url-content\",\"method\":\"GET\",\"name\":\"fetch-url-content\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"properties\":{\"query\":{\"description\":\"Regex filter applied after fetching. Only paragraphs matching the pattern are returned, ranked by match count, up to the character limit. Omit to get the full page (middle-truncated if large). Syntax: any JS regex - 'authentication', '(login|signup)', 'class\\\\s+\\\\w+'. Invalid regex falls back to literal match.\",\"type\":\"string\"},\"url\":{\"description\":\"The complete URL to fetch (must include http:// or https://)\",\"format\":\"uri\",\"minLength\":1,\"type\":\"string\"}},\"required\":[\"url\"],\"type\":\"object\"},\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Tools\",\"tags\":[\"Scraping\",\"Web\",\"Content\"],\"title\":\"Fetch URL Content\",\"titleShort\":\"Fetch URL\"}],\"totalCount\":607,\"webPinnedCount\":72}",
+        "name": "tool-help",
+        "role": "tool",
+        "tool_call_id": "functions.tool-help:1"
+      },
+      {
+        "content": "{\"allAiToolIds\":[\"ai-run\",\"system-prompt-debug\",\"chat-downvotes-total\",\"chat-errors-total\",\"chat-memories-created\",\"chat-messages-by-ai\",\"chat-messages-by-user\",\"chat-messages-total\",\"chat-messages-with-attachments\",\"chat-share-links-created\",\"chat-threads-active-total\",\"chat-threads-created\",\"chat-tool-calls-total\",\"chat-unique-users\",\"chat-upvotes-total\",\"favorite-get\",\"favorite-update\",\"favorite-delete\",\"favorite-create\",\"favorites\",\"favorites-reorder\",\"folder-contents\",\"folder-create\",\"folders-list\",\"folder-permissions\",\"folder-get\",\"folder-delete\",\"folder-move\",\"agent_chat_folders_subfolders_subFolderId_permissions_GET\",\"agent_chat_folders_subfolders_subFolderId_permissions_PATCH\",\"folder-rename\",\"folder-update\",\"agent_chat_public-feed_GET\",\"chat-settings\",\"chat-settings-update\",\"skill-get\",\"skill-update\",\"skill-delete\",\"skill-publish\",\"skill-report\",\"skill-vote\",\"skill-create\",\"skills\",\"skill-moderation\",\"agent_chat_skills_moderation_PATCH\",\"agent_chat_threads_threadId_GET\",\"agent_chat_threads_threadId_PATCH\",\"agent_chat_threads_threadId_DELETE\",\"agent_chat_threads_threadId_messages_messageId_GET\",\"agent_chat_threads_threadId_messages_messageId_PATCH\",\"agent_chat_threads_threadId_messages_messageId_DELETE\",\"agent_chat_threads_threadId_messages_messageId_vote_POST\",\"thread-messages\",\"agent_chat_threads_threadId_messages_POST\",\"agent_chat_threads_threadId_messages_path_GET\",\"agent_chat_threads_threadId_messages_search_GET\",\"agent_chat_threads_threadId_permissions_GET\",\"agent_chat_threads_threadId_permissions_PATCH\",\"thread-share-links\",\"agent_chat_threads_threadId_share-links_POST\",\"agent_chat_threads_threadId_share-links_PATCH\",\"agent_chat_threads_threadId_share-links_DELETE\",\"agent-chat-threads\",\"agent_chat_threads_POST\",\"agent_chat_threads_rename_PATCH\",\"agent-search-messages\",\"agent-search-threads\",\"coding-agent\",\"cortex-delete\",\"cortex-edit\",\"cortex-embed-backfill\",\"cortex-exec\",\"cortex-list\",\"cortex-mkdir\",\"cortex-move\",\"cortex-read\",\"cortex-search\",\"cortex-terminals\",\"cortex-tree\",\"cortex-write\",\"describe_image\",\"describe_video\",\"fetch-url-content\",\"generate_image\",\"models\",\"generate_music\",\"brave-search\",\"kagi-search\",\"web-search\",\"generate_video\",\"agent-view-image\",\"vibe-sense-evaluator-and\",\"vibe-sense-evaluator-crossover\",\"vibe-sense-evaluator-not\",\"vibe-sense-evaluator-or\",\"vibe-sense-evaluator-script\",\"vibe-sense-evaluator-threshold\",\"vibe-sense-bollinger\",\"vibe-sense-clamp\",\"vibe-sense-delta\",\"vibe-sense-ema\",\"vibe-sense-macd\",\"vibe-sense-rsi\",\"vibe-sense-window-avg\",\"vibe-sense-window-max\",\"vibe-sense-window-min\",\"vibe-sense-window-sum\",\"vibe-sense-transformer-field-pick\",\"vibe-sense-transformer-json-path\",\"vibe-sense-transformer-merge\",\"vibe-sense-transformer-ratio\",\"vibe-sense-transformer-script\",\"browser-click\",\"browser-close-page\",\"browser-drag\",\"browser-emulate\",\"browser-eval\",\"browser-fill-form\",\"browser-fill\",\"browser-get-console-message\",\"browser-get-network-request\",\"browser-handle-dialog\",\"browser-hover\",\"browser-list-console-messages\",\"browser-list-network-requests\",\"browser-list-pages\",\"browser-navigate-page\",\"browser-new-page\",\"browser-performance-analyze-insight\",\"browser-performance-start-trace\",\"browser-performance-stop-trace\",\"browser-press-key\",\"browser-resize-page\",\"browser-select-page\",\"browser-screenshot\",\"browser-take-snapshot\",\"browser-upload-file\",\"browser-wait-for\",\"coa-account-deactivate\",\"coa-account-get\",\"coa-account-update\",\"coa-account-create\",\"coa-account-list\",\"accounting-dashboard\",\"coa-journal-entry-get\",\"coa-journal-post\",\"coa-journal-reverse\",\"coa-journal-create\",\"coa-journal-list\",\"coa-ledger\",\"coa-period-close\",\"coa-period-get\",\"coa-period-create\",\"coa-period-list\",\"coa-balance-sheet\",\"coa-profit-loss\",\"coa-receivables-aging\",\"coa-tax-report\",\"coa-trial-balance\",\"coa-setup\",\"companies_companyId_get_GET\",\"companies_companyId_members_memberId_remove_POST\",\"companies_companyId_members_memberId_update-role_PATCH\",\"companies_companyId_members_invite_POST\",\"company-members-list\",\"companies_companyId_onboard_POST\",\"companies_companyId_update_PATCH\",\"companies_create_POST\",\"companies-list\",\"contact-form\",\"credits_admin-add_POST\",\"credits-avg-transaction\",\"credits-balance-total\",\"credits-earned\",\"credits-expired\",\"credits-free-grants\",\"credits-free-pool-utilization\",\"credits-packs-created\",\"credits-purchased\",\"credits-refunded\",\"credits-spent-by-leads\",\"credits-spent-by-users\",\"credits-spent-total\",\"credits-subscription-revenue\",\"credits-transactions-count\",\"credits-transfer-volume\",\"credits-usage-with-feature\",\"credits-wallets-total\",\"credits-balance\",\"credits_history_GET\",\"credits-public-cap\",\"credits_purchase_POST\",\"desktop-click\",\"desktop-focus-window\",\"desktop-accessibility\",\"desktop-get-focused-window\",\"desktop-list-monitors\",\"desktop-list-windows\",\"desktop-move-mouse\",\"desktop-move-window-to-monitor\",\"desktop-press-key\",\"desktop-scroll\",\"desktop-screenshot\",\"desktop-type-text\",\"cluster-init\",\"cluster-status\",\"deploy-preview\",\"deploy\",\"scale\",\"inventory-dashboard\",\"inventory_stock_adjust_POST\",\"inventory_stock_issue_POST\",\"inventory-stock\",\"inventory_stock_receive_POST\",\"inventory_transfer_transferId_dispatch_POST\",\"inventory_transfer_transferId_get_GET\",\"inventory_transfer_transferId_receive_POST\",\"inventory_transfer_create_POST\",\"inventory-transfers\",\"inventory_warehouse_warehouseId_get_GET\",\"inventory_warehouse_warehouseId_update_PATCH\",\"inventory_warehouse_create_POST\",\"inventory-warehouses\",\"lead-magnet_captures_GET\",\"lead-magnet_config_GET\",\"lead-magnet_config_DELETE\",\"lead-magnet_providers_acumbamail_POST\",\"lead-magnet_providers_adobecampaign_POST\",\"lead-magnet_providers_cleverreach_POST\",\"lead-magnet_providers_connectif_POST\",\"lead-magnet_providers_datanext_POST\",\"lead-magnet_providers_edrone_POST\",\"lead-magnet_providers_emarsys_POST\",\"lead-magnet_providers_expertsender_POST\",\"lead-magnet_providers_freshmail_POST\",\"lead-magnet_providers_getresponse_POST\",\"lead-magnet_providers_google-sheets_POST\",\"lead-magnet_providers_google-sheets_sheets-list_GET\",\"lead-magnet_providers_klaviyo_POST\",\"lead-magnet_providers_mailup_POST\",\"lead-magnet_providers_mapp_POST\",\"lead-magnet_providers_platform-email_POST\",\"lead-magnet_providers_sailthru_POST\",\"lead-magnet_providers_salesmanago_POST\",\"lead-magnet_providers_shopify_POST\",\"lead-magnet_providers_spotler_POST\",\"lead-magnet_providers_youlead_POST\",\"leads_batch_PATCH\",\"leads_batch_DELETE\",\"leads_campaigns_bounce-processor_GET\",\"bounce-processor\",\"leads_campaigns_campaign-starter_GET\",\"campaign-starter\",\"leads_campaigns_email-campaigns_GET\",\"email-campaigns\",\"leads_campaigns_emails_test-mail_POST\",\"leads_campaigns_halt-all_POST\",\"campaign-journey-variants\",\"leads_campaigns_journey-variants_POST\",\"leads_campaigns_journey-variants_PATCH\",\"campaign-queue\",\"campaign-stats\",\"leads_create_POST\",\"leads-dashboard\",\"leads-active\",\"leads-bounced\",\"leads-campaign-running\",\"leads-converted\",\"leads-created\",\"leads-email-clicks\",\"leads-email-opens\",\"leads-emails-sent\",\"leads-engagements\",\"leads-form-submits\",\"leads-in-contact\",\"leads-newsletter-subscribers\",\"leads-unsubscribed\",\"leads-website-users\",\"leads-website-visits\",\"leads_export_GET\",\"leads-import\",\"leads_import_jobs_:jobId_GET\",\"leads_import_jobs_:jobId_PATCH\",\"leads_import_jobs_:jobId_DELETE\",\"leads_import_jobs_:jobId_retry_POST\",\"leads_import_jobs_:jobId_stop_POST\",\"leads_import_process_POST\",\"leads-import-status\",\"leads_lead_id_GET\",\"leads_lead_id_PATCH\",\"leads_lead_id_DELETE\",\"leads-list\",\"leads-search\",\"leads-stats\",\"messenger_accounts_create_POST\",\"messenger_accounts_edit_id_GET\",\"messenger_accounts_edit_id_PUT\",\"messenger_accounts_edit_id_DELETE\",\"messenger-accounts\",\"messenger-bounced\",\"messenger-clicked\",\"messenger-delivered\",\"messenger-opened\",\"messenger-sent\",\"messenger-total\",\"messenger_inbox_folders_GET\",\"messenger-inbox\",\"messenger_inbox_mark-read_POST\",\"messenger_inbox_move_POST\",\"messenger_messages_id_GET\",\"messenger-messages\",\"email-stats\",\"messenger_preview_render_POST\",\"messenger_preview_send-test_POST\",\"messenger-imap-sync\",\"messenger_send_POST\",\"newsletter-campaigns-sent\",\"newsletter-events-total\",\"newsletter-subscriptions-new\",\"newsletter-unsubscribes\",\"newsletter-status\",\"newsletter-subscribe\",\"newsletter-unsubscribe\",\"payment_bill_billId_approve_POST\",\"payment-bill-get\",\"payment_bill_billId_pay_POST\",\"payment_bill_create_POST\",\"payment_bill_line_add_POST\",\"payment-bill-list\",\"payment_checkout_POST\",\"payment_credit-note_create_POST\",\"payment-dashboard\",\"payments-count\",\"payments-disputes-count\",\"payments-failed\",\"payments-invoices-paid\",\"payments-methods-added\",\"payments-refund-count\",\"payments-refund-volume\",\"payments-revenue\",\"payment_estimate_estimateId_accept_POST\",\"payment_estimate_estimateId_convert-to-invoice_POST\",\"payment_estimate_estimateId_decline_POST\",\"payment_estimate_estimateId_duplicate_POST\",\"payment-estimate-get\",\"payment_estimate_estimateId_send_POST\",\"payment_estimate_create_POST\",\"payment_estimate_line_lineId_remove_POST\",\"payment_estimate_line_add_POST\",\"payment-estimate-list\",\"payment_invoice_invoiceId_duplicate_POST\",\"payment-invoice-get\",\"payment_invoice_invoiceId_public-view_GET\",\"payment_invoice_invoiceId_record-payment_POST\",\"payment_invoice_invoiceId_send-reminder_POST\",\"payment_invoice_invoiceId_send_POST\",\"payment_invoice_invoiceId_void_POST\",\"payment_invoice_create_POST\",\"payment_invoice_line_lineId_remove_POST\",\"payment_invoice_line_add_POST\",\"payment-invoice-list\",\"pos-dashboard\",\"pos_order_orderId_add-item_POST\",\"pos_order_orderId_add-payment_POST\",\"pos_order_orderId_complete_POST\",\"pos-order-get\",\"pos_order_orderId_remove-item_POST\",\"pos_order_orderId_void_POST\",\"pos_order_create_POST\",\"pos-order-list\",\"pos-product-lookup\",\"pos_session_sessionId_get_GET\",\"pos_session_close_POST\",\"pos-session-open\",\"pos_terminal_create_POST\",\"pos-terminals\",\"products_catalog_productId_deactivate_POST\",\"catalog-product-get\",\"products_catalog_productId_update_PATCH\",\"products_catalog_create_POST\",\"products-catalog-list\",\"products_category_create_POST\",\"products-category-list\",\"purchasing-dashboard\",\"purchasing_order_poId_cancel_POST\",\"purchasing_order_poId_confirm_POST\",\"purchasing_order_poId_convert-to-bill_POST\",\"purchasing_order_poId_get_GET\",\"purchasing_order_poId_receive_POST\",\"purchasing_order_poId_send_POST\",\"purchasing_order_poId_update_PATCH\",\"purchasing_order_create_POST\",\"purchasing_order_line_add_POST\",\"purchasing_order_line_remove_POST\",\"purchasing-orders\",\"purchasing_vendor_vendorId_deactivate_POST\",\"purchasing-vendor-get\",\"purchasing_vendor_vendorId_update_PATCH\",\"purchasing_vendor_create_POST\",\"purchasing-vendors\",\"referral_admin_payouts_GET\",\"referral_admin_payouts_POST\",\"referral_codes_list_GET\",\"referrals-codes-created\",\"referrals-conversion-rate\",\"referrals-earnings-volume\",\"referrals-lead-clicks\",\"referrals-payouts\",\"referrals-signups\",\"referral_POST\",\"referral_earnings_list_GET\",\"referral_payout_GET\",\"referral_payout_POST\",\"referral-stats\",\"remote-status\",\"remote-connection_instanceId_PATCH\",\"remote-connection_instanceId_DELETE\",\"remote-connect\",\"remote-connections\",\"remote-connection_register_POST\",\"rename-self\",\"system_unified-interface_tasks_task-sync_report_POST\",\"sync-trigger-pull\",\"ssh_connections_id_GET\",\"ssh_connections_id_PATCH\",\"ssh_connections_id_DELETE\",\"ssh-mount\",\"ssh-mount-update\",\"ssh-mount-delete\",\"ssh-mount-create\",\"ssh-mount-list\",\"ssh_connections_create_POST\",\"ssh-connections-list\",\"ssh_connections_test_POST\",\"ssh_linux_users_username_DELETE\",\"ssh_linux_users_create_POST\",\"ssh_linux_users_list_GET\",\"subscription-admin-list\",\"subscription-admin-purchases\",\"subscription-admin-referrals\",\"subscription_admin_referrals_POST\",\"subscription-admin-stats\",\"subscription-cancel\",\"subscription_company_companyId_get_GET\",\"subscription_company_companyId_list_GET\",\"subscription_create_POST\",\"subscription-dashboard\",\"subscriptions-active\",\"subscriptions-cancelled\",\"subscriptions-churned\",\"subscriptions-new\",\"subscriptions-payment-failed\",\"subscriptions-trialing\",\"subscription_GET\",\"subscription-update\",\"db-health\",\"error-logs\",\"update-error-log\",\"tool-help\",\"health\",\"system-settings\",\"unbottled-login\",\"init\",\"generate-key\",\"update\",\"cron-executions-failed\",\"cron-executions-succeeded\",\"cron-executions-total\",\"error-logs-errors\",\"error-logs-total\",\"error-logs-warnings\",\"execute-tool\",\"generate:expo\",\"generate:tanstack\",\"complete-task\",\"cron-get\",\"cron-update\",\"cron-delete\",\"system_unified-interface_tasks_cron_bulk_POST\",\"cron-history\",\"cron-queue\",\"cron-stats\",\"task-list\",\"cron-create\",\"execute-task\",\"wait-for-task\",\"system_unified-interface_vibe-sense_cleanup_POST\",\"system_unified-interface_vibe-sense_graphs_id_archive_POST\",\"system_unified-interface_vibe-sense_graphs_id_backtest_POST\",\"system_unified-interface_vibe-sense_graphs_id_data_GET\",\"system_unified-interface_vibe-sense_graphs_id_edit_PUT\",\"system_unified-interface_vibe-sense_graphs_id_promote_POST\",\"system_unified-interface_vibe-sense_graphs_id_trigger_POST\",\"system_unified-interface_vibe-sense_graphs_id_versions_GET\",\"vibe-sense-graphs\",\"system_unified-interface_vibe-sense_graphs_POST\",\"vibe-sense-run-config\",\"tax_rate_rateId_delete_POST\",\"tax_rate_rateId_update_PATCH\",\"tax_rate_create_POST\",\"tax_rate_list_GET\",\"tax_report_GET\",\"users-active-total\",\"users-banned\",\"users-email-verified\",\"users-login-attempts-failed\",\"users-login-attempts-total\",\"users-marketing-consent\",\"users-registered\",\"users-two-fa-enabled\",\"users-with-stripe\",\"user_private_me_addresses_addressId_PATCH\",\"user_private_me_addresses_addressId_DELETE\",\"user_private_me_addresses_GET\",\"user_private_me_addresses_POST\",\"user-me\",\"user_private_me_POST\",\"users_create_POST\",\"users-list\",\"users-stats\",\"users_user_id_GET\",\"users_user_id_PUT\",\"users_user_id_DELETE\",\"users_user_id_roles_POST\",\"users_user_id_roles_DELETE\",\"users-view\"],\"allowedCount\":526,\"categories\":[{\"count\":12,\"name\":\"desktop\",\"subCategories\":[{\"count\":2,\"name\":\"Capture\"},{\"count\":1,\"name\":\"Inspection\"},{\"count\":5,\"name\":\"Interaction\"},{\"count\":4,\"name\":\"Windows\"}]}],\"cliAllowedCount\":607,\"currentEnv\":\"development\",\"currentPage\":1,\"currentPlatform\":\"ai\",\"effectivePageSize\":800,\"hint\":\"12 tools matched. Use vibe help <name> for full details.\",\"matchedCount\":12,\"mcpAllowedCount\":601,\"mcpPinnedCount\":3,\"pinnedCount\":16,\"skillAllowedDefault\":null,\"skillPinnedDefault\":null,\"tools\":[{\"category\":\"desktop\",\"description\":\"Get the accessibility tree of the focused window or a specific application\",\"icon\":\"layers\",\"id\":\"desktop-accessibility\",\"method\":\"POST\",\"name\":\"desktop-accessibility\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Inspection\",\"tags\":[\"Desktop Automation\",\"Accessibility Automation\"],\"title\":\"Get Accessibility Tree\",\"titleShort\":\"A11y Tree\"},{\"category\":\"desktop\",\"description\":\"Move the mouse to absolute coordinates and perform a mouse click\",\"icon\":\"mouse-pointer\",\"id\":\"desktop-click\",\"method\":\"POST\",\"name\":\"desktop-click\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Interaction\",\"tags\":[\"Desktop Automation\",\"Input Automation\"],\"title\":\"Click\",\"titleShort\":\"Click\"},{\"category\":\"desktop\",\"description\":\"Bring a window to the foreground and give it focus\",\"icon\":\"maximize\",\"id\":\"desktop-focus-window\",\"method\":\"POST\",\"name\":\"desktop-focus-window\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Windows\",\"tags\":[\"Desktop Automation\",\"Window Management\"],\"title\":\"Focus Window\",\"titleShort\":\"Focus Window\"},{\"category\":\"desktop\",\"description\":\"Get information about the currently focused window\",\"icon\":\"eye\",\"id\":\"desktop-get-focused-window\",\"method\":\"POST\",\"name\":\"desktop-get-focused-window\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Windows\",\"tags\":[\"Desktop Automation\",\"Window Management\"],\"title\":\"Get Focused Window\",\"titleShort\":\"Focused Window\"},{\"category\":\"desktop\",\"description\":\"List all connected monitors with resolution, position, and index\",\"icon\":\"monitor\",\"id\":\"desktop-list-monitors\",\"method\":\"POST\",\"name\":\"desktop-list-monitors\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Capture\",\"tags\":[\"Desktop Automation\",\"Capture Automation\"],\"title\":\"List Monitors\",\"titleShort\":\"Monitors\"},{\"category\":\"desktop\",\"description\":\"List all open windows on the desktop\",\"icon\":\"list\",\"id\":\"desktop-list-windows\",\"method\":\"POST\",\"name\":\"desktop-list-windows\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Windows\",\"tags\":[\"Desktop Automation\",\"Window Management\"],\"title\":\"List Windows\",\"titleShort\":\"List Windows\"},{\"category\":\"desktop\",\"description\":\"Move the mouse cursor to absolute screen coordinates\",\"icon\":\"move\",\"id\":\"desktop-move-mouse\",\"method\":\"POST\",\"name\":\"desktop-move-mouse\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Interaction\",\"tags\":[\"Desktop Automation\",\"Input Automation\"],\"title\":\"Move Mouse\",\"titleShort\":\"Move Mouse\"},{\"category\":\"desktop\",\"description\":\"Move a window to a specific monitor\",\"icon\":\"monitor\",\"id\":\"desktop-move-window-to-monitor\",\"method\":\"POST\",\"name\":\"desktop-move-window-to-monitor\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Windows\",\"tags\":[\"Desktop Automation\",\"Window Management\"],\"title\":\"Move Window to Monitor\",\"titleShort\":\"Move Window\"},{\"category\":\"desktop\",\"description\":\"Press a key or key combination using xdotool\",\"icon\":\"keyboard\",\"id\":\"desktop-press-key\",\"method\":\"POST\",\"name\":\"desktop-press-key\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Interaction\",\"tags\":[\"Desktop Automation\",\"Input Automation\"],\"title\":\"Press Key\",\"titleShort\":\"Press Key\"},{\"category\":\"desktop\",\"description\":\"Capture a screenshot of the desktop or a screen region\",\"icon\":\"monitor\",\"id\":\"desktop-screenshot\",\"method\":\"POST\",\"name\":\"desktop-screenshot\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Capture\",\"tags\":[\"Desktop Automation\",\"Capture Automation\"],\"title\":\"Take Desktop Screenshot\",\"titleShort\":\"Screenshot\"},{\"category\":\"desktop\",\"description\":\"Scroll at the current mouse position or specified coordinates\",\"icon\":\"chevron-down\",\"id\":\"desktop-scroll\",\"method\":\"POST\",\"name\":\"desktop-scroll\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Interaction\",\"tags\":[\"Desktop Automation\",\"Input Automation\"],\"title\":\"Scroll\",\"titleShort\":\"Scroll\"},{\"category\":\"desktop\",\"description\":\"Type text into the focused window using keyboard simulation\",\"icon\":\"keyboard\",\"id\":\"desktop-type-text\",\"method\":\"POST\",\"name\":\"desktop-type-text\",\"platforms\":[\"cli\",\"ai\",\"mcp\",\"remote-skill\",\"trpc\",\"next-page\",\"next-api\",\"cron\",\"electron\",\"frame\"],\"subCategory\":\"Interaction\",\"tags\":[\"Desktop Automation\",\"Input Automation\"],\"title\":\"Type Text\",\"titleShort\":\"Type Text\"}],\"totalCount\":607,\"totalPages\":1,\"webPinnedCount\":72}",
+        "name": "tool-help",
+        "role": "tool",
+        "tool_call_id": "functions.tool-help:2"
+      },
+      {
+        "content": " No explicit task in this turn. Checking for pending background work. ",
+        "reasoning": " The user hasn't sent a new message yet. This appears to be a fresh turn with the system context loaded. The previous conversation summary shows a series of tool-system tests that were executed. There doesn't seem to be a specific new task from the user in this turn - the system context is just being provided.\n\nI should wait for the user's actual request. But since this is an automated agent context and no human is present, I need to check if there's something I should be doing. Looking at the context, this seems to be a background task in the cron folder. The previous conversation was about testing various tools.\n\nSince there's no explicit user message in this turn, I should check if there's a pending task or if I need to do something. Let me look at the context more carefully - the state boundary says \"the following was captured before this turn and may reflect an earlier tool-loop state\". This suggests the system is setting up context but the actual user task might be coming or might be implicit.\n\nActually, looking again, there is no user message here. The system is providing context. In an automated execution context with no human present, I should check if there's a task to complete. Let me look for any tasks or cron jobs that might need execution.\n\nWait - the system prompt says \"Complete the task fully, then emit your final response and stop.\" But there's no explicit task in this turn. The previous conversation was about testing tools. Let me re-read...\n\nActually, this might just be a system context injection and I should wait for the actual user input. But since this is an automated agent and \"No human is present\", perhaps I should check if there's something pending. Let me check the cron dashboard or tasks.\n\nActually, I think the most appropriate action is to check if there are any pending cron tasks or if the user (system) expects me to continue with something. Let me check tasks.",
+        "reasoning_details": [
+          {
+            "format": "unknown",
+            "index": 0,
+            "text": " The user hasn't sent a new message yet. This appears to be a fresh turn with the system context loaded. The previous conversation summary shows a series of tool-system tests that were executed. There doesn't seem to be a specific new task from the user in this turn - the system context is just being provided.\n\nI should wait for the user's actual request. But since this is an automated agent context and no human is present, I need to check if there's something I should be doing. Looking at the context, this seems to be a background task in the cron folder. The previous conversation was about testing various tools.\n\nSince there's no explicit user message in this turn, I should check if there's a pending task or if I need to do something. Let me look at the context more carefully - the state boundary says \"the following was captured before this turn and may reflect an earlier tool-loop state\". This suggests the system is setting up context but the actual user task might be coming or might be implicit.\n\nActually, looking again, there is no user message here. The system is providing context. In an automated execution context with no human present, I should check if there's a task to complete. Let me look for any tasks or cron jobs that might need execution.\n\nWait - the system prompt says \"Complete the task fully, then emit your final response and stop.\" But there's no explicit task in this turn. The previous conversation was about testing tools. Let me re-read...\n\nActually, this might just be a system context injection and I should wait for the actual user input. But since this is an automated agent and \"No human is present\", perhaps I should check if there's something pending. Let me check the cron dashboard or tasks.\n\nActually, I think the most appropriate action is to check if there are any pending cron tasks or if the user (system) expects me to continue with something. Let me check tasks.",
+            "type": "reasoning.text"
+          }
+        ],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{},\"toolName\":\"task-list\"}",
+              "name": "execute-tool"
+            },
+            "id": "functions.execute-tool:3",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": "{\"result\":{\"countsByHidden\":{\"all\":15,\"hidden\":12,\"visible\":3},\"countsByStatus\":{\"all\":3,\"completed\":0,\"disabled\":3,\"failed\":0,\"pending\":0,\"running\":0},\"tasks\":[{\"averageExecutionTime\":0,\"category\":\"taskCategory.system\",\"consecutiveFailures\":0,\"createdAt\":\"2026-06-10T11:56:20.448Z\",\"description\":\"AI works your queue while you're away - advances projects, handles next steps, picks up where you left off.\",\"displayName\":\"Autopilot\",\"enabled\":false,\"errorCount\":0,\"executionCount\":0,\"hidden\":false,\"id\":\"autopilot-2ddc3a11\",\"lastExecutedAt\":null,\"lastExecutionDuration\":null,\"lastExecutionError\":null,\"lastExecutionStatus\":null,\"nextExecutionAt\":null,\"notificationTargets\":[],\"outputMode\":\"outputMode.storeOnly\",\"owner\":{\"type\":\"user\",\"userId\":\"2ddc3a11-4931-4ab0-9afe-fba6337920a4\"},\"priority\":\"priority.low\",\"retries\":3,\"retryDelay\":30000,\"routeId\":\"ai-run\",\"runOnce\":false,\"schedule\":\"0 8 * * 1-5\",\"shortId\":\"autopilot-2ddc3a11\",\"successCount\":0,\"tags\":[],\"targetInstance\":null,\"taskInput\":{\"excludeMemories\":false,\"maxTurns\":12,\"prompt\":\"Run your autopilot session. Pick up where active projects left off - advance next steps, handle queued work, keep things moving.\",\"rootFolderId\":\"cron\",\"skill\":\"hermes-autopilot\",\"subFolderId\":\"60b536c2-43c4-4ca7-9c71-0063944d999a\"},\"timeout\":1800000,\"timezone\":\"UTC\",\"updatedAt\":\"2026-06-12T15:19:31.101Z\",\"version\":\"1.0.0\"},{\"averageExecutionTime\":0,\"category\":\"taskCategory.system\",\"consecutiveFailures\":0,\"createdAt\":\"2026-06-10T11:56:20.443Z\",\"description\":\"AI reorganizes your cortex while you sleep - consolidates memories, cleans up documents, surfaces what matters.\",\"displayName\":\"Dreaming\",\"enabled\":false,\"errorCount\":0,\"executionCount\":0,\"hidden\":false,\"id\":\"dream-2ddc3a11\",\"lastExecutedAt\":null,\"lastExecutionDuration\":null,\"lastExecutionError\":null,\"lastExecutionStatus\":null,\"nextExecutionAt\":null,\"notificationTargets\":[],\"outputMode\":\"outputMode.storeOnly\",\"owner\":{\"type\":\"user\",\"userId\":\"2ddc3a11-4931-4ab0-9afe-fba6337920a4\"},\"priority\":\"priority.low\",\"retries\":3,\"retryDelay\":30000,\"routeId\":\"ai-run\",\"runOnce\":false,\"schedule\":\"0 2 * * *\",\"shortId\":\"dream-2ddc3a11\",\"successCount\":0,\"tags\":[],\"targetInstance\":null,\"taskInput\":{\"excludeMemories\":false,\"maxTurns\":10,\"prompt\":\"Run your dreaming session. Reorganize and consolidate the cortex - memories, documents, threads. Leave everything cleaner and more organized.\",\"rootFolderId\":\"cron\",\"skill\":\"thea-dreamer\",\"subFolderId\":\"d60041eb-2103-4ce1-a7a2-66b03451bcd6\"},\"timeout\":1800000,\"timezone\":\"UTC\",\"updatedAt\":\"2026-06-12T15:19:31.102Z\",\"version\":\"1.0.0\"},{\"averageExecutionTime\":0,\"category\":\"taskCategory.system\",\"consecutiveFailures\":0,\"createdAt\":\"2026-06-10T11:56:20.448Z\",\"description\":\"Thea monitors the production instance - checks health, advances features, handles marketing, sends news.\",\"displayName\":\"Mama Heartbeat\",\"enabled\":false,\"errorCount\":0,\"executionCount\":0,\"hidden\":false,\"id\":\"thea-mama\",\"lastExecutedAt\":null,\"lastExecutionDuration\":null,\"lastExecutionError\":null,\"lastExecutionStatus\":null,\"nextExecutionAt\":null,\"notificationTargets\":[],\"outputMode\":\"outputMode.storeOnly\",\"owner\":{\"type\":\"system\"},\"priority\":\"priority.low\",\"retries\":3,\"retryDelay\":30000,\"routeId\":\"ai-run\",\"runOnce\":false,\"schedule\":\"0 */4 * * *\",\"shortId\":\"thea-mama\",\"successCount\":0,\"tags\":[],\"targetInstance\":null,\"taskInput\":{\"excludeMemories\":false,\"maxTurns\":15,\"prompt\":\"Run your mama session. Check platform health, review error logs, advance any pending feature work, and draft any needed announcements. Leave a summary in /documents/mama/log/.\",\"rootFolderId\":\"cron\",\"skill\":\"thea-mama\",\"subFolderId\":\"d409cd04-f10e-4c9a-904e-d53a94b533a2\"},\"timeout\":1800000,\"timezone\":\"UTC\",\"updatedAt\":\"2026-06-12T15:19:31.114Z\",\"version\":\"1.0.0\"}],\"totalTasks\":3}}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "functions.execute-tool:3"
+      }
+    ],
+    "model": "moonshotai/kimi-k2.6",
+    "stream": true,
+    "temperature": 0.7,
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "function": {
+          "description": "Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model.",
+          "name": "ai-run",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "appendThreadId": {
+                "anyOf": [
+                  {
+                    "const": "",
+                    "type": "string"
+                  },
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                ]
+              },
+              "availableTools": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "properties": {
+                        "requiresConfirmation": {
+                          "default": false,
+                          "type": "boolean"
+                        },
+                        "toolId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "toolId"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "excludeMemories": {
+                "default": false,
+                "type": "boolean"
+              },
+              "favoriteId": {
+                "type": "string"
+              },
+              "instructions": {
+                "type": "string"
+              },
+              "maxTurns": {
+                "default": 150,
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer"
+              },
+              "pinnedTools": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "properties": {
+                        "requiresConfirmation": {
+                          "default": false,
+                          "type": "boolean"
+                        },
+                        "toolId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "toolId"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "preCalls": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "properties": {
+                        "args": {
+                          "additionalProperties": {},
+                          "default": {},
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "routeId": {
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "routeId"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "prompt": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "rootFolderId": {
+                "default": "cron",
+                "enum": [
+                  "private",
+                  "shared",
+                  "public",
+                  "incognito",
+                  "cron",
+                  "remote"
+                ],
+                "type": "string"
+              },
+              "skill": {
+                "type": "string"
+              },
+              "subFolderId": {
+                "anyOf": [
+                  {
+                    "const": "",
+                    "type": "string"
+                  },
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "prompt"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.",
+          "name": "coding-agent",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "interactiveMode": {
+                "default": false,
+                "type": "boolean"
+              },
+              "model": {
+                "type": "string"
+              },
+              "prompt": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "provider": {
+                "default": "claude-code",
+                "enum": [
+                  "claude-code",
+                  "open-code"
+                ],
+                "type": "string"
+              },
+              "taskTitle": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "prompt"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Remove a file or folder. Gone forever.",
+          "name": "cortex-delete",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "recursive": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Change part of a file. Find text and replace it, or edit specific lines.",
+          "name": "cortex-edit",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "endLine": {
+                "maximum": 9007199254740991,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "find": {
+                "type": "string"
+              },
+              "newContent": {
+                "type": "string"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "replace": {
+                "type": "string"
+              },
+              "startLine": {
+                "maximum": 9007199254740991,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Run a shell command on a machine. Only works on /ssh/ paths. Persistent terminal — cwd carries over between calls. New sessions start in the default mount directory if configured.",
+          "name": "cortex-exec",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "command": {
+                "maxLength": 10000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "terminalId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "timeoutMs": {
+                "maximum": 300000,
+                "minimum": 1,
+                "type": "number"
+              },
+              "workingDir": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "command"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "See what's in a folder.",
+          "name": "cortex-list",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "path": {
+                "default": "/",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Create a folder.",
+          "name": "cortex-mkdir",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "createParents": {
+                "default": true,
+                "type": "boolean"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "viewType": {
+                "enum": [
+                  "enums.viewType.list",
+                  "enums.viewType.kanban",
+                  "enums.viewType.calendar",
+                  "enums.viewType.grid",
+                  "enums.viewType.wiki"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Move or rename a file or folder.",
+          "name": "cortex-move",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "from": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "to": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Open any file - your notes, threads, memories, skills, or tasks.",
+          "name": "cortex-read",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "maxLines": {
+                "maximum": 10000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Find files by name or content. Searches everything.",
+          "name": "cortex-search",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "maxResults": {
+                "default": 20,
+                "maximum": 50,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "default": "/",
+                "type": "string"
+              },
+              "query": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "List active terminal sessions with current working directories.",
+          "name": "cortex-terminals",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "See the full folder structure at a glance. For /ssh/ paths, shows machines and mount summaries — use cortex-list or cortex-exec to navigate deeper.",
+          "name": "cortex-tree",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "depth": {
+                "default": 5,
+                "maximum": 10,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "path": {
+                "default": "/",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Save a file. Give it a path and content - done.",
+          "name": "cortex-write",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "createParents": {
+                "default": true,
+                "type": "boolean"
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
+          "name": "tool-help",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "callbackMode": {
+                "description": "OMIT for normal tool calls - result is returned synchronously, loop continues. Only set when you need async: 'detach' - fire-and-forget, returns {taskId}, use wait-for-task later. 'wakeUp' - fire-and-forget, result auto-injected when ready, do NOT call wait-for-task. 'endLoop' - stops entire AI turn after this batch, use ONLY as final action. 'approve' - requires user confirmation before executing.",
+                "enum": [
+                  "detach",
+                  "wakeUp",
+                  "endLoop",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "instanceId": {
+                "type": "string"
+              },
+              "page": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "pageSize": {
+                "maximum": 1000,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "query": {
+                "type": "string"
+              },
+              "toolName": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+          "name": "execute-tool",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "definitions": {
+              "__schema0": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  },
+                  {},
+                  {},
+                  {
+                    "items": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                ]
+              }
+            },
+            "properties": {
+              "callbackMode": {
+                "default": "wait",
+                "enum": [
+                  "wait",
+                  "detach",
+                  "endLoop",
+                  "wakeUp",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "input": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "default": {},
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "instanceId": {
+                "type": "string"
+              },
+              "toolName": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "toolName"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "function": {
+          "description": "Wait on a pending background task. Returns the result immediately if already completed, or pauses the AI stream until the task finishes (wakeUp mechanism).",
+          "name": "wait-for-task",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "properties": {
+              "taskId": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ]
+  }
+}

@@ -18,7 +18,7 @@ import React from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
-import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {

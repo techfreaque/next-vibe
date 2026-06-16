@@ -5,6 +5,7 @@
 
 import { CREDITS_ALIAS } from "@/app/api/[locale]/credits/constants";
 import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 export const category: CategoryDefinition = {
   key: "credits",

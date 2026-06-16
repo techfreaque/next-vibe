@@ -5,19 +5,19 @@ import "server-only";
  * Reads files from both the document workspace and virtual mounts
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   ErrorResponseTypes,
   fail,
   success,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CortexReadT } from "./i18n";
 import { CortexNodeType } from "../enum";
 import {
   getNode,
@@ -28,7 +28,9 @@ import {
   normalizeToCanonicalPath,
   normalizePath,
 } from "../repository";
+import type { CortexReadT } from "./i18n";
 
+import type { CortexReadT } from "./i18n";
 interface ReadParams {
   userId: string;
   user: JwtPrivatePayloadType;
@@ -310,3 +312,6 @@ export class CortexReadRepository {
     }
   }
 }
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";

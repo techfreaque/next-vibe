@@ -155,6 +155,13 @@ while [ "$current_dir" != "$root" ]; do
   candidate="$current_dir/$REL_PATH"
   if [ -f "$candidate" ]; then
     PROC_NAME="vibe-\${1:-cli}"
+    # Capture start time in ms before exec (EPOCHREALTIME is bash 5+; fall back to date)
+    if [ -n "\${EPOCHREALTIME+x}" ]; then
+      VIBE_START_TIME=$(( \${EPOCHREALTIME%.*}\${EPOCHREALTIME#*.} / 1000 ))
+    else
+      VIBE_START_TIME=$(date +%s%3N)
+    fi
+    export VIBE_START_TIME
     exec -a "$PROC_NAME" bun "$(_bun_path "$candidate")" "$@"
   fi
   current_dir="$(dirname "$current_dir")"

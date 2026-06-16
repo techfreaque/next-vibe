@@ -157,7 +157,6 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     persistenceKey,
     ...restFormOptions
   } = formOptions;
-
   // Get Zustand store methods
   const { setFormQueryParams } = useApiStore();
 
@@ -393,7 +392,8 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           const parsedData = JSON.parse(
             savedFormData,
           ) as TEndpoint["types"]["RequestOutput"];
-          // Merge saved data with schema defaults - defaults take precedence for undefined/null values
+          // Merge saved data with schema defaults - defaults take precedence for undefined/null values.
+          // mergedDefaultValues already includes initialState (from URL), so it wins over localStorage.
           const mergedData = mergeWithDefaults(parsedData, mergedDefaultValues);
           formMethodsRef.current.reset(mergedData);
           // Update query params with merged data
@@ -627,11 +627,13 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
 
           if (formData) {
             // Filter formData through requestSchema to remove response-only fields
-            // This prevents sending response data back to the API as query params
+            // This prevents sending response data back to the API as query params.
+            // If parsing fails (e.g. a field is mid-edit), skip the update — the
+            // previous valid params stay in the store and the query keeps its last result.
             const parsed = endpoint.requestSchema.safeParse(formData);
-            const requestOnlyData = parsed.success ? parsed.data : formData;
-
-            setQueryParams(requestOnlyData);
+            if (parsed.success) {
+              setQueryParams(parsed.data);
+            }
           }
         }, debounceMs);
       });
@@ -858,6 +860,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       isCachedData: query.isCachedData,
       status: query.status,
       refetch: query.refetch,
+      remove: query.remove,
       submitForm,
       setErrorType,
       clearSavedForm,

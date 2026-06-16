@@ -14,8 +14,8 @@
  * The response must have the same keys (output, taskId, status, etc.) across modes.
  *
  * Two transport modes exercised by separate test entry points:
- *   - Direct (isDirectlyAccessible=true): WAIT/END_LOOP return inline, no queue.
- *   - Queue (isDirectlyAccessible=false): WAIT/END_LOOP → stream waits → pulse → revival.
+ *   - Direct (transportMode='direct-http'): WAIT/END_LOOP return inline, no queue.
+ *   - Queue (transportMode='cloud-only'): WAIT/END_LOOP → stream waits → pulse → revival.
  */
 
 import "server-only";
@@ -28,6 +28,7 @@ installFetchCache();
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { db } from "@/app/api/[locale]/system/db";
@@ -48,6 +49,7 @@ import {
 } from "../../ai-stream/testing/fetch-cache";
 import {
   fetchThreadMessages,
+  getOrCreateFolder,
   runTestStream,
   toolResultRecord,
   type SlimMessage,
@@ -72,7 +74,7 @@ export interface CodingAgentModeConfig {
    */
   pulse?: (threadId: string) => Promise<void>;
   /**
-   * True when isDirectlyAccessible=true (direct HTTP transport).
+   * True when transportMode='direct-http' (direct HTTP transport).
    * Affects assertions: WAIT/END_LOOP result arrives inline; no 'waiting' state.
    */
   isDirect: boolean;
@@ -330,8 +332,9 @@ async function waitForThreadIdle(
 async function patchWakeUpFixture(
   contextName: string,
   threadId: string,
+  user: JwtPrivatePayloadType,
 ): Promise<void> {
-  const msgs = await fetchThreadMessages(threadId);
+  const msgs = await fetchThreadMessages(threadId, user);
   const dispatchMsg = msgs.findLast(
     (m) =>
       m.role === "tool" &&
@@ -435,6 +438,9 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
   describe(cfg.label, () => {
     let testUser: JwtPrivatePayloadType;
     let mainFavoriteId: string;
+    /** Per-suite folder: <suiteRoot> -> tests -> <testCaseName>. */
+    let testSubFolderId: string;
+    let suiteRootFolderIdRef: DefaultFolderId;
     beforeAll(async () => {
       const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
       expect(
@@ -476,6 +482,24 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
         mainFavoriteId = MAIN_FAVORITE_ID;
       }
 
+      // All suite threads land in BACKGROUND -> tests -> <testCaseName>.
+      const suiteRootFolderId = DefaultFolderId.BACKGROUND;
+      const testCaseName =
+        cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
+        "coding-agent";
+      const testsParentId = await getOrCreateFolder(
+        testUser,
+        suiteRootFolderId,
+        "tests",
+      );
+      testSubFolderId = await getOrCreateFolder(
+        testUser,
+        suiteRootFolderId,
+        testCaseName,
+        testsParentId,
+      );
+      suiteRootFolderIdRef = suiteRootFolderId;
+
       if (cfg.setup) {
         await cfg.setup(testUser);
       }
@@ -494,7 +518,11 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
     async function runStream(
       params: Parameters<typeof runTestStream>[0],
     ): ReturnType<typeof runTestStream> {
-      const first = await runTestStream(params);
+      const first = await runTestStream({
+        ...params,
+        rootFolderId: params.rootFolderId ?? suiteRootFolderIdRef,
+        subFolderId: params.subFolderId ?? testSubFolderId,
+      });
 
       if (cfg.pulse && first.result.success && first.result.data.threadId) {
         const tid = first.result.data.threadId;
@@ -539,7 +567,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             "idle",
           );
 
-          const msgs = await fetchThreadMessages(tid);
+          const msgs = await fetchThreadMessages(tid, testUser);
           const revivalAi = [...msgs]
             .toReversed()
             .find((m) => m.role === "assistant");
@@ -886,7 +914,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           // Patch fixture: the AI's LLM response (fixture) hardcodes the task ID
           // from the recording run. On replay, a new task ID is created. Patching
           // the fixture with the current run's ID keeps it valid for subsequent replays.
-          await patchWakeUpFixture(wakeUpContext, threadId);
+          await patchWakeUpFixture(wakeUpContext, threadId, testUser);
 
           // pulse: execute the pending wakeUp task + wait-for-task dependency
           if (cfg.pulse) {
@@ -899,7 +927,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           await assertThreadIdle(threadId);
           await assertNoPendingTasks(threadId);
 
-          const finalMsgs = await fetchThreadMessages(threadId);
+          const finalMsgs = await fetchThreadMessages(threadId, testUser);
 
           // execute-tool(wakeUp) message must exist - it dispatched the task
           const dispatchMsg = findCodingAgentMsg(finalMsgs);
@@ -984,7 +1012,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
     //   - Cross-mode snapshot comparison: CA5 shape === CA1 shape, etc.
     //
     // Interactive mode flow: escalateToTask sets waitingForRemoteResult=true,
-    // stream pauses, triggerLocalPulse re-runs as batch to get real output,
+    // stream pauses, WS connector on hermes executes coding-agent (headless=true → batch),
     // handleTaskCompletion backfills → revival. Visually identical to batch WAIT.
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     describe("Interactive thread: same callback modes, interactiveMode=true", () => {
@@ -1038,7 +1066,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           await assertThreadIdle(threadId);
           await assertNoPendingTasks(threadId);
 
-          const finalMsgs = await fetchThreadMessages(threadId);
+          const finalMsgs = await fetchThreadMessages(threadId, testUser);
           const toolMsg = findCodingAgentMsg(finalMsgs);
           expect(
             toolMsg,
@@ -1292,7 +1320,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           }
 
           // Patch fixture: same wakeUp task ID instability as CA4
-          await patchWakeUpFixture(wakeUpContext, threadId);
+          await patchWakeUpFixture(wakeUpContext, threadId, testUser);
 
           if (cfg.pulse) {
             await cfg.pulse(threadId);
@@ -1304,7 +1332,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           await assertThreadIdle(threadId);
           await assertNoPendingTasks(threadId);
 
-          const finalMsgs = await fetchThreadMessages(threadId);
+          const finalMsgs = await fetchThreadMessages(threadId, testUser);
 
           // execute-tool(wakeUp) dispatch message must exist
           const dispatchMsg = findCodingAgentMsg(finalMsgs);

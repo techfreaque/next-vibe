@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The generate_image tool returned a result with:\n- creditCost: 2.9 (positive)\n- imageUrl: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/fae930eb-9b49-44a7-8c98-3ee0270b9f77/78aff12c-4958-47cd-bc58-fb2d36fa178d.png\" (non-empty)\n\nBoth conditions are met. I should reply with STEP_OK.</think> STEP_OK\n\nUser: [T11f-verify image-visibility] IMPORTANT: Do NOT use any tools. Do NOT call describe_image or fetch or any other tool. Just answer directly based on what you can already see in the conversation. In the previous step (T11f) you called generate_image. Can you see the generated output image as an inline image (not just a URL string) in the tool result from that step? If YES — you can see an actual image (any image, regardless of content) — reply with STEP_OK and briefly describe what the image shows. If NO — you cannot see any inline image, only a text URL or JSON — reply with FAILED: <explain what you see instead>.\n\nAssistant: <think> The user is asking me to verify if in step T11f I can see the generated output image as an inline image (not just a URL string) in the tool result from that step. Let me look back at the T11f context.\n\nIn T11f (Context ID:891bf488), the tool result from generate_image shows:\n```\n## Return of tool_execute-tool_fRCtvRAXt1BeJd1pJs2L\n{\"creditCost\":124.8,\"mediaType\":null,\"text\":null,\"videoUrl\":\"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/3d4039cd-9c87-41c8-b242-272ceb917eb0/02a51459-f64f-4c58-b3fb-647b7ac2648a.mp4\"}\n```\n\nWait, that's from T11c. Let me look at T11f more carefully.\n\nActually, looking at the context more carefully, T11f was the i2i-nano-banana test. The result shows:\n```\n## Return of tool_execute-tool_bsOlv0vBl1KHtOYVHouZ\n![stylized cartoon portrait, vibra\n\nUser: [T12 invalid-parent] Say exactly: INVALID_PARENT_TEST STEP_OK\n\nAssistant: <think> The user wants me to say exactly: \"INVALID_PARENT_TEST STEP_OK\"\n\nThis is a simple instruction. I should just output that exact text in my final response.</think> INVALID_PARENT_TEST STEP_OK\n\nUser: [C1 credit-deduction] Reply with exactly one word: OK",
+    "encoding_format": "float"
+  }
+}

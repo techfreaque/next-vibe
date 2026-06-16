@@ -40,6 +40,7 @@ export class VideoGenerationRepository {
   /**
    * Generate a video from a text prompt
    */
+import { generateVideoWithUnbottled } from "./providers/unbottled";
   static async generateVideo(
     data: VideoGenerationPostRequestOutput,
     user: JwtPayloadType,
@@ -257,3 +258,6 @@ export class VideoGenerationRepository {
     });
   }
 }
+import { generateVideoWithUnbottled } from "./providers/unbottled";
+import { generateVideoWithUnbottled } from "./providers/unbottled";
+import { generateVideoWithUnbottled } from "./providers/unbottled";

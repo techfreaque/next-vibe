@@ -30,9 +30,10 @@ import {
   SshAuthTypeDB,
   SshAuthTypeOptions,
 } from "../../enum";
+import connectionsListDefinition from "../list/definition";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const ConnectionDetailContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ConnectionDetailContainer })),
@@ -43,10 +44,11 @@ export const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["ssh", "connections", "[id]"],
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
   icon: "server",
-  category: "endpointCategories.ssh",
-  subCategory: "endpointCategories.sshConnections",
+  category: "ssh",
+  subCategory: "Connections",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
   tags: ["category" as const],
 
@@ -56,7 +58,9 @@ export const { GET } = createEndpoint({
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: connectionsListDefinition.GET,
+        labelField: "name",
         schema: z.string().uuid(),
         label: "get.fields.id.label",
         description: "get.fields.id.description",
@@ -176,10 +180,11 @@ export const { PATCH } = createEndpoint({
   method: Methods.PATCH,
   path: ["ssh", "connections", "[id]"],
   title: "patch.title",
+  titleShort: "patch.titleShort",
   description: "patch.description",
   icon: "server",
-  category: "endpointCategories.ssh",
-  subCategory: "endpointCategories.sshConnections",
+  category: "ssh",
+  subCategory: "Connections",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
   tags: ["category" as const],
 
@@ -189,7 +194,9 @@ export const { PATCH } = createEndpoint({
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: connectionsListDefinition.GET,
+        labelField: "name",
         schema: z.string().uuid(),
         label: "patch.fields.id.label",
         description: "patch.fields.id.description",
@@ -339,10 +346,11 @@ export const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["ssh", "connections", "[id]"],
   title: "delete.title",
+  titleShort: "delete.titleShort",
   description: "delete.description",
   icon: "server",
-  category: "endpointCategories.ssh",
-  subCategory: "endpointCategories.sshConnections",
+  category: "ssh",
+  subCategory: "Connections",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
   tags: ["category" as const],
 
@@ -358,7 +366,9 @@ export const { DELETE } = createEndpoint({
       }),
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: connectionsListDefinition.GET,
+        labelField: "name",
         schema: z.string().uuid(),
         label: "delete.fields.id.label",
         description: "delete.fields.id.description",

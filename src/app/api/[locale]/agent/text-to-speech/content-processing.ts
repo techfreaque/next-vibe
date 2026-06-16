@@ -8,7 +8,7 @@ import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/sh
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getTranslatorFromEndpoint } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
+import { getTranslatorFromEndpoint } from "next-vibe-ui/unified/_shared/field-helpers";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../shared/utils";

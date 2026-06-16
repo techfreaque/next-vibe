@@ -20,7 +20,7 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import { preWarmChannel } from "../../../../system/unified-interface/websocket/client";
 import { buildMessagesChannel } from "../../../chat/threads/[threadId]/messages/channel";

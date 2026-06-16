@@ -17,7 +17,7 @@ import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { EXECUTE_TOOL_ALIAS } from "../../../ai/execute-tool/constants";
+import { EXECUTE_TOOL_ALIAS } from "../../../execute-tool/constants";
 import { renderToString as fastRenderToString } from "../cli/response/fast-ink-renderer/renderer";
 import { prewarmLazyWidgets } from "../cli/response/result-formatter";
 import { McpRenderTree } from "./render-tree";

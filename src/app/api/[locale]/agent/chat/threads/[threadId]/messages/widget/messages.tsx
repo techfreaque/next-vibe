@@ -17,7 +17,7 @@ import {
   useState,
 } from "react";
 
-import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { Logo } from "@/app/[locale]/_components/logo";
 import {
   DOM_IDS,
@@ -50,8 +50,8 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { useWidgetSelector } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { useWidgetSelector } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { platform } from "@/config/env-client";
 import { parseError } from "next-vibe/shared/utils";
 import type { MessageMetadata } from "../../../../db";

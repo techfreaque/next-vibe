@@ -15,7 +15,7 @@ import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unifi
 import {
   useWidgetLocale,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 interface ThreadDetailWidgetProps {
   path: string;

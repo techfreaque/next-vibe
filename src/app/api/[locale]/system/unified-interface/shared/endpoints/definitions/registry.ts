@@ -5,8 +5,6 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation as appLocaleScopedTranslation } from "@/app/[locale]/i18n";
-
 import { parseError } from "@/app/api/[locale]/shared/utils";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { pathToAliasMap } from "../../../../generated/alias-map";
@@ -201,7 +199,6 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     endpoints: CreateApiEndpointAny[],
     locale: CountryLanguage,
   ): SerializableToolMetadata[] {
-    const { t: appLocaleT } = appLocaleScopedTranslation.scopedT(locale);
     return endpoints.map((definition) => {
       const { t } = definition.scopedTranslation.scopedT(locale);
       const method = definition.method;
@@ -212,7 +209,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
         method,
         title: t(definition.title),
         description: t(definition.description),
-        category: appLocaleT(definition.category),
+        category: definition.category,
         tags: definition.tags.map((tag) => t(tag)),
         toolName,
         allowedRoles: definition.allowedRoles

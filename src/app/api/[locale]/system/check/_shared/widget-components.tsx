@@ -12,7 +12,7 @@ import { H3 } from "next-vibe-ui/ui/typography";
 import { useMemo } from "react";
 
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
-import { useWidgetLocale } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetLocale } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 interface CodeQualityItem {
   file: string;

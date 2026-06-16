@@ -12,10 +12,12 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ConnectionCreateRepository } from "../create/repository";
 import type { NewSshConnection } from "../../db";
 import { sshConnections } from "../../db";
+import { SshAuthType } from "../../enum";
 import type {
   ConnectionDeleteResponseOutput,
   ConnectionDetailResponseOutput,
@@ -121,6 +123,15 @@ export class ConnectionDetailRepository {
         updates.username = data.username;
       }
       if (data.authType !== undefined) {
+        if (
+          data.authType === SshAuthType.LOCAL &&
+          (user.isPublic || !user.roles.includes(UserPermissionRole.ADMIN))
+        ) {
+          return fail({
+            message: t("patch.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
         updates.authType = data.authType;
       }
       if (data.notes !== undefined) {
@@ -166,6 +177,12 @@ export class ConnectionDetailRepository {
       }
 
       logger.info(`Updated SSH connection ${id} for user ${user.id!}`);
+
+      // Auto-materialize a default mount if none configured yet
+      const { ensureDefaultMount } =
+        await import("@/app/api/[locale]/ssh/connections/mounts-bootstrap");
+      await ensureDefaultMount(id, user.id!);
+
       return success({ updatedAt: updated.updatedAt.toISOString() });
     } catch (error) {
       logger.error("Failed to update SSH connection", parseError(error));

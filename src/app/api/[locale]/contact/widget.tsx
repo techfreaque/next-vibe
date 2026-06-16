@@ -5,11 +5,9 @@
 
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
-import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 

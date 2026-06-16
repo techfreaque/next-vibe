@@ -31,10 +31,11 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "speech-to-text", "hotkey"],
   title: "speechToText.hotkey.post.title" as const,
+  titleShort: "speechToText.hotkey.post.titleShort" as const,
   description: "speechToText.hotkey.post.description" as const,
   icon: "mic",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiGeneration",
+  category: "ai",
+  subCategory: "Generation",
   tags: [
     "chat.tags.speech" as const,
     "chat.tags.hotkey" as const,

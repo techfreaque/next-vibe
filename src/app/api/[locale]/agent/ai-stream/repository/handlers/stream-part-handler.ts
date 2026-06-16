@@ -14,6 +14,7 @@ import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { AiStreamT } from "../../stream/i18n";
 import type { StreamContext } from "../core/stream-context";
+import { AbortReason, StreamAbortError } from "../core/constants";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import { FilePartHandler } from "./file-part-handler";
 import { FinishStepHandler } from "./finish-step-handler";
@@ -514,3 +515,6 @@ export class StreamPartHandler {
     return { shouldAbort: false };
   }
 }
+import { AbortReason, StreamAbortError } from "../core/constants";
+import { AbortReason, StreamAbortError } from "../core/constants";
+import { AbortReason, StreamAbortError } from "../core/constants";

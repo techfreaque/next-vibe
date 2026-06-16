@@ -1,10 +1,13 @@
 /**
  * SSH Connections List Repository
+ *
+ * Merges SSH connections and active remote connections into a unified list.
+ * Read-time merge — no write-time sync needed.
  */
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -13,14 +16,19 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { sshConnections } from "../../db";
 import { SshAuthType } from "../../enum";
 import type { ConnectionsListResponseOutput } from "./definition";
 import type { ConnectionsListT } from "./i18n";
+
+type Connection = ConnectionsListResponseOutput["connections"][number];
 
 export class ConnectionsListRepository {
   static async list(
@@ -29,44 +37,53 @@ export class ConnectionsListRepository {
     t: ConnectionsListT,
   ): Promise<ResponseType<ConnectionsListResponseOutput>> {
     try {
-      const rows = await db
-        .select({
-          id: sshConnections.id,
-          label: sshConnections.label,
-          host: sshConnections.host,
-          port: sshConnections.port,
-          username: sshConnections.username,
-          authType: sshConnections.authType,
-          isDefault: sshConnections.isDefault,
-          fingerprint: sshConnections.fingerprint,
-          notes: sshConnections.notes,
-          createdAt: sshConnections.createdAt,
-        })
-        .from(sshConnections)
-        .where(eq(sshConnections.userId, user.id!));
+      const [sshRows, remoteRows] = await Promise.all([
+        db
+          .select({
+            id: sshConnections.id,
+            label: sshConnections.label,
+            host: sshConnections.host,
+            port: sshConnections.port,
+            username: sshConnections.username,
+            authType: sshConnections.authType,
+            isDefault: sshConnections.isDefault,
+            fingerprint: sshConnections.fingerprint,
+            notes: sshConnections.notes,
+            createdAt: sshConnections.createdAt,
+          })
+          .from(sshConnections)
+          .where(eq(sshConnections.userId, user.id!)),
+        db
+          .select({
+            id: remoteConnections.id,
+            instanceId: remoteConnections.instanceId,
+            remoteUrl: remoteConnections.remoteUrl,
+            isActive: remoteConnections.isActive,
+            routingRules: remoteConnections.routingRules,
+            lastSyncedAt: remoteConnections.lastSyncedAt,
+            transportMode: remoteConnections.transportMode,
+            createdAt: remoteConnections.createdAt,
+          })
+          .from(remoteConnections)
+          .where(
+            and(
+              eq(remoteConnections.userId, user.id!),
+              eq(remoteConnections.isActive, true),
+            ),
+          ),
+      ]);
 
-      const connections: ConnectionsListResponseOutput["connections"] =
-        rows.map((r) => ({
-          id: r.id,
-          label: r.label,
-          host: r.host,
-          port: r.port,
-          username: r.username,
-          authType: r.authType,
-          isDefault: r.isDefault,
-          fingerprint: r.fingerprint ?? null,
-          notes: r.notes ?? null,
-          createdAt: r.createdAt.toISOString(),
-        }));
+      const connections: Connection[] = [];
 
-      // Ensure a LOCAL entry exists for local mode - upsert once
-      const isLocalMode = process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "false";
-      if (isLocalMode) {
-        const hasLocal = connections.some(
-          (c) => c.authType === SshAuthType.LOCAL,
-        );
+      // Always ensure a LOCAL entry exists — admin only
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+      if (isAdmin) {
+        const hasLocal = sshRows.some((c) => c.authType === SshAuthType.LOCAL);
         if (!hasLocal) {
-          const hasDefault = connections.some((c) => c.isDefault);
+          const hasDefault =
+            sshRows.some((c) => c.isDefault) ||
+            remoteRows.some((c) => c.routingRules?.isDefault === true);
           const [inserted] = await db
             .insert(sshConnections)
             .values({
@@ -93,22 +110,73 @@ export class ConnectionsListRepository {
               createdAt: sshConnections.createdAt,
             });
           if (inserted) {
-            connections.unshift({
-              ...inserted,
-              fingerprint: inserted.fingerprint ?? null,
-              notes: inserted.notes ?? null,
-              createdAt: inserted.createdAt.toISOString(),
-            });
+            sshRows.unshift(inserted);
           }
         }
       }
 
+      // Map SSH connections
+      for (const r of sshRows) {
+        connections.push({
+          id: r.id,
+          label: r.label,
+          host: r.host,
+          port: r.port,
+          username: r.username,
+          authType: r.authType,
+          isDefault: r.isDefault,
+          fingerprint: r.fingerprint ?? null,
+          notes: r.notes ?? null,
+          createdAt: r.createdAt.toISOString(),
+          connectionType: r.authType === SshAuthType.LOCAL ? "local" : "ssh",
+          health: null,
+          remoteInstanceId: null,
+          transportMode: null,
+        });
+      }
+
+      // Map remote connections
+      for (const r of remoteRows) {
+        connections.push({
+          id: r.id,
+          label: r.instanceId,
+          host: r.remoteUrl,
+          port: 0,
+          username: r.instanceId,
+          authType: "remote",
+          isDefault: r.routingRules?.isDefault ?? false,
+          fingerprint: null,
+          notes: null,
+          createdAt: r.createdAt.toISOString(),
+          connectionType: "remote",
+          health: RemoteConnectionRepository.getConnectionHealth(r),
+          remoteInstanceId: r.instanceId,
+          transportMode: r.transportMode,
+        });
+      }
+
+      // Sort: local first, then ssh, then remote. Within each group, by label.
+      const typeOrder: Record<string, number> = {
+        local: 0,
+        ssh: 1,
+        remote: 2,
+      };
+      connections.sort((a, b) => {
+        const orderDiff =
+          (typeOrder[a.connectionType] ?? 9) -
+          (typeOrder[b.connectionType] ?? 9);
+        if (orderDiff !== 0) {
+          return orderDiff;
+        }
+        return a.label.localeCompare(b.label);
+      });
+
       logger.debug(
-        `Listed ${connections.length} SSH connections for user ${user.id!}`,
+        `Listed ${connections.length} connections (${sshRows.length} SSH + ${remoteRows.length} remote) for user ${user.id!}`,
       );
       return success({ connections });
     } catch (error) {
-      logger.error("Failed to list SSH connections", parseError(error));
+      logger.error("Failed to list connections", parseError(error));
       return fail({
         message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

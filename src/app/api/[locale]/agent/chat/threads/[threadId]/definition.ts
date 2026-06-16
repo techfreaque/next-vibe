@@ -28,6 +28,7 @@ import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { DefaultFolderId } from "../../config";
 import { ThreadStatus, ThreadStatusOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
+import threadsDefinitions from "../definition";
 
 /**
  * Get Thread by ID Endpoint (GET)
@@ -652,3 +653,6 @@ export type ThreadDeleteUrlParamsTypeOutput =
 
 const definitions = { GET, PATCH, DELETE };
 export default definitions;
+import threadsDefinitions from "../definition";
+import threadsDefinitions from "../definition";
+import threadsDefinitions from "../definition";

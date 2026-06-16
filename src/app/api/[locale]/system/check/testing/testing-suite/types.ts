@@ -14,7 +14,7 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "../../../unified-interface/unified-ui/widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/types";
 
 /**
  * Options for testing an API endpoint

@@ -22,16 +22,18 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import type {
+  CategoryDefinition,
+  SubcategoryDefinition,
+} from "@/app/api/[locale]/system/help/category-types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
   formatDuration,
   formatGenerator,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import type {
-  CategoryDefinition,
-  SubcategoryDefinition,
-} from "@/app/api/[locale]/system/help/category-types";
 
 import type { LiveIndex } from "../shared/live-index";
 import {
@@ -214,16 +216,8 @@ export class CategoryIndexGeneratorRepository {
     // Build the registry array as a TypeScript literal (no imports needed for data)
     const registryEntries = categories
       .map((c) => {
-        const {
-          key,
-          label,
-          group,
-          icon,
-          order,
-          defaultEntry,
-          defaultEntryLink,
-          subcategories,
-        } = c.def;
+        const { key, label, group, icon, order, defaultEntry, subcategories } =
+          c.def;
 
         const labelRecord = typeof label === "object" ? label : {};
         const labelsJson = JSON.stringify(labelRecord);
@@ -232,8 +226,10 @@ export class CategoryIndexGeneratorRepository {
             ? label
             : (labelRecord["en-US"] ?? labelRecord["en-GLOBAL"] ?? key);
 
-        // defaultEntry is now a plain alias string
-        const defaultEntryAlias = defaultEntry;
+        const defaultEntryAlias =
+          typeof defaultEntry === "object" && defaultEntry !== null
+            ? defaultEntry[UserPermissionRole.ADMIN]
+            : defaultEntry;
 
         const subcatLines = subcategories
           ? Object.entries(subcategories)
@@ -253,15 +249,8 @@ export class CategoryIndexGeneratorRepository {
                       subcatLabelRecord["en-GLOBAL"] ??
                       k);
                 const subcatLabelsJson = JSON.stringify(subcatLabelRecord);
-                // Subcategory inherits parent's defaultEntry if not set
-                const subcatAlias = sv.defaultEntry ?? defaultEntryAlias;
-                const subcatDefaultPart = subcatAlias
-                  ? `, defaultEntryAlias: "${subcatAlias}"`
-                  : "";
-                const subcatLinkPart = sv.defaultEntryLink
-                  ? `, defaultEntryLink: "${sv.defaultEntryLink}"`
-                  : "";
-                return `      ${JSON.stringify(k)}: { icon: "${sv.icon}", order: ${sv.order ?? 0}, label: "${subcatLabelFallback}", labels: ${subcatLabelsJson}${subcatDefaultPart}${subcatLinkPart} },`;
+
+                return `      ${JSON.stringify(k)}: { icon: "${sv.icon}", order: ${sv.order ?? 0}, label: "${subcatLabelFallback}", labels: ${subcatLabelsJson} },`;
               })
               .join("\n")
           : null;
@@ -274,11 +263,7 @@ export class CategoryIndexGeneratorRepository {
           ? `\n    defaultEntryAlias: "${defaultEntryAlias}",`
           : "";
 
-        const defaultEntryLinkPart = defaultEntryLink
-          ? `\n    defaultEntryLink: "${defaultEntryLink}",`
-          : "";
-
-        return `  {\n    key: "${key}",\n    label: "${labelFallback}",\n    labels: ${labelsJson},\n    group: "${group}",\n    icon: "${icon}",\n    order: ${order ?? 99},${defaultEntryPart}${defaultEntryLinkPart}${subcatBlock}\n  },`;
+        return `  {\n    key: "${key}",\n    label: "${labelFallback}",\n    labels: ${labelsJson},\n    group: "${group}",\n    icon: "${icon}",\n    order: ${order ?? 99},${defaultEntryPart}${subcatBlock}\n  },`;
       })
       .join("\n");
 

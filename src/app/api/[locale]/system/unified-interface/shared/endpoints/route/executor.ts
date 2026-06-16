@@ -22,7 +22,7 @@ import {
   isStreamingResponse,
   success,
 } from "@/app/api/[locale]/shared/types/response.schema";
-import { scopedTranslation as systemScopedTranslation } from "@/app/api/[locale]/system/i18n";
+import { scopedTranslation as systemScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -82,7 +82,7 @@ export class RouteExecutionExecutor {
 
       if (!handlerResult) {
         return fail({
-          message: t("unifiedInterface.cli.vibe.errors.routeNotFound", {
+          message: t("cli.vibe.errors.routeNotFound", {
             toolName: params.toolName,
           }),
           errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
@@ -115,7 +115,7 @@ export class RouteExecutionExecutor {
       // Streaming responses are not supported in CLI/AI/MCP platforms
       if (isStreamingResponse(result)) {
         return fail({
-          message: t("unifiedInterface.cli.vibe.errors.executionFailed"),
+          message: t("cli.vibe.errors.executionFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -123,7 +123,7 @@ export class RouteExecutionExecutor {
       // File responses are not supported in CLI/AI/MCP platforms
       if (isFileResponse(result)) {
         return fail({
-          message: t("unifiedInterface.cli.vibe.errors.executionFailed"),
+          message: t("cli.vibe.errors.executionFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -180,7 +180,7 @@ export class RouteExecutionExecutor {
         },
       );
       return fail({
-        message: t("unifiedInterface.cli.vibe.errors.unknownError"),
+        message: t("cli.vibe.errors.unknownError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

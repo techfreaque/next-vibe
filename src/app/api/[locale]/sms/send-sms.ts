@@ -12,7 +12,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { smsEnv } from "./env";
-import { smsScopedT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";
 import { getMessageBirdProvider } from "./providers/messagebird";
@@ -103,7 +103,7 @@ export async function sendSms(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<ResponseType<SmsResult>> {
-  const { t } = smsScopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const maxAttempts =
     params.retry?.attempts ||
     parseInt(smsEnv.SMS_MAX_RETRY_ATTEMPTS || "3", 10);
@@ -225,7 +225,7 @@ export async function batchSendSms(
     }>;
   }>
 > {
-  const { t } = smsScopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   logger.info("Sending batch SMS", { count: messages.length });
 
   const results = await Promise.all(

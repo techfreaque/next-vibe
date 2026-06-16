@@ -53,6 +53,8 @@ export async function resolveVirtualRead(
   userId: string,
   path: string,
   mountPrefix: string,
+  isAdmin: boolean,
+  locale: CountryLanguage,
 ): Promise<VirtualReadResult | null> {
   switch (mountPrefix) {
     case "/threads": {
@@ -61,7 +63,7 @@ export async function resolveVirtualRead(
     }
     case "/skills": {
       const { readSkillPath } = await import("./skills");
-      return readSkillPath(userId, path);
+      return readSkillPath(userId, path, locale);
     }
     case "/favorites": {
       const { readFavoritePath } = await import("./favorites");
@@ -83,6 +85,10 @@ export async function resolveVirtualRead(
       const { readGenPath } = await import("./gens");
       return readGenPath(userId, path);
     }
+    case "/ssh": {
+      const { readSshPath } = await import("./ssh");
+      return readSshPath(userId, path, isAdmin);
+    }
     default:
       return null;
   }
@@ -95,6 +101,7 @@ export async function resolveVirtualList(
   userId: string,
   path: string,
   mountPrefix: string,
+  isAdmin: boolean,
 ): Promise<VirtualListEntry[]> {
   switch (mountPrefix) {
     case "/threads": {
@@ -125,6 +132,10 @@ export async function resolveVirtualList(
       const { listGenPath } = await import("./gens");
       return listGenPath(userId, path);
     }
+    case "/ssh": {
+      const { listSshPath } = await import("./ssh");
+      return listSshPath(userId, path, isAdmin);
+    }
     default:
       return [];
   }
@@ -133,7 +144,10 @@ export async function resolveVirtualList(
 /**
  * Get counts for all virtual mounts (used by tree/system prompt)
  */
-export async function getVirtualMountCounts(userId: string): Promise<{
+export async function getVirtualMountCounts(
+  userId: string,
+  isAdmin: boolean,
+): Promise<{
   threads: { total: number; byRoot: Record<string, number> };
   memories: number;
   skills: number;
@@ -143,6 +157,7 @@ export async function getVirtualMountCounts(userId: string): Promise<{
   uploads: number;
   searches: number;
   gens: number;
+  ssh: number;
 }> {
   const [threadCounts, skillCount, favoriteCount, taskCount] =
     await Promise.all([
@@ -155,14 +170,21 @@ export async function getVirtualMountCounts(userId: string): Promise<{
   // Count document + memory workspace files from cortex_nodes
   const { countDocuments } = await import("./documents");
   const { countMemories } = await import("./memories-count");
-  const [docCount, memoryCount, uploadCounts, searchCounts, genCounts] =
-    await Promise.all([
-      countDocuments(userId),
-      countMemories(userId),
-      import("./uploads").then((m) => m.getUploadCounts(userId)),
-      import("./searches").then((m) => m.getSearchCounts(userId)),
-      import("./gens").then((m) => m.getGenCounts(userId)),
-    ]);
+  const [
+    docCount,
+    memoryCount,
+    uploadCounts,
+    searchCounts,
+    genCounts,
+    sshCount,
+  ] = await Promise.all([
+    countDocuments(userId),
+    countMemories(userId),
+    import("./uploads").then((m) => m.getUploadCounts(userId)),
+    import("./searches").then((m) => m.getSearchCounts(userId)),
+    import("./gens").then((m) => m.getGenCounts(userId)),
+    import("./ssh").then((m) => m.getSshCount(userId, isAdmin)),
+  ]);
 
   return {
     threads: threadCounts,
@@ -174,6 +196,7 @@ export async function getVirtualMountCounts(userId: string): Promise<{
     uploads: uploadCounts.total,
     searches: searchCounts.total,
     gens: genCounts.total,
+    ssh: sshCount,
   };
 }
 
@@ -190,6 +213,10 @@ export async function resolveVirtualWrite(
     case "/skills": {
       const { writeSkillPath } = await import("./skills");
       return writeSkillPath(ctx, path, content);
+    }
+    case "/ssh": {
+      const { writeSshPath } = await import("./ssh");
+      return writeSshPath(ctx.userId, path, content);
     }
     default:
       return null;
@@ -209,6 +236,10 @@ export async function resolveVirtualDelete(
       const { deleteSkillPath } = await import("./skills");
       return deleteSkillPath(ctx, path);
     }
+    case "/ssh": {
+      const { deleteSshPath } = await import("./ssh");
+      return deleteSshPath(ctx.userId, path);
+    }
     default:
       return null;
   }
@@ -227,6 +258,10 @@ export async function resolveVirtualMove(
     case "/skills": {
       const { moveSkillPath } = await import("./skills");
       return moveSkillPath(ctx, fromPath, toPath);
+    }
+    case "/ssh": {
+      const { moveSshPath } = await import("./ssh");
+      return moveSshPath(ctx.userId, fromPath, toPath);
     }
     default:
       return null;

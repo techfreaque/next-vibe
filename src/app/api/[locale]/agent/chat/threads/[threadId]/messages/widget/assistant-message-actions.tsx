@@ -27,14 +27,14 @@ import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
 import type messagesDefinition from "../definition";
-import { useWidgetItem } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
 import { MessageActionButton } from "./message-action-button";

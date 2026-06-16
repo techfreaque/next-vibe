@@ -11,20 +11,19 @@ import {
   backButton,
   customWidgetObject,
   objectField,
-  requestField,
   responseArrayField,
   responseField,
+  searchBarField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { KAGI_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -85,12 +84,16 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      query: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+      query: searchBarField(scopedTranslation, {
+        type: WidgetType.SEARCH_BAR,
+        fieldName: "query",
         label: "get.fields.query.title" as const,
         description: "get.fields.query.description" as const,
         placeholder: "get.fields.query.placeholder" as const,
+        submitText: "get.submitButton.label" as const,
+        submitLoadingText: "get.submitButton.loadingText" as const,
+        submitIcon: "search",
+        size: "xl",
         columns: 12,
         schema: z.string().min(1).max(400),
       }),

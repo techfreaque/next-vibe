@@ -25,13 +25,12 @@ import type { JSX } from "react";
 import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
 import { useCustomerPortal } from "@/app/api/[locale]/payment/portal/hooks";
 import {
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { useTranslation } from "@/i18n/core/client";
-
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import type definition from "./definition";
 import { SubscriptionStatus } from "./enum";
 
@@ -45,10 +44,13 @@ function formatDate(date: string, locale: string): string {
 /**
  * Subscription Overview Container Widget
  */
-export function SubscriptionOverviewContainer(): JSX.Element {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function SubscriptionOverviewContainer(_props: {
+  field: (typeof definition.GET)["fields"];
+}): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
   const subscription = useWidgetValue<typeof definition.GET>();
-  const { locale } = useTranslation();
+  const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const portal = useCustomerPortal(logger, user);
@@ -76,7 +78,8 @@ export function SubscriptionOverviewContainer(): JSX.Element {
 
   const handleManageSubscription = async (): Promise<void> => {
     if (subscription.provider === PaymentProvider.NOWPAYMENTS) {
-      alert(t("manage.nowpayments.info"));
+      // eslint-disable-next-line no-alert
+      window.alert(t("manage.nowpayments.info"));
       return;
     }
 
@@ -91,9 +94,8 @@ export function SubscriptionOverviewContainer(): JSX.Element {
         }
       },
       onError: ({ error }) => {
-        alert(
-          error.message ?? "Failed to open customer portal. Please try again.",
-        );
+        // eslint-disable-next-line no-alert
+        window.alert(error.message ?? t("manage.portal.error"));
       },
     });
   };
@@ -240,7 +242,10 @@ export function SubscriptionOverviewContainer(): JSX.Element {
           {!isCanceled && (
             <Div className="mt-6 pt-4 border-t">
               <Button
-                onClick={handleManageSubscription}
+                type="button"
+                onClick={() => {
+                  void handleManageSubscription();
+                }}
                 variant="outline"
                 className="w-full"
               >

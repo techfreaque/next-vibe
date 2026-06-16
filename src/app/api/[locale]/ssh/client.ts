@@ -521,3 +521,46 @@ export async function sftpWriteFile(
     });
   });
 }
+
+export async function sftpDeleteFile(
+  client: Ssh2Client,
+  filePath: string,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    client.sftp((err, sftp) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      sftp.unlink(filePath, (err2) => {
+        if (err2) {
+          reject(err2);
+          return;
+        }
+        resolve();
+      });
+    });
+  });
+}
+
+export async function sftpRenameFile(
+  client: Ssh2Client,
+  fromPath: string,
+  toPath: string,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    client.sftp((err, sftp) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      sftp.rename(fromPath, toPath, (err2) => {
+        if (err2) {
+          reject(err2);
+          return;
+        }
+        resolve();
+      });
+    });
+  });
+}

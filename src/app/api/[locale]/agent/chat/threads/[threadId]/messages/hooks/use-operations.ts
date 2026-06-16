@@ -22,7 +22,7 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";

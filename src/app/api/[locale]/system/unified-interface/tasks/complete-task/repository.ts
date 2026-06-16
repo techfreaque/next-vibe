@@ -17,8 +17,8 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
-import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
+import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
@@ -30,7 +30,6 @@ import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
 import { CronTaskStatus } from "../enum";
 import type { TasksT } from "../i18n";
 import { handleTaskCompletion } from "../task-completion-handler";
-import { TaskSyncRepository } from "../task-sync/repository";
 import type {
   CompleteTaskRequestOutput,
   CompleteTaskResponseOutput,
@@ -71,7 +70,6 @@ export class CompleteTaskRepository {
       );
       return success({
         completed: true,
-        pushedToRemote: false,
         updatedAt: (task.lastExecutedAt ?? new Date()).toISOString(),
       });
     }
@@ -197,27 +195,8 @@ export class CompleteTaskRepository {
       }
     }
 
-    // Push to remote if needed
-    let pushedToRemote = false;
-    if (task.targetInstance) {
-      const pushResult = await TaskSyncRepository.pushStatusToRemote({
-        taskId: task.id,
-        status,
-        summary,
-        durationMs: Math.round(now.getTime() - task.createdAt.getTime()),
-        executionId,
-        output: response,
-        startedAt: now.toISOString(),
-        serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        executedByInstance: null,
-        logger,
-      });
-      pushedToRemote = pushResult.success;
-    }
-
     return success({
       completed: true,
-      pushedToRemote,
       updatedAt: now.toISOString(),
     });
   }

@@ -4,20 +4,9 @@
  */
 
 import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
-import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
-import { BUILDER_ALIAS } from "@/app/api/[locale]/system/builder/constants";
-import { DEV_ALIASES } from "@/app/api/[locale]/system/server/dev/constants";
-import { VIBE_CHECK_ALIAS } from "@/app/api/[locale]/system/check/vibe-check/constants";
-import { GUARD_STATUS_ALIAS } from "@/app/api/[locale]/system/guard/status/constants";
-import { ELECTRON_ALIAS } from "@/app/api/[locale]/system/server/electron/start/constants";
 import { SYSTEM_SETTINGS_ALIAS } from "@/app/api/[locale]/system/settings/constants";
-import { CLI_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/cli/setup/status/constants";
-import { MCP_ALIAS } from "@/app/api/[locale]/system/unified-interface/mcp/serve/constants";
-import { VIBE_FRAME_MOUNT_ALIAS } from "@/app/api/[locale]/system/unified-interface/vibe-frame/mount/constants";
-import { CRON_LIST_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/constants";
-import { ERROR_LOGS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/error-monitor/logs/constants";
-import { PULSE_HISTORY_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/history/constants";
-import { REMOTE_SYNC_ALIAS } from "@/app/api/[locale]/remote-connection/sync/constants";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
 
 export const category: CategoryDefinition = {
   key: "devTools",
@@ -30,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "system",
   icon: "settings",
   order: 20,
-  defaultEntry: HEALTH_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: SYSTEM_SETTINGS_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     Generators: {
       icon: "code-2",
@@ -41,7 +34,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Generatoren",
         "pl-PL": "Generatory",
       },
-      defaultEntry: BUILDER_ALIAS,
     },
     Build: {
       icon: "zap",
@@ -52,7 +44,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Build",
         "pl-PL": "Kompilacja",
       },
-      defaultEntry: DEV_ALIASES[0],
     },
     Check: {
       icon: "check-circle",
@@ -63,7 +54,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Prüfen",
         "pl-PL": "Sprawdź",
       },
-      defaultEntry: VIBE_CHECK_ALIAS,
     },
     serverManagement: {
       icon: "server",
@@ -74,7 +64,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Server",
         "pl-PL": "Serwer",
       },
-      // inherits parent defaultEntry (health)
     },
     serverGuard: {
       icon: "shield",
@@ -85,7 +74,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Guard",
         "pl-PL": "Guard",
       },
-      defaultEntry: GUARD_STATUS_ALIAS,
     },
     serverElectron: {
       icon: "monitor",
@@ -96,7 +84,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Electron",
         "pl-PL": "Electron",
       },
-      defaultEntry: ELECTRON_ALIAS,
     },
     settingsEnv: {
       icon: "sliders",
@@ -107,7 +94,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Einstellungen",
         "pl-PL": "Ustawienia",
       },
-      defaultEntry: SYSTEM_SETTINGS_ALIAS,
     },
     settingsKeys: {
       icon: "key",
@@ -128,7 +114,6 @@ export const category: CategoryDefinition = {
         "de-DE": "CLI",
         "pl-PL": "CLI",
       },
-      defaultEntry: CLI_STATUS_ALIAS,
     },
     interfacesMcp: {
       icon: "cpu",
@@ -139,7 +124,6 @@ export const category: CategoryDefinition = {
         "de-DE": "MCP",
         "pl-PL": "MCP",
       },
-      defaultEntry: MCP_ALIAS,
     },
     interfacesFrame: {
       icon: "layout",
@@ -150,7 +134,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Frame",
         "pl-PL": "Frame",
       },
-      defaultEntry: VIBE_FRAME_MOUNT_ALIAS,
     },
     tasksCron: {
       icon: "clock",
@@ -161,7 +144,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Cron-Aufgaben",
         "pl-PL": "Zadania cron",
       },
-      defaultEntry: CRON_LIST_ALIAS,
     },
     tasksMonitoring: {
       icon: "activity",
@@ -172,7 +154,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Überwachung",
         "pl-PL": "Monitoring",
       },
-      defaultEntry: ERROR_LOGS_ALIAS,
     },
     tasksPulse: {
       icon: "radio",
@@ -183,7 +164,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Pulse",
         "pl-PL": "Puls",
       },
-      defaultEntry: PULSE_HISTORY_ALIAS,
     },
     tasksSync: {
       icon: "refresh-cw",
@@ -194,7 +174,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Synchronisierung",
         "pl-PL": "Synchronizacja",
       },
-      defaultEntry: REMOTE_SYNC_ALIAS,
     },
   },
 };

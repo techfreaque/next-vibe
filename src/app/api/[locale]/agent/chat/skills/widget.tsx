@@ -33,39 +33,44 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
+import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/widget";
-import IconWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/icon/widget";
-import { SeparatorWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/separator/widget";
-import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
+import IconWidget from "next-vibe-ui/unified/display-only/icon/widget";
+import { SeparatorWidget } from "next-vibe-ui/unified/display-only/separator/widget";
+import TextWidget from "next-vibe-ui/unified/display-only/text/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 
 import { cn } from "../../../shared/utils";
-import { Icon } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/selector/selector-onboarding/context";
 
-import { parseSkillId } from "../slugify";
+import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import { useAddToFavorites } from "../favorites/create/hooks";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { useChatFavorites } from "../favorites/hooks/hooks";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { useChatSettings } from "../settings/hooks";
 import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
 import type { SkillListItem } from "./definition";
 import { SkillOwnershipType, SkillSourceFilter, SkillTrustLevel } from "./enum";
-import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 
+import { parseSkillId } from "../slugify";
 /**
+import { parseSkillId } from "../slugify";
  * Props for custom widget
+import { parseSkillId } from "../slugify";
  */
 interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];

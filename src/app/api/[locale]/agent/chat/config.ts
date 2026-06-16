@@ -19,14 +19,15 @@ import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import {
   EXECUTE_TOOL_ALIAS,
   type CallbackModeValue,
-} from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+} from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   UserRole,
   type UserPermissionRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 /**
  * Default folder IDs
  * These are special system folder IDs that exist outside the database

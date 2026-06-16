@@ -15,6 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CortexNodeType } from "../enum";
@@ -242,3 +243,6 @@ export class CortexListRepository {
     }
   }
 }
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";

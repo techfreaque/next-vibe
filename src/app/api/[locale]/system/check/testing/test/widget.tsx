@@ -7,7 +7,7 @@
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 
-import { useWidgetValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetValue } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type definition from "./definition";
 

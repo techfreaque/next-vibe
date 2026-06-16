@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:3eea36c8 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 12, 16:54]\n\nAssistant: STEP_OK\n\nSystem: [Context: ID:58e0e1dc | Posted:Jun 12, 16:55]\n\nUser: [T5 detach-dispatch] Call the generate_image tool with prompt='wait-for-task-test' and callbackMode='detach'. Check that the result has a taskId string and status field, and does NOT have an imageUrl. End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (16)\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format\n\nSystem: [Context: ID:05edba47 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 12, 16:55]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"generate_image\",\"input\":{\"prompt\":\"wait-for-task-test\"},\"callbackMode\":\"detach\"}\n\nTool: [result:execute-tool] {\"taskId\":\"local-bg-1781283320392-j4poy7\",\"status\":\"status.pending\",\"hint\":\"Task detached. Use wait-for-task with this taskId if you need the result.\"}",
+    "encoding_format": "float"
+  }
+}

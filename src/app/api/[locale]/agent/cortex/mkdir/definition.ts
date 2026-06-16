@@ -17,7 +17,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CORTEX_MKDIR_ALIAS, resolveCortexIcon } from "../constants";

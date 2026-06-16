@@ -73,16 +73,6 @@ export class CortexWriteRepository {
       });
     }
 
-    // Filesystem backend for preview-mode admin
-    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
-    if (!user.isPublic && !isVirtualWritable(path)) {
-      const { isFilesystemMode } = await import("../fs-provider");
-      if (isFilesystemMode(user)) {
-        const { fsWriteFile } = await import("../fs-provider/fs-write");
-        return fsWriteFile(path, content, { t });
-      }
-    }
-
     // Virtual writable mount - delegate to mount handler
     if (isVirtualWritable(path)) {
       const mountPrefix = getMountPrefix(path, locale);
@@ -185,14 +175,6 @@ export class CortexWriteRepository {
         `Cortex write: ${path} (${size} bytes, ${isNew ? "created" : "overwritten"})`,
       );
 
-      // Disk write-through for documents
-      try {
-        const { syncToDisk } = await import("../fs-provider/fs-sync");
-        await syncToDisk(path, content);
-      } catch {
-        // Best-effort
-      }
-
       // Queue background embedding for semantic search
       if (row) {
         const { queueEmbedding } = await import("../embeddings/auto-embed");
@@ -204,6 +186,27 @@ export class CortexWriteRepository {
           feature: CortexCreditFeature.WRITE,
         });
       }
+
+      // WS-push sync: broadcast changed provider to connected remote instances
+      void (async (): Promise<void> => {
+        try {
+          const { serializeProviders } =
+            await import("@/app/api/[locale]/remote-connection/sync-provider");
+          const { broadcastSyncNotify } =
+            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+          const providerKey = path.startsWith("/memories")
+            ? "memories"
+            : "documents";
+          const syncPayloads = await serializeProviders(
+            [providerKey],
+            userId,
+            logger,
+          );
+          broadcastSyncNotify(userId, syncPayloads, logger);
+        } catch {
+          // Best-effort: cron fallback handles missed syncs
+        }
+      })();
 
       return success({
         responsePath: path,

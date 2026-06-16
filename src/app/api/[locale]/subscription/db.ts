@@ -8,6 +8,7 @@ import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import { catalogProducts } from "../products/db";
 import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 import { users } from "../user/db";
 import {
@@ -80,6 +81,9 @@ export const subscriptions = pgTable("subscriptions", {
   providerPriceId: text("provider_price_id"),
   providerProductId: text("provider_product_id"),
 
+  // Catalog product reference (soft ref — no FK constraint)
+  catalogProductId: uuid("catalog_product_id"),
+
   // Metadata
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
@@ -96,6 +100,10 @@ export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
   user: one(users, {
     fields: [subscriptions.userId],
     references: [users.id],
+  }),
+  catalogProduct: one(catalogProducts, {
+    fields: [subscriptions.catalogProductId],
+    references: [catalogProducts.id],
   }),
 }));
 

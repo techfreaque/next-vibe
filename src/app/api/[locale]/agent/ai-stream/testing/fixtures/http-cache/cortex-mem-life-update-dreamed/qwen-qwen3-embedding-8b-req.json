@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> All 6 standard life areas are present in /memories/life/:\n1. career.md\n2. finances.md\n3. growth.md\n4. health.md\n5. purpose.md\n6. relationships.md\n\nNo areas are missing. The task is complete.</think> Files in /memories/life/:\n- career.md\n- finances.md\n- growth.md\n- health.md\n- purpose.md\n- relationships.md\n\nAll 6 standard life areas are present. None are missing.\n\nVERDICT: PASS\n\nUser: Use cortex-read on /memories/life/career.md. Report: (1) what frontmatter fields are present, (2) whether it has a \"## Current State\" section or similar life-area structure. If the file doesn't exist, just report that gracefully.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nAssistant: <think> The user wants me to read /memories/life/career.md and report:\n1. What frontmatter fields are present\n2. Whether it has a \"## Current State\" section or similar life-area structure\n\nLet me read the file.</think>\n\nAssistant: <think>The user asked me to report:\n1. What frontmatter fields are present\n2. Whether it has a \"## Current State\" section or similar life-area structure\n\nFrom the file content:\n\nFrontmatter:\n```\n---\npriority: 90\ntags: [life, career, goals]\n---\n```\n\nFields present: `priority`, `tags`\n\nSections present:\n- ## Current State\n- ## Goals\n- ## Active Projects\n- ## Blockers\n- ## Patterns\n\nYes, it has a \"## Current State\" section and a life-area structure with multiple sections.\n\nThe file exists, so no need to report it doesn't exist gracefully.\n\nVERDICT: PASS since the tool call succeeded and results are correct.</think>**Frontmatter fields present:**\n- `priority: 90`\n- `tags: [life, career, goals]`\n\n**Life-area structure:**\nYes, it has a `## Current State` section. The file also contains `## Goals\n\nUser: First, read /memories/life/career.md. If it exists and has a last-dreamed field in frontmatter, use cortex-edit to update that field to today's date (2026-04-23). If the file doesn't exist, use cortex-write to create it with frontmatter containing \"last-dreamed: 2026-04-23\" and a simple body. Report what you did.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
+    "encoding_format": "float"
+  }
+}

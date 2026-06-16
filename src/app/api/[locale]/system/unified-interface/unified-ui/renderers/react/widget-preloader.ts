@@ -31,153 +31,172 @@ export function eagerImport(
 // Start all imports at module-eval time so chunks are in-flight immediately.
 eagerImport(
   "description",
-  () => import("../../widgets/display-only/description/widget"),
+  () => import("next-vibe-ui/unified/display-only/description/widget"),
 );
 eagerImport(
   "metadata",
-  () => import("../../widgets/display-only/metadata/widget"),
+  () => import("next-vibe-ui/unified/display-only/metadata/widget"),
 );
 eagerImport(
   "key-value",
-  () => import("../../widgets/display-only/key-value/widget"),
+  () => import("next-vibe-ui/unified/display-only/key-value/widget"),
 );
 eagerImport(
   "markdown",
-  () => import("../../widgets/display-only/markdown/widget"),
+  () => import("next-vibe-ui/unified/display-only/markdown/widget"),
 );
 eagerImport(
   "markdown-editor",
-  () => import("../../widgets/form-fields/markdown-editor/widget"),
+  () => import("next-vibe-ui/unified/form-fields/markdown-editor/widget"),
 );
-eagerImport("link", () => import("../../widgets/display-only/link/widget"));
+eagerImport(
+  "link",
+  () => import("next-vibe-ui/unified/display-only/link/widget"),
+);
 eagerImport(
   "code-output",
-  () => import("../../widgets/containers/code-output/widget"),
+  () => import("next-vibe-ui/unified/containers/code-output/widget"),
 );
 eagerImport(
   "code-quality-list",
-  () => import("../../widgets/display-only/code-quality-list/widget"),
+  () => import("next-vibe-ui/unified/display-only/code-quality-list/widget"),
 );
 eagerImport(
   "pagination",
-  () => import("../../widgets/containers/pagination/widget"),
+  () => import("next-vibe-ui/unified/containers/pagination/widget"),
 );
-eagerImport("stat", () => import("../../widgets/display-only/stat/widget"));
-eagerImport("chart", () => import("../../widgets/display-only/chart/widget"));
+eagerImport(
+  "stat",
+  () => import("next-vibe-ui/unified/display-only/stat/widget"),
+);
+eagerImport(
+  "chart",
+  () => import("next-vibe-ui/unified/display-only/chart/widget"),
+);
 eagerImport(
   "status-indicator",
-  () => import("../../widgets/display-only/status-indicator/widget"),
+  () => import("next-vibe-ui/unified/display-only/status-indicator/widget"),
 );
 eagerImport(
   "empty-state",
-  () => import("../../widgets/display-only/empty-state/widget"),
+  () => import("next-vibe-ui/unified/display-only/empty-state/widget"),
 );
 eagerImport(
   "code-quality-files",
-  () => import("../../widgets/display-only/code-quality-files/widget"),
+  () => import("next-vibe-ui/unified/display-only/code-quality-files/widget"),
 );
 eagerImport(
   "code-quality-summary",
-  () => import("../../widgets/display-only/code-quality-summary/widget"),
+  () => import("next-vibe-ui/unified/display-only/code-quality-summary/widget"),
 );
-eagerImport("avatar", () => import("../../widgets/display-only/avatar/widget"));
+eagerImport(
+  "avatar",
+  () => import("next-vibe-ui/unified/display-only/avatar/widget"),
+);
 eagerImport(
   "loading",
-  () => import("../../widgets/display-only/loading/widget"),
+  () => import("next-vibe-ui/unified/display-only/loading/widget"),
 );
 eagerImport(
   "color",
-  () => import("../../widgets/form-fields/color-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/color-field/widget"),
 );
 eagerImport(
   "country-select",
-  () => import("../../widgets/form-fields/country-select-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/country-select-field/widget"),
 );
 eagerImport(
   "currency-select",
-  () => import("../../widgets/form-fields/currency-select-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/currency-select-field/widget"),
 );
 eagerImport(
   "date",
-  () => import("../../widgets/form-fields/date-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/date-field/widget"),
 );
 eagerImport(
   "date-range",
-  () => import("../../widgets/form-fields/date-range-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/date-range-field/widget"),
 );
 eagerImport(
   "datetime",
-  () => import("../../widgets/form-fields/datetime-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/datetime-field/widget"),
 );
 eagerImport(
   "email",
-  () => import("../../widgets/form-fields/email-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/email-field/widget"),
 );
 eagerImport(
   "file",
-  () => import("../../widgets/form-fields/file-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/file-field/widget"),
 );
 eagerImport(
   "filter-pills",
-  () => import("../../widgets/form-fields/filter-pills-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/filter-pills-field/widget"),
 );
-eagerImport("int", () => import("../../widgets/form-fields/int-field/widget"));
+eagerImport(
+  "int",
+  () => import("next-vibe-ui/unified/form-fields/int-field/widget"),
+);
 eagerImport(
   "json",
-  () => import("../../widgets/form-fields/json-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/json-field/widget"),
 );
 eagerImport(
   "language-select",
-  () => import("../../widgets/form-fields/language-select-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/language-select-field/widget"),
 );
 eagerImport(
   "multiselect",
-  () => import("../../widgets/form-fields/multiselect-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/multiselect-field/widget"),
 );
 eagerImport(
   "number",
-  () => import("../../widgets/form-fields/number-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/number-field/widget"),
 );
 eagerImport(
   "password",
-  () => import("../../widgets/form-fields/password-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/password-field/widget"),
 );
 eagerImport(
   "tel",
-  () => import("../../widgets/form-fields/phone-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/phone-field/widget"),
 );
 eagerImport(
   "range-slider",
-  () => import("../../widgets/form-fields/range-slider-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/range-slider-field/widget"),
 );
 eagerImport(
   "slider",
-  () => import("../../widgets/form-fields/slider-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/slider-field/widget"),
 );
 eagerImport(
   "tags",
-  () => import("../../widgets/form-fields/tags-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/tags-field/widget"),
 );
 eagerImport(
   "text-array",
-  () => import("../../widgets/form-fields/text-array-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/text-array-field/widget"),
 );
 eagerImport(
   "time",
-  () => import("../../widgets/form-fields/time-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/time-field/widget"),
 );
 eagerImport(
   "time-range",
-  () => import("../../widgets/form-fields/time-range-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/time-range-field/widget"),
 );
 eagerImport(
   "timezone",
-  () => import("../../widgets/form-fields/timezone-field/widget"),
+  () => import("next-vibe-ui/unified/form-fields/timezone-field/widget"),
 );
-eagerImport("url", () => import("../../widgets/form-fields/url-field/widget"));
+eagerImport(
+  "url",
+  () => import("next-vibe-ui/unified/form-fields/url-field/widget"),
+);
 eagerImport(
   "markdown-textarea",
-  () => import("../../widgets/form-fields/markdown-textarea-field/widget"),
+  () =>
+    import("next-vibe-ui/unified/form-fields/markdown-textarea-field/widget"),
 );
 
 /**

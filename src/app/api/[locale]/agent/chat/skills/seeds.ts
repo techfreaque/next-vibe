@@ -43,9 +43,6 @@ const TEST_SKILLS: Omit<NewCustomSkill, "userId">[] = [
     trustLevel: SkillTrustLevel.COMMUNITY,
     voteCount: 42,
     reportCount: 0,
-    modelSelection: {
-      selectionType: ModelSelectionType.FILTERS,
-    },
     variants: [
       {
         id: "standard",
@@ -108,9 +105,6 @@ const testSkill = { name: "Layout Preview Bot", status: "just vibing" };
     trustLevel: SkillTrustLevel.COMMUNITY,
     voteCount: 0,
     reportCount: 0,
-    modelSelection: {
-      selectionType: ModelSelectionType.FILTERS,
-    },
     createdAt: new Date("2026-02-01T12:00:00Z"),
     updatedAt: new Date("2026-02-01T12:00:00Z"),
   },
@@ -127,9 +121,6 @@ const testSkill = { name: "Layout Preview Bot", status: "just vibing" };
     trustLevel: SkillTrustLevel.VERIFIED,
     voteCount: 999,
     reportCount: 2,
-    modelSelection: {
-      selectionType: ModelSelectionType.FILTERS,
-    },
     variants: [
       {
         id: "default",
@@ -166,9 +157,6 @@ This skill has 999 votes. Test that the verified badge renders correctly, vote c
     trustLevel: SkillTrustLevel.COMMUNITY,
     voteCount: 7,
     reportCount: 0,
-    modelSelection: {
-      selectionType: ModelSelectionType.FILTERS,
-    },
     variants: [
       {
         id: "default",

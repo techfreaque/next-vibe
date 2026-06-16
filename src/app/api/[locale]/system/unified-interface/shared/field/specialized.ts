@@ -8,8 +8,8 @@
 import { z } from "zod";
 
 import type { AppLocaleTranslationKey } from "@/app/[locale]/i18n";
-import type { MultiSelectFieldWidgetConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/types";
-import type { SelectFieldWidgetConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/types";
+import type { MultiSelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/multiselect-field/types";
+import type { SelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/select-field/types";
 
 import { FieldDataType, WidgetType } from "../types/enums";
 

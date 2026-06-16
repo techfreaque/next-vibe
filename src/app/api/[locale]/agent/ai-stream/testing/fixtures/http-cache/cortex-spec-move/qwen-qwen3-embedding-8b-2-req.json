@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: Use cortex-write to create /memories/spec-test/critical-note.md with this content:\n\n---\npriority: 90\npinned: true\ntags: [spec-test]\n---\n\nThis is a PINNED critical note. It must ALWAYS appear in the system prompt, never trimmed.\n\nAfter writing, read it back with cortex-read and confirm:\n1. The file was created\n2. The frontmatter contains pinned: true\n3. The content matches what you wrote\n\n\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nAssistant: <think>The user wants me to:\n1. Create `/memories/spec-test/critical-note.md` with specific content using `cortex-write`\n2. Read it back with `cortex-read`\n3. Confirm: file created, frontmatter has `pinned: true`, content matches what I wrote\n4. End with `VERDICT: PASS` or `VERDICT: FAIL`\n\nLet me do the write first, then read it back.</think>\n\nAssistant: <think>Good, the file was created. Now I need to read it back to confirm the content.</think>\n\nAssistant: <think>Let me verify all three requirements:\n\n1. The file was created — Yes, `cortex-write` returned `created: true`, and `cortex-read` confirms it exists at `/memories/spec-test/critical-note.md`.\n2. The frontmatter contains `pinned: true` — Yes, the content shows `pinned: true` in the frontmatter.\n3. The content matches what I wrote — Yes, it matches exactly:\n```\n---\npriority: 90\npinned: true\ntags: [spec-test]\n---\n\nThis is a PINNED critical note. It must ALWAYS appear in the system prompt, never trimmed.\n```\n\nEverything checks out. I'll provide the confirmation and end with VERDICT: PASS.</think>File created at `/memories/spec-test/critical-note.md` (144 bytes).\n\nConfirmed:\n1. **File created** — `created: true` from write; readable at the target path.\n2. **Frontmatter contains `pinned: t\n\nUser: Use cortex-move to rename the file from \"/memories/spec-test/life-career.md\" to \"/memories/spec-test/life-career-moved.md\".\nAfter moving:\n1. Confirm the source path no longer exists (use cortex-read on the source, expect a not-found error)\n2. Confirm the destination path exists and has the same content (use cortex-read on dest)\n\n\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
+    "encoding_format": "float"
+  }
+}

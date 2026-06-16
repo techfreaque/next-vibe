@@ -5,7 +5,15 @@
 
 "use client";
 
+import { Dialog, DialogContent } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe-ui/ui/select";
 import { P } from "next-vibe-ui/ui/typography";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { useMemo, useState } from "react";
@@ -26,12 +34,17 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { NavigationStackEntry } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import {
+  isCliPlatform,
+  type Platform,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { EndpointRenderer, type SubmitButtonConfig } from "./EndpointRenderer";
+import { PickerProvider } from "next-vibe-ui/unified/_shared/picker-context";
+import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 
 /**
  * Extracts mutation options from an endpoint, stripping onSuccess
@@ -252,6 +265,12 @@ function EndpointsPageInternal<
   // In that case loggerProp must be supplied
   const logger = useLogger();
 
+  // Use finalNavigation (override-aware) for mutation success handlers.
+  // Raw Zustand refs (navigationPop, etc.) would bypass the URL-synced override.
+  const finalNavigationPop = finalNavigation.pop;
+  const finalNavigationReplace = finalNavigation.replace;
+  const finalNavigationStack = finalNavigation.stack;
+
   // Build mutation options with onSuccess callback for finalNavigation
   const mutationOptionsWithNav = useMemo(() => {
     // Only work with caller's options - don't merge with endpoint options here
@@ -293,7 +312,8 @@ function EndpointsPageInternal<
           }
 
           // Handle navigation pop or replace
-          const currentEntry = navigationStack[navigationStack.length - 1];
+          const currentEntry =
+            finalNavigationStack[finalNavigationStack.length - 1];
           const popCount = currentEntry?.popNavigationOnSuccess;
           const replaceConfig = currentEntry?.replaceOnSuccess;
           const successCallback = currentEntry?.onSuccessCallback;
@@ -302,7 +322,7 @@ function EndpointsPageInternal<
             const urlPathParams = replaceConfig.getUrlPathParams
               ? replaceConfig.getUrlPathParams(responseData)
               : undefined;
-            navigationReplace(replaceConfig.endpoint, {
+            finalNavigationReplace(replaceConfig.endpoint, {
               urlPathParams,
               prefillFromGet: replaceConfig.prefillFromGet,
               getEndpoint: replaceConfig.prefillFromGet
@@ -311,7 +331,7 @@ function EndpointsPageInternal<
             });
           } else if (popCount && popCount > 0) {
             for (let i = 0; i < popCount; i++) {
-              navigationPop();
+              finalNavigationPop();
             }
             successCallback?.();
           }
@@ -325,9 +345,9 @@ function EndpointsPageInternal<
     endpoint.POST,
     endpoint.PUT,
     endpointOptions?.create?.mutationOptions,
-    navigationPop,
-    navigationReplace,
-    navigationStack,
+    finalNavigationPop,
+    finalNavigationReplace,
+    finalNavigationStack,
   ]);
 
   // Create wrapped PATCH mutation options with finalNavigation handling
@@ -371,7 +391,8 @@ function EndpointsPageInternal<
         }
 
         // Handle popNavigationOnSuccess or replaceOnSuccess from finalNavigation entry
-        const currentEntry = navigationStack[navigationStack.length - 1];
+        const currentEntry =
+          finalNavigationStack[finalNavigationStack.length - 1];
         const popCount = currentEntry?.popNavigationOnSuccess;
         const replaceConfig = currentEntry?.replaceOnSuccess;
         const successCallback = currentEntry?.onSuccessCallback;
@@ -380,7 +401,7 @@ function EndpointsPageInternal<
           const urlPathParams = replaceConfig.getUrlPathParams
             ? replaceConfig.getUrlPathParams(responseData)
             : undefined;
-          navigationReplace(replaceConfig.endpoint, {
+          finalNavigationReplace(replaceConfig.endpoint, {
             urlPathParams,
             prefillFromGet: replaceConfig.prefillFromGet,
             getEndpoint: replaceConfig.prefillFromGet
@@ -389,7 +410,7 @@ function EndpointsPageInternal<
           });
         } else if (popCount && popCount > 0) {
           for (let i = 0; i < popCount; i++) {
-            navigationPop();
+            finalNavigationPop();
           }
           successCallback?.();
         }
@@ -398,9 +419,9 @@ function EndpointsPageInternal<
   }, [
     endpoint.PATCH,
     endpointOptions?.update?.mutationOptions,
-    navigationPop,
-    navigationReplace,
-    navigationStack,
+    finalNavigationPop,
+    finalNavigationReplace,
+    finalNavigationStack,
   ]);
 
   // Create wrapped DELETE mutation options with finalNavigation handling
@@ -444,7 +465,8 @@ function EndpointsPageInternal<
         }
 
         // Handle popNavigationOnSuccess or replaceOnSuccess from finalNavigation entry
-        const currentEntry = navigationStack[navigationStack.length - 1];
+        const currentEntry =
+          finalNavigationStack[finalNavigationStack.length - 1];
         const popCount = currentEntry?.popNavigationOnSuccess;
         const replaceConfig = currentEntry?.replaceOnSuccess;
         const successCallback = currentEntry?.onSuccessCallback;
@@ -453,7 +475,7 @@ function EndpointsPageInternal<
           const urlPathParams = replaceConfig.getUrlPathParams
             ? replaceConfig.getUrlPathParams(responseData)
             : undefined;
-          navigationReplace(replaceConfig.endpoint, {
+          finalNavigationReplace(replaceConfig.endpoint, {
             urlPathParams,
             prefillFromGet: replaceConfig.prefillFromGet,
             getEndpoint: replaceConfig.prefillFromGet
@@ -462,7 +484,7 @@ function EndpointsPageInternal<
           });
         } else if (popCount && popCount > 0) {
           for (let i = 0; i < popCount; i++) {
-            navigationPop();
+            finalNavigationPop();
           }
           successCallback?.();
         }
@@ -471,9 +493,9 @@ function EndpointsPageInternal<
   }, [
     endpoint.DELETE,
     endpointOptions?.delete?.mutationOptions,
-    navigationPop,
-    navigationReplace,
-    navigationStack,
+    finalNavigationPop,
+    finalNavigationReplace,
+    finalNavigationStack,
   ]);
 
   // Merge finalNavigation-aware mutation options and endpoint's built-in options.
@@ -640,6 +662,9 @@ function EndpointsPageInternal<
           refetch: async (): Promise<void> => {
             await endpointState.read?.refetch();
           },
+          remove: (): void => {
+            endpointState.read?.remove();
+          },
           isLoading: endpointState.read.isLoading,
           isLoadingFresh: endpointState.read.isLoadingFresh,
           isFetching: endpointState.read.isFetching,
@@ -701,6 +726,7 @@ function EndpointsPageInternal<
                 disabled={true}
                 responseOnly={responseOnly}
                 platform={platform}
+                navigationOverride={navigationOverride}
               />
             )}
             {!disabled && isGetEndpoint && endpointState.read && (
@@ -727,6 +753,7 @@ function EndpointsPageInternal<
                 user={user}
                 responseOnly={responseOnly}
                 platform={platform}
+                navigationOverride={navigationOverride}
               />
             )}
             {!disabled &&
@@ -749,6 +776,7 @@ function EndpointsPageInternal<
                   locale={locale}
                   isSubmitting={endpointState.update?.isSubmitting ?? isLoading}
                   data={responseData}
+                  className={className}
                   submitButton={submitButton}
                   response={response}
                   endpointMutations={endpointMutations}
@@ -756,6 +784,7 @@ function EndpointsPageInternal<
                   user={user}
                   responseOnly={responseOnly}
                   platform={platform}
+                  navigationOverride={navigationOverride}
                 />
               )}
             {!disabled && isDeleteEndpoint && endpointState.delete && (
@@ -775,6 +804,7 @@ function EndpointsPageInternal<
                 user={user}
                 responseOnly={responseOnly}
                 platform={platform}
+                navigationOverride={navigationOverride}
               />
             )}
           </>
@@ -795,6 +825,7 @@ function EndpointsPageInternal<
             debug={debug}
             user={user}
             locale={locale}
+            platform={platform}
             modalOpenState={modalOpenState}
             setModalOpenState={setModalOpenState}
             finalNavigation={finalNavigation}
@@ -828,7 +859,9 @@ export function EndpointsPage<
 EndpointsPage.displayName = "EndpointsPage";
 
 /**
- * Helper component to render content either as a hidden div or in a popover modal
+ * Helper component to render content either as a hidden div or in a Dialog modal.
+ * Uses next-vibe-ui Dialog for modal rendering (web: Radix portal + focus trap,
+ * CLI: Ink border + focus scope + Esc handling).
  */
 function StackEntryRenderer({
   entry,
@@ -867,37 +900,149 @@ function StackEntryRenderer({
   }
 
   return (
-    <>
-      {/* Modal as centered dialog */}
-      {modalIsOpen && (
-        <>
-          {/* Backdrop - dims page and handles outside clicks */}
-          <Div
-            onClick={(e) => {
-              e.preventDefault();
-              setModalOpenState({
-                ...modalOpenState,
-                [entry.timestamp]: false,
-              });
-              finalNavigation.pop();
-            }}
-            className="fixed inset-0 z-[100] bg-black/50"
-            aria-hidden="true"
-          />
-          {/* Modal content container */}
-          <Div className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none">
-            <Div
-              onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              className="relative bg-background border shadow-lg rounded-lg overflow-y-auto w-[400px] max-w-[90vw] max-h-[min(600px,calc(100dvh-100px))] pointer-events-auto"
-            >
-              {children}
-            </Div>
-          </Div>
-        </>
-      )}
-    </>
+    <Dialog
+      open={modalIsOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          setModalOpenState({
+            ...modalOpenState,
+            [entry.timestamp]: false,
+          });
+          finalNavigation.pop();
+        }
+      }}
+    >
+      {/* z-[500] / overlay z-[450]: navigation modals can open from inside a
+          popover (z-[400], e.g. the model selector) - the modal must layer
+          above it and the backdrop must dim the popover */}
+      <DialogContent
+        className="sm:max-w-[400px] max-w-[90vw] max-h-[min(600px,calc(100dvh-100px))] overflow-y-auto z-[500]"
+        overlayClassName="z-[450]"
+      >
+        {children}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/**
+ * CLI picker: fetches a list endpoint and renders a keyboard-navigable Select.
+ * Used by StackEntryLayer when platform=CLI and pickerCallback is set.
+ *
+ * Items are extracted by looking for the pickerLabelField (e.g. "name") in each
+ * item, falling back to common field names: name, title, label, id.
+ */
+function CliPickerSelect({
+  entry,
+  pickerCallbackWithPop,
+  locale,
+  user,
+}: {
+  entry: NavigationStackEntry;
+  pickerCallbackWithPop: ((value: WidgetData) => void) | undefined;
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+}): React.JSX.Element {
+  const logger = useLogger();
+  const endpointInstance = useEndpoint(
+    { GET: entry.endpoint },
+    {
+      read: {
+        urlPathParams: entry.params.urlPathParams,
+        initialState: entry.params.data,
+      },
+    },
+    logger,
+    user,
+  );
+
+  const readResult = endpointInstance.read;
+  const data = readResult?.data;
+
+  // Extract items from the response — handle both array root and nested array fields
+  const items: WidgetData[] = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+    if (Array.isArray(data)) {
+      return data as WidgetData[];
+    }
+    // Look for the first array-valued top-level key
+    for (const val of Object.values(data as Record<string, WidgetData>)) {
+      if (Array.isArray(val)) {
+        return val as WidgetData[];
+      }
+    }
+    return [];
+  }, [data]);
+
+  // Extract label from an item using pickerLabelField or heuristic
+  const labelField = entry.pickerLabelField;
+  const getLabel = (item: WidgetData): string => {
+    if (typeof item !== "object" || item === null || Array.isArray(item)) {
+      return String(item);
+    }
+    const obj = item as Record<string, WidgetData>;
+    if (labelField && labelField in obj) {
+      return String(obj[labelField] ?? "");
+    }
+    for (const key of ["name", "title", "label", "id"] as const) {
+      if (key in obj && obj[key] !== undefined && obj[key] !== null) {
+        return String(obj[key]);
+      }
+    }
+    return JSON.stringify(item);
+  };
+
+  const getId = (item: WidgetData): string => {
+    if (typeof item !== "object" || item === null || Array.isArray(item)) {
+      return String(item);
+    }
+    const obj = item as Record<string, WidgetData>;
+    if ("id" in obj) {
+      return String(obj["id"] ?? "");
+    }
+    return JSON.stringify(item);
+  };
+
+  const { t: widgetT } = scopedTranslation.scopedT(locale);
+
+  const [selected, setSelected] = useState<string | undefined>(undefined);
+
+  const handleChange = (value: string): void => {
+    const item = items.find((i) => getId(i) === value);
+    if (item && pickerCallbackWithPop) {
+      pickerCallbackWithPop(item);
+    }
+    setSelected(value);
+  };
+
+  if (!data) {
+    return <P>{widgetT("widgets.formFields.entityPicker.loading")}</P>;
+  }
+
+  if (items.length === 0) {
+    return <P>{widgetT("widgets.formFields.entityPicker.noItems")}</P>;
+  }
+
+  return (
+    <Select value={selected} onValueChange={handleChange}>
+      <SelectTrigger>
+        <SelectValue
+          placeholder={widgetT("widgets.formFields.entityPicker.select")}
+        />
+      </SelectTrigger>
+      <SelectContent>
+        {items.map((item) => {
+          const id = getId(item);
+          return (
+            <SelectItem key={id} value={id}>
+              {getLabel(item)}
+            </SelectItem>
+          );
+        })}
+      </SelectContent>
+    </Select>
   );
 }
 
@@ -913,6 +1058,7 @@ function StackEntryLayer({
   debug,
   user,
   locale,
+  platform,
   modalOpenState,
   setModalOpenState,
   finalNavigation,
@@ -924,6 +1070,7 @@ function StackEntryLayer({
   debug?: boolean;
   user: JwtPayloadType;
   locale: CountryLanguage;
+  platform?: Platform;
   modalOpenState: Record<number, boolean>;
   setModalOpenState: (
     state:
@@ -945,9 +1092,16 @@ function StackEntryLayer({
 
   // Hooks called at top level of this component (before any conditional returns)
   const navigationPop = finalNavigation.pop;
+  const navigationPush = finalNavigation.push;
+  // Expose the current entry as a single-element stack so that
+  // mutationOptionsWithNav inside the stacked EndpointsPageInternal can read
+  // popNavigationOnSuccess, replaceOnSuccess, onSuccessCallback from it.
+  const entryStack = useMemo(() => [entry], [entry]);
+
   const navigationOverride = useMemo(() => {
     if (isModal) {
       return {
+        push: navigationPush,
         pop: (): void => {
           setModalOpenState(
             (prev: Record<number, boolean>): Record<number, boolean> => ({
@@ -958,19 +1112,71 @@ function StackEntryLayer({
           navigationPop();
         },
         canGoBack: true,
+        stack: entryStack,
+        current: entry,
       };
     }
     // Non-modal: allow back navigation when there's a stack to go back to
     if (index > 0) {
       return {
+        push: navigationPush,
         pop: (): void => {
           navigationPop();
         },
         canGoBack: true,
+        stack: entryStack,
+        current: entry,
       };
     }
-    return undefined;
-  }, [isModal, index, entry.timestamp, navigationPop, setModalOpenState]);
+    // First entry (index === 0): back goes to base layer (pops this entry off parent stack)
+    return {
+      push: navigationPush,
+      pop: (): void => {
+        navigationPop();
+      },
+      canGoBack: true,
+      stack: entryStack,
+      current: entry,
+    };
+  }, [
+    isModal,
+    index,
+    entry,
+    entryStack,
+    navigationPop,
+    navigationPush,
+    setModalOpenState,
+  ]);
+
+  // Wrap pickerCallback to auto-pop the modal/layer after a value is selected
+  const pickerCallbackWithPop = useMemo(() => {
+    if (!entry.pickerCallback) {
+      return undefined;
+    }
+    const cb = entry.pickerCallback;
+    const popFn = navigationOverride?.pop ?? navigationPop;
+    return (value: WidgetData): void => {
+      cb(value);
+      popFn();
+    };
+  }, [entry.pickerCallback, navigationOverride, navigationPop]);
+
+  // CLI picker mode: when pickerCallback is set and platform is CLI, render an
+  // interactive Select instead of the full widget (Button onClick doesn't work in Ink)
+  if (
+    entry.pickerCallback &&
+    platform !== undefined &&
+    isCliPlatform(platform)
+  ) {
+    return (
+      <CliPickerSelect
+        entry={entry}
+        pickerCallbackWithPop={pickerCallbackWithPop}
+        locale={locale}
+        user={user}
+      />
+    );
+  }
 
   // Don't render if not visible
   if (!isVisible) {
@@ -980,181 +1186,198 @@ function StackEntryLayer({
   // Render appropriate endpoint based on method
   if (method === "GET") {
     return (
-      <StackEntryRenderer
-        entry={entry}
-        isModal={isModal}
-        isVisible={isVisible}
-        className={className}
-        modalOpenState={modalOpenState}
-        setModalOpenState={setModalOpenState}
-        finalNavigation={finalNavigation}
-      >
-        <EndpointsPageInternal
-          endpoint={{ GET: entry.endpoint }}
-          locale={locale}
-          endpointOptions={{
-            read: {
-              urlPathParams: entry.params.urlPathParams,
-              initialState: entry.params.data,
-            },
-          }}
-          submitButton={submitButton}
-          debug={debug}
-          user={user}
-          _disableNavigationStack={true}
-          navigationOverride={navigationOverride}
-        />
-      </StackEntryRenderer>
+      <PickerProvider onSelect={pickerCallbackWithPop}>
+        <StackEntryRenderer
+          entry={entry}
+          isModal={isModal}
+          isVisible={isVisible}
+          className={className}
+          modalOpenState={modalOpenState}
+          setModalOpenState={setModalOpenState}
+          finalNavigation={finalNavigation}
+        >
+          <EndpointsPageInternal
+            endpoint={{ GET: entry.endpoint }}
+            locale={locale}
+            className={className}
+            endpointOptions={{
+              read: {
+                urlPathParams: entry.params.urlPathParams,
+                initialState: entry.params.data,
+              },
+            }}
+            submitButton={submitButton}
+            debug={debug}
+            user={user}
+            _disableNavigationStack={true}
+            navigationOverride={navigationOverride}
+          />
+        </StackEntryRenderer>
+      </PickerProvider>
     );
   }
 
   if (method === "POST") {
     return (
-      <StackEntryRenderer
-        entry={entry}
-        isModal={isModal}
-        isVisible={isVisible}
-        className={className}
-        modalOpenState={modalOpenState}
-        setModalOpenState={setModalOpenState}
-        finalNavigation={finalNavigation}
-      >
-        <EndpointsPageInternal
-          user={user}
-          endpoint={{ POST: entry.endpoint }}
-          locale={locale}
-          endpointOptions={{
-            create: {
-              urlPathParams: entry.params.urlPathParams,
-              autoPrefillData: entry.params.data,
-              mutationOptions: extractMutationOptions(entry.endpoint),
-            },
-          }}
-          submitButton={submitButton}
-          debug={debug}
-          _disableNavigationStack={true}
-          navigationOverride={navigationOverride}
-        />
-      </StackEntryRenderer>
+      <PickerProvider onSelect={pickerCallbackWithPop}>
+        <StackEntryRenderer
+          entry={entry}
+          isModal={isModal}
+          isVisible={isVisible}
+          className={className}
+          modalOpenState={modalOpenState}
+          setModalOpenState={setModalOpenState}
+          finalNavigation={finalNavigation}
+        >
+          <EndpointsPageInternal
+            user={user}
+            endpoint={{ POST: entry.endpoint }}
+            locale={locale}
+            className={className}
+            endpointOptions={{
+              create: {
+                urlPathParams: entry.params.urlPathParams,
+                autoPrefillData: entry.params.data,
+                mutationOptions: extractMutationOptions(entry.endpoint),
+              },
+            }}
+            submitButton={submitButton}
+            debug={debug}
+            _disableNavigationStack={true}
+            navigationOverride={navigationOverride}
+          />
+        </StackEntryRenderer>
+      </PickerProvider>
     );
   }
 
   if (method === "PATCH" && entry.prefillFromGet && entry.getEndpoint) {
     return (
-      <StackEntryRenderer
-        entry={entry}
-        isModal={isModal}
-        isVisible={isVisible}
-        className={className}
-        modalOpenState={modalOpenState}
-        setModalOpenState={setModalOpenState}
-        finalNavigation={finalNavigation}
-      >
-        <EndpointsPageInternal
-          user={user}
-          endpoint={{ GET: entry.getEndpoint, PATCH: entry.endpoint }}
-          locale={locale}
-          forceMethod={method}
-          endpointOptions={{
-            read: {
-              urlPathParams: entry.params.urlPathParams as never,
-            },
-            update: {
-              urlPathParams: entry.params.urlPathParams,
-              autoPrefillData: entry.params.data,
-              mutationOptions: extractMutationOptions(entry.endpoint),
-              // When prefillFromGet provides data, also pass as initialState
-              // so it takes priority over the GET response shape
-              ...(entry.params.data ? { initialState: entry.params.data } : {}),
-            },
-          }}
-          submitButton={submitButton}
-          debug={debug}
-          _disableNavigationStack={true}
-          navigationOverride={navigationOverride}
-        />
-      </StackEntryRenderer>
+      <PickerProvider onSelect={pickerCallbackWithPop}>
+        <StackEntryRenderer
+          entry={entry}
+          isModal={isModal}
+          isVisible={isVisible}
+          className={className}
+          modalOpenState={modalOpenState}
+          setModalOpenState={setModalOpenState}
+          finalNavigation={finalNavigation}
+        >
+          <EndpointsPageInternal
+            user={user}
+            endpoint={{ GET: entry.getEndpoint, PATCH: entry.endpoint }}
+            locale={locale}
+            className={className}
+            forceMethod={method}
+            endpointOptions={{
+              read: {
+                urlPathParams: entry.params.urlPathParams as never,
+              },
+              update: {
+                urlPathParams: entry.params.urlPathParams,
+                autoPrefillData: entry.params.data,
+                mutationOptions: extractMutationOptions(entry.endpoint),
+                // When prefillFromGet provides data, also pass as initialState
+                // so it takes priority over the GET response shape
+                ...(entry.params.data
+                  ? { initialState: entry.params.data }
+                  : {}),
+              },
+            }}
+            submitButton={submitButton}
+            debug={debug}
+            _disableNavigationStack={true}
+            navigationOverride={navigationOverride}
+          />
+        </StackEntryRenderer>
+      </PickerProvider>
     );
   }
 
   if (method === "PATCH") {
     return (
-      <StackEntryRenderer
-        entry={entry}
-        isModal={isModal}
-        isVisible={isVisible}
-        className={className}
-        modalOpenState={modalOpenState}
-        setModalOpenState={setModalOpenState}
-        finalNavigation={finalNavigation}
-      >
-        <EndpointsPageInternal
-          user={user}
-          endpoint={{ PATCH: entry.endpoint }}
-          locale={locale}
-          forceMethod={method}
-          endpointOptions={{
-            update: {
-              urlPathParams: entry.params.urlPathParams,
-              autoPrefillData: entry.params.data,
-              mutationOptions: extractMutationOptions(entry.endpoint),
-            },
-          }}
-          submitButton={submitButton}
-          debug={debug}
-          _disableNavigationStack={true}
-          navigationOverride={navigationOverride}
-        />
-      </StackEntryRenderer>
+      <PickerProvider onSelect={pickerCallbackWithPop}>
+        <StackEntryRenderer
+          entry={entry}
+          isModal={isModal}
+          isVisible={isVisible}
+          className={className}
+          modalOpenState={modalOpenState}
+          setModalOpenState={setModalOpenState}
+          finalNavigation={finalNavigation}
+        >
+          <EndpointsPageInternal
+            user={user}
+            endpoint={{ PATCH: entry.endpoint }}
+            locale={locale}
+            className={className}
+            forceMethod={method}
+            endpointOptions={{
+              update: {
+                urlPathParams: entry.params.urlPathParams,
+                autoPrefillData: entry.params.data,
+                mutationOptions: extractMutationOptions(entry.endpoint),
+              },
+            }}
+            submitButton={submitButton}
+            debug={debug}
+            _disableNavigationStack={true}
+            navigationOverride={navigationOverride}
+          />
+        </StackEntryRenderer>
+      </PickerProvider>
     );
   }
 
   if (method === "DELETE") {
     return (
-      <StackEntryRenderer
-        entry={entry}
-        isModal={isModal}
-        isVisible={isVisible}
-        className={className}
-        modalOpenState={modalOpenState}
-        setModalOpenState={setModalOpenState}
-        finalNavigation={finalNavigation}
-      >
-        <EndpointsPageInternal
-          user={user}
-          endpoint={{ DELETE: entry.endpoint }}
-          locale={locale}
-          endpointOptions={{
-            delete: {
-              urlPathParams: entry.params.urlPathParams,
-              autoPrefillData: {
-                ...entry.params.urlPathParams,
-                ...entry.params.data,
-              },
-              mutationOptions: {
-                ...extractMutationOptions(entry.endpoint),
-                onSuccess: async (ctx) => {
-                  const base = extractMutationOptions(entry.endpoint);
-                  if (base?.onSuccess) {
-                    await base.onSuccess(ctx);
-                  }
-                  if (
-                    entry.popNavigationOnSuccess &&
-                    entry.popNavigationOnSuccess > 0
-                  ) {
-                    for (let i = 0; i < entry.popNavigationOnSuccess; i++) {
-                      navigationOverride?.pop?.();
+      <PickerProvider onSelect={pickerCallbackWithPop}>
+        <StackEntryRenderer
+          entry={entry}
+          isModal={isModal}
+          isVisible={isVisible}
+          className={className}
+          modalOpenState={modalOpenState}
+          setModalOpenState={setModalOpenState}
+          finalNavigation={finalNavigation}
+        >
+          <EndpointsPageInternal
+            user={user}
+            endpoint={{ DELETE: entry.endpoint }}
+            locale={locale}
+            className={className}
+            endpointOptions={{
+              delete: {
+                urlPathParams: entry.params.urlPathParams,
+                autoPrefillData: {
+                  ...entry.params.urlPathParams,
+                  ...entry.params.data,
+                },
+                mutationOptions: {
+                  ...extractMutationOptions(entry.endpoint),
+                  onSuccess: async (ctx) => {
+                    const base = extractMutationOptions(entry.endpoint);
+                    if (base?.onSuccess) {
+                      await base.onSuccess(ctx);
                     }
-                  }
+                    if (
+                      entry.popNavigationOnSuccess &&
+                      entry.popNavigationOnSuccess > 0
+                    ) {
+                      for (let i = 0; i < entry.popNavigationOnSuccess; i++) {
+                        navigationOverride?.pop?.();
+                      }
+                    }
+                  },
                 },
               },
-            },
-          }}
-          debug={debug}
-          _disableNavigationStack={true}
-          navigationOverride={navigationOverride}
-        />
-      </StackEntryRenderer>
+            }}
+            debug={debug}
+            _disableNavigationStack={true}
+            navigationOverride={navigationOverride}
+          />
+        </StackEntryRenderer>
+      </PickerProvider>
     );
   }
 
@@ -1178,6 +1401,7 @@ function StackEntryLayer({
           user={user}
           endpoint={endpointConfig}
           locale={locale}
+          className={className}
           forceMethod={method}
           endpointOptions={{
             ...(entry.prefillFromGet

@@ -4,6 +4,7 @@
  */
 
 import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
 
 export const category: CategoryDefinition = {
@@ -17,7 +18,11 @@ export const category: CategoryDefinition = {
   group: "system",
   icon: "user",
   order: 10,
-  defaultEntry: USER_ME_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: USER_ME_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     login: {
       icon: "log-in",

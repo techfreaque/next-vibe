@@ -1,0 +1,206 @@
+/**
+ * Company Subscription Get API Endpoint Definition
+ * Returns the active subscription for a company
+ */
+
+import { z } from "zod";
+
+import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import {
+  objectField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import {
+  PaymentProvider,
+  PaymentProviderDB,
+} from "@/app/api/[locale]/payment/enum";
+import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
+import {
+  BillingInterval,
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from "../../../enum";
+import { scopedTranslation } from "./i18n";
+
+const { GET } = createEndpoint({
+  scopedTranslation,
+  method: Methods.GET,
+  path: ["subscription", "company", "[companyId]", "get"],
+  title: "get.title",
+  titleShort: "get.titleShort",
+  description: "get.description",
+  icon: "crown",
+  category: "payments",
+  subCategory: "Management",
+  tags: ["tags.subscription", "tags.company", "tags.get"],
+  allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
+
+  fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    noCard: true,
+    usage: { request: "urlPathParams", response: true },
+    children: {
+      companyId: requestUrlPathParamsField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: companiesListDefinitions.GET,
+        labelField: "name",
+        label: "get.companyId.label",
+        description: "get.companyId.description",
+        hidden: true,
+        schema: z.uuid(),
+      }),
+
+      // Response fields
+      id: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.uuid(),
+      }),
+      plan: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.enum(SubscriptionPlan),
+      }),
+      billingInterval: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.enum(BillingInterval),
+      }),
+      status: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.enum(SubscriptionStatus),
+      }),
+      currentPeriodStart: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        fieldType: FieldDataType.DATETIME,
+        schema: z.string(),
+      }),
+      currentPeriodEnd: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        fieldType: FieldDataType.DATETIME,
+        schema: z.string(),
+      }),
+      cancelAtPeriodEnd: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.boolean(),
+      }),
+      cancelAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().optional(),
+      }),
+      canceledAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().optional(),
+      }),
+      endedAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().optional(),
+      }),
+      provider: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.enum(PaymentProviderDB),
+      }),
+      providerSubscriptionId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().optional(),
+      }),
+      createdAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        fieldType: FieldDataType.DATETIME,
+        schema: z.string(),
+      }),
+      updatedAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        fieldType: FieldDataType.DATETIME,
+        schema: z.string(),
+      }),
+    },
+  }),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
+    },
+  },
+
+  successTypes: {
+    title: "get.success.title",
+    description: "get.success.description",
+  },
+
+  examples: {
+    urlPathParams: {
+      default: {
+        companyId: "123e4567-e89b-12d3-a456-426614174000",
+      },
+    },
+    responses: {
+      default: {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        plan: SubscriptionPlan.SUBSCRIPTION,
+        billingInterval: BillingInterval.MONTHLY,
+        status: SubscriptionStatus.ACTIVE,
+        currentPeriodStart: "2024-01-01T00:00:00Z",
+        currentPeriodEnd: "2024-02-01T00:00:00Z",
+        cancelAtPeriodEnd: false,
+        provider: PaymentProvider.STRIPE,
+        providerSubscriptionId: "sub_123456789",
+        createdAt: "2024-01-01T00:00:00Z",
+        updatedAt: "2024-01-01T00:00:00Z",
+      },
+    },
+  },
+});
+
+export type CompanySubscriptionGetRequestOutput =
+  typeof GET.types.RequestOutput;
+export type CompanySubscriptionGetResponseOutput =
+  typeof GET.types.ResponseOutput;
+
+const definitions = {
+  GET,
+} as const;
+export default definitions;

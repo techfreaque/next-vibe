@@ -11,17 +11,17 @@ import { useMemo } from "react";
 import {
   useWidgetForm,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
-import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/widget";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
+import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
 import { SshAuthType, SshAuthTypeOptions } from "../../enum";
 import type endpoints from "./definition";

@@ -14,6 +14,7 @@ import {
   requestField,
   responseArrayField,
   responseField,
+  searchBarField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -24,7 +25,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { SearchProvider, SearchProviderDB } from "../enum";
 import { WEB_SEARCH_ALIAS } from "./constants";
@@ -43,11 +44,6 @@ const FRESHNESS_OPTIONS = [
   "past_month",
   "past_year",
 ] as const;
-
-/**
- * Provider options: auto + all enum values
- */
-const PROVIDER_VALUES = ["auto", ...SearchProviderDB] as const;
 
 /**
  * GET /web-search - Search the web with preferred provider
@@ -104,12 +100,16 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      query: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+      query: searchBarField(scopedTranslation, {
+        type: WidgetType.SEARCH_BAR,
+        fieldName: "query",
         label: "get.fields.query.title" as const,
         description: "get.fields.query.description" as const,
         placeholder: "get.fields.query.placeholder" as const,
+        submitText: "get.submitButton.label" as const,
+        submitLoadingText: "get.submitButton.loadingText" as const,
+        submitIcon: "search",
+        size: "xl",
         columns: 12,
         schema: z.string().min(1).max(400),
       }),
@@ -121,10 +121,6 @@ const { GET } = createEndpoint({
         description: "get.fields.provider.description" as const,
         options: [
           {
-            value: "auto",
-            label: "get.fields.provider.options.auto" as const,
-          },
-          {
             value: SearchProvider.BRAVE,
             label: "get.fields.provider.options.brave" as const,
           },
@@ -134,7 +130,10 @@ const { GET } = createEndpoint({
           },
         ],
         columns: 4,
-        schema: z.enum(PROVIDER_VALUES).optional().default("auto"),
+        schema: z
+          .enum(SearchProviderDB)
+          .optional()
+          .default(SearchProvider.BRAVE),
       }),
 
       maxResults: requestField(scopedTranslation, {

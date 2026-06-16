@@ -16,7 +16,16 @@ import {
   ApiProvider,
   calculateCreditCost,
 } from "@/app/api/[locale]/agent/models/models";
-import { getMusicGenModelById } from "@/app/api/[locale]/agent/music-generation/models";
+import type { UnbottledCloudSession } from "@/app/api/[locale]/agent/env";
+import {
+  getMusicGenModelById,
+  getMusicGenModelUnderlyingProvider,
+  type MusicGenModelOption,
+} from "@/app/api/[locale]/agent/music-generation/models";
+import {
+  getUnbottledMediaSession,
+  isSelfRelayUrl,
+} from "@/app/api/[locale]/agent/shared/unbottled-media-relay";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -35,6 +44,7 @@ import { MUSIC_DURATION_SECONDS } from "./enum";
 import type { MusicGenerationT } from "./i18n";
 import { generateMusicWithModelsLab } from "./providers/modelslab";
 import { generateMusicWithReplicate } from "./providers/replicate";
+import { generateMusicWithUnbottled } from "./providers/unbottled";
 
 interface MediaGenStreamContext {
   threadId?: string | undefined;
@@ -119,40 +129,86 @@ export class MusicGenerationRepository {
     }
     const { tCredits } = balanceCheck.data;
 
-    let generationResult: ResponseType<{ audioUrl: string }>;
-
-    switch (audioModel.apiProvider) {
-      case ApiProvider.REPLICATE:
-        generationResult = await generateMusicWithReplicate({
-          providerModel: audioModel.providerModel,
-          prompt: data.prompt,
-          durationSeconds,
-          inputMediaUrl: data.inputMediaUrl,
-          logger,
-          locale,
-        });
-        break;
-
-      case ApiProvider.MODELSLAB:
-        generationResult = await generateMusicWithModelsLab({
-          providerModel: audioModel.providerModel,
-          prompt: data.prompt,
-          durationSeconds,
-          inputMediaUrl: data.inputMediaUrl,
-          logger,
-          locale,
-        });
-        break;
-
-      default:
+    // UNBOTTLED relay resolution (spec: UNBOTTLED Provider). Self-relay
+    // dispatches in-process via the cheapest non-UNBOTTLED entry while the
+    // marked-up UNBOTTLED creditCost (computed above) still applies.
+    let dispatchModel: MusicGenModelOption = audioModel;
+    let unbottledSession: UnbottledCloudSession | null = null;
+    if (audioModel.apiProvider === ApiProvider.UNBOTTLED) {
+      unbottledSession = getUnbottledMediaSession();
+      if (!unbottledSession) {
         return fail({
           message: t("post.errors.notConfigured", {
             label: audioModel.apiProvider,
-            envKey: "N/A",
+            envKey: "UNBOTTLED_CLOUD_CREDENTIALS",
             url: "https://unbottled.ai",
           }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
+      }
+      if (isSelfRelayUrl(unbottledSession.remoteUrl)) {
+        const underlying = getMusicGenModelUnderlyingProvider(data.model);
+        if (!underlying) {
+          return fail({
+            message: t("post.errors.notConfigured", {
+              label: audioModel.apiProvider,
+              envKey: "N/A",
+              url: "https://unbottled.ai",
+            }),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
+        }
+        dispatchModel = underlying;
+        unbottledSession = null;
+      }
+    }
+
+    let generationResult: ResponseType<{ audioUrl: string }>;
+
+    if (unbottledSession) {
+      generationResult = await generateMusicWithUnbottled({
+        session: unbottledSession,
+        providerModel: dispatchModel.providerModel,
+        prompt: data.prompt,
+        duration: data.duration,
+        inputMediaUrl: data.inputMediaUrl,
+        logger,
+        locale,
+      });
+    } else {
+      switch (dispatchModel.apiProvider) {
+        case ApiProvider.REPLICATE:
+          generationResult = await generateMusicWithReplicate({
+            providerModel: dispatchModel.providerModel,
+            prompt: data.prompt,
+            durationSeconds,
+            inputMediaUrl: data.inputMediaUrl,
+            logger,
+            locale,
+          });
+          break;
+
+        case ApiProvider.MODELSLAB:
+          generationResult = await generateMusicWithModelsLab({
+            providerModel: dispatchModel.providerModel,
+            prompt: data.prompt,
+            durationSeconds,
+            inputMediaUrl: data.inputMediaUrl,
+            logger,
+            locale,
+          });
+          break;
+
+        default:
+          return fail({
+            message: t("post.errors.notConfigured", {
+              label: dispatchModel.apiProvider,
+              envKey: "N/A",
+              url: "https://unbottled.ai",
+            }),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
+      }
     }
 
     if (!generationResult.success) {

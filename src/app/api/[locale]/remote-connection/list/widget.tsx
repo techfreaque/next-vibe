@@ -25,21 +25,18 @@ import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { WifiOff } from "next-vibe-ui/ui/icons/WifiOff";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
-import { Switch } from "next-vibe-ui/ui/switch";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import { GITHUB_REPO_URL } from "@/config/constants";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { usePickerCallback } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/picker-context";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -47,7 +44,7 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { envClient } from "@/config/env-client";
 
 import type endpoints from "./definition";

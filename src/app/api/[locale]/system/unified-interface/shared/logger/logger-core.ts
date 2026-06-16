@@ -1,46 +1,19 @@
 /**
  * Logger Core
  * Shared implementation for both server and client loggers.
- * All formatting, timing, MCP mode, and file logging logic lives here.
- * Persistence is injected via the onPersist callback.
+ * All formatting and console output lives here.
+ * File logging and DB persistence are injected via callbacks so this file
+ * stays free of node:fs and server-only imports — safe to bundle on the client.
  */
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import {
-  enableDebugLogger,
-  isFileLoggingEnabled,
-  mcpSilentMode,
-} from "@/config/debug";
+import { enableDebugLogger, mcpSilentMode } from "@/config/debug";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger, ErrorLogLevel, LoggerMetadata } from "./endpoint";
 import { colors, maybeColorize, semantic } from "./colors";
-
-// Lazy import keeps file-logger (which uses node:fs + process.cwd()) out of
-// the static module graph so Turbopack's NFT tracer doesn't scan next.config.ts.
-const _fl = (): Promise<{
-  fileLog: (
-    message: string,
-    data?: Record<string, LoggerMetadata>,
-  ) => Promise<void>;
-  devFileLog: (
-    message: string,
-    data?: Record<string, LoggerMetadata>,
-  ) => Promise<void>;
-  startFileLog: (
-    message: string,
-    data?: Record<string, LoggerMetadata>,
-  ) => Promise<void>;
-}> => import("./file-logger");
-
-function writeToFile(
-  message: string,
-  data?: Record<string, LoggerMetadata>,
-): void {
-  void _fl().then(({ fileLog }) => fileLog(message, data));
-}
 
 function serializeDebugMeta(meta: LoggerMetadata[]): string {
   if (meta.length === 0) {
@@ -75,17 +48,34 @@ export type PersistFn = (
   locale: CountryLanguage,
 ) => void;
 
+export type FileLogFn = (
+  message: string,
+  data?: Record<string, LoggerMetadata>,
+) => void;
+
+export function formatLogPrefix(
+  startTime = Number(process.env["VIBE_START_TIME"] ?? Date.now()),
+): string {
+  if (process.env["NEXT_RUNTIME"]) {
+    return "";
+  }
+  if (process.env["VIBE_LOG_TIMESTAMP"] === "iso") {
+    return `[${new Date().toISOString().slice(11, 23)}] `;
+  }
+  return `[${((Date.now() - startTime) / 1000).toFixed(3)}s] `;
+}
+
 export function createLogger(
   debugEnabled = false,
   startTime: number = Date.now(),
   locale: CountryLanguage,
   onPersist?: PersistFn,
+  onFileLog?: FileLogFn,
 ): EndpointLogger {
-  const isProduction = process.env["NODE_ENV"] === "production";
   const noTimePrefix = !!process.env["NEXT_RUNTIME"];
 
   const getTimePrefix = (): string => {
-    if (isProduction) {
+    if (process.env["VIBE_LOG_TIMESTAMP"] === "iso") {
       return new Date().toISOString().slice(11, 23);
     }
     return `${((Date.now() - startTime) / 1000).toFixed(3)}s`;
@@ -98,22 +88,12 @@ export function createLogger(
     info(message: string, ...metadata: LoggerMetadata[]): void {
       const metadataObj = metadata.length > 0 ? { metadata } : undefined;
       if (mcpSilentMode) {
-        if (!(debugEnabled || enableDebugLogger)) {
-          return;
-        }
-        writeToFile(`[INFO] ${fmt(message)}`, metadataObj);
-      } else {
-        // oxlint-disable-next-line no-console
-        console.log(fmt(message), ...metadata);
+        onFileLog?.(`[INFO] ${fmt(message)}`, metadataObj);
+        return;
       }
-      if (isFileLoggingEnabled()) {
-        void _fl().then(({ devFileLog, startFileLog }) =>
-          Promise.all([
-            devFileLog(fmt(message), metadataObj),
-            startFileLog(fmt(message), metadataObj),
-          ]),
-        );
-      }
+      // oxlint-disable-next-line no-console
+      console.log(fmt(message), ...metadata);
+      onFileLog?.(fmt(message), metadataObj);
     },
 
     error(
@@ -131,29 +111,19 @@ export function createLogger(
       const hasMetadata = Object.keys(metadataObj).length > 0;
 
       if (mcpSilentMode) {
-        if (!(debugEnabled || enableDebugLogger)) {
-          return;
-        }
-        writeToFile(
+        onFileLog?.(
           `[ERROR] ${fmt(message)}`,
           hasMetadata ? metadataObj : undefined,
         );
-      } else {
-        // oxlint-disable-next-line no-console
-        console.error(
-          fmt(message),
-          ...(error !== undefined ? [error] : []),
-          ...metadata,
-        );
+        return;
       }
-      if (isFileLoggingEnabled()) {
-        void _fl().then(({ devFileLog, startFileLog }) =>
-          Promise.all([
-            devFileLog(fmt(message), hasMetadata ? metadataObj : undefined),
-            startFileLog(fmt(message), hasMetadata ? metadataObj : undefined),
-          ]),
-        );
-      }
+      // oxlint-disable-next-line no-console
+      console.error(
+        fmt(message),
+        ...(error !== undefined ? [error] : []),
+        ...metadata,
+      );
+      onFileLog?.(fmt(message), hasMetadata ? metadataObj : undefined);
     },
 
     warn(message: string, ...metadata: LoggerMetadata[]): void {
@@ -161,45 +131,24 @@ export function createLogger(
 
       const metadataObj = metadata.length > 0 ? { metadata } : undefined;
       if (mcpSilentMode) {
-        if (!(debugEnabled || enableDebugLogger)) {
-          return;
-        }
-        writeToFile(`[WARN] ${fmt(message)}`, metadataObj);
-      } else {
-        // oxlint-disable-next-line no-console
-        console.warn(fmt(message), ...metadata);
+        onFileLog?.(`[WARN] ${fmt(message)}`, metadataObj);
+        return;
       }
-      if (isFileLoggingEnabled()) {
-        void _fl().then(({ devFileLog, startFileLog }) =>
-          Promise.all([
-            devFileLog(fmt(message), metadataObj),
-            startFileLog(fmt(message), metadataObj),
-          ]),
-        );
-      }
+      // oxlint-disable-next-line no-console
+      console.warn(fmt(message), ...metadata);
+      onFileLog?.(fmt(message), metadataObj);
     },
 
     vibe(message: string, ...metadata: LoggerMetadata[]): void {
       const metadataObj = metadata.length > 0 ? { metadata } : undefined;
+      const prefix = noTimePrefix ? "" : `[${getTimePrefix()}] `;
       if (mcpSilentMode) {
-        if (!(debugEnabled || enableDebugLogger)) {
-          return;
-        }
-        writeToFile(`[VIBE] [${getTimePrefix()}] ${message}`, metadataObj);
-      } else {
-        const prefix = noTimePrefix ? "" : `[${getTimePrefix()}] `;
-        // oxlint-disable-next-line no-console
-        console.log(`${prefix}${message}`, ...metadata);
+        onFileLog?.(`[VIBE] ${prefix}${message}`, metadataObj);
+        return;
       }
-      if (isFileLoggingEnabled()) {
-        const prefix = noTimePrefix ? "" : `[${getTimePrefix()}] `;
-        void _fl().then(({ devFileLog, startFileLog }) =>
-          Promise.all([
-            devFileLog(`${prefix}${message}`, metadataObj),
-            startFileLog(`${prefix}${message}`, metadataObj),
-          ]),
-        );
-      }
+      // oxlint-disable-next-line no-console
+      console.log(`${prefix}${message}`, ...metadata);
+      onFileLog?.(`${prefix}${message}`, metadataObj);
     },
 
     debug(message: string, ...metadata: LoggerMetadata[]): void {
@@ -208,27 +157,20 @@ export function createLogger(
       }
       const metadataObj = metadata.length > 0 ? { metadata } : undefined;
       if (mcpSilentMode) {
-        writeToFile(`[DEBUG] ${fmt(message)}`, metadataObj);
-      } else {
-        const meta = serializeDebugMeta(metadata);
-        const timeTag = noTimePrefix
-          ? ""
-          : `${colors.dim}[${getTimePrefix()}]${colors.reset} `;
-        // oxlint-disable-next-line no-console
-        console.log(
-          `${timeTag}${maybeColorize(`${message}${meta}`, semantic.debug)}`,
-        );
+        onFileLog?.(`[DEBUG] ${fmt(message)}`, metadataObj);
+        return;
       }
-      if (isFileLoggingEnabled()) {
-        const meta = serializeDebugMeta(metadata);
-        const timeTag = noTimePrefix ? "" : `[${getTimePrefix()}] `;
-        void _fl().then(({ devFileLog, startFileLog }) =>
-          Promise.all([
-            devFileLog(`${timeTag}${message}${meta}`, metadataObj),
-            startFileLog(`${timeTag}${message}${meta}`, metadataObj),
-          ]),
-        );
-      }
+      const meta = serializeDebugMeta(metadata);
+      const timeTag = noTimePrefix
+        ? ""
+        : `${colors.dim}[${getTimePrefix()}]${colors.reset} `;
+      // oxlint-disable-next-line no-console
+      console.log(
+        `${timeTag}${maybeColorize(`${message}${meta}`, semantic.debug)}`,
+      );
+      const meta2 = serializeDebugMeta(metadata);
+      const timeTag2 = noTimePrefix ? "" : `[${getTimePrefix()}] `;
+      onFileLog?.(`${timeTag2}${message}${meta2}`, metadataObj);
     },
 
     isDebugEnabled: debugEnabled || enableDebugLogger,

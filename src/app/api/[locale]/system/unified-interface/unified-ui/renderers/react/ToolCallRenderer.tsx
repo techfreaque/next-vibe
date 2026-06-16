@@ -51,11 +51,11 @@ import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-
 import {
   Icon,
   type IconKey,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+} from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { EXECUTE_TOOL_ALIAS } from "../../../ai/execute-tool/constants";
+import { EXECUTE_TOOL_ALIAS } from "../../../execute-tool/constants";
 import { NavigationStackProvider } from "../../../react/hooks/use-navigation-stack";
 import {
   type ReactTranslationKey,

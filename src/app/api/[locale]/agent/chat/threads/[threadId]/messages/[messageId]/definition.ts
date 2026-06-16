@@ -25,10 +25,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { DefaultFolderId } from "../../../../config";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../../../enum";
 import { scopedTranslation } from "./i18n";
+import threadsDefinitions from "../../../definition";
 const DeleteMessageWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.DeleteMessageWidget })),
 );
@@ -100,7 +101,9 @@ const { GET } = createEndpoint({
       // === URL PARAMS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "get.threadId.label" as const,
         description: "get.threadId.description" as const,
         schema: z.uuid(),
@@ -219,6 +222,7 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
+  titleShort: "patch.titleShort" as const,
   description: "patch.description" as const,
   icon: "message-circle",
   category: "ai",
@@ -274,7 +278,9 @@ const { PATCH } = createEndpoint({
       // === URL PARAMS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "patch.threadId.label" as const,
         description: "patch.threadId.description" as const,
         schema: z.uuid(),
@@ -390,6 +396,7 @@ const { DELETE } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "delete.title" as const,
+  titleShort: "delete.titleShort" as const,
   description: "delete.description" as const,
   icon: "message-circle",
   category: "ai",
@@ -477,7 +484,9 @@ const { DELETE } = createEndpoint({
       // === URL PARAMS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "delete.threadId.label" as const,
         description: "delete.threadId.description" as const,
         schema: z.uuid(),

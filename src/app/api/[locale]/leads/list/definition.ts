@@ -29,7 +29,7 @@ import {
   LanguagesOptions,
 } from "@/i18n/core/config";
 
-import { paginationField } from "../../system/unified-interface/unified-ui/widgets/containers/pagination/types";
+import { paginationField } from "next-vibe-ui/unified/containers/pagination/types";
 import { UserRole } from "../../user/user-roles/enum";
 import {
   EmailCampaignStage,
@@ -49,7 +49,7 @@ import {
 import { LEADS_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const LeadsListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadsListContainer })),

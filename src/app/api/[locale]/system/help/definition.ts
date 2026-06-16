@@ -29,7 +29,8 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { Platform } from "../unified-interface/shared/types/platform";
 import { TOOL_HELP_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

@@ -63,11 +63,12 @@ import { ThreadPermissionsDialog } from "@/app/api/[locale]/agent/chat/threads/[
 import { ThreadShareDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/widget";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import {
   scopedTranslation as chatScopedTranslation,
@@ -105,11 +106,13 @@ function ThreadRow({
   isActive,
   compact,
   allFolders,
+  onPick,
 }: {
   thread: ThreadFromResponse;
   isActive: boolean;
   compact?: boolean;
   allFolders: FolderFromResponse[];
+  onPick?: ((item: { id: string; name: string }) => void) | null;
 }): React.JSX.Element {
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
@@ -133,6 +136,11 @@ function ThreadRow({
       return;
     }
     if (e.target.closest?.("button") || e.target.closest?.("input")) {
+      return;
+    }
+    // Picker mode: resolve the selection and return
+    if (onPick) {
+      onPick({ id: thread.id, name: thread.title });
       return;
     }
     // Update Zustand store - single source of truth
@@ -378,6 +386,7 @@ function ThreadRow({
       )}
 
       {!isEditing &&
+        !onPick &&
         (isHovered || isTouched || isActive || isTouch) &&
         hasMenuItems && (
           <Div className="flex items-center gap-1">
@@ -655,12 +664,14 @@ function ThreadSection({
   activeThreadId,
   allFolders,
   compact,
+  onPick,
 }: {
   label: string;
   threads: ThreadFromResponse[];
   activeThreadId: string | null;
   allFolders: FolderFromResponse[];
   compact?: boolean;
+  onPick?: ((item: { id: string; name: string }) => void) | null;
 }): React.JSX.Element | null {
   if (threads.length === 0) {
     return null;
@@ -678,6 +689,7 @@ function ThreadSection({
             isActive={thread.id === activeThreadId}
             allFolders={allFolders}
             compact={compact}
+            onPick={onPick}
           />
         ))}
       </Div>
@@ -695,8 +707,10 @@ export function ThreadsList({
   allFolders,
   isLoading,
   showEmptyMessage = true,
+  onPick,
 }: {
   threads: ThreadFromResponse[];
+  onPick?: ((item: { id: string; name: string }) => void) | null;
   allFolders: FolderFromResponse[];
   isLoading?: boolean;
   showEmptyMessage?: boolean;
@@ -758,24 +772,28 @@ export function ThreadsList({
         threads={grouped.today}
         activeThreadId={activeThreadId}
         allFolders={allFolders}
+        onPick={onPick}
       />
       <ThreadSection
         label={t("widget.folderList.lastWeek")}
         threads={grouped.lastWeek}
         activeThreadId={activeThreadId}
         allFolders={allFolders}
+        onPick={onPick}
       />
       <ThreadSection
         label={t("widget.folderList.lastMonth")}
         threads={grouped.lastMonth}
         activeThreadId={activeThreadId}
         allFolders={allFolders}
+        onPick={onPick}
       />
       <ThreadSection
         label={t("widget.folderList.older")}
         threads={grouped.older}
         activeThreadId={activeThreadId}
         allFolders={allFolders}
+        onPick={onPick}
       />
     </Div>
   );
@@ -787,6 +805,7 @@ export function ThreadsList({
  */
 export function ThreadsListContainer(): React.JSX.Element {
   const { logger, user, endpointMutations } = useWidgetContext();
+  const onPickRaw = usePickerCallback<{ id: string; name: string }>();
 
   const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
@@ -843,6 +862,7 @@ export function ThreadsListContainer(): React.JSX.Element {
       threads={rootThreads}
       allFolders={allFolders}
       isLoading={isLoadingFresh}
+      onPick={onPickRaw}
     />
   );
 }

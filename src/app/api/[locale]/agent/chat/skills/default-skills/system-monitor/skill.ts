@@ -4,7 +4,7 @@ import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
 import { CRON_HISTORY_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/constants";
 import { CRON_STATS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/constants";
-import { DB_HEALTH_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/db-health/constants";
+import { DB_HEALTH_ALIAS } from "@/app/api/[locale]/system/db/health/constants";
 import { PULSE_EXECUTE_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/execute/constants";
 import { PULSE_HISTORY_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/history/constants";
 import { PULSE_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/constants";

@@ -21,7 +21,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { SshAuthType, SshAuthTypeDB, SshAuthTypeOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const ConnectionCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ConnectionCreateContainer })),
@@ -32,10 +32,11 @@ export const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["ssh", "connections", "create"],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "plus",
-  category: "endpointCategories.ssh",
-  subCategory: "endpointCategories.sshConnections",
+  category: "ssh",
+  subCategory: "Connections",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
   tags: ["category" as const],
 

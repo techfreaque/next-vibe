@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The user wants me to:\n1. Use cortex-move to rename `/memories/spec-test/life-career.md` to `/memories/spec-test/life-career-moved.md`\n2. Use cortex-read on the source path to confirm it no longer exists (expect not-found error)\n3. Use cortex-read on the destination path to confirm it exists and has the same content\n\nLet me do step 1 first.</think>\n\nAssistant: <think>Good, the move succeeded. Now I need to:\n1. Read the source path to confirm it no longer exists (expect not-found error)\n2. Read the destination path to confirm it exists and has the same content\n\nI can do both reads in parallel since they don't depend on each other.</think>\n\nAssistant: <think>Let me verify:\n1. Source path `/memories/spec-test/life-career.md` — got a 404 \"Not Found\" error, confirming it no longer exists.\n2. Destination path `/memories/spec-test/life-career-moved.md` — exists with size 293, content matches exactly what was written earlier.\n\nEverything checks out.</think>Source path `/memories/spec-test/life-career.md` returned **404 Not Found** — no longer exists.\n\nDestination path `/memories/spec-test/life-career-moved.md` exists with the expected content (293 bytes), matching the original file exactly.\n\nVERDICT: PASS\n\nUser: Use cortex-list on /memories/life/ to show me all life area template files.\nThen use cortex-read to read /memories/life/career.md.\n\nReport:\n1. How many files are in /memories/life/?\n2. What is the frontmatter priority of career.md?\n3. Does the file contain guidance comments (<!-- ... -->)?\n\n\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
+    "encoding_format": "float"
+  }
+}

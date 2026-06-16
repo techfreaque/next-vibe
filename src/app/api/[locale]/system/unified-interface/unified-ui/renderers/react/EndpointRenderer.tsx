@@ -33,7 +33,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import { useNavigationStack } from "../../../react/hooks/use-navigation-stack";
+import {
+  useNavigationStack,
+  type UseNavigationStackReturn,
+} from "../../../react/hooks/use-navigation-stack";
 import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import { WidgetType } from "../../../shared/types/enums";
@@ -43,13 +46,13 @@ import {
   extractAllFields,
   scanForInlineButtons,
   withValueNonStrict,
-} from "../../widgets/_shared/field-helpers";
+} from "next-vibe-ui/unified/_shared/field-helpers";
 import type {
   EndpointFormValues,
   ReactWidgetContext,
-} from "../../widgets/_shared/react-types";
-import { isResponseField } from "../../widgets/_shared/type-guards";
-import { WidgetContextProvider } from "../../widgets/_shared/WidgetContextProvider";
+} from "next-vibe-ui/unified/_shared/react-types";
+import { isResponseField } from "next-vibe-ui/unified/_shared/type-guards";
+import { WidgetContextProvider } from "next-vibe-ui/unified/_shared/WidgetContextProvider";
 import { ContentBlocksRenderer } from "./ContentBlocksRenderer";
 import { LazyWidgetRenderer } from "./LazyWidgetRenderer";
 
@@ -137,6 +140,8 @@ export interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
   platform?: Platform;
   /** When true, only renders response fields (used by CLI result formatter) */
   responseOnly?: boolean;
+  /** Navigation override — replaces the default NavigationStack navigation in widget context */
+  navigationOverride?: Partial<UseNavigationStackReturn>;
 }
 
 /**
@@ -163,9 +168,46 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   _noFormElement: noFormElementProp = false,
   platform: platformProp,
   responseOnly = false,
+  navigationOverride,
 }: EndpointRendererProps<TEndpoint>): JSX.Element {
   // Initialize navigation stack for cross-definition navigation
-  const navigation = useNavigationStack();
+  const baseNavigation = useNavigationStack();
+  // Extract stable refs to avoid creating new object on every render
+  const basePush = baseNavigation.push;
+  const baseReplace = baseNavigation.replace;
+  const basePop = baseNavigation.pop;
+  const baseStack = baseNavigation.stack;
+  const baseCanGoBack = baseNavigation.canGoBack;
+  const baseCurrent = baseNavigation.current;
+  const navigation = useMemo(
+    () =>
+      navigationOverride
+        ? {
+            push: navigationOverride.push ?? basePush,
+            replace: navigationOverride.replace ?? baseReplace,
+            pop: navigationOverride.pop ?? basePop,
+            stack: navigationOverride.stack ?? baseStack,
+            canGoBack: navigationOverride.canGoBack ?? baseCanGoBack,
+            current: navigationOverride.current ?? baseCurrent,
+          }
+        : {
+            push: basePush,
+            replace: baseReplace,
+            pop: basePop,
+            stack: baseStack,
+            canGoBack: baseCanGoBack,
+            current: baseCurrent,
+          },
+    [
+      navigationOverride,
+      basePush,
+      baseReplace,
+      basePop,
+      baseStack,
+      baseCanGoBack,
+      baseCurrent,
+    ],
+  );
 
   // Check if the root fields config requests noFormElement (e.g. customWidgetObject)
   const _noFormElement =
@@ -311,29 +353,37 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
           }
         ).render
       : undefined;
-    // If the lazy has been pre-warmed (_status === 1), use the resolved component directly
-    // so the fast sync reconciler doesn't have to handle React.lazy internals.
-    const resolved =
+    // If the lazy has been pre-warmed, use the resolved component directly
+    // so the fast sync reconciler doesn't have to handle React.lazy/Suspense internals.
+    // lazyWidget() sets .resolved after preload(); bare React.lazy uses _payload._status === 1.
+    const resolved: React.ComponentType | undefined =
       lazyRender &&
-      typeof lazyRender === "object" &&
-      "_payload" in lazyRender &&
-      (
-        lazyRender as {
-          _payload: {
-            _status: number;
-            _result: { default: React.ComponentType };
-          };
-        }
-      )._payload._status === 1
-        ? (
-            lazyRender as {
-              _payload: {
-                _status: number;
-                _result: { default: React.ComponentType };
-              };
-            }
-          )._payload._result.default
-        : undefined;
+      typeof lazyRender === "function" &&
+      "cliWidget" in lazyRender &&
+      "resolved" in lazyRender &&
+      lazyRender.resolved !== null &&
+      lazyRender.resolved !== undefined
+        ? (lazyRender.resolved as React.ComponentType)
+        : lazyRender &&
+            typeof lazyRender === "object" &&
+            "_payload" in lazyRender &&
+            (
+              lazyRender as {
+                _payload: {
+                  _status: number;
+                  _result: { default: React.ComponentType };
+                };
+              }
+            )._payload._status === 1
+          ? (
+              lazyRender as {
+                _payload: {
+                  _status: number;
+                  _result: { default: React.ComponentType };
+                };
+              }
+            )._payload._result.default
+          : undefined;
     // oxlint-disable-next-line typescript/no-explicit-any
     const CustomRender: React.ComponentType<any> | undefined =
       resolved ?? lazyRender;

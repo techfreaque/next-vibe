@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, like, ne, sql } from "drizzle-orm";
 
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";

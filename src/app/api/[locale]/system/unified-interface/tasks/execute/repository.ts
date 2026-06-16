@@ -17,7 +17,7 @@ import {
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { db } from "@/app/api/[locale]/system/db";
-import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -36,7 +36,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { scopedTranslation as tasksScopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
 import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler";
-import { TaskSyncRepository } from "@/app/api/[locale]/remote-connection/sync/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -213,31 +212,6 @@ export class TaskExecuteRepository {
     const timeoutMs = task.timeout ?? 300000;
     const maxRetries = task.retries ?? 0;
     const retryDelayMs = task.retryDelay ?? 30000;
-
-    const { RemoteConnectionRepository } =
-      await import("@/app/api/[locale]/remote-connection/repository");
-    const instanceId = user.id
-      ? await RemoteConnectionRepository.getLocalInstanceId(user.id)
-      : RemoteConnectionRepository.deriveDefaultSelfInstanceId();
-
-    // Fire-and-forget: notify remote RUNNING
-    if (task.targetInstance) {
-      void TaskSyncRepository.pushStatusToRemote({
-        taskId: task.id,
-        status: CronTaskStatus.RUNNING,
-        summary: "",
-        durationMs: null,
-        startedAt: startedAt.toISOString(),
-        serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        executedByInstance: instanceId,
-        logger,
-      }).catch((pushErr) => {
-        logger.warn("pushStatusToRemote (RUNNING) failed", {
-          taskId: task.id,
-          error: String(pushErr),
-        });
-      });
-    }
 
     const taskInput = task.taskInput ?? {};
     const { urlPathParams, data: handlerData } = await splitTaskArgs(
@@ -428,11 +402,7 @@ export class TaskExecuteRepository {
     const taskThreadId = task.wakeUpThreadId ?? null;
     const taskToolMessageId = task.wakeUpToolMessageId ?? null;
 
-    // Skip handleTaskCompletion for remote tasks (targetInstance set) - the
-    // originator receives the result via /report and runs handleTaskCompletion
-    // there. Running it here would create resume-stream on the wrong instance
-    // and try to backfill a toolMessageId that doesn't exist locally.
-    if (taskToolMessageId && taskUserContext && !task.targetInstance) {
+    if (taskToolMessageId && taskUserContext) {
       await handleTaskCompletion({
         toolMessageId: taskToolMessageId,
         threadId: taskThreadId,
@@ -453,27 +423,6 @@ export class TaskExecuteRepository {
         logger.error("handleTaskCompletion failed", {
           taskId: task.id,
           error: completionErr.message,
-        });
-      });
-    }
-
-    // Fire-and-forget: push final status to remote
-    if (task.targetInstance) {
-      void TaskSyncRepository.pushStatusToRemote({
-        taskId: task.id,
-        status: finalStatus,
-        summary: finalMessage ?? "",
-        durationMs: finalDurationMs,
-        executionId: firstExecutionId ?? undefined,
-        output: finalResult ?? undefined,
-        startedAt: startedAt.toISOString(),
-        serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        executedByInstance: instanceId,
-        logger,
-      }).catch((pushErr) => {
-        logger.warn("pushStatusToRemote (final) failed", {
-          taskId: task.id,
-          error: String(pushErr),
         });
       });
     }

@@ -839,57 +839,8 @@
     {
       "idx": 119,
       "version": "7",
-      "when": 1780333460000,
-      "tag": "20260601171000_remote_connection_flags",
-      "breakpoints": true
-    },
-    {
-      "idx": 120,
-      "version": "7",
-      "when": 1780340000000,
-      "tag": "20260601180000_remove_deprecated_remote_columns",
-      "breakpoints": true
-    },
-    {
-      "idx": 121,
-      "version": "7",
-      "when": 1780416000000,
-      "tag": "20260603100000_drop_task_queue_columns",
-      "breakpoints": true
-    },
-    {
-      "idx": 122,
-      "version": "7",
-      "when": 1748967600000,
-      "tag": "20260603170000_cortex_skill_soft_delete",
-      "breakpoints": true
-    },
-    {
-      "idx": 123,
-      "version": "7",
-      "when": 1749168000000,
-      "tag": "20260606000000_ssh_connection_mounts",
-      "breakpoints": true
-    },
-    {
-      "idx": 124,
-      "version": "7",
-      "when": 1749297600000,
-      "tag": "20260607120000_remote_connection_cleanup",
-      "breakpoints": true
-    },
-    {
-      "idx": 125,
-      "version": "7",
-      "when": 1781179200000,
-      "tag": "20260611120000_remote_connection_push_cursors",
-      "breakpoints": true
-    },
-    {
-      "idx": 126,
-      "version": "7",
-      "when": 1781274886089,
-      "tag": "20260612143446_unique_pestilence",
+      "when": 1781278240049,
+      "tag": "20260612153040_remote_system_redesign",
       "breakpoints": true
     }
   ]

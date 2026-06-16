@@ -35,9 +35,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { DefaultFolderId } from "../../chat/config";
 import { SKILL_CREATOR_ID } from "../../chat/skills/constants";
 import { scopedTranslation } from "../stream/i18n";

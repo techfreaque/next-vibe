@@ -5,6 +5,7 @@
 
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   jsonb,
   pgTable,
@@ -18,7 +19,6 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
@@ -39,7 +39,7 @@ import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-spee
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
 import type { VideoGenModelId } from "../../video-generation/models";
@@ -109,13 +109,7 @@ export const customSkills = pgTable(
     ).$type<MusicGenModelSelection>(),
     videoGenModelId: text("video_gen_model_id").$type<VideoGenModelId>(),
 
-    // Model selection (discriminated union from API)
-    // Kept for backward compat - always synced from the default variant's modelSelection
-    modelSelection: jsonb("model_selection")
-      .$type<ChatModelSelection>()
-      .notNull(),
-
-    // Named variants with per-variant model selections (null = legacy single-variant skill)
+    // Named variants with per-variant model selections
     variants: jsonb("variants").$type<SkillVariantData[]>(),
 
     // Ownership type (determines visibility: USER=private, PUBLIC=shared, SYSTEM=built-in)
@@ -159,6 +153,9 @@ export const customSkills = pgTable(
     // Lightweight versioning - set when status transitions to PUBLISHED
     publishedAt: timestamp("published_at"),
     changeNote: text("change_note"),
+
+    // Soft-delete for tombstone propagation across connected instances.
+    isDeleted: boolean("is_deleted").default(false).notNull(),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),

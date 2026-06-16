@@ -150,6 +150,11 @@ export class ConnectionCreateRepository {
       }
 
       logger.info(`Created SSH connection ${row.id} for user ${user.id!}`);
+
+      // Auto-materialize a default mount if none configured yet
+      const { ensureDefaultMount } = await import("../mounts-bootstrap");
+      await ensureDefaultMount(row.id, user.id!);
+
       return success({ id: row.id });
     } catch (error) {
       logger.error("Failed to create SSH connection", parseError(error));

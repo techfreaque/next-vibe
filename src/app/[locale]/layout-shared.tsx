@@ -3,17 +3,17 @@
  * Platform-agnostic providers and setup used by both web and native layouts
  */
 
-import { QueryProvider } from "next-vibe/system/unified-interface/react/hooks/query-provider";
 import { ThemeProvider } from "next-vibe-ui/ui/theme-provider";
 import { Toaster } from "next-vibe-ui/ui/toaster";
+import { QueryProvider } from "next-vibe/system/unified-interface/react/hooks/query-provider";
 import type { JSX, ReactNode } from "react";
 
 import { TranslationProvider } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { LoggerProvider } from "@/hooks/use-logger";
+import { LoggerProvider } from "@/hooks/logger-provider";
 
-import { ErrorBoundary } from "./_components/error-boundary";
+import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
 /**
  * Shared root providers for both web and native

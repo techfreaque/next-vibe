@@ -132,9 +132,8 @@ const kagiProvider: SearchProviderConfig = {
  * Provider registry - typesafe lookup by enum value
  * To add a new provider: add enum value, create adapter, add to registry.
  */
-export const SEARCH_PROVIDER_REGISTRY: Record<
-  SearchProviderValue,
-  SearchProviderConfig
+export const SEARCH_PROVIDER_REGISTRY: Partial<
+  Record<SearchProviderValue, SearchProviderConfig>
 > = {
   [SearchProvider.BRAVE]: braveProvider,
   [SearchProvider.KAGI]: kagiProvider,
@@ -147,22 +146,18 @@ export const SEARCH_PROVIDER_REGISTRY: Record<
 export function resolveSearchProvider(
   explicit?: SearchProviderValue | null,
 ): SearchProviderConfig | null {
-  // Explicit choice
-  if (explicit) {
-    const provider = SEARCH_PROVIDER_REGISTRY[explicit];
-    if (provider.isAvailable()) {
-      return provider;
+  // Auto or unset: prefer Brave (cheaper), fall back to Kagi
+  if (!explicit || explicit === SearchProvider.AUTO) {
+    if (braveProvider.isAvailable()) {
+      return braveProvider;
+    }
+    if (kagiProvider.isAvailable()) {
+      return kagiProvider;
     }
     return null;
   }
 
-  // Auto-detect: prefer Brave (cheaper)
-  if (braveProvider.isAvailable()) {
-    return braveProvider;
-  }
-  if (kagiProvider.isAvailable()) {
-    return kagiProvider;
-  }
-
-  return null;
+  // Explicit provider choice
+  const provider = SEARCH_PROVIDER_REGISTRY[explicit];
+  return provider?.isAvailable() ? provider : null;
 }

@@ -1,63 +1,138 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Link } from "next-vibe-ui/ui/link";
-import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
+import { useMemo } from "react";
 
+import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
+import { Div } from "next-vibe-ui/ui/div";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type {
+  HelpGetResponseOutput,
+  HelpGetRequestInput,
+} from "@/app/api/[locale]/system/help/definition";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { useLogger } from "@/hooks/use-logger";
 
-import { scopedTranslation } from "./i18n";
+function parseInitialState(
+  searchParams: ReturnType<typeof useSearchParams>,
+): Partial<HelpGetRequestInput> {
+  const state: Partial<HelpGetRequestInput> = { statsFilter: "webPinned" };
 
-interface ToolsPageClientProps {
-  locale: CountryLanguage;
-  user: JwtPayloadType;
+  const q = searchParams.get("q");
+  if (q) {
+    state.query = q;
+  }
+
+  const sf = searchParams.get("sf");
+  if (
+    sf === "pinned" ||
+    sf === "allowed" ||
+    sf === "all" ||
+    sf === "webPinned" ||
+    sf === "cliAllowed" ||
+    sf === "mcpPinned" ||
+    sf === "mcpAllowed"
+  ) {
+    state.statsFilter = sf;
+  }
+
+  if (searchParams.get("prod") === "1") {
+    state.includeProdOnly = true;
+  }
+
+  const view = searchParams.get("view");
+  if (
+    view === UserPermissionRole.PUBLIC ||
+    view === UserPermissionRole.CUSTOMER
+  ) {
+    state.viewAsRole = view;
+  }
+
+  const inst = searchParams.get("inst");
+  if (inst) {
+    state.instanceId = inst;
+  }
+
+  const cat = searchParams.get("cat");
+  if (cat) {
+    state.category = cat;
+  }
+
+  const p = searchParams.get("p");
+  if (p) {
+    const n = parseInt(p, 10);
+    if (!isNaN(n) && n >= 1) {
+      state.page = n;
+    }
+  }
+
+  const ps = searchParams.get("ps");
+  if (ps) {
+    const n = parseInt(ps, 10);
+    if (!isNaN(n) && n >= 1) {
+      state.pageSize = n;
+    }
+  }
+
+  return state;
 }
 
 export function ToolsPageClient({
   locale,
   user,
-}: ToolsPageClientProps): JSX.Element {
-  const { t } = scopedTranslation.scopedT(locale);
+  initialHelpData,
+}: {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  initialHelpData?: HelpGetResponseOutput | null;
+}): JSX.Element {
+  const searchParams = useSearchParams();
+  const logger = useLogger();
+
+  const endpointOptions = useMemo(
+    () => {
+      const initialState = parseInitialState(searchParams);
+      const useInitialData =
+        !initialState.category &&
+        (!initialState.statsFilter || initialState.statsFilter === "webPinned");
+      return {
+        read: {
+          initialState,
+          initialData: useInitialData
+            ? (initialHelpData ?? undefined)
+            : undefined,
+          queryOptions: {
+            staleTime: 60 * 1000,
+            refetchOnWindowFocus: false,
+          },
+        },
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const endpointInstance = useEndpoint(
+    helpDefinitions,
+    endpointOptions,
+    logger,
+    user,
+  );
 
   return (
-    <Div className="bg-background">
-      <Div className="container max-w-4xl mx-auto py-6 px-4">
-        <Link
-          href={`/${locale}/threads/private/new`}
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
-        >
-          <ChevronLeft className="mr-1 h-4 w-4" />
-          {t("backToChat")}
-        </Link>
-
-        <Div className="flex items-center gap-3 mb-2">
-          <Zap className="h-6 w-6 text-primary" />
-          <H1 className="text-2xl font-bold">{t("title")}</H1>
-        </Div>
-        <P className="text-muted-foreground mb-6">{t("description")}</P>
-
-        <Div className="rounded-xl border bg-card overflow-hidden">
-          <EndpointsPage
-            endpoint={helpDefinitions}
-            locale={locale}
-            user={user}
-            endpointOptions={{
-              read: {
-                queryOptions: {
-                  staleTime: 60 * 1000,
-                  refetchOnWindowFocus: false,
-                },
-              },
-            }}
-          />
-        </Div>
-      </Div>
+    <Div className="flex flex-col h-dvh w-full overflow-hidden">
+      <EndpointsPage
+        endpoint={helpDefinitions}
+        locale={locale}
+        user={user}
+        endpointInstance={endpointInstance}
+        endpointOptions={endpointOptions}
+        className="flex flex-col flex-1 min-h-0 w-full"
+      />
     </Div>
   );
 }

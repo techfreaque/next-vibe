@@ -11,22 +11,22 @@ import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Span } from "next-vibe-ui/ui/span";
 
-import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
+import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/badge/widget";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 
 import type definition from "./definition";
 import type { FolderPermissionsTranslationKey } from "./i18n";
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
 /**
  * Props for custom widget

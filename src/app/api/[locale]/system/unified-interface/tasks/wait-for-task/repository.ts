@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { desc, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -20,13 +20,14 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { CallbackMode } from "../../ai/execute-tool/constants";
-import { cronTaskExecutions, cronTasks } from "../cron/db";
+import { CallbackMode } from "../../execute-tool/constants";
+import { cronTasks } from "../cron/db";
 import { CronTaskStatus } from "../enum";
 import type { TasksT } from "../i18n";
 import type {

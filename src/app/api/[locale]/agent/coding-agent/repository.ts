@@ -31,7 +31,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { CodingAgentT } from "./i18n";

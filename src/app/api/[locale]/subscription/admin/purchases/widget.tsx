@@ -19,12 +19,13 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
@@ -93,8 +94,8 @@ function PurchaseRow({
 
         <Div className="flex items-center gap-3 text-sm text-muted-foreground">
           <Span className="tabular-nums">
-            {purchase.remaining.toLocaleString()} /{" "}
-            {purchase.originalAmount.toLocaleString()}
+            {purchase.remaining.toLocaleString(locale)} /{" "}
+            {purchase.originalAmount.toLocaleString(locale)}
           </Span>
           <Span className="text-xs">({usageRatio}%)</Span>
         </Div>
@@ -122,6 +123,7 @@ export function PurchasesContainer({
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
+  const { pop: goBack, canGoBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
@@ -151,6 +153,18 @@ export function PurchasesContainer({
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b">
+        {canGoBack && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              goBack();
+            }}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        )}
         <Span className="font-semibold text-base mr-auto">
           {t("get.title")}
           {totalCount > 0 && (

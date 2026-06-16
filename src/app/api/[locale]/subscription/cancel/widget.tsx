@@ -25,16 +25,16 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
+import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 
 import type definition from "./definition";
 

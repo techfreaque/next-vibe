@@ -12,6 +12,8 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
@@ -19,7 +21,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { SearchProviderValue } from "../enum";
+import { SearchProvider, type SearchProviderValue } from "../enum";
 import { resolveSearchProvider, type WebSearchResponse } from "../provider";
 import type { WebSearchGetRequestOutput } from "./definition";
 import type { WebSearchT } from "./i18n";
@@ -89,9 +91,8 @@ export class WebSearchRepository {
       });
     }
 
-    // Resolve provider: explicit request > user preference > auto-detect (Brave)
-    const explicitProvider =
-      data.provider !== "auto" ? (data.provider as SearchProviderValue) : null;
+    // Resolve provider: explicit request > user preference > Brave default
+    const explicitProvider = data.provider ?? null;
 
     const userPreference = explicitProvider
       ? null
@@ -101,14 +102,17 @@ export class WebSearchRepository {
     const providerConfig = resolveSearchProvider(preferredProvider);
 
     if (!providerConfig) {
-      if (explicitProvider) {
+      if (explicitProvider && explicitProvider !== SearchProvider.AUTO) {
         return fail({
           message: t("get.errors.providerUnavailable.title"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
+      const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
       return fail({
-        message: t("get.errors.noProvider.title"),
+        message: isAdmin
+          ? t("get.errors.noProviderAdmin.title")
+          : t("get.errors.noProviderUser.title"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }

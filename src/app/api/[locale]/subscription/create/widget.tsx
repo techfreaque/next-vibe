@@ -55,10 +55,10 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import FormAlertWidget from "../../system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+import FormAlertWidget from "next-vibe-ui/unified/interactive/form-alert/widget";
 import type definition from "./definition";
 
 /**

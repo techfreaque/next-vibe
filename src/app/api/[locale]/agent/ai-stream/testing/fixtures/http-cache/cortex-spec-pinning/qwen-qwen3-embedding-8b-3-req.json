@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:bca21c9a | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 16, 16:49]\n\nAssistant: File created and verified at path `/memories/spec-test/life-career.md`. Content matches exactly (293 bytes, frontmatter + Current State, Goals, Blockers sections).\n\nVERDICT: PASS\n\nSystem: [Context: ID:3ebd0fe3 | Posted:Jun 16, 16:49]\n\nUser: Use cortex-write to create /memories/spec-test/critical-note.md with this content:\n\n---\npriority: 90\npinned: true\ntags: [spec-test]\n---\n\nThis is a PINNED critical note. It must ALWAYS appear in the system prompt, never trimmed.\n\nAfter writing, read it back with cortex-read and confirm:\n1. The file was created\n2. The frontmatter contains pinned: true\n3. The content matches what you wrote\n\n\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (17)\n│   ├── life-career.md [75%]\n│   │   Building unbottled.ai, a free-speech AI platform. · ## Goals · - Short-term: Launch v1 with 50+ models · - Medium-term: 10k users · - Long-term: Become the default AI layer for open web · ##…\n│   ├── name.md\n│   │   <!-- Your name and how you prefer to be addressed. The AI will fill this in during your first conversation. -->\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operat\n\nSystem: [Context: ID:65c67e60 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 16, 16:49]\n\nAssistant: [tool:cortex-write] {\"path\":\"/memories/spec-test/critical-note.md\",\"content\":\"---\\npriority: 90\\npinned: true\\ntags: [spec-test]\\n---\\n\\nThis is a PINNED critical note. It must ALWAYS appear in the system prompt, never t\n\nTool: [result:cortex-write] {\"responsePath\":\"/memories/spec-test/critical-note.md\",\"size\":144,\"created\":true,\"updatedAt\":\"2026-06-16T16:49:46.533Z\",\"responseContent\":\"---\\npriority: 90\\npinned: true\\ntags: [spec-test]\\n---\\n\\nThis is a PINNED critical note. It must ALWAYS appear in the system prompt, never trimmed.\\n\"}",
+    "encoding_format": "float"
+  }
+}

@@ -28,6 +28,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 import { THREAD_SHARE_LINKS_ALIAS } from "./constants";
+import threadsDefinitions from "../../definition";
 
 /**
  * GET endpoint - List all share links for a thread
@@ -686,3 +687,6 @@ export type ShareLinkRevokeUrlVariablesOutput =
 const definitions = { GET, POST, PATCH, DELETE };
 
 export default definitions;
+import threadsDefinitions from "../../definition";
+import threadsDefinitions from "../../definition";
+import threadsDefinitions from "../../definition";

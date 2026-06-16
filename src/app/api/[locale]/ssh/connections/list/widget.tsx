@@ -23,13 +23,13 @@ import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import { type JSX, useCallback } from "react";
 
-import { usePickerCallback } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/picker-context";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 
 import type endpoints from "./definition";
 

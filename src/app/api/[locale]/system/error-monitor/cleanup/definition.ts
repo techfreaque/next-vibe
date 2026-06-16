@@ -1,0 +1,139 @@
+/**
+ * Error Logs Cleanup API Definition
+ * POST endpoint to prune old error logs (called by cron daily)
+ */
+
+import { z } from "zod";
+
+import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import {
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import {
+  EndpointErrorTypes,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
+import { ERROR_LOGS_CLEANUP_ALIAS } from "./constants";
+
+const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["system", "error-monitor", "cleanup"],
+  aliases: [ERROR_LOGS_CLEANUP_ALIAS],
+  title: "errorMonitor.cleanup.post.title",
+  titleShort: "errorMonitor.cleanup.post.titleShort",
+  description: "errorMonitor.cleanup.post.description",
+  category: "devTools",
+  subCategory: "tasksMonitoring",
+  icon: "trash",
+  tags: ["errorMonitor.tag" as const],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+    UserRole.MCP_OFF,
+    UserRole.SKILL_OFF,
+  ],
+
+  fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "errorMonitor.cleanup.post.container.title",
+    description: "errorMonitor.cleanup.post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
+      deletedCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "errorMonitor.cleanup.post.response.deletedCount",
+        schema: z.number(),
+      }),
+      deletedByTime: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "errorMonitor.cleanup.post.response.deletedByTime",
+        schema: z.number(),
+      }),
+      deletedByCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "errorMonitor.cleanup.post.response.deletedByCount",
+        schema: z.number(),
+      }),
+      retentionDays: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "errorMonitor.cleanup.post.response.retentionDays",
+        schema: z.number(),
+      }),
+      maxRows: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "errorMonitor.cleanup.post.response.maxRows",
+        schema: z.number(),
+      }),
+    },
+  }),
+
+  errorTypes: {
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "errorMonitor.post.errors.unauthorized.title",
+      description: "errorMonitor.post.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "errorMonitor.post.errors.forbidden.title",
+      description: "errorMonitor.post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "errorMonitor.post.errors.server.title",
+      description: "errorMonitor.post.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "errorMonitor.post.errors.unknown.title",
+      description: "errorMonitor.post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "errorMonitor.post.errors.validation.title",
+      description: "errorMonitor.post.errors.validation.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "errorMonitor.post.errors.unknown.title",
+      description: "errorMonitor.post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "errorMonitor.post.errors.unknown.title",
+      description: "errorMonitor.post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "errorMonitor.post.errors.unknown.title",
+      description: "errorMonitor.post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "errorMonitor.post.errors.unknown.title",
+      description: "errorMonitor.post.errors.unknown.description",
+    },
+  },
+
+  successTypes: {
+    title: "errorMonitor.cleanup.post.success.title",
+    description: "errorMonitor.cleanup.post.success.description",
+  },
+
+  examples: {
+    responses: {
+      default: {
+        deletedCount: 142,
+        deletedByTime: 120,
+        deletedByCount: 22,
+        retentionDays: 180,
+        maxRows: 100_000,
+      },
+    },
+  },
+});
+
+export type CleanupPostResponseOutput = typeof POST.types.ResponseOutput;
+
+const definitions = { POST };
+export default definitions;

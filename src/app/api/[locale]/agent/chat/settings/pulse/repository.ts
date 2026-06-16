@@ -19,7 +19,7 @@ import {
 import { TASK_TIMEOUTS } from "@/app/api/[locale]/system/unified-interface/tasks/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { AI_RUN_ALIAS } from "@/app/api/[locale]/agent/ai-stream/run/constants";
 
 import type { ChatSettings } from "../db";

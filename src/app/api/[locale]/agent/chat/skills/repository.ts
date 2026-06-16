@@ -9,10 +9,7 @@ import { and, count, eq, inArray, ne, or, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 import type { z } from "zod";
 
-import {
-  chatModelSelectionSchema,
-  type ChatModelSelection,
-} from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
@@ -39,7 +36,7 @@ import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/imag
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
-import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
 
@@ -232,12 +229,10 @@ export class SkillsRepository {
   }
 
   /**
-   * Safely parse variants from DB JSONB, falling back to a single default variant
-   * built from the top-level modelSelection column.
+   * Safely parse variants from DB JSONB.
    */
   private static safeParseVariants(
     variants: SkillVariantData[] | null | undefined,
-    modelSelection: ChatModelSelection | null,
   ): SkillVariantData[] {
     if (variants && variants.length > 0) {
       const parsed = variants
@@ -247,20 +242,6 @@ export class SkillsRepository {
       if (parsed.length > 0) {
         return parsed;
       }
-    }
-    // Fallback: build a single default variant from top-level modelSelection
-    const sel = SkillsRepository.safeParseSelection(
-      chatModelSelectionSchema,
-      modelSelection,
-    );
-    if (sel) {
-      return [
-        {
-          id: "default",
-          modelSelection: sel,
-          isDefault: true,
-        },
-      ];
     }
     return [];
   }
@@ -338,7 +319,7 @@ export class SkillsRepository {
 
         if (needCustom) {
           // Build DB where clause based on source filter
-          const dbCondition =
+          const sourceCondition =
             source === SkillSourceFilter.MY
               ? eq(customSkills.userId, userId)
               : source === SkillSourceFilter.COMMUNITY
@@ -353,6 +334,10 @@ export class SkillsRepository {
                       ne(customSkills.userId, userId),
                     ),
                   );
+          const dbCondition = and(
+            eq(customSkills.isDeleted, false),
+            sourceCondition,
+          );
 
           const customSkillsList = await db
             .select({
@@ -365,7 +350,6 @@ export class SkillsRepository {
               category: customSkills.category,
               tagline: customSkills.tagline,
               ownershipType: customSkills.ownershipType,
-              modelSelection: customSkills.modelSelection,
               variants: customSkills.variants,
               voteCount: customSkills.voteCount,
               trustLevel: customSkills.trustLevel,
@@ -416,6 +400,7 @@ export class SkillsRepository {
                 ),
               );
             } else {
+              const defaultVariant = variants?.[0];
               customSkillsCards.push(
                 SkillsRepository.mapSkillToListItem(
                   externalId,
@@ -425,7 +410,7 @@ export class SkillsRepository {
                     tagline: char.tagline,
                     description: char.description,
                     category: char.category,
-                    modelSelection: char.modelSelection,
+                    modelSelection: defaultVariant?.modelSelection,
                     ownershipType: char.ownershipType,
                     voteCount: char.voteCount,
                     trustLevel: char.trustLevel,
@@ -553,13 +538,17 @@ export class SkillsRepository {
             category: customSkills.category,
             tagline: customSkills.tagline,
             ownershipType: customSkills.ownershipType,
-            modelSelection: customSkills.modelSelection,
             variants: customSkills.variants,
             voteCount: customSkills.voteCount,
             trustLevel: customSkills.trustLevel,
           })
           .from(customSkills)
-          .where(eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC));
+          .where(
+            and(
+              eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
+              eq(customSkills.isDeleted, false),
+            ),
+          );
 
         for (const char of publicSkills) {
           const externalId = char.slug || char.id;
@@ -602,6 +591,7 @@ export class SkillsRepository {
               ),
             );
           } else {
+            const defaultVariant = variants?.[0];
             communitySkillsCards.push(
               SkillsRepository.mapSkillToListItem(
                 externalId,
@@ -611,7 +601,7 @@ export class SkillsRepository {
                   tagline: char.tagline,
                   description: char.description,
                   category: char.category,
-                  modelSelection: char.modelSelection,
+                  modelSelection: defaultVariant?.modelSelection,
                   ownershipType: char.ownershipType,
                   voteCount: char.voteCount,
                   trustLevel: char.trustLevel,
@@ -746,7 +736,10 @@ export class SkillsRepository {
         return {
           sectionIcon: config.icon,
           sectionTitle: t(config.category),
-          sectionCount: chars.length,
+          // Count unique skills - variants of the same skill are separate items
+          sectionCount: new Set(
+            chars.map((c) => parseSkillId(c.skillId).skillId),
+          ).size,
           skills: chars,
           order: config.order,
         };
@@ -876,6 +869,7 @@ export class SkillsRepository {
         .where(
           and(
             idCondition,
+            eq(customSkills.isDeleted, false),
             userId
               ? or(
                   eq(customSkills.userId, userId),
@@ -965,7 +959,6 @@ export class SkillsRepository {
 
       const parsedVariants = SkillsRepository.safeParseVariants(
         customSkill.variants,
-        customSkill.modelSelection,
       );
 
       return success<SkillGetResponseOutput>({
@@ -1053,19 +1046,20 @@ export class SkillsRepository {
         name: data.name,
       });
 
-      // Build variants array: use provided variants or auto-create single default variant
-      const effectiveModelSelection =
-        data.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
-      const effectiveVariants =
+      // Variants are the source of truth for model selection.
+      // If request provides modelSelection without variants, wrap it into a single default variant.
+      const effectiveVariants: SkillVariantData[] | null =
         data.variants && data.variants.length > 0
           ? data.variants
-          : [
-              {
-                id: "default",
-                modelSelection: effectiveModelSelection,
-                isDefault: true,
-              },
-            ];
+          : data.modelSelection
+            ? [
+                {
+                  id: "default",
+                  modelSelection: data.modelSelection,
+                  isDefault: true,
+                },
+              ]
+            : null;
 
       // Validate variant IDs are unique within the skill
       if (data.variants && data.variants.length > 0) {
@@ -1111,7 +1105,6 @@ export class SkillsRepository {
             "manualModelId" in data.videoGenModelSelection
               ? (data.videoGenModelSelection.manualModelId ?? null)
               : null,
-          modelSelection: effectiveModelSelection,
           variants: effectiveVariants,
           ownershipType: data.isPublic
             ? SkillOwnershipType.PUBLIC
@@ -1151,6 +1144,8 @@ export class SkillsRepository {
         user,
       );
       if (skill) {
+        const defaultVariant =
+          effectiveVariants?.find((v) => v.isDefault) ?? effectiveVariants?.[0];
         const listItem = SkillsRepository.mapSkillToListItem(
           skill.slug ?? skill.id,
           {
@@ -1159,8 +1154,7 @@ export class SkillsRepository {
             tagline: skill.tagline,
             description: skill.description,
             category: skill.category,
-            modelSelection:
-              skill.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
+            modelSelection: defaultVariant?.modelSelection,
             ownershipType: skill.ownershipType,
             voteCount: skill.voteCount,
             trustLevel: skill.trustLevel,
@@ -1272,19 +1266,11 @@ export class SkillsRepository {
           data.name,
         );
 
-        // Derive model selections from the default variant (variants are now the source of truth)
-        const derivedVariants: SkillVariantData[] =
-          data.variants && data.variants.length > 0
-            ? data.variants
-            : [
-                {
-                  id: "default",
-                  modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
-                  isDefault: true,
-                },
-              ];
+        // Variants are the source of truth for model selection
+        const derivedVariants: SkillVariantData[] | null =
+          data.variants && data.variants.length > 0 ? data.variants : null;
         const derivedDefaultVariant =
-          derivedVariants.find((v) => v.isDefault) ?? derivedVariants[0];
+          derivedVariants?.find((v) => v.isDefault) ?? derivedVariants?.[0];
 
         const [derivedSkill] = await db
           .insert(customSkills)
@@ -1321,9 +1307,6 @@ export class SkillsRepository {
               derivedDefaultVariant.videoGenModelSelection.manualModelId
                 ? derivedDefaultVariant.videoGenModelSelection.manualModelId
                 : null,
-            modelSelection:
-              derivedDefaultVariant?.modelSelection ??
-              DEFAULT_CHAT_MODEL_SELECTION,
             variants: derivedVariants,
             ownershipType: data.isPublic
               ? SkillOwnershipType.PUBLIC
@@ -1347,8 +1330,7 @@ export class SkillsRepository {
               tagline: derivedSkill.tagline,
               description: derivedSkill.description,
               category: derivedSkill.category,
-              modelSelection:
-                derivedSkill.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
+              modelSelection: derivedDefaultVariant?.modelSelection,
               ownershipType: derivedSkill.ownershipType,
               voteCount: derivedSkill.voteCount,
               trustLevel: derivedSkill.trustLevel,
@@ -1410,13 +1392,9 @@ export class SkillsRepository {
       const { variants: requestVariants, ...dataWithoutVariants } =
         dataWithoutIsPublic;
 
-      // Sync modelSelection from default variant when variants are provided
       const variantsToWrite = requestVariants ?? undefined;
-      const defaultVariantModelSelection = variantsToWrite
-        ? variantsToWrite.find((v) => v.isDefault)?.modelSelection
-        : undefined;
 
-      // Derive per-modality selections from the default variant (variants are now the source of truth)
+      // Derive per-modality selections from the default variant (variants are the source of truth)
       const updateDefaultVariant = variantsToWrite
         ? (variantsToWrite.find((v) => v.isDefault) ?? variantsToWrite[0])
         : undefined;
@@ -1436,9 +1414,7 @@ export class SkillsRepository {
           icon: iconToUpdate,
           ownershipType,
           variants: variantsToWrite,
-          // Sync top-level modelSelection from default variant for backward compat
-          modelSelection: defaultVariantModelSelection,
-          // Sync legacy per-modality columns from default variant for backward compat
+          // Sync per-modality columns from default variant
           voiceModelSelection: updateDefaultVariant
             ? SkillsRepository.normalizeTtsSelection(
                 updateDefaultVariant.voiceModelSelection ?? null,
@@ -1625,6 +1601,7 @@ export class SkillsRepository {
       );
 
       const result = await db.transaction(async (tx) => {
+        // Hard-delete favorites (no need to propagate favorites to remotes)
         await tx
           .delete(chatFavorites)
           .where(
@@ -1636,8 +1613,11 @@ export class SkillsRepository {
             ),
           );
 
+        // Soft-delete the skill: isDeleted=true + bump updatedAt so tombstone propagates
+        // to connected remote instances. Hard-delete deferred until propagated.
         return tx
-          .delete(customSkills)
+          .update(customSkills)
+          .set({ isDeleted: true, updatedAt: new Date() })
           .where(
             and(
               eq(customSkills.id, existingSkill.id),
@@ -1675,6 +1655,24 @@ export class SkillsRepository {
         // Best-effort embedding removal
       });
 
+      // WS-push sync: broadcast tombstone to connected remote instances
+      void (async (): Promise<void> => {
+        try {
+          const { serializeProviders } =
+            await import("@/app/api/[locale]/remote-connection/sync-provider");
+          const { broadcastSyncNotify } =
+            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+          const syncPayloads = await serializeProviders(
+            ["skills"],
+            userId,
+            logger,
+          );
+          broadcastSyncNotify(userId, syncPayloads, logger);
+        } catch {
+          // Best-effort
+        }
+      })();
+
       return success({
         name: deleted.name,
         tagline: deleted.tagline,
@@ -1706,7 +1704,7 @@ export class SkillsRepository {
       tagline: string | null;
       description: string | null;
       category: typeof SkillCategoryValue;
-      modelSelection: ChatModelSelection;
+      modelSelection?: ChatModelSelection;
       ownershipType: typeof SkillOwnershipTypeValue;
       voteCount: number | null;
       trustLevel: typeof SkillTrustLevelValue | null;

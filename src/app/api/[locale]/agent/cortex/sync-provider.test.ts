@@ -109,8 +109,8 @@ describe("sync policy filtering", () => {
     syncPolicy: string | null | undefined,
     syncId: string | null,
   ): boolean {
-    if (!syncId) return false;
-    if (syncPolicy === null || syncPolicy === undefined) return true;
+    if (!syncId) {return false;}
+    if (syncPolicy === null || syncPolicy === undefined) {return true;}
     return syncPolicy === CortexSyncPolicy.SYNC;
   }
 

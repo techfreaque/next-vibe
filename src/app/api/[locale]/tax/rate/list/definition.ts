@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
   responseField,
-  customWidgetObject,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -24,9 +24,10 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
-import { TaxType, TaxTypeDB, TaxTypeOptions } from "../../enum";
 import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
+import { TaxType, TaxTypeDB, TaxTypeOptions } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import { TAX_RATE_LIST_ALIAS } from "./constants";
 
 const TaxRateListWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.TaxRateListWidget })),
@@ -42,6 +43,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["tax", "rate", "list"],
+  aliases: [TAX_RATE_LIST_ALIAS] as const,
   title: "rate.list.title" as const,
   titleShort: "rate.list.titleShort" as const,
   description: "rate.list.description" as const,

@@ -24,7 +24,7 @@ import {
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "../../../unified-interface/unified-ui/widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/types";
 import { sendTestRequest } from "./send-test-request";
 import type { TestEndpointOptions, TestRunner } from "./types";
 import { resolveTestAdminUser } from "./resolve-test-user";

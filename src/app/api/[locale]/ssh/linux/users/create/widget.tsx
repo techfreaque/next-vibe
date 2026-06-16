@@ -8,15 +8,15 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
-import { TextArrayFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-array-field/widget";
-import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/widget";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+import { useWidgetForm } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { TextArrayFieldWidget } from "next-vibe-ui/unified/form-fields/text-array-field/widget";
+import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
 import type endpoints from "./definition";
 import type { LinuxUserCreateResponseOutput } from "./definition";

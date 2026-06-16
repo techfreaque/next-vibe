@@ -2,7 +2,7 @@ export const translations = {
   title: "Vibe Stage",
   titleShort: "Vibe Stage",
   description:
-    "Auto-stage boilerplate files (route.ts, i18n/*/index.ts) that pass the boilerplate pattern check. Runs the boilerplate oxlint plugin on all unstaged candidates and git-adds only files with zero violations.",
+    "Auto-stage boilerplate files (route.ts, i18n/*/index.ts) that pass pattern checks. Also stages import-only changes in any file, or partially stages only the import hunks from mixed-change files.",
 
   fields: {
     dryRun: {
@@ -20,8 +20,9 @@ export const translations = {
 
   response: {
     staged: "Staged",
+    partiallyStaged: "Partially staged (imports only)",
     skipped: "Skipped (violations)",
-    noChanges: "No stageable boilerplate files found in working tree",
+    noChanges: "No stageable files found in working tree",
     dryRunNote: "Dry run - no files were actually staged",
   },
 
@@ -75,15 +76,18 @@ export const translations = {
     submit: "Run Stage",
     dryRun: "Dry Run",
     staged: "Staged",
+    partiallyStaged: "Partially staged",
     skipped: "Skipped",
     stagedCount: "files staged",
+    partiallyStaged_count: "files partially staged (imports only)",
     skippedCount: "files skipped (violations)",
-    noChanges: "No stageable boilerplate files found",
+    noChanges: "No stageable files found",
     noChangesHint:
-      "Modified route.ts and i18n/*/index.ts files that pass the boilerplate pattern check will appear here",
+      "Boilerplate files, import-only changes, or files with import hunks will appear here",
     dryRunBadge: "Dry Run",
     dryRunNote: "Preview only — no files were staged",
     cleanFile: "clean",
+    partialFile: "imports only",
     violationsFile: "violations",
     loading: "Scanning working tree...",
   },

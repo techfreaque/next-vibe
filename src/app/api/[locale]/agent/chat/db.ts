@@ -47,9 +47,9 @@ import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/reposito
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import { leads } from "@/app/api/[locale]/leads/db";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 

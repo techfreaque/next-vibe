@@ -1,12 +1,11 @@
 /**
  * Complete Task API Definition
- * MCP tool called by tools (e.g. claude-code interactive) when their async work is done.
+ * MCP tool called by tools (e.g. coding agent interactive) when their async work is done.
  * Accepts the exact response payload of the originating tool - same shape as if the tool
  * had returned synchronously. The framework uses this as the wakeUpResult so the deferred
  * TOOL message in the thread renders with the correct response fields.
  *
  * Only taskId + response are required. Status is always "completed".
- * MCP-visible on all instances so Claude Code in a terminal can call back.
  */
 
 import { z } from "zod";
@@ -35,10 +34,11 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "complete-task"],
   title: "completeTask.post.title",
+  titleShort: "completeTask.post.titleShort",
   description: "completeTask.post.description",
   icon: "check-circle",
-  category: "endpointCategories.tasks",
-  subCategory: "endpointCategories.tasksCron",
+  category: "devTools",
+  subCategory: "tasksCron",
   tags: ["tags.tasks" as const],
   allowedRoles: [
     UserRole.ADMIN,
@@ -68,10 +68,6 @@ const { POST } = createEndpoint({
 
       // Response
       completed: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        schema: z.boolean(),
-      }),
-      pushedToRemote: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
       }),
@@ -139,7 +135,6 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         completed: true,
-        pushedToRemote: false,
         updatedAt: new Date("2026-02-26T21:00:00Z").toISOString(),
       },
     },

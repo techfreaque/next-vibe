@@ -14,8 +14,8 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import {
   useWidgetLocale,
   useWidgetPlatform,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { CliIcon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/cli-icons";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { CliIcon } from "next-vibe-ui/unified/form-fields/icon-field/cli-icons";
 
 export interface CodeQualityItem {
   file: string;

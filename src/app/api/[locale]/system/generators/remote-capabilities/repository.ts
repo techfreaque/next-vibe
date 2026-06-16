@@ -27,6 +27,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { RemoteToolCapability } from "@/app/api/[locale]/remote-connection/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
@@ -36,7 +37,6 @@ import {
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { RemoteToolCapability } from "@/app/api/[locale]/remote-connection/db";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   filterUserPermissionRoles,
@@ -454,6 +454,9 @@ export class RemoteCapabilitiesGeneratorRepository {
         const toolName = getPreferredToolName(definition);
 
         const title = t(definition.title);
+        const titleShort = definition.titleShort
+          ? t(definition.titleShort)
+          : undefined;
 
         const description = t(definition.description ?? definition.title);
 
@@ -486,6 +489,7 @@ export class RemoteCapabilitiesGeneratorRepository {
         capabilities.push({
           toolName,
           title,
+          ...(titleShort ? { titleShort } : {}),
           description,
           fields,
           executionMode: "via-execute-route",

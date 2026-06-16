@@ -6,7 +6,7 @@ import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   CallbackMode,
   CallbackModeDB,
-} from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+} from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";

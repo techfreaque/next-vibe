@@ -30,9 +30,9 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { DateFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { DateFieldWidget } from "next-vibe-ui/unified/form-fields/date-field/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 
 import { PulseExecutionStatus } from "../../enum";
 import type endpoints from "./definition";

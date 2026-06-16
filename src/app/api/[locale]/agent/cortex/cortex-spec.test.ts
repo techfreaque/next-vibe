@@ -72,8 +72,8 @@ function parseVerdict(content: string | null | undefined): {
   const lines = content.trimEnd().split("\n");
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i]?.trim() ?? "";
-    if (!line) continue;
-    if (line === VERDICT_PASS) return { verdict: "PASS" };
+    if (!line) {continue;}
+    if (line === VERDICT_PASS) {return { verdict: "PASS" };}
     if (line.startsWith(VERDICT_FAIL_PREFIX)) {
       return {
         verdict: "FAIL",
@@ -112,7 +112,7 @@ async function resolveUser(
     defaultLocale,
     logger,
   );
-  if (!result.success || !result.data) return null;
+  if (!result.success || !result.data) {return null;}
   const user = result.data;
 
   const [link, roleRows] = await Promise.all([
@@ -122,7 +122,7 @@ async function resolveUser(
     db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
   ]);
 
-  if (!link) return null;
+  if (!link) {return null;}
 
   const roles = roleRows
     .map((r) => r.role)
@@ -134,8 +134,8 @@ async function resolveUser(
 }
 
 function matchesToolName(m: SlimMessage, toolName: string): boolean {
-  if (m.role !== "tool" || !m.toolCall) return false;
-  if (m.toolCall.toolName === toolName) return true;
+  if (m.role !== "tool" || !m.toolCall) {return false;}
+  if (m.toolCall.toolName === toolName) {return true;}
   if (
     m.toolCall.toolName === "execute-tool" &&
     typeof m.toolCall.args === "object" &&
@@ -159,9 +159,9 @@ function findToolMsg(
 function resolveToolResult(
   msg: SlimMessage,
 ): Record<string, WidgetData> | null {
-  if (!msg.toolCall?.result) return null;
+  if (!msg.toolCall?.result) {return null;}
   const rec = toolResultRecord(msg.toolCall.result);
-  if (!rec) return null;
+  if (!rec) {return null;}
   for (const key of ["data", "result"] as const) {
     if (key in rec && typeof rec[key] === "object" && rec[key] !== null) {
       return toolResultRecord(rec[key]) ?? rec;
@@ -217,7 +217,7 @@ describe("Cortex Spec E2E", () => {
       resolved,
       `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
     ).toBeTruthy();
-    if (!resolved) return;
+    if (!resolved) {return;}
     testUser = resolved;
 
     const SPEC_FAV_ID = "00000000-0000-4001-c000-000000000002";
@@ -269,7 +269,7 @@ describe("Cortex Spec E2E", () => {
   }, TEST_TIMEOUT);
 
   afterAll(async () => {
-    if (!testUser) return;
+    if (!testUser) {return;}
     await db
       .delete(cortexNodes)
       .where(
@@ -297,7 +297,7 @@ describe("Cortex Spec E2E", () => {
     it(
       name,
       async () => {
-        if (suiteFailed) return;
+        if (suiteFailed) {return;}
         try {
           await fn();
         } catch (err) {

@@ -79,24 +79,6 @@ export class CortexEditRepository {
       });
     }
 
-    // Filesystem backend for preview-mode admin
-    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
-    if (!user.isPublic && !isVirtualWritable(path)) {
-      const { isFilesystemMode } = await import("../fs-provider");
-      if (isFilesystemMode(user)) {
-        const { fsEditFile } = await import("../fs-provider/fs-edit");
-        return fsEditFile({
-          path,
-          find,
-          replace,
-          startLine,
-          endLine,
-          newContent,
-          t,
-        });
-      }
-    }
-
     // Virtual writable mount - read via mount, apply edit, write back via mount
     if (isVirtualWritable(path)) {
       return CortexEditRepository.editVirtualMount({
@@ -198,14 +180,6 @@ export class CortexEditRepository {
 
     logger.info(`Cortex edit: ${path} (${replacements} replacements)`);
 
-    // Disk write-through for documents
-    try {
-      const { syncToDisk } = await import("../fs-provider/fs-sync");
-      await syncToDisk(path, content);
-    } catch {
-      // Best-effort
-    }
-
     // Queue background re-embedding for semantic search
     if (node.id) {
       const { queueEmbedding } = await import("../embeddings/auto-embed");
@@ -217,6 +191,27 @@ export class CortexEditRepository {
         feature: CortexCreditFeature.EDIT,
       });
     }
+
+    // WS-push sync: broadcast to connected remote instances
+    void (async (): Promise<void> => {
+      try {
+        const { serializeProviders } =
+          await import("@/app/api/[locale]/remote-connection/sync-provider");
+        const { broadcastSyncNotify } =
+          await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+        const providerKey = path.startsWith("/memories")
+          ? "memories"
+          : "documents";
+        const syncPayloads = await serializeProviders(
+          [providerKey],
+          userId,
+          logger,
+        );
+        broadcastSyncNotify(userId, syncPayloads, logger);
+      } catch {
+        // Best-effort: cron fallback handles missed syncs
+      }
+    })();
 
     return success({
       responsePath: path,

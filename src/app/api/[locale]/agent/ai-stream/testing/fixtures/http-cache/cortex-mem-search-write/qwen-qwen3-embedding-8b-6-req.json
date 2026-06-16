@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-cortex-write-twice--1--create----d422ba3b-9f6d-4ba2-9e95-d55c25855cc7.md\n\n# Use cortex-write twice:\n1. Create...\nFolder: cron",
+    "encoding_format": "float"
+  }
+}

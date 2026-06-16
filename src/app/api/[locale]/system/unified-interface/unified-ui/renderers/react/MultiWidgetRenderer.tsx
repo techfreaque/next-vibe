@@ -11,7 +11,7 @@ import type { InferResponseOutput } from "@/app/api/[locale]/system/unified-inte
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
-import { withValueNonStrict } from "../../widgets/_shared/field-helpers";
+import { withValueNonStrict } from "next-vibe-ui/unified/_shared/field-helpers";
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,
@@ -19,12 +19,12 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
-} from "../../widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/types";
 import {
   useWidgetForm,
   useWidgetResponseOnly,
   useWidgetUser,
-} from "../../widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import {
   ChildrenDataRenderer,
   type ProcessedChildren,

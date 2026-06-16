@@ -4,17 +4,9 @@
  */
 
 import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
-import { CHAT_MESSAGES_BY_USER_ALIAS } from "@/app/api/[locale]/agent/chat/data-sources/chat-messages-by-user/constants";
-import { LEADS_CONVERTED_ALIAS } from "@/app/api/[locale]/leads/data-sources/leads-converted/constants";
-import { MESSENGER_DELIVERED_ALIAS } from "@/app/api/[locale]/messenger/data-sources/messenger-delivered/constants";
-import { NEWSLETTER_UNSUBSCRIBES_ALIAS } from "@/app/api/[locale]/newsletter/data-sources/newsletter-unsubscribes/constants";
-import { PAYMENTS_INVOICES_PAID_ALIAS } from "@/app/api/[locale]/payment/data-sources/payments-invoices-paid/constants";
-import { REFERRALS_EARNINGS_VOLUME_ALIAS } from "@/app/api/[locale]/referral/data-sources/referrals-earnings-volume/constants";
-import { SUBSCRIPTIONS_NEW_ALIAS } from "@/app/api/[locale]/subscription/data-sources/subscriptions-new/constants";
-import { CRON_EXECUTIONS_SUCCEEDED_ALIAS } from "@/app/api/[locale]/system/unified-interface/data-sources/cron-executions-succeeded/constants";
-import { CREDITS_USAGE_WITH_FEATURE_ALIAS } from "@/app/api/[locale]/credits/data-sources/credits-usage-with-feature/constants";
-import { USERS_ACTIVE_TOTAL_ALIAS } from "@/app/api/[locale]/user/data-sources/users-active-total/constants";
 import { VIBE_SENSE_GRAPHS_ALIAS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/constants";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
 
 export const category: CategoryDefinition = {
   key: "analytics",
@@ -27,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "analytics",
   icon: "bar-chart-2",
   order: 10,
-  defaultEntry: VIBE_SENSE_GRAPHS_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: VIBE_SENSE_GRAPHS_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     "Vibe Sense": {
       icon: "activity",
@@ -38,7 +34,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Vibe Sense",
         "pl-PL": "Vibe Sense",
       },
-      defaultEntry: VIBE_SENSE_GRAPHS_ALIAS,
     },
     Indicators: {
       icon: "trending-up",
@@ -79,7 +74,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Lead-Daten",
         "pl-PL": "Dane leadów",
       },
-      defaultEntry: LEADS_CONVERTED_ALIAS,
     },
     usersData: {
       icon: "user",
@@ -90,7 +84,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Nutzerdaten",
         "pl-PL": "Dane użytkowników",
       },
-      defaultEntry: USERS_ACTIVE_TOTAL_ALIAS,
     },
     messengerData: {
       icon: "mail",
@@ -101,7 +94,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Messenger-Daten",
         "pl-PL": "Dane komunikatora",
       },
-      defaultEntry: MESSENGER_DELIVERED_ALIAS,
     },
     paymentsData: {
       icon: "credit-card",
@@ -112,7 +104,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Zahlungsdaten",
         "pl-PL": "Dane płatności",
       },
-      defaultEntry: PAYMENTS_INVOICES_PAID_ALIAS,
     },
     creditsData: {
       icon: "coins",
@@ -123,7 +114,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Guthaben-Daten",
         "pl-PL": "Dane kredytów",
       },
-      defaultEntry: CREDITS_USAGE_WITH_FEATURE_ALIAS,
     },
     subscriptionsData: {
       icon: "repeat",
@@ -134,7 +124,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Abonnement-Daten",
         "pl-PL": "Dane subskrypcji",
       },
-      defaultEntry: SUBSCRIPTIONS_NEW_ALIAS,
     },
     referralData: {
       icon: "share-2",
@@ -145,7 +134,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Empfehlungsdaten",
         "pl-PL": "Dane poleceń",
       },
-      defaultEntry: REFERRALS_EARNINGS_VOLUME_ALIAS,
     },
     newsletterData: {
       icon: "newspaper",
@@ -156,7 +144,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Newsletter-Daten",
         "pl-PL": "Dane newslettera",
       },
-      defaultEntry: NEWSLETTER_UNSUBSCRIBES_ALIAS,
     },
     chatData: {
       icon: "message-square",
@@ -167,7 +154,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Chat-Daten",
         "pl-PL": "Dane czatu",
       },
-      defaultEntry: CHAT_MESSAGES_BY_USER_ALIAS,
     },
     systemData: {
       icon: "server",
@@ -178,7 +164,6 @@ export const category: CategoryDefinition = {
         "de-DE": "Systemdaten",
         "pl-PL": "Dane systemowe",
       },
-      defaultEntry: CRON_EXECUTIONS_SUCCEEDED_ALIAS,
     },
   },
 };

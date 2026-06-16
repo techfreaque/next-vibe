@@ -33,10 +33,10 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
 import { CronTaskStatus } from "../enum";
 import type endpoints from "./definition";

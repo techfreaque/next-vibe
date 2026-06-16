@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The tool returned a large result. I need to check:\n1. The result contains a non-empty `tools` array\n2. Each tool has a `name` and `description`\n\nLet me verify from the result:\n- `tools` array is present and has many items (the result shows 526 matched tools, and the `tools` array is populated with many entries)\n- Each tool entry I can see has `name` and `description` fields\n\nLooking at the first few tools in the array:\n- `user_private_me_addresses_addressId_DELETE`: has `name` and `description`\n- `user_private_me_addresses_addressId_PATCH`: has `name` and `description`\n- etc.\n\nAll tools visible in the output have both `name` and `description` fields present.\n\nThe `tools` array is definitely non-empty - it contains hundreds of tools.\n\nEverything worked as expected. I should end with\n\nUser: [T1b tool-help-detail] Call the tool-help tool with toolName='generate_image'. Check that the result contains a name, a description, and a parameters schema. End your reply with STEP_OK if all three were present, or FAILED: <what was missing> if anything was wrong.\n\nAssistant: <think> The user wants me to call `tool-help` with `toolName='generate_image'` and verify the result contains name, description, and parameters schema.</think>\n\nAssistant: <think> The result contains:\n1. `name`: \"generate_image\" ✓\n2. `description`: \"Generate an image from a text prompt using AI\" ✓\n3. `parameters` schema: present with $schema, properties, required fields, etc. ✓\n\nAll three are present. STEP_OK.</think> STEP_OK\n\nUser: [T3b fork-branch] Say exactly: BRANCH_RESPONSE STEP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -8,8 +8,10 @@
  * src/app/api/[locale]/system/generated/category-registry.ts
  */
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { UserPermissionRole } from "../../user/user-roles/enum";
+import { pathToAliasMap } from "../generated/alias-map";
 
 /** Top-level grouping in the admin sidebar */
 export type AdminGroup =
@@ -49,13 +51,12 @@ export interface CategoryDefinition {
    * If omitted, clicking expands the category to show all tools.
    * Use the endpoint's first alias string (from its constants.ts).
    */
-  defaultEntry?: string;
-  /**
-   * URL path to navigate to when clicking the category header.
-   * Mutually exclusive with defaultEntry. Supports ctrl+click (opens in new tab).
-   * Example: "/story" for a Website category link.
-   */
-  defaultEntryLink?: string;
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: keyof typeof pathToAliasMap;
+    [UserPermissionRole.CUSTOMER]: keyof typeof pathToAliasMap;
+    [UserPermissionRole.PUBLIC]: keyof typeof pathToAliasMap;
+  };
+
   /** Named sub-sections within this category */
   subcategories?: Record<string, SubcategoryDefinition>;
 }

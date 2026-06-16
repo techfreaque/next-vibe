@@ -13,7 +13,7 @@
 
 import React, { Suspense, useMemo } from "react";
 
-import { useWidgetLocale } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetLocale } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import { scopedTranslation } from "../i18n";
 import { findMountWidget } from "../mounts/widget-registry";

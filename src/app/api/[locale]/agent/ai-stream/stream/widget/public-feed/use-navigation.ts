@@ -7,6 +7,7 @@
 
 "use client";
 
+import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
 import { useCallback } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -154,3 +155,6 @@ export function useNavigation(
     navigateToNewThread,
   };
 }
+import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
+import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
+import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";

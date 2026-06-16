@@ -54,9 +54,9 @@ import {
   useWidgetResponse,
   useWidgetUser,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";

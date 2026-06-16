@@ -4,7 +4,9 @@
  */
 
 import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
-import { TAX_RATE_LIST_ALIAS } from "@/app/api/[locale]/tax/rate/list/constants";
+import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { TAX_RATE_LIST_ALIAS } from "./rate/list/constants";
 
 export const category: CategoryDefinition = {
   key: "tax",
@@ -17,7 +19,11 @@ export const category: CategoryDefinition = {
   group: "business",
   icon: "file-text",
   order: 65,
-  defaultEntry: TAX_RATE_LIST_ALIAS,
+  defaultEntry: {
+    [UserPermissionRole.ADMIN]: TAX_RATE_LIST_ALIAS,
+    [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
+    [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
+  },
   subcategories: {
     "Tax Rates": {
       icon: "receipt",

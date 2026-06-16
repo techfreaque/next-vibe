@@ -17,7 +17,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CORTEX_WRITE_ALIAS, resolveCortexIcon } from "../constants";
@@ -36,6 +36,7 @@ const { POST } = createEndpoint({
   defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   dynamicTitle: ({ request }) => {
     if (request?.path) {
@@ -58,8 +59,7 @@ const { POST } = createEndpoint({
   },
   icon: "edit",
   dynamicIcon: ({ request }) => resolveCortexIcon(request?.path),
-  category: "ai",
-  subCategory: "Tools",
+  category: "cortex",
   tags: ["post.tags.cortex" as const],
   defaultExpanded: false,
 

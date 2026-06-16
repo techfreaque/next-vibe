@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----df21ef21-621d-43c9-ace5-b5b88002e1a8.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\nPreview: <think> The user asked me to call generate_image with callbackMode='wakeUp'. The first phase returned a pending status w…",
+    "encoding_format": "float"
+  }
+}

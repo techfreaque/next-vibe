@@ -17,7 +17,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { UserRole } from "../../../user/user-roles/enum";
 import { VIBE_STAGE_ALIAS } from "./constants";
@@ -73,6 +73,14 @@ const { POST } = createEndpoint({
 
       // === RESPONSE FIELDS ===
       staged: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.string(),
+        }),
+      }),
+
+      partiallyStaged: responseArrayOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         child: responseField(scopedTranslation, {
           type: WidgetType.TEXT,
@@ -149,6 +157,9 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         staged: ["src/app/api/[locale]/products/catalog/list/route.ts"],
+        partiallyStaged: [
+          "src/app/api/[locale]/products/catalog/list/definition.ts",
+        ],
         skipped: [],
       },
     },

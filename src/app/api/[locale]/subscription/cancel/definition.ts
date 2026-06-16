@@ -20,7 +20,7 @@ import {
 import { UserRole } from "../../user/user-roles/enum";
 import { scopedTranslation } from "../i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const SubscriptionCancelContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SubscriptionCancelContainer })),

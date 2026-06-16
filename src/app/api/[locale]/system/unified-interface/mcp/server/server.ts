@@ -60,16 +60,10 @@ export class MCPServer {
     }
 
     try {
-      logger.info("[MCP Server] Starting...");
-
-      logger.info("[MCP Server] Configuration", {
+      logger.debug(
         // eslint-disable-next-line i18next/no-literal-string
-        name: "Vibe MCP Server",
-        version: "1.0.0",
-        locale: locale,
-        debug: logger.isDebugEnabled,
-        projectRoot: process.env.PROJECT_ROOT || process.cwd(),
-      });
+        `[MCP Server] Starting locale=${String(locale)} debug=${String(logger.isDebugEnabled)} root=${process.env["PROJECT_ROOT"] ?? process.cwd()}`,
+      );
 
       // Create protocol handler
       this.protocolHandler = createMCPProtocolHandler(
@@ -99,7 +93,7 @@ export class MCPServer {
       await this.transport.start();
 
       this.running = true;
-      logger.info("[MCP Server] Server started successfully");
+      logger.debug("[MCP Server] Started");
 
       // Setup graceful shutdown
       this.setupShutdownHandlers(logger);

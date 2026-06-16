@@ -51,6 +51,21 @@ export const translations: typeof enTranslations = {
         description:
           "Kennung der entfernten Instanz. Wird als Unterordner für die Thread-Organisation verwendet.",
       },
+      threadMirrorMode: {
+        label: "Thread-Spiegelmodus",
+        description:
+          "Wo der Thread gespeichert wird: beide Seiten, nur Aufrufer, nur Provider oder nirgends. 'both'/'cloud' speichern den Thread auf dieser Instanz unter REMOTE/<Aufrufer-Instanz>.",
+      },
+      userMessageId: {
+        label: "Benutzernachrichten-ID",
+        description:
+          "Die vom Aufrufer vergebene ID der Benutzernachricht. Wird unverändert gespeichert, damit die Thread-Synchronisation idempotent bleibt.",
+      },
+      parentMessageId: {
+        label: "Übergeordnete Nachrichten-ID",
+        description:
+          "Die ID der vorherigen Blattnachricht des Aufrufers. Die neue Benutzernachricht wird daran angehängt, damit der synchronisierte Thread eine einzige verkettete Liste bleibt.",
+      },
       tools: {
         title: "Client-Tools",
         description:
@@ -88,6 +103,19 @@ export const translations: typeof enTranslations = {
         updatedArgs: {
           label: "Geänderte Argumente",
           description: "Optional bearbeitete Tool-Argumente für die Ausführung",
+        },
+      },
+      confirmationOverrides: {
+        title: "Bestätigungs-Overrides",
+        description:
+          "Pro-Tool-Bestätigungsregeln aus dem Favoriten/Skill des Aufrufers, angewendet auf das execute-tool-Gate dieser Schleife.",
+        toolId: {
+          label: "Tool-ID",
+          description: "Das Tool, für das die Bestätigungsregel gilt",
+        },
+        requiresConfirmation: {
+          label: "Bestätigung erforderlich",
+          description: "Wahr, wenn das Tool auf Benutzerbestätigung warten muss",
         },
       },
       attachments: {

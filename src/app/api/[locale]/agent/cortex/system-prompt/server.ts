@@ -6,6 +6,7 @@ import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-strea
 import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CronTaskItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { languageConfig } from "@/i18n";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
@@ -1379,3 +1380,6 @@ export async function loadRawEmbeddingScores(
 
   return { scores, embeddingGenerated: true };
 }
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";

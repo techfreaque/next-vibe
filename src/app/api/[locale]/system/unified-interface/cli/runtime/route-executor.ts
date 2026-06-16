@@ -7,7 +7,7 @@
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type {
   JwtPayloadType,

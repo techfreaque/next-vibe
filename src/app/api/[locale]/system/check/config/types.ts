@@ -69,6 +69,11 @@ export interface JsxCapitalizationPluginConfig {
   commonUiElements?: readonly string[] | string[];
 }
 
+export interface BoilerplatePluginConfig {
+  /** Extra allowed import sources for route.ts beyond the built-in defaults */
+  routeAllowedImports?: readonly string[] | string[];
+}
+
 // ============================================================
 // Oxlint Configuration
 // ============================================================
@@ -82,6 +87,7 @@ export interface OxlintJsPlugin {
     | I18nPluginConfig
     | RestrictedSyntaxPluginConfig
     | JsxCapitalizationPluginConfig
+    | BoilerplatePluginConfig
     | LintConfigElement;
 }
 

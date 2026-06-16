@@ -224,6 +224,8 @@ export interface ApiQueryFormReturn<
   isCachedData: boolean;
   status: "loading" | "success" | "error" | "idle";
   refetch: () => Promise<ResponseType<TResponse>>;
+  /** Remove cached query data, forcing a fresh fetch on next request. */
+  remove: () => void;
   /**
    * Set error type for both the form and query
    * @param error - The error to set or null to clear

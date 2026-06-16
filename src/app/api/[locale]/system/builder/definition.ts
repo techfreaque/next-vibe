@@ -10,7 +10,7 @@
 import type { BunPlugin } from "bun";
 import { z } from "zod";
 
-import type { PackageManifest } from "../packages/types";
+import type { PackageManifest } from "./repository/vibe-package/types";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {

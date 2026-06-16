@@ -20,7 +20,7 @@
  *   import { TypecheckRepository } from "@next-vibe/checker/typecheck"
  */
 
-import type { PackageManifest } from "../packages/types";
+import type { PackageManifest } from "../builder/repository/vibe-package/types";
 import { GITHUB_REPO_URL } from "@/config/constants";
 import { CHECK_CONFIG_CREATE_ALIAS } from "./config/create/constants";
 import { VIBE_CHECK_ALIAS } from "./vibe-check/constants";
@@ -51,6 +51,8 @@ const manifest: PackageManifest = {
       "src/app/api/[locale]/system/check/oxlint/plugins/jsx-capitalization/src/index.ts",
     "./oxlint-plugins/i18n":
       "src/app/api/[locale]/system/check/oxlint/plugins/i18n/src/index.ts",
+    "./oxlint-plugins/boilerplate":
+      "src/app/api/[locale]/system/check/oxlint/plugins/boilerplate/src/index.ts",
   },
 
   platforms: ["cli", "mcp"],

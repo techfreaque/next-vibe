@@ -15,7 +15,7 @@ import {
   MAX_MESSAGE_LENGTH,
   MAX_STACK_LENGTH,
   type NewErrorLog,
-} from "@/app/api/[locale]/system/unified-interface/tasks/error-monitor/db";
+} from "@/app/api/[locale]/system/error-monitor/db";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 

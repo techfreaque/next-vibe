@@ -40,40 +40,44 @@ const poolConfig = {
   connectionTimeoutMillis: 30_000, // How long to wait for a connection to become available
 };
 
+const schema = {
+  ...userSchema,
+  ...remoteConnectionSchema,
+  ...agentChatSchema,
+  ...chartOfAccountsSchema,
+  ...companiesSchema,
+  ...creditSchema,
+  ...paymentSchema,
+  ...cronTasksSchema,
+  ...leadsSchema,
+  ...referralSchema,
+  ...sshSchema,
+  ...taxSchema,
+  ...catalogProductsSchema,
+  ...posSchema,
+  ...inventorySchema,
+  ...purchasingSchema,
+  ...vibeSenseSchema,
+};
+
+function createPool(): Pool {
+  return new Pool(poolConfig);
+}
+
 /**
- * PostgreSQL connection pool
+ * PostgreSQL connection pool (mutable so it can be recreated after a reset)
  */
-const pool = new Pool(poolConfig);
+let pool = createPool();
 
 /**
  * Drizzle ORM database client with schema registration
  */
-export const db = drizzle(pool, {
-  schema: {
-    ...userSchema,
-    ...remoteConnectionSchema,
-    ...agentChatSchema,
-    ...chartOfAccountsSchema,
-    ...companiesSchema,
-    ...creditSchema,
-    ...paymentSchema,
-    ...cronTasksSchema,
-    ...leadsSchema,
-    ...referralSchema,
-    ...sshSchema,
-    ...taxSchema,
-    ...catalogProductsSchema,
-    ...posSchema,
-    ...inventorySchema,
-    ...purchasingSchema,
-    ...vibeSenseSchema,
-  },
-});
+export let db = drizzle(pool, { schema });
 
 /**
  * Raw PostgreSQL pool for direct queries when needed
  */
-export const rawPool = pool;
+export let rawPool = pool;
 
 /**
  * Track if database has been closed to prevent double-close errors
@@ -102,4 +106,15 @@ export async function closeDatabase(logger: EndpointLogger): Promise<void> {
     // Ignore errors during shutdown - this is expected when pool is already closed
     logger.error("Database pool close failed", parseError(error));
   }
+}
+
+/**
+ * Reopen database connections after a reset (e.g. `vibe dev -r`).
+ * Creates a fresh pool and re-wires the drizzle client.
+ */
+export function reopenDatabase(): void {
+  pool = createPool();
+  db = drizzle(pool, { schema });
+  rawPool = pool;
+  databaseClosed = false;
 }

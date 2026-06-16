@@ -20,6 +20,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 import { THREAD_FILES_ALIAS } from "./constants";
+import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
 
 /**
  * Endpoint definition
@@ -49,7 +50,9 @@ const { GET } = createEndpoint({
     children: {
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         schema: z.uuid(),
       }),
       filename: requestUrlPathParamsField(scopedTranslation, {

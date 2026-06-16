@@ -5,7 +5,7 @@ import "server-only";
  * Builds a compact directory tree representation
  */
 
-import { and, eq, like } from "drizzle-orm";
+import { and, asc, eq, like } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -18,6 +18,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cortexNodes } from "../db";

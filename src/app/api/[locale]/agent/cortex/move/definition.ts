@@ -17,7 +17,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CORTEX_MOVE_ALIAS, resolveCortexIcon } from "../constants";
@@ -33,8 +33,10 @@ const { POST } = createEndpoint({
   path: ["agent", "cortex", "move"],
   aliases: [CORTEX_MOVE_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "move",
   dynamicTitle: ({ request }) => {
@@ -57,8 +59,7 @@ const { POST } = createEndpoint({
       color: "bg-green-500/10 text-green-500",
     },
   },
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "cortex",
   tags: ["post.tags.cortex" as const],
   defaultExpanded: false,
 

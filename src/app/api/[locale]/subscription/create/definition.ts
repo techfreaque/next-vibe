@@ -25,9 +25,10 @@ import {
   SubscriptionPlan,
   SubscriptionPlanOptions,
 } from "../enum";
+import productsListDefinitions from "@/app/api/[locale]/products/catalog/list/definition";
 import { scopedTranslation } from "../i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const SubscriptionCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SubscriptionCreateContainer })),
@@ -41,10 +42,11 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["subscription", "create"],
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "package-plus",
-  category: "endpointCategories.payments",
-  subCategory: "endpointCategories.subscriptionManagement",
+  category: "payments",
+  subCategory: "Management",
   tags: ["tags.subscription" as const, "tags.create" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
@@ -81,6 +83,16 @@ const { POST } = createEndpoint({
         description: "form.fields.provider.description" as const,
         schema: z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
         hidden: true,
+      }),
+      catalogProductId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: productsListDefinitions.GET,
+        labelField: "name",
+        label: "form.fields.catalogProductId.label" as const,
+        description: "form.fields.catalogProductId.description" as const,
+        hidden: true,
+        schema: z.string().uuid().optional(),
       }),
 
       // RESPONSE FIELDS

@@ -12,7 +12,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { smsEnv } from "../env";
-import { smsScopedT } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type {
   SendSmsParams,
   SmsProvider,
@@ -63,7 +63,7 @@ export function getAwsSnsProvider(): SmsProvider {
       _logger: EndpointLogger,
       locale: CountryLanguage,
     ): Promise<ResponseType<SmsResult>> {
-      const { t } = smsScopedT(locale);
+      const { t } = scopedTranslation.scopedT(locale);
       try {
         // Validate credentials
         if (!accessKeyId) {

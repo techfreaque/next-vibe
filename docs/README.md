@@ -78,7 +78,7 @@ vibe contact --name="Jane" --message="Hello"
 vibe threads --interactive   # Prompt mode
 ```
 
-**Reserved flags:** `--output`, `--verbose`, `--debug`, `--locale`, `--interactive`, `--dry-run`, `--user-type`
+**Reserved flags:** `--output`, `--verbose`, `--debug`, `--hermes`, `--locale`, `--thea`, `--interactive`, `--dry-run`, `--user-type`
 
 **Disable:** `UserRole.CLI_OFF` | **Allow without auth:** `UserRole.CLI_AUTH_BYPASS`
 

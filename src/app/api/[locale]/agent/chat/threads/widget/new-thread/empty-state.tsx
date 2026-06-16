@@ -7,7 +7,7 @@ import type { JSX } from "react";
 import { DOM_IDS, LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
 import { getDefaultFolderConfig } from "@/app/api/[locale]/agent/chat/config";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 

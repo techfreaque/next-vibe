@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think> The user asked me to call generate_image with callbackMode='wakeUp'. The first phase returned a pending status with a hint. Now I've been revived with the result. Let me check if the imageUrl is present in the result.\n\nLooking at the tool result, I see an image was generated and displayed. The result shows an image. Let me check if there's an imageUrl in the result data.\n\nThe tool result shows the image inline. I need to determine if the imageUrl is present. Based on the pattern from previous successful generate_image calls, when an image is generated successfully, the result typically contains an imageUrl. The image was successfully generated and displayed, so the imageUrl should be present.\n\nI should respond with WAKEUP_OK since the image was successfully generated and displayed.\n\nUser: [T7a approve-phase1] In a single response, call BOTH at the same time: (1) the tool-help tool to list available tools, and (2) the generate_image tool with prompt='approve-test'. The generate_image tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.\n\nAssistant: <think> The user wants me to:\n1. Call tool-help to list available tools\n2. Call generate_image with prompt='approve-test' in the same response (parallel tool calls)\n\nThe generate_image tool requires user confirmation, so it should NOT execute yet. The user wants me to end with STEP_OK after the tool calls.\n\nLet me make both calls in parallel. The generate_image call should be with callbackMode='approve' to require confirmation. Wait, the user says \"The generate_image tool requires user confirmation - it should NOT execute yet.\" \n\nLooking at the generate_image tool schema from earlier, it doesn't have a requiresConfirmation flag. But the execute-tool endpoint might support callbackMode='approve'. Let me check the execute-tool schema.\n\nActually, looking at the execute-tool parameters, callba\n\nUser:",
+    "encoding_format": "float"
+  }
+}

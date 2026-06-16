@@ -26,7 +26,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
 import type messagesDefinition from "../definition";
-import { useWidgetItem } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { useMessageGroupName } from "./embedded-context";
 import { FileAttachments } from "./file-attachments";
 import { MessageAuthorInfo } from "./message-author";

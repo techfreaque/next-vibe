@@ -30,9 +30,11 @@ import {
   LeadSource,
   LeadSourceOptions,
 } from "../../enum";
+import leadsListDefinitions from "@/app/api/[locale]/leads/list/definition";
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const LeadClickTrackingContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadClickTrackingContainer })),
@@ -115,7 +117,9 @@ const { POST } = createEndpoint({
       // === REQUEST FIELDS ===
       leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: leadsListDefinitions.GET,
+        labelField: "email",
         label: "post.leadId.label",
         description: "post.leadId.description",
         placeholder: "post.leadId.placeholder",
@@ -156,7 +160,9 @@ const { POST } = createEndpoint({
       }),
       userId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: usersListDefinitions.GET,
+        labelField: "email",
         label: "post.userId.label",
         description: "post.userId.description",
         placeholder: "post.userId.placeholder",
@@ -365,7 +371,9 @@ const { GET } = createEndpoint({
       // === REQUEST FIELDS (Query Parameters) ===
       leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: leadsListDefinitions.GET,
+        labelField: "email",
         label: "get.id.label",
         description: "get.id.description",
         placeholder: "get.id.placeholder",

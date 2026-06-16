@@ -203,32 +203,29 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    */
   async handleInitialize(params: WidgetData): Promise<MCPInitializeResult> {
     const typedParams = params;
-    this.logger.info("[MCP Protocol] Initializing", {
-      clientName:
-        typeof typedParams === "object" &&
-        typedParams !== null &&
-        "clientInfo" in typedParams &&
-        typeof typedParams.clientInfo === "object" &&
-        typedParams.clientInfo !== null &&
-        "name" in typedParams.clientInfo
-          ? String(typedParams.clientInfo.name)
-          : "unknown",
-      clientVersion:
-        typeof typedParams === "object" &&
-        typedParams !== null &&
-        "clientInfo" in typedParams &&
-        typeof typedParams.clientInfo === "object" &&
-        typedParams.clientInfo !== null &&
-        "version" in typedParams.clientInfo
-          ? String(typedParams.clientInfo.version)
-          : "unknown",
-      protocolVersion:
-        typeof typedParams === "object" &&
-        typedParams !== null &&
-        "protocolVersion" in typedParams
-          ? String(typedParams.protocolVersion)
-          : "unknown",
-    });
+    const clientInfo =
+      typeof typedParams === "object" &&
+      typedParams !== null &&
+      "clientInfo" in typedParams &&
+      typeof typedParams.clientInfo === "object" &&
+      typedParams.clientInfo !== null
+        ? typedParams.clientInfo
+        : null;
+    const clientName =
+      clientInfo && "name" in clientInfo ? String(clientInfo.name) : "unknown";
+    const clientVersion =
+      clientInfo && "version" in clientInfo
+        ? String(clientInfo.version)
+        : "unknown";
+    const protocolVersion =
+      typeof typedParams === "object" &&
+      typedParams !== null &&
+      "protocolVersion" in typedParams
+        ? String(typedParams.protocolVersion)
+        : "unknown";
+    this.logger.debug(
+      `[MCP Protocol] Init client=${clientName}@${clientVersion} protocol=${protocolVersion}`,
+    );
 
     // Initialize registry
     await this.registry.initialize(this.logger);
@@ -258,7 +255,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    * Handle tools/list request
    */
   async handleToolsList(): Promise<MCPToolsListResult> {
-    this.logger.info("[MCP Protocol] Listing tools");
+    this.logger.debug("[MCP Protocol] Listing tools");
 
     // Get full endpoints with field information for proper schema generation
     const endpoints = await this.defRegistry.getEndpointsForUser(
@@ -280,9 +277,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       endpointToMCPTool(endpoint, this.locale),
     );
 
-    this.logger.info("[MCP Protocol] Tools listed", {
-      count: tools.length,
-    });
+    this.logger.debug(`[MCP Protocol] Tools listed count=${tools.length}`);
 
     return {
       tools,

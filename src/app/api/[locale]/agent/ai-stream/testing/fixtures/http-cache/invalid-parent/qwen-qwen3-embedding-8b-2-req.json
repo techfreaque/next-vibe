@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----4bcd6cec-4e6c-485d-9694-fda6fde64cb7.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\nPreview: <think> The user is asking me to verify if in step T11f I can see the generated output image as an inline image (not jus…",
+    "encoding_format": "float"
+  }
+}

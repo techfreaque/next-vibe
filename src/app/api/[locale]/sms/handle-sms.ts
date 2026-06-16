@@ -19,7 +19,7 @@ import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
 import { smsEnv } from "./env";
-import { smsScopedT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import { batchSendSms, sendSms } from "./send-sms";
 import type {
   ProviderBaseOptions,
@@ -59,7 +59,7 @@ export async function handleSms<
   locale: CountryLanguage;
   logger: EndpointLogger;
 }): Promise<ResponseType<UndefinedType>> {
-  const { t: tSms } = smsScopedT(locale);
+  const { t: tSms } = scopedTranslation.scopedT(locale);
   const startTime = options?.logPerformance ? performance.now() : null;
   const errors: ErrorResponseType[] = [];
   let processedCount = 0;

@@ -23,14 +23,14 @@ import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles
 import {
   isRequestField,
   isResponseField,
-} from "../../widgets/_shared/type-guards";
+} from "next-vibe-ui/unified/_shared/type-guards";
 import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
   FieldUsageConfig,
   ObjectChildrenConstraint,
   SchemaTypes,
-} from "../../widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/types";
 
 /**
  * Type guard to check if a variant has object-like children that can be indexed

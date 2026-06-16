@@ -1,19 +1,14 @@
 /**
- * Coding Agent Integration - Queue (hermes-dev 3000 → hermes 3001, NAT mode)
+ * Coding Agent Integration - Cloud-Only Transport (UNAVAILABLE path)
  *
- * Simulates a non-publicly-accessible local instance (NAT mode). Coding-agent
- * calls go via execute-tool(instanceId='hermes') with isDirectlyAccessible=false:
+ * Tests that transportMode='cloud-only' returns an immediate UNAVAILABLE error —
+ * no cron task is created, no 'waiting' state is entered.
  *
- *   1. execute-tool creates a cron task in hermes-dev's DB (targetInstance='hermes')
- *   2. Stream aborts → thread enters 'waiting' state
- *   3. cfg.pulse() calls triggerHermesPull() for E2E coverage (hermes 3001 pulls tasks),
- *      then triggerLocalPulse() simulates task completion + fires revival in-process
- *      (fetch-cache interceptor active → fixtures apply to the revival stream too)
- *   4. Revival stream runs to completion → thread returns to 'idle'
- *   5. Test re-fetches messages - tool result backfilled, AI response present
+ * Cloud-only is the passive inbound mode: the remote instance has no token that
+ * can be dialled. Tool dispatch is not supported → execute-tool fails immediately
+ * with EXTERNAL_SERVICE_ERROR. The AI receives the error inline and proceeds.
  *
- * Setup is E2E: connectToHermes establishes both directions + syncs capabilities.
- * isDirectlyAccessible is forced to false after connect to enable queue path.
+ * This verifies the fail-fast contract: no task queue fallback, no retry.
  */
 
 import "server-only";
@@ -21,18 +16,22 @@ import "server-only";
 import { installFetchCache } from "../../ai-stream/testing/fetch-cache";
 installFetchCache();
 
+import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { remoteConnections } from "@/app/api/[locale]/user/remote-connection/db";
 import { and, eq } from "drizzle-orm";
 import { describeCodingAgentSuite } from "./coding-agent-base.test";
 
 const HERMES_INSTANCE_ID = "hermes";
+/** instanceId used by hermes to refer to atlas */
+const ATLAS_INSTANCE_ID = "atlas";
+/** Local dev server URL (hermes, vibe --hermes dev) */
+const LOCAL_DEV_URL = "http://localhost:3002";
 
-let _prodUserId: string | null = null;
 let _prodAdminToken: string | null = null;
+let _prodUserId: string | null = null;
 
-async function setupQueueConnection(
+async function setupCloudOnlyConnection(
   testUser: JwtPrivatePayloadType,
 ): Promise<void> {
   const {
@@ -46,19 +45,20 @@ async function setupQueueConnection(
   // Idempotent: clean up any leftover connection from a previous failed run
   await disconnectFromHermes(testUser.id);
 
-  // E2E: log into prod, register hermes-dev on hermes, sync capabilities
-  await connectToHermes(testUser);
+  // E2E: log into prod, register atlas on hermes, sync capabilities
+  await connectToHermes(testUser, LOCAL_DEV_URL);
 
   // Ensure capabilities are populated before tests run
   await triggerPull();
 
   _prodUserId = await resolveProdUserId();
-  _prodAdminToken = await resolveProdAdminToken();
+  _prodAdminToken = await resolveProdAdminToken(LOCAL_DEV_URL);
 
-  // Force queue path: isDirectlyAccessible=false → execute-tool uses task-queue not direct HTTP
+  // Force cloud-only transport: no token dialling, tool dispatch returns UNAVAILABLE immediately.
+  // transportMode='cloud-only' is the passive inbound mode — no task queue fallback.
   await db
     .update(remoteConnections)
-    .set({ isDirectlyAccessible: false })
+    .set({ transportMode: "cloud-only" })
     .where(
       and(
         eq(remoteConnections.userId, testUser.id),
@@ -67,11 +67,32 @@ async function setupQueueConnection(
     );
 }
 
-async function teardownQueueConnection(
+async function teardownCloudOnlyConnection(
   testUser: JwtPrivatePayloadType,
 ): Promise<void> {
   const { disconnectFromHermes, unregisterDevFromHermes, closeProdDb } =
     await import("../../ai-stream/testing/remote-setup");
+
+  // Reset transportMode on hermes before disconnecting (best-effort).
+  if (_prodAdminToken) {
+    try {
+      await fetch(
+        `${LOCAL_DEV_URL}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            // eslint-disable-next-line i18next/no-literal-string
+            Authorization: `Bearer ${_prodAdminToken}`,
+          },
+          body: JSON.stringify({ transportMode: "cloud-only" }),
+          signal: AbortSignal.timeout(5_000),
+        },
+      );
+    } catch {
+      /* best-effort */
+    }
+  }
 
   const tasks: Promise<void>[] = [disconnectFromHermes(testUser.id)];
   if (_prodUserId) {
@@ -83,39 +104,16 @@ async function teardownQueueConnection(
   _prodAdminToken = null;
 }
 
-/**
- * Queue revival simulation:
- *   triggerHermesPull for E2E coverage (hermes pulls tasks from hermes-dev).
- *   triggerLocalPulse finds the pending remote execute-tool task in hermes-dev's
- *   DB, simulates hermes completing it via handleTaskCompletion with directResumeUser,
- *   which fires revival directly in-process with the fetch-cache interceptor active.
- */
-async function runQueuePulse(threadId: string): Promise<void> {
-  if (!_prodAdminToken) {
-    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-    throw new Error(
-      "runQueuePulse: no prod admin token - setupQueueConnection not called?",
-    );
-  }
-
-  const { triggerHermesPull, triggerLocalPulse } =
-    await import("../../ai-stream/testing/remote-setup");
-
-  // Step 1: trigger hermes (3001) pull cycle for E2E coverage.
-  // Only pull (not execute) to avoid double-revival race condition.
-  await triggerHermesPull(_prodAdminToken);
-
-  // Step 2: simulate task completion + fire revival in-process (fetch-cache active).
-  await triggerLocalPulse(threadId);
-}
-
 describeCodingAgentSuite({
   label:
-    "Coding Agent Integration - Queue (hermes-dev 3000 → hermes 3001, NAT mode)",
-  cachePrefix: "ca-queue-",
+    "Coding Agent Integration - Cloud-Only (UNAVAILABLE: no task queue fallback)",
+  cachePrefix: "ca-cloud-only-",
   remoteInstanceId: HERMES_INSTANCE_ID,
-  setup: setupQueueConnection,
-  teardown: teardownQueueConnection,
-  pulse: runQueuePulse,
-  isDirect: false,
+  setup: setupCloudOnlyConnection,
+  teardown: teardownCloudOnlyConnection,
+  // No pulse: cloud-only returns UNAVAILABLE inline — thread never enters 'waiting'.
+  pulse: undefined,
+  // isDirect: cloud-only fails fast (inline error), same as direct-http in terms of
+  // response shape (no deferred waiting state).
+  isDirect: true,
 });

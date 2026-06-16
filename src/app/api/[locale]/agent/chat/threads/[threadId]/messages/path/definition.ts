@@ -28,6 +28,7 @@ import { DefaultFolderId } from "../../../../config";
 import type { MessageMetadata } from "../../../../db";
 import { ChatMessageRole } from "../../../../enum";
 import { scopedTranslation } from "./i18n";
+import threadsDefinitions from "../../../definition";
 
 /**
  * Get Conversation Path Endpoint (GET)
@@ -97,7 +98,9 @@ const { GET } = createEndpoint({
       // === URL PARAMS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "get.threadId.label" as const,
         description: "get.threadId.description" as const,
         schema: z.uuid(),

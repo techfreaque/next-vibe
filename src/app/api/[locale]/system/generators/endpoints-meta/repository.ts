@@ -82,6 +82,8 @@ interface EndpointMeta {
   aliases: string[];
   /** Pre-translated at generation time */
   title: string;
+  /** Pre-translated short title at generation time */
+  titleShort: string;
   /** Pre-translated at generation time */
   description: string;
   icon: string;
@@ -387,6 +389,7 @@ export class EndpointsMetaGeneratorRepository {
 
       // Translate title & description via the endpoint's own scoped i18n
       const title = t(definition.title);
+      const titleShort = t(definition.titleShort as Parameters<typeof t>[0]);
       const description = t(definition.description);
       const category: string = definition.category;
       const subCategory: string = definition.subCategory ?? "";
@@ -453,6 +456,7 @@ export class EndpointsMetaGeneratorRepository {
           : [],
         aliases,
         title,
+        titleShort,
         description,
         icon: definition.icon,
         category,
@@ -574,6 +578,7 @@ export interface EndpointMeta {
   allowedRoles: string[];
   aliases: string[];
   title: string;
+  titleShort: string;
   description: string;
   icon: string;
   category: string;

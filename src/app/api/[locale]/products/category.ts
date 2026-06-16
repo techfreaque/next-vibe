@@ -5,6 +5,8 @@
 
 import { PRODUCTS_CATALOG_LIST_ALIAS } from "@/app/api/[locale]/products/catalog/list/constants";
 import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
 
 export const category: CategoryDefinition = {
   key: "products",

@@ -24,6 +24,7 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import threadsDefinitions from "../definition";
 
 const { PATCH } = createEndpoint({
   scopedTranslation,
@@ -51,7 +52,9 @@ const { PATCH } = createEndpoint({
       // For the AI platform it is hidden and auto-filled from streamContext.threadId.
       threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "patch.threadId.label" as const,
         description: "patch.threadId.description" as const,
         columns: 12,

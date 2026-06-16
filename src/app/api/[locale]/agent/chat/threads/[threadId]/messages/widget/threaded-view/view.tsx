@@ -9,7 +9,7 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
 
-import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
 import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
 import { getDirectReplies } from "@/app/[locale]/chat/lib/utils/thread-builder";
@@ -30,7 +30,7 @@ import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
 import { scopedTranslation } from "../../i18n";
 import type messagesDefinition from "../../definition";
-import { useWidgetItem } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { useMessageGroupName } from "../embedded-context";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";

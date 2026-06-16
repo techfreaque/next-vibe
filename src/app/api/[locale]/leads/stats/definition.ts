@@ -50,7 +50,7 @@ import {
 import { LEADS_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const LeadsStatsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadsStatsContainer })),

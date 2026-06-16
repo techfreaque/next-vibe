@@ -39,6 +39,7 @@ import {
 
 import { scopedTranslation } from "./i18n";
 import { THREAD_MESSAGES_ALIAS } from "./constants";
+import threadsDefinitions from "../../definition";
 
 const MessagesWidget = lazy(() =>
   import("./widget/widget").then((m) => ({ default: m.MessagesWidget })),
@@ -936,3 +937,6 @@ export type MessageCreateResponseOutput = typeof POST.types.ResponseOutput;
  * Export definitions
  */
 export default { GET, POST } as const;
+import threadsDefinitions from "../../definition";
+import threadsDefinitions from "../../definition";
+import threadsDefinitions from "../../definition";

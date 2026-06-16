@@ -19,6 +19,7 @@ import {
 import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import threadsDefinitions from "../../definition";
 
 /**
  * Get Thread Permissions Endpoint (GET)
@@ -48,7 +49,9 @@ const { GET } = createEndpoint({
       // === REQUEST URL PARAMS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "get.threadId.label" as const,
         description: "get.threadId.description" as const,
         schema: z.uuid(),
@@ -177,6 +180,7 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
+  titleShort: "patch.titleShort" as const,
   description: "patch.description" as const,
   icon: "shield",
   category: "ai",
@@ -193,7 +197,9 @@ const { PATCH } = createEndpoint({
       // === REQUEST URL PARAMS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "patch.threadId.label" as const,
         description: "patch.threadId.description" as const,
         schema: z.uuid(),

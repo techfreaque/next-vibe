@@ -384,6 +384,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
       const hasPermission = this.hasEndpointPermissionForRoles(
         localModeRoles,
         user,
+        platform,
       );
       if (!hasPermission) {
         const { t: tRoles } = userRolesScopedTranslation.scopedT(locale);
@@ -481,10 +482,14 @@ class PermissionsRegistry implements IPermissionsRegistry {
   private hasEndpointPermissionForRoles(
     roles: readonly UserRoleValue[],
     user: JwtPayloadType,
+    platform?: Platform,
   ): boolean {
-    // Check for CLI auth bypass - if enabled, allow access without role check
+    // Check for CLI auth bypass - only bypasses role check for CLI_PACKAGE platform
     const platformMarkers = filterPlatformMarkers(roles);
-    if (this.allowsCliAuthBypass(platformMarkers)) {
+    if (
+      platform === Platform.CLI_PACKAGE &&
+      this.allowsCliAuthBypass(platformMarkers)
+    ) {
       return true;
     }
 
@@ -524,9 +529,12 @@ class PermissionsRegistry implements IPermissionsRegistry {
       return false;
     }
 
-    // Check for CLI auth bypass - if enabled, allow access without role check
+    // Check for CLI auth bypass - only bypasses role check for CLI_PACKAGE platform
     const platformMarkers = filterPlatformMarkers(endpoint.allowedRoles);
-    if (this.allowsCliAuthBypass(platformMarkers)) {
+    if (
+      platform === Platform.CLI_PACKAGE &&
+      this.allowsCliAuthBypass(platformMarkers)
+    ) {
       return true;
     }
 

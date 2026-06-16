@@ -15,6 +15,7 @@ export const {
   options: SearchProviderOptions,
   Value: SearchProviderValue,
 } = createEnumOptions(scopedTranslation, {
+  AUTO: "enums.provider.AUTO",
   BRAVE: "enums.provider.BRAVE",
   KAGI: "enums.provider.KAGI",
 } as const);
@@ -22,6 +23,7 @@ export const {
 export type SearchProviderValue = typeof SearchProviderValue;
 
 export const SearchProviderDB = [
+  SearchProvider.AUTO,
   SearchProvider.BRAVE,
   SearchProvider.KAGI,
 ] as const;

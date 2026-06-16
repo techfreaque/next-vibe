@@ -14,16 +14,16 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import { db } from "@/app/api/[locale]/system/db";
 import {
   CallbackMode,
   type CallbackModeValue,
-} from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+} from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

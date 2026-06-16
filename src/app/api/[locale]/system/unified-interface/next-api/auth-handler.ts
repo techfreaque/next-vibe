@@ -86,7 +86,15 @@ export class WebAuthHandler extends BaseAuthHandler {
         locale,
       });
 
-      const cookieStore = await cookies();
+      let cookieStore: Awaited<ReturnType<typeof cookies>>;
+      try {
+        cookieStore = await cookies();
+      } catch {
+        // No request scope (in-process headless caller): the bearer token
+        // returned to the caller IS the session — nothing to persist.
+        logger.debug("No request scope - skipping cookie session store");
+        return success();
+      }
 
       // Session cookie: 30 days if rememberMe, otherwise session-only (no maxAge)
       const cookieOptions: {

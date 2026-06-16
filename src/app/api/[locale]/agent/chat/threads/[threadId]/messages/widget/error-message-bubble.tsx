@@ -19,7 +19,7 @@ import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { useTranslation } from "@/i18n/core/client";
 

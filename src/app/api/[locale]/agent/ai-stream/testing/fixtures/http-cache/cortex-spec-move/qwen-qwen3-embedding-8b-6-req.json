@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-cortex-write-to-create----46c4fca9-220b-468a-96e1-ba2eb454f93f.md\n\n# Use cortex-write to create...\nFolder: cron\nPreview: <think>Let me verify all three requirements: 1. The file was created — Yes, cortex-write returned created: true, and cor…",
+    "encoding_format": "float"
+  }
+}

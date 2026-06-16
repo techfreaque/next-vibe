@@ -4,17 +4,17 @@
  */
 
 import { z } from "zod";
+import { lazy } from "react";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -24,7 +24,12 @@ import {
   TtsModelId,
   TtsModelIdOptions,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { DEFAULT_TTS_VOICE_ID } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const TextToSpeechContainer = lazy(() =>
+  import("./widget").then((m) => ({ default: m.TextToSpeechContainer })),
+);
 
 /**
  * Text-to-Speech Endpoint (POST)
@@ -40,21 +45,24 @@ const { POST } = createEndpoint({
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
   ],
+  defaultWebPinned: [
+    UserRole.ADMIN,
+    UserRole.CUSTOMER,
+    UserRole.PUBLIC,
+    UserRole.AI_TOOL_OFF,
+  ],
 
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "volume-2",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiGeneration",
+  category: "ai",
+  subCategory: "Generation",
   tags: ["tags.speech", "tags.tts", "tags.ai"],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.form.title",
-    description: "post.form.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: TextToSpeechContainer,
+    usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
       text: requestField(scopedTranslation, {
@@ -73,7 +81,7 @@ const { POST } = createEndpoint({
         description: "post.voice.description",
         columns: 12,
         options: TtsModelIdOptions,
-        schema: z.enum(TtsModelId).optional(),
+        schema: z.enum(TtsModelId).default(DEFAULT_TTS_VOICE_ID),
       }),
 
       audioUrl: responseField(scopedTranslation, {

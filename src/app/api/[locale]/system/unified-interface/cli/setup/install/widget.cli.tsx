@@ -3,7 +3,7 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { useWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetPlatform } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type { InstallResponseOutput } from "./definition";
 

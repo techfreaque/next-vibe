@@ -25,7 +25,7 @@ import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { DefaultFolderId } from "../../../chat/config";
 
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { ChatMessage } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import type { ChatModelOption } from "../../models";

@@ -21,7 +21,8 @@ import {
   useWidgetLogger,
   useWidgetSelector,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { platform } from "@/config/env-client";
 
 import type definition from "../definition";
 import { LinearMessageView } from "./linear-view/view";
@@ -34,7 +35,9 @@ import { ChatMessages } from "./messages";
  * which provides streaming, branch navigation, scroll management, all view modes,
  * and full interactive callbacks.
  *
+import messagesDefinition from "../definition";
  * When rendered standalone (ai-stream/run embeds): renders a read-only LinearMessageView.
+import messagesDefinition from "../definition";
  */
 export const MessagesWidget = React.memo(
   function MessagesWidget(): React.JSX.Element {
@@ -85,7 +88,7 @@ function ReadOnlyMessages(): React.JSX.Element {
         msg.updatedAt instanceof Date ? msg.updatedAt : new Date(msg.updatedAt);
       return { ...msg, authorName: null, createdAt, updatedAt };
     });
-  }, [rawMessages]);
+  }, [effectiveMessages]);
 
   const emptyBranchIndices = useMemo(() => ({}), []);
   const { path, branchInfo } = useMemo(
@@ -139,3 +142,6 @@ function ReadOnlyMessages(): React.JSX.Element {
     </Div>
   );
 }
+import messagesDefinition from "../definition";
+import messagesDefinition from "../definition";
+import messagesDefinition from "../definition";

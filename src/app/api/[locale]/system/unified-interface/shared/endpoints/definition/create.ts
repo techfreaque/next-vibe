@@ -14,7 +14,10 @@
 
 import type { z } from "zod";
 
-import type { AppLocaleTranslationKey } from "@/app/[locale]/i18n";
+import type {
+  CategoryKey,
+  SubCategoryKey,
+} from "@/app/api/[locale]/system/generated/category-registry";
 import type {
   ApiFormOptions,
   ApiMutationOptions,
@@ -37,8 +40,8 @@ import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/t
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+} from "next-vibe-ui/unified/_shared/types";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import {
   UserRole,
   type UserRoleValue,
@@ -214,6 +217,7 @@ export interface ApiEndpoint<
   // Translation keys use NoInfer to ensure they don't contribute to TScopedTranslationKey inference
   // This makes errors appear on the specific property with the invalid key
   readonly title: NoInfer<TScopedTranslationKey>;
+  readonly titleShort: NoInfer<TScopedTranslationKey>;
   readonly description: NoInfer<TScopedTranslationKey>;
 
   /**
@@ -251,8 +255,8 @@ export interface ApiEndpoint<
     };
   };
 
-  readonly category: AppLocaleTranslationKey;
-  readonly subCategory: AppLocaleTranslationKey;
+  readonly category: CategoryKey;
+  readonly subCategory?: SubCategoryKey;
   readonly tags: readonly NoInfer<TScopedTranslationKey>[];
 
   /**
@@ -303,6 +307,22 @@ export interface ApiEndpoint<
    * Defaults to false (no confirmation required)
    */
   readonly requiresConfirmation?: boolean;
+
+  /**
+   * Roles for which this tool is AI-pinned (always in context) by default.
+   * Users can override per-favorite. The generator reads this to produce
+   * the generated default-pins.ts file, replacing manual alias arrays in constants.ts.
+   * Example: [UserRole.ADMIN, UserRole.CUSTOMER]
+   */
+  readonly defaultAiPinned?: readonly UserRoleValue[];
+
+  /**
+   * Roles for which this tool is web-sidebar-pinned by default.
+   * Users can override via settings. The generator reads this to produce
+   * the generated default-pins.ts file.
+   * Example: [UserRole.ADMIN]
+   */
+  readonly defaultWebPinned?: readonly UserRoleValue[];
   /**
    * Stream timeout in milliseconds when this tool is called by AI and escalates
    * to a background task (via escalateToTask or remote queue).
@@ -683,6 +703,7 @@ export function createEndpoint<
     method: config.method,
     path: config.path,
     title: config.title,
+    titleShort: config.titleShort,
     description: config.description,
     dynamicTitle: config.dynamicTitle,
     category: config.category,
@@ -703,6 +724,10 @@ export function createEndpoint<
     credits: config.credits,
     dynamicCredits: config.dynamicCredits,
     defaultExpanded: config.defaultExpanded,
+    requiresConfirmation: config.requiresConfirmation,
+    streamTimeoutMs: config.streamTimeoutMs,
+    defaultAiPinned: config.defaultAiPinned,
+    defaultWebPinned: config.defaultWebPinned,
     events: config.events,
     icon: config.icon,
     dynamicIcon: config.dynamicIcon,

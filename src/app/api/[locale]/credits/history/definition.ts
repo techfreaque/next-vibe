@@ -24,11 +24,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { dateSchema } from "../../shared/types/common.schema";
-import { paginationField } from "../../system/unified-interface/unified-ui/widgets/containers/pagination/types";
+import { paginationField } from "next-vibe-ui/unified/containers/pagination/types";
 import { CreditTransactionType } from "../enum";
 import { scopedTranslation } from "../i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const CreditHistoryContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CreditHistoryContainer })),

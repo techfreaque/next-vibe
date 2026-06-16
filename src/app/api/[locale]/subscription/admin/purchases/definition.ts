@@ -38,7 +38,7 @@ import {
 import { SUBSCRIPTION_ADMIN_PURCHASES_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const PurchasesContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PurchasesContainer })),
@@ -54,12 +54,14 @@ const { GET } = createEndpoint({
   path: ["subscription", "admin", "purchases"],
   aliases: [SUBSCRIPTION_ADMIN_PURCHASES_ALIAS],
   allowedRoles: [UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "credit-card",
-  category: "endpointCategories.subscriptions",
-  subCategory: "endpointCategories.subscriptionAnalytics",
+  category: "subscriptions",
+  subCategory: "subscriptionAnalytics",
   tags: ["get.title" as const],
 
   fields: customWidgetObject({

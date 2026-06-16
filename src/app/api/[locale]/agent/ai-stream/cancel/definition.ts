@@ -21,6 +21,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -35,6 +36,7 @@ const { POST } = createEndpoint({
   ],
 
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "square",
   category: "ai",
@@ -90,7 +92,9 @@ const { POST } = createEndpoint({
       // === REQUEST ===
       threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "post.threadId.label",
         description: "post.threadId.description",
         schema: z.string().uuid(),

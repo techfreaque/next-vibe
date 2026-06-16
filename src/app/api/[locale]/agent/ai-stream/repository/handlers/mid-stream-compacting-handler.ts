@@ -26,6 +26,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { getChatModelById, type ChatModelId } from "../../models";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
+import { COMPACTING_LLM_TIMEOUT_MS } from "./compacting-handler";
 
 /** How many recent non-system messages to preserve verbatim (not summarized). */
 const RECENT_TURNS_TO_KEEP = 8;
@@ -375,3 +376,6 @@ export class MidStreamCompactingHandler {
     );
   }
 }
+import { COMPACTING_LLM_TIMEOUT_MS } from "./compacting-handler";
+import { COMPACTING_LLM_TIMEOUT_MS } from "./compacting-handler";
+import { COMPACTING_LLM_TIMEOUT_MS } from "./compacting-handler";

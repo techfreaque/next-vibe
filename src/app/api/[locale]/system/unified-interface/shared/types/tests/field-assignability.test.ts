@@ -6,7 +6,7 @@
 
 import type { z } from "zod";
 
-import type { FieldUsageConfig } from "../../../unified-ui/widgets/_shared/types";
+import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
 import type {
   RequestResponseWidgetConfig,
   UnifiedField,

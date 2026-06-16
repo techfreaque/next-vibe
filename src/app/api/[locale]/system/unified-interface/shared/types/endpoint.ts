@@ -10,13 +10,14 @@ import type {
   ArrayChildConstraint,
   FieldUsageConfig,
   ObjectChildrenConstraint,
-} from "../../unified-ui/widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/types";
 import type { ObjectWidgetConfig } from "../widgets/configs";
 
 // Re-export UnifiedField from configs.ts where it's now defined
 export type { UnifiedField } from "../widgets/configs";
 import type { CreateApiEndpointAny } from "./endpoint-base";
 import type { FieldUsage } from "./enums";
+import type { WidgetData } from "./json";
 
 // ============================================================================
 // SCHEMA TYPE PRESERVATION AND BACK-PROPAGATION SYSTEM
@@ -304,6 +305,18 @@ export interface NavigationStackEntry<
   popNavigationOnSuccess?: number;
   /** Called after popNavigationOnSuccess completes (e.g. to trigger parent refetch) */
   onSuccessCallback?: () => void;
+  /**
+   * Picker callback — when set, the pushed widget is in "picker mode".
+   * The widget should call this with the selected value instead of navigating deeper.
+   * Type is WidgetData at the stack level; type safety is enforced at the EntityPickerField call site.
+   */
+  pickerCallback?: (value: WidgetData) => void;
+  /**
+   * For CLI picker mode: the field name in each list item to use as the display label.
+   * e.g. "name" or "title". The framework uses this to render a Select when platform=CLI.
+   * Falls back to "name", "title", "label", "id" heuristic if not set.
+   */
+  pickerLabelField?: string;
   replaceOnSuccess?: {
     endpoint: CreateApiEndpointAny;
     getUrlPathParams?: (

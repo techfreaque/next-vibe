@@ -7,7 +7,7 @@ import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { EXECUTE_TOOL_ALIAS } from "../../../../../system/unified-interface/ai/execute-tool/constants";
+import { EXECUTE_TOOL_ALIAS } from "../../../../../system/unified-interface/execute-tool/constants";
 
 import {
   CORTEX_DELETE_ALIAS,

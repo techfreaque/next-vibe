@@ -39,6 +39,8 @@ export interface FileClass {
   promptFragments?: boolean;
   /** skill.ts anywhere in api/ - affects skills-index generator */
   skillsIndex?: boolean;
+  /** category.ts - affects category-index generator */
+  categoryIndex?: boolean;
 }
 
 /** Dirty flags - which generator groups need to run */
@@ -52,6 +54,7 @@ export interface DirtyFlags {
   graphSeedsIndex: boolean;
   promptFragments: boolean;
   skillsIndex: boolean;
+  categoryIndex: boolean;
 }
 
 /**
@@ -87,6 +90,9 @@ export interface LiveIndex {
 
   // --- Skills-index generator ---
   defaultSkillFiles: Set<string>;
+
+  // --- Category-index generator ---
+  categoryFiles: Set<string>;
 
   /**
    * Per-definition HTTP method cache.
@@ -216,6 +222,10 @@ export function classifyFile(filename: string): FileClass | null {
     return { skillsIndex: true };
   }
 
+  if (base === "category.ts") {
+    return { categoryIndex: true };
+  }
+
   return null;
 }
 
@@ -274,6 +284,7 @@ export function buildLiveIndex(): LiveIndex {
     ),
   );
   const defaultSkillFiles = new Set(findFilesRecursively(apiDir, "skill.ts"));
+  const categoryFiles = new Set(findFilesRecursively(apiDir, "category.ts"));
 
   // Build method cache for all definition files
   const methodCache = new Map<string, string[]>();
@@ -291,6 +302,7 @@ export function buildLiveIndex(): LiveIndex {
     graphSeedsIndex: true,
     promptFragments: true,
     skillsIndex: true,
+    categoryIndex: true,
   };
 
   return {
@@ -305,6 +317,7 @@ export function buildLiveIndex(): LiveIndex {
     graphSeedFiles,
     promptFragmentFiles,
     defaultSkillFiles,
+    categoryFiles,
     methodCache,
     dirty,
   };
@@ -457,6 +470,16 @@ export function updateLiveIndex(
       index.defaultSkillFiles.delete(normalized);
     }
     index.dirty.skillsIndex = true;
+    return;
+  }
+
+  if (base === "category.ts") {
+    if (fileExists) {
+      index.categoryFiles.add(normalized);
+    } else {
+      index.categoryFiles.delete(normalized);
+    }
+    index.dirty.categoryIndex = true;
   }
 }
 
@@ -473,4 +496,5 @@ export function clearDirtyFlags(index: LiveIndex): void {
   index.dirty.graphSeedsIndex = false;
   index.dirty.promptFragments = false;
   index.dirty.skillsIndex = false;
+  index.dirty.categoryIndex = false;
 }

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import {
@@ -57,16 +57,6 @@ export class CortexDeleteRepository {
         message: t("delete.errors.validation.title"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
-    }
-
-    // Filesystem backend for preview-mode admin
-    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
-    if (!user.isPublic && !isVirtualWritable(path)) {
-      const { isFilesystemMode } = await import("../fs-provider");
-      if (isFilesystemMode(user)) {
-        const { fsDeleteNode } = await import("../fs-provider/fs-delete");
-        return fsDeleteNode(path, recursive ?? false, { t });
-      }
     }
 
     // Virtual writable mount - delegate to mount handler
@@ -134,25 +124,47 @@ export class CortexDeleteRepository {
     }
 
     try {
+      // Soft-delete: mark isDeleted=true + bump updatedAt so tombstone propagates to
+      // connected remote instances via WS push. Hard-delete deferred until propagated.
+      const deletedAt = new Date();
       const result = await db
-        .delete(cortexNodes)
+        .update(cortexNodes)
+        .set({ isDeleted: true, updatedAt: deletedAt })
         .where(
           and(
             eq(cortexNodes.userId, userId),
-            sql`(${cortexNodes.path} = ${path} OR ${cortexNodes.path} LIKE ${`${path}/%`})`,
+            or(
+              eq(cortexNodes.path, path),
+              sql`${cortexNodes.path} LIKE ${`${path}/%`}`,
+            ),
           ),
         );
 
       const nodesDeleted = result.rowCount ?? 0;
-      logger.info(`Cortex delete: ${path} (${nodesDeleted} nodes)`);
+      logger.info(
+        `Cortex soft-delete: ${path} (${nodesDeleted} nodes marked deleted)`,
+      );
 
-      // Disk write-through: remove from disk
-      try {
-        const { deleteFromDisk } = await import("../fs-provider/fs-sync");
-        await deleteFromDisk(path);
-      } catch {
-        // Best-effort
-      }
+      // WS-push sync: broadcast tombstone to connected remote instances
+      void (async (): Promise<void> => {
+        try {
+          const { serializeProviders } =
+            await import("@/app/api/[locale]/remote-connection/sync-provider");
+          const { broadcastSyncNotify } =
+            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+          const providerKey = path.startsWith("/memories")
+            ? "memories"
+            : "documents";
+          const syncPayloads = await serializeProviders(
+            [providerKey],
+            userId,
+            logger,
+          );
+          broadcastSyncNotify(userId, syncPayloads, logger);
+        } catch {
+          // Best-effort
+        }
+      })();
 
       return success({ responsePath: path, nodesDeleted });
     } catch (error) {

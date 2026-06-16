@@ -7,8 +7,10 @@ import { db } from "@/app/api/[locale]/system/db";
 import { leadMagnetConfigs } from "../../db";
 
 export interface GoogleSheetsCredentials {
+import { saveProviderConfig } from "../repository";
   googleAccessToken: string;
   googleRefreshToken: string;
+import type { LeadMagnetT } from "../../i18n";
   googleTokenExpiry: string;
   googleSheetId?: string;
   googleSheetTab?: string;
@@ -80,3 +82,9 @@ export const GoogleSheetsCredentialsRepository = {
     }
   },
 };
+import { saveProviderConfig } from "../repository";
+import type { LeadMagnetT } from "../../i18n";
+import { saveProviderConfig } from "../repository";
+import type { LeadMagnetT } from "../../i18n";
+import { saveProviderConfig } from "../repository";
+import type { LeadMagnetT } from "../../i18n";

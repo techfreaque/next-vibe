@@ -5,7 +5,7 @@ import "server-only";
  * Registers custom skills for cross-instance sync via the unified SyncProvider interface.
  */
 
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/app/api/[locale]/system/db";

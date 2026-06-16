@@ -17,7 +17,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CORTEX_READ_ALIAS, resolveCortexIcon } from "../constants";
@@ -33,8 +33,10 @@ const { GET } = createEndpoint({
   path: ["agent", "cortex", "read"],
   aliases: [CORTEX_READ_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   dynamicTitle: ({ request }) => {
     if (request?.path) {
@@ -57,9 +59,11 @@ const { GET } = createEndpoint({
   },
   icon: "file-text",
   dynamicIcon: ({ request }) => resolveCortexIcon(request?.path),
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "cortex",
   tags: ["get.tags.cortex" as const],
+  cli: {
+    firstCliArgKey: "path",
+  },
   defaultExpanded: true,
 
   fields: customWidgetObject({

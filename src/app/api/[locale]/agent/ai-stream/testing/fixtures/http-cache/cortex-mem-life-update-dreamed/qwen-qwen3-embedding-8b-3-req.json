@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-cortex-list-on--memories-life---report-all----d31a6538-e3a3-40e6-be25-aef9ee048100.md\n\n# Use cortex-list on /memories/life/. Report all...\nFolder: cron\nPreview: <think>The user asked me to report: 1. What frontmatter fields are present 2. Whether it has a \"## Current State\" sectio…",
+    "encoding_format": "float"
+  }
+}

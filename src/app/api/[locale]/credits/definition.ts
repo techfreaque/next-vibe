@@ -20,7 +20,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { dateSchema } from "../shared/types/common.schema";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const CreditsBalanceContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CreditsBalanceContainer })),

@@ -10,7 +10,7 @@ import { ViewModeToggle } from "@/app/api/[locale]/agent/chat/threads/[threadId]
 import {
   useWidgetLogger,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ChatToolbarProps {

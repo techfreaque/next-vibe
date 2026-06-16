@@ -50,6 +50,21 @@ export const translations: typeof enTranslations = {
         description:
           "Identyfikator zdalnej instancji. Używany jako podfolder do organizacji wątków.",
       },
+      threadMirrorMode: {
+        label: "Tryb kopiowania wątku",
+        description:
+          "Gdzie przechowywany jest wątek: po obu stronach, tylko u wywołującego, tylko u dostawcy lub nigdzie. 'both'/'cloud' zapisują wątek na tej instancji w REMOTE/<instancja wywołująca>.",
+      },
+      userMessageId: {
+        label: "ID wiadomości użytkownika",
+        description:
+          "Identyfikator wiadomości użytkownika nadany przez wywołującego. Zapisywany bez zmian, aby synchronizacja wątku była idempotentna.",
+      },
+      parentMessageId: {
+        label: "ID wiadomości nadrzędnej",
+        description:
+          "Identyfikator poprzedniej wiadomości-liścia wywołującego. Nowa wiadomość użytkownika łączy się z nią, aby zsynchronizowany wątek był jedną listą.",
+      },
       tools: {
         title: "Narzędzia klienta",
         description:
@@ -89,6 +104,19 @@ export const translations: typeof enTranslations = {
           label: "Zmienione argumenty",
           description:
             "Opcjonalnie edytowane argumenty narzędzia użyte przy wykonaniu",
+        },
+      },
+      confirmationOverrides: {
+        title: "Nadpisania potwierdzeń",
+        description:
+          "Reguły potwierdzania dla poszczególnych narzędzi z ulubionego/umiejętności wywołującego, stosowane do bramki execute-tool tej pętli.",
+        toolId: {
+          label: "ID narzędzia",
+          description: "Narzędzie, którego dotyczy reguła potwierdzenia",
+        },
+        requiresConfirmation: {
+          label: "Wymaga potwierdzenia",
+          description: "Prawda, jeśli narzędzie musi czekać na potwierdzenie użytkownika",
         },
       },
       attachments: {

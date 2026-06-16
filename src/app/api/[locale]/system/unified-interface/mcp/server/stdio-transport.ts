@@ -46,7 +46,7 @@ export class StdioTransport implements IMCPTransport {
       return;
     }
 
-    this.logger.info("[MCP Transport] Starting STDIO transport...");
+    this.logger.debug("[MCP Transport] Starting STDIO transport");
 
     // Create readline interface
     // NOTE: Do NOT set output to process.stdout - it interferes with MCP protocol
@@ -82,7 +82,7 @@ export class StdioTransport implements IMCPTransport {
     process.stdout.on("error", this.stdoutErrorHandler);
 
     this.running = true;
-    this.logger.info("[MCP Transport] STDIO transport started");
+    this.logger.debug("[MCP Transport] STDIO ready");
 
     // Set up startup timeout - exit if no initialization within 5 seconds
     // This prevents hanging when health checks don't send initialization

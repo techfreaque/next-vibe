@@ -14,9 +14,9 @@ import { Span } from "next-vibe-ui/ui/span";
 import {
   useWidgetDisabled,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";

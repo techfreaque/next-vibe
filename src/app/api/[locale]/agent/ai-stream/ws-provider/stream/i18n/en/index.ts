@@ -48,6 +48,21 @@ export const translations = {
         description:
           "Remote instance identifier. Used as sub-folder for thread organisation.",
       },
+      threadMirrorMode: {
+        label: "Thread Mirror Mode",
+        description:
+          "Where the thread is stored: both sides, caller only, provider only, or nowhere. 'both'/'cloud' make this instance persist the thread under REMOTE/<caller instance>.",
+      },
+      userMessageId: {
+        label: "User Message ID",
+        description:
+          "The caller-assigned id for the user message. Persisted as-is so the thread sync round-trip stays idempotent.",
+      },
+      parentMessageId: {
+        label: "Parent Message ID",
+        description:
+          "The caller's prior-leaf message id. The new user message chains off it so the synced thread is one linked list.",
+      },
       tools: {
         title: "Client Tools",
         description:
@@ -85,6 +100,19 @@ export const translations = {
         updatedArgs: {
           label: "Updated Arguments",
           description: "Optional edited tool arguments to use on execution",
+        },
+      },
+      confirmationOverrides: {
+        title: "Confirmation Overrides",
+        description:
+          "Per-tool confirmation gates from the caller's favorite/skill, applied to this loop's execute-tool gate.",
+        toolId: {
+          label: "Tool ID",
+          description: "The tool the confirmation gate applies to",
+        },
+        requiresConfirmation: {
+          label: "Requires Confirmation",
+          description: "True if the tool must pause for user confirmation",
         },
       },
       attachments: {

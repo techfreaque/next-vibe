@@ -242,7 +242,7 @@ function findAllToolMsgsSinceLast(
   messages: SlimMessage[],
   toolName: string,
 ): SlimMessage[] {
-  const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
+  const lastUserMsg = [...messages].toReversed().find((m) => m.role === "user");
   if (!lastUserMsg) {
     return findAllToolMsgs(messages, toolName);
   }

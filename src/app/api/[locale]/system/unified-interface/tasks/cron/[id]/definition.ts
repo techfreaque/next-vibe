@@ -35,7 +35,7 @@ import {
   TaskOutputModeOptions,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { taskInputSchema, taskOwnerSchema } from "../db";
 import {
@@ -385,6 +385,7 @@ const { PUT } = createEndpoint({
   path: ["system", "unified-interface", "tasks", "cron", "[id]"],
   aliases: [CRON_UPDATE_ALIAS],
   title: "put.title",
+  titleShort: "put.titleShort",
   description: "put.description",
   icon: "clock",
   category: "devTools",
@@ -944,6 +945,7 @@ const { DELETE } = createEndpoint({
   path: ["system", "unified-interface", "tasks", "cron", "[id]"],
   aliases: [CRON_DELETE_ALIAS],
   title: "delete.title",
+  titleShort: "delete.titleShort",
   description: "delete.description",
   icon: "clock",
   category: "devTools",

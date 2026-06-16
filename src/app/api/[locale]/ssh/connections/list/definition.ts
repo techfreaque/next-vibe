@@ -16,10 +16,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { ConnectionHealthSchema } from "@/app/api/[locale]/remote-connection/db";
+
 import { SshAuthType, SshAuthTypeDB } from "../../enum";
 import { scopedTranslation } from "./i18n";
+import { SSH_CONNECTIONS_LIST_ALIAS } from "./constants";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+const ConnectionTypeSchema = z.enum(["local", "ssh", "remote"]);
+const AuthTypeWithRemoteDB = [...SshAuthTypeDB, "remote"] as const;
+
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const ConnectionsListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ConnectionsListContainer })),
@@ -29,12 +35,15 @@ export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["ssh", "connections", "list"],
+  aliases: [SSH_CONNECTIONS_LIST_ALIAS] as const,
   title: "get.title",
+  titleShort: "get.titleShort",
   description: "get.description",
   icon: "server",
-  category: "endpointCategories.ssh",
-  subCategory: "endpointCategories.sshConnections",
+  category: "ssh",
+  subCategory: "Connections",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  defaultWebPinned: [UserRole.ADMIN],
   tags: ["category" as const],
 
   fields: customWidgetObject({
@@ -51,11 +60,15 @@ export const { GET } = createEndpoint({
             host: z.string(),
             port: z.number(),
             username: z.string(),
-            authType: z.enum(SshAuthTypeDB),
+            authType: z.enum(AuthTypeWithRemoteDB),
             isDefault: z.boolean(),
             fingerprint: z.string().nullable(),
             notes: z.string().nullable(),
             createdAt: z.string(),
+            connectionType: ConnectionTypeSchema,
+            health: ConnectionHealthSchema.nullable(),
+            remoteInstanceId: z.string().nullable(),
+            transportMode: z.string().nullable(),
           }),
         ),
       }),
@@ -112,15 +125,51 @@ export const { GET } = createEndpoint({
         connections: [
           {
             id: "uuid-1",
+            label: "Local Machine",
+            host: "localhost",
+            port: 0,
+            username: "deploy",
+            authType: SshAuthType.LOCAL,
+            isDefault: true,
+            fingerprint: null,
+            notes: "Built-in local shell",
+            createdAt: "2026-01-01T00:00:00Z",
+            connectionType: "local" as const,
+            health: null,
+            remoteInstanceId: null,
+            transportMode: null,
+          },
+          {
+            id: "uuid-2",
             label: "prod-web-01",
             host: "192.168.1.1",
             port: 22,
             username: "deploy",
             authType: SshAuthType.PRIVATE_KEY,
-            isDefault: true,
+            isDefault: false,
             fingerprint: null,
             notes: null,
             createdAt: "2026-01-01T00:00:00Z",
+            connectionType: "ssh" as const,
+            health: null,
+            remoteInstanceId: null,
+            transportMode: null,
+          },
+          {
+            id: "uuid-3",
+            label: "thea",
+            host: "https://unbottled.ai",
+            port: 0,
+            username: "thea",
+            authType: "remote" as const,
+            isDefault: false,
+            fingerprint: null,
+            notes: null,
+            createdAt: "2026-03-01T00:00:00Z",
+            connectionType: "remote" as const,
+            health: "healthy" as const,
+            remoteInstanceId: "thea",
+            transportMode: "reverse-ws",
           },
         ],
       },

@@ -7,7 +7,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import {
   FAVORITE_CREATE_ALIAS,
   FAVORITE_DELETE_ALIAS,

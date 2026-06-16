@@ -37,12 +37,12 @@ next-vibe-ui/
 
 The same React component tree renders everywhere. Platform selection happens at the import level — app code always imports `next-vibe-ui/ui/X`:
 
-| Platform | Mechanism | Resolution order |
-| --- | --- | --- |
-| Web (Next.js) | `tsconfig.json` path alias | `web/*` |
-| TanStack SSR | Vite plugin `next-vibe-ui-ssr-resolver` (`enforce: "pre"`) in `src/app/api/[locale]/system/builder/repository/vite-compiler.ts` + `tsconfig.tanstack.json` | `tanstack/*` → `web/*` |
-| CLI / MCP | Bun plugin `cli-overrides` from `src/app/api/[locale]/system/unified-interface/cli/cli-widget-plugin-factory.ts` | `cli/*` → `web/*`; also rewrites any import to a `*.cli.tsx` sibling if one exists |
-| Native | tsconfig `customConditions: ["react-native"]` | `native/*` |
+| Platform      | Mechanism                                                                                                                                                  | Resolution order                                                                   |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Web (Next.js) | `tsconfig.json` path alias                                                                                                                                 | `web/*`                                                                            |
+| TanStack SSR  | Vite plugin `next-vibe-ui-ssr-resolver` (`enforce: "pre"`) in `src/app/api/[locale]/system/builder/repository/vite-compiler.ts` + `tsconfig.tanstack.json` | `tanstack/*` → `web/*`                                                             |
+| CLI / MCP     | Bun plugin `cli-overrides` from `src/app/api/[locale]/system/unified-interface/cli/cli-widget-plugin-factory.ts`                                           | `cli/*` → `web/*`; also rewrites any import to a `*.cli.tsx` sibling if one exists |
+| Native        | tsconfig `customConditions: ["react-native"]`                                                                                                              | `native/*`                                                                         |
 
 `next-vibe-ui/unified/*` resolves directly to `unified/*` on all platforms — it is platform-agnostic by construction.
 
@@ -54,14 +54,14 @@ Almost everything just works — React, React Query, React Hook Form, Zustand ar
 
 Each util has one implementation per platform that needs it; missing means "falls through to web/" (TanStack) or "not applicable".
 
-| Util | Web | CLI | Native | TanStack |
-| --- | --- | --- | --- | --- |
-| `lib/storage` | `localStorage` | file per key at `./.tmp/storage/<key>.json` | AsyncStorage | — |
-| `lib/cookies` | `document.cookie` / `next/headers` | file per key at `./.tmp/cookies/<key>.json` | token store | — |
-| `lib/redirect` | `next/navigation` | — | RN navigation | TanStack redirect |
-| `lib/not-found` | `notFound()` | — | RN error screen | TanStack notFound |
-| `lib/request`, `lib/headers` | Next request/headers | — | — | TanStack request context |
-| `lib/server-only` | (real `server-only`) | — | — | shim checking `import.meta.env.SSR` |
+| Util                         | Web                                | CLI                                         | Native          | TanStack                            |
+| ---------------------------- | ---------------------------------- | ------------------------------------------- | --------------- | ----------------------------------- |
+| `lib/storage`                | `localStorage`                     | file per key at `./.tmp/storage/<key>.json` | AsyncStorage    | —                                   |
+| `lib/cookies`                | `document.cookie` / `next/headers` | file per key at `./.tmp/cookies/<key>.json` | token store     | —                                   |
+| `lib/redirect`               | `next/navigation`                  | —                                           | RN navigation   | TanStack redirect                   |
+| `lib/not-found`              | `notFound()`                       | —                                           | RN error screen | TanStack notFound                   |
+| `lib/request`, `lib/headers` | Next request/headers               | —                                           | —               | TanStack request context            |
+| `lib/server-only`            | (real `server-only`)               | —                                           | —               | shim checking `import.meta.env.SSR` |
 
 Platform-specific extras: `cli/lib/focus-manager.tsx` (`useCliFieldFocus` wrapping Ink's `useFocus`), `native/lib/keyboard.tsx`, `native/lib/useColorScheme.tsx`.
 

@@ -65,18 +65,19 @@ export class SubscriptionAdminStatsRepository {
   private static formatPeriodLabel(
     period: string,
     timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
+    locale: CountryLanguage,
   ): string {
     const date = new Date(period);
     switch (timePeriod) {
       case TimePeriod.DAY:
-        return date.toLocaleDateString("en-US", {
+        return date.toLocaleDateString(locale, {
           month: "short",
           day: "numeric",
         });
       case TimePeriod.WEEK:
         return `Week ${SubscriptionAdminStatsRepository.getWeekNumber(date)}`;
       case TimePeriod.MONTH:
-        return date.toLocaleDateString("en-US", {
+        return date.toLocaleDateString(locale, {
           month: "short",
           year: "numeric",
         });
@@ -119,6 +120,7 @@ export class SubscriptionAdminStatsRepository {
       const response = await SubscriptionAdminStatsRepository.buildResponse(
         dateRange,
         timePeriod,
+        locale,
       );
       return success(response);
     } catch (error) {
@@ -138,6 +140,7 @@ export class SubscriptionAdminStatsRepository {
   private static async buildResponse(
     dateRange: { from: Date; to: Date },
     timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
+    locale: CountryLanguage,
   ): Promise<SubscriptionStatsResponseOutput> {
     // Revenue stats
     const [revenueResult] = await db
@@ -289,11 +292,13 @@ export class SubscriptionAdminStatsRepository {
       x: SubscriptionAdminStatsRepository.formatPeriodLabel(
         item.period,
         timePeriod,
+        locale,
       ),
       y: item.total,
       label: SubscriptionAdminStatsRepository.formatPeriodLabel(
         item.period,
         timePeriod,
+        locale,
       ),
     }));
 
@@ -321,11 +326,13 @@ export class SubscriptionAdminStatsRepository {
       x: SubscriptionAdminStatsRepository.formatPeriodLabel(
         item.period,
         timePeriod,
+        locale,
       ),
       y: item.count,
       label: SubscriptionAdminStatsRepository.formatPeriodLabel(
         item.period,
         timePeriod,
+        locale,
       ),
     }));
 

@@ -14,6 +14,7 @@ import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
 import type {
+  BoilerplatePluginConfig,
   CheckConfig,
   I18nPluginConfig,
   JsxCapitalizationPluginConfig,
@@ -29,13 +30,15 @@ import type {
 export type PluginName =
   | "oxlint-plugin-i18n/no-literal-string"
   | "oxlint-plugin-jsx-capitalization/jsx-capitalization"
-  | "oxlint-plugin-restricted/restricted-syntax";
+  | "oxlint-plugin-restricted/restricted-syntax"
+  | "oxlint-plugin-boilerplate/route-pattern";
 
 /** Map plugin names to their config types */
 export interface PluginConfigMap {
   "oxlint-plugin-i18n/no-literal-string": I18nPluginConfig;
   "oxlint-plugin-jsx-capitalization/jsx-capitalization": JsxCapitalizationPluginConfig;
   "oxlint-plugin-restricted/restricted-syntax": RestrictedSyntaxPluginConfig;
+  "oxlint-plugin-boilerplate/route-pattern": BoilerplatePluginConfig;
 }
 
 /** Result of loading config */

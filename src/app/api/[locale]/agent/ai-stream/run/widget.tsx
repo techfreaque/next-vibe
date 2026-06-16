@@ -58,19 +58,19 @@ import {
   useWidgetOnSubmit,
   useWidgetUser,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/widget";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as runScopedTranslation } from "./i18n";
 
 import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
+import { type ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { platform } from "@/config/env-client";
 import { CortexModal } from "../../../agent/cortex/widget/cortex-modal";
 import { DefaultFolderId } from "../../chat/config";
@@ -80,7 +80,6 @@ import {
   ChatNavigationProvider,
   useChatNavigationStore,
 } from "../../chat/hooks/use-chat-navigation-store";
-import { useSkill } from "../../chat/skills/[id]/hooks";
 import messagesDefinition from "../../chat/threads/[threadId]/messages/definition";
 import { AIToolsModal } from "../../tools/widget/ai-tools-modal";
 

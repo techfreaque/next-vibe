@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Vibe Stage",
   titleShort: "Vibe Stage",
   description:
-    "Stagt automatisch Boilerplate-Dateien (route.ts, i18n/*/index.ts), die das Muster-Check bestehen. Führt das Boilerplate-Oxlint-Plugin auf allen nicht-gestagten Kandidaten aus und git-addet nur Dateien ohne Verstöße.",
+    "Stagt automatisch Boilerplate-Dateien (route.ts, i18n/*/index.ts), die die Musterprüfung bestehen. Stagt außerdem reine Import-Änderungen in beliebigen Dateien oder nur die Import-Hunks aus gemischt geänderten Dateien.",
 
   fields: {
     dryRun: {
@@ -22,9 +22,9 @@ export const translations: typeof enTranslations = {
 
   response: {
     staged: "Gestagt",
+    partiallyStaged: "Teilweise gestagt (nur Imports)",
     skipped: "Übersprungen (Verstöße)",
-    noChanges:
-      "Keine stagbaren Boilerplate-Dateien im Arbeitsverzeichnis gefunden",
+    noChanges: "Keine stagbaren Dateien im Arbeitsverzeichnis gefunden",
     dryRunNote: "Probelauf - es wurden keine Dateien tatsächlich gestagt",
   },
 
@@ -79,15 +79,18 @@ export const translations: typeof enTranslations = {
     submit: "Stage ausführen",
     dryRun: "Probelauf",
     staged: "Gestagt",
+    partiallyStaged: "Teilweise gestagt",
     skipped: "Übersprungen",
     stagedCount: "Dateien gestagt",
+    partiallyStaged_count: "Dateien teilweise gestagt (nur Imports)",
     skippedCount: "Dateien übersprungen (Verstöße)",
-    noChanges: "Keine stagbaren Boilerplate-Dateien gefunden",
+    noChanges: "Keine stagbaren Dateien gefunden",
     noChangesHint:
-      "Geänderte route.ts und i18n/*/index.ts Dateien, die den Muster-Check bestehen, erscheinen hier",
+      "Boilerplate-Dateien, reine Import-Änderungen oder Dateien mit Import-Hunks erscheinen hier",
     dryRunBadge: "Probelauf",
     dryRunNote: "Nur Vorschau — keine Dateien wurden gestagt",
     cleanFile: "sauber",
+    partialFile: "nur Imports",
     violationsFile: "Verstöße",
     loading: "Arbeitsverzeichnis wird gescannt...",
   },

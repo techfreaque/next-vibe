@@ -13,7 +13,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { PackageEndpointGeneratorRepository } from "@/app/api/[locale]/system/generators/package-endpoints/repository";
+import { PackageEndpointGeneratorRepository } from "./vibe-package/package-endpoint-generator";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type {
@@ -37,9 +37,9 @@ import { configValidator } from "./config-validator";
 import { errorSuggester } from "./error-suggester";
 import { fileCopier } from "./file-copier";
 import { folderCleaner } from "./folder-cleaner";
-import { npmPackageGenerator } from "./npm-package-generator";
+import { npmPackageGenerator } from "./vibe-package/npm-package-generator";
 import { outputFormatter } from "./output-formatter";
-import { createPackagePlugins } from "./package-plugins";
+import { createPackagePlugins } from "./vibe-package/package-plugins";
 import { profileService } from "./profile-service";
 import { reportGenerator } from "./report-generator";
 import { viteCompiler } from "./vite-compiler";

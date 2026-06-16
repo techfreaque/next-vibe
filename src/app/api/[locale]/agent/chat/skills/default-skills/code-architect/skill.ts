@@ -19,7 +19,7 @@ import { tool } from "../../config";
 
 import { SQL_ALIAS } from "@/app/api/[locale]/system/db/sql/constants";
 import { REBUILD_ALIAS } from "@/app/api/[locale]/system/server/rebuild/constants";
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import { WAIT_FOR_TASK_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/constants";
 import { AI_RUN_ALIAS } from "../../../../ai-stream/run/constants";
 

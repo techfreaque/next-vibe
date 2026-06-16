@@ -9,14 +9,11 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   CreateApiEndpoint,
   InferResponseOutput,
 } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
-import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -31,7 +28,7 @@ import {
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "../../../unified-interface/unified-ui/widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/types";
 import { scopedTranslation } from "../../i18n";
 
 /**

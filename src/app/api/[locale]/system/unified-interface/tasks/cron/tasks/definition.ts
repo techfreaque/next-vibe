@@ -26,7 +26,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import {
   CronTaskEnabledFilter,
   CronTaskEnabledFilterDB,
@@ -499,6 +499,7 @@ const { POST } = createEndpoint({
   path: ["system", "unified-interface", "tasks", "cron", "tasks"],
   aliases: [CRON_CREATE_ALIAS],
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
   icon: "clock",
   category: "devTools",

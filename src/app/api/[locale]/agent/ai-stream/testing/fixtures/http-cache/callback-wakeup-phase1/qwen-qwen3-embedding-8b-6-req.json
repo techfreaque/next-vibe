@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-t1-thread-create-tool-call--use-the-tool-help----482a6a48-4dd8-4b0c-930e-5a4633c7a93c.md\n\n# [T1 thread-create+tool-call] Use the tool-help...\nFolder: cron\nPreview: <think> The wakeUp callback has been triggered and I received the image result. I can see the image was generated succes…",
+    "encoding_format": "float"
+  }
+}

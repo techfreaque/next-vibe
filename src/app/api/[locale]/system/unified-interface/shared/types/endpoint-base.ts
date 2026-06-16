@@ -8,8 +8,8 @@
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { z } from "zod";
-import type { FieldUsageConfig } from "../../unified-ui/widgets/_shared/cli-types";
-import type { AnyChildrenConstrain } from "../../unified-ui/widgets/_shared/types";
+import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/cli-types";
+import type { AnyChildrenConstrain } from "next-vibe-ui/unified/_shared/types";
 import type { CreateApiEndpoint } from "../endpoints/definition/create";
 import type { EndpointEventsMap } from "../../websocket/structured-events";
 import type { UnifiedField } from "./endpoint";

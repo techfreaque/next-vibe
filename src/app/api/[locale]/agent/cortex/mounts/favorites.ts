@@ -5,7 +5,7 @@ import "server-only";
  * Renders user favorites (skill + model/tool loadouts) as markdown files at /favorites/<slug>.md
  */
 
-import { and, count as drizzleCount, eq, or } from "drizzle-orm";
+import { and, count as drizzleCount, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 

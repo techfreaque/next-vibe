@@ -32,10 +32,7 @@ export class MCPServeRepository {
     definitionLdr?: IDefinitionLoader,
   ): Promise<ResponseType<MCPServeResponseInput>> {
     // Log current directory (chdir already happened in vibe-runtime)
-    logger.info("[MCP] Starting MCP server", {
-      cwd: process.cwd(),
-      projectRoot: process.env.PROJECT_ROOT,
-    });
+    logger.debug(`[MCP] Starting server cwd=${process.cwd()}`);
 
     const mcpServer = new MCPServer(registry, defRegistry, definitionLdr);
 

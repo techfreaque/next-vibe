@@ -21,9 +21,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 import { scopedTranslation } from "../i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const AdminAddCreditsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.AdminAddCreditsContainer })),
@@ -48,7 +49,9 @@ const { POST } = createEndpoint({
     children: {
       targetUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: usersListDefinitions.GET,
+        labelField: "email",
         label: "adminAdd.post.targetUserId.label" as const,
         description: "adminAdd.post.targetUserId.description" as const,
         columns: 12,

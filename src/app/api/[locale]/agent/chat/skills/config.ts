@@ -7,7 +7,7 @@
  * DEFAULT_SKILLS and COMPANION_SKILLS are auto-generated - see generators/skills-index
  */
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import {
   UserPermissionRole,
   type UserPermissionRoleValue,

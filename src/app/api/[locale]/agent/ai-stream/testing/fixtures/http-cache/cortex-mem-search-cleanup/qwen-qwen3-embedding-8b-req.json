@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The search returned 2 results. The top result is /memories/mem-search-test/bioluminescence.md with score 0.72. The task asked to report how many results and the path of the top result.\n\nNow I need to end with exactly VERDICT: PASS or VERDICT: FAIL. Everything worked correctly.</think>Found **2 results**. The top result is at path:\n\n`/memories/mem-search-test/bioluminescence.md`\n\nVERDICT: PASS\n\nUser: Use cortex-search to search for \"quantum entanglement Bell inequality\" without restricting to a path. Report paths of results you find and confirm at least one is in /memories/.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.\n\nAssistant: <think>The user wants me to use cortex-search to search for \"quantum entanglement Bell inequality\" without restricting to a path, then report paths of results and confirm at least one is in /memories/.</think>\n\nAssistant: <think>The user asked for:\n1. Use cortex-search for \"quantum entanglement Bell inequality\" without restricting to a path.\n2. Report paths of results found.\n3. Confirm at least one is in /memories/.\n\nI found 20 results. The top result is /memories/mem-search-test/quantum-entanglement.md, which is definitely in /memories/. The rest are mostly skills. \n\nLet me report the key paths found and confirm the /memories/ result.</think>Found **20 results**. Key paths:\n\n- `/memories/mem-search-test/quantum-entanglement.md` (top match, score 0.77)\n- `/skills/default/socratic-questioner.md`\n- `/skills/default/philosopher.md`\n- `/skills/default/debater.md`\n- `/skills/default/uncensored.md`\n- `/skills/default/teacher.md`\n- `/skills/default/quality-tester.md`\n- `/skills/default/free-speech-activist.md`\n- `\n\nUser: Use cortex-delete to recursively delete the entire /memories/mem-search-test/ directory. Report how many nodes were deleted.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
+    "encoding_format": "float"
+  }
+}

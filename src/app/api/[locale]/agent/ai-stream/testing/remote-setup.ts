@@ -590,39 +590,8 @@ export async function connectToHermes(
     await import("@/app/api/[locale]/remote-connection/connector");
   closeConnection(HERMES_INSTANCE_ID);
 
-  // Patch hermes's side: set syncScope on its record for atlas so that
-  // pull-based sync (D5/D6/M5/M6) returns documents/memories in the payload.
-  // Without this, hermes filters them out because its connRow.syncScope=null.
-  const { RemoteTransport } =
-    await import("@/app/api/[locale]/remote-connection/transport");
-  const target = await RemoteTransport.resolveTarget({
-    userId: user.id,
-    locale: defaultLocale,
-    logger,
-  });
-  if (target) {
-    const { default: connByIdDef } =
-      await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
-    const { callEndpoint } =
-      await import("@/app/api/[locale]/remote-connection/call-endpoint");
-    await callEndpoint({
-      definition: connByIdDef.PATCH,
-      input: {
-        syncScope: {
-          favorites: true,
-          documents: true,
-          memories: true,
-          skills: true,
-          threads: true,
-        },
-      },
-      urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
-      target,
-      locale: defaultLocale,
-      user,
-      logger,
-    });
-  }
+  // Hermes's reverse entry for atlas defaults to all sync domains enabled
+  // (register sets REVERSE_ENTRY_SYNC_SCOPE) — no test-side patch needed.
 }
 
 /**

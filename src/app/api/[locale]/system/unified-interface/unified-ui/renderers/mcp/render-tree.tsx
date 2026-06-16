@@ -10,7 +10,7 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import { queryClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
-import { LoggerProvider } from "@/hooks/use-logger";
+import { LoggerProvider } from "@/hooks/logger-provider";
 
 export function McpRenderTree({
   endpoint,

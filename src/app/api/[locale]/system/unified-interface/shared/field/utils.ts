@@ -17,14 +17,15 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
-} from "../../unified-ui/widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/types";
 import type {
   CustomWidgetObjectConfig,
   CustomWidgetPrimitiveConfig,
-} from "../../unified-ui/widgets/containers/custom/types";
-import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
-import type { NavigateButtonWidgetConfig } from "../../unified-ui/widgets/interactive/navigate-button/types";
-import type { SubmitButtonWidgetConfig } from "../../unified-ui/widgets/interactive/submit-button/types";
+} from "next-vibe-ui/unified/containers/custom/types";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { NavigateButtonWidgetConfig } from "next-vibe-ui/unified/interactive/navigate-button/types";
+import type { SearchBarWidgetConfig } from "next-vibe-ui/unified/interactive/search-bar/types";
+import type { SubmitButtonWidgetConfig } from "next-vibe-ui/unified/interactive/submit-button/types";
 import type { EndpointLogger } from "../logger/endpoint";
 import type { InferSchemaFromField, UnifiedField } from "../types/endpoint";
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
@@ -980,11 +981,12 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         childSchema = typedField.child;
       } else {
         // Child is a UnifiedField, generate schema from it
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: union schema return type requires cast to access ZodTypeAny._def
         childSchema = generateSchemaForUsage<typeof typedField.child, Usage>(
           typedField.child,
           targetUsage,
           userRoles,
-        );
+        ) as z.ZodTypeAny;
         // Check if schema is z.never() using _def.type check
         if (childSchema._def.type === neverType) {
           return z.never() as InferSchemaFromField<F, Usage>;
@@ -1355,6 +1357,39 @@ export function requestField<
       TScopedTranslation["ScopedTranslationKey"],
       TSchema,
       { request: "data"; response?: never }
+    >,
+    "usage" | "schemaType"
+  >,
+>(
+  scopedTranslation: TScopedTranslation,
+  config: TConfig,
+): TConfig & {
+  usage: { request: "data"; response?: never };
+  schemaType: "primitive";
+} {
+  // scopedTranslation is only used for type inference
+  void scopedTranslation;
+  return {
+    ...config,
+    usage: { request: "data" },
+    schemaType: "primitive" as const,
+  };
+}
+
+/**
+ * Scoped search bar field creator
+ * Creates a SEARCH_BAR widget field with schema validation.
+ * Use size "xl" for hero/start-page search, "default" for results-page compact bar.
+ */
+export function searchBarField<
+  TScopedTranslation extends ScopedTranslationType,
+  TSchema extends z.ZodTypeAny,
+  const TConfig extends Omit<
+    SearchBarWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TSchema,
+      { request: "data"; response?: never },
+      "primitive"
     >,
     "usage" | "schemaType"
   >,

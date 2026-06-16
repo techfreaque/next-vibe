@@ -7,13 +7,13 @@
         "{{PROJECT_PATH}}/src/app/api/[locale]/system/unified-interface/cli/runtime/env-preload.ts",
         "{{PROJECT_PATH}}/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
         "mcp",
-        "--local"
+        "--hermes"
       ],
       "env": {
         "NODE_ENV": "production"
       }
     },
-    "hermes-dev": {
+    "atlas": {
       "command": "bun",
       "args": [
         "--preload",

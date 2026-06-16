@@ -1,7 +1,7 @@
 /**
  * Cortex Cross-Instance Sync Integration Tests
  *
- * Tests the hash-first sync protocol between hermes-dev (port 3000) and
+ * Tests the hash-first sync protocol between atlas (port 3000) and
  * hermes (port 3001). Verifies:
  *
  *   1. Hash engine: computeProviderHash is deterministic + sensitive to changes
@@ -29,9 +29,9 @@
 
 import "server-only";
 
-import { randomUUID } from "node:crypto";
 import { and, eq, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { randomUUID } from "node:crypto";
 import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -42,31 +42,31 @@ import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
-import { cortexNodes } from "./db";
-import {
-  computeProviderHash,
-  computeSyncHashes,
-  buildSyncPayloads,
-  ensureProvidersRegistered,
-  type SyncHashEntry,
-} from "@/app/api/[locale]/system/unified-interface/tasks/task-sync/sync-provider";
-import { documentsSyncProvider } from "./sync-provider";
-import { skillsSyncProvider } from "@/app/api/[locale]/agent/chat/skills/sync-provider";
 import {
   PROD_URL,
+  closeProdDb,
   connectToHermes,
   disconnectFromHermes,
   resolveProdAdminToken,
   resolveProdUserId,
-  triggerPull,
   triggerHermesPull,
-  closeProdDb,
+  triggerPull,
 } from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
+import { skillsSyncProvider } from "@/app/api/[locale]/agent/chat/skills/sync-provider";
+import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
+import {
+  buildSyncPayloads,
+  computeProviderHash,
+  computeSyncHashes,
+  ensureProvidersRegistered,
+  type SyncHashEntry,
+} from "@/app/api/[locale]/remote-connection/sync-provider";
 import * as userSchema from "@/app/api/[locale]/user/db";
-import * as remoteConnectionSchema from "@/app/api/[locale]/user/remote-connection/db";
+import { cortexNodes } from "./db";
+import { documentsSyncProvider } from "./sync-provider";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -76,6 +76,24 @@ const HERMES_SKIP_REASON = "hermes not reachable at localhost:3001";
 // Note: test paths use "/documents/sync-test-" prefix for isolation and cleanup
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+async function pollUntil<T>(
+  label: string,
+  fn: () => Promise<T | null | undefined | false>,
+  timeoutMs = 15_000,
+): Promise<T> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const result = await fn();
+    if (result) {
+      return result;
+    }
+    await new Promise<void>((r) => {
+      setTimeout(r, 200);
+    });
+  }
+  throw new Error(`[pollUntil] ${label}: timed out after ${timeoutMs}ms`);
+}
 
 async function resolveUser(
   email: string,
@@ -886,7 +904,7 @@ describe("Sync: cross-instance documents sync (live hermes)", () => {
 
   const TEST_CONTENT = `# Cross-Instance Sync Test
 
-This document was written on hermes-dev to verify cortex sync to hermes.
+This document was written on atlas to verify cortex sync to hermes.
 Unique marker: sync-live-test-${Date.now().toString(36)}`;
 
   const TEST_SYNC_ID = randomUUID();
@@ -912,7 +930,7 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
       prodAdminToken = await resolveProdAdminToken();
       prodUserId = await resolveProdUserId();
 
-      // Establish hermes-dev → hermes connection
+      // Establish atlas → hermes connection
       await connectToHermes(devUser);
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -1000,8 +1018,8 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
         TEST_SYNC_ID,
       );
 
-      // Step 2: Trigger hermes to pull from hermes-dev (behind-NAT mode)
-      // hermes (port 3001) contacts hermes-dev (port 3000), receives hash diff,
+      // Step 2: Trigger hermes to pull from atlas (behind-NAT mode)
+      // hermes (port 3001) contacts atlas (port 3000), receives hash diff,
       // gets the new syncId in the documents payload.
       await triggerHermesPull(prodAdminToken);
 
@@ -1145,9 +1163,10 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
         return;
       }
 
-      // Delete the node on dev
+      // Soft-delete on dev: set isDeleted=true + bump updatedAt (tombstone protocol)
       await db
-        .delete(cortexNodes)
+        .update(cortexNodes)
+        .set({ isDeleted: true, updatedAt: new Date() })
         .where(
           and(
             eq(cortexNodes.userId, devUser.id),
@@ -1155,34 +1174,23 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
           ),
         );
 
-      // Trigger hermes pull
+      // Trigger hermes pull — tombstone now included in serialized payload
       await triggerHermesPull(prodAdminToken);
-      // eslint-disable-next-line no-promise-executor-return
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 2000);
-      });
 
-      // Hermes must no longer have the node
-      // NOTE: The current protocol serializes all non-deleted nodes. A deletion on dev
-      // means the syncId disappears from getHashEntries → hash changes → new payload sent
-      // without that syncId. Hermes's upsertFromJson only upserts what it receives;
-      // it does NOT delete nodes that are absent from the payload.
-      // A tombstone (isDeleted: true) is needed for explicit deletion propagation.
-      //
-      // This test documents the CURRENT behavior (no tombstone support yet).
-      // If tombstone support is added, change expectation to: node must be gone.
-      const hermesRows = await prodDb.execute<{ path: string }>(
-        sql`SELECT path FROM cortex_nodes WHERE user_id = ${prodUserId} AND sync_id = ${TEST_SYNC_ID} LIMIT 1`,
+      // Hermes must apply tombstone: no active (non-deleted) row for this syncId
+      await pollUntil(
+        "SL4: tombstone must propagate to hermes (no active row)",
+        async () => {
+          const r = await prodDb.execute<{ path: string }>(
+            sql`SELECT path FROM cortex_nodes WHERE user_id = ${prodUserId} AND sync_id = ${TEST_SYNC_ID} AND (is_deleted IS NULL OR is_deleted = false) LIMIT 1`,
+          );
+          return r.rows.length === 0 ? true : false;
+        },
       );
 
-      // Document current behavior: deletion is NOT propagated without tombstone
-      // eslint-disable-next-line no-console
-      console.info(
-        `[SL4] After delete+resync: hermes still has node = ${hermesRows.rows.length > 0} (tombstone not implemented)`,
-      );
-      // The important thing: dev no longer has the node
+      // Dev node must be soft-deleted (still exists as tombstone, not hard-deleted)
       const devRows = await db
-        .select({ path: cortexNodes.path })
+        .select({ path: cortexNodes.path, isDeleted: cortexNodes.isDeleted })
         .from(cortexNodes)
         .where(
           and(
@@ -1190,7 +1198,11 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
             eq(cortexNodes.path, TEST_PATH),
           ),
         );
-      expect(devRows.length, "SL4: dev must have deleted the node").toBe(0);
+      expect(devRows.length, "SL4: dev tombstone row must still exist").toBe(1);
+      expect(
+        devRows[0]!.isDeleted,
+        "SL4: dev node must be marked isDeleted",
+      ).toBe(true);
     },
     SYNC_TIMEOUT,
   );
@@ -1305,7 +1317,7 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
         "BN1: node must be on hermes before pull",
       ).toBe(1);
 
-      // Step 2: Trigger hermes-dev to pull from hermes
+      // Step 2: Trigger atlas to pull from hermes
       // pullFromRemote sends dev's hashes → hermes diffs → returns changed payload
       await triggerPull();
 

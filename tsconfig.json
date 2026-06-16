@@ -32,6 +32,7 @@
       ],
       "@next-vibe/checker/*": ["./src/app/api/[locale]/*"],
       "next-vibe-ui/*": ["./src/packages/next-vibe-ui/web/*"],
+      "next-vibe-ui/unified/*": ["./src/packages/next-vibe-ui/unified/*"],
       "server-only": [
         "./src/app/api/[locale]/system/unified-interface/shared/server-only/server-only.ts"
       ]

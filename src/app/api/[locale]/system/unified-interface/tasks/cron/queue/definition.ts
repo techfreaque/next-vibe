@@ -37,7 +37,7 @@ import {
   TaskOutputModeDB,
 } from "../../enum";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { CRON_QUEUE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

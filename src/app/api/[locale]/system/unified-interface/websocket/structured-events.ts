@@ -86,11 +86,11 @@ export type ComputeEventPayloads<
   TEvents extends EndpointEventsMap<TResponseOutput>,
 > = {
   [K in keyof TEvents]: TEvents[K] extends { fields: infer F }
-    ? F extends
-        | readonly (keyof TResponseOutput)[]
-        | NestedFieldSpec<TResponseOutput>
+    ? F extends readonly (keyof TResponseOutput)[]
       ? EventPayload<TResponseOutput, F>
-      : { readonly [key: string]: never }
+      : F extends NestedFieldSpec<TResponseOutput>
+        ? NestedEventPayload<TResponseOutput, F>
+        : { readonly [key: string]: never }
     : { readonly [key: string]: never };
 };
 
@@ -122,6 +122,8 @@ export interface EndpointEventHandlerContext<
   requestData: TRequestOutput;
   queryClient: QueryClient;
   logger: EndpointLogger;
+  /** The React Query cache key for this subscription instance. */
+  cacheKey: string | undefined;
 }
 
 // ============================================================================

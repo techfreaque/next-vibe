@@ -1,19 +1,20 @@
 /**
- * Coding Agent Integration - Direct (hermes-dev 3000 → hermes 3001, isDirectlyAccessible=true)
+ * Coding Agent Integration - Direct (atlas 3000 → hermes 3001, transportMode='direct-http')
  *
  * Simulates a publicly accessible remote instance. Coding-agent calls go via
- * execute-tool(instanceId='hermes') with isDirectlyAccessible=true:
+ * execute-tool(instanceId='hermes') with transportMode='direct-http':
  *
  *   WAIT/END_LOOP: blocking direct HTTP → result inline, no queue, no waiting state.
  *   DETACH/WAKE_UP: fire-and-forget goroutine → result async via handleTaskCompletion.
  *
- * Setup is E2E: connectToHermes logs into prod, registers hermes-dev, syncs caps.
- * isDirectlyAccessible=true is the default after connectToHermes (same machine).
+ * Setup is E2E: connectToHermes logs into prod, registers atlas, syncs caps.
+ * transportMode='direct-http' is the default after connectToHermes (same machine).
  *
  * pulse is provided as a fallback: if hermes (3001) is unreachable, execute-tool falls
  * back to the task-queue path and the thread enters 'waiting'. The pulse handles that
- * case without breaking the test. When hermes is reachable, the thread never enters
- * 'waiting' for WAIT/END_LOOP and pulse is never called.
+ * case via the WS connector (same as queue test) without breaking the test.
+ * When hermes is reachable, the thread never enters 'waiting' for WAIT/END_LOOP and
+ * pulse is never called.
  */
 
 import "server-only";
@@ -21,10 +22,17 @@ import "server-only";
 import { installFetchCache } from "../../ai-stream/testing/fetch-cache";
 installFetchCache();
 
+import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { eq } from "drizzle-orm";
 import { describeCodingAgentSuite } from "./coding-agent-base.test";
 
 const HERMES_INSTANCE_ID = "hermes";
+/** instanceId used by hermes to refer to atlas */
+const ATLAS_INSTANCE_ID = "atlas";
+/** Prod server URL (hermes, vibe start) */
+const PROD_URL = "http://localhost:3001";
 
 let _prodUserId: string | null = null;
 let _prodAdminToken: string | null = null;
@@ -54,6 +62,27 @@ async function teardownDirectConnection(
   const { disconnectFromHermes, unregisterDevFromHermes, closeProdDb } =
     await import("../../ai-stream/testing/remote-setup");
 
+  // Disable forceSystemProvider on hermes before disconnecting (best-effort)
+  if (_prodAdminToken) {
+    try {
+      await fetch(
+        `${PROD_URL}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            // eslint-disable-next-line i18next/no-literal-string
+            Authorization: `Bearer ${_prodAdminToken}`,
+          },
+          body: JSON.stringify({ forceSystemProvider: false }),
+          signal: AbortSignal.timeout(5_000),
+        },
+      );
+    } catch {
+      /* best-effort */
+    }
+  }
+
   const tasks: Promise<void>[] = [disconnectFromHermes(testUser.id)];
   if (_prodUserId) {
     tasks.push(unregisterDevFromHermes(_prodUserId));
@@ -65,23 +94,66 @@ async function teardownDirectConnection(
 }
 
 /**
- * Fallback pulse for direct mode: only fires when the direct HTTP call failed and
+ * Fallback pulse for direct mode: fires only when the direct HTTP call failed and
  * execute-tool fell back to the queue path (thread in 'waiting').
- * Uses triggerLocalPulse which simulates task completion in-process.
+ * Uses WS connector on hermes 3001 - same as queue test.
  */
 async function runDirectPulse(threadId: string): Promise<void> {
-  const { triggerHermesPull, triggerLocalPulse } =
-    await import("../../ai-stream/testing/remote-setup");
-
-  if (_prodAdminToken) {
-    await triggerHermesPull(_prodAdminToken);
+  if (!_prodAdminToken) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+    throw new Error(
+      "runDirectPulse: no prod admin token - setupDirectConnection not called?",
+    );
   }
-  await triggerLocalPulse(threadId);
+
+  const patchResp = await fetch(
+    `${PROD_URL}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${_prodAdminToken}`,
+      },
+      body: JSON.stringify({ forceSystemProvider: true }),
+      signal: AbortSignal.timeout(10_000),
+    },
+  );
+
+  if (!patchResp.ok) {
+    const body = await patchResp.text().catch(() => "unknown");
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+    throw new Error(
+      `runDirectPulse: PATCH forceSystemProvider failed ${String(patchResp.status)}: ${body}`,
+    );
+  }
+
+  const deadline = Date.now() + 60_000;
+  while (Date.now() < deadline) {
+    const [thread] = await db
+      .select({ streamingState: chatThreads.streamingState })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, threadId))
+      .limit(1);
+
+    if (thread && thread.streamingState !== "waiting") {
+      return;
+    }
+
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 500);
+    });
+  }
+
+  // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
+  throw new Error(
+    `runDirectPulse: thread ${threadId} still in 'waiting' after 60s`,
+  );
 }
 
 describeCodingAgentSuite({
   label:
-    "Coding Agent Integration - Direct (hermes-dev 3000 → hermes 3001, isDirectlyAccessible=true)",
+    "Coding Agent Integration - Direct (atlas 3000 → hermes 3001, transportMode='direct-http')",
   cachePrefix: "ca-direct-",
   remoteInstanceId: HERMES_INSTANCE_ID,
   setup: setupDirectConnection,

@@ -27,7 +27,7 @@ import {
 } from "../enum";
 import { scopedTranslation } from "../i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const SubscriptionUpdateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SubscriptionUpdateContainer })),
@@ -41,6 +41,7 @@ const { PUT } = createEndpoint({
   method: Methods.PUT,
   path: ["subscription", "update"],
   title: "put.title" as const,
+  titleShort: "put.titleShort" as const,
   description: "put.description" as const,
   icon: "package-check",
   category: "payments",

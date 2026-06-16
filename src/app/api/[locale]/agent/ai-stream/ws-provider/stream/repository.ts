@@ -21,6 +21,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
+import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import { db } from "@/app/api/[locale]/system/db";
+import { and, eq } from "drizzle-orm";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -405,3 +408,12 @@ export class WsProviderStreamRepository {
     }
   }
 }
+import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import { db } from "@/app/api/[locale]/system/db";
+import { and, eq } from "drizzle-orm";
+import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import { db } from "@/app/api/[locale]/system/db";
+import { and, eq } from "drizzle-orm";
+import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import { db } from "@/app/api/[locale]/system/db";
+import { and, eq } from "drizzle-orm";

@@ -507,21 +507,95 @@ export class SubscriptionRepository {
       plan: data.plan,
       billingInterval: data.billingInterval,
       provider: data.provider,
+      catalogProductId: data.catalogProductId,
     });
+
+    // Validate catalog product if provided
+    if (data.catalogProductId) {
+      const { catalogProducts } = await import("../products/db");
+
+      const [catalogProduct] = await db
+        .select({
+          id: catalogProducts.id,
+          isSubscription: catalogProducts.isSubscription,
+          isActive: catalogProducts.isActive,
+        })
+        .from(catalogProducts)
+        .where(eq(catalogProducts.id, data.catalogProductId))
+        .limit(1);
+
+      if (!catalogProduct) {
+        const { t } = scopedTranslation.scopedT(locale);
+        return fail({
+          message: t("errors.not_found"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      if (!catalogProduct.isSubscription || !catalogProduct.isActive) {
+        const { t } = scopedTranslation.scopedT(locale);
+        return fail({
+          message: t("errors.not_found"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      logger.debug("Catalog product validated for subscription", {
+        catalogProductId: data.catalogProductId,
+      });
+    }
 
     // Create checkout session via checkout repository
     const { t: checkoutT } = checkoutScopedTranslation.scopedT(locale);
-    return await SubscriptionCheckoutRepository.createCheckoutSession(
-      {
-        planId: data.plan,
-        billingInterval: data.billingInterval,
-        provider: data.provider,
-      },
-      user,
-      locale,
-      logger,
-      checkoutT,
-    );
+    const checkoutResult =
+      await SubscriptionCheckoutRepository.createCheckoutSession(
+        {
+          planId: data.plan,
+          billingInterval: data.billingInterval,
+          provider: data.provider,
+        },
+        user,
+        locale,
+        logger,
+        checkoutT,
+      );
+
+    // If catalogProductId was provided and checkout succeeded, link the catalog product
+    // to the existing subscription record if one exists for this user (additive only).
+    if (checkoutResult.success && data.catalogProductId) {
+      try {
+        const [existingSub] = await db
+          .select({ id: subscriptions.id })
+          .from(subscriptions)
+          .where(eq(subscriptions.userId, user.id))
+          .limit(1);
+
+        if (existingSub) {
+          await db
+            .update(subscriptions)
+            .set({
+              catalogProductId: data.catalogProductId,
+              updatedAt: new Date(),
+            })
+            .where(eq(subscriptions.id, existingSub.id));
+
+          logger.debug("Linked catalog product to existing subscription", {
+            userId: user.id,
+            catalogProductId: data.catalogProductId,
+            subscriptionId: existingSub.id,
+          });
+        }
+      } catch (linkError) {
+        // Non-fatal: catalog product linking failed, log and continue
+        logger.error("Failed to link catalog product to subscription", {
+          error: parseError(linkError),
+          userId: user.id,
+          catalogProductId: data.catalogProductId,
+        });
+      }
+    }
+
+    return checkoutResult;
   }
 
   static async updateSubscription(

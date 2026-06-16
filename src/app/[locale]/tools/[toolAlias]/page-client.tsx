@@ -21,6 +21,7 @@ export function ToolDetailPageClient({
       endpoint={helpDefinitions}
       locale={locale}
       user={user}
+      className="flex flex-col h-dvh w-full overflow-hidden"
       endpointOptions={{
         read: {
           formOptions: {

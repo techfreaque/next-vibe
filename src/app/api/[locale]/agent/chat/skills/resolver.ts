@@ -37,7 +37,6 @@ export async function resolveSkillVariant(
     // Custom skill: resolve variant-aware model selections from DB
     const [row] = await db
       .select({
-        modelSelection: customSkills.modelSelection,
         voiceModelSelection: customSkills.voiceModelSelection,
         sttModelSelection: customSkills.sttModelSelection,
         imageVisionModelSelection: customSkills.imageVisionModelSelection,
@@ -65,8 +64,7 @@ export async function resolveSkillVariant(
 
     return activeVariant
       ? {
-          modelSelection:
-            activeVariant.modelSelection ?? row.modelSelection ?? undefined,
+          modelSelection: activeVariant.modelSelection ?? undefined,
           voiceModelSelection:
             activeVariant.voiceModelSelection ??
             row.voiceModelSelection ??
@@ -95,7 +93,7 @@ export async function resolveSkillVariant(
             activeVariant.videoGenModelSelection ?? undefined,
         }
       : {
-          modelSelection: row.modelSelection ?? undefined,
+          modelSelection: undefined,
           voiceModelSelection: row.voiceModelSelection ?? undefined,
           sttModelSelection: row.sttModelSelection ?? undefined,
           imageVisionModelSelection: row.imageVisionModelSelection ?? undefined,

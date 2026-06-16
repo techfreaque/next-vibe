@@ -123,6 +123,7 @@ export function useEndpointSubscription(
         requestData: requestDataRef.current,
         queryClient,
         logger,
+        cacheKey,
       });
     }
 

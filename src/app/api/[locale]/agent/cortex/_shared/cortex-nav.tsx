@@ -28,7 +28,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { scopedTranslation } from "../i18n";
 
 export type CortexNavAction =

@@ -16,7 +16,7 @@ import {
 import {
   CallbackMode,
   EXECUTE_TOOL_ALIAS,
-} from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+} from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";

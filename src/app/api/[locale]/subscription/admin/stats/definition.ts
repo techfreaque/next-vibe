@@ -34,7 +34,7 @@ import { dateSchema } from "../../../shared/types/common.schema";
 import { SUBSCRIPTION_ADMIN_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const SubscriptionStatsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SubscriptionStatsContainer })),
@@ -46,12 +46,14 @@ const { GET } = createEndpoint({
   path: ["subscription", "admin", "stats"],
   aliases: [SUBSCRIPTION_ADMIN_STATS_ALIAS],
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "bar-chart-3",
-  category: "endpointCategories.subscriptions",
-  subCategory: "endpointCategories.subscriptionAnalytics",
+  category: "subscriptions",
+  subCategory: "subscriptionAnalytics",
   tags: ["get.title" as const],
   allowedRoles: [UserRole.ADMIN] as const,
+  defaultWebPinned: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     render: SubscriptionStatsContainer,

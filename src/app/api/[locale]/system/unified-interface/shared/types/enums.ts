@@ -93,6 +93,9 @@ export enum WidgetType {
 
   // Interactive action widgets
   SUBMIT_BUTTON = "submit_button",
+
+  // Compound search bar: text input + submit button in one row
+  SEARCH_BAR = "search_bar",
 }
 
 /**

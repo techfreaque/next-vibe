@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Vibe Stage",
   titleShort: "Vibe Stage",
   description:
-    "Automatycznie staguje pliki boilerplate (route.ts, i18n/*/index.ts), które przechodzą sprawdzenie wzorca. Uruchamia wtyczkę oxlint boilerplate na wszystkich niestageowanych kandydatach i git-adduje tylko pliki bez naruszeń.",
+    "Automatycznie staguje pliki boilerplate (route.ts, i18n/*/index.ts) przechodzące sprawdzenie wzorca. Staguje też pliki ze zmianami tylko w importach lub częściowo — wyłącznie hunki importowe z plików z mieszanymi zmianami.",
 
   fields: {
     dryRun: {
@@ -22,9 +22,9 @@ export const translations: typeof enTranslations = {
 
   response: {
     staged: "Stagowane",
+    partiallyStaged: "Częściowo stagowane (tylko importy)",
     skipped: "Pominięte (naruszenia)",
-    noChanges:
-      "Nie znaleziono stagowanych plików boilerplate w drzewie roboczym",
+    noChanges: "Nie znaleziono stagowanych plików w drzewie roboczym",
     dryRunNote:
       "Próbny przebieg - żadne pliki nie zostały faktycznie stagowane",
   },
@@ -80,15 +80,18 @@ export const translations: typeof enTranslations = {
     submit: "Uruchom Stage",
     dryRun: "Próbny przebieg",
     staged: "Stagowane",
+    partiallyStaged: "Częściowo stagowane",
     skipped: "Pominięte",
     stagedCount: "pliki stagowane",
+    partiallyStaged_count: "pliki częściowo stagowane (tylko importy)",
     skippedCount: "pliki pominięte (naruszenia)",
-    noChanges: "Nie znaleziono stagowanych plików boilerplate",
+    noChanges: "Nie znaleziono stagowanych plików",
     noChangesHint:
-      "Zmodyfikowane pliki route.ts i i18n/*/index.ts, które przechodzą sprawdzenie wzorca, pojawią się tutaj",
+      "Pliki boilerplate, zmiany tylko w importach lub pliki z hunkami importowymi pojawią się tutaj",
     dryRunBadge: "Próbny przebieg",
     dryRunNote: "Tylko podgląd — żadne pliki nie zostały stagowane",
     cleanFile: "czysty",
+    partialFile: "tylko importy",
     violationsFile: "naruszenia",
     loading: "Skanowanie drzewa roboczego...",
   },

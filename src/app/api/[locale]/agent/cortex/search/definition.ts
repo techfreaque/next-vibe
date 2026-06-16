@@ -20,7 +20,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CORTEX_SEARCH_ALIAS, resolveCortexIcon } from "../constants";
@@ -36,8 +36,10 @@ const { GET } = createEndpoint({
   path: ["agent", "cortex", "search"],
   aliases: [CORTEX_SEARCH_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   cli: { firstCliArgKey: "query" },
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "search",
   dynamicTitle: ({ request }) => {
@@ -60,8 +62,7 @@ const { GET } = createEndpoint({
       color: "bg-green-500/10 text-green-500",
     },
   },
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "cortex",
   tags: ["get.tags.cortex" as const],
   defaultExpanded: true,
   options: {

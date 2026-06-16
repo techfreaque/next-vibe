@@ -7,16 +7,16 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 
-import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
+import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetContext,
   useWidgetTranslation,
   useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { PaginationWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/pagination/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { PaginationWidget } from "next-vibe-ui/unified/containers/pagination/widget";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
-import NavigateButtonWidget from "../../system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
+import NavigateButtonWidget from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import type definition from "./definition";
 
 /**

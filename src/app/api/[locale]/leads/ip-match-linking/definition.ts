@@ -20,19 +20,27 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { IP_MATCH_LINKING_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["leads", "ip-match-linking"],
+  aliases: [IP_MATCH_LINKING_ALIAS] as const,
   title: "post.title",
+  titleShort: "post.titleShort",
   description: "post.description",
-  category: "endpointCategories.leads",
-  subCategory: "endpointCategories.leadsManagement",
+  category: "leads",
+  subCategory: "Management",
   icon: "link",
   tags: ["tag"],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+    UserRole.MCP_OFF,
+    UserRole.CLI_OFF,
+  ],
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

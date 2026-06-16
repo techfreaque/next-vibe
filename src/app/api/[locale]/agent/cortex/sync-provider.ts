@@ -5,7 +5,7 @@ import "server-only";
  * Registers Cortex documents for cross-instance sync via the unified SyncProvider interface.
  */
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, asc, eq, gt, inArray, notLike, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/app/api/[locale]/system/db";

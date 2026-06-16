@@ -40,14 +40,12 @@ import "server-only";
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
-import { and, eq, isNull } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";

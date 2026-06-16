@@ -45,8 +45,9 @@ import {
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import leadsSearchDefinitions from "@/app/api/[locale]/leads/search/definition";
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 const LeadDetailContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadDetailContainer })),
@@ -336,7 +337,9 @@ const { PATCH } = createEndpoint({
       }),
       convertedUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: usersListDefinitions.GET,
+        labelField: "email",
         label: "patch.convertedUserId.label",
         description: "patch.convertedUserId.description",
         placeholder: "patch.convertedUserId.placeholder",

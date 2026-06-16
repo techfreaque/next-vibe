@@ -3,7 +3,7 @@ import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-conten
 import { WEB_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/web-search/constants";
 import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {

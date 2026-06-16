@@ -25,6 +25,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatMessageRole } from "../../../../enum";
 import { scopedTranslation } from "./i18n";
+import threadsDefinitions from "../../../definition";
 
 /**
  * Search Messages Endpoint (GET)
@@ -239,3 +240,6 @@ export type MessageSearchUrlVariablesOutput =
  * Export definitions
  */
 export default { GET };
+import threadsDefinitions from "../../../definition";
+import threadsDefinitions from "../../../definition";
+import threadsDefinitions from "../../../definition";
