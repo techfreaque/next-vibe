@@ -6,8 +6,8 @@ import { Cross2Icon } from "next-vibe-ui/ui/icons/Cross2Icon";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "../i18n";
 
+import { uiScopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 
 // Cross-platform type exports

@@ -1,8 +1,8 @@
 import {
   ErrorResponseTypes,
   fail,
-  success,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 
 import type { LeadMagnetT } from "../../i18n";

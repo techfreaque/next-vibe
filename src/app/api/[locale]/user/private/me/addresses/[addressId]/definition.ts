@@ -4,6 +4,7 @@
  * DELETE - remove an address
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -19,11 +20,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import addressesListDefinitions from "@/app/api/[locale]/user/private/me/addresses/definition";
 
 import { UserRole } from "../../../../user-roles/enum";
 import { scopedTranslation } from "./i18n";
-import addressesListDefinitions from "@/app/api/[locale]/user/private/me/addresses/definition";
 
 const UserAddressPatchContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UserAddressPatchContainer })),

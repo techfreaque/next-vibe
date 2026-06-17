@@ -1,19 +1,19 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type {
-  TabsProps,
-  TabsListProps,
-  TabsTriggerProps,
   TabsContentProps,
+  TabsListProps,
+  TabsProps,
+  TabsTriggerProps,
 } from "../../web/ui/tabs";
 
 export type {
-  TabsProps,
-  TabsListProps,
-  TabsTriggerProps,
   TabsContentProps,
+  TabsListProps,
+  TabsProps,
+  TabsTriggerProps,
 } from "../../web/ui/tabs";
 
 export function Tabs({ children }: TabsProps): JSX.Element {

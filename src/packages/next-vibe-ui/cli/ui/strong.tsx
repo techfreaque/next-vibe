@@ -1,7 +1,6 @@
-import * as React from "react";
 import { Text } from "ink";
+import * as React from "react";
 
-import type { StrongProps } from "../../web/ui/strong";
 import { parseClassesToInkProps } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
 
 export function Strong({

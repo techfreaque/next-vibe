@@ -1,5 +1,10 @@
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/constants";
+import { SQL_ALIAS } from "@/app/api/[locale]/system/db/sql/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
+import { REBUILD_ALIAS } from "@/app/api/[locale]/system/server/rebuild/constants";
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
+import { WAIT_FOR_TASK_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -9,28 +14,12 @@ import {
   CORTEX_READ_ALIAS,
   CORTEX_SEARCH_ALIAS,
 } from "../../../../cortex/constants";
-
 import {
   CORTEX_LIST_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "../../../../cortex/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-
-import { SQL_ALIAS } from "@/app/api/[locale]/system/db/sql/constants";
-import { REBUILD_ALIAS } from "@/app/api/[locale]/system/server/rebuild/constants";
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import { WAIT_FOR_TASK_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/constants";
-import { AI_RUN_ALIAS } from "../../../../ai-stream/run/constants";
-
-import {
-  AUDIO_VISION,
-  IMAGE_GEN,
-  MUSIC_GEN,
-  STT,
-  VIDEO_GEN,
-  VOICE,
-} from "../_shared/media-presets";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -40,6 +29,14 @@ import {
   SkillCategory,
   SkillOwnershipType,
 } from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
 
 export const codeArchitectSkill: Skill = {
   id: "code-architect",

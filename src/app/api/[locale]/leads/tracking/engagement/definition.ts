@@ -3,12 +3,14 @@
  * Defines endpoints for lead engagement tracking operations and click tracking with redirects
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import leadsListDefinitions from "@/app/api/[locale]/leads/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -19,6 +21,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 import { dateSchema } from "../../../shared/types/common.schema";
 import {
@@ -30,8 +33,6 @@ import {
   LeadSource,
   LeadSourceOptions,
 } from "../../enum";
-import leadsListDefinitions from "@/app/api/[locale]/leads/list/definition";
-import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 import { scopedTranslation } from "./i18n";
 
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";

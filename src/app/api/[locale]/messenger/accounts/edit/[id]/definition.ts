@@ -2,8 +2,13 @@
  * Unified Messenger Account Edit API Definition (GET + PUT)
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import {
+  CampaignType,
+  CampaignTypeOptions,
+} from "@/app/api/[locale]/messenger/accounts/enum";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -24,17 +29,13 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   CountriesOptions,
   Languages,
   LanguagesOptions,
 } from "@/i18n/core/config";
 
-import {
-  CampaignType,
-  CampaignTypeOptions,
-} from "@/app/api/[locale]/messenger/accounts/enum";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   EmailCampaignStage,
   EmailCampaignStageOptions,

@@ -16,9 +16,9 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
 import { DB_HEALTH_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({

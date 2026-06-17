@@ -1,3 +1,4 @@
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import {

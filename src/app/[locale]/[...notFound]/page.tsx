@@ -5,8 +5,8 @@ import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
-import { NotFoundBackButton } from "./not-found-client";
 import { scopedTranslation } from "./i18n";
+import { NotFoundBackButton } from "./not-found-client";
 
 interface NotFoundPageProps {
   params: Promise<{ locale: CountryLanguage }>;

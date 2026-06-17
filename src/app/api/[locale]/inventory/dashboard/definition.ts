@@ -3,8 +3,10 @@
  * GET — live KPI snapshot for stock health, transfers, and warehouses
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import listDef0 from "@/app/api/[locale]/companies/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -22,7 +24,6 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "../i18n";
-import listDef0 from "@/app/api/[locale]/companies/list/definition";
 
 const InventoryDashboardWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.InventoryDashboardWidget })),

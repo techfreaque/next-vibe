@@ -6,9 +6,10 @@
 
 import "server-only";
 
-import { GraphResolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/enum";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { GraphResolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/enum";
+import { GraphResolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/enum";
 import { success } from "next-vibe/shared/types/response.schema";
 
 import type {

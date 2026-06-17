@@ -10,7 +10,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Span } from "next-vibe-ui/ui/span";
-
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -20,6 +19,7 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 

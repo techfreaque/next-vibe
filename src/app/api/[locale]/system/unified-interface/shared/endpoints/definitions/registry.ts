@@ -1,12 +1,12 @@
 import "server-only";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { parseError } from "@/app/api/[locale]/shared/utils";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { pathToAliasMap } from "../../../../generated/alias-map";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";

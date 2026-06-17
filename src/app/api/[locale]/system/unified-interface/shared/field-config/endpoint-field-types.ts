@@ -4,6 +4,7 @@
  */
 
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+
 import type { Countries } from "@/i18n/core/config";
 
 import type { PrefillDisplayConfig } from "./field-config-types";

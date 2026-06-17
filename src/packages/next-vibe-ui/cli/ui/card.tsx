@@ -1,23 +1,23 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type {
-  CardProps,
-  CardHeaderProps,
-  CardTitleProps,
-  CardDescriptionProps,
   CardContentProps,
+  CardDescriptionProps,
   CardFooterProps,
+  CardHeaderProps,
+  CardProps,
+  CardTitleProps,
 } from "../../web/ui/card";
 
 export type {
-  CardProps,
-  CardHeaderProps,
-  CardTitleProps,
-  CardDescriptionProps,
   CardContentProps,
+  CardDescriptionProps,
   CardFooterProps,
+  CardHeaderProps,
+  CardProps,
+  CardTitleProps,
 } from "../../web/ui/card";
 
 export function Card({ children }: CardProps): JSX.Element {

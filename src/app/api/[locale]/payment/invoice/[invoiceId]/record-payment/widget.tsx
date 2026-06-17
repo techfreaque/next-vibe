@@ -17,6 +17,7 @@ import { DateFieldWidget } from "next-vibe-ui/unified/form-fields/date-field/wid
 import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import type { JSX } from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 

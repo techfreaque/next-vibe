@@ -9,7 +9,6 @@ import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import type { JSX } from "react";
 
 import type { StoryComponentsTranslationKey } from "../i18n";
-
 import type {
   BadgeTranslationPayload,
   NavSingleItemType,

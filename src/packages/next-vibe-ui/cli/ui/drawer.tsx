@@ -2,30 +2,30 @@ import { Text } from "ink";
 import * as React from "react";
 
 export type {
-  DrawerRootProps,
-  DrawerTriggerProps,
-  DrawerPortalProps,
   DrawerCloseProps,
-  DrawerTriggerRefObject,
   DrawerCloseRefObject,
-  DrawerOverlayProps,
   DrawerContentProps,
-  DrawerHeaderProps,
-  DrawerFooterProps,
-  DrawerTitleProps,
-  DrawerDescriptionProps,
   DrawerContextValue,
+  DrawerDescriptionProps,
+  DrawerFooterProps,
+  DrawerHeaderProps,
+  DrawerOverlayProps,
+  DrawerPortalProps,
+  DrawerRootProps,
+  DrawerTitleProps,
+  DrawerTriggerProps,
+  DrawerTriggerRefObject,
 } from "../../web/ui/drawer";
 
 import type {
-  DrawerRootProps,
-  DrawerTriggerProps,
   DrawerCloseProps,
   DrawerContentProps,
-  DrawerHeaderProps,
-  DrawerFooterProps,
-  DrawerTitleProps,
   DrawerDescriptionProps,
+  DrawerFooterProps,
+  DrawerHeaderProps,
+  DrawerRootProps,
+  DrawerTitleProps,
+  DrawerTriggerProps,
 } from "../../web/ui/drawer";
 
 export function Drawer({

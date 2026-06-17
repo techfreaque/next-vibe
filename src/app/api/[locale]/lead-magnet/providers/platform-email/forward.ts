@@ -1,5 +1,5 @@
-import React from "react";
 import { success } from "next-vibe/shared/types/response.schema";
+import React from "react";
 
 import type { ForwardLeadFn } from "../types";
 import type { LeadNotificationEmailProps } from "./lead-notification.email";

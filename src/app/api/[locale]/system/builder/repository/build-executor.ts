@@ -13,7 +13,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { PackageEndpointGeneratorRepository } from "./vibe-package/package-endpoint-generator";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type {
@@ -37,11 +36,12 @@ import { configValidator } from "./config-validator";
 import { errorSuggester } from "./error-suggester";
 import { fileCopier } from "./file-copier";
 import { folderCleaner } from "./folder-cleaner";
-import { npmPackageGenerator } from "./vibe-package/npm-package-generator";
 import { outputFormatter } from "./output-formatter";
-import { createPackagePlugins } from "./vibe-package/package-plugins";
 import { profileService } from "./profile-service";
 import { reportGenerator } from "./report-generator";
+import { npmPackageGenerator } from "./vibe-package/npm-package-generator";
+import { PackageEndpointGeneratorRepository } from "./vibe-package/package-endpoint-generator";
+import { createPackagePlugins } from "./vibe-package/package-plugins";
 import { viteCompiler } from "./vite-compiler";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];

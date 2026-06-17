@@ -1,15 +1,6 @@
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
-
-import {
-  AUDIO_VISION,
-  IMAGE_GEN,
-  MUSIC_GEN,
-  STT,
-  VIDEO_GEN,
-  VOICE,
-} from "../_shared/media-presets";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -19,6 +10,14 @@ import {
   SkillCategory,
   SkillOwnershipType,
 } from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
 
 export const translatorSkill: Skill = {
   id: "translator",

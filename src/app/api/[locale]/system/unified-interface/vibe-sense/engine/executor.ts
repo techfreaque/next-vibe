@@ -10,6 +10,7 @@ import "server-only";
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -20,8 +21,8 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import { GraphResolution } from "../enum";
 import type { GraphNodeConfig } from "../graph/schema";
 import type { GraphEdge } from "../graph/types";
-import {
   DataPointSchema,
+import {
   type DataPoint,
   type Resolution,
   type SignalEvent,

@@ -14,8 +14,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
+import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -23,11 +23,11 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { paymentEstimateLines, paymentEstimates } from "../../../db";
 import { EstimateStatus } from "../../../enum";
-import { scopedTranslation } from "./i18n";
 import type {
-  EstimateDuplicateUrlPathParams,
   EstimateDuplicateResponseOutput,
+  EstimateDuplicateUrlPathParams,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class EstimateDuplicateRepository {
   static async duplicateEstimate(

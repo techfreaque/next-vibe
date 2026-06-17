@@ -7,7 +7,6 @@
  */
 
 import type { QueryClient } from "@tanstack/react-query";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "../shared/logger/endpoint";
 
 // ============================================================================

@@ -1,15 +1,15 @@
 import * as React from "react";
 
 export type {
-  NavigationMenuTriggerStyleProps,
-  NavigationMenuProps,
-  NavigationMenuListProps,
-  NavigationMenuItemProps,
-  NavigationMenuTriggerProps,
   NavigationMenuContentProps,
-  NavigationMenuLinkProps,
-  NavigationMenuViewportProps,
   NavigationMenuIndicatorProps,
+  NavigationMenuItemProps,
+  NavigationMenuLinkProps,
+  NavigationMenuListProps,
+  NavigationMenuProps,
+  NavigationMenuTriggerProps,
+  NavigationMenuTriggerStyleProps,
+  NavigationMenuViewportProps,
 } from "../../web/ui/navigation-menu";
 
 import { cva } from "class-variance-authority";
@@ -17,12 +17,12 @@ import { cva } from "class-variance-authority";
 export const navigationMenuTriggerStyle = cva("");
 
 import type {
-  NavigationMenuProps,
-  NavigationMenuListProps,
-  NavigationMenuItemProps,
-  NavigationMenuTriggerProps,
   NavigationMenuContentProps,
+  NavigationMenuItemProps,
   NavigationMenuLinkProps,
+  NavigationMenuListProps,
+  NavigationMenuProps,
+  NavigationMenuTriggerProps,
 } from "../../web/ui/navigation-menu";
 
 export function NavigationMenu({

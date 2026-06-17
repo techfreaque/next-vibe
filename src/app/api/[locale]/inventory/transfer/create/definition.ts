@@ -2,8 +2,11 @@
  * Inventory Transfer Create API Route Definition
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import companiesListDef from "@/app/api/[locale]/companies/list/definition";
+import warehouseListDef from "@/app/api/[locale]/inventory/warehouse/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

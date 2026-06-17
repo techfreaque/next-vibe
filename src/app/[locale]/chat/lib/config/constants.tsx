@@ -3,9 +3,9 @@
  * Local constants for chat UI layout and behavior
  */
 
-import { createContext, useContext } from "react";
 import type { JSX, ReactNode } from "react";
 import React from "react";
+import { createContext, useContext } from "react";
 
 /**
  * Context for the current input overlay height, set by the chat layout and

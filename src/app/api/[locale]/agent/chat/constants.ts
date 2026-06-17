@@ -27,6 +27,7 @@ import {
   CORTEX_MOVE_ALIAS,
   CORTEX_READ_ALIAS,
   CORTEX_SEARCH_ALIAS,
+import { DefaultFolderId } from "./config";
   CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "../cortex/constants";

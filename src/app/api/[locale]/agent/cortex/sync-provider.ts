@@ -4,17 +4,16 @@ import "server-only";
  * Documents Sync Provider
  * Registers Cortex documents for cross-instance sync via the unified SyncProvider interface.
  */
-
 import { and, asc, eq, gt, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
-
-import { db } from "@/app/api/[locale]/system/db";
+import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import {
+
   type SyncProvider,
   toStandardCursor,
 } from "@/app/api/[locale]/remote-connection/sync-provider";
-import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+import { db } from "@/app/api/[locale]/system/db";
 
 import { cortexNodes } from "./db";
 import { CortexNodeType, CortexSyncPolicy } from "./enum";

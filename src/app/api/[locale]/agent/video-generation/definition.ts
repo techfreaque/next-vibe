@@ -3,8 +3,10 @@
  * Generates videos from text prompts using various AI providers
  */
 
+import { lazy } from "react";
 import { z } from "zod";
 
+import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,

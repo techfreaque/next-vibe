@@ -1,7 +1,6 @@
-import * as React from "react";
 import { Box, Text } from "ink";
+import * as React from "react";
 
-import type { DivProps, DivRefObject } from "../../web/ui/div";
 import { parseClassesToInkProps } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
 
 /**

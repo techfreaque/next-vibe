@@ -2,20 +2,19 @@ import * as React from "react";
 
 export type {
   AnimatePresenceProps,
-  MotionTransition,
-  MotionDivProps,
-  MotionSpanProps,
   MotionButtonProps,
+  MotionDivProps,
   MotionImgProps,
+  MotionSpanProps,
+  MotionTransition,
 } from "../../web/ui/motion";
 
 import type {
   AnimatePresenceProps,
+  MotionButtonProps,
   MotionDivProps,
   MotionSpanProps,
-  MotionButtonProps,
 } from "../../web/ui/motion";
-
 import { Div } from "./div";
 import { Span } from "./span";
 

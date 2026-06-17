@@ -3,9 +3,12 @@
  * Admin/dev-only - renders the full system prompt for a given user context.
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import skillsDefinitions from "@/app/api/[locale]/agent/chat/skills/definition";
+import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -18,12 +21,9 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
-import skillsDefinitions from "@/app/api/[locale]/agent/chat/skills/definition";
 
 const SystemPromptDebugWidget = lazyWidget(() =>
   import("./widget.cli").then((m) => ({ default: m.SystemPromptDebugWidget })),

@@ -3,11 +3,12 @@
  * Defines endpoint for creating a new custom skill
  */
 
+import { lazy } from "react";
 import { z } from "zod";
 
 import {
-  chatModelSelectionSchema,
   type ChatModelSelection,
+  chatModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
@@ -37,7 +38,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazy } from "react";
 import { iconSchema } from "../../../../shared/types/common.schema";
 import { ChatModelId, getBestChatModel } from "../../../ai-stream/models";
 import {

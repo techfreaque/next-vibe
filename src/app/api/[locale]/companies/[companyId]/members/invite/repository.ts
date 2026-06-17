@@ -14,15 +14,15 @@ import {
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { users } from "@/app/api/[locale]/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
-import { users } from "@/app/api/[locale]/user/db";
 import { companyMembers } from "../../../db";
 import type { CompanyMemberRoleDB } from "../../../enum";
 import { CompanyAuthRepository } from "../../../repository";
-import { scopedTranslation } from "./i18n";
 import type { MemberInviteRequestOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class MemberInviteRepository {
   static async inviteMember(

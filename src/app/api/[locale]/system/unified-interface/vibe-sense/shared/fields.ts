@@ -8,6 +8,7 @@
  * transformers, data sources).
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
@@ -20,7 +21,6 @@ import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { GraphResolution, GraphResolutionDB } from "../enum";
 

@@ -24,8 +24,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId } from "../../config";
 import { ChatMessageRole, ChatMessageRoleDB } from "../../enum";
-import { scopedTranslation } from "./i18n";
 import { SEARCH_MESSAGES_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Global Message Search Endpoint (GET)

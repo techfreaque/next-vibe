@@ -4,6 +4,7 @@
  * PATCH /agent/chat/skills/moderation - hide or clear reports on a skill (admin only)
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -25,6 +26,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SKILL_MODERATION_ALIAS } from "../constants";
+import skillsDefinitions from "../definition";
 import { SkillStatus, SkillStatusDB } from "../enum";
 import { scopedTranslation } from "./i18n";
 import skillsDefinitions from "../definition";

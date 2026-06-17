@@ -9,15 +9,16 @@
 import "server-only";
 
 import { and, eq, like, or } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
   ErrorResponseTypes,
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
 import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";

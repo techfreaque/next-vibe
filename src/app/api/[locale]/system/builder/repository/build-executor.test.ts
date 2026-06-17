@@ -7,7 +7,7 @@ import { resolve } from "node:path";
 
 import { afterEach, describe, expect, it, mock } from "bun:test";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { defaultLocale } from "@/i18n/core/config";
 

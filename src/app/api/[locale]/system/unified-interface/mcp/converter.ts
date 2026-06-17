@@ -14,8 +14,8 @@ import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interfac
 import {
   hasChild,
   hasChildren,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/type-guards";
-import type { SchemaTypes } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/type-guards";
+import type { SchemaTypes } from "next-vibe-ui/unified/_shared/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { MCPTool } from "./types";

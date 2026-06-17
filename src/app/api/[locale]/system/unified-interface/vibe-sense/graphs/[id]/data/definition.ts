@@ -5,6 +5,7 @@
  *         Resolution controls bucket size; cursor enables backwards pagination.
  */
 
+import React from "react";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -22,6 +23,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
@@ -34,7 +36,6 @@ import { graphConfigSchema } from "../../../graph/schema";
 import React from "react";
 
 import { scopedTranslation } from "./i18n";
-import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 
 // Lazy import to avoid TDZ circular dependency in MCP context
 // (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")

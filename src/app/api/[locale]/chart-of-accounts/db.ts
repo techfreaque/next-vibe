@@ -21,13 +21,13 @@ import { users } from "../user/db";
 import {
   AccountSubtypeDB,
   AccountTypeDB,
+  JournalEntryStatus,
   JournalEntryStatusDB,
+  JournalSourceType,
   JournalSourceTypeDB,
   LineTypeDB,
-  PeriodStatusDB,
   PeriodStatus,
-  JournalEntryStatus,
-  JournalSourceType,
+  PeriodStatusDB,
 } from "./enum";
 
 /**

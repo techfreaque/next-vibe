@@ -4,6 +4,7 @@
  * POST: update cap amount (admin only)
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -20,7 +21,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
 import { CREDITS_PUBLIC_CAP_ALIAS } from "./constants";
 
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";

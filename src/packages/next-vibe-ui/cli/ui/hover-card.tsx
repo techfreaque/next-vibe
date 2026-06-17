@@ -1,17 +1,17 @@
 import * as React from "react";
 
 export type {
+  HoverCardContentProps,
+  HoverCardPortalProps,
   HoverCardRootProps,
   HoverCardTriggerProps,
-  HoverCardPortalProps,
-  HoverCardContentProps,
 } from "../../web/ui/hover-card";
 
 import type {
+  HoverCardContentProps,
+  HoverCardPortalProps,
   HoverCardRootProps,
   HoverCardTriggerProps,
-  HoverCardPortalProps,
-  HoverCardContentProps,
 } from "../../web/ui/hover-card";
 
 export function HoverCard({

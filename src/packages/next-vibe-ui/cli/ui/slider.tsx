@@ -2,17 +2,17 @@ import { Text } from "ink";
 import type { JSX } from "react";
 
 import type {
-  SliderRootProps,
-  SliderTrackProps,
   SliderRangeProps,
+  SliderRootProps,
   SliderThumbProps,
+  SliderTrackProps,
 } from "../../web/ui/slider";
 
 export type {
-  SliderRootProps,
-  SliderTrackProps,
   SliderRangeProps,
+  SliderRootProps,
   SliderThumbProps,
+  SliderTrackProps,
 } from "../../web/ui/slider";
 
 // CLI: show value range as "min..max" - no drag UI in terminal

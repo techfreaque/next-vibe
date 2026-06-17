@@ -13,8 +13,8 @@ import {
 
 import { db } from "@/app/api/[locale]/system/db";
 
-import type { LeadMagnetProviderDB } from "../enum";
 import { leadMagnetConfigs } from "../db";
+import type { LeadMagnetProviderDB } from "../enum";
 import type { LeadMagnetConfigGetResponseOutput } from "./definition";
 
 type LeadMagnetProviderKey = (typeof LeadMagnetProviderDB)[number];

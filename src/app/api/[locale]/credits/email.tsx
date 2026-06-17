@@ -8,32 +8,33 @@ import type { ReactElement } from "react";
 import { z } from "zod";
 
 import {
-  ErrorResponseTypes,
-  fail,
   success,
 } from "next-vibe/shared/types/response.schema";
+  ErrorResponseTypes,
+  fail,
+import { parseError } from "next-vibe/shared/utils";
+import type { ReactElement } from "react";
+import { z } from "zod";
 
-import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { userLeadLinks } from "@/app/api/[locale]/leads/db";
 import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
   type TrackingContext,
 } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
-import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
+import type { UndefinedType } from "@/app/api/[locale]/shared/types/common.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import { users } from "@/app/api/[locale]/user/db";
-import { userLeadLinks } from "@/app/api/[locale]/leads/db";
-import { eq } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils";
-import type { UndefinedType } from "@/app/api/[locale]/shared/types/common.schema";
+import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { configScopedTranslation } from "@/config/i18n";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CreditsT } from "./i18n";
-import { scopedTranslation } from "./i18n";
 import type {
   AdminAddCreditsPostRequestOutput,
+import type { CreditsT } from "./i18n";
+import { scopedTranslation } from "./i18n";
   AdminAddCreditsPostResponseOutput,
 } from "./admin-add/definition";
 

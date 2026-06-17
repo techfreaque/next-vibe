@@ -21,8 +21,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../user-roles/enum";
-import { scopedTranslation } from "./i18n";
 import { USER_SESSIONS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const ALLOWED_ROLES = [
   UserRole.CUSTOMER,

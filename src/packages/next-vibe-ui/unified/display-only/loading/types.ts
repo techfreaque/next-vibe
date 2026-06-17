@@ -6,6 +6,7 @@ import type {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
 import type {
   BasePrimitiveDisplayOnlyWidgetConfig,
   FieldUsageConfig,

@@ -10,38 +10,15 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import {
-  EndpointErrorTypes,
-  Methods as MethodsEnum,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
-import { callApi, containsFile, objectToFormData } from "./api-utils";
+import { callApi } from "./call-api";
 
-/**
- * Type guard to check if a value is a Record<string, WidgetData>
- */
-function isJsonObject(value: WidgetData): value is Record<string, WidgetData> {
-  return (
-    value !== null &&
-    value !== undefined &&
-    typeof value === "object" &&
-    !Array.isArray(value) &&
-    !(value instanceof File) &&
-    !(value instanceof Blob)
-  );
-}
-
-/**
- * Options for query execution
- */
 export interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
-  /** Callback when query succeeds */
   onSuccess?: (
     context: {
       requestData: TRequest;
@@ -52,7 +29,6 @@ export interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
     logger: EndpointLogger,
   ) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
 
-  /** Callback when query fails */
   onError?: (context: {
     error: ErrorResponseType;
     requestData: TRequest;
@@ -60,23 +36,6 @@ export interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
   }) => void | Promise<void>;
 }
 
-/**
- * Pure function to execute a query
- * Extracted from store.ts to be used by useApiQuery with React Query
- *
- * This function:
- * - Validates request data
- * - Builds the API URL with path parameters
- * - Makes the API call
- * - Handles errors and returns proper error responses
- * - Calls onSuccess/onError callbacks with our custom shape
- *
- * Note: This does NOT handle:
- * - Caching (handled by React Query)
- * - Deduplication (handled by React Query)
- * - Throttling (handled by React Query's staleTime)
- * - State management (handled by React Query)
- */
 export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   logger,
@@ -104,18 +63,15 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
 }): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
   let requestData = initialRequestData;
 
-  // Check if the endpoint expects undefined for request data
   const isUndefinedSchema =
     endpoint.requestSchema.safeParse(undefined).success &&
     !endpoint.requestSchema.safeParse({}).success;
 
-  // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
   const requestSchema = endpoint.requestSchema as z.ZodTypeAny;
   const isEmptyObjectSchema =
     requestSchema instanceof z.ZodObject &&
     Object.keys(requestSchema.shape || {}).length === 0;
 
-  // If the schema expects undefined but we received an object, set requestData to undefined
   if (
     isUndefinedSchema &&
     typeof requestData === "object" &&
@@ -124,13 +80,10 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
     requestData = undefined as TEndpoint["types"]["RequestOutput"];
   }
 
-  // If the schema expects an empty object but we received undefined, set requestData to empty object
   if (isEmptyObjectSchema && requestData === undefined) {
     requestData = {} as TEndpoint["types"]["RequestOutput"];
   }
 
-  // Validate request data using the endpoint's schema
-  // Skip validation for z.never() schemas (GET endpoints with no request data)
   const isNeverSchema = requestSchema instanceof z.ZodNever;
 
   if (!isNeverSchema) {
@@ -142,7 +95,6 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
         error: requestValidation.error.message,
       });
 
-      // Use endpoint's VALIDATION_FAILED error type if available
       const validationErrorConfig =
         endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
 
@@ -162,7 +114,6 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
         },
       });
 
-      // Call onError callback if provided
       if (options.onError) {
         options.onError({
           error: errorResponse,
@@ -176,157 +127,16 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
   }
 
   try {
-    // Build the endpoint URL with locale and replace URL path parameters
-    let endpointUrl = `${envClient.NEXT_PUBLIC_APP_URL}/api/${locale}`;
-
-    // Build path from endpoint.path array, replacing [param] or :param placeholders
-    for (const segment of endpoint.path) {
-      // Check if this segment is a URL parameter (wrapped in brackets or prefixed with colon)
-      const isBracketParam = segment.startsWith("[") && segment.endsWith("]");
-      const isColonParam = segment.startsWith(":");
-      if (isBracketParam || isColonParam) {
-        // Extract parameter name (e.g., "[id]" → "id", ":id" → "id")
-        const paramName = isBracketParam
-          ? segment.slice(1, -1)
-          : segment.slice(1);
-
-        // Get value from pathParams
-        const paramValue = pathParams?.[paramName as keyof typeof pathParams];
-
-        if (paramValue === undefined) {
-          logger.error("executeQuery: Missing URL path parameter", {
-            paramName,
-            endpoint: endpoint.path.join("/"),
-            availableParams: pathParams ? Object.keys(pathParams) : [],
-          });
-
-          // Use endpoint's VALIDATION_FAILED error type if available
-          const validationErrorConfig =
-            endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
-
-          const { t: sharedT2 } = sharedScopedTranslation.scopedT(locale);
-          const message = validationErrorConfig?.description
-            ? endpoint.scopedTranslation
-                .scopedT(locale)
-                .t(validationErrorConfig.description)
-            : sharedT2("errors.validationFailed.description");
-
-          const errorResponse = fail({
-            message,
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: {
-              paramName,
-              endpoint: endpoint.path.join("/"),
-            },
-          });
-
-          // Call onError callback if provided
-          if (options.onError) {
-            options.onError({
-              error: errorResponse,
-              requestData,
-              urlPathParams: pathParams,
-            });
-          }
-
-          return errorResponse;
-        }
-
-        endpointUrl += `/${encodeURIComponent(String(paramValue))}`;
-      } else {
-        endpointUrl += `/${segment}`;
-      }
-    }
-
-    // For GET requests, add query parameters to URL
-    // For non-GET requests, prepare the request body
-    let postBody: string | FormData | undefined;
-    if (endpoint.method === MethodsEnum.GET) {
-      // Add query parameters to URL for GET requests
-      if (requestData && typeof requestData === "object") {
-        const searchParams = new URLSearchParams();
-
-        // Helper function to flatten nested objects into dot notation
-        function flattenObject(
-          obj: Record<string, WidgetData>,
-          prefix = "",
-        ): void {
-          for (const [key, value] of Object.entries(obj)) {
-            const fullKey = prefix ? `${prefix}.${key}` : key;
-
-            if (value === undefined || value === null) {
-              continue;
-            } else if (Array.isArray(value)) {
-              // Handle arrays
-              if (value.length === 0) {
-                // Empty array - skip it entirely
-                continue;
-              } else {
-                value.forEach((item, index) => {
-                  if (isJsonObject(item)) {
-                    flattenObject(item, `${fullKey}[${index}]`);
-                  } else {
-                    searchParams.append(`${fullKey}[${index}]`, String(item));
-                  }
-                });
-              }
-            } else if (isJsonObject(value)) {
-              // Handle nested objects
-              const objEntries = Object.entries(value);
-              const hasNonNullValues = objEntries.some(
-                ([, v]) => v !== undefined && v !== null,
-              );
-
-              if (!hasNonNullValues) {
-                // Empty object (all values are undefined/null) - skip it entirely
-                continue;
-              } else {
-                // Recursively flatten non-empty object
-                flattenObject(value, fullKey);
-              }
-            } else {
-              // Handle primitives
-              searchParams.append(fullKey, String(value));
-            }
-          }
-        }
-
-        if (isJsonObject(requestData)) {
-          flattenObject(requestData);
-        }
-
-        const queryString = searchParams.toString();
-        if (queryString) {
-          endpointUrl += `?${queryString}`;
-        }
-      }
-    } else {
-      // Prepare the request body for non-GET requests
-      // Check if requestData contains File objects - if so, use FormData
-      if (containsFile(requestData)) {
-        // Convert to FormData
-        if (isJsonObject(requestData)) {
-          postBody = objectToFormData(requestData);
-        }
-      } else {
-        // Use JSON
-        postBody = JSON.stringify(requestData);
-      }
-    }
-
     const response = await callApi(
       endpoint,
-      endpointUrl,
-      postBody,
       logger,
       user,
       locale,
-      initialRequestData,
+      requestData,
       pathParams,
     );
 
     if (!response.success) {
-      // Call onError callback if provided
       if (options.onError) {
         options.onError({
           error: response,
@@ -334,27 +144,21 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
           urlPathParams: pathParams,
         });
       }
-
       return response;
     }
 
-    // Call onSuccess callback if provided
     if (options.onSuccess) {
       const onSuccessResult = await options.onSuccess(
         {
           requestData,
           urlPathParams: pathParams,
-          responseData: (response.success
-            ? response.data
-            : undefined) as TEndpoint["types"]["ResponseOutput"],
+          responseData: response.data as TEndpoint["types"]["ResponseOutput"],
         },
         user,
         logger,
       );
 
-      // If onSuccess returns an error, treat it as an error
       if (onSuccessResult) {
-        // Call onError callback if provided
         if (options.onError) {
           options.onError({
             error: onSuccessResult,
@@ -362,7 +166,6 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
             urlPathParams: pathParams,
           });
         }
-
         return onSuccessResult;
       }
     }
@@ -371,13 +174,11 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
   } catch (err) {
     const parsedError = parseError(err);
 
-    // Use endpoint's SERVER_ERROR or NETWORK_ERROR error type if available
     const serverErrorConfig =
       endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
     const networkErrorConfig =
       endpoint.errorTypes?.[EndpointErrorTypes.NETWORK_ERROR];
 
-    // Prefer NETWORK_ERROR for network-related issues, otherwise SERVER_ERROR
     const isNetworkError =
       parsedError.message.toLowerCase().includes("network") ||
       parsedError.message.toLowerCase().includes("fetch");
@@ -397,7 +198,6 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       },
     });
 
-    // Call onError callback if provided
     if (options.onError) {
       options.onError({
         error: errorResponse,

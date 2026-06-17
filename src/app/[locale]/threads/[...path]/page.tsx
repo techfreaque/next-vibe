@@ -49,12 +49,11 @@ import { ThreadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[thr
 import type { ThreadListResponseOutput } from "@/app/api/[locale]/agent/chat/threads/definition";
 import { scopedTranslation as threadsScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/i18n";
 import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
-
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { scopedTranslation as userScopedTranslation } from "@/app/api/[locale]/user/i18n";

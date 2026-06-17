@@ -7,6 +7,7 @@ import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import { useWidgetValue } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { AlertWidget } from "next-vibe-ui/unified/display-only/alert/widget";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import type { JSX } from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 

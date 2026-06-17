@@ -14,13 +14,12 @@ import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
 import { Home } from "next-vibe-ui/ui/icons/Home";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { Star } from "next-vibe-ui/ui/icons/Star";
 import { SquareCheck } from "next-vibe-ui/ui/icons/SquareCheck";
+import { Star } from "next-vibe-ui/ui/icons/Star";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { Wand2 } from "next-vibe-ui/ui/icons/Wand2";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetForm,
   useWidgetNavigation,
@@ -28,9 +27,9 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+
 import { CortexNav } from "../_shared/cortex-nav";
 import { formatBytes } from "../_shared/format-bytes";
-
 import type definition from "./definition";
 
 const MOUNT_ICONS: Record<

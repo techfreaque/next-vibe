@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/documents/move-test/tree-src/sub/leaf.md\n\n# Leaf\n\nDeeply nested content.",
+    "input": "/documents/move-test/tree-src/top.md\n\n# Top\n\nTop-level content.",
     "encoding_format": "float"
   }
 }

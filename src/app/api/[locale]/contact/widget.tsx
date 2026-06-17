@@ -19,6 +19,7 @@ import { EmailFieldWidget } from "next-vibe-ui/unified/form-fields/email-field/w
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
+import React from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 

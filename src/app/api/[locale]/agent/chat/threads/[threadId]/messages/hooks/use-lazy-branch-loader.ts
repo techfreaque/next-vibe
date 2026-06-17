@@ -12,6 +12,7 @@
  */
 
 import { parseError } from "next-vibe/shared/utils";
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
@@ -27,7 +28,6 @@ import { useChatStore } from "../../../../hooks/store";
 import messagesDefinitions from "../definition";
 import type { PathGetResponseOutput } from "../path/definition";
 import pathDefinitions from "../path/definition";
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 import { patchMessage, upsertMessage } from "./update-messages";
 
 interface LazyBranchLoaderReturn {

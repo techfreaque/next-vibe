@@ -1,9 +1,9 @@
 import "server-only";
+
 /**
  * Test Email API Route Handler
  * POST /api/[locale]/leads/campaigns/emails/test-mail
  */
-
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 

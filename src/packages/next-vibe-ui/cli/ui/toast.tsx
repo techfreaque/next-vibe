@@ -1,14 +1,14 @@
 import * as React from "react";
 
 export type {
-  ToastProviderProps,
-  ToastViewportProps,
-  ToastRootProps,
+  ToastActionElement,
   ToastActionProps,
   ToastCloseProps,
-  ToastTitleProps,
   ToastDescriptionProps,
-  ToastActionElement,
+  ToastProviderProps,
+  ToastRootProps,
+  ToastTitleProps,
+  ToastViewportProps,
 } from "../../web/ui/toast";
 
 import { cva } from "class-variance-authority";
@@ -16,11 +16,11 @@ import { cva } from "class-variance-authority";
 export const toastVariants = cva("");
 
 import type {
+  ToastActionProps,
+  ToastDescriptionProps,
   ToastProviderProps,
   ToastRootProps,
-  ToastActionProps,
   ToastTitleProps,
-  ToastDescriptionProps,
 } from "../../web/ui/toast";
 
 export function ToastProvider({

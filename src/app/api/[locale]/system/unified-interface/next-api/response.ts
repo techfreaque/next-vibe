@@ -4,7 +4,6 @@
  * All validation is handled by genericHandler
  */
 
-import { NextResponse } from "next-vibe-ui/lib/request";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -16,10 +15,12 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
+import { NextResponse } from "next-vibe-ui/lib/request";
 
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { formatValidationErrorCompact } from "../shared/utils/format-validation-error";

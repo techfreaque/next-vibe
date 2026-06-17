@@ -17,8 +17,8 @@ import { parseError } from "next-vibe/shared/utils";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { chatSettings } from "./db";
@@ -28,15 +28,15 @@ import type {
   ChatSettingsUpdateResponseOutput,
 } from "./definition";
 import type { SettingsT } from "./i18n";
-import { ChatSettingsRepositoryClient } from "./repository-client";
 import {
   AUTOPILOT_DEFAULT_SCHEDULE,
   DREAM_DEFAULT_SCHEDULE,
-  MAMA_DEFAULT_SCHEDULE,
   ensureAutopilotTask,
   ensureDreamTask,
   ensureMamaTask,
+  MAMA_DEFAULT_SCHEDULE,
 } from "./pulse/repository";
+import { ChatSettingsRepositoryClient } from "./repository-client";
 
 /**
  * Chat Settings Repository

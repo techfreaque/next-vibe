@@ -4,6 +4,7 @@ import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

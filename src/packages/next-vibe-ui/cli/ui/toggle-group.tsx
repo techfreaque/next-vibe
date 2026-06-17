@@ -1,15 +1,15 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type {
-  ToggleGroupRootProps,
   ToggleGroupItemProps,
+  ToggleGroupRootProps,
 } from "../../web/ui/toggle-group";
 
 export type {
-  ToggleGroupRootProps,
   ToggleGroupItemProps,
+  ToggleGroupRootProps,
 } from "../../web/ui/toggle-group";
 
 // CLI: render group as a box of items

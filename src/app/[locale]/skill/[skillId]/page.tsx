@@ -7,8 +7,19 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
+import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
+import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
+import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
+import { modelProviders } from "@/app/api/[locale]/agent/models/models";
+import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
+import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
@@ -18,22 +29,11 @@ import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
-import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
-import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
-import { modelProviders } from "@/app/api/[locale]/agent/models/models";
-import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
-import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import { Div } from "next-vibe-ui/ui/div";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { scopedTranslation } from "./i18n";
-import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import {
-  SkillLandingPage,
   type LeadMagnetConfigData,
   type ResolvedSkillModels,
+  SkillLandingPage,
 } from "./page-client";
 
 interface Props {

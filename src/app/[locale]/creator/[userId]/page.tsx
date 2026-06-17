@@ -14,9 +14,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { CreatorProfileRepository } from "@/app/api/[locale]/user/public/creator/[userId]/repository";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { CreatorProfileRepository } from "@/app/api/[locale]/user/public/creator/[userId]/repository";
 import { scopedTranslation } from "@/app/api/[locale]/user/public/creator/[userId]/i18n";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { CreatorProfilePage, type CreatorPageData } from "./page-client";

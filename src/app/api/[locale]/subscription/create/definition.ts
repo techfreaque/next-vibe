@@ -2,8 +2,10 @@
  * Subscription Create API Endpoint Definition
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import productsListDefinitions from "@/app/api/[locale]/products/catalog/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -25,7 +27,6 @@ import {
   SubscriptionPlan,
   SubscriptionPlanOptions,
 } from "../enum";
-import productsListDefinitions from "@/app/api/[locale]/products/catalog/list/definition";
 import { scopedTranslation } from "../i18n";
 
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";

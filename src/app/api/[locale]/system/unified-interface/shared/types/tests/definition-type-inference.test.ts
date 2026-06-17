@@ -39,7 +39,7 @@ import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
   ObjectChildrenConstraint,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/types";
 
 // Legacy ObjectField type alias for backward compatibility in tests
 // ObjectField<TChildren, TUsage, TKey> → ObjectWidgetConfig<TKey, TUsage, "object", TChildren>

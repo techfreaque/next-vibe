@@ -14,10 +14,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { ConnectionCreateRepository } from "../create/repository";
 import type { NewSshConnection } from "../../db";
 import { sshConnections } from "../../db";
 import { SshAuthType } from "../../enum";
+import { ConnectionCreateRepository } from "../create/repository";
 import type {
   ConnectionDeleteResponseOutput,
   ConnectionDetailResponseOutput,

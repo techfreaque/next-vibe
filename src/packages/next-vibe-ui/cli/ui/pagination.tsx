@@ -1,25 +1,25 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type {
-  PaginationProps,
   PaginationContentProps,
+  PaginationEllipsisProps,
   PaginationItemProps,
   PaginationLinkProps,
-  PaginationPreviousProps,
   PaginationNextProps,
-  PaginationEllipsisProps,
+  PaginationPreviousProps,
+  PaginationProps,
 } from "../../web/ui/pagination";
 
 export type {
-  PaginationProps,
   PaginationContentProps,
+  PaginationEllipsisProps,
   PaginationItemProps,
   PaginationLinkProps,
-  PaginationPreviousProps,
   PaginationNextProps,
-  PaginationEllipsisProps,
+  PaginationPreviousProps,
+  PaginationProps,
 } from "../../web/ui/pagination";
 
 export function Pagination({ children }: PaginationProps): JSX.Element {

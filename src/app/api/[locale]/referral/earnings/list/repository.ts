@@ -10,9 +10,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { ReferralT } from "../../i18n";
 import { ReferralRepository } from "../../repository";
 import type { EarningsListGetResponseOutput } from "./definition";
-import type { ReferralT } from "../../i18n";
 
 export const EarningsListRepository = {
   listEarnings(

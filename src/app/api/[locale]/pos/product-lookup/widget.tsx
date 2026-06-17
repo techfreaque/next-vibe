@@ -11,6 +11,7 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";

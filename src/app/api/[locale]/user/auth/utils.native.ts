@@ -14,8 +14,8 @@ import {
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { AuthT } from "./i18n";
 import type { CompleteUserType } from "../types";
+import type { AuthT } from "./i18n";
 
 /**
  * Require an authenticated admin user - Native stub

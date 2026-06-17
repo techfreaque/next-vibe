@@ -9,31 +9,33 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import type { ReactWidgetProps } from "../../widgets/_shared/react-types";
+import type { ReactWidgetProps } from "next-vibe-ui/unified/_shared/react-types";
 import type {
   AnyChildrenConstrain,
   ConstrainedChildUsage,
   DispatchField,
   FieldUsageConfig,
-} from "../../widgets/_shared/types";
-import { useWidgetLocale } from "../../widgets/_shared/use-widget-context";
-import ContainerWidget from "../../widgets/containers/container/widget";
-import AlertWidget from "../../widgets/display-only/alert/widget";
-import BadgeWidget from "../../widgets/display-only/badge/widget";
-import IconWidget from "../../widgets/display-only/icon/widget";
-import SeparatorWidget from "../../widgets/display-only/separator/widget";
-import TextWidget from "../../widgets/display-only/text/widget";
-import TitleWidget from "../../widgets/display-only/title/widget";
-import BooleanFieldWidget from "../../widgets/form-fields/boolean-field/widget";
-import IconFieldWidget from "../../widgets/form-fields/icon-field/widget";
-import SelectFieldWidget from "../../widgets/form-fields/select-field/widget";
-import TextFieldWidget from "../../widgets/form-fields/text-field/widget";
-import TextareaFieldWidget from "../../widgets/form-fields/textarea-field/widget";
-import UuidFieldWidget from "../../widgets/form-fields/uuid-field/widget";
-import ButtonWidget from "../../widgets/interactive/button/widget";
-import FormAlertWidget from "../../widgets/interactive/form-alert/widget";
-import NavigateButtonWidget from "../../widgets/interactive/navigate-button/widget";
-import SubmitButtonWidget from "../../widgets/interactive/submit-button/widget";
+} from "next-vibe-ui/unified/_shared/types";
+import { useWidgetLocale } from "next-vibe-ui/unified/_shared/use-widget-context";
+import ContainerWidget from "next-vibe-ui/unified/containers/container/widget";
+import AlertWidget from "next-vibe-ui/unified/display-only/alert/widget";
+import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
+import IconWidget from "next-vibe-ui/unified/display-only/icon/widget";
+import SeparatorWidget from "next-vibe-ui/unified/display-only/separator/widget";
+import TextWidget from "next-vibe-ui/unified/display-only/text/widget";
+import TitleWidget from "next-vibe-ui/unified/display-only/title/widget";
+import BooleanFieldWidget from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import EntityPickerFieldWidget from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
+import IconFieldWidget from "next-vibe-ui/unified/form-fields/icon-field/widget";
+import SelectFieldWidget from "next-vibe-ui/unified/form-fields/select-field/widget";
+import TextFieldWidget from "next-vibe-ui/unified/form-fields/text-field/widget";
+import TextareaFieldWidget from "next-vibe-ui/unified/form-fields/textarea-field/widget";
+import UuidFieldWidget from "next-vibe-ui/unified/form-fields/uuid-field/widget";
+import ButtonWidget from "next-vibe-ui/unified/interactive/button/widget";
+import FormAlertWidget from "next-vibe-ui/unified/interactive/form-alert/widget";
+import NavigateButtonWidget from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import SearchBarWidget from "next-vibe-ui/unified/interactive/search-bar/widget";
+import SubmitButtonWidget from "next-vibe-ui/unified/interactive/submit-button/widget";
 import { WidgetErrorBoundary } from "./ErrorBoundary";
 import { resolvedCache } from "./widget-preloader";
 
@@ -276,6 +278,18 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
       return createWidget("avatar", props);
     case WidgetType.LOADING:
       return createWidget("loading", props);
+    case WidgetType.SEARCH_BAR: {
+      // Dispatch-boundary cast: switch discriminant guarantees type safety.
+      // oxlint-disable-next-line typescript/no-explicit-any
+      const SearchBarW = SearchBarWidget as React.ComponentType<any>;
+      return (
+        <SearchBarW
+          fieldName={props.fieldName}
+          field={props.field}
+          inlineButtonInfo={props.inlineButtonInfo}
+        />
+      );
+    }
 
     case WidgetType.FORM_FIELD: {
       // TypeScript cannot narrow fieldType through the large FormFieldWidgetConfig union
@@ -309,6 +323,19 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
           return createWidget("datetime", props);
         case FieldDataType.EMAIL:
           return createWidget("email", props);
+        case FieldDataType.ENTITY_PICKER: {
+          // Dispatch-boundary cast: switch discriminant guarantees type safety.
+          const EntityPickerW = EntityPickerFieldWidget as React.ComponentType<
+            typeof props
+          >;
+          return (
+            <EntityPickerW
+              fieldName={props.fieldName}
+              field={props.field}
+              inlineButtonInfo={props.inlineButtonInfo}
+            />
+          );
+        }
         case FieldDataType.FILE:
           return createWidget("file", props);
         case FieldDataType.FILTER_PILLS:

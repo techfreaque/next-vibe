@@ -916,7 +916,7 @@ function StackEntryRenderer({
           popover (z-[400], e.g. the model selector) - the modal must layer
           above it and the backdrop must dim the popover */}
       <DialogContent
-        className="sm:max-w-[400px] max-w-[90vw] max-h-[min(600px,calc(100dvh-100px))] overflow-y-auto z-[500]"
+        className="sm:max-w-[600px] max-w-[90vw] max-h-[min(80dvh,calc(100dvh-80px))] overflow-y-auto z-[500]"
         overlayClassName="z-[450]"
       >
         {children}

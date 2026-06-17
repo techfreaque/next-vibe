@@ -8,6 +8,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -21,7 +22,6 @@ import type {
 import { useFrameBridge } from "@/app/api/[locale]/system/unified-interface/vibe-frame/use-bridge";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { Div } from "next-vibe-ui/ui/div";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 

@@ -4,6 +4,7 @@
  * PATCH endpoint to resolve/reopen an error log by fingerprint
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
@@ -19,8 +20,8 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
 import { ERROR_LOGS_ALIAS } from "./constants";
 import {
   ErrorLogStatusFilter,

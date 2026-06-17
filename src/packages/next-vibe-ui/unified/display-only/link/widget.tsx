@@ -5,15 +5,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/ExternalLink";
 import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import {
-  getIconSizeClassName,
-  getSpacingClassName,
-  getTextSizeClassName,
-  isExternalUrl,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
@@ -24,6 +15,15 @@ import {
   useWidgetForm,
   useWidgetIsInteractive,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import {
+  getIconSizeClassName,
+  getSpacingClassName,
+  getTextSizeClassName,
+  isExternalUrl,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
 
 import { extractLinkData } from "./shared";
 import type { LinkWidgetConfig, LinkWidgetSchema } from "./types";

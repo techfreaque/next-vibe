@@ -1,7 +1,7 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
 import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

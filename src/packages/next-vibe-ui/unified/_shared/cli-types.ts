@@ -10,8 +10,8 @@ import type { FieldValues, UseFormReturn } from "react-hook-form";
 import type z from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
+
 import type {
   AnyChildrenConstrain,
   BaseWidgetContext,

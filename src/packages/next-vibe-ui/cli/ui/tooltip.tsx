@@ -6,23 +6,24 @@
  * - TooltipContent: suppressed in CLI (noise), compact in MCP
  */
 import { Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import * as React from "react";
 
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+  TooltipContentProps,
+  TooltipPortalProps,
 
 export type {
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
-  TooltipContentProps,
-  TooltipPortalProps,
 } from "../../web/ui/tooltip";
+  TooltipContentProps,
 
 import type {
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
-  TooltipContentProps,
 } from "../../web/ui/tooltip";
 
 export function TooltipProvider({

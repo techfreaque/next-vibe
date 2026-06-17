@@ -1,25 +1,25 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type {
-  BreadcrumbProps,
-  BreadcrumbListProps,
+  BreadcrumbEllipsisProps,
   BreadcrumbItemProps,
   BreadcrumbLinkProps,
+  BreadcrumbListProps,
   BreadcrumbPageProps,
+  BreadcrumbProps,
   BreadcrumbSeparatorProps,
-  BreadcrumbEllipsisProps,
 } from "../../web/ui/breadcrumb";
 
 export type {
-  BreadcrumbProps,
-  BreadcrumbListProps,
+  BreadcrumbEllipsisProps,
   BreadcrumbItemProps,
   BreadcrumbLinkProps,
+  BreadcrumbListProps,
   BreadcrumbPageProps,
+  BreadcrumbProps,
   BreadcrumbSeparatorProps,
-  BreadcrumbEllipsisProps,
 } from "../../web/ui/breadcrumb";
 
 export function Breadcrumb({ children }: BreadcrumbProps): JSX.Element {

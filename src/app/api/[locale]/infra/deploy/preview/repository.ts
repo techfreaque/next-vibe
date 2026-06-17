@@ -13,11 +13,11 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { InfraT } from "../../i18n";
 import type {
   DeployPreviewRequestOutput,
   DeployPreviewResponseOutput,
 } from "./definition";
-import type { InfraT } from "../../i18n";
 
 export class DeployPreviewRepository {
   static async preview(

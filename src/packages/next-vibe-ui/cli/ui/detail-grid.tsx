@@ -7,9 +7,9 @@ import type {
 } from "../../web/ui/detail-grid";
 
 export type {
+  DetailFieldProps,
   DetailGridColumns,
   DetailGridProps,
-  DetailFieldProps,
 } from "../../web/ui/detail-grid";
 
 export function DetailGrid({ children }: DetailGridProps): JSX.Element {

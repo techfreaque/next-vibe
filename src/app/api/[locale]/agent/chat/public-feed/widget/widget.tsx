@@ -5,6 +5,8 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -19,16 +21,16 @@ import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { cn } from "next-vibe/shared/utils";
-import React from "react";
 
 import {
   useWidgetContext,
+import React from "react";
+import React from "react";
   useWidgetForm,
   useWidgetSelector,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import { DefaultFolderId } from "../../config";
-import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import type definition from "../definition";
 import type { PublicFeedItem } from "../definition";

@@ -7,6 +7,7 @@
 "use client";
 
 import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { useCallback, useState } from "react";
 
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
@@ -15,14 +16,13 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type {
   ChatModelId,
   ChatModelSelection,
 } from "../../../ai-stream/models";
 import type { VoiceModelSelection } from "../../../text-to-speech/models";
-import { parseSkillId } from "../../slugify";
 import characterSingleDefinitions from "../../skills/[id]/definition";
+import { parseSkillId } from "../../slugify";
 import { ChatFavoritesRepositoryClient } from "../repository-client";
 import favoritesDefinition, {
   type FavoriteCreateRequestOutput,

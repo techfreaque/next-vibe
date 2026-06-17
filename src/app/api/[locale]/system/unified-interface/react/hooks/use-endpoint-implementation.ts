@@ -5,7 +5,6 @@ import { useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointReadOptions } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
@@ -21,10 +20,11 @@ import type {
   PrimaryMutationUrlVariables,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-helpers";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
-import { scopedTranslation as reactScopedTranslation } from "../i18n";
 
+import { scopedTranslation as reactScopedTranslation } from "../i18n";
 import type {
   EndpointReturn,
   FormAlertState,

@@ -5,7 +5,6 @@
 
 "use client";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { List } from "next-vibe-ui/ui/icons/List";

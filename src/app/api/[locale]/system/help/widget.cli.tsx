@@ -15,12 +15,40 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import {
   useWidgetLocale,
   useWidgetPlatform,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+
+import { CATEGORY_REGISTRY } from "@/app/api/[locale]/system/generated/category-registry";
 
 import type {
   HelpGetResponseOutput,
   HelpToolMetadataSerialized,
 } from "./definition";
+
+// ── Category label lookup ───────────────────────────────────────────────────
+
+function getCategoryLabel(key: string, locale: string): string {
+  const cat = CATEGORY_REGISTRY.find((c) => c.key === key);
+  if (!cat) {
+    return key;
+  }
+  return cat.labels?.[locale as keyof typeof cat.labels] ?? cat.label ?? key;
+}
+
+function getSubCategoryLabel(
+  catKey: string,
+  subKey: string,
+  locale: string,
+): string {
+  const cat = CATEGORY_REGISTRY.find((c) => c.key === catKey);
+  if (!cat?.subcategories) {
+    return subKey;
+  }
+  const sub = cat.subcategories[subKey];
+  if (!sub) {
+    return subKey;
+  }
+  return sub.labels?.[locale as keyof typeof sub.labels] ?? sub.label ?? subKey;
+}
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -469,6 +497,28 @@ function renderDetailCli(tool: HelpToolItem): string {
     }
   }
 
+  // vibe help usage reference - always shown at the bottom of detail view
+  lines.push(chalk.dim("─".repeat(49)));
+  lines.push(
+    `  ${chalk.bold("vibe help")} ${chalk.dim("— search & filter options")}`,
+  );
+  lines.push("");
+  const helpCmds: [string, string][] = [
+    ["vibe help", "list all tools"],
+    ["vibe help <query>", "search by keyword"],
+    ["vibe help --toolName=<name>", "show this detail view"],
+    ["vibe help --category=<cat>", "filter by category"],
+    ["vibe help --subCategory=<sub>", "filter by subcategory"],
+    ["vibe help --page=<n>", "paginate results"],
+    ["vibe help --pageSize=<n>", "results per page (max 1000)"],
+  ];
+  const helpCmdCol = Math.max(...helpCmds.map(([cmd]) => cmd.length));
+  for (const [cmd, desc] of helpCmds) {
+    lines.push(
+      `  ${chalk.green(cmd.padEnd(helpCmdCol + 2))}${chalk.dim(desc)}`,
+    );
+  }
+
   return lines.join("\n");
 }
 
@@ -534,6 +584,7 @@ function renderCategoriesCli(
     subCategories?: { name: string; count: number }[];
   }[],
   totalCount: number,
+  hint?: string,
 ): string {
   const lines: string[] = [];
   lines.push(
@@ -560,7 +611,8 @@ function renderCategoriesCli(
   lines.push("");
   lines.push(
     chalk.dim(
-      `Use: vibe help --category="<name>" or --subCategory="<name>" to filter`,
+      hint ??
+        `Use: vibe help --category="<name>" or --subCategory="<name>" to filter`,
     ),
   );
 
@@ -574,6 +626,7 @@ function renderCategoriesMcp(
     subCategories?: { name: string; count: number }[];
   }[],
   totalCount: number,
+  hint?: string,
 ): string {
   const lines: string[] = [];
   lines.push(`Tool Categories (${totalCount} tools)`);
@@ -587,7 +640,8 @@ function renderCategoriesMcp(
   }
   lines.push("");
   lines.push(
-    `Use category="<name>" or subCategory="<name>" to filter, toolName="<name>" for detail.`,
+    hint ??
+      `Use category="<name>" or subCategory="<name>" to filter, toolName="<name>" for detail.`,
   );
   return lines.join("\n");
 }
@@ -600,6 +654,7 @@ function renderToolListCli(
   currentPage?: number,
   totalPages?: number,
   hint?: string,
+  locale = "en-US",
 ): string {
   const lines: string[] = [];
 
@@ -627,11 +682,13 @@ function renderToolListCli(
   const maxNameLen = Math.max(...tools.map((t) => t.name.length), 8);
 
   for (const [category, subMap] of groups) {
-    lines.push(`  ${chalk.bold.underline(category)}`);
+    const catLabel = getCategoryLabel(category, locale);
+    lines.push(`  ${chalk.bold.underline(catLabel)}`);
     for (const [sub, subTools] of subMap) {
       // Only print subCategory header if it differs from category and there are multiple subCategories
       if (subMap.size > 1 && sub !== category) {
-        lines.push(`    ${chalk.dim(sub)}`);
+        const subLabel = getSubCategoryLabel(category, sub, locale);
+        lines.push(`    ${chalk.dim(subLabel)}`);
       }
       for (const tool of subTools) {
         const name = chalk.green(tool.name.padEnd(maxNameLen + 1));
@@ -737,19 +794,26 @@ export function HelpToolsWidget({ field }: CliWidgetProps): JSX.Element {
     // Mode 2: Category overview (no tools, categories present)
     if (tools.length === 0 && categories && categories.length > 0) {
       return isMcp
-        ? renderCategoriesMcp(categories, totalCount)
-        : renderCategoriesCli(categories, totalCount);
+        ? renderCategoriesMcp(categories, totalCount, hint)
+        : renderCategoriesCli(categories, totalCount, hint);
     }
 
     // Mode 3: Tool list
     if (tools.length > 0) {
       return isMcp
         ? renderToolListMcp(tools, matchedCount, currentPage, totalPages)
-        : renderToolListCli(tools, matchedCount, currentPage, totalPages, hint);
+        : renderToolListCli(
+            tools,
+            matchedCount,
+            currentPage,
+            totalPages,
+            hint,
+            locale,
+          );
     }
 
     return isMcp ? "No tools found." : chalk.dim("No tools found.");
-  }, [field.value, isMcp]);
+  }, [field.value, isMcp, locale]);
 
   if (!output) {
     return <Box />;

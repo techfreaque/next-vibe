@@ -8,11 +8,6 @@ import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import type { RemoteCallData } from "@/app/api/[locale]/remote-connection/dispatch";
-import {
-  AUTH_TOKEN_COOKIE_NAME,
-  LEAD_ID_COOKIE_NAME,
-} from "@/config/constants";
 import {
   ErrorResponseTypes,
   fail,
@@ -20,7 +15,9 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
+import type { RemoteCallData } from "@/app/api/[locale]/remote-connection/dispatch";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   JwtPayloadType,
   JWTPublicPayloadType,
@@ -31,11 +28,14 @@ import {
   UserPermissionRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  AUTH_TOKEN_COOKIE_NAME,
+  LEAD_ID_COOKIE_NAME,
+} from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { TOOL_HELP_ALIAS } from "../../../help/constants";
 import {
   definitionLoader,

@@ -1,12 +1,12 @@
 import * as React from "react";
 
 export type {
-  ScrollAreaRootProps,
-  ScrollAreaViewportProps,
   ScrollAreaBarProps,
-  ScrollAreaThumbProps,
   ScrollAreaCornerProps,
   ScrollAreaProps,
+  ScrollAreaRootProps,
+  ScrollAreaThumbProps,
+  ScrollAreaViewportProps,
   ScrollBarProps,
 } from "../../web/ui/scroll-area";
 

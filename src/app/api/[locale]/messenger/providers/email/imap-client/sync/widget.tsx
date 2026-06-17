@@ -4,7 +4,9 @@
 
 "use client";
 
+import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
+import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
@@ -19,10 +21,8 @@ import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-fie
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { Checkbox } from "next-vibe-ui/ui/checkbox";
-import { Label } from "next-vibe-ui/ui/label";
+import React from "react";
 
-import { useMessengerAccountsList } from "@/app/api/[locale]/messenger/accounts/list/hooks";
 import type { MessengerAccountsListGETResponseOutput } from "@/app/api/[locale]/messenger/accounts/list/definition";
 import type definition from "./definition";
 

@@ -3,8 +3,8 @@
  * Converts audio to text using Eden AI providers
  */
 
-import { z } from "zod";
 import { lazy } from "react";
+import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -27,9 +27,9 @@ const SpeechToTextContainer = lazy(() =>
 );
 
 import { TRANSCRIBE_AUDIO_ALIAS } from "./constants";
+import { DEFAULT_STT_MODEL_ID } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { SttModelId } from "./models";
-import { DEFAULT_STT_MODEL_ID } from "./constants";
 
 /**
  * Speech-to-Text Endpoint (POST)

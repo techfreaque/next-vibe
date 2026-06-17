@@ -3,8 +3,10 @@
  * Defines endpoints for specific lead operations
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import leadsSearchDefinitions from "@/app/api/[locale]/leads/search/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -25,6 +27,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 import {
   Countries,
   CountriesOptions,

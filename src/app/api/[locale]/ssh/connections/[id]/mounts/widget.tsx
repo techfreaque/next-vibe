@@ -34,9 +34,9 @@ import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/wid
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
-import type listDefinition from "./list/definition";
-import type createDefinition from "./create/definition";
 import type detailDefinition from "./[mountId]/definition";
+import type createDefinition from "./create/definition";
+import type listDefinition from "./list/definition";
 
 // ─── Mounts List ──────────────────────────────────────────────────────────────
 

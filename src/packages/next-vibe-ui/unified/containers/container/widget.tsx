@@ -15,6 +15,8 @@ import {
   type FormAlertState,
 } from "next-vibe-ui/ui/form/form-alert";
 import { H1, P } from "next-vibe-ui/ui/typography";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { type JSX } from "react";
 import type { Path } from "react-hook-form";
 import { useWatch } from "react-hook-form";
@@ -22,6 +24,8 @@ import { useWatch } from "react-hook-form";
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { scopedTranslation as reactScopedTranslation } from "@/app/api/[locale]/system/unified-interface/react/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { LayoutType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -29,10 +33,10 @@ import {
   getIconSizeClassName,
   getLayoutClassName,
   getSpacingClassName,
+
   getTextSizeClassName,
   type LayoutConfig,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { MultiWidgetRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/MultiWidgetRenderer";
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import { hasChild, hasChildren } from "../../_shared/type-guards";

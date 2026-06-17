@@ -36,7 +36,7 @@ import type {
   LeadStatusValue,
 } from "../enum";
 import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
-import { csvImportJobs, importBatches, type CsvImportJob } from "./db";
+import { type CsvImportJob, csvImportJobs, importBatches } from "./db";
 import type {
   LeadsImportRequestOutput,
   LeadsImportResponseOutput,

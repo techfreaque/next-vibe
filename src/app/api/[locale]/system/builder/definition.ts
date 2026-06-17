@@ -28,6 +28,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { BUILDER_ALIAS } from "./constants";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
@@ -48,7 +49,7 @@ import {
   ViteMinifyOptions,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
-import { BUILDER_ALIAS } from "./constants";
+import type { PackageManifest } from "./repository/vibe-package/types";
 
 /**
  * Package.json exports field schema

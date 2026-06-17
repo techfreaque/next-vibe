@@ -11,16 +11,16 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { GITHUB_REPO_URL } from "@/config/constants";
-import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { ContactFormSection } from "../_components/contact-form-section";
 
+import { ContactFormSection } from "../_components/contact-form-section";
 import { scopedTranslation } from "./i18n";
 
 export interface SelfHostPageData {

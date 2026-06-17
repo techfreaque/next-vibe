@@ -1,13 +1,14 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import {
+  type InkTextProps,
   mergeTextProps,
   parseClassesToInkProps,
   parseClassesToTextProps,
-  type InkTextProps,
 } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
+
 import type {
   BlockQuoteProps,
   CodeProps,

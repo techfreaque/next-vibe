@@ -13,13 +13,13 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { LeadsT } from "../i18n";
 import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type {
   LeadListGetRequestTypeOutput,
   LeadListGetResponseTypeOutput,
 } from "./definition";
-import type { LeadsT } from "../i18n";
 import type { LeadsListT } from "./i18n";
 
 /**

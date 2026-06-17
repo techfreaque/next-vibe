@@ -10,31 +10,32 @@
  * - getFilteredTtsModels(), getFilteredSttModels(), etc.: Role-specific filtered models
  */
 
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
+  type ChatModelOption,
   chatModelOptions,
   getChatModelById,
-  type ChatModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  audioVisionModelOptions,
-  imageVisionModelOptions,
-  videoVisionModelOptions,
-  type AudioVisionModelOption,
-  type ImageVisionModelOption,
-  type VideoVisionModelOption,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type {
-  ModelOptionBase,
-  ModelOptionTokenBased,
-} from "@/app/api/[locale]/agent/models/models";
-import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+  AudioVisionModelSelection,
+  ImageVisionModelSelection,
+  VideoVisionModelSelection,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import {
-  imageGenModelOptions,
+  type AudioVisionModelOption,
+  audioVisionModelOptions,
+  type ImageVisionModelOption,
+  imageVisionModelOptions,
+  type VideoVisionModelOption,
+  videoVisionModelOptions,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import {
   type ImageGenModelOption,
+  imageGenModelOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import { getModelPrice } from "@/app/api/[locale]/agent/models/all-models";
-import { isModelProviderAvailable } from "@/app/api/[locale]/agent/models/models";
-import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import type {
   AudioVisionModelSelection,
   ImageVisionModelSelection,
@@ -42,20 +43,20 @@ import type {
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
-import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import {
-  musicGenModelOptions,
   type MusicGenModelOption,
+  musicGenModelOptions,
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 } from "@/app/api/[locale]/agent/music-generation/models";
 import {
-  sttModelOptions,
   type SttModelOption,
+  sttModelOptions,
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 } from "@/app/api/[locale]/agent/speech-to-text/models";
 import {
-  ttsModelOptions,
   type TtsModelOption,
+  ttsModelOptions,
+import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 } from "@/app/api/[locale]/agent/text-to-speech/models";
 import {
   videoGenModelOptions,

@@ -5,27 +5,27 @@
 
 import "server-only";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
+import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
 import { paymentBills } from "../../db";
-import { scopedTranslation } from "./i18n";
 import type {
   BillCreateRequestOutput,
   BillCreateResponseOutput,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class BillCreateRepository {
   static async createBill(

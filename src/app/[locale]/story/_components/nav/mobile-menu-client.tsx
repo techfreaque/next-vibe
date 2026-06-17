@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import type { BadgeVariant } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
@@ -15,7 +16,6 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation } from "../i18n";
 import { ThemeToggleMobile } from "../../../_components/theme-toggle";
 import type { BadgeVariant } from "next-vibe-ui/ui/badge";
 

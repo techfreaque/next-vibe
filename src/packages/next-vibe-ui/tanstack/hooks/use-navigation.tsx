@@ -8,6 +8,7 @@ import {
   useLocation,
   useNavigate,
   useParams,
+import { useMemo, useRef } from "react";
   useRouter as useTanStackRouter,
 } from "@tanstack/react-router";
 

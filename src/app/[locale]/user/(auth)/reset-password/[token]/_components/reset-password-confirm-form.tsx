@@ -1,10 +1,10 @@
 "use client";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";

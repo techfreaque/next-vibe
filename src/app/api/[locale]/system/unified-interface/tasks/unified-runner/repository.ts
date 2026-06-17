@@ -23,6 +23,7 @@ import {
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type {
@@ -39,7 +40,7 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { dbUserIdToOwner, type CronTaskExecution } from "../cron/db";
+import { type CronTaskExecution, dbUserIdToOwner } from "../cron/db";
 import { CronTasksRepository } from "../cron/repository";
 import { CronTaskStatus } from "../enum";
 import { scopedTranslation as tasksScopedTranslation } from "../i18n";
@@ -47,7 +48,6 @@ import type {
   UnifiedRunnerRequestOutput,
   UnifiedRunnerResponseOutput,
 } from "./definition";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   CronTaskAny,
   ResolveRouteIdResult,

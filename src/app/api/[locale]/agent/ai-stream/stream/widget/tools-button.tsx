@@ -1,22 +1,23 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
 import { Span } from "next-vibe-ui/ui/span";
-import { cn } from "next-vibe/shared/utils";
-import type { JSX } from "react";
-import { useMemo } from "react";
-
-import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
-import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { useToolsModalStore } from "@/app/api/[locale]/agent/tools/store";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useMemo } from "react";
+
+import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
+import { useToolsModalStore } from "@/app/api/[locale]/agent/tools/store";
+import helpDefinitions from "@/app/api/[locale]/system/help/definition";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 interface ToolsButtonProps {

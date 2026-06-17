@@ -3,8 +3,8 @@
  * Provides seed data for subscription-related tables
  */
 
-import { parseError } from "next-vibe/shared/utils";
 import { eq as eqOp } from "drizzle-orm";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

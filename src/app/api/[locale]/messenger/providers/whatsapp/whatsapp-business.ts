@@ -16,8 +16,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { MessageChannel } from "../../accounts/enum";
-import { sendViaMessagingAccount } from "../../messaging/send/service";
 import { scopedTranslation as providerScopedTranslation } from "../../i18n";
+import { sendViaMessagingAccount } from "../../messaging/send/service";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { SendOnlyProvider } from "../send-only-base";
 

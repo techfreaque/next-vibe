@@ -2,8 +2,11 @@
  * Inventory Stock List API Route Definition
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import warehouseListDef from "@/app/api/[locale]/inventory/warehouse/list/definition";
+import catalogListDef from "@/app/api/[locale]/products/catalog/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

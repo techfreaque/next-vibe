@@ -9,9 +9,9 @@ import { useEffect, useRef } from "react";
 
 import trackingEndpoints from "@/app/api/[locale]/leads/tracking/engagement/definition";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import { useLogger } from "@/hooks/use-logger";
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { useLogger } from "@/hooks/use-logger";
 import { useTranslation } from "@/i18n/core/client";
 
 import { EngagementTypes } from "../../api/[locale]/leads/enum";

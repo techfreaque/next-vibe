@@ -16,6 +16,8 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { users } from "@/app/api/[locale]/user/db";
 
 import {
@@ -24,8 +26,6 @@ import {
   TaskCategoryDB,
   TaskOutputModeDB,
 } from "../enum";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { NotificationTarget } from "../unified-runner/types";
 
 /**

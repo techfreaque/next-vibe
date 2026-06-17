@@ -5,8 +5,8 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { UpdateRoleRepository } from "./repository";
 import definitions from "./definition";
+import { UpdateRoleRepository } from "./repository";
 
 export const { PATCH, tools } = endpointsHandler({
   endpoint: definitions,

@@ -9,6 +9,12 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
+import {
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetSelector,
+  useWidgetUser,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import React, {
   useCallback,
   useContext,
@@ -17,21 +23,15 @@ import React, {
   useState,
 } from "react";
 
-import { buildMessagePath } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import {
   LAYOUT,
   useInputHeight,
 } from "@/app/[locale]/chat/lib/config/constants";
+import { buildMessagePath } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import {
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetSelector,
-  useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { platform } from "@/config/env-client";
 
 import type definition from "../definition";

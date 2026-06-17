@@ -26,12 +26,12 @@ import type {
 } from "./[id]/definition";
 import { emails, type NewEmail } from "./db";
 import {
+  mapMessageStatusFilter,
+  mapMessageTypeFilter,
   MessageSortField,
   MessageStatusFilter,
   MessageTypeFilter,
   SortOrder,
-  mapMessageStatusFilter,
-  mapMessageTypeFilter,
 } from "./enum";
 import type {
   EmailsListRequestOutput,

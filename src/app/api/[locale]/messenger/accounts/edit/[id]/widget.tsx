@@ -22,6 +22,7 @@ import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import React from "react";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 

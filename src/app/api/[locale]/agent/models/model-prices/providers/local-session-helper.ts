@@ -10,16 +10,16 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 
+import type { UnbottledCloudSession } from "@/app/api/[locale]/agent/env";
 import { db } from "@/app/api/[locale]/system/db";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { userRoles } from "@/app/api/[locale]/user/db";
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
-import type { UnbottledCloudSession } from "@/app/api/[locale]/agent/env";
+import { defaultLocale } from "@/i18n/core/config";
 
 /**
  * Resolve an admin session pointing at the given local URL.

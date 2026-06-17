@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import companyListDefinitions from "@/app/api/[locale]/companies/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

@@ -9,6 +9,7 @@ import "server-only";
 
 import { and, eq, like, ne, sql } from "drizzle-orm";
 
+import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
 import { db } from "@/app/api/[locale]/system/db";

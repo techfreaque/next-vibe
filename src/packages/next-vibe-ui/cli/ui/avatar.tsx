@@ -2,15 +2,15 @@ import { Text } from "ink";
 import type { JSX } from "react";
 
 import type {
-  AvatarRootProps,
-  AvatarImageProps,
   AvatarFallbackProps,
+  AvatarImageProps,
+  AvatarRootProps,
 } from "../../web/ui/avatar";
 
 export type {
-  AvatarRootProps,
-  AvatarImageProps,
   AvatarFallbackProps,
+  AvatarImageProps,
+  AvatarRootProps,
 } from "../../web/ui/avatar";
 
 function getInitials(text: string): string {

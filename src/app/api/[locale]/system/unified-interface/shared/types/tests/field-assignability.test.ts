@@ -4,9 +4,9 @@
  * Tests that specific field types are assignable to generic field types.
  */
 
+import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
 import type { z } from "zod";
 
-import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
 import type {
   RequestResponseWidgetConfig,
   UnifiedField,

@@ -19,6 +19,7 @@ import {
 } from "next-vibe-ui/ui/form/form";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Markdown } from "next-vibe-ui/ui/markdown";
+import type { ToolbarAction } from "next-vibe-ui/ui/markdown-editor";
 import { MarkdownEditor } from "next-vibe-ui/ui/markdown-editor";
 import { Span } from "next-vibe-ui/ui/span";
 import {
@@ -27,6 +28,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import type { ReactFormFieldProps } from "next-vibe-ui/unified/_shared/react-types";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 

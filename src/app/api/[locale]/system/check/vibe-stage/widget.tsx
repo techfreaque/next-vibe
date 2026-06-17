@@ -16,7 +16,6 @@ import {
   Loader2,
   SkipForward,
 } from "lucide-react";
-
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";

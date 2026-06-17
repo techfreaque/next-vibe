@@ -1,17 +1,18 @@
-import { cn } from "next-vibe/shared/utils/utils";
 import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import { View } from "react-native";
 
 import type {
   DetailFieldProps,
   DetailGridProps,
 } from "@/packages/next-vibe-ui/web/ui/detail-grid";
+
 import { Text } from "./text";
 
 export type {
+  DetailFieldProps,
   DetailGridColumns,
   DetailGridProps,
-  DetailFieldProps,
 } from "@/packages/next-vibe-ui/web/ui/detail-grid";
 
 const StyledView = styled(View, { className: "style" });

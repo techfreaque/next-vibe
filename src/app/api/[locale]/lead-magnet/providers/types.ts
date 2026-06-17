@@ -3,6 +3,7 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+
 import type { LeadMagnetT } from "../i18n";
 
 export interface LeadData {

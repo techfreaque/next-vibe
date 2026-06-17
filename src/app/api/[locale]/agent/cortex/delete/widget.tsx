@@ -10,17 +10,14 @@ import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetDisabled,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { useTranslation } from "@/i18n/core/client";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { CortexNav } from "../_shared/cortex-nav";
 
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";

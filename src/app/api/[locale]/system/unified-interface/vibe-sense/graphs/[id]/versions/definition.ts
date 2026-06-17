@@ -19,10 +19,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 
 const { GET } = createEndpoint({
   scopedTranslation,

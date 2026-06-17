@@ -2,6 +2,7 @@
  * Unified Messenger Accounts List API Definition
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
@@ -23,11 +24,13 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 import {
-  MessengerAccountStatus,
-  MessengerAccountStatusDB,
-  MessengerAccountStatusFilterOptions,
   MessengerAccountSortField,
   MessengerAccountSortFieldOptions,
+  MessengerAccountStatus,
+  MessengerAccountStatusDB,
+  MessengerAccountStatusFilter,
+  MessengerAccountStatusFilterOptions,
+  MessengerChannelFilter,
   MessengerChannelFilterOptions,
   MessengerHealthStatus,
   MessengerHealthStatusDB,
@@ -37,10 +40,7 @@ import {
   MessengerProviderFilterOptions,
   MessengerSortOrder,
   MessengerSortOrderOptions,
-  MessengerChannelFilter,
-  MessengerAccountStatusFilter,
 } from "../enum";
-import { scopedTranslation } from "./i18n";
 import { MessageChannel, MessageChannelDB } from "../enum";
 import { MESSENGER_ACCOUNTS_ALIAS } from "./constants";
 

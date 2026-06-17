@@ -20,12 +20,12 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { users } from "@/app/api/[locale]/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { REFERRAL_CONFIG } from "./config";
 
 import type {
   CodesListGetResponseOutput,
   ReferralCode,
 } from "./codes/list/definition";
+import { REFERRAL_CONFIG } from "./config";
 import {
   leadReferrals,
   payoutRequests,

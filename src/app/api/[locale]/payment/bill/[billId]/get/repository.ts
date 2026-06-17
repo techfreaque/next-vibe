@@ -6,12 +6,12 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
@@ -21,8 +21,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
 import { paymentBillLines, paymentBills } from "../../../db";
+import type { BillGetResponseOutput, BillGetUrlPathParams } from "./definition";
 import { scopedTranslation } from "./i18n";
-import type { BillGetUrlPathParams, BillGetResponseOutput } from "./definition";
 
 export class BillGetRepository {
   static async getBill(

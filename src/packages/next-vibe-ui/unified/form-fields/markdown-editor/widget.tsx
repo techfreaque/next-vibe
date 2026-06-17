@@ -9,13 +9,6 @@ import { X } from "next-vibe-ui/ui/icons/X";
 import type { InputKeyboardEvent } from "next-vibe-ui/ui/input";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-import { useState } from "react";
-
-import {
-  getIconSizeClassName,
-  getSpacingClassName,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
 import type { ReactRequestResponseWidgetProps } from "next-vibe-ui/unified/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
 import {
@@ -23,8 +16,15 @@ import {
   useWidgetForm,
   useWidgetIsInteractive,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useState } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import {
+  getIconSizeClassName,
+  getSpacingClassName,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
+
 import { extractEditableTextData } from "./shared";
 import type {
   MarkdownEditorWidgetConfig,

@@ -7,15 +7,16 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { Camera } from "next-vibe-ui/ui/icons/Camera";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Save } from "next-vibe-ui/ui/icons/Save";
-import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { Instagram } from "next-vibe-ui/ui/icons/Instagram";
+import { LogOut } from "next-vibe-ui/ui/icons/LogOut";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Music } from "next-vibe-ui/ui/icons/Music";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { Save } from "next-vibe-ui/ui/icons/Save";
 import { SiDiscord } from "next-vibe-ui/ui/icons/SiDiscord";
 import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
 import { Twitter } from "next-vibe-ui/ui/icons/Twitter";
@@ -23,7 +24,26 @@ import { Youtube } from "next-vibe-ui/ui/icons/Youtube";
 import { Input } from "next-vibe-ui/ui/input";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
+import { StatusPill } from "next-vibe-ui/ui/status-pill";
 import { H2, P } from "next-vibe-ui/ui/typography";
+import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+import {
+  useWidgetForm,
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetTranslation,
+  useWidgetUser,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import { ColorFieldWidget } from "next-vibe-ui/unified/form-fields/color-field/widget";
+import { FileFieldWidget } from "next-vibe-ui/unified/form-fields/file-field/widget";
+import { MarkdownTextareaFieldWidget } from "next-vibe-ui/unified/form-fields/markdown-textarea-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { UrlFieldWidget } from "next-vibe-ui/unified/form-fields/url-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import {
   type JSX,
   useCallback,
@@ -37,17 +57,13 @@ import { buildScopedPaletteStyle } from "@/app/[locale]/creator/[userId]/_shared
 import {
   DEFAULT_ACCENT,
   ProfileBio,
-  ProfileHero,
   ProfileSocialPills,
 } from "@/app/[locale]/creator/[userId]/_shared/profile-content";
-import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import skillsDef from "@/app/api/[locale]/agent/chat/skills/definition";
 import { SkillOwnershipType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
-import { CollapsibleSkillSection } from "@/app/api/[locale]/agent/chat/skills/widget";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import creditsDef from "@/app/api/[locale]/credits/definition";
 import configDef from "@/app/api/[locale]/lead-magnet/config/definition";
+import referralDef from "@/app/api/[locale]/referral/definition";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -56,23 +72,28 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
-import { ColorFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/color-field/widget";
-import { FileFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/file-field/widget";
-import { MarkdownTextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/markdown-textarea-field/widget";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { UrlFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/url-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import { ColorFieldWidget } from "next-vibe-ui/unified/form-fields/color-field/widget";
+import { FileFieldWidget } from "next-vibe-ui/unified/form-fields/file-field/widget";
+import { MarkdownTextareaFieldWidget } from "next-vibe-ui/unified/form-fields/markdown-textarea-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { UrlFieldWidget } from "next-vibe-ui/unified/form-fields/url-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import passwordDef from "@/app/api/[locale]/user/private/me/password/definition";
+import sessionsDef from "@/app/api/[locale]/user/private/sessions/definition";
 import { envClient } from "@/config/env-client";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 
+import subscriptionDef from "@/app/api/[locale]/subscription/definition";
+import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
+import logoutDef from "@/app/api/[locale]/user/private/logout/definition";
+import addressesDef from "@/app/api/[locale]/user/private/me/addresses/definition";
 import { apiClient } from "../../../system/unified-interface/react/hooks/store";
-import { EndpointsPage } from "../../../system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import { useApiQuery } from "../../../system/unified-interface/react/hooks/use-api-query";
 import { scopedTranslation as userRoleScopedTranslation } from "../../user-roles/i18n";
 import avatarDef from "./avatar/definition";
 import type meDefinition from "./definition";
-import type { MePostResponseOutput } from "./definition";
+import type { MeGetResponseOutput, MePostRequestOutput } from "./definition";
 import { useUser } from "./hooks";
 
 export function MeDeleteWidget(): JSX.Element {

@@ -27,6 +27,7 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
+import type { JSX } from "react";
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 

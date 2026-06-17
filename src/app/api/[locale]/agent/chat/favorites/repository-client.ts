@@ -10,15 +10,15 @@ import {
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { parseError } from "../../../shared/utils";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { ChatModelSelection } from "../../ai-stream/models";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
@@ -29,6 +29,7 @@ import type { TtsModelId } from "../../text-to-speech/models";
 import { STORAGE_KEYS } from "../constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
+import { generateFavoriteSlug, generateSlug, parseSkillId } from "../slugify";
 import { ModelSelectionType } from "../skills/enum";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
 import type {

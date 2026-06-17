@@ -1,12 +1,23 @@
 "use client";
 
+import { success } from "next-vibe/shared/types/response.schema";
+import { cn } from "next-vibe/shared/utils";
+import { parseError } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
+import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Span } from "next-vibe-ui/ui/span";
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
+import {
+  useWidgetEndpointMutations,
+  useWidgetForm,
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetUser,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { useWidgetSelector } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import {
   useCallback,
@@ -17,8 +28,6 @@ import {
   useState,
 } from "react";
 
-import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 import { Logo } from "@/app/[locale]/_components/logo";
 import {
   DOM_IDS,
@@ -34,27 +43,19 @@ import {
 import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import {
-  useWidgetEndpointMutations,
-  useWidgetForm,
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { useWidgetSelector } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { platform } from "@/config/env-client";
-import { parseError } from "next-vibe/shared/utils";
+
 import type { MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
 import messagesDefinition from "../definition";

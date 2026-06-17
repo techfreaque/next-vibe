@@ -14,9 +14,9 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "../shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import type { EndpointLogger } from "../shared/logger/endpoint";
 import { buildUserChannel, buildWsChannel } from "./channel";
 import { publishWsEvent } from "./emitter";
 import type {

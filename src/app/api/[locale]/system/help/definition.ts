@@ -9,8 +9,10 @@
  *   CLI   - response mode (default) or interactive mode (--interactive flag)
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -23,14 +25,12 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   UserPermissionRole,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { Platform } from "../unified-interface/shared/types/platform";
 import { TOOL_HELP_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

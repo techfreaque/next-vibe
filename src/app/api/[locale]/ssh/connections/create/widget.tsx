@@ -12,7 +12,6 @@ import {
   useWidgetForm,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";

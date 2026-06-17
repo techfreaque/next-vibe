@@ -16,33 +16,33 @@ import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H4, P } from "next-vibe-ui/ui/typography";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import { scopedTranslation } from "@/app/[locale]/subscription/i18n";
+import { chatModelDefinitions } from "@/app/api/[locale]/agent/ai-stream/models";
+import { imageGenModelDefinitions } from "@/app/api/[locale]/agent/image-generation/models";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
+  getProviderPrice,
   isApiProviderAvailable,
   type ModelDefinition,
-  getProviderPrice,
   modelProviders,
 } from "@/app/api/[locale]/agent/models/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
+import { musicGenModelDefinitions } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelDefinitions } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { ttsModelDefinitions } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelDefinitions } from "@/app/api/[locale]/agent/video-generation/models";
 import {
   FEATURE_COSTS,
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { chatModelDefinitions } from "@/app/api/[locale]/agent/ai-stream/models";
-import { imageGenModelDefinitions } from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelDefinitions } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelDefinitions } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { ttsModelDefinitions } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelDefinitions } from "@/app/api/[locale]/agent/video-generation/models";
 import { formatPrice } from "./types";
 
 interface OverviewTabProps {

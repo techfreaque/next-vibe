@@ -1,14 +1,16 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { LogOut } from "next-vibe-ui/ui/icons/LogOut";
+import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import type { JSX } from "react";
-import { useEffect, useRef } from "react";
 
 import {
   useWidgetLocale,
+import type { JSX } from "react";
+import { useEffect, useRef } from "react";
+import type { JSX } from "react";
+import { useEffect, useRef } from "react";
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";

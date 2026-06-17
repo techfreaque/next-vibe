@@ -1,15 +1,7 @@
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
-import type { Skill, SkillVariant } from "../../config";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
-import {
-  AUDIO_VISION,
-  IMAGE_GEN,
-  MUSIC_GEN,
-  STT,
-  VIDEO_GEN,
-  VOICE,
-} from "../_shared/media-presets";
+import type { Skill, SkillVariant } from "../../config";
 import {
   ContentLevel,
   ModelSelectionType,
@@ -18,6 +10,14 @@ import {
   SkillCategory,
   SkillOwnershipType,
 } from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
 
 export const HERMES_VARIANTS: SkillVariant[] = [
   {

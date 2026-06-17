@@ -25,10 +25,10 @@ import {
   type CallbackModeValue,
 } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { RESUME_STREAM_ALIAS } from "../../../agent/ai-stream/resume-stream/constants";
 import { cronTasks } from "./cron/db";
 import { createTaskEmitters } from "./cron/emitter";
@@ -143,9 +143,9 @@ export async function handleTaskCompletion(params: {
         : "failed";
 
   // 1. Backfill result into the originating tool call message (cache-stable).
-  //    endLoop behaves the same as wait: backfill original, no deferred child.
-  //    wakeUp: backfill deferred to resume-stream (sequenceId check).
-  //    detach: no backfill (initial {taskId, status, hint} is the final state).
+  //    The tool message is the canonical result store for every callback mode
+  //    and every execution location. wakeUp defers the write to resume-stream
+  //    (sequenceId check); all other modes backfill here.
   if (toolMessageId) {
     try {
       const [existing] = await db
@@ -165,17 +165,13 @@ export async function handleTaskCompletion(params: {
             ? sortObjectKeys(JSON.parse(JSON.stringify(output)) as WidgetData)
             : undefined;
 
-        // wakeUp: do NOT backfill here. resume-stream checks the leaf sequenceId:
-        //   - same sequenceId → backfill the original tool message directly
-        //   - different sequenceId → insert a deferred TOOL message after the new leaf
-        // detach: do NOT backfill either. The initial {taskId, status, hint} written by
-        //   ToolResultHandler.processToolResult is the correct final state. The real result
-        //   lives only in cron_task_executions (task history), not in the thread.
-        // All other modes: always backfill the original tool message.
-        if (
-          callbackMode !== CallbackMode.WAKE_UP &&
-          callbackMode !== CallbackMode.DETACH
-        ) {
+        // wakeUp: resume-stream owns the backfill — it checks the leaf
+        // sequenceId and either backfills the original tool message (same
+        // sequence) or inserts a deferred TOOL message after the new leaf.
+        // All other modes (wait, endLoop, detach, approve): backfill the
+        // original tool message — it is the canonical result store for every
+        // execution location.
+        if (callbackMode !== CallbackMode.WAKE_UP) {
           await db
             .update(chatMessages)
             .set({
@@ -187,6 +183,9 @@ export async function handleTaskCompletion(params: {
                       status: toolStatus,
                       result: stableResult,
                       isPartial: false,
+                      // The task that produced this result stays discoverable
+                      // after the dispatch placeholder is replaced.
+                      remoteTaskId: taskId,
                     }
                   : undefined,
               },
@@ -199,6 +198,17 @@ export async function handleTaskCompletion(params: {
             toolStatus,
             taskId,
           });
+
+          // Mirror the backfill to peers when this thread is a REMOTE-folder
+          // mirror. The live relay stream has already closed by the time a
+          // detach/endLoop task completes, so the only way the result reaches
+          // the caller's mirror is the sync channel (push-pull on connect +
+          // live event push). pushThreadSync no-ops for non-mirrored threads.
+          if (existing.threadId) {
+            const { pushThreadSync } =
+              await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+            await pushThreadSync(existing.threadId, ownerUser.id, logger);
+          }
         } else {
           logger.debug(
             "[TaskCompletion] wakeUp - backfill deferred to resume-stream (sequenceId check)",
@@ -256,29 +266,33 @@ export async function handleTaskCompletion(params: {
     emitTaskQueue("task-updated", taskPayload);
   }
 
-  // 2b. For endLoop: task is done, no AI continuation - clear thread from "waiting" → "idle".
-  //    The abort handler set thread to "waiting" when the stream died. Now that the task
-  //    has completed (and TASK_COMPLETED WS was just emitted above), the UI can unlock.
-  if (callbackMode === CallbackMode.END_LOOP && threadId) {
+  // 2b. No-revival modes (endLoop, detach): the task is done and no AI
+  //    continuation follows — reconcile the thread state. A stream that died
+  //    into 'waiting' on this task returns to 'idle' unless OTHER work is
+  //    still pending (clearStreamingState re-evaluates tasks, scheduled
+  //    revivals and in-flight remote calls).
+  if (
+    (callbackMode === CallbackMode.END_LOOP ||
+      callbackMode === CallbackMode.DETACH) &&
+    threadId
+  ) {
     try {
-      await db
-        .update(chatThreads)
-        .set({ streamingState: "idle", updatedAt: new Date() })
-        .where(eq(chatThreads.id, threadId));
-
+      const { clearStreamingState } =
+        await import("@/app/api/[locale]/agent/ai-stream/repository/core/stream-registry");
+      const cleared = await clearStreamingState(threadId, logger, ownerUser);
       createMessagesEmitter(
         threadId,
         null,
         logger,
         ownerUser,
-      )("streaming-state-changed", { streamingState: "idle" });
+      )("streaming-state-changed", { streamingState: cleared.state });
 
-      logger.info(
-        "[TaskCompletion] endLoop - cleared thread from waiting to idle",
-        { threadId, taskId },
+      logger.debug(
+        "[TaskCompletion] no-revival completion - thread state reconciled",
+        { threadId, taskId, callbackMode, state: cleared.state },
       );
     } catch (clearErr) {
-      logger.warn("[TaskCompletion] Failed to clear endLoop thread state", {
+      logger.warn("[TaskCompletion] Failed to reconcile thread state", {
         threadId,
         error: clearErr instanceof Error ? clearErr.message : String(clearErr),
       });
@@ -381,42 +395,70 @@ export async function handleTaskCompletion(params: {
       // Use the task owner's user (built from task.userId) so the revival headless stream
       // runs with the correct leadId for credit validation - not the complete-task caller's identity.
       if (directResumeLocale) {
-        const { t } = aiStreamScopedTranslation.scopedT(directResumeLocale);
-        // Always use ownerUser for the revival stream - correct credit validation.
-        // Await so callers that await handleTaskCompletion (e.g. pulse) get a fully
-        // resolved revival. The cron task above is a safety net if this throws.
-        const { ResumeStreamRepository } =
-          await import("@/app/api/[locale]/agent/ai-stream/resume-stream/repository");
-        await ResumeStreamRepository.resume(
-          resumeInput,
-          ownerUser,
-          directResumeLocale,
-          logger,
-          t,
-          abortSignal,
-          subAgentDepth,
-        ).catch((fireErr) => {
-          logger.warn(
-            "[TaskCompletion] Direct resume-stream fire failed (cron fallback active)",
-            {
-              resumeTaskId,
-              error:
-                fireErr instanceof Error ? fireErr.message : String(fireErr),
-            },
+        // Claim the one-shot row before firing — the same enabled→false claim
+        // the pulse uses — so exactly one of direct-fire / pulse executes this
+        // revival, and stream-exit verdicts never count an in-flight revival
+        // as still scheduled.
+        const claimedRows = await db
+          .update(cronTasks)
+          .set({ enabled: false, updatedAt: new Date() })
+          .where(
+            and(eq(cronTasks.id, resumeTaskId), eq(cronTasks.enabled, true)),
+          )
+          .returning({ id: cronTasks.id });
+        if (claimedRows.length > 0) {
+          const { t } = aiStreamScopedTranslation.scopedT(directResumeLocale);
+          // Always use ownerUser for the revival stream - correct credit validation.
+          // Await so callers that await handleTaskCompletion (e.g. pulse) get a fully
+          // resolved revival.
+          const { ResumeStreamRepository } =
+            await import("@/app/api/[locale]/agent/ai-stream/resume-stream/repository");
+          await ResumeStreamRepository.resume(
+            resumeInput,
+            ownerUser,
+            directResumeLocale,
+            logger,
+            t,
+            abortSignal,
+            subAgentDepth,
+          ).catch(async (fireErr) => {
+            logger.warn(
+              "[TaskCompletion] Direct resume-stream fire failed - re-enabling row for cron fallback",
+              {
+                resumeTaskId,
+                error:
+                  fireErr instanceof Error ? fireErr.message : String(fireErr),
+              },
+            );
+            // Hand the revival back to the pulse.
+            await db
+              .update(cronTasks)
+              .set({ enabled: true, updatedAt: new Date() })
+              .where(eq(cronTasks.id, resumeTaskId));
+          });
+          logger.debug("[TaskCompletion] Fired resume-stream directly", {
+            resumeTaskId,
+            threadId,
+          });
+        } else {
+          logger.debug(
+            "[TaskCompletion] resume-stream row already claimed - skipping direct fire",
+            { resumeTaskId, threadId },
           );
-        });
-        logger.debug("[TaskCompletion] Fired resume-stream directly", {
-          resumeTaskId,
-          threadId,
-        });
+        }
       }
     } catch (err) {
       logger.error("[TaskCompletion] Failed to schedule resume-stream task", {
         threadId,
+        taskId,
+        callbackMode,
         error: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+        detail: JSON.stringify(
+          err,
+          Object.getOwnPropertyNames(err instanceof Error ? err : {}),
+        ),
       });
     }
   }
 }
-        taskId,
-        callbackMode,

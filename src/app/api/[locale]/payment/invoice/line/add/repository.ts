@@ -21,11 +21,11 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
-import { scopedTranslation } from "./i18n";
 import type {
   InvoiceLineAddRequestOutput,
   InvoiceLineAddResponseOutput,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class InvoiceLineAddRepository {
   static async addLine(

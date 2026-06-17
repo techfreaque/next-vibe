@@ -19,25 +19,12 @@ import {
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
 } from "@/config/constants";
-import { platform } from "@/config/env-client";
+import { envClient, platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { scopedTranslation as hooksTranslation } from "./i18n";
-
-/**
- * Read the CSRF double-submit cookie and return its value, or null if absent.
- * The cookie is non-HttpOnly so JS can read it for the double-submit pattern.
- */
-function getCsrfToken(): string | null {
-  if (typeof document === "undefined") {
-    return null; // SSR / non-browser environments
-  }
-  const match = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith(`${CSRF_TOKEN_COOKIE_NAME}=`));
-  return match ? (match.split("=")[1] ?? null) : null;
-}
+import { containsFile, objectToFormData } from "./api-utils-shared";
 
 const MUTATING_METHODS = new Set([
   Methods.POST,
@@ -46,9 +33,16 @@ const MUTATING_METHODS = new Set([
   Methods.PATCH,
 ]);
 
-/**
- * Type guard to check if a value is a Record<string, WidgetData>
- */
+function getCsrfToken(): string | null {
+  if (typeof document === "undefined") {
+    return null;
+  }
+  const match = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${CSRF_TOKEN_COOKIE_NAME}=`));
+  return match ? (match.split("=")[1] ?? null) : null;
+}
+
 function isJsonObject(value: WidgetData): value is Record<string, WidgetData> {
   return (
     value !== null &&
@@ -61,100 +55,100 @@ function isJsonObject(value: WidgetData): value is Record<string, WidgetData> {
   );
 }
 
-/**
- * Check if an object contains File instances (recursively)
- */
-export function containsFile(obj: WidgetData): boolean {
-  if (obj instanceof File) {
-    return true;
-  }
-  if (obj instanceof Blob) {
-    return true;
-  }
-  if (Array.isArray(obj)) {
-    return obj.some((item) => containsFile(item));
-  }
-  if (obj && typeof obj === "object") {
-    return Object.values(obj).some((value) => containsFile(value));
-  }
-  return false;
-}
+function buildUrl<TEndpoint extends CreateApiEndpointAny>(
+  endpoint: TEndpoint,
+  locale: CountryLanguage,
+  requestData: TEndpoint["types"]["RequestOutput"],
+  pathParams: TEndpoint["types"]["UrlVariablesOutput"],
+  logger: EndpointLogger,
+): { url: string; missingParam?: string } {
+  let url = `${envClient.NEXT_PUBLIC_APP_URL}/api/${locale}`;
 
-/**
- * Extract File/Blob entries from an object as flat dot-notation key→file pairs.
- * Used to separate files from JSON-serializable data when building mixed FormData.
- */
-function extractFiles(
-  obj: WidgetData,
-  parentKey = "",
-  result: Array<[string, File | Blob]> = [],
-): Array<[string, File | Blob]> {
-  if (obj instanceof File || obj instanceof Blob) {
-    result.push([parentKey, obj]);
-  } else if (Array.isArray(obj)) {
-    obj.forEach((item, index) => {
-      extractFiles(item, `${parentKey}[${index}]`, result);
-    });
-  } else if (isJsonObject(obj)) {
-    for (const [key, value] of Object.entries(obj)) {
-      extractFiles(value, parentKey ? `${parentKey}.${key}` : key, result);
+  for (const segment of endpoint.path) {
+    const isBracketParam = segment.startsWith("[") && segment.endsWith("]");
+    const isColonParam = segment.startsWith(":");
+    if (isBracketParam || isColonParam) {
+      const paramName = isBracketParam
+        ? segment.slice(1, -1)
+        : segment.slice(1);
+      const paramValue = pathParams?.[paramName as keyof typeof pathParams];
+      if (paramValue === undefined) {
+        logger.error("callApi: Missing URL path parameter", {
+          paramName,
+          endpoint: endpoint.path.join("/"),
+          availableParams: pathParams ? Object.keys(pathParams) : [],
+        });
+        return { url, missingParam: paramName };
+      }
+      url += `/${encodeURIComponent(String(paramValue))}`;
+    } else {
+      url += `/${segment}`;
     }
   }
-  return result;
-}
 
-/**
- * Strip File/Blob instances from an object, replacing them with null.
- * The result is safe to JSON.stringify.
- */
-function stripFiles(obj: WidgetData): WidgetData {
-  if (obj instanceof File || obj instanceof Blob) {
-    return null;
-  }
-  if (Array.isArray(obj)) {
-    return obj.map(stripFiles);
-  }
-  if (isJsonObject(obj)) {
-    const result: Record<string, WidgetData> = {};
-    for (const [key, value] of Object.entries(obj)) {
-      result[key] = stripFiles(value);
+  if (
+    endpoint.method === Methods.GET &&
+    requestData &&
+    typeof requestData === "object"
+  ) {
+    const searchParams = new URLSearchParams();
+
+    function flattenObject(obj: Record<string, WidgetData>, prefix = ""): void {
+      for (const [key, value] of Object.entries(obj)) {
+        const fullKey = prefix ? `${prefix}.${key}` : key;
+        if (value === undefined || value === null) {
+          continue;
+        } else if (Array.isArray(value)) {
+          if (value.length === 0) {
+            continue;
+          }
+          value.forEach((item, index) => {
+            if (isJsonObject(item)) {
+              flattenObject(item, `${fullKey}[${index}]`);
+            } else {
+              searchParams.append(`${fullKey}[${index}]`, String(item));
+            }
+          });
+        } else if (isJsonObject(value)) {
+          const hasNonNullValues = Object.values(value).some(
+            (v) => v !== undefined && v !== null,
+          );
+          if (hasNonNullValues) {
+            flattenObject(value, fullKey);
+          }
+        } else {
+          searchParams.append(fullKey, String(value));
+        }
+      }
     }
-    return result;
-  }
-  return obj;
-}
 
-/**
- * Convert an object containing File/Blob values to FormData using the mixed pattern:
- * - Non-file data is JSON-serialized into a "data" field (preserves types like booleans)
- * - File/Blob values are appended as separate dot-notation fields
- *
- * The server-side request-parser already handles this pattern (checks for "data" field first).
- */
-export function objectToFormData(obj: Record<string, WidgetData>): FormData {
-  const formData = new FormData();
-
-  // Serialize all non-file data as JSON in "data" field - preserves booleans, numbers, nulls
-  const jsonData = stripFiles(obj);
-  formData.append("data", JSON.stringify(jsonData));
-
-  // Append File/Blob values separately with dot-notation keys
-  const files = extractFiles(obj);
-  for (const [key, file] of files) {
-    formData.append(key, file);
+    if (isJsonObject(requestData)) {
+      flattenObject(requestData);
+    }
+    const queryString = searchParams.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
   }
 
-  return formData;
+  return { url };
 }
 
-/**
- * Core function to call an API endpoint
- * Handles request validation, authentication, and response parsing
- */
+function buildBody<TEndpoint extends CreateApiEndpointAny>(
+  endpoint: TEndpoint,
+  requestData: TEndpoint["types"]["RequestOutput"],
+): string | FormData | undefined {
+  if (endpoint.method === Methods.GET || requestData === undefined) {
+    return undefined;
+  }
+  if (containsFile(requestData) && isJsonObject(requestData)) {
+    return objectToFormData(requestData);
+  }
+  return JSON.stringify(requestData);
+}
+
 export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
-  endpointUrl: string,
-  postBody: string | FormData | undefined,
   logger: EndpointLogger,
   user: JwtPayloadType,
   locale: CountryLanguage,
@@ -166,13 +160,9 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     method: endpoint.method,
     pathParams,
   });
-  // Determine if we should use client route (route-client.ts)
+
   let shouldUseClientRoute = false;
 
-  // 1. Check useClientRoute callback (data-driven decision, e.g. incognito)
-  // The callback is typed with InferRequestOutput<TFields> which becomes `never`
-  // due to covariant TFields + contravariant function params. We extract it as a
-  // wider function type since the concrete endpoint always accepts its own data.
   if (endpoint.useClientRoute) {
     const clientRouteCheck = endpoint.useClientRoute as (props: {
       data: TEndpoint["types"]["RequestOutput"];
@@ -188,14 +178,12 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     });
   }
 
-  // 2. Check allowedClientRoles (role-based decision, e.g. public users)
   if (!shouldUseClientRoute && endpoint.allowedClientRoles) {
     const { filterUserPermissionRoles, UserPermissionRole } =
       await import("@/app/api/[locale]/user/user-roles/enum");
     const clientPermissionRoles = filterUserPermissionRoles(
       endpoint.allowedClientRoles,
     );
-
     if (
       user.isPublic &&
       clientPermissionRoles.includes(UserPermissionRole.PUBLIC)
@@ -208,15 +196,12 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     }
   }
 
-  // Route to client handler if either check passed
   if (shouldUseClientRoute) {
     const { endpointToToolName } =
       await import("@/app/api/[locale]/system/unified-interface/shared/utils/path");
     const { getClientRouteHandler } =
       await import("@/app/api/[locale]/system/generated/route-handlers-client");
-
     const pathKey = endpointToToolName(endpoint);
-
     const handlerObject = await getClientRouteHandler(pathKey);
     if (handlerObject?.handler) {
       return handlerObject.handler({
@@ -227,26 +212,40 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         user,
       });
     }
-
     logger.warn(
       "Client handler not found, falling back to server API",
       pathKey,
     );
   }
 
+  const { url, missingParam } = buildUrl(
+    endpoint,
+    locale,
+    requestData,
+    pathParams,
+    logger,
+  );
+  if (missingParam) {
+    return fail({
+      message: hooksTranslation
+        .scopedT(locale)
+        .t("apiUtils.errors.internal_error"),
+      errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      messageParams: {
+        paramName: missingParam,
+        endpoint: endpoint.path.join("/"),
+      },
+    });
+  }
+
+  const postBody = buildBody(endpoint, requestData);
+
   try {
-    // Prepare headers - don't set Content-Type for FormData (browser will set it with boundary)
     const headers: Record<string, string> =
       postBody instanceof FormData
         ? {}
-        : {
-            "Content-Type": "application/json",
-          };
+        : { "Content-Type": "application/json" };
 
-    // Attach CSRF double-submit token for mutating browser requests.
-    // The server validates that X-CSRF-Token === csrf_token cookie.
-    // Non-browser callers (CLI, MCP, server-to-server) won't have the cookie
-    // so the header is simply absent - the server allows that case.
     if (MUTATING_METHODS.has(endpoint.method)) {
       const csrfToken = getCsrfToken();
       if (csrfToken) {
@@ -254,10 +253,6 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
       }
     }
 
-    // For React Native and mobile platforms, check for stored token and add Authorization header.
-    // Format: "Bearer <jwtToken>####<leadId>" - embeds both values so the server can identify
-    // the caller without relying on cookies (which don't work cross-origin).
-    // Web apps on the same origin continue to use httpOnly cookies via credentials: "include".
     if (platform.isReactNative) {
       const { t: authT } = authScopedTranslation.scopedT(locale);
       const storedToken = await authClientRepository.getAuthToken(
@@ -266,57 +261,44 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
       );
       const leadId = user?.leadId;
       if (storedToken.success && storedToken.data && leadId) {
-        // Authenticated: embed JWT + leadId suffix
         headers.Authorization = `Bearer ${storedToken.data}${BEARER_LEAD_ID_SEPARATOR}${leadId}`;
         logger.debug(
           "Added Authorization header for React Native authentication",
         );
       } else if (leadId) {
-        // Public user: no JWT, leadId-only suffix
         headers.Authorization = `Bearer ${BEARER_LEAD_ID_SEPARATOR}${leadId}`;
         logger.debug("Added public leadId-only Authorization header");
       }
     }
 
-    // Prepare request options
     const options: RequestInit = {
       method: endpoint.method,
       headers,
-      credentials: "include", // Include cookies for session-based auth
+      credentials: "include",
     };
 
-    // Add request body for non-GET requests
     if (endpoint.method !== Methods.GET && postBody) {
       options.body = postBody;
     }
 
-    // Make the API call
-    const response = await fetch(endpointUrl, options);
+    const response = await fetch(url, options);
     const json = (await response.json()) as ResponseType<
       TEndpoint["types"]["ResponseOutput"]
     >;
 
-    // Handle API response
     if (!response.ok) {
-      // If the server returned a properly formatted error response, use it directly
       if (!json.success && json.message) {
         return json;
       }
-
-      // Fallback error when server doesn't return proper error format
       return fail({
         message: hooksTranslation
           .scopedT(locale)
           .t("apiUtils.errors.http_error"),
         errorType: ErrorResponseTypes.HTTP_ERROR,
-        messageParams: {
-          statusCode: response.status,
-          url: endpointUrl,
-        },
+        messageParams: { statusCode: response.status, url },
       });
     }
 
-    // Validate successful response against schema
     if (json.success) {
       const validationResponse = validateData(
         json.data,
@@ -326,43 +308,30 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         Platform.NEXT_API,
         `${endpoint.path.join("/")}/${endpoint.method}`,
       );
-
       if (!validationResponse.success) {
-        // Fallback error when response validation fails
         return fail({
           message: hooksTranslation
             .scopedT(locale)
             .t("apiUtils.errors.validation_error"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
-            message: validationResponse.message,
-          },
+          messageParams: { message: validationResponse.message },
         });
       }
-
-      return {
-        success: true,
-        data: validationResponse.data,
-      };
+      return { success: true, data: validationResponse.data };
     }
 
-    // If we have a properly formatted error response, return it directly
     if (!json.success && "errorType" in json) {
       return json;
     }
 
-    // Fallback error when server returns success but no data
     return fail({
       message: hooksTranslation
         .scopedT(locale)
         .t("apiUtils.errors.internal_error"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
-        url: endpointUrl,
-      },
+      messageParams: { url },
     });
   } catch (error) {
-    // Fallback error when request fails completely
     return fail({
       message: hooksTranslation
         .scopedT(locale)

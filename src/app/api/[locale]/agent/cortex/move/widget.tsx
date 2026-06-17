@@ -11,7 +11,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { FolderInput } from "next-vibe-ui/ui/icons/FolderInput";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetDisabled,
   useWidgetTranslation,
@@ -20,8 +19,8 @@ import {
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { CortexNav } from "../_shared/cortex-nav";
 
+import { CortexNav } from "../_shared/cortex-nav";
 import type definition from "./definition";
 
 interface CustomWidgetProps {

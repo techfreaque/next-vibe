@@ -1,17 +1,17 @@
 // CLI: OTP input has no terminal equivalent - return null
 
 import type {
-  InputOTPProps,
   InputOTPGroupProps,
-  InputOTPSlotProps,
+  InputOTPProps,
   InputOTPSeparatorProps,
+  InputOTPSlotProps,
 } from "../../web/ui/input-otp";
 
 export type {
-  InputOTPProps,
   InputOTPGroupProps,
-  InputOTPSlotProps,
+  InputOTPProps,
   InputOTPSeparatorProps,
+  InputOTPSlotProps,
   OTPContextValue,
 } from "../../web/ui/input-otp";
 

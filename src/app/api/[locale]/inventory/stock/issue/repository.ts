@@ -4,13 +4,13 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
+import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
+import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
 } from "@/app/api/[locale]/shared/types/response.schema";
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
-import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";

@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -21,7 +22,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
 
 const { POST } = createEndpoint({
   scopedTranslation,

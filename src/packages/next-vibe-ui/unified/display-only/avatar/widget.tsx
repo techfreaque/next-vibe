@@ -7,6 +7,7 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import { getTextSizeClassName } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
+
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

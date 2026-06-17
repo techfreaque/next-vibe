@@ -6,7 +6,6 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetContext,
@@ -16,7 +15,6 @@ import {
 import { PaginationWidget } from "next-vibe-ui/unified/containers/pagination/widget";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
-import NavigateButtonWidget from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import type definition from "./definition";
 
 /**

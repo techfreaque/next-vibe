@@ -26,12 +26,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import type { ReactFormFieldProps } from "next-vibe-ui/unified/_shared/react-types";
 import type { JSX } from "react";
 
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import type { ReactFormFieldProps } from "next-vibe-ui/unified/_shared/react-types";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {

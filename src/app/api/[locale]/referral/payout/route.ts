@@ -8,11 +8,10 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-
 import {
   payoutAdminEmailTemplate,
-  payoutUserEmailTemplate,
   PayoutRepository,
+  payoutUserEmailTemplate,
 } from "./repository";
 
 export const { GET, POST, tools } = endpointsHandler({

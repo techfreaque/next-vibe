@@ -4,6 +4,7 @@
  * POST: submit a payout request
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { REFERRAL_CONFIG } from "../config";
@@ -23,6 +24,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { REFERRAL_CONFIG } from "../config";
 
 import { UserRole } from "../../user/user-roles/enum";
 import { PayoutCurrency, PayoutCurrencyDB, PayoutStatusDB } from "../enum";

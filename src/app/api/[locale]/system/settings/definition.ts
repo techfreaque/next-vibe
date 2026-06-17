@@ -4,8 +4,15 @@
  * PATCH: Update .env file values - flat individual fields per env key
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import {
+  ENV_KEYS,
+  type EnvFieldType,
+  type EnvKeyMeta,
+  type EnvKeyName,
+} from "@/app/api/[locale]/system/generated/env-keys";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -23,6 +30,8 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
+import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./i18n";
   ENV_KEYS,
   type EnvFieldType,
   type EnvKeyMeta,

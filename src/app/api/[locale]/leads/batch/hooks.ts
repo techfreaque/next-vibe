@@ -10,8 +10,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { useLogger } from "@/hooks/use-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { useLogger } from "@/hooks/use-logger";
 
 import type { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
 import type { LeadListGetRequestTypeOutput } from "../list/definition";

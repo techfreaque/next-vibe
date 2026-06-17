@@ -6,8 +6,8 @@ import "server-only";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { PosTerminalCreateRepository } from "./repository";
 import definitions from "./definition";
+import { PosTerminalCreateRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,

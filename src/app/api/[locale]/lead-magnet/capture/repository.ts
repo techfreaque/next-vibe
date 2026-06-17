@@ -13,20 +13,21 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { referralCodes } from "@/app/api/[locale]/referral/db";
+import { leadMagnetCaptures, leadMagnetConfigs } from "../db";
 import { db } from "@/app/api/[locale]/system/db";
 
 import type { LeadMagnetCaptureStatusValue } from "../enum";
 import { LeadMagnetCaptureStatus } from "../enum";
-import { leadMagnetCaptures, leadMagnetConfigs } from "../db";
-import { getProvider } from "../providers/forwarding";
 import { scopedTranslation as parentScopedTranslation } from "../i18n";
-import { scopedTranslation } from "./i18n";
+import { getProvider } from "../providers/forwarding";
 import type {
   CapturePostRequestOutput,
+import { scopedTranslation } from "./i18n";
   CapturePostResponseOutput,
 } from "./definition";
 

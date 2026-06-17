@@ -8,6 +8,7 @@
  * Auto-upgrades trust_level to VERIFIED when vote_count >= threshold.
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";

@@ -2,13 +2,13 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type {
-  RadioGroupRootProps,
   RadioGroupItemProps,
+  RadioGroupRootProps,
 } from "../../web/ui/radio-group";
 
 export type {
-  RadioGroupRootProps,
   RadioGroupItemProps,
+  RadioGroupRootProps,
 } from "../../web/ui/radio-group";
 
 // Radio button marker - non-translatable terminal symbol

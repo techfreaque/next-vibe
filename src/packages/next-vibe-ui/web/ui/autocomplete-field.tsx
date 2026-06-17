@@ -12,8 +12,8 @@ import React, { useMemo, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import { uiScopedTranslation } from "../i18n";
 
+import { uiScopedTranslation } from "../i18n";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {

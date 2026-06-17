@@ -14,18 +14,18 @@ import { defaultLocale } from "@/i18n/core/config";
 // Import client env modules
 import {
   envClient as env_envClient,
-  envClientSchema as env_envClientSchema,
   envClientExamples,
+  envClientSchema as env_envClientSchema,
 } from "../../../../../config/env-client";
 import {
   contactClientEnv,
-  contactClientEnvSchema,
   contactClientEnvExamples,
+  contactClientEnvSchema,
 } from "../../contact/env-client";
 import {
   paymentClientEnv,
-  paymentClientEnvSchema,
   paymentClientEnvExamples,
+  paymentClientEnvSchema,
 } from "../../payment/env-client";
 
 // Platform detection (will be set at runtime)

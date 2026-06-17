@@ -10,8 +10,8 @@ import { success } from "next-vibe/shared/types/response.schema";
 
 import { persistErrorLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/error-persist";
 import { clientFileLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { isFileLoggingEnabled } from "@/config/debug";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   ClientLogRequestOutput,

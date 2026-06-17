@@ -20,8 +20,8 @@ import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
-import { Users } from "next-vibe-ui/ui/icons/Users";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
+import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, Muted, P } from "next-vibe-ui/ui/typography";
@@ -37,12 +37,12 @@ import { configScopedTranslation } from "@/config/i18n";
 import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation as pageT } from "./i18n";
 import type { ReferralPageT } from "./i18n";
+import { scopedTranslation as pageT } from "./i18n";
 import {
   buildCommissionRows,
-  getReferralParams,
   type CommissionRow,
+  getReferralParams,
 } from "./i18n/utils";
 
 function ChainTable({

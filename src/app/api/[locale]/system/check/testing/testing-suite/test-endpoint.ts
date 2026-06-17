@@ -1,6 +1,10 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import type {
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "next-vibe-ui/unified/_shared/types";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { z } from "zod";
 
@@ -8,9 +12,9 @@ import type {
   CreateApiEndpoint,
   InferResponseOutput,
 } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -21,13 +25,9 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type {
-  AnyChildrenConstrain,
-  FieldUsageConfig,
-} from "next-vibe-ui/unified/_shared/types";
+import { resolveTestAdminUser } from "./resolve-test-user";
 import { sendTestRequest } from "./send-test-request";
 import type { TestEndpointOptions, TestRunner } from "./types";
-import { resolveTestAdminUser } from "./resolve-test-user";
 
 /**
  * Type for example entry

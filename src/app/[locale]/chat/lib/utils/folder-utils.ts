@@ -9,7 +9,6 @@ import {
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as chatScopedTranslation } from "@/app/[locale]/chat/i18n";

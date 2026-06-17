@@ -3,6 +3,7 @@
  * Routes to user's preferred search provider (Brave, Kagi, or auto-detect)
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";

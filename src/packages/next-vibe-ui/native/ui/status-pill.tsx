@@ -1,16 +1,17 @@
-import { cn } from "next-vibe/shared/utils/utils";
 import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import { View } from "react-native";
 
 import type {
   StatusPillProps,
   StatusPillVariant,
 } from "@/packages/next-vibe-ui/web/ui/status-pill";
+
 import { Text } from "./text";
 
 export type {
-  StatusPillVariant,
   StatusPillProps,
+  StatusPillVariant,
 } from "@/packages/next-vibe-ui/web/ui/status-pill";
 
 const StyledView = styled(View, { className: "style" });

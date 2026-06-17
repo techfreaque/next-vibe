@@ -3,7 +3,6 @@
  * Centralized enum definitions for skill system using localized enum pattern
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
 import { ModelUtility, type ModelUtilityValue } from "../../models/enum";

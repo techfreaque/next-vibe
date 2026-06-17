@@ -12,26 +12,22 @@ import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetDisabled,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { CortexNav } from "../_shared/cortex-nav";
 import { DomainEnrichment } from "../_shared/domain-enrichment";
 import { formatBytes } from "../_shared/format-bytes";
-
 import type definition from "./definition";
-
 interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
+
 
 export function CortexReadWidget({
   field,

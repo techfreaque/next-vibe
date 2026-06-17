@@ -8,29 +8,28 @@ import "server-only";
  * Instance-local fields (useCount, lastUsedAt) are NOT synced.
  * Last-writer-wins on updatedAt; tie → remote wins.
  */
-
 import { and, asc, eq, gt, inArray, sql } from "drizzle-orm";
+import { parseError } from "next-vibe/shared/utils/parse-error";
+import { IconKeyDB } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { z } from "zod";
 
-import { db } from "@/app/api/[locale]/system/db";
+import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
+import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
 import {
   type SyncProvider,
   toStandardCursor,
 } from "@/app/api/[locale]/remote-connection/sync-provider";
-import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
-import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-  audioVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-import { IconKeyDB } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { db } from "@/app/api/[locale]/system/db";
 
 import { chatFavorites } from "./db";
 

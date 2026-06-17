@@ -1,15 +1,6 @@
-import { ChatModelId } from "../../../../ai-stream/models";
 import { DEFAULT_CHAT_MODEL_ID } from "../../../../ai-stream/constants";
+import { ChatModelId } from "../../../../ai-stream/models";
 import type { Skill, SkillVariant } from "../../config";
-
-import {
-  AUDIO_VISION,
-  IMAGE_GEN,
-  MUSIC_GEN,
-  STT,
-  VIDEO_GEN,
-  VOICE,
-} from "../_shared/media-presets";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -19,6 +10,14 @@ import {
   SkillCategory,
   SkillOwnershipType,
 } from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
 
 export const THEA_VARIANTS: SkillVariant[] = [
   {

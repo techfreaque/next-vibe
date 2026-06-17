@@ -16,15 +16,15 @@ import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CronTaskRecentExecution } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";
 import type { CronTaskItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
+import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { TaskCategory, TaskCategoryDB } from "../enum";
 import type { TasksT } from "../i18n";
 import { scopedTranslation } from "../i18n";
@@ -572,6 +572,17 @@ export class CronTasksRepository {
       await db.delete(cronTasks).where(eq(cronTasks.id, canonicalId));
       logger.info("Successfully deleted cron task", { id });
 
+      // Remove cortex_nodes entry for this task
+      if (userId) {
+        void (async (): Promise<void> => {
+          const { removeVirtualNode } =
+            await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+          await removeVirtualNode(userId, `/tasks/${canonicalId}.md`);
+        })().catch(() => {
+          // Best-effort cortex cleanup
+        });
+      }
+
       // Emit task-removed to WS subscribers
       const { emitTaskList, emitTaskQueue } = createTaskEmitters(logger, user);
       const removedPayload = { tasks: [{ id: canonicalId }] };
@@ -801,7 +812,7 @@ export class CronTasksRepository {
     try {
       // Query 1: Task definitions with enriched fields
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/user/remote-connection/repository");
+        await import("@/app/api/[locale]/remote-connection/repository");
       const instanceId =
         await RemoteConnectionRepository.getLocalInstanceId(userId);
 
@@ -932,5 +943,27 @@ export class CronTasksRepository {
       });
       return [];
     }
+  }
+
+  /**
+   * Patch task - filters undefined fields from data and calls updateTask.
+   */
+  static patchTask(
+    id: string,
+    data: Partial<CronTaskRow>,
+    user: JwtPayloadType | null,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CronTaskPutResponseOutput>> {
+    const updates: Partial<CronTaskRow> = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined) {
+        // Safe: key and value come from Object.entries(data) where data is Partial<CronTaskRow>
+        (updates as Partial<Record<string, CronTaskRow[keyof CronTaskRow]>>)[
+          key
+        ] = value as CronTaskRow[keyof CronTaskRow];
+      }
+    }
+    return CronTasksRepository.updateTask(id, updates, user, locale, logger);
   }
 }

@@ -15,6 +15,8 @@ import { useInView } from "react-intersection-observer";
 
 import { FREE_CREDIT_POOL } from "@/app/api/[locale]/credits/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { configScopedTranslation } from "@/config/i18n";
 

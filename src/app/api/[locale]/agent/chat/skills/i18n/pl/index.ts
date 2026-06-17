@@ -1707,6 +1707,7 @@ export const translations: typeof enTranslations = {
       variants: {
         kimi: "Kimi",
         budget: "Budżetowy",
+        visual: "Wizualny",
       },
     },
   },

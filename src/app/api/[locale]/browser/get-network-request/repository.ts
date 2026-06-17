@@ -15,6 +15,7 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+
 import { BrowserTool } from "../enum";
 import type { BrowserT } from "../i18n";
 import type { MCPContentBlock } from "../shared/repository";

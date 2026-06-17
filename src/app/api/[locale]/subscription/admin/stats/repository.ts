@@ -17,8 +17,8 @@ import { creditPacks, creditWallets } from "@/app/api/[locale]/credits/db";
 import { paymentTransactions } from "@/app/api/[locale]/payment/db";
 import { PaymentStatus } from "@/app/api/[locale]/payment/enum";
 import {
-  referralEarnings,
   payoutRequests,
+  referralEarnings,
   userReferrals,
 } from "@/app/api/[locale]/referral/db";
 import { PayoutStatus } from "@/app/api/[locale]/referral/enum";

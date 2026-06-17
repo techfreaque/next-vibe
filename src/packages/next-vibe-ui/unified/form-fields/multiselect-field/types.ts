@@ -5,7 +5,6 @@
 
 import type { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { ArrayWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { BaseFormFieldWidgetConfig } from "../_shared/types";

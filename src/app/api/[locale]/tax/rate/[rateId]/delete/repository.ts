@@ -8,6 +8,8 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
+import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
+import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import {
   ErrorResponseTypes,
   fail,
@@ -19,8 +21,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
-import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
 import { taxRates } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
 import type {

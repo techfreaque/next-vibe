@@ -4,21 +4,20 @@ import "server-only";
  * Cortex Write Repository
  * Handles creating and overwriting files in the document workspace
  */
+  success,
+  success,
 
 import { db } from "@/app/api/[locale]/system/db";
 import {
   ErrorResponseTypes,
   fail,
-  success,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CortexWriteT } from "./i18n";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
 import {
@@ -27,10 +26,11 @@ import {
   isValidPath,
   isVirtualWritable,
   isWritablePath,
-  normalizeToCanonicalPath,
   normalizePath,
+  normalizeToCanonicalPath,
   parseFrontmatter,
 } from "../repository";
+import type { CortexWriteT } from "./i18n";
 
 interface WriteParams {
   userId: string;
@@ -161,6 +161,8 @@ export class CortexWriteRepository {
             size,
             frontmatter,
             nodeType: CortexNodeType.FILE,
+            // Re-writing a path revives a soft-deleted (tombstoned) node.
+            isDeleted: false,
             updatedAt: now,
           },
         })

@@ -4,6 +4,7 @@
  */
 
 import { relations } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   boolean,
   customType,
@@ -16,7 +17,6 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 

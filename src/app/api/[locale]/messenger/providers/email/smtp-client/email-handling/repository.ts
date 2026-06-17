@@ -17,13 +17,13 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { MessageStatus, MessageType } from "../../../../messages/enum";
 import { createTrackingContext } from "../components/tracking_context.email";
 import { EmailMetadataRepository } from "../email-metadata/repository";
 import { EmailSendingRepository } from "../email-sending/repository";
 import { scopedTranslation } from "../i18n";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type {
   EmailHandleRequestOutput,
   EmailHandleResponseOutput,

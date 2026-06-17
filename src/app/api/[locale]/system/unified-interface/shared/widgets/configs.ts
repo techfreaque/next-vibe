@@ -14,76 +14,77 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
-} from "../../unified-ui/widgets/_shared/types";
-import type { CodeOutputWidgetConfig } from "../../unified-ui/widgets/containers/code-output/types";
+} from "next-vibe-ui/unified/_shared/types";
+import type { CodeOutputWidgetConfig } from "next-vibe-ui/unified/containers/code-output/types";
 import type {
   ContainerUnionWidgetConfig,
   ContainerWidgetConfig,
-} from "../../unified-ui/widgets/containers/container/types";
+} from "next-vibe-ui/unified/containers/container/types";
 import type {
   CustomWidgetObjectConfig,
   CustomWidgetPrimitiveConfig,
-} from "../../unified-ui/widgets/containers/custom/types";
-import type { PaginationWidgetConfig } from "../../unified-ui/widgets/containers/pagination/types";
-import type { AlertWidgetConfig } from "../../unified-ui/widgets/display-only/alert/types";
-import type { AvatarWidgetConfig } from "../../unified-ui/widgets/display-only/avatar/types";
-import type { BadgeWidgetConfig } from "../../unified-ui/widgets/display-only/badge/types";
-import type { ChartWidgetConfig } from "../../unified-ui/widgets/display-only/chart/types";
-import type { CodeQualityFilesWidgetConfig } from "../../unified-ui/widgets/display-only/code-quality-files/types";
-import type { CodeQualityListWidgetConfig } from "../../unified-ui/widgets/display-only/code-quality-list/types";
-import type { CodeQualitySummaryWidgetConfig } from "../../unified-ui/widgets/display-only/code-quality-summary/types";
-import type { DescriptionWidgetConfig } from "../../unified-ui/widgets/display-only/description/types";
-import type { EmptyStateWidgetConfig } from "../../unified-ui/widgets/display-only/empty-state/types";
-import type { IconWidgetConfig } from "../../unified-ui/widgets/display-only/icon/types";
-import type { KeyValueWidgetConfig } from "../../unified-ui/widgets/display-only/key-value/types";
-import type { LinkWidgetConfig } from "../../unified-ui/widgets/display-only/link/types";
-import type { LoadingWidgetConfig } from "../../unified-ui/widgets/display-only/loading/types";
-import type { MarkdownWidgetConfig } from "../../unified-ui/widgets/display-only/markdown/types";
-import type { MetadataWidgetConfig } from "../../unified-ui/widgets/display-only/metadata/types";
-import type { SeparatorWidgetConfig } from "../../unified-ui/widgets/display-only/separator/types";
-import type { StatWidgetConfig } from "../../unified-ui/widgets/display-only/stat/types";
-import type { StatusIndicatorWidgetConfig } from "../../unified-ui/widgets/display-only/status-indicator/types";
-import type { TextWidgetConfig } from "../../unified-ui/widgets/display-only/text/types";
-import type { TitleWidgetConfig } from "../../unified-ui/widgets/display-only/title/types";
-import type { BooleanFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/boolean-field/types";
-import type { ColorFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/color-field/types";
-import type { CountrySelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/country-select-field/types";
-import type { CurrencySelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/currency-select-field/types";
-import type { DateFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/date-field/types";
-import type { DateRangeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/date-range-field/types";
-import type { DateTimeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/datetime-field/types";
-import type { EmailFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/email-field/types";
-import type { FileFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/file-field/types";
-import type { FilterPillsFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/filter-pills-field/types";
-import type { IconFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/icon-field/types";
-import type { IntFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/int-field/types";
-import type { JsonFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/json-field/types";
-import type { LanguageSelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/language-select-field/types";
-import type { MarkdownEditorWidgetConfig } from "../../unified-ui/widgets/form-fields/markdown-editor/types";
-import type { MultiSelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/multiselect-field/types";
-import type { NumberFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/number-field/types";
-import type { PasswordFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/password-field/types";
-import type { PhoneFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/phone-field/types";
-import type { RangeSliderFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/range-slider-field/types";
-import type { SelectFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/select-field/types";
-import type { SliderFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/slider-field/types";
-import type { TagsFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/tags-field/types";
-import type { TextArrayFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/text-array-field/types";
-import type { TextFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/text-field/types";
-import type { TextareaFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/textarea-field/types";
-import type { MarkdownTextareaFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/markdown-textarea-field/types";
-import type { TimeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-field/types";
-import type { TimeRangeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-range-field/types";
-import type { SignalsFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/signals-field/types";
-import type { TimeSeriesFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-series-field/types";
-import type { TimezoneFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/timezone-field/types";
-import type { UrlFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/url-field/types";
-import type { EntityPickerFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/entity-picker-field/types";
-import type { UuidFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/uuid-field/types";
-import type { ButtonWidgetConfig } from "../../unified-ui/widgets/interactive/button/types";
-import type { FormAlertWidgetConfig } from "../../unified-ui/widgets/interactive/form-alert/types";
-import type { NavigateButtonWidgetConfig } from "../../unified-ui/widgets/interactive/navigate-button/types";
-import type { SubmitButtonWidgetConfig } from "../../unified-ui/widgets/interactive/submit-button/types";
+} from "next-vibe-ui/unified/containers/custom/types";
+import type { PaginationWidgetConfig } from "next-vibe-ui/unified/containers/pagination/types";
+import type { AlertWidgetConfig } from "next-vibe-ui/unified/display-only/alert/types";
+import type { AvatarWidgetConfig } from "next-vibe-ui/unified/display-only/avatar/types";
+import type { BadgeWidgetConfig } from "next-vibe-ui/unified/display-only/badge/types";
+import type { ChartWidgetConfig } from "next-vibe-ui/unified/display-only/chart/types";
+import type { CodeQualityFilesWidgetConfig } from "next-vibe-ui/unified/display-only/code-quality-files/types";
+import type { CodeQualityListWidgetConfig } from "next-vibe-ui/unified/display-only/code-quality-list/types";
+import type { CodeQualitySummaryWidgetConfig } from "next-vibe-ui/unified/display-only/code-quality-summary/types";
+import type { DescriptionWidgetConfig } from "next-vibe-ui/unified/display-only/description/types";
+import type { EmptyStateWidgetConfig } from "next-vibe-ui/unified/display-only/empty-state/types";
+import type { IconWidgetConfig } from "next-vibe-ui/unified/display-only/icon/types";
+import type { KeyValueWidgetConfig } from "next-vibe-ui/unified/display-only/key-value/types";
+import type { LinkWidgetConfig } from "next-vibe-ui/unified/display-only/link/types";
+import type { LoadingWidgetConfig } from "next-vibe-ui/unified/display-only/loading/types";
+import type { MarkdownWidgetConfig } from "next-vibe-ui/unified/display-only/markdown/types";
+import type { MetadataWidgetConfig } from "next-vibe-ui/unified/display-only/metadata/types";
+import type { SeparatorWidgetConfig } from "next-vibe-ui/unified/display-only/separator/types";
+import type { StatWidgetConfig } from "next-vibe-ui/unified/display-only/stat/types";
+import type { StatusIndicatorWidgetConfig } from "next-vibe-ui/unified/display-only/status-indicator/types";
+import type { TextWidgetConfig } from "next-vibe-ui/unified/display-only/text/types";
+import type { TitleWidgetConfig } from "next-vibe-ui/unified/display-only/title/types";
+import type { BooleanFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/boolean-field/types";
+import type { ColorFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/color-field/types";
+import type { CountrySelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/country-select-field/types";
+import type { CurrencySelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/currency-select-field/types";
+import type { DateFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/date-field/types";
+import type { DateRangeFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/date-range-field/types";
+import type { DateTimeFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/datetime-field/types";
+import type { EmailFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/email-field/types";
+import type { FileFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/file-field/types";
+import type { FilterPillsFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/filter-pills-field/types";
+import type { IconFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/icon-field/types";
+import type { IntFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/int-field/types";
+import type { JsonFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/json-field/types";
+import type { LanguageSelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/language-select-field/types";
+import type { MarkdownEditorWidgetConfig } from "next-vibe-ui/unified/form-fields/markdown-editor/types";
+import type { MultiSelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/multiselect-field/types";
+import type { NumberFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/number-field/types";
+import type { PasswordFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/password-field/types";
+import type { PhoneFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/phone-field/types";
+import type { RangeSliderFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/range-slider-field/types";
+import type { SelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/select-field/types";
+import type { SliderFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/slider-field/types";
+import type { TagsFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/tags-field/types";
+import type { TextArrayFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/text-array-field/types";
+import type { TextFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/text-field/types";
+import type { TextareaFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/textarea-field/types";
+import type { MarkdownTextareaFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/markdown-textarea-field/types";
+import type { TimeFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/time-field/types";
+import type { TimeRangeFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/time-range-field/types";
+import type { SignalsFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/signals-field/types";
+import type { TimeSeriesFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/time-series-field/types";
+import type { TimezoneFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/timezone-field/types";
+import type { UrlFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/url-field/types";
+import type { EntityPickerFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/entity-picker-field/types";
+import type { UuidFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/uuid-field/types";
+import type { ButtonWidgetConfig } from "next-vibe-ui/unified/interactive/button/types";
+import type { FormAlertWidgetConfig } from "next-vibe-ui/unified/interactive/form-alert/types";
+import type { NavigateButtonWidgetConfig } from "next-vibe-ui/unified/interactive/navigate-button/types";
+import type { SearchBarWidgetConfig } from "next-vibe-ui/unified/interactive/search-bar/types";
+import type { SubmitButtonWidgetConfig } from "next-vibe-ui/unified/interactive/submit-button/types";
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
 
 // Union type for all form field widgets
@@ -296,7 +297,8 @@ export type FormFieldWidgetConfig<
       // @ts-expect-error - TSchema constraint mismatch
       TSchema,
       TUsage
-    >;
+    >
+  | SearchBarWidgetConfig<TKey, TSchema, TUsage>;
 
 /**
  * Widget configs that support object-union (discriminated unions)

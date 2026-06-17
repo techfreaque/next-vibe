@@ -1,33 +1,34 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 import * as React from "react";
+
+import {
+  parseClassesToBoxProps,
+  parseClassesToTextProps,
+} from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
 
 import type {
   TableBodyProps,
   TableCaptionProps,
   TableCellProps,
   TableFooterProps,
-  TableHeadProps,
   TableHeaderProps,
+  TableHeadProps,
   TableProps,
   TableRowProps,
 } from "../../web/ui/table";
-import {
-  parseClassesToBoxProps,
-  parseClassesToTextProps,
-} from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 // Re-export types from web version
 export type {
-  TableProps,
-  TableHeaderProps,
   TableBodyProps,
-  TableFooterProps,
-  TableRowProps,
-  TableHeadProps,
-  TableCellProps,
   TableCaptionProps,
+  TableCellProps,
+  TableFooterProps,
+  TableHeaderProps,
+  TableHeadProps,
+  TableProps,
+  TableRowProps,
 } from "../../web/ui/table";
 
 const SEPARATOR = "\u2500".repeat(60);

@@ -18,11 +18,11 @@ import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/defini
 import creditsDefinition from "@/app/api/[locale]/credits/definition";
 import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
 import historyDefinition from "@/app/api/[locale]/credits/history/definition";
+import remoteConnectionDefinition from "@/app/api/[locale]/remote-connection/list/definition";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import subscriptionDefinition from "@/app/api/[locale]/subscription/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import remoteConnectionDefinition from "@/app/api/[locale]/remote-connection/list/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface SubscriptionPageClientProps {

@@ -2,17 +2,18 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
-import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
+import { Pin } from "next-vibe-ui/ui/icons/Pin";
 import { ListItem } from "next-vibe-ui/ui/list-item";
+import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { StatusPill } from "next-vibe-ui/ui/status-pill";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { Pin } from "next-vibe-ui/ui/icons/Pin";
-import type { JSX } from "react";
 
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+import type { JSX } from "react";
+import type { JSX } from "react";
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 

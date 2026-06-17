@@ -11,14 +11,14 @@ import { eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
-  success,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import {
-  ModalityResolver,
   type BridgeContext,
+  ModalityResolver,
 } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import { ProviderFactory } from "@/app/api/[locale]/agent/ai-stream/repository/core/provider-factory";
 import {

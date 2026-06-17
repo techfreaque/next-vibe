@@ -8,7 +8,6 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { VibeSenseRepository } from "../../../repository";
-
 import definitions from "./definition";
 
 export const { POST, tools } = endpointsHandler({

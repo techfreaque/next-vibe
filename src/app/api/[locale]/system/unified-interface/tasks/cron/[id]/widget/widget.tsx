@@ -28,7 +28,6 @@ import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -41,7 +40,15 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, { useCallback, useEffect, useState } from "react";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import { cn } from "@/app/api/[locale]/shared/utils";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";

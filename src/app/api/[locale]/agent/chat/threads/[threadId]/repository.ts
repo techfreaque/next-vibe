@@ -20,13 +20,13 @@ import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interfa
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import threadsDefinitions from "../definition";
 import { chatFolders, chatThreads } from "../../db";
 import {
   canDeleteThread,
   canUpdateThread,
   canViewThread,
 } from "../../permissions/permissions";
+import threadsDefinitions from "../definition";
 import type {
   ThreadDeleteResponseOutput,
   ThreadGetResponseOutput,

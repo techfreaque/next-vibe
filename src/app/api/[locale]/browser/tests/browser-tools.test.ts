@@ -20,38 +20,38 @@
 
 import "server-only";
 
+import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import closePageEndpoints from "@/app/api/[locale]/browser/close-page/definition";
+import emulateEndpoints from "@/app/api/[locale]/browser/emulate/definition";
+import evaluateScriptEndpoints from "@/app/api/[locale]/browser/evaluate-script/definition";
+import listConsoleMessagesEndpoints from "@/app/api/[locale]/browser/list-console-messages/definition";
+import listNetworkRequestsEndpoints from "@/app/api/[locale]/browser/list-network-requests/definition";
+import listPagesEndpoints from "@/app/api/[locale]/browser/list-pages/definition";
+import navigatePageEndpoints from "@/app/api/[locale]/browser/navigate-page/definition";
+import newPageEndpoints from "@/app/api/[locale]/browser/new-page/definition";
+import performanceStartTraceEndpoints from "@/app/api/[locale]/browser/performance-start-trace/definition";
+import performanceStopTraceEndpoints from "@/app/api/[locale]/browser/performance-stop-trace/definition";
+import resizePageEndpoints from "@/app/api/[locale]/browser/resize-page/definition";
+import selectPageEndpoints from "@/app/api/[locale]/browser/select-page/definition";
+import takeScreenshotEndpoints from "@/app/api/[locale]/browser/take-screenshot/definition";
+import takeSnapshotEndpoints from "@/app/api/[locale]/browser/take-snapshot/definition";
+import waitForEndpoints from "@/app/api/[locale]/browser/wait-for/definition";
+import { db } from "@/app/api/[locale]/system/db";
 import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { defaultLocale } from "@/i18n/core/config";
-import { eq } from "drizzle-orm";
 import { env } from "@/config/env";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import newPageEndpoints from "@/app/api/[locale]/browser/new-page/definition";
-import closePageEndpoints from "@/app/api/[locale]/browser/close-page/definition";
-import takeSnapshotEndpoints from "@/app/api/[locale]/browser/take-snapshot/definition";
-import listPagesEndpoints from "@/app/api/[locale]/browser/list-pages/definition";
-import takeScreenshotEndpoints from "@/app/api/[locale]/browser/take-screenshot/definition";
-import selectPageEndpoints from "@/app/api/[locale]/browser/select-page/definition";
-import navigatePageEndpoints from "@/app/api/[locale]/browser/navigate-page/definition";
-import resizePageEndpoints from "@/app/api/[locale]/browser/resize-page/definition";
-import evaluateScriptEndpoints from "@/app/api/[locale]/browser/evaluate-script/definition";
-import listNetworkRequestsEndpoints from "@/app/api/[locale]/browser/list-network-requests/definition";
-import listConsoleMessagesEndpoints from "@/app/api/[locale]/browser/list-console-messages/definition";
-import performanceStartTraceEndpoints from "@/app/api/[locale]/browser/performance-start-trace/definition";
-import performanceStopTraceEndpoints from "@/app/api/[locale]/browser/performance-stop-trace/definition";
-import waitForEndpoints from "@/app/api/[locale]/browser/wait-for/definition";
-import emulateEndpoints from "@/app/api/[locale]/browser/emulate/definition";
+import { defaultLocale } from "@/i18n/core/config";
 
 // ---------------------------------------------------------------------------
 // Constants

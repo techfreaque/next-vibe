@@ -18,8 +18,8 @@ import {
   Platform,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { env } from "@/config/env";
-
 import type { CheckVibeCheckT, CheckVibeCheckTranslationKey } from "./i18n";
+
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -36,6 +36,7 @@ import type { TypecheckResponseOutput } from "../typecheck/definition";
 import { scopedTranslation as typecheckScopedTranslation } from "../typecheck/i18n";
 import { TypecheckRepository } from "../typecheck/repository";
 import type {
+import type { CheckVibeCheckT, CheckVibeCheckTranslationKey } from "./i18n";
   VibeCheckRequestOutput,
   VibeCheckResponseOutput,
 } from "./definition";

@@ -9,8 +9,8 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { companies } from "../companies/db";
 
+import { companies } from "../companies/db";
 import { taxRates } from "./db";
 import type { TaxTypeDB } from "./enum";
 import { TaxType } from "./enum";

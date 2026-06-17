@@ -3,6 +3,7 @@
  * Trigger a single task by ID and receive the result synchronously
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -22,7 +23,6 @@ import {
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { TASK_EXECUTE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

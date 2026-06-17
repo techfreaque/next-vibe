@@ -11,7 +11,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetDisabled,
   useWidgetNavigation,
@@ -22,8 +21,8 @@ import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { CortexNav } from "../_shared/cortex-nav";
 
+import { CortexNav } from "../_shared/cortex-nav";
 import type definition from "./definition";
 
 interface CustomWidgetProps {

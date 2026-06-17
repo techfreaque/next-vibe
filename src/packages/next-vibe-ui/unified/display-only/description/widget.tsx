@@ -2,21 +2,21 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import type { JSX } from "react";
-
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import {
-  getSpacingClassName,
-  getTextSizeClassName,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
 import type { ReactRequestResponseWidgetProps } from "next-vibe-ui/unified/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
 import {
   useWidgetContext,
   useWidgetForm,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+import {
+  getSpacingClassName,
+  getTextSizeClassName,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
+
 import type { DescriptionWidgetConfig } from "./types";
 
 /**

@@ -25,8 +25,8 @@ import {
 } from "../../messenger/providers/email/smtp-client/components/tracking_context.email";
 import type definition from "./definition";
 import {
-  type UnsubscribePostResponseOutput as NewsletterUnsubscribeResponseType,
   type UnsubscribePostRequestOutput as NewsletterUnsubscribeType,
+  type UnsubscribePostResponseOutput as NewsletterUnsubscribeResponseType,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
 

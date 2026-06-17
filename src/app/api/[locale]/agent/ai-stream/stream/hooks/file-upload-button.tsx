@@ -125,6 +125,7 @@ export const FileUploadButton = memo(function FileUploadButton({
               onClick={handleButtonClick}
               disabled={disabled}
               className="h-8 w-8 @sm:h-9 @sm:w-9 relative"
+              title={t("input.attachments.uploadFile")}
             >
               <Paperclip className="h-4 w-4" />
               <Div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-semibold">
@@ -194,6 +195,7 @@ export const FileUploadButton = memo(function FileUploadButton({
                 onClick={handleButtonClick}
                 disabled={disabled}
                 className="h-8 w-8 @sm:h-9 @sm:w-9"
+                title={t("input.attachments.uploadFile")}
               >
                 <Paperclip className="h-4 w-4" />
               </Button>

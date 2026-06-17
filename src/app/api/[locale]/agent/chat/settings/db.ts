@@ -8,11 +8,11 @@ import { jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { SearchProviderValue } from "@/app/api/[locale]/agent/search/enum";
 import { users } from "@/app/api/[locale]/user/db";
 
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ViewModeValue } from "../enum";
-import type { SearchProviderValue } from "@/app/api/[locale]/agent/search/enum";
 
 /**
  * Chat Settings Table

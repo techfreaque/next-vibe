@@ -12,6 +12,7 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
+import type { JSX } from "react";
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { DateFieldWidget } from "next-vibe-ui/unified/form-fields/date-field/widget";
 

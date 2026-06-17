@@ -6,12 +6,12 @@
 import "server-only";
 
 import { ne } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";

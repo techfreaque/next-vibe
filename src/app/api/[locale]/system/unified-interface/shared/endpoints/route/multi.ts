@@ -1,11 +1,11 @@
 import "server-only";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 /**
  * Endpoint Handler Implementation
  * Main function for creating type-safe multi-method handlers
  */
 import type { NextRequest, NextResponse } from "next-vibe-ui/lib/request";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

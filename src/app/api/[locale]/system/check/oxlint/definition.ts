@@ -3,6 +3,7 @@
  * Production-ready endpoint for run oxlint
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -22,7 +23,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
 
 const CheckResultWidget = lazyWidget(() =>

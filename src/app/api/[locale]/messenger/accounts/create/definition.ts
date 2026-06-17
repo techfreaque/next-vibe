@@ -2,6 +2,7 @@
  * Unified Messenger Account Create API Definition
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
@@ -32,6 +33,13 @@ import {
   EmailJourneyVariantOptions,
 } from "../../../leads/enum";
 import { UserRole } from "../../../user/user-roles/enum";
+import {
+  EmailImapAuthMethodDB,
+  EmailImapAuthMethodOptions,
+  EmailSecurityType,
+  EmailSecurityTypeDB,
+  EmailSecurityTypeOptions,
+} from "../../providers/email/enum";
 import { CampaignType, CampaignTypeOptions } from "../enum";
 import {
   MessengerAccountStatus,
@@ -41,13 +49,6 @@ import {
   MessengerProviderDB,
   MessengerProviderOptions,
 } from "../enum";
-import {
-  EmailImapAuthMethodDB,
-  EmailImapAuthMethodOptions,
-  EmailSecurityType,
-  EmailSecurityTypeDB,
-  EmailSecurityTypeOptions,
-} from "../../providers/email/enum";
 import {
   MessageChannel,
   MessageChannelDB,

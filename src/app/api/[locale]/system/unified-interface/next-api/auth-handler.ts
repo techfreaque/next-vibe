@@ -1,6 +1,5 @@
 import "server-only";
 
-import { cookies } from "next-vibe-ui/lib/headers";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -8,6 +7,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { Environment, parseError } from "next-vibe/shared/utils";
+import { cookies } from "next-vibe-ui/lib/headers";
 
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,

@@ -5,6 +5,7 @@
 import "server-only";
 
 import { env } from "@/config/env";
+
 import { DEV_SEED_DEMO_USER_EMAIL } from "../users/seeds";
 
 export const DEV_SEED_PASSWORD = env.VIBE_ADMIN_USER_PASSWORD;

@@ -13,8 +13,8 @@ import {
   useWidgetTranslation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 
-import type { RebuildResponseOutput } from "./definition";
 import type endpoints from "./definition";
+import type { RebuildResponseOutput } from "./definition";
 
 interface CliWidgetProps {
   field: {

@@ -10,8 +10,8 @@ import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { getAvailableSkillCount } from "@/app/api/[locale]/agent/chat/skills/config";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";

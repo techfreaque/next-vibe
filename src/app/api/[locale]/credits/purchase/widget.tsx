@@ -25,13 +25,23 @@ import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import { Bitcoin } from "next-vibe-ui/ui/icons/Bitcoin";
 import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/ExternalLink";
-import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Minus } from "next-vibe-ui/ui/icons/Minus";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
+import {
+  useWidgetForm,
+  useWidgetLogger,
+  useWidgetOnSubmit,
+  useWidgetTranslation,
+  useWidgetUser,
+  useWidgetValue,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -45,16 +55,6 @@ import {
 } from "@/app/api/[locale]/products/repository-client";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { useSubscription } from "@/app/api/[locale]/subscription/hooks";
-import {
-  useWidgetForm,
-  useWidgetLogger,
-  useWidgetOnSubmit,
-  useWidgetTranslation,
-  useWidgetUser,
-  useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";

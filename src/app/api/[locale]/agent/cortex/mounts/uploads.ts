@@ -6,7 +6,6 @@ import "server-only";
  * Each file renders as markdown with a download link + metadata frontmatter.
  * Organized by MIME type: images/, documents/, audio/, video/, other/
  */
-
 import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
 
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";

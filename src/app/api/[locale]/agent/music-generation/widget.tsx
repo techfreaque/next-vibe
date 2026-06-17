@@ -12,17 +12,6 @@ import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H3 } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-import { useMemo, useState } from "react";
-
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
-import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import {
-  ModelSelector,
-  ModelSelectorTrigger,
-} from "@/app/api/[locale]/agent/models/widget/model-selector";
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -34,11 +23,12 @@ import {
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useMemo, useState } from "react";
 
 import type definition from "./definition";
 import { MusicDuration } from "./enum";
 import { scopedTranslation } from "./i18n";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "./constants";
 import { getMusicGenModelById, MusicGenModelId } from "./models";
 
 interface CustomWidgetProps {

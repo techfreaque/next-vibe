@@ -3,18 +3,18 @@
  * Arrow keys to navigate, Space to toggle selection, Enter to confirm
  */
 import { Box, Text, useInput } from "ink";
-import { useState } from "react";
-import type { JSX } from "react";
-
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useState } from "react";
+
 import type {
-  MultiSelectProps,
   MultiSelectOption,
+  MultiSelectProps,
 } from "../../web/ui/multi-select";
 
 export type {
-  MultiSelectProps,
   MultiSelectOption,
+  MultiSelectProps,
 } from "../../web/ui/multi-select";
 
 const CHECKED = "\u2713";

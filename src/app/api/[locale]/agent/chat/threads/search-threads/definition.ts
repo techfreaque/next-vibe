@@ -22,8 +22,8 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ThreadStatus, ThreadStatusOptions } from "../../enum";
-import { scopedTranslation } from "./i18n";
 import { SEARCH_THREADS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Search Threads Endpoint (GET)

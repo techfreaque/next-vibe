@@ -22,12 +22,12 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { verifyInvoiceViewToken } from "../../token";
-import { scopedTranslation } from "./i18n";
 import type {
-  InvoicePublicViewUrlPathParams,
   InvoicePublicViewRequestOutput,
   InvoicePublicViewResponseOutput,
+  InvoicePublicViewUrlPathParams,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class InvoicePublicViewRepository {
   static async getPublicInvoice(

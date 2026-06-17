@@ -1747,7 +1747,7 @@ export class CreditRepository {
         });
       });
 
-      logger.info("Credits added", {
+      logger.debug("Credits added", {
         walletId: wallet.id,
         amount,
         packType,
@@ -3461,7 +3461,7 @@ export class CreditRepository {
           totalCredits,
         });
       } else {
-        logger.info("Credits added after purchase", {
+        logger.debug("Credits added after purchase", {
           sessionId: session.id,
           userId,
           totalCredits,

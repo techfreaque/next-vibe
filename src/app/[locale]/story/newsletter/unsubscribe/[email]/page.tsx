@@ -10,8 +10,8 @@ import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { scopedTranslation } from "../../i18n";
 
+import { scopedTranslation } from "../../i18n";
 import { UnsubscribePage } from "../_components/unsubscribe-page";
 
 interface PageProps {

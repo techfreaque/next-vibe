@@ -7,7 +7,7 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "../../../unified-ui/widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/types";
 import type { EventSchemas } from "../../../websocket/types";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
 import { objectField, requestField } from "../../field/utils";

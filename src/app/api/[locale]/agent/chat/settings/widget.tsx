@@ -9,31 +9,25 @@
 
 "use client";
 
-import taskExecuteEndpoints from "@/app/api/[locale]/system/unified-interface/tasks/execute/definition";
-import favoritesEndpoint from "@/app/api/[locale]/agent/chat/favorites/definition";
-import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/chat/favorites/favorite-select-context";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { cn } from "next-vibe/shared/utils";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Link } from "next-vibe-ui/ui/link";
 import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
+import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { Info } from "next-vibe-ui/ui/icons/Info";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
 import { Moon } from "next-vibe-ui/ui/icons/Moon";
 import { Play } from "next-vibe-ui/ui/icons/Play";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
+import { Link } from "next-vibe-ui/ui/link";
 import {
   Select,
   SelectContent,
@@ -56,25 +50,36 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
-import { useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { cn } from "next-vibe/shared/utils";
+import {
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetUser,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 
-import {
   getChatModelById,
+  getChatModelById,
+import {
   type ChatModelId,
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
   type ChatModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
+import favoritesEndpoint from "@/app/api/[locale]/agent/chat/favorites/definition";
+import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/chat/favorites/favorite-select-context";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 
 import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
@@ -95,13 +100,13 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type definition from "./definition";
 import type { ChatSettingsUpdateRequestOutput } from "./definition";
+  generateRandomDreamerSchedule,
+  MAMA_DEFAULT_SCHEDULE,
 import { useChatSettings } from "./hooks";
 import { scopedTranslation } from "./i18n";
 import {
   AUTOPILOT_DEFAULT_SCHEDULE,
   DREAM_DEFAULT_SCHEDULE,
-  MAMA_DEFAULT_SCHEDULE,
-  generateRandomDreamerSchedule,
   generateRandomAutopilotSchedule,
 } from "./pulse/constants";
 

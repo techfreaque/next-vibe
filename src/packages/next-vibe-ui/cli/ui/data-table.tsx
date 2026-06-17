@@ -4,11 +4,11 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 import * as React from "react";
 
 import type { DataTableProps } from "../../web/ui/data-table";
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 export type { DataTableProps } from "../../web/ui/data-table";
 

@@ -9,12 +9,10 @@ import { and, count as drizzleCount, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 
-import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
-import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
-
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
-
 /**
+import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
  * Read a favorite as markdown
  * Path: /favorites/<slug> or /favorites/<uuid>
  */

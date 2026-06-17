@@ -26,12 +26,13 @@
 import "server-only";
 
 import { and, eq, like } from "drizzle-orm";
+import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-
-import { db } from "@/app/api/[locale]/system/db";
+import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
+import { db } from "@/app/api/[locale]/system/db";
+
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
@@ -40,10 +41,12 @@ import { CortexNodeType } from "./enum";
 import { removeVirtualNodesByEntityId } from "./embeddings/sync-virtual";
 
 import deleteEndpoint from "./delete/definition";
-import writeEndpoint from "./write/definition";
+import { removeVirtualNodesByEntityId } from "./embeddings/sync-virtual";
+import { CortexNodeType } from "./enum";
+import listEndpoint from "./list/definition";
 import mkdirEndpoint from "./mkdir/definition";
 import readEndpoint from "./read/definition";
-import listEndpoint from "./list/definition";
+import writeEndpoint from "./write/definition";
 
 const TEST_TIMEOUT = 60_000;
 

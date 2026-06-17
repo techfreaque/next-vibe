@@ -1,11 +1,12 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils/utils";
 import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 
 import type { SectionGroupProps } from "@/packages/next-vibe-ui/web/ui/section-group";
+
 import { styledNative } from "../utils/style-converter";
 import { Text } from "./text";
 

@@ -2,17 +2,17 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type {
-  AccordionProps,
-  AccordionItemProps,
-  AccordionTriggerProps,
   AccordionContentProps,
+  AccordionItemProps,
+  AccordionProps,
+  AccordionTriggerProps,
 } from "../../web/ui/accordion";
 
 export type {
-  AccordionProps,
-  AccordionItemProps,
-  AccordionTriggerProps,
   AccordionContentProps,
+  AccordionItemProps,
+  AccordionProps,
+  AccordionTriggerProps,
 } from "../../web/ui/accordion";
 
 // CLI: always expanded - no interactivity in terminal

@@ -12,7 +12,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
-import { imageGenModelDefinitions } from "../../../image-generation/models";
 
 // USD per image - standard quality 1024×1024
 const OPENAI_IMAGE_STATIC_PRICES: Record<string, number> = {

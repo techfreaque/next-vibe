@@ -1,16 +1,17 @@
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { MetricCard } from "next-vibe-ui/ui/metric-card";
 import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { Button } from "next-vibe-ui/ui/button";
-import type { JSX } from "react";
 
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+import type { JSX } from "react";
+import type { JSX } from "react";
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 

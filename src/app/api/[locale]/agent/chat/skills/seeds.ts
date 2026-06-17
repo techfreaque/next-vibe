@@ -7,20 +7,20 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 import { users } from "@/app/api/[locale]/user/db";
+import { env } from "@/config/env";
 
+import { ensureUniqueSlug, generateSlug } from "../slugify";
+import type { SkillVariantData } from "./db";
+import { customSkills, type NewCustomSkill } from "./db";
 import {
   ModelSelectionType,
   SkillCategory,
   SkillOwnershipType,
   SkillStatus,
-  SkillType,
   SkillTrustLevel,
+  SkillType,
 } from "./enum";
-import type { SkillVariantData } from "./db";
-import { customSkills, type NewCustomSkill } from "./db";
-import { generateSlug, ensureUniqueSlug } from "../slugify";
 
 export const priority = 40;
 

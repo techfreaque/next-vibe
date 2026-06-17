@@ -18,6 +18,7 @@ import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import { accountNavItems } from "../_components/account-nav-items";
 
 export interface AccountLayoutData {

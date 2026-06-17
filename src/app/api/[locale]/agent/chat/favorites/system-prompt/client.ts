@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 
-import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
 import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
 
 import type { FavoritesData, FavoriteSummaryItem } from "./prompt";
 

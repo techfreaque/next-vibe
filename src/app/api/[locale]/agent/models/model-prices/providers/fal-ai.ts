@@ -9,6 +9,7 @@
 import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
 import { imageGenModelDefinitions } from "../../../image-generation/models";
 import { musicGenModelDefinitions } from "../../../music-generation/models";
 import { ApiProvider } from "../../models";

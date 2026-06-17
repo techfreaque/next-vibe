@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-cortex-list-on-the-root-path-----to-see-all----f82b5759-33f6-4831-9e2f-5aa8a5119310.md\n\n# Use cortex-list on the root path \"/\" to see all...\nFolder: cron\nPreview: <think> Both operations succeeded and returned the expected values: 1. First write: created: true — file did not exist,…",
+    "encoding_format": "float"
+  }
+}

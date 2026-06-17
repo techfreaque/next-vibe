@@ -2,12 +2,12 @@
  * CLI NumberInput - text input that parses integers/floats
  * Also supports +/- keys to increment/decrement
  */
-import TextInput from "ink-text-input";
 import { Box, Text, useInput } from "ink";
-import { useState } from "react";
-import type { JSX } from "react";
-
+import TextInput from "ink-text-input";
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useState } from "react";
+
 import type { NumberInputProps } from "../../web/ui/number-input";
 
 export type { NumberInputProps } from "../../web/ui/number-input";

@@ -16,6 +16,8 @@ import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
 import type definition from "./definition";
+import type definition from "./definition";
+import type definition from "./definition";
 
 import { AccountType } from "../../../enum";
 

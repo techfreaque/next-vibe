@@ -3,8 +3,11 @@
  * Creates a new sales estimate/quote in DRAFT status with line items
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import listDef0 from "@/app/api/[locale]/companies/list/definition";
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -19,13 +22,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { scopedTranslation } from "./i18n";
-import listDef0 from "@/app/api/[locale]/companies/list/definition";
 import listDef1 from "@/app/api/[locale]/users/list/definition";
+
+import { scopedTranslation } from "./i18n";
 
 const EstimateCreateWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.EstimateCreateWidget })),

@@ -29,6 +29,16 @@ import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
+import {
+  useWidgetForm,
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetOnSubmit,
+  useWidgetTranslation,
+  useWidgetUser,
+  useWidgetValue,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import FormAlertWidget from "next-vibe-ui/unified/interactive/form-alert/widget";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -47,18 +57,8 @@ import {
   SubscriptionStatus,
 } from "@/app/api/[locale]/subscription/enum";
 import { useSubscription } from "@/app/api/[locale]/subscription/hooks";
-import {
-  useWidgetForm,
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetOnSubmit,
-  useWidgetTranslation,
-  useWidgetUser,
-  useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import FormAlertWidget from "next-vibe-ui/unified/interactive/form-alert/widget";
 import type definition from "./definition";
 
 /**

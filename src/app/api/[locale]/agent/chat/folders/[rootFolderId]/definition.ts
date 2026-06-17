@@ -3,15 +3,16 @@
  * Defines endpoints for listing folders
  */
 
+import { lazy } from "react";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  responseArrayOptionalField,
   objectField,
   requestUrlPathParamsField,
   responseArrayField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {

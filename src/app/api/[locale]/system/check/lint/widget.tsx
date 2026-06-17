@@ -5,7 +5,6 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-
 import { useWidgetValue } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import {

@@ -1,13 +1,14 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Div } from "next-vibe-ui/ui/div";
+import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import type { JSX } from "react";
 
-import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation as resetPasswordScopedTranslation } from "@/app/api/[locale]/user/public/reset-password/i18n";
@@ -18,7 +19,6 @@ import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { scopedTranslation as pageT } from "../i18n";
 import ResetPasswordConfirmForm from "./_components/reset-password-confirm-form";

@@ -5,6 +5,11 @@
 
 import { z } from "zod";
 
+import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
+import {
+  PaymentProvider,
+  PaymentProviderDB,
+} from "@/app/api/[locale]/payment/enum";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -20,11 +25,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import {
-  PaymentProvider,
-  PaymentProviderDB,
-} from "@/app/api/[locale]/payment/enum";
-import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
 import {
   BillingInterval,
   SubscriptionPlan,

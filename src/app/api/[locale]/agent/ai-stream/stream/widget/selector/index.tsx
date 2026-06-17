@@ -23,13 +23,6 @@ function useIsClient(): boolean {
   );
 }
 
-import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
-import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
-import {
-  getChatModelById,
-  type ChatModelId,
-} from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   useWidgetLogger,
   useWidgetUser,

@@ -1,8 +1,8 @@
 import { Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
-import type { PhoneFieldProps, CountryData } from "../../web/ui/phone-field";
+import type { CountryData, PhoneFieldProps } from "../../web/ui/phone-field";
 
 export type { PhoneFieldProps, CountryData } from "../../web/ui/phone-field";
 // COUNTRIES is a large data array only needed for web phone input UI

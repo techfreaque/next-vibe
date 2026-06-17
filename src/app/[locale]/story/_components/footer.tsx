@@ -1,14 +1,14 @@
 import { Div } from "next-vibe-ui/ui/div";
-import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
+import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { Briefcase } from "next-vibe-ui/ui/icons/Briefcase";
 import { Code } from "next-vibe-ui/ui/icons/Code";
 import { Folder } from "next-vibe-ui/ui/icons/Folder";
-import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Tag } from "next-vibe-ui/ui/icons/Tag";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
@@ -19,11 +19,13 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
-import { configScopedTranslation } from "@/config/i18n";
-import { envClient } from "@/config/env-client";
 import { GITHUB_REPO_URL } from "@/config/constants";
+import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import { scopedTranslation } from "./i18n";
 
 import { Logo } from "../../_components/logo";

@@ -12,6 +12,17 @@ import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H3 } from "next-vibe-ui/ui/typography";
+import {
+  useWidgetDisabled,
+  useWidgetForm,
+  useWidgetIsSubmitting,
+  useWidgetLocale,
+  useWidgetUser,
+  useWidgetValue,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
@@ -27,17 +38,6 @@ import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
-import {
-  useWidgetDisabled,
-  useWidgetForm,
-  useWidgetIsSubmitting,
-  useWidgetLocale,
-  useWidgetUser,
-  useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
 import type definition from "./definition";
 import { ImageSize } from "./enum";

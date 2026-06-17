@@ -36,11 +36,11 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
-import { scopedTranslation } from "./i18n";
 import type {
-  InvoiceVoidUrlPathParams,
   InvoiceVoidResponseOutput,
+  InvoiceVoidUrlPathParams,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class InvoiceVoidRepository {
   static async voidInvoice(

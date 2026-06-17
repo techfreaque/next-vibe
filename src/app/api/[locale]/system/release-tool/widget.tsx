@@ -15,6 +15,7 @@ import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
+import type { JSX } from "react";
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 

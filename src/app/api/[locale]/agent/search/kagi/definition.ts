@@ -3,6 +3,7 @@
  * Web search and FastGPT capability for AI agents
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";

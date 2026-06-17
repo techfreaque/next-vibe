@@ -4,8 +4,8 @@
  */
 
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,

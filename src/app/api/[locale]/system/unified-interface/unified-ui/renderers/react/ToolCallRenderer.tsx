@@ -18,6 +18,7 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import {
   Collapsible,
@@ -32,7 +33,10 @@ import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
-import { cn } from "next-vibe/shared/utils";
+import {
+  Icon,
+  type IconKey,
+} from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
@@ -48,10 +52,6 @@ import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-int
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
-import {
-  Icon,
-  type IconKey,
-} from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

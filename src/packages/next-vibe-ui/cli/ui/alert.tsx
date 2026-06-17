@@ -1,18 +1,18 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type {
+  AlertDescriptionProps,
   AlertProps,
   AlertTitleProps,
-  AlertDescriptionProps,
   AlertVariant,
 } from "../../web/ui/alert";
 
 export type {
+  AlertDescriptionProps,
   AlertProps,
   AlertTitleProps,
-  AlertDescriptionProps,
   AlertVariant,
 } from "../../web/ui/alert";
 import { cva } from "class-variance-authority";

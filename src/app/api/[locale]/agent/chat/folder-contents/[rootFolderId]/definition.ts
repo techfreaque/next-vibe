@@ -4,8 +4,15 @@
  * sorted by sort_order so items can be interleaved.
  */
 
+import { lazy } from "react";
 import { z } from "zod";
 
+import {
+  onEventDeleteIncognitoFolder,
+  onEventDeleteIncognitoThread,
+  onEventUpdateIncognitoFolder,
+  onEventUpdateIncognitoThread,
+} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
 import {
   dateSchema,
   iconSchema,
@@ -36,15 +43,6 @@ import {
 
 import { DefaultFolderId } from "../../config";
 import { ThreadStatusDB, ThreadStatusOptions } from "../../enum";
-import { lazy } from "react";
-
-import {
-  onEventUpdateIncognitoThread,
-  onEventDeleteIncognitoThread,
-  onEventUpdateIncognitoFolder,
-  onEventDeleteIncognitoFolder,
-} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
-
 import { scopedTranslation } from "./i18n";
 
 const FolderContentsWidget = lazy(() =>

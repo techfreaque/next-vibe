@@ -11,27 +11,24 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetDisabled,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { useTranslation } from "@/i18n/core/client";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import { CortexNav } from "../_shared/cortex-nav";
 import { DomainEnrichment } from "../_shared/domain-enrichment";
 import { formatBytes } from "../_shared/format-bytes";
-
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
-
 interface CustomWidgetProps {
   field: (typeof definition.POST)["fields"];
 }
+
 
 export function CortexWriteWidget({
   field,

@@ -3,6 +3,7 @@
  * Lists all companies the calling user is a member of
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -29,8 +30,8 @@ import {
   CompanyMemberRoleOptions,
   CompanyType,
   CompanyTypeOptions,
-} from "../enum";
 import { scopedTranslation } from "./i18n";
+} from "../enum";
 import { COMPANIES_LIST_ALIAS } from "./constants";
 
 const CompanyListWidget = lazyWidget(() =>

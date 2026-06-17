@@ -16,30 +16,30 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { z } from "zod";
 
 import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type {
   AudioVisionModelSelection,
   ImageVisionModelSelection,
   VideoVisionModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
 import type { VideoGenModelId } from "../../video-generation/models";

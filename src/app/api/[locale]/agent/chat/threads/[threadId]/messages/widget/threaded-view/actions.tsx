@@ -13,17 +13,20 @@ import { Square } from "next-vibe-ui/ui/icons/Square";
 import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
+import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { getCurrentUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
+  useChatNavigationStore,
+  useChatNavigationStore,
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCurrentUrl } from "next-vibe-ui/utils/browser";
 
 import {
-  useChatNavigationStore,
   type ChatNavigationState,
 } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";

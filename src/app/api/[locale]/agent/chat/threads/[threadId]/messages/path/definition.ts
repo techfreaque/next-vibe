@@ -27,8 +27,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { DefaultFolderId } from "../../../../config";
 import type { MessageMetadata } from "../../../../db";
 import { ChatMessageRole } from "../../../../enum";
-import { scopedTranslation } from "./i18n";
 import threadsDefinitions from "../../../definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Get Conversation Path Endpoint (GET)

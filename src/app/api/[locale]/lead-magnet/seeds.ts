@@ -7,9 +7,6 @@
 
 import { eq } from "drizzle-orm";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 import { messengerAccounts } from "@/app/api/[locale]/messenger/accounts/db";
 import {
   CampaignType,
@@ -18,7 +15,10 @@ import {
   MessengerProvider,
 } from "@/app/api/[locale]/messenger/accounts/enum";
 import { EmailSecurityType } from "@/app/api/[locale]/messenger/providers/email/enum";
+import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { users } from "@/app/api/[locale]/user/db";
+import { env } from "@/config/env";
 
 import { leadMagnetConfigs } from "./db";
 

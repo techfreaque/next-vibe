@@ -4,6 +4,7 @@
  * Following migration guide: Files at level of usage, split god repositories
  */
 
+import React from "react";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";

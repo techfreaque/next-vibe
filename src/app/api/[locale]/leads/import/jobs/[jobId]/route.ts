@@ -1,9 +1,9 @@
 import "server-only";
+
 /**
  * Import Job Management API Routes
  * Individual job operations (update, delete)
  */
-
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 

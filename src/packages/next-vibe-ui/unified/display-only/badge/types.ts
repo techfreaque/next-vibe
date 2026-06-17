@@ -7,12 +7,12 @@ import type { BadgeVariant } from "next-vibe-ui/ui/badge";
 import type { z } from "zod";
 
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   EnumWidgetSchema,
   NumberWidgetSchema,
   StringWidgetSchema,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import type {
   BasePrimitiveWidgetConfig,

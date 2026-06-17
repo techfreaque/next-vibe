@@ -1,9 +1,12 @@
 /// <reference types="vite/client" />
-import { TanstackPage as RootLayout } from "@/app/[locale]/layout";
-import type { CountryLanguage } from "@/i18n/core/config";
 import "@/packages/next-vibe-ui/tanstack/global-css";
+
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+
+import { TanstackPage as RootLayout } from "@/app/[locale]/layout";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import globalsUrl from "../../packages/next-vibe-ui/globals.css?url";
 
 const loadLayout = createServerFn({ method: "GET" })

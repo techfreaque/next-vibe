@@ -23,8 +23,8 @@ import {
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
 import threadsDefinitions from "../definition";
+import { scopedTranslation } from "./i18n";
 
 const { PATCH } = createEndpoint({
   scopedTranslation,

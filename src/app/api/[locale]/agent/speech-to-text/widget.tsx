@@ -12,18 +12,10 @@ import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { MicOff } from "next-vibe-ui/ui/icons/MicOff";
 import { Square } from "next-vibe-ui/ui/icons/Square";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
-import { Input } from "next-vibe-ui/ui/input";
 import type { InputChangeEvent, InputRefObject } from "next-vibe-ui/ui/input";
+import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-import { useCallback, useRef, useState } from "react";
-
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import {
-  ModelSelector,
-  ModelSelectorTrigger,
-} from "@/app/api/[locale]/agent/models/widget/model-selector";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -34,6 +26,14 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useCallback, useRef, useState } from "react";
+
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+} from "@/app/api/[locale]/agent/models/widget/model-selector";
 
 import { DEFAULT_STT_MODEL_ID } from "./constants";
 import type definition from "./definition";

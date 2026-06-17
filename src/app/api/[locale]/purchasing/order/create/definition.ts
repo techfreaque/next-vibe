@@ -3,8 +3,11 @@
  * POST — create a new purchase order in Draft status
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
+import vendorListDefinitions from "@/app/api/[locale]/purchasing/vendor/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

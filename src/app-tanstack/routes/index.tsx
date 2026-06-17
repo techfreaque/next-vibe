@@ -1,10 +1,12 @@
 "use-custom";
-// AUTO-GENERATED - redirects / to the default locale.
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   loader: () => {
-    throw new Error("This should never be called");
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    throw new Error(
+      "This should never be called - middleware should have redirected",
+    );
   },
   component: () => null,
 });

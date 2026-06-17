@@ -3,6 +3,7 @@
  * Defines endpoints for getting and deleting individual subfolders
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";

@@ -10,8 +10,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 

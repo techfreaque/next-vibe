@@ -8,10 +8,9 @@ import {
   CallbackModeDB,
 } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { ToolExecutionContext } from "../../../chat/config";
 
+import type { ToolExecutionContext } from "../../../chat/config";
 import type { ToolCall } from "../../../chat/db";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import type { StreamContext } from "../core/stream-context";

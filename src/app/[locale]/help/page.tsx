@@ -17,7 +17,6 @@ import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-
 import { configScopedTranslation } from "@/config/i18n";
 import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";

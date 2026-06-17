@@ -1,5 +1,4 @@
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-
 import { LEADS_LIST_ALIAS } from "@/app/api/[locale]/leads/list/constants";
 import { LEADS_STATS_ALIAS } from "@/app/api/[locale]/leads/stats/constants";
 import { EMAIL_STATS_ALIAS } from "@/app/api/[locale]/messenger/messages/stats/constants";
@@ -16,15 +15,6 @@ import {
 } from "../../../../cortex/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-
-import {
-  AUDIO_VISION,
-  IMAGE_GEN,
-  MUSIC_GEN,
-  STT,
-  VIDEO_GEN,
-  VOICE,
-} from "../_shared/media-presets";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -34,6 +24,14 @@ import {
   SkillCategory,
   SkillOwnershipType,
 } from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
 
 export const statsAnalystSkill: Skill = {
   id: "stats-analyst",

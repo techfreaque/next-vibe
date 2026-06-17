@@ -3,6 +3,7 @@
  * Production-ready endpoint for comprehensive code quality checks
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -21,6 +22,8 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
+
 
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { envClient } from "@/config/env-client";

@@ -1,11 +1,11 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import type {
   MarkdownEditorProps,
   ToolbarAction,
 } from "../../web/ui/markdown-editor";
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 export type {
   MarkdownEditorProps,

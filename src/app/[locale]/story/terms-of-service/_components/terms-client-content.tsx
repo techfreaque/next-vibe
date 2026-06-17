@@ -7,6 +7,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { ReactElement } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import { scopedTranslation } from "../i18n";
 
 interface TermsClientInteractionProps {

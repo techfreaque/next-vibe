@@ -7,6 +7,8 @@ import { useEffect } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
   useWidgetForm,
   useWidgetPlatform,
   useWidgetTranslation,

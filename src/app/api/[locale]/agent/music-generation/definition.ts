@@ -3,8 +3,13 @@
  * Generates music from text prompts using various AI providers
  */
 
+import { lazy } from "react";
 import { z } from "zod";
 
+import {
+  MusicGenModelId,
+  MusicGenModelIdOptions,
+} from "@/app/api/[locale]/agent/music-generation/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -22,11 +27,7 @@ import {
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import {
-  MusicGenModelId,
-  MusicGenModelIdOptions,
-} from "@/app/api/[locale]/agent/music-generation/models";
-import { lazy } from "react";
+import { MUSIC_GEN_ALIAS } from "./constants";
 import {
   DEFAULT_MUSIC_DURATION,
   MusicDuration,

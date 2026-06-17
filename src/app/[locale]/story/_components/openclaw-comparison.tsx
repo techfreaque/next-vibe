@@ -9,6 +9,8 @@ import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { configScopedTranslation } from "@/config/i18n";
 

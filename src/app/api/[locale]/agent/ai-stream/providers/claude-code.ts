@@ -257,7 +257,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
     // Create MCP server with our tools
     const vibeServer = createSdkMcpServer({
       // eslint-disable-next-line i18next/no-literal-string -- technical identifier
-      name: "vibe-local",
+      name: "hermes",
       // eslint-disable-next-line i18next/no-literal-string -- semver
       version: "1.0.0",
       tools: mcpTools,
@@ -265,7 +265,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
 
     const allowedToolNames = mcpTools.map(
       // eslint-disable-next-line i18next/no-literal-string -- MCP naming convention
-      (t) => `mcp__vibe-local__${t.name}`,
+      (t) => `mcp__hermes__${t.name}`,
     );
 
     const agentAbortController = new AbortController();

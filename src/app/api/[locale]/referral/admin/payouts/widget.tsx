@@ -9,7 +9,6 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetNavigation,
   useWidgetTranslation,

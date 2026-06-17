@@ -5,25 +5,25 @@ import "server-only";
  * Hybrid search: FTS (keyword) + vector (semantic) with score-based ranking.
  * Falls back to FTS-only when embeddings are unavailable.
  */
-
 import { and, eq, isNotNull, like, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import {
   ErrorResponseTypes,
-  fail,
   success,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CortexSearchT } from "./i18n";
 import { truncateContent } from "../_shared/text-utils";
 import { cortexNodes } from "../db";
+import type { CortexSearchT } from "./i18n";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
 import { isValidPath, normalizePath } from "../repository";
 

@@ -5,12 +5,13 @@
 
 import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import folderContentsDefinition from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import pathDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
@@ -20,7 +21,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
 
@@ -358,7 +358,7 @@ export async function sendMessage(
     }
 
     // Snapshot URL before navigation - needed for revert on failure
-    const preNavigationUrl = window.location.href;
+    const preNavigationUrl = getCurrentUrl();
 
     // Navigate immediately BEFORE creating messages - only for new threads
     if (onThreadCreated && createdThreadIdForNewThread) {
@@ -448,7 +448,9 @@ export async function sendMessage(
       );
 
       // Revert navigation back to where the user was
-      window.history.replaceState(null, "", preNavigationUrl);
+      if (preNavigationUrl) {
+        silentReplaceState(preNavigationUrl);
+      }
       return { success: false, createdThreadId: createdThreadIdForNewThread };
     }
 

@@ -21,8 +21,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
 import { MESSENGER_INBOX_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const { GET } = createEndpoint({
   scopedTranslation,

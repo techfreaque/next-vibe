@@ -8,6 +8,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { ScaleComponentType } from "@/app/api/[locale]/infra/enum";
+import { ScaleComponent } from "@/app/api/[locale]/infra/enum";
 import type { ClientT } from "@/app/api/[locale]/ssh/client";
 import {
   getConnectionCredentials,
@@ -15,8 +17,6 @@ import {
   sshExecCommand,
 } from "@/app/api/[locale]/ssh/client";
 import type { SshConnection } from "@/app/api/[locale]/ssh/db";
-import type { ScaleComponentType } from "@/app/api/[locale]/infra/enum";
-import { ScaleComponent } from "@/app/api/[locale]/infra/enum";
 
 import { getReplicaCount, scaleDeployment } from "../k3s/scripts";
 

@@ -17,8 +17,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
-import { scopedTranslation } from "./i18n";
 import { DB_GENERATE_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

@@ -29,10 +29,11 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+
 import { messengerAccounts } from "../../../../accounts/db";
 import { MessengerAccountStatus } from "../../../../accounts/enum";
+import { MessageChannel } from "../../../../accounts/enum";
 import type { SpecialFolderTypeValue } from "../../../../messages/enum";
 import { MessageType, SpecialFolderType } from "../../../../messages/enum";
 

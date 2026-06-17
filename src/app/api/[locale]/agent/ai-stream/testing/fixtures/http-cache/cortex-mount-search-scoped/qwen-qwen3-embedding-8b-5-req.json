@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/use-cortex-write-to-create----9bec7667-e361-45a7-a307-815cd4bf3dea.md\n\n# Use cortex-write to create...\nFolder: cron\nPreview: <think> The search returned 20 results total. The first result is the file we created: Path: /documents/search-test/quan…",
+    "input": "/threads/cron/use-cortex-write-to-create----3d42ee5d-4d4b-4c73-a62a-95ab5d277f08.md\n\n# Use cortex-write to create...\nFolder: cron\nPreview: <think> The search returned 20 results total. The first result is the file we created: Path: /documents/search-test/quan…",
     "encoding_format": "float"
   }
 }

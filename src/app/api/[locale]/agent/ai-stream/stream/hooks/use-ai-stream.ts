@@ -11,7 +11,6 @@
  * on messagesDefinition.GET), NOT from this hook.
  */
 
-import { toast } from "next-vibe-ui/hooks/use-toast";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useMemo } from "react";
 

@@ -4,6 +4,7 @@
 
 import { z } from "zod";
 
+import { ConnectionHealthSchema } from "@/app/api/[locale]/remote-connection/db";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -18,8 +19,9 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ConnectionHealthSchema } from "@/app/api/[locale]/remote-connection/db";
 
-import { SshAuthType, SshAuthTypeDB } from "../../enum";
 import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./i18n";
+import { SshAuthType, SshAuthTypeDB } from "../../enum";
 import { SSH_CONNECTIONS_LIST_ALIAS } from "./constants";
 
 const ConnectionTypeSchema = z.enum(["local", "ssh", "remote"]);

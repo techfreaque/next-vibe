@@ -1,25 +1,25 @@
 import * as React from "react";
 
 export type {
-  ThemeKeys,
-  ChartConfig,
-  ChartDataPoint,
-  PayloadItem,
+  AreaProps,
+  AxisProps,
+  BarProps,
   ChartBaseProps,
+  ChartConfig,
   ChartContainerBaseProps,
   ChartContainerProps,
-  ChartStyleProps,
   ChartContextProps,
-  ChartTooltipProps,
-  ChartLegendProps,
-  ChartTooltipContentProps,
+  ChartDataPoint,
   ChartLegendContentProps,
+  ChartLegendProps,
   ChartProps,
+  ChartStyleProps,
+  ChartTooltipContentProps,
+  ChartTooltipProps,
   LineProps,
-  BarProps,
-  AreaProps,
+  PayloadItem,
   PieProps,
-  AxisProps,
+  ThemeKeys,
 } from "../../web/ui/chart";
 
 export function useChart(): ChartContextProps {
@@ -31,8 +31,8 @@ import type {
   ChartContainerProps,
   ChartContextProps,
   ChartDataPoint,
-  ChartTooltipContentProps,
   ChartLegendContentProps,
+  ChartTooltipContentProps,
 } from "../../web/ui/chart";
 
 export function ChartContainer<TData extends ChartDataPoint = ChartDataPoint>({

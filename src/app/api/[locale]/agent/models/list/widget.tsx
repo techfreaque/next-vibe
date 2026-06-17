@@ -182,6 +182,11 @@ function ModelGrid({
   onPick,
   onPick,
   onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
 }): JSX.Element {
   if (models.length === 0) {
     return (

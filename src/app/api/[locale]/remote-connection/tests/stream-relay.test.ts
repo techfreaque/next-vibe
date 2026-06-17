@@ -13,8 +13,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { StreamRelayPostBody } from "@/app/api/[locale]/remote-connection/stream-relay";
 import type { ToolSource } from "@/app/api/[locale]/remote-connection/db";
+import type { StreamRelayPostBody } from "@/app/api/[locale]/remote-connection/stream-relay";
 
 // ─── Mirror the filtering logic from RemoteTransport.relayStream() ────────────
 

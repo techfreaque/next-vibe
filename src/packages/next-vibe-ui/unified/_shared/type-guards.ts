@@ -18,6 +18,7 @@ import type z from "zod";
 
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,

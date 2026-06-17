@@ -1,8 +1,9 @@
-import { cn } from "next-vibe/shared/utils/utils";
 import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import { View } from "react-native";
 
 import type { WidgetHeaderProps } from "@/packages/next-vibe-ui/web/ui/widget-header";
+
 import { Text } from "./text";
 
 export type { WidgetHeaderProps } from "@/packages/next-vibe-ui/web/ui/widget-header";

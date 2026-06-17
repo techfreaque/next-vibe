@@ -2,6 +2,7 @@
  * Vibe Sense - Graph Archive Definition
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -16,11 +17,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
-import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 
 const ArchiveWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ArchiveWidget })),

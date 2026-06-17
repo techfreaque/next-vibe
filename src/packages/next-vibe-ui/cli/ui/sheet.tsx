@@ -2,28 +2,28 @@ import { Text } from "ink";
 import * as React from "react";
 
 export type {
-  SheetRootProps,
-  SheetTriggerProps,
   SheetCloseProps,
-  SheetPortalProps,
-  SheetOverlayProps,
   SheetContentProps,
-  SheetHeaderProps,
-  SheetFooterProps,
-  SheetTitleProps,
   SheetDescriptionProps,
+  SheetFooterProps,
+  SheetHeaderProps,
+  SheetOverlayProps,
+  SheetPortalProps,
+  SheetRootProps,
+  SheetTitleProps,
+  SheetTriggerProps,
 } from "../../web/ui/sheet";
 
 import type {
-  SheetRootProps,
-  SheetTriggerProps,
   SheetCloseProps,
-  SheetPortalProps,
   SheetContentProps,
-  SheetHeaderProps,
-  SheetFooterProps,
-  SheetTitleProps,
   SheetDescriptionProps,
+  SheetFooterProps,
+  SheetHeaderProps,
+  SheetPortalProps,
+  SheetRootProps,
+  SheetTitleProps,
+  SheetTriggerProps,
 } from "../../web/ui/sheet";
 
 export function Sheet({

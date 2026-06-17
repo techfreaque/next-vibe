@@ -3,8 +3,11 @@
  * Defines endpoint for retrieving credit transaction history
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { paginationField } from "next-vibe-ui/unified/containers/pagination/types";
 import { z } from "zod";
 
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -22,9 +25,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { dateSchema } from "../../shared/types/common.schema";
-import { paginationField } from "next-vibe-ui/unified/containers/pagination/types";
 import { CreditTransactionType } from "../enum";
 import { scopedTranslation } from "../i18n";
 

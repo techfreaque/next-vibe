@@ -12,11 +12,11 @@ import {
   type ChatT,
   scopedTranslation as chatScopedTranslation,
 } from "@/app/api/[locale]/agent/chat/i18n";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import speechToTextDefinitions from "./definition";
 

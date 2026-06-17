@@ -1,11 +1,11 @@
 "use client";
 
 import type { Route } from "next";
+import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
-import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
 import { envClient, platform } from "@/config/env-client";

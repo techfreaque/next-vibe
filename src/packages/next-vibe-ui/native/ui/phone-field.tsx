@@ -3,6 +3,7 @@
  * Production-ready international phone input with country code selection
  */
 import { cn } from "next-vibe/shared/utils/utils";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 

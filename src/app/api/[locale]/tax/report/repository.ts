@@ -9,6 +9,7 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
+import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import {
   ErrorResponseTypes,
   fail,
@@ -19,7 +20,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { scopedTranslation } from "../i18n";
 import type {
   TaxReportRequestOutput,

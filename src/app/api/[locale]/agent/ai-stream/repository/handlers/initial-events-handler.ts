@@ -2,11 +2,11 @@
  * InitialEventsHandler - Handles initial stream events emission
  */
 
+import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ToolCall } from "../../../chat/db";
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class InitialEventsHandler {

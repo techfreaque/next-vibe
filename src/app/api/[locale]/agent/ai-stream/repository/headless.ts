@@ -9,6 +9,7 @@ import "server-only";
 
 import { and, desc, eq } from "drizzle-orm";
 
+import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
@@ -18,10 +19,10 @@ import {
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "../../chat/config";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
@@ -352,7 +353,6 @@ export async function runHeadlessAiStream(
     if (favoriteId) {
       const userId = "id" in user ? (user.id as string) : undefined;
       if (userId) {
-    compactTriggerOverride,
         const resolved = await resolveFavorite(
           favoriteId,
           userId,
@@ -625,7 +625,6 @@ export async function runHeadlessAiStream(
       mediaModelOverrides,
       providerOverride,
       parentAbortSignal,
-      compactTriggerOverride,
     });
 
     if (!result.success) {

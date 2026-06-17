@@ -4,8 +4,13 @@
  * Located in threads/[threadId]/messages/ folder as per architectural standards
  */
 
-import { toast } from "next-vibe-ui/hooks/use-toast";
 import { parseError } from "next-vibe/shared/utils";
+import { toast } from "next-vibe-ui/hooks/use-toast";
+import {
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetUser,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { useCallback, useMemo, useRef } from "react";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -18,11 +23,6 @@ import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadI
 import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import {
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
 
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";

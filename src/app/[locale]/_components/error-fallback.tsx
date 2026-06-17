@@ -5,8 +5,8 @@ import { Div } from "next-vibe-ui/ui/div";
 import { H2, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
-import { useTranslation } from "@/i18n/core/client";
 import { configScopedTranslation } from "@/config/i18n";
+import { useTranslation } from "@/i18n/core/client";
 
 export default function ErrorFallback(): React.JSX.Element {
   const { locale } = useTranslation();

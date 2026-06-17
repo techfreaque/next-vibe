@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/documents/move-test/srcdir/doc.md\n\nmoving between dirs",
+    "input": "/documents/move-test/dstdir/doc.md\n\nmoving between dirs",
     "encoding_format": "float"
   }
 }

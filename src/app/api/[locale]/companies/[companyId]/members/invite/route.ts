@@ -5,8 +5,8 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { MemberInviteRepository } from "./repository";
 import definitions from "./definition";
+import { MemberInviteRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,

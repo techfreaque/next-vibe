@@ -1,15 +1,12 @@
 import { z } from "zod";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
 } from "../chat/skills/enum";
-import {
-  filtersSelectionSchema,
-  sharedFilterPropsSchema,
-} from "../models/selection";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -22,6 +19,10 @@ import {
   type ModelOptionAudioBased,
   type ModelProviderConfigAudioBased,
 } from "../models/models";
+import {
+  filtersSelectionSchema,
+  sharedFilterPropsSchema,
+} from "../models/selection";
 import { MusicDuration } from "./enum";
 
 const ALL_DURATIONS = [

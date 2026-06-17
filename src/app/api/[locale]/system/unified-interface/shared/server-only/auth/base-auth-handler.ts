@@ -1,7 +1,7 @@
 import "server-only";
 
-import type { NextRequest } from "next-vibe-ui/lib/request";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

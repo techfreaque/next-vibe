@@ -18,6 +18,8 @@ import {
 
 import { LogoutWidget } from "./widget";
 
+import { LogoutWidget } from "./widget";
+import { LogoutWidget } from "./widget";
 import { UserRole } from "../../user-roles/enum";
 import { scopedTranslation } from "./i18n";
 

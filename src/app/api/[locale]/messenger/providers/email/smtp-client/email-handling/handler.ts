@@ -6,6 +6,11 @@
 import "server-only";
 
 import type {
+  ErrorResponseType,
+  SuccessResponseType,
+} from "next-vibe/shared/types/response.schema";
+
+import type {
   EmailRenderProps,
   EmailRenderSkip,
   EmailResolvedData,
@@ -16,10 +21,6 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
-import type {
-  ErrorResponseType,
-  SuccessResponseType,
-} from "next-vibe/shared/types/response.schema";
 
 export type { EmailRenderProps, EmailResolvedData };
 

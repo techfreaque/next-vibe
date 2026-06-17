@@ -31,8 +31,9 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import React from "react";
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 
 import type definition from "./definition";

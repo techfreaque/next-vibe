@@ -3,8 +3,11 @@
  * Defines endpoint for listing skills
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -27,9 +30,8 @@ import {
   UserPermissionRole,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { iconSchema } from "../../../shared/types/common.schema";
 import { allModelDefinitions } from "../../models/all-models";
 
@@ -47,9 +49,7 @@ import {
   SkillSourceFilterDB,
   SkillTrustLevelDB,
 } from "./enum";
-
 import { scopedTranslation } from "./i18n";
-import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 const SkillsListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillsListContainer })),

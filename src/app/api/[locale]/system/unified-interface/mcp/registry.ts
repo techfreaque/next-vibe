@@ -18,7 +18,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { MCPContent } from "./types";
 
 import { VIBE_CHECK_TOOL_NAMES } from "@/app/api/[locale]/system/check/vibe-check/constants";
-import { DefaultFolderId } from "../../../agent/chat/config";
+import { makeHeadlessContext } from "../../../agent/chat/config";
 import {
   definitionLoader,
   type IDefinitionLoader,
@@ -74,12 +74,10 @@ export class MCPRegistry {
     }
 
     try {
-      logger.info("[MCP Registry] Starting initialization...");
-
       this.lastRefresh = Date.now();
       this.initialized = true;
 
-      logger.info("[MCP Registry] Initialization complete");
+      logger.debug("[MCP Registry] Initialized");
     } catch (error) {
       logger.error("[MCP Registry] Initialization failed", {
         error: parseError(error).message,
@@ -182,6 +180,39 @@ export class MCPRegistry {
 
     const { t } = mcpScopedTranslation.scopedT(context.locale);
 
+    // Prefixed tool name (e.g. "hermes__tool-help_POST") — route to remote instance via
+    // unified execute-tool repository instead of the local handler.
+    if (context.toolName.includes("__")) {
+      const { RouteExecuteRepository } =
+        await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+      const result = await RouteExecuteRepository.runInProcess({
+        toolName: context.toolName,
+        input: context.data as Record<string, WidgetData>,
+        callbackMode: "wait",
+        user: context.user,
+        locale: context.locale,
+        logger,
+        streamContext: makeHeadlessContext(context.signal),
+        platform: Platform.MCP,
+      });
+      if (!result.success) {
+        return this.fail({
+          error: result.message,
+          code: MCPErrorCode.TOOL_EXECUTION_FAILED,
+          details: { toolName: context.toolName },
+        });
+      }
+      return await this.convertToMCPResult(
+        result,
+        context.toolName,
+        context.locale,
+        logger,
+        null,
+        context.user,
+        context.data,
+      );
+    }
+
     // Check tool exists and user has MCP execution access (opt-out, not opt-in MCP_VISIBLE)
     // Discovery (tools/list) uses MCP_VISIBLE opt-in, but execution uses opt-out semantics.
     const allMcpTools = await this.definitionsReg.getSerializedToolsForUser(
@@ -203,6 +234,50 @@ export class MCPRegistry {
         code: MCPErrorCode.TOOL_NOT_FOUND,
         details: { toolName: context.toolName },
       });
+    }
+
+    const streamContext = makeHeadlessContext(context.signal);
+
+    // Remote routing: check if a remote connection's routing rules match this request.
+    // Same logic as CLI remote leg — if a target is found, route through runInProcess
+    // with instanceId so both direct-http and reverse-ws transports are handled uniformly.
+    // Hot-reload is local-only; remote execution uses the remote's own module cache.
+    const userId =
+      !context.user.isPublic && "id" in context.user
+        ? context.user.id
+        : undefined;
+    if (userId) {
+      const { RemoteTransport } =
+        await import("@/app/api/[locale]/remote-connection/transport");
+      const target = await RemoteTransport.resolveTarget({
+        userId,
+        locale: context.locale,
+        logger,
+      });
+      if (target) {
+        const { RouteExecuteRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+        const remoteResult = await RouteExecuteRepository.runInProcess({
+          toolName: context.toolName,
+          input: context.data as Record<string, WidgetData>,
+          instanceId: target.instanceId,
+          callbackMode: "wait",
+          user: context.user,
+          locale: context.locale,
+          logger,
+          streamContext,
+          platform: Platform.MCP,
+        });
+        return await this.convertToMCPResult(
+          remoteResult,
+          context.toolName,
+          context.locale,
+          logger,
+          null,
+          context.user,
+          context.data,
+        );
+      }
     }
 
     // Hot reload: load fresh modules on every call so file changes are reflected
@@ -229,28 +304,7 @@ export class MCPRegistry {
       logger,
       platform: Platform.MCP,
       preloadedHandler: freshHandler,
-      streamContext: {
-        rootFolderId: DefaultFolderId.BACKGROUND,
-        threadId: undefined,
-        aiMessageId: undefined,
-        skillId: undefined,
-        headless: undefined,
-        subAgentDepth: 0,
-        currentToolMessageId: undefined,
-        callerToolCallId: undefined,
-        pendingToolMessages: undefined,
-        pendingTimeoutMs: undefined,
-        leafMessageId: undefined,
-        waitingForRemoteResult: undefined,
-        favoriteId: undefined,
-        abortSignal: context.signal,
-        callerCallbackMode: undefined,
-        onEscalatedTaskCancel: undefined,
-        escalateToTask: undefined,
-        isRevival: undefined,
-
-        providerOverride: undefined,
-      },
+      streamContext,
     };
 
     try {

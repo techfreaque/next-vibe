@@ -13,7 +13,7 @@ import type {
   AnyChildrenConstrain,
   ConstrainedChildUsage,
   FieldUsageConfig,
-} from "../../../unified-ui/widgets/_shared/types";
+} from "next-vibe-ui/unified/_shared/types";
 import type { EventSchemas } from "../../../websocket/types";
 import type {
   ApiEndpoint,

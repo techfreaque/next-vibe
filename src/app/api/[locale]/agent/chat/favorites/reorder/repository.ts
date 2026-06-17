@@ -20,8 +20,8 @@ import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interfa
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { isUuid } from "../../slugify";
-import favoritesDefinitions from "../definition";
 import { chatFavorites } from "../db";
+import favoritesDefinitions from "../definition";
 import type {
   FavoritesReorderRequestOutput,
   FavoritesReorderResponseOutput,

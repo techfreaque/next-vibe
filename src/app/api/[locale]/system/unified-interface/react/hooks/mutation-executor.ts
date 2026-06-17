@@ -9,24 +9,15 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
-import { scopedTranslation as reactNativeScopedTranslation } from "@/app/api/[locale]/system/unified-interface/react-native/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import {
-  EndpointErrorTypes,
-  Methods as MethodsEnum,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
-import { callApi, containsFile, objectToFormData } from "./api-utils";
+import { callApi } from "./call-api";
 
-/**
- * Options for mutation execution
- */
 export interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
-  /** Callback when mutation succeeds */
   onSuccess?: (context: {
     requestData: TRequest;
     urlPathParams: TUrlVariables;
@@ -36,7 +27,6 @@ export interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
     locale: CountryLanguage;
   }) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
 
-  /** Callback when mutation fails */
   onError?: (context: {
     error: ErrorResponseType;
     requestData: TRequest;
@@ -45,22 +35,6 @@ export interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
   }) => void | Promise<void>;
 }
 
-/**
- * Pure function to execute a mutation
- * Extracted from store.ts to be used by useApiMutation with React Query
- *
- * This function:
- * - Validates request data
- * - Builds the API URL with path parameters
- * - Makes the API call
- * - Handles errors and returns proper error responses
- * - Calls onSuccess/onError callbacks with our custom shape
- *
- * Note: This does NOT handle:
- * - State management (handled by React Query)
- * - Retry logic (handled by React Query)
- * - Loading states (handled by React Query)
- */
 export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   logger,
@@ -86,7 +60,6 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
     TEndpoint["types"]["UrlVariablesOutput"]
   >;
 }): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
-  // Validate request data against schema
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
   const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
   const isUndefinedSchema =
@@ -99,7 +72,6 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
 
   let requestData = initialRequestData;
 
-  // Handle schema conversions
   if (
     isUndefinedSchema &&
     typeof requestData === "object" &&
@@ -120,72 +92,9 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
     requestData = {} as TEndpoint["types"]["RequestOutput"];
   }
 
-  // Build the endpoint URL with locale and replace URL path parameters
-  let endpointUrl = `${envClient.NEXT_PUBLIC_APP_URL}/api/${locale}`;
-
-  // Build path from endpoint.path array, replacing [param] placeholders
-  for (const segment of endpoint.path) {
-    // Check if this segment is a URL parameter (wrapped in brackets)
-    if (segment.startsWith("[") && segment.endsWith("]")) {
-      // Extract parameter name (e.g., "[id]" → "id")
-      const paramName = segment.slice(1, -1);
-
-      // Get value from pathParams
-      const paramValue = pathParams?.[paramName as keyof typeof pathParams];
-
-      if (paramValue === undefined) {
-        logger.error("executeMutation: Missing URL path parameter", {
-          paramName,
-          endpoint: endpoint.path.join("/"),
-          availableParams: pathParams ? Object.keys(pathParams) : [],
-          pathParamsFullObject: pathParams,
-        });
-
-        const { t: rnT } = reactNativeScopedTranslation.scopedT(locale);
-        const errorResponse = fail({
-          message: rnT("errors.missingUrlParam"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { paramName, endpoint: endpoint.path.join("/") },
-        });
-
-        // Call onError callback if provided
-        if (options.onError) {
-          options.onError({
-            error: errorResponse,
-            requestData,
-            urlPathParams: pathParams,
-            logger,
-          });
-        }
-
-        return errorResponse;
-      }
-
-      // Add the parameter value to the URL
-      endpointUrl += `/${String(paramValue)}`;
-    } else {
-      // Regular path segment
-      endpointUrl += `/${segment}`;
-    }
-  }
-
-  // Prepare request body
-  let body: string | FormData | undefined;
-
-  if (endpoint.method !== MethodsEnum.GET && requestData !== undefined) {
-    if (containsFile(requestData)) {
-      body = objectToFormData(requestData);
-    } else {
-      body = JSON.stringify(requestData);
-    }
-  }
-
   try {
-    // Make API call
     const response = await callApi(
       endpoint,
-      endpointUrl,
-      body,
       logger,
       user,
       locale,
@@ -193,8 +102,19 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
       pathParams,
     );
 
-    // Handle success callback
-    if (response.success && options.onSuccess) {
+    if (!response.success) {
+      if (options.onError) {
+        await options.onError({
+          error: response,
+          requestData,
+          urlPathParams: pathParams,
+          logger,
+        });
+      }
+      return response;
+    }
+
+    if (options.onSuccess) {
       const callbackResult = await options.onSuccess({
         requestData,
         urlPathParams: pathParams,
@@ -204,7 +124,6 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
         locale,
       });
 
-      // If callback returns an error, return it
       if (callbackResult) {
         return callbackResult as ResponseType<
           TEndpoint["types"]["ResponseOutput"]
@@ -216,7 +135,6 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   } catch (error) {
     const parsedError = parseError(error);
 
-    // Use endpoint's SERVER_ERROR error type if available
     const serverErrorConfig =
       endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
     const { t } = endpoint.scopedTranslation.scopedT(locale);
@@ -236,7 +154,6 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
       error: parsedError,
     });
 
-    // Handle error callback
     if (options.onError) {
       await options.onError({
         error: errorResponse,

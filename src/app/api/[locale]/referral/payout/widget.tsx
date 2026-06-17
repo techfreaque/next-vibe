@@ -19,14 +19,13 @@ import { History } from "next-vibe-ui/ui/icons/History";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Wallet } from "next-vibe-ui/ui/icons/Wallet";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 
-import { REFERRAL_CONFIG, computeLevelPercentages } from "../config";
+import { computeLevelPercentages, REFERRAL_CONFIG } from "../config";
 import type definition from "./definition";
 
 function fmtPct(v: number): string {

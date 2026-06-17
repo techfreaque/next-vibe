@@ -4,6 +4,8 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
+import type { JSX } from "react";
+import type { JSX } from "react";
 
 import { useWidgetValue } from "next-vibe-ui/unified/_shared/use-widget-context";
 

@@ -19,6 +19,7 @@ import { PhoneFieldWidget } from "next-vibe-ui/unified/form-fields/phone-field/w
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { UrlFieldWidget } from "next-vibe-ui/unified/form-fields/url-field/widget";
+import { type JSX } from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 

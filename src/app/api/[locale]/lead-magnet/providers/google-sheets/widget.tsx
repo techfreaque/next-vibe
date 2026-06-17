@@ -6,6 +6,8 @@ import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Table } from "next-vibe-ui/ui/icons/Table";
+import { Input } from "next-vibe-ui/ui/input";
+import { Label } from "next-vibe-ui/ui/label";
 import {
   Select,
   SelectContent,
@@ -16,11 +18,13 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
-import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
 
 import {
   useWidgetContext,
+import type { JSX } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import type { JSX } from "react";
+import React, { useCallback, useEffect, useState } from "react";
   useWidgetLocale,
   useWidgetLogger,
   useWidgetTranslation,

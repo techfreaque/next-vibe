@@ -5,6 +5,7 @@
  * Main input area for sending messages with voice support
  */
 
+import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
@@ -31,11 +32,14 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
-import { cn } from "next-vibe/shared/utils";
+import {
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetUser,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
 import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
@@ -50,6 +54,7 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
 import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
 import {
   getBestAudioVisionModel,
   getBestImageVisionModel,
@@ -57,30 +62,24 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
+import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
-import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import {
-  useMessageOperations,
   type MessageOperationsDeps,
+  useMessageOperations,
 } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-operations";
+import { CortexButton } from "@/app/api/[locale]/agent/cortex/widget/cortex-button";
 import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
 import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
-import {
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 import { CallModeIndicator } from "../hooks/call-mode-indicator";
 import { FileUploadButton } from "../hooks/file-upload-button";
@@ -94,8 +93,8 @@ import {
 } from "../hooks/use-input-autosave";
 import { useVoiceRecording } from "../hooks/use-voice-recording";
 import { useVoiceRuntimeState } from "../hooks/voice-mode/store";
+import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 import { Selector } from "./selector";
-import { CortexButton } from "@/app/api/[locale]/agent/cortex/widget/cortex-button";
 import { ToolsButton } from "./tools-button";
 import { useInputHandlers } from "./use-input-handlers";
 

@@ -3,8 +3,10 @@
  * POST — soft-deactivate an account
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import accountListDefinitions from "@/app/api/[locale]/chart-of-accounts/account/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

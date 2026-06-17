@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+
 import {
   ContentLevel,
   IntelligenceLevel,

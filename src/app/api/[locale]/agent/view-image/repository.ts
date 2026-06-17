@@ -1,18 +1,18 @@
 import "server-only";
 
+import type { HandlerResponse } from "next-vibe/shared/types/response.schema";
 import {
   createContentResponse,
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
-import type { HandlerResponse } from "next-vibe/shared/types/response.schema";
 
 import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { ViewImageT } from "./i18n";
 import type { ViewImagePostRequestInput } from "./definition";
+import type { ViewImageT } from "./i18n";
 
 export class ViewImageRepository {
   static async viewImage(

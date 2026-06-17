@@ -11,6 +11,11 @@ import {
   Section,
   Text as Span,
 } from "@react-email/components";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
@@ -20,11 +25,8 @@ import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { FEATURED_MODELS } from "../agent/ai-stream/models";
+import { contactClientRepository } from "../contact/repository-client";
 import { EmailTemplate } from "../messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,

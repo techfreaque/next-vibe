@@ -7,6 +7,7 @@ import {
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+
 import type { ReactStaticWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import { useWidgetResponse } from "../../_shared/use-widget-context";

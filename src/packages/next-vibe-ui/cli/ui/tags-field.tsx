@@ -1,7 +1,7 @@
 import { Text } from "ink";
 import type { JSX } from "react";
 
-import type { TagsFieldProps, TagOption } from "../../web/ui/tags-field";
+import type { TagOption, TagsFieldProps } from "../../web/ui/tags-field";
 
 export type { TagsFieldProps, TagOption } from "../../web/ui/tags-field";
 

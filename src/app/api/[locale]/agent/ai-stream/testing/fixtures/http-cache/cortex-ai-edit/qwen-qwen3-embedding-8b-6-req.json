@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----66541853-c1b4-414d-b789-740ce5d94b56.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\nPreview: <think>The file was read successfully. The content is: ` AI Test Notes This document was created by an AI to test cortex…",
+    "encoding_format": "float"
+  }
+}

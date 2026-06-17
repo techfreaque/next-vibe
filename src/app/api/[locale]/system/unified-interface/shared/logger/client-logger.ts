@@ -4,8 +4,8 @@
  * Import this in all client code: "use client" components, client hooks, etc.
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger, LoggerMetadata } from "./endpoint";
 import { createLogger } from "./logger-core";

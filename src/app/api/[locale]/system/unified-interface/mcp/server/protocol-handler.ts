@@ -292,7 +292,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     params: MCPToolCallParams,
     requestId?: string | number,
   ): Promise<MCPToolCallResult> {
-    this.logger.info("[MCP Protocol] Calling tool", {
+    this.logger.debug("[MCP Protocol] Calling tool", {
       toolName: params.name,
       argumentsKeys: Object.keys(params.arguments || {}),
       argumentsData: JSON.stringify(params.arguments),
@@ -319,7 +319,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
         this.logger,
       );
 
-      this.logger.info("[MCP Protocol] Tool call complete", {
+      this.logger.debug("[MCP Protocol] Tool call complete", {
         toolName: params.name,
         isError: result.isError,
       });

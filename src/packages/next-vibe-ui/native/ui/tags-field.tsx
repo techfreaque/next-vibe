@@ -3,6 +3,7 @@
  * Production-ready multi-select tags input with suggestions and custom values
  */
 import { cn } from "next-vibe/shared/utils/utils";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 import React, { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
@@ -13,7 +14,6 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/tags-field";
 
 import { useTranslation } from "../../../../i18n/core/client";
-import { uiScopedTranslation } from "next-vibe-ui/i18n";
 import { Badge } from "./badge";
 import { Plus, X } from "./icons";
 import { Input } from "./input";

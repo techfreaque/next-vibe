@@ -15,7 +15,6 @@ import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
-
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
@@ -42,16 +41,20 @@ import {
 import { P } from "next-vibe-ui/ui/typography";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { useCallback, useMemo, useState } from "react";
 
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetContext,
   useWidgetLocale,
   useWidgetNavigation,
+import { useCallback, useMemo, useState } from "react";
   useWidgetTranslation,
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { useCallback, useMemo, useState } from "react";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
   useWidgetValue,
+
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 

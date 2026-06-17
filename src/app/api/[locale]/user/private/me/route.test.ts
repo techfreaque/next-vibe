@@ -1,5 +1,5 @@
-import { testEndpoint } from "../../../system/check/testing/testing-suite";
-import endpoint from "./definition";
+import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { beforeAll, describe, expect, it } from "vitest";
 
 testEndpoint(endpoint.GET);
 

@@ -5,32 +5,32 @@
 
 import "server-only";
 
-import { generateText as aiGenerateText } from "ai";
 import type { LanguageModel } from "ai";
+import { generateText as aiGenerateText } from "ai";
 import { eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
-  success,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { db } from "@/app/api/[locale]/system/db";
-import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import {
-  ModalityResolver,
   type BridgeContext,
+  ModalityResolver,
 } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
 import { ProviderFactory } from "@/app/api/[locale]/agent/ai-stream/repository/core/provider-factory";
-import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import {
   chatFavorites,
   FAVORITE_CONFIG_COLUMNS,
 } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { resolveFavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/repository";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
+import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

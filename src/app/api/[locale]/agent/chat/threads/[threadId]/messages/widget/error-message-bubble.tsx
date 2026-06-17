@@ -1,29 +1,29 @@
 "use client";
 
 import { AlertCircle, CheckCircle2, StopCircle } from "lucide-react";
+import { cn } from "next-vibe/shared/utils";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { Div } from "next-vibe-ui/ui/div";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Span } from "next-vibe-ui/ui/span";
-import { cn } from "next-vibe/shared/utils";
-import type { JSX } from "react";
-import { lazy, Suspense, useState } from "react";
-
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
-import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import type { ContactRequest } from "@/app/api/[locale]/contact/definition";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { useUser } from "@/app/api/[locale]/user/private/me/hooks";
 import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import { useTranslation } from "@/i18n/core/client";
+import type { JSX } from "react";
+import { lazy, Suspense, useState } from "react";
 
 import { StreamErrorType } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { ContactRequest } from "@/app/api/[locale]/contact/definition";
+import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
+import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { useUser } from "@/app/api/[locale]/user/private/me/hooks";
+import { useTranslation } from "@/i18n/core/client";
+
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+
 import { ChatModelId, chatModelOptionsIndex } from "../ai-stream/models";
 import {
   ContentLevel,
@@ -12,6 +13,7 @@ import {
   ApiProvider,
   buildModelOptionsIndex,
   calculateCreditCost,
+  compareProviderSort,
   defaultFeatures,
   filterRoleModels,
   getModelForProvider,

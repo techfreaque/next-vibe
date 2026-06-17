@@ -13,18 +13,18 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatActionCommand,
   formatDatabase,
   formatDuration,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
 import type { MigrateResponseOutput } from "./definition";
-import { scopedTranslation } from "./i18n";
 import type { MigrateT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 export class DatabaseMigrationRepository {
   static async runMigrations(

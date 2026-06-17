@@ -4,11 +4,13 @@
  */
 
 import { Hr, Section, Text as Span } from "@react-email/components";
+import { eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
@@ -23,13 +25,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import { users } from "@/app/api/[locale]/user/db";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { eq } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils";
 
+import { REFERRAL_CONFIG } from "../config";
 import { PayoutCurrency } from "../enum";
 import type { ReferralT } from "../i18n";
 import { scopedTranslation } from "../i18n";
-import { REFERRAL_CONFIG } from "../config";
 import type definition from "./definition";
 import {
   type PayoutPostRequestOutput,

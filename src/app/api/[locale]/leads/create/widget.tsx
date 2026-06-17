@@ -22,15 +22,15 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { LeadStatus } from "../enum";
 import type definition from "./definition";
 

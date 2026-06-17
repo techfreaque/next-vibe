@@ -15,7 +15,9 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
+import { type JSX } from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { InvoiceStatus } from "@/app/api/[locale]/payment/enum";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
 import invoiceRecordPaymentDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/record-payment/definition";
@@ -23,7 +25,7 @@ import invoiceSendDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceI
 import invoiceSendReminderDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/send-reminder/definition";
 import invoiceVoidDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/void/definition";
 import invoiceLineAddDefinitions from "@/app/api/[locale]/payment/invoice/line/add/definition";
-import { InvoiceStatus } from "@/app/api/[locale]/payment/enum";
+
 import type definition from "./definition";
 
 function fmt(n: number): string {

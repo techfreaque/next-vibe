@@ -10,8 +10,8 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import definitions from "./definition";
 import type { DefaultFolderId } from "../../../config";
+import definitions from "./definition";
 
 /**
  * Hook for fetching messages list with tree structure support

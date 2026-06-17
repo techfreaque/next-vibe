@@ -9,8 +9,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   getConnectionCredentials,
   openSshClient,
@@ -18,9 +16,11 @@ import {
 } from "@/app/api/[locale]/ssh/client";
 import { sshConnections } from "@/app/api/[locale]/ssh/db";
 import { ClusterRole } from "@/app/api/[locale]/ssh/enum";
+import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { ClusterStatusResponseOutput } from "./definition";
 import type { InfraT } from "../../i18n";
+import type { ClusterStatusResponseOutput } from "./definition";
 
 const GET_NODES_JSON = `k3s kubectl get nodes -o json 2>/dev/null`;
 const GET_PODS_BY_NS = `k3s kubectl get pods --all-namespaces --no-headers 2>/dev/null | awk '{print $1}' | sort | uniq -c`;

@@ -11,10 +11,10 @@ import type { JSX } from "react";
 import { useRef, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "../i18n";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
+import { uiScopedTranslation } from "../i18n";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import { Input, type InputKeyboardEvent } from "./input";

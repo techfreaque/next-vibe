@@ -26,12 +26,12 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
-import { scopedTranslation } from "./i18n";
 import type {
-  InvoiceSendReminderUrlPathParams,
   InvoiceSendReminderRequestOutput,
   InvoiceSendReminderResponseOutput,
+  InvoiceSendReminderUrlPathParams,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class InvoiceSendReminderRepository {
   static async sendReminder(

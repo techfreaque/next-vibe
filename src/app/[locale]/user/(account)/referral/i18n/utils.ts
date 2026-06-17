@@ -1,8 +1,8 @@
-import type { CountryLanguage } from "@/i18n/core/config";
 import {
-  REFERRAL_CONFIG,
   computeLevelPercentages,
+  REFERRAL_CONFIG,
 } from "@/app/api/[locale]/referral/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ReferralPageT } from ".";
 

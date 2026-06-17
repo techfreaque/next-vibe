@@ -10,6 +10,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { NowpaymentsCliT } from "./i18n";
+import type { NowpaymentsCliT } from "./i18n";
+import type { NowpaymentsCliT } from "./i18n";
 
 import type { RequestSchema, ResponseSchema } from "./definition";
 

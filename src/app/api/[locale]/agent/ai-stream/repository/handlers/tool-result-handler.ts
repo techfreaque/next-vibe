@@ -12,11 +12,10 @@ import {
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { parseError } from "../../../../shared/utils";
-
 import { type ToolCall } from "../../../chat/db";
 import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";

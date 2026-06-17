@@ -17,6 +17,8 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
+import type { JSX } from "react";
+import { useState } from "react";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";

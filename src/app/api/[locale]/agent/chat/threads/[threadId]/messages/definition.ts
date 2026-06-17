@@ -3,9 +3,16 @@
  * Defines endpoints for listing and creating messages in a thread
  */
 
+import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
+import { lazy } from "react";
 import { z } from "zod";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  finishIncognitoThreadIfIncognito,
+  onEventPersistMessage,
+  persistMessageIfIncognito,
+} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -23,14 +30,15 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
-import { lazy } from "react";
 import { DefaultFolderId } from "../../../config";
 import type { MessageMetadata } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
-
+import threadsDefinitions from "../../definition";
+import { THREAD_MESSAGES_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 import {
   onEventPersistMessage,
   persistMessageIfIncognito,

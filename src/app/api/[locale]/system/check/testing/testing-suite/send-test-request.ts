@@ -7,6 +7,10 @@ import {
   isStreamingResponse,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import type {
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "next-vibe-ui/unified/_shared/types";
 import type { z } from "zod";
 
 import type {
@@ -21,10 +25,6 @@ import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interf
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 
-import type {
-  AnyChildrenConstrain,
-  FieldUsageConfig,
-} from "next-vibe-ui/unified/_shared/types";
 import {
   UserPermissionRole,
   type UserRoleValue,

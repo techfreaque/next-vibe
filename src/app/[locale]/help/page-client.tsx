@@ -2,8 +2,8 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { SiDiscord } from "next-vibe-ui/ui/icons/SiDiscord";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { SiDiscord } from "next-vibe-ui/ui/icons/SiDiscord";
 import { Link } from "next-vibe-ui/ui/link";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import { openUrl } from "next-vibe-ui/utils/browser";

@@ -5,16 +5,15 @@ import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { configScopedTranslation } from "@/config/i18n";
 
 import { scopedTranslation } from "./i18n";
 

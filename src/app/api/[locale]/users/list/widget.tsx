@@ -5,14 +5,15 @@
 
 "use client";
 
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
-import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
 import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";

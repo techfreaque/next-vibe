@@ -3,6 +3,7 @@
  * GET — retrieve a single bill with all line items
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -20,12 +21,11 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { BillStatus, BillStatusDB, BillStatusOptions } from "../../../enum";
-import { scopedTranslation } from "./i18n";
 import listDef0 from "../../list/definition";
+import { scopedTranslation } from "./i18n";
 
 const BillGetWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.BillGetWidget })),

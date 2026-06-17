@@ -7,7 +7,6 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import { redirect } from "next-vibe-ui/lib/redirect";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -16,6 +15,7 @@ import {
   throwErrorResponse,
 } from "next-vibe/shared/types/response.schema";
 import { Environment, parseError } from "next-vibe/shared/utils";
+import { redirect } from "next-vibe-ui/lib/redirect";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {

@@ -14,8 +14,8 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  signalStreamsRequestField,
   signalsResponseField,
+  signalStreamsRequestField,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 

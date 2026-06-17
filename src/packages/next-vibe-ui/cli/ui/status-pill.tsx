@@ -1,15 +1,15 @@
 import { Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type {
   StatusPillProps,
   StatusPillVariant,
 } from "../../web/ui/status-pill";
 
 export type {
-  StatusPillVariant,
   StatusPillProps,
+  StatusPillVariant,
 } from "../../web/ui/status-pill";
 
 const VARIANT_COLOR: Record<StatusPillVariant, string | undefined> = {

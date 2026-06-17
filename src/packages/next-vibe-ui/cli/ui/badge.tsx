@@ -1,7 +1,8 @@
+import { cva } from "class-variance-authority";
 import { Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { BadgeProps } from "../../web/ui/badge";
 
 import { cva } from "class-variance-authority";

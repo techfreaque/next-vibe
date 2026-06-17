@@ -6,14 +6,15 @@
 
 "use client";
 
+import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useRef } from "react";
 
+import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { type VadConfig, VoiceActivityDetector } from "./voice-mode/vad";
 
-import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
-import { VoiceActivityDetector, type VadConfig } from "./voice-mode/vad";
 import { useVoiceModeStore } from "./voice-mode/store";
 
 export interface UseCallModeOptions {

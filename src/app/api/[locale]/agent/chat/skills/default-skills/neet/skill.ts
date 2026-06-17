@@ -2,7 +2,6 @@ import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/consta
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
-
 import {
   ContentLevel,
   IntelligenceLevel,

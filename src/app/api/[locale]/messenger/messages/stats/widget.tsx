@@ -6,17 +6,14 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Input } from "next-vibe-ui/ui/input";
 import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { MetricCard } from "next-vibe-ui/ui/metric-card";
 import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
 import { ProgressBlock } from "next-vibe-ui/ui/progress-block";
-import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { Search } from "next-vibe-ui/ui/icons/Search";
 import { SectionGroup } from "next-vibe-ui/ui/section-group";
-import { Span } from "next-vibe-ui/ui/span";
-import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,
   SelectContent,

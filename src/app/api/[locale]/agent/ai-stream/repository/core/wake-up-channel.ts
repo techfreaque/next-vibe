@@ -15,8 +15,8 @@
  *   so we use a direct in-process handler map here instead.
  */
 
-import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 export interface WakeUpPayload {

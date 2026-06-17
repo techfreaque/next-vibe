@@ -3,8 +3,12 @@
  * Defines endpoint for listing user favorites
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -27,13 +31,9 @@ import {
   UserPermissionRole,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { iconSchema } from "../../../shared/types/common.schema";
 import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
+
+import { iconSchema } from "../../../shared/types/common.schema";
 import { FAVORITES_LIST_ALIAS } from "./constants";
 import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";

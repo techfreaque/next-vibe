@@ -1,16 +1,20 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";
 
 import { leadMagnetConfigs } from "../../db";
+import type { LeadMagnetT } from "../../i18n";
+import { saveProviderConfig } from "../repository";
 
 export interface GoogleSheetsCredentials {
-import { saveProviderConfig } from "../repository";
   googleAccessToken: string;
   googleRefreshToken: string;
-import type { LeadMagnetT } from "../../i18n";
   googleTokenExpiry: string;
   googleSheetId?: string;
   googleSheetTab?: string;
@@ -82,9 +86,3 @@ export const GoogleSheetsCredentialsRepository = {
     }
   },
 };
-import { saveProviderConfig } from "../repository";
-import type { LeadMagnetT } from "../../i18n";
-import { saveProviderConfig } from "../repository";
-import type { LeadMagnetT } from "../../i18n";
-import { saveProviderConfig } from "../repository";
-import type { LeadMagnetT } from "../../i18n";

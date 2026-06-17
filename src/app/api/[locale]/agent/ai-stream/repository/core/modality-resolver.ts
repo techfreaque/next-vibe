@@ -15,11 +15,11 @@ import {
   getBestChatModel,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
+  type AudioVisionModelId,
+  type AudioVisionModelOption,
   getBestAudioVisionModel,
   getBestImageVisionModel,
   getBestVideoVisionModel,
-  type AudioVisionModelId,
-  type AudioVisionModelOption,
   type ImageVisionModelId,
   type ImageVisionModelOption,
   type VideoVisionModelId,
@@ -27,6 +27,7 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type { ChatFavorite } from "@/app/api/[locale]/agent/chat/favorites/db";
 import type { SkillVariant } from "@/app/api/[locale]/agent/chat/skills/config";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
   getBestImageGenModel,
@@ -48,7 +49,6 @@ import {
   type SttModelOption,
 } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import {
   getBestTtsModel,
   type TtsModelId,

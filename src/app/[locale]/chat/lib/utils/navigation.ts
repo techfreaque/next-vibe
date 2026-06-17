@@ -5,13 +5,13 @@
 
 import type { Route } from "next";
 
+import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
 import {
   DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
 
 /**
  * Get the root folder ID for a given folder

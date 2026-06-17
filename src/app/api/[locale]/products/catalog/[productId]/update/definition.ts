@@ -3,15 +3,18 @@
  * PATCH: update fields on an existing catalog product
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import catalogListDefinitions from "@/app/api/[locale]/products/catalog/list/definition";
+import categoryListDefinitions from "@/app/api/[locale]/products/category/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseField,
-  customWidgetObject,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,

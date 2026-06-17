@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { NavigationStackEntry } from "../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
-import { resolveEndpoint } from "../utils/resolve-endpoint";
 import { endpointToUrlSegment } from "../../shared/utils/path";
+import { resolveEndpoint } from "../utils/resolve-endpoint";
 import type { UseNavigationStackReturn } from "./use-navigation-stack";
 
 // ── Serialization ─────────────────────────────────────────────────────────────
@@ -21,7 +21,7 @@ function serializeEntry(entry: NavigationStackEntry): {
   alias: string;
   params: Record<string, string>;
 } {
-  const alias = entry.endpoint.aliases?.[0] ?? entry.endpoint.path.join("/");
+  const alias = endpointToUrlSegment(entry.endpoint);
   const params: Record<string, string> = {};
 
   if (entry.params.urlPathParams) {
@@ -141,6 +141,8 @@ interface UseUrlNavStackOptions {
 export type UrlNavStackReturn = UseNavigationStackReturn & {
   /** Reset in-memory stack without touching browser history. For sidebar-driven base changes. */
   _clearStack: () => void;
+  /** Seed an initial stack entry without touching browser history. For restoring URL params on page refresh. */
+  _seedStack: (entry: NavigationStackEntry) => void;
 };
 
 export function useUrlNavStack(
@@ -245,6 +247,14 @@ export function useUrlNavStack(
     setStack([]);
   }, []);
 
+  // ── Seed: set initial stack entry without touching browser history ──────────
+  // Use on mount when the URL already encodes endpoint params (e.g. page refresh
+  // at leads/lead/[id]?id=xxx). Unlike push(), no pushState is emitted.
+  const seedStack = useCallback((entry: NavigationStackEntry): void => {
+    stackRef.current = [entry];
+    setStack([entry]);
+  }, []);
+
   // ── Replace ───────────────────────────────────────────────────────────────
   const replace = useCallback<UseNavigationStackReturn["replace"]>(
     (endpoint: CreateApiEndpointAny, opts?: NavPushOptions): void => {
@@ -290,5 +300,6 @@ export function useUrlNavStack(
     // Extra: reset in-memory stack without touching browser history.
     // Not part of UseNavigationStackReturn — accessed directly by the widget.
     _clearStack: clearStack,
+    _seedStack: seedStack,
   };
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { success } from "next-vibe/shared/types/response.schema";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
@@ -16,19 +17,18 @@ import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
-import { success } from "next-vibe/shared/types/response.schema";
-import { useCallback, useState, type JSX } from "react";
+import {
+  useWidgetLogger,
+  useWidgetUser,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { type JSX, useCallback, useState } from "react";
 
 import {
-  getBestChatModel,
   type ChatModelSelection,
+  getBestChatModel,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import {
-  formatSkillId,
-  parseSkillId,
-} from "@/app/api/[locale]/agent/chat/slugify";
 import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
 import favoritesDefinition from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
@@ -39,16 +39,17 @@ import {
 } from "@/app/api/[locale]/agent/chat/skills/config";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
+import {
+  formatSkillId,
+  parseSkillId,
+} from "@/app/api/[locale]/agent/chat/slugify";
 import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import {
-  useWidgetLogger,
-  useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import {
   DEFAULT_CHAT_MODEL_ID,
   DEFAULT_CHAT_MODEL_SELECTION,

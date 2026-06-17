@@ -3,9 +3,13 @@
  * Converts text to speech using AI providers (OpenAI TTS, ElevenLabs, Eden AI)
  */
 
-import { z } from "zod";
 import { lazy } from "react";
+import { z } from "zod";
 
+import {
+  TtsModelId,
+  TtsModelIdOptions,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -20,10 +24,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import {
-  TtsModelId,
-  TtsModelIdOptions,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
 import { DEFAULT_TTS_VOICE_ID } from "./constants";
 import { scopedTranslation } from "./i18n";
 

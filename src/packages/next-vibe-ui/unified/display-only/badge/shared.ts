@@ -4,9 +4,9 @@
  */
 
 import type { BadgeVariant } from "next-vibe-ui/ui/badge";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type z from "zod";
 
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 

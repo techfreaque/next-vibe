@@ -4,6 +4,8 @@
 
 "use client";
 
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
@@ -50,6 +52,7 @@ import {
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
 import IconWidget from "next-vibe-ui/unified/display-only/icon/widget";
@@ -60,7 +63,6 @@ import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 
 import { cn } from "../../../shared/utils";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/selector/selector-onboarding/context";
 
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";

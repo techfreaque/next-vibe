@@ -3,8 +3,11 @@
  * POST — add a line item to a draft bill, auto-calculating tax and totals
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import billListDefinitions from "@/app/api/[locale]/payment/bill/list/definition";
+import productsListDefinitions from "@/app/api/[locale]/products/catalog/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -12,7 +15,6 @@ import {
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -22,8 +24,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import billListDefinitions from "@/app/api/[locale]/payment/bill/list/definition";
-import productsListDefinitions from "@/app/api/[locale]/products/catalog/list/definition";
 import { scopedTranslation } from "./i18n";
 
 const BillLineAddWidgetLazy = lazyWidget(() =>

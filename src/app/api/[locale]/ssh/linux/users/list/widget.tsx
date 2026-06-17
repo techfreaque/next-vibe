@@ -24,6 +24,7 @@ import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+import React, { useCallback } from "react";
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 

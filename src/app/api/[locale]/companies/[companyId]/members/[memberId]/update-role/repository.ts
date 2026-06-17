@@ -18,8 +18,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
 import { companyMembers } from "../../../../db";
-import { CompanyMemberRole } from "../../../../enum";
 import type { CompanyMemberRoleDB } from "../../../../enum";
+import { CompanyMemberRole } from "../../../../enum";
 import { scopedTranslation } from "../../../../i18n";
 import { CompanyAuthRepository } from "../../../../repository";
 import type { UpdateRoleRequestOutput } from "./definition";

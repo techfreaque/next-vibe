@@ -3,6 +3,7 @@
  * POST: run + save config, GET: read config
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -27,7 +28,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { BOUNCE_PROCESSOR_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 const BounceProcessorConfigWidget = lazyWidget(() =>

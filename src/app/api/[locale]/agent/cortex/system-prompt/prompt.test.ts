@@ -16,11 +16,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   cleanExcerpt,
-  cortexFragment,
-  renderCortexTree,
   type CortexData,
   type CortexDirEntry,
   type CortexFileEntry,
+  cortexFragment,
+  renderCortexTree,
 } from "./prompt";
 
 // ── Factory helpers (typed against the real current types) ────────────────────

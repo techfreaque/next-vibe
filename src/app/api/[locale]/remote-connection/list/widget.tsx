@@ -480,7 +480,12 @@ function SyncSettingsCard({
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  isAdmin,
+  isAdmin,
 
+  isAdmin,
+  isAdmin,
+  isAdmin,
   isAdmin,
   isAdmin,
   isAdmin,

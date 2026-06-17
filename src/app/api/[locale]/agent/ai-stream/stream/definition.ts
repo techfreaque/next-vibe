@@ -3,17 +3,30 @@
  * Defines endpoint for AI-powered streaming chat functionality using OpenAI GPT-4o
  */
 
+import { lazy } from "react";
 import { z } from "zod";
 
 import {
   ChatModelId,
   ChatModelIdOptions,
 } from "@/app/api/[locale]/agent/ai-stream/models";
+import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
+import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import {
   TtsModelId,
   TtsModelIdOptions,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -31,18 +44,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import { lazy } from "react";
 import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
@@ -50,7 +51,6 @@ import { type ChatMessage, selectChatMessageSchema } from "../../chat/db";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../chat/enum";
 import { AI_STREAM_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import threadsDefinitions from "@/app/api/[locale]/agent/chat/threads/definition";
 
 const toolConfigItemSchema = z.object({
   toolId: z.string(),

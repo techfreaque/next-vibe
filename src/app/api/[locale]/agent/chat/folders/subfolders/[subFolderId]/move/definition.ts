@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";

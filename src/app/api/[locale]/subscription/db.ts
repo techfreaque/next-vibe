@@ -8,8 +8,8 @@ import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import { catalogProducts } from "../products/db";
 import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
+import { catalogProducts } from "../products/db";
 import { users } from "../user/db";
 import {
   BillingInterval,

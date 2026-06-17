@@ -6,11 +6,11 @@
 import type { z } from "zod";
 
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { BaseExecutionContext } from "../shared/endpoints/route/executor";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 /**
  * JSON-RPC 2.0 Base Types

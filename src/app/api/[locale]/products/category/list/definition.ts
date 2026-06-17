@@ -3,8 +3,10 @@
  * GET: list product categories for a company or owner
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -24,6 +26,8 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
 import { scopedTranslation } from "./i18n";

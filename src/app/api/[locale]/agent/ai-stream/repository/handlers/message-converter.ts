@@ -16,14 +16,20 @@ import type {
   ErrorResponseType,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils";
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
 import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 
+import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
+import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 import type { DefaultFolderId } from "../../../chat/config";
+import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 
 import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { ChatMessage } from "../../../chat/db";

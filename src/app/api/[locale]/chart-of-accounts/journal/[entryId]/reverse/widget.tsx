@@ -13,6 +13,7 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { DateFieldWidget } from "next-vibe-ui/unified/form-fields/date-field/widget";
+import type { JSX } from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 

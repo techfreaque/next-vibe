@@ -11,6 +11,7 @@ import { Maximize } from "next-vibe-ui/ui/icons/Maximize";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
+import { scopedTranslation } from "@/app/[locale]/cortex/i18n";
 import cortexListDefinitions from "@/app/api/[locale]/agent/cortex/list/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

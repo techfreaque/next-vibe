@@ -40,6 +40,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { z } from "zod";
 
 import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
@@ -49,12 +50,10 @@ import { leads } from "@/app/api/[locale]/leads/db";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { TtsModelId } from "../text-to-speech/models";
-
 import type { DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
 import type { FavoriteConfig } from "./favorites/db";

@@ -11,6 +11,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 interface CallModeIndicatorProps {

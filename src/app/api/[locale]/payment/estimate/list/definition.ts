@@ -3,8 +3,10 @@
  * GET — paginated list of estimates for a company
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import listDef0 from "@/app/api/[locale]/companies/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -20,13 +22,11 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import listDef1 from "@/app/api/[locale]/users/list/definition";
 
 import { EstimateStatusDB, EstimateStatusOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
-import listDef0 from "@/app/api/[locale]/companies/list/definition";
-import listDef1 from "@/app/api/[locale]/users/list/definition";
 
 const EstimateListWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.EstimateListWidget })),

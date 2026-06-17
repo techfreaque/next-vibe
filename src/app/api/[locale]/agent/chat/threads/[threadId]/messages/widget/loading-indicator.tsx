@@ -2,8 +2,8 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import { memo } from "react";
 import type { JSX } from "react";
+import { memo } from "react";
 
 export const LoadingIndicator = memo(function LoadingIndicator({
   isStreaming,

@@ -29,19 +29,20 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
-import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { DetailField, DetailGrid } from "next-vibe-ui/ui/detail-grid";
+import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
-import { Switch } from "next-vibe-ui/ui/switch";
-import { DetailField, DetailGrid } from "next-vibe-ui/ui/detail-grid";
-import { Div } from "next-vibe-ui/ui/div";
 import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { SectionGroup } from "next-vibe-ui/ui/section-group";
 import { StatusPill } from "next-vibe-ui/ui/status-pill";
+import { Switch } from "next-vibe-ui/ui/switch";
+import { Code, P } from "next-vibe-ui/ui/typography";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import { Code, P } from "next-vibe-ui/ui/typography";
@@ -70,6 +71,7 @@ import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-butt
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import connectDefinitions from "../connect/definition";
+import type { SyncScope } from "../db";
 import definitions from "./definition";
 import type { default as definitionsType } from "./definition";
 import { scopedTranslation } from "./i18n";

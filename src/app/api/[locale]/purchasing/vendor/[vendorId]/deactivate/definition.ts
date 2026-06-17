@@ -3,8 +3,10 @@
  * POST — soft-deactivate a vendor
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import vendorListDefinitions from "@/app/api/[locale]/purchasing/vendor/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

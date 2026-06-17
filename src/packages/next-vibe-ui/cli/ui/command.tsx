@@ -2,26 +2,26 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type {
-  CommandProps,
   CommandDialogProps,
-  CommandInputProps,
-  CommandListProps,
   CommandEmptyProps,
   CommandGroupProps,
-  CommandSeparatorProps,
+  CommandInputProps,
   CommandItemProps,
+  CommandListProps,
+  CommandProps,
+  CommandSeparatorProps,
   CommandShortcutProps,
 } from "../../web/ui/command";
 
 export type {
-  CommandProps,
   CommandDialogProps,
-  CommandInputProps,
-  CommandListProps,
   CommandEmptyProps,
   CommandGroupProps,
-  CommandSeparatorProps,
+  CommandInputProps,
   CommandItemProps,
+  CommandListProps,
+  CommandProps,
+  CommandSeparatorProps,
   CommandShortcutProps,
 } from "../../web/ui/command";
 

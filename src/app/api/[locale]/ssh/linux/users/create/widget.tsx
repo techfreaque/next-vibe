@@ -7,12 +7,15 @@
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useMemo } from "react";
+import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
+import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
 
 import { useWidgetForm } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextArrayFieldWidget } from "next-vibe-ui/unified/form-fields/text-array-field/widget";
-import { PasswordFieldWidget } from "next-vibe-ui/unified/form-fields/password-field/widget";
+import type { JSX } from "react";
+import { useMemo } from "react";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";

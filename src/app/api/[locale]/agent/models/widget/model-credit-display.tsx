@@ -26,9 +26,10 @@ import { useRef, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
+  chatModelOptions,
+  chatModelOptions,
 
 import {
-  chatModelOptions,
   type ChatModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { imageGenModelOptions } from "@/app/api/[locale]/agent/image-generation/models";
@@ -44,10 +45,10 @@ import {
 import { getCreditCostFromModel, getModelPrice } from "../all-models";
 import { scopedTranslation } from "../i18n";
 import {
-  PRICE_REFERENCE_STT_SECONDS,
-  PRICE_REFERENCE_TTS_CHARS,
   type AnyModelId,
   type AnyModelOption,
+  PRICE_REFERENCE_STT_SECONDS,
+  PRICE_REFERENCE_TTS_CHARS,
 } from "../models";
 
 /**

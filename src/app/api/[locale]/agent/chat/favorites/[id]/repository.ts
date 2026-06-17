@@ -6,7 +6,6 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
-
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -15,19 +14,20 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
+import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import favoritesDefinitions from "../definition";
+import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
+import { SkillsRepository } from "../../skills/repository";
 import {
   ensureUniqueSlug,
   formatSkillId,
@@ -36,10 +36,9 @@ import {
   isUuid,
   parseSkillId,
 } from "../../slugify";
-import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
 import { FavoritesCreateRepository } from "../create/repository";
-import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
+import favoritesDefinitions from "../definition";
 import { ChatFavoritesRepositoryClient } from "../repository-client";
 import type {
   FavoriteDeleteResponseOutput,

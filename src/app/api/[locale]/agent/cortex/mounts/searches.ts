@@ -5,7 +5,6 @@ import "server-only";
  * Exposes past web search results as markdown files at /searches/<YYYY-MM>/<query-slug>-<messageId>.md
  * Reconstructed from chatMessages where metadata.toolCall.toolName = "web-search"
  */
-
 import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
 
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";

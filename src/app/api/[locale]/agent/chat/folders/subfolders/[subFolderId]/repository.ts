@@ -16,11 +16,11 @@ import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interfa
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import folderContentsDefinitions from "../../../folder-contents/[rootFolderId]/definition";
 import type {
   FolderDeleteResponseOutput,
   FolderGetResponseOutput,
 } from "./definition";
-import folderContentsDefinitions from "../../../folder-contents/[rootFolderId]/definition";
 import { scopedTranslation } from "./i18n";
 import type {
   FolderUpdateRequestOutput,

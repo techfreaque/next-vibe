@@ -38,9 +38,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
-  type ToolCall,
   chatMessages,
   chatThreads,
+  type ToolCall,
 } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";

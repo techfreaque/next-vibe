@@ -22,8 +22,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
 import threadsDefinitions from "../../../../definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Vote Message Endpoint (POST)

@@ -3,8 +3,10 @@
  * POST — change a DRAFT journal entry to POSTED status
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import journalListDefinitions from "@/app/api/[locale]/chart-of-accounts/journal/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

@@ -4,7 +4,6 @@ import "server-only";
  * Virtual Mount Resolver
  * Routes Cortex paths to the appropriate data source and renders as markdown
  */
-
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

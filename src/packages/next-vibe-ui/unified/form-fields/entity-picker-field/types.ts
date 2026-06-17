@@ -2,9 +2,9 @@
  * Entity Picker Field Widget Types
  */
 
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import type { BaseFormFieldWidgetConfig } from "../_shared/types";

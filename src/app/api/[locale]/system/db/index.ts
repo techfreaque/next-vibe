@@ -10,20 +10,20 @@ import { env } from "@/config/env";
 import * as agentChatSchema from "../../agent/chat/db";
 import * as chartOfAccountsSchema from "../../chart-of-accounts/db";
 import * as companiesSchema from "../../companies/db";
-import * as paymentSchema from "../../payment/db";
 import * as creditSchema from "../../credits/db";
+import * as inventorySchema from "../../inventory/db";
 import * as leadsSchema from "../../leads/db";
+import * as paymentSchema from "../../payment/db";
+import * as posSchema from "../../pos/db";
+import * as catalogProductsSchema from "../../products/db";
+import * as purchasingSchema from "../../purchasing/db";
 import * as referralSchema from "../../referral/db";
+import * as remoteConnectionSchema from "../../remote-connection/db";
 import * as sshSchema from "../../ssh/db";
 import * as cronTasksSchema from "../../system/unified-interface/tasks/cron/db";
-import * as taxSchema from "../../tax/db";
 import * as vibeSenseSchema from "../../system/unified-interface/vibe-sense/db";
+import * as taxSchema from "../../tax/db";
 import * as userSchema from "../../user/db";
-import * as catalogProductsSchema from "../../products/db";
-import * as posSchema from "../../pos/db";
-import * as inventorySchema from "../../inventory/db";
-import * as purchasingSchema from "../../purchasing/db";
-import * as remoteConnectionSchema from "../../remote-connection/db";
 
 /**
  * Database connection pool configuration

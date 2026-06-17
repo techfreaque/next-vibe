@@ -3,9 +3,11 @@
  * Defines endpoints for GET, PATCH (update), and DELETE operations on a single skill
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -32,8 +34,6 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
 import { getBestChatModel } from "../../../ai-stream/models";
 import {
@@ -47,10 +47,10 @@ import {
   SKILL_GET_ALIAS,
   SKILL_UPDATE_ALIAS,
 } from "../constants";
+import listDef0 from "../definition";
 import { type SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
 import { scopedTranslation } from "./i18n";
-import listDef0 from "../definition";
 
 const SkillEditContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillEditContainer })),

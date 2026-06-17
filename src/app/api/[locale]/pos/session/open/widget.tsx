@@ -17,8 +17,8 @@ import {
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-
 import { posTerminalNameMap } from "../../terminal/list/widget";
+import { type JSX, useRef } from "react";
 
 import type definition from "./definition";
 

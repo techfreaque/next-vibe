@@ -3,8 +3,10 @@
  * POST — create a reversal entry mirroring debits/credits
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import journalListDefinitions from "@/app/api/[locale]/chart-of-accounts/journal/list/definition";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {

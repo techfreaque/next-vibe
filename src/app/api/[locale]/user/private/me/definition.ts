@@ -20,7 +20,6 @@ import {
   customWidgetObject,
   objectField,
   objectOptionalField,
-  objectUnionField,
   requestField,
   responseArrayField,
   responseField,
@@ -34,9 +33,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { UserRole } from "../../user-roles/enum";
+import { UserRole, UserRoleDB } from "../../user-roles/enum";
 import { userRoleResponseSchema } from "../../user-roles/types";
-import { scopedTranslation } from "./i18n";
 import { USER_ME_ALIAS } from "./constants";
 
 const MeUpdateWidget = lazy(() =>

@@ -79,6 +79,8 @@ import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import { useRouter, useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -87,8 +89,6 @@ import {
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import {
   scopedTranslation as chatScopedTranslation,
   type ChatT,
@@ -201,6 +201,7 @@ function ThreadRow({
   const [editTitle, setEditTitle] = useState(item.title ?? "");
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
+  const { pushState } = useSilentHistory();
   const isActive = activeThreadId === item.id;
   const isIncognito = item.rootFolderId === DefaultFolderId.INCOGNITO;
 
@@ -221,7 +222,7 @@ function ThreadRow({
     const url = item.folderId
       ? `/${locale}/threads/${item.rootFolderId}/${item.folderId}/${item.id}`
       : `/${locale}/threads/${item.rootFolderId}/${item.id}`;
-    window.history.pushState(null, "", url);
+    pushState(url);
   };
 
   const mutateThread = async (updates: {
@@ -354,11 +355,7 @@ function ThreadRow({
           currentRootFolderId: item.rootFolderId as DefaultFolderId,
           currentSubFolderId: null,
         });
-        window.history.pushState(
-          null,
-          "",
-          `/${locale}/threads/${item.rootFolderId}/${NEW_MESSAGE_ID}`,
-        );
+        pushState(`/${locale}/threads/${item.rootFolderId}/${NEW_MESSAGE_ID}`);
       }
       if (isIncognito) {
         const { ChatThreadsRepositoryClient } =
@@ -710,6 +707,7 @@ function ThreadRowShared({
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
+  const { pushState } = useSilentHistory();
   const isActive = activeThreadId === item.id;
   const isThreadStreaming = item.streamingState !== "idle";
   const activeShareCount = item.activeShareCount ?? 0;
@@ -730,7 +728,7 @@ function ThreadRowShared({
     const url = item.folderId
       ? `/${locale}/threads/${item.rootFolderId}/${item.folderId}/${item.id}`
       : `/${locale}/threads/${item.rootFolderId}/${item.id}`;
-    window.history.pushState(null, "", url);
+    pushState(url);
   };
 
   const mutateThread = async (updates: {
@@ -820,14 +818,10 @@ function ThreadRowShared({
       if (isActive) {
         setNavigation({
           activeThreadId: NEW_MESSAGE_ID,
-          currentRootFolderId: item.rootFolderId as DefaultFolderId,
+          currentRootFolderId: item.rootFolderId,
           currentSubFolderId: null,
         });
-        window.history.pushState(
-          null,
-          "",
-          `/${locale}/threads/${item.rootFolderId}/${NEW_MESSAGE_ID}`,
-        );
+        pushState(`/${locale}/threads/${item.rootFolderId}/${NEW_MESSAGE_ID}`);
       }
       const threadDef = await import("../../threads/[threadId]/definition");
       await apiClient.mutate(
@@ -1115,6 +1109,7 @@ function FolderRow({
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
   const activeFolderId = useChatNavigationStore((s) => s.currentSubFolderId);
   const router = useRouter();
+  const { pushState } = useSilentHistory();
   const { initialSubFolderContentsData, initialSubFolderId } =
     useChatBootContext();
 
@@ -1165,11 +1160,7 @@ function FolderRow({
         currentRootFolderId: activeRootFolderId,
         currentSubFolderId: item.parentId ?? null,
       });
-      window.history.pushState(
-        null,
-        "",
-        buildFolderUrl(locale, activeRootFolderId, item.parentId),
-      );
+      pushState(buildFolderUrl(locale, activeRootFolderId, item.parentId));
     } else {
       // expand - set subfolder and navigate to new thread in that folder
       setNavigation({
@@ -1177,9 +1168,7 @@ function FolderRow({
         currentSubFolderId: item.id,
         activeThreadId: NEW_MESSAGE_ID,
       });
-      window.history.pushState(
-        null,
-        "",
+      pushState(
         `${buildFolderUrl(locale, activeRootFolderId, item.id)}/${NEW_MESSAGE_ID}`,
       );
     }
@@ -1204,9 +1193,7 @@ function FolderRow({
       currentRootFolderId: activeRootFolderId,
       currentSubFolderId: item.id,
     });
-    window.history.pushState(
-      null,
-      "",
+    pushState(
       `${buildFolderUrl(locale, activeRootFolderId, item.id)}/${NEW_MESSAGE_ID}`,
     );
   };
@@ -1374,11 +1361,7 @@ function FolderRow({
           currentRootFolderId: activeRootFolderId,
           currentSubFolderId: null,
         });
-        window.history.pushState(
-          null,
-          "",
-          `/${locale}/threads/${activeRootFolderId}/${NEW_MESSAGE_ID}`,
-        );
+        pushState(`/${locale}/threads/${activeRootFolderId}/${NEW_MESSAGE_ID}`);
       }
       // Navigate away if currently inside the deleted folder
       if (activeFolderId === item.id) {

@@ -6,8 +6,8 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { SkillReportRepository } from "./repository";
 import definitions from "./definition";
+import { SkillReportRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,

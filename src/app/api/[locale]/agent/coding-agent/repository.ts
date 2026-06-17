@@ -18,16 +18,10 @@
  */
 import "server-only";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { eq } from "drizzle-orm";
 import { execSync, spawn } from "node:child_process";
 import { once } from "node:events";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
-import { db } from "@/app/api/[locale]/system/db";
-import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,

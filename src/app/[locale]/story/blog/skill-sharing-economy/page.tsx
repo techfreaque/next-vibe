@@ -5,6 +5,7 @@ import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Code } from "next-vibe-ui/ui/icons/Code";
 import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
+import { Languages } from "next-vibe-ui/ui/icons/Languages";
 import { Palette } from "next-vibe-ui/ui/icons/Palette";
 import { ShieldOff } from "next-vibe-ui/ui/icons/ShieldOff";
 import { Languages } from "next-vibe-ui/ui/icons/Languages";

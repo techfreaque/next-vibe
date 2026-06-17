@@ -1,15 +1,17 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { CornerDownRight } from "next-vibe-ui/ui/icons/CornerDownRight";
-import { cn } from "next-vibe/shared/utils";
+import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
 
-import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
 import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
 import { getDirectReplies } from "@/app/[locale]/chat/lib/utils/thread-builder";
@@ -21,16 +23,14 @@ import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSkill } from "../../../../../skills/[id]/hooks";
+import type messagesDefinition from "../../definition";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
 import { scopedTranslation } from "../../i18n";
-import type messagesDefinition from "../../definition";
-import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { useMessageGroupName } from "../embedded-context";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";

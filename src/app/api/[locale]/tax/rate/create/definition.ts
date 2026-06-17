@@ -3,8 +3,10 @@
  * POST endpoint to add a new tax rate to a company
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -22,7 +24,6 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { TaxType, TaxTypeDB, TaxTypeOptions } from "../../enum";
-import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
 import { scopedTranslation } from "../../i18n";
 
 const ALLOWED_ROLES = [

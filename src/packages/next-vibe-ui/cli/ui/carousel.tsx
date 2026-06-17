@@ -2,18 +2,18 @@ import * as React from "react";
 
 export type {
   CarouselApi,
+  CarouselButtonProps,
+  CarouselContentProps,
+  CarouselItemProps,
   CarouselOptions,
   CarouselPlugin,
   CarouselProps,
-  CarouselContentProps,
-  CarouselItemProps,
-  CarouselButtonProps,
 } from "../../web/ui/carousel";
 
 import type {
-  CarouselProps,
   CarouselContentProps,
   CarouselItemProps,
+  CarouselProps,
 } from "../../web/ui/carousel";
 
 export function Carousel({

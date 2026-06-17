@@ -6,7 +6,6 @@
 import "server-only";
 
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -15,6 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -23,13 +23,13 @@ import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { chatSettings } from "../settings/db";
+import { scopedTranslation as settingsScopedTranslation } from "../settings/i18n";
+import { ChatSettingsRepository } from "../settings/repository";
 import { DEFAULT_SKILLS } from "../skills/config";
 import { NO_SKILL_ID } from "../skills/constants";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
 import { SkillsRepository } from "../skills/repository";
-import { chatSettings } from "../settings/db";
-import { scopedTranslation as settingsScopedTranslation } from "../settings/i18n";
-import { ChatSettingsRepository } from "../settings/repository";
 import {
   formatSkillId,
   isSkillVariantId,
@@ -47,9 +47,9 @@ import {
   formatEmptyFavoritesGuidance,
   formatFavoritesSummary,
 } from "./favorites-formatter";
-import type { FavoriteSummaryItem } from "./system-prompt/prompt";
 import type { FavoritesT } from "./i18n";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
+import type { FavoriteSummaryItem } from "./system-prompt/prompt";
 
 export function buildFavoriteConfig(
   overrides: Partial<FavoriteConfig> & Pick<FavoriteConfig, "id" | "skillId">,

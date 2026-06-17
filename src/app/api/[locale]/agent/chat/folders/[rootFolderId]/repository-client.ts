@@ -12,13 +12,13 @@ import {
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
 import type { FolderContentsItem } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import folderContentsDefinitions from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import { parseError } from "@/app/api/[locale]/shared/utils";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { DefaultFolderId } from "../../config";

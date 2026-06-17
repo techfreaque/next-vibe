@@ -23,11 +23,11 @@ import { CurrenciesArr, defaultLocale } from "@/i18n/core/config";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
-import { scopedTranslation } from "./i18n";
 import type {
-  InvoiceDuplicateUrlPathParams,
   InvoiceDuplicateResponseOutput,
+  InvoiceDuplicateUrlPathParams,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class InvoiceDuplicateRepository {
   static async duplicateInvoice(

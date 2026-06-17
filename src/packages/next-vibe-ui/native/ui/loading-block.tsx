@@ -1,16 +1,17 @@
-import { cn } from "next-vibe/shared/utils/utils";
 import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import { ActivityIndicator, View } from "react-native";
 
 import type {
   LoadingBlockProps,
   LoadingBlockSize,
 } from "@/packages/next-vibe-ui/web/ui/loading-block";
+
 import { Text } from "./text";
 
 export type {
-  LoadingBlockSize,
   LoadingBlockProps,
+  LoadingBlockSize,
 } from "@/packages/next-vibe-ui/web/ui/loading-block";
 
 const StyledView = styled(View, { className: "style" });

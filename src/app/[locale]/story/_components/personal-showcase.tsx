@@ -1,11 +1,11 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
-import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -17,13 +17,13 @@ import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import type { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
 

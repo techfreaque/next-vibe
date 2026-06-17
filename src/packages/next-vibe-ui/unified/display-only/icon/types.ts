@@ -3,6 +3,7 @@
  * Displays an icon from the icon library
  */
 
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { z } from "zod";
 
 import type {
@@ -13,7 +14,6 @@ import type {
 } from "@/app/api/[locale]/shared/types/common.schema";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
 import type {
   BasePrimitiveWidgetConfig,

@@ -3,12 +3,14 @@
  * Defines endpoint for listing leads with filtering and pagination
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { paginationField } from "next-vibe-ui/unified/containers/pagination/types";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   objectField,
   responseArrayField,
   responseField,
@@ -29,7 +31,6 @@ import {
   LanguagesOptions,
 } from "@/i18n/core/config";
 
-import { paginationField } from "next-vibe-ui/unified/containers/pagination/types";
 import { UserRole } from "../../user/user-roles/enum";
 import {
   EmailCampaignStage,

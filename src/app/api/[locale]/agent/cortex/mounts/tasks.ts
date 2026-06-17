@@ -4,7 +4,6 @@ import "server-only";
  * Tasks Virtual Mount
  * Renders cron tasks as markdown files at /tasks/<taskId>.md
  */
-
 import { count as drizzleCount, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";

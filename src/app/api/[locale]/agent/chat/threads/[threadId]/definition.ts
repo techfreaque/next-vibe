@@ -27,8 +27,8 @@ import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId } from "../../config";
 import { ThreadStatus, ThreadStatusOptions } from "../../enum";
-import { scopedTranslation } from "./i18n";
 import threadsDefinitions from "../definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Get Thread by ID Endpoint (GET)

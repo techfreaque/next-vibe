@@ -5,8 +5,8 @@ import { DotsHorizontalIcon } from "next-vibe-ui/ui/icons/DotsHorizontalIcon";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "../i18n";
 
+import { uiScopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 
 // Breadcrumb

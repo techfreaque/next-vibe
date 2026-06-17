@@ -2,8 +2,10 @@
  * Inventory Warehouse Get API Route Definition
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import listDef0 from "@/app/api/[locale]/inventory/warehouse/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -19,10 +21,8 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "../../../i18n";
-import listDef0 from "@/app/api/[locale]/inventory/warehouse/list/definition";
 
 const InventoryWarehouseGetWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.InventoryWarehouseGetWidget })),

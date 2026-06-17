@@ -5,12 +5,11 @@
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getTranslatorFromEndpoint } from "next-vibe-ui/unified/_shared/field-helpers";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { parseError } from "../../shared/utils";
 import type { JwtPayloadType } from "../../user/auth/types";
 

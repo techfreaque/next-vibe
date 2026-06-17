@@ -4,9 +4,9 @@
  * Handles ONLY Next.js-specific concerns: NextRequest parsing, NextResponse wrapping, streaming
  */
 
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import { NextResponse } from "next-vibe-ui/lib/request";
-import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";

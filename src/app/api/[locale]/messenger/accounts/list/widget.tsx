@@ -8,12 +8,12 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
@@ -31,6 +31,7 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 
+import messengerAccountCreateDefinition from "../create/definition";
 import messengerAccountEditDefinition from "../edit/[id]/definition";
 import type { MessengerChannelFilterValue } from "../enum";
 import {
@@ -38,11 +39,10 @@ import {
   MessengerChannelFilter,
   MessengerChannelFilterOptions,
 } from "../enum";
+import { MessageChannel } from "../enum";
 import { scopedTranslation as accountsScopedTranslation } from "../i18n";
-import messengerAccountCreateDefinition from "../create/definition";
 import type definition from "./definition";
 import type { MessengerAccountsListGETResponseOutput } from "./definition";
-import { MessageChannel } from "../enum";
 
 type MessengerAccount = NonNullable<
   MessengerAccountsListGETResponseOutput["accounts"]

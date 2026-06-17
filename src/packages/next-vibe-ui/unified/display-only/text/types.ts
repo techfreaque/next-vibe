@@ -9,12 +9,12 @@ import type {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   BooleanWidgetSchema,
   NumberWidgetSchema,
   StringWidgetSchema,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { TParams } from "@/i18n/core/static-types";
 
 import type {

@@ -3,20 +3,22 @@
  * Reads model definitions (static, no DB) and applies search + filter.
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import { allModelDefinitions, getModelPrice } from "../all-models";
 import { chatModelOptions } from "../../ai-stream/models";
+import { IntelligenceLevelDB } from "../../chat/skills/enum";
 import { imageGenModelOptions } from "../../image-generation/models";
 import { musicGenModelOptions } from "../../music-generation/models";
-import { videoGenModelOptions } from "../../video-generation/models";
-import { ttsModelOptions } from "../../text-to-speech/models";
 import { sttModelOptions } from "../../speech-to-text/models";
+import { ttsModelOptions } from "../../text-to-speech/models";
+import { videoGenModelOptions } from "../../video-generation/models";
+import { allModelDefinitions, getModelPrice } from "../all-models";
+import { ModelUtility } from "../enum";
 import type { AnyModelOption, ModelDefinition } from "../models";
 import { modelProviders } from "../models";
 import { IntelligenceLevelDB } from "../../chat/skills/enum";

@@ -1,15 +1,15 @@
 import { Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type {
-  ProgressRootProps,
   ProgressIndicatorProps,
+  ProgressRootProps,
 } from "../../web/ui/progress";
 
 export type {
-  ProgressRootProps,
   ProgressIndicatorProps,
+  ProgressRootProps,
 } from "../../web/ui/progress";
 
 const BAR_WIDTH = 20;

@@ -25,16 +25,6 @@ import { Label } from "next-vibe-ui/ui/label";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
-import type { JSX } from "react";
-import { useCallback, useMemo, useState } from "react";
-
-import { scopedTranslation as skillIdTranslation } from "@/app/api/[locale]/agent/chat/skills/[id]/i18n";
-import { ModelGroup } from "@/app/api/[locale]/agent/chat/skills/[id]/widget";
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
-import {
-  ModelSelector,
-  ModelSelectorTrigger,
-} from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -51,6 +41,8 @@ import { IconFieldWidget } from "next-vibe-ui/unified/form-fields/icon-field/wid
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
@@ -58,10 +50,9 @@ import {
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import {
-  getBestChatModel,
   type ChatModelId,
+  getBestChatModel,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   getBestAudioVisionModel,
@@ -69,8 +60,16 @@ import {
   getBestVideoVisionModel,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import { scopedTranslation as skillIdTranslation } from "@/app/api/[locale]/agent/chat/skills/[id]/i18n";
+import { ModelGroup } from "@/app/api/[locale]/agent/chat/skills/[id]/widget";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+} from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
 import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
@@ -81,45 +80,45 @@ import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/vide
 import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+
 import {
   chatManualModelSelectionSchema,
-  chatModelSelectionSchema,
   type ChatModelSelection,
+  chatModelSelectionSchema,
 } from "../../../ai-stream/models";
 import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
   type AudioVisionModelSelection,
+  audioVisionModelSelectionSchema,
   type ImageVisionModelSelection,
+  imageVisionModelSelectionSchema,
   type VideoVisionModelSelection,
+  videoVisionModelSelectionSchema,
 } from "../../../ai-stream/vision-models";
 import {
-  imageGenModelSelectionSchema,
   type ImageGenModelSelection,
+  imageGenModelSelectionSchema,
 } from "../../../image-generation/models";
 import {
-  musicGenModelSelectionSchema,
   type MusicGenModelSelection,
+  musicGenModelSelectionSchema,
 } from "../../../music-generation/models";
 import {
-  sttModelSelectionSchema,
   type SttModelSelection,
+  sttModelSelectionSchema,
 } from "../../../speech-to-text/models";
 import {
-  voiceModelSelectionSchema,
   type VoiceModelSelection,
+  voiceModelSelectionSchema,
 } from "../../../text-to-speech/models";
 import {
-  ToolsConfigEdit,
   type ToolEntry,
+  ToolsConfigEdit,
   type ToolsConfigValue,
 } from "../../../tools/widget/tools-config-widget";
 import {
-  videoGenModelSelectionSchema,
   type VideoGenModelSelection,
+  videoGenModelSelectionSchema,
 } from "../../../video-generation/models";
-
 import { useChatSettings } from "../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../settings/repository-client";
 import { CompactTriggerEdit } from "../../settings/widget";

@@ -3,8 +3,10 @@
  * POST — add a custom account to a company's CoA
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import listDef0 from "@/app/api/[locale]/companies/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -26,9 +28,8 @@ import {
   AccountSubtypeOptions,
   AccountType,
   AccountTypeOptions,
-} from "../../enum";
 import { scopedTranslation } from "./i18n";
-import listDef0 from "@/app/api/[locale]/companies/list/definition";
+} from "../../enum";
 import listDef1 from "../list/definition";
 
 const CoaAccountCreateWidgetLazy = lazyWidget(() =>

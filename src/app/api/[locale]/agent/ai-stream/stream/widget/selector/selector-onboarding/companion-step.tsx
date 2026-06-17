@@ -7,16 +7,16 @@ import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { type JSX } from "react";
 
 import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import {
-  type Skill,
   COMPANION_SKILLS,
+  type Skill,
 } from "@/app/api/[locale]/agent/chat/skills/config";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface CompanionStepProps {

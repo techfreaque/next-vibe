@@ -7,11 +7,12 @@ import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
-import React from "react";
 
 import {
   useWidgetTranslation,
   useWidgetValue,
+import React from "react";
+import React from "react";
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 

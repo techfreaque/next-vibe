@@ -3,11 +3,11 @@
  * Production-ready autocomplete with search, categories, and custom values
  */
 import { cn } from "next-vibe/shared/utils/utils";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "next-vibe-ui/i18n";
 import type {
   AutocompleteFieldProps,
   AutocompleteOption,

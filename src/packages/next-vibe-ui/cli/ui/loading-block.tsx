@@ -1,12 +1,12 @@
 import { Box, Text } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { LoadingBlockProps } from "../../web/ui/loading-block";
 
 export type {
-  LoadingBlockSize,
   LoadingBlockProps,
+  LoadingBlockSize,
 } from "../../web/ui/loading-block";
 
 const SPINNER_DOT = "\u25CF";

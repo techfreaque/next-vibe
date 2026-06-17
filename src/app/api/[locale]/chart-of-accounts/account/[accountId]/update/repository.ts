@@ -5,19 +5,18 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
+import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { accountNodes } from "../../../db";

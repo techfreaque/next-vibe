@@ -32,12 +32,10 @@ import {
   generateFavoriteSlug,
   parseSkillId,
 } from "../../slugify";
-import { DEFAULT_SKILLS } from "../../skills/config";
-import { SkillsRepository } from "../../skills/repository";
-import favoritesDefinitions from "../definition";
 import { chatFavorites } from "../db";
 import { ChatFavoritesRepositoryClient } from "../repository-client";
 import type {
+import favoritesDefinitions from "../definition";
   FavoriteCreateRequestOutput,
   FavoriteCreateResponseOutput,
 } from "./definition";

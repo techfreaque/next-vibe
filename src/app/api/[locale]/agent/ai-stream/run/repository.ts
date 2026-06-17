@@ -20,6 +20,10 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import {
+  type ChatModelId,
+  getBestChatModel,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import {
   DefaultFolderId,
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
@@ -35,7 +39,12 @@ import {
   resolveFavoriteConfig,
 } from "@/app/api/[locale]/agent/chat/favorites/repository";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
+import {
+  isFiltersSelection,
+  isManualSelection,
+} from "@/app/api/[locale]/agent/chat/skills/create/definition";
 import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { db } from "@/app/api/[locale]/system/db";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -44,15 +53,6 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import {
-  getBestChatModel,
-  type ChatModelId,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  isFiltersSelection,
-  isManualSelection,
-} from "@/app/api/[locale]/agent/chat/skills/create/definition";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import type { HeadlessPreCall } from "../repository/headless";
 import { runHeadlessAiStream } from "../repository/headless";
 import type { AiStreamT } from "../stream/i18n";

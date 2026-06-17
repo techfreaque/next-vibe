@@ -4,8 +4,8 @@ import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-strea
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { listMonitors } from "../shared/repository";
-import { DesktopPlatform } from "./prompt";
 import type { DesktopData, SupportedDesktopEnv } from "./prompt";
+import { DesktopPlatform } from "./prompt";
 
 function getPlatform(): DesktopPlatform {
   switch (process.platform) {

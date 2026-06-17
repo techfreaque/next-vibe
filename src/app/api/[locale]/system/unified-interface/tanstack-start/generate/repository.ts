@@ -197,7 +197,7 @@ export class GenerateTanstackRoutesRepository {
         continue;
       }
       const srcFile = join(GenerateTanstackRoutesRepository.UI_DIR, relPath);
-      if (GenerateTanstackRoutesRepository.hasCustomDirective(srcFile)) {
+      if (hasCustomDirective(srcFile)) {
         result.skipped.push(relPath);
         continue;
       }
@@ -219,7 +219,7 @@ export class GenerateTanstackRoutesRepository {
     for (const relPath of allPages) {
       const dir = dirname(relPath);
       const srcFile = join(GenerateTanstackRoutesRepository.UI_DIR, relPath);
-      if (GenerateTanstackRoutesRepository.hasCustomDirective(srcFile)) {
+      if (hasCustomDirective(srcFile)) {
         result.skipped.push(relPath);
         continue;
       }
@@ -241,7 +241,7 @@ export class GenerateTanstackRoutesRepository {
     for (const relPath of allApiRoutes) {
       const dir = dirname(relPath);
       const srcFile = join(GenerateTanstackRoutesRepository.API_DIR, relPath);
-      if (GenerateTanstackRoutesRepository.hasCustomDirective(srcFile)) {
+      if (hasCustomDirective(srcFile)) {
         result.skipped.push(relPath);
         continue;
       }
@@ -289,6 +289,7 @@ export class GenerateTanstackRoutesRepository {
       `import { createFileRoute, redirect } from "@tanstack/react-router";`,
       ``,
       `export const Route = createFileRoute("/")({`,
+      `  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax`,
       `  loader: () => { throw redirect({ to: "/${locale}/", replace: true }); },`,
       `  component: () => null,`,
       `});`,
@@ -831,19 +832,7 @@ export class GenerateTanstackRoutesRepository {
         if (!content.startsWith("// AUTO-GENERATED")) {
           continue;
         }
-        const hasCustom = content
-          .split("\n")
-          .slice(0, 10)
-          .some((line) => {
-            const t = line.trim().replace(/;$/, "");
-            return (
-              t === '"use custom"' ||
-              t === "'use custom'" ||
-              t === '"use-custom"' ||
-              t === "'use-custom'"
-            );
-          });
-        if (!hasCustom) {
+        if (!hasCustomDirective(fullPath)) {
           rmSync(fullPath);
         }
       } catch {
@@ -858,53 +847,11 @@ export class GenerateTanstackRoutesRepository {
 
   /** Write content to outPath unless the existing file has a "use custom" directive. Returns true if written. */
   private static writeIfNotCustom(outPath: string, content: string): boolean {
-    if (existsSync(outPath)) {
-      try {
-        const existing = readFileSync(outPath, "utf-8");
-        const hasCustom = existing
-          .split("\n")
-          .slice(0, 10)
-          .some((line) => {
-            const t = line.trim().replace(/;$/, "");
-            return (
-              t === '"use custom"' ||
-              t === "'use custom'" ||
-              t === '"use-custom"' ||
-              t === "'use-custom'"
-            );
-          });
-        if (hasCustom) {
-          return false;
-        }
-      } catch {
-        // ignore read errors, proceed to write
-      }
+    if (hasCustomDirective(outPath)) {
+      return false;
     }
     writeFileSync(outPath, content, "utf-8");
     return true;
-  }
-
-  private static hasCustomDirective(filePath: string): boolean {
-    if (!existsSync(filePath)) {
-      return false;
-    }
-    try {
-      const content = readFileSync(filePath, "utf-8");
-      return content
-        .split("\n")
-        .slice(0, 10)
-        .some((line) => {
-          const t = line.trim().replace(/;$/, "");
-          return (
-            t === '"use custom"' ||
-            t === "'use custom'" ||
-            t === '"use-custom"' ||
-            t === "'use-custom'"
-          );
-        });
-    } catch {
-      return false;
-    }
   }
 
   /**

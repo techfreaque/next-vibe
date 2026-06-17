@@ -3,12 +3,9 @@
  * Defines endpoint for sending test emails with custom lead data
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import {
-  CampaignType,
-  CampaignTypeOptions,
-} from "@/app/api/[locale]/messenger/accounts/enum";
 import {
   EmailCampaignStage,
   EmailCampaignStageOptions,
@@ -19,11 +16,15 @@ import {
   LeadStatus,
   LeadStatusOptions,
 } from "@/app/api/[locale]/leads/enum";
+import {
+  CampaignType,
+  CampaignTypeOptions,
+} from "@/app/api/[locale]/messenger/accounts/enum";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseField,

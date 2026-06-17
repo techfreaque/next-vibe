@@ -34,12 +34,13 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
-import { PayoutStatus } from "@/app/api/[locale]/referral/enum";
 import { PayoutAction } from "@/app/api/[locale]/subscription/admin/enum";
+import { PayoutStatus } from "@/app/api/[locale]/referral/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";
 import type { ReferralsGetResponseOutput } from "./definition";

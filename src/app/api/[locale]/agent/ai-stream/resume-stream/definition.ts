@@ -44,10 +44,11 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
   title: "resumeStream.post.title",
+  titleShort: "resumeStream.post.titleShort",
   description: "resumeStream.post.description",
   icon: "play",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiInference",
+  category: "ai",
+  subCategory: "Inference",
   tags: ["tags.ai", "tags.chat"],
 
   fields: objectField(scopedTranslation, {
@@ -65,11 +66,12 @@ const { POST } = createEndpoint({
       }),
 
       // ── Favorite shortcut (loads model + skill in one shot) ─────────
+      // Optional: revival routing can come from modelId/skillId alone.
       favoriteId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
-        schema: z.string(),
+        schema: z.string().optional(),
       }),
 
       // ── Explicit model / skill (override or use instead of favorite) ─

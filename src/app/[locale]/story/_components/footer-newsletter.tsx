@@ -14,8 +14,8 @@ import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation } from "./i18n";
 import CountrySelector from "../../_components/country-selector";
+import { scopedTranslation } from "./i18n";
 
 export function NewsletterSignupFooter({
   locale,

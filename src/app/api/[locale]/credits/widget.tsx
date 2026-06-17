@@ -21,6 +21,11 @@ import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
+import {
+  useWidgetSelector,
+  useWidgetTranslation,
+  useWidgetUser,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
@@ -28,11 +33,6 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import {
-  useWidgetSelector,
-  useWidgetTranslation,
-  useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 

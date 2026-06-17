@@ -20,9 +20,9 @@ import {
   MessageChannel,
   MessengerProvider as MessengerProviderEnum,
 } from "../accounts/enum";
+import { scopedTranslation as providerScopedTranslation } from "../i18n";
 import { resendProvider } from "./email/resend";
 import { smtpProvider } from "./email/smtp";
-import { scopedTranslation as providerScopedTranslation } from "../i18n";
 import type { MessengerProvider } from "./provider";
 import { SmsMessengerProvider } from "./sms/twilio";
 import { TelegramMessengerProvider } from "./telegram/telegram-bot";

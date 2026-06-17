@@ -5,8 +5,8 @@
 import type { z } from "zod";
 
 import type { RequiredFieldTheme } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
-
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,

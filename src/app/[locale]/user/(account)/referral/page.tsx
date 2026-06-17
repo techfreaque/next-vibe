@@ -13,7 +13,6 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-
 import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 

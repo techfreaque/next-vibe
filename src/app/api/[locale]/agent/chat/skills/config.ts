@@ -8,15 +8,16 @@
  */
 
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import {
-  UserPermissionRole,
-  type UserPermissionRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
   COMPANION_SKILLS,
   DEFAULT_SKILLS,
 } from "@/app/api/[locale]/system/generated/skills-index";
+import {
+  UserPermissionRole,
+  type UserPermissionRoleValue,
+} from "@/app/api/[locale]/user/user-roles/enum";
+
 import type { ChatModelSelection } from "../../ai-stream/models";
 import type {
   AudioVisionModelSelection,

@@ -20,12 +20,12 @@ import type { Countries, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 
 import type { EmailsT } from "../../i18n";
+import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";
 import { getTemplate } from "../../registry/generated";
 import {
   getTemplateSubject,
   renderTemplateComponent,
 } from "../../registry/template";
-import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";
 
 // Type definitions
 interface PreviewRenderRequestType {

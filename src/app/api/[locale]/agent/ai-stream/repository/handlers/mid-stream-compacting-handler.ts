@@ -23,7 +23,7 @@ import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { getChatModelById, type ChatModelId } from "../../models";
+import { type ChatModelId, getChatModelById } from "../../models";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
 import { COMPACTING_LLM_TIMEOUT_MS } from "./compacting-handler";

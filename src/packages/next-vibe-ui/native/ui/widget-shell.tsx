@@ -1,5 +1,5 @@
-import { cn } from "next-vibe/shared/utils/utils";
 import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import { View } from "react-native";
 
 import type { WidgetShellProps } from "@/packages/next-vibe-ui/web/ui/widget-shell";

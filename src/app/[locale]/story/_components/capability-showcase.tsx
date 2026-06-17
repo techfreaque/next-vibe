@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
@@ -11,20 +12,27 @@ import { Link } from "next-vibe-ui/ui/link";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
-import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
+import { useInView } from "react-intersection-observer";
 
+import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
+import {
+  ChatModelId,
+  FEATURED_MODELS,
+} from "@/app/api/[locale]/agent/ai-stream/models";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { useLogger } from "@/hooks/use-logger";
+import type { ModelCountsByContentLevel } from "@/app/api/[locale]/agent/models/all-models";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { configScopedTranslation } from "@/config/i18n";
+import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
@@ -37,7 +45,6 @@ import { configScopedTranslation } from "@/config/i18n";
 
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
-import { useInView } from "react-intersection-observer";
 
 type ScopedT = ReturnType<(typeof scopedTranslation)["scopedT"]>["t"];
 

@@ -8,7 +8,6 @@
  * src/app/api/[locale]/system/generated/category-registry.ts
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { UserPermissionRole } from "../../user/user-roles/enum";
 import type { pathToAliasMap } from "../generated/alias-map";

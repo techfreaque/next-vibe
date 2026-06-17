@@ -3,8 +3,11 @@
  * POST: create a product category
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
+import categoryListDefinitions from "@/app/api/[locale]/products/category/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

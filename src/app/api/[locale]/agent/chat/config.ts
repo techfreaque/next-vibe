@@ -18,17 +18,16 @@ import {
 } from "@/app/api/[locale]/agent/cortex/constants";
 import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import {
-  EXECUTE_TOOL_ALIAS,
   type CallbackModeValue,
 } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+  EXECUTE_TOOL_ALIAS,
 import {
-  UserRole,
   type UserPermissionRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+  UserRole,
 
 /**
+} from "@/app/api/[locale]/user/user-roles/enum";
  * Default folder IDs
  * These are special system folder IDs that exist outside the database
  * They use simple string IDs (not UUIDs) for easy reference
@@ -46,11 +45,11 @@ export enum DefaultFolderId {
   /** Incognito folder - localStorage only, never sent to server */
   INCOGNITO = "incognito",
 
-  /** Background folder - threads created by scheduled AI agent tasks */
+  /** Background folder - threads created by sub AI agents */
   BACKGROUND = "cron",
 
-  /** Support folder - admin-to-admin support threads via ws-provider */
-  SUPPORT = "support",
+  /** Remote folder - hub for connected remote instance threads */
+  REMOTE = "remote",
 }
 
 /**
@@ -64,7 +63,7 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
   [DefaultFolderId.INCOGNITO]: [
     // Task infrastructure - results can't route back to localStorage-only threads
     "coding-agent",
-    "ssh-exec",
+    CORTEX_EXEC_ALIAS,
     EXECUTE_TOOL_ALIAS,
     "wait-for-task",
     "complete-task",
@@ -84,7 +83,7 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
   ],
   [DefaultFolderId.PUBLIC]: [
     "coding-agent",
-    "ssh-exec",
+    CORTEX_EXEC_ALIAS,
     EXECUTE_TOOL_ALIAS,
     "wait-for-task",
     "complete-task",
@@ -132,6 +131,15 @@ export const FOLDER_ALLOWS_REMOTE_TOOLS: Partial<
  * so handlers know which thread/message/model they're operating in.
  */
 export interface ToolExecutionContext {
+  /**
+   * Per-context confirmation settings (favorite/skill/request cascade).
+   * execute-tool consults these for its TARGET tool so wrapped calls honour
+   * the same confirmation gate as direct calls.
+   */
+  confirmationOverrides?: Array<{
+    toolId: string;
+    requiresConfirmation: boolean;
+  }> | null;
   /** Which root folder the conversation lives in */
   rootFolderId: DefaultFolderId;
   /** Thread ID of the active conversation */
@@ -152,13 +160,17 @@ export interface ToolExecutionContext {
    * Not present in non-streaming contexts (cron, headless).
    */
   pendingToolMessages:
-    | ReadonlyMap<
+    | Map<
         string,
         {
           messageId: string;
           toolCallData?: {
             parentId: string | null;
-            toolCall?: { requiresConfirmation?: boolean };
+            toolCall?: {
+              requiresConfirmation?: boolean;
+              waitingForConfirmation?: boolean;
+              isConfirmed?: boolean;
+            };
           };
         }
       >
@@ -220,6 +232,20 @@ export interface ToolExecutionContext {
    * Optional - only present in streaming contexts (bridged via defineProperty).
    */
   shouldStopLoop?: boolean;
+  /**
+   * Set when any tool in the current step requires user confirmation.
+   * Causes finish-step-handler to abort the stream before the AI response turn,
+   * so the user sees the confirmation UI without the AI continuing.
+   * Optional - only meaningful in streaming contexts.
+   */
+  stepHasToolsAwaitingConfirmation?: boolean;
+  /**
+   * Set by tool-confirmation-handler before re-executing a confirmed tool.
+   * Signals that the execute-tool requiresConfirmation gate should be bypassed.
+   * Without this, re-executing execute-tool(toolName='contact-form') would
+   * re-trigger the gate and return waiting_for_confirmation a second time.
+   */
+  isConfirmedReExecution?: boolean;
   /**
    * The stream's abort signal - set when streaming, undefined for non-stream contexts.
    * Tool executions check this before starting to bail out if the stream was cancelled.
@@ -309,6 +335,37 @@ export interface ToolExecutionContext {
    * Only available in streaming contexts - undefined for cron/headless invocations.
    */
   emitPartialToolResult?: (partialResult: WidgetData) => Promise<void>;
+}
+
+/**
+ * Create a minimal headless ToolExecutionContext for non-streaming callers:
+ * MCP, CLI, cron tasks, tests, vibe-sense. All stream-specific fields are
+ * undefined; only rootFolderId, subAgentDepth, and abortSignal are set.
+ */
+export function makeHeadlessContext(
+  signal?: AbortSignal,
+): ToolExecutionContext {
+  return {
+    rootFolderId: DefaultFolderId.BACKGROUND,
+    threadId: undefined,
+    aiMessageId: undefined,
+    skillId: undefined,
+    headless: true,
+    subAgentDepth: 0,
+    currentToolMessageId: undefined,
+    callerToolCallId: undefined,
+    pendingToolMessages: undefined,
+    pendingTimeoutMs: undefined,
+    leafMessageId: undefined,
+    waitingForRemoteResult: undefined,
+    favoriteId: undefined,
+    abortSignal: signal ?? new AbortController().signal,
+    callerCallbackMode: undefined,
+    onEscalatedTaskCancel: undefined,
+    escalateToTask: undefined,
+    isRevival: undefined,
+    providerOverride: undefined,
+  };
 }
 
 /**
@@ -425,14 +482,14 @@ export const DEFAULT_FOLDER_CONFIGS = {
     rolesModerate: [UserRole.ADMIN], // Only admins
     rolesAdmin: [UserRole.ADMIN], // Only admins
   },
-  [DefaultFolderId.SUPPORT]: {
-    id: DefaultFolderId.SUPPORT,
-    translationKey: "common.supportChats",
-    icon: "help-circle",
-    descriptionKey: "folders.supportDescription",
+  [DefaultFolderId.REMOTE]: {
+    id: DefaultFolderId.REMOTE,
+    translationKey: "common.remoteChats",
+    icon: "plug",
+    descriptionKey: "folders.remoteDescription",
     order: 5,
     color: "indigo",
-    rolesView: [UserRole.ADMIN], // Admin-only: local instance owners + remote support agents
+    rolesView: [UserRole.ADMIN], // Admin-only: local instance owners + connected remote instances
     rolesManage: [UserRole.ADMIN],
     rolesCreateThread: [UserRole.ADMIN],
     rolesPost: [UserRole.ADMIN],

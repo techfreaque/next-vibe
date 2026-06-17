@@ -77,7 +77,6 @@ function calcPerRunBudget(
   };
 }
 
-import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
 import {
   useWidgetContext,
   useWidgetForm,

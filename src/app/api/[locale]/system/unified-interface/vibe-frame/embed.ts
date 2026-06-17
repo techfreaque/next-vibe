@@ -32,6 +32,7 @@
  */
 
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { ParentBridge } from "./bridge";
 import {
   checkDisplayFrequency,

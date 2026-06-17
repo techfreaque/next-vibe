@@ -3,8 +3,10 @@
  * POST — open a new accounting period
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import listDef0 from "@/app/api/[locale]/companies/list/definition";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -23,7 +25,6 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "./i18n";
-import listDef0 from "@/app/api/[locale]/companies/list/definition";
 
 const CoaPeriodCreateWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CoaPeriodCreateWidget })),

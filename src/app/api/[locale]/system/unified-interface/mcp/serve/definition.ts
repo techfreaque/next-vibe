@@ -25,18 +25,19 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "mcp", "serve"],
-  aliases: ["mcp", "mcp:serve", "mcp:start", "start-mcp"],
+  aliases: [MCP_ALIAS] as const,
   title: "serve.post.title" as const,
+  titleShort: "serve.post.titleShort" as const,
   description: "serve.post.description" as const,
   icon: "plug",
-  category: "endpointCategories.interfaces",
-  subCategory: "endpointCategories.interfacesMcp",
+  category: "devTools",
+  subCategory: "interfacesMcp",
   tags: ["serve.tags.mcp" as const],
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
-    UserRole.CLI_AUTH_BYPASS,
   ] as const,
 
   fields: objectField(scopedTranslation, {

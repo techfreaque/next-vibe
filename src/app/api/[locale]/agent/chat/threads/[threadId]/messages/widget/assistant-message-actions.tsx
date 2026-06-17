@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowBigDown } from "next-vibe-ui/ui/icons/ArrowBigDown";
@@ -15,7 +17,8 @@ import {
   PopoverTrigger,
 } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
-import { cn } from "next-vibe/shared/utils";
+import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
 import React, { useState } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -27,14 +30,11 @@ import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation } from "../i18n";
 import type messagesDefinition from "../definition";
-import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
 import { MessageActionButton } from "./message-action-button";

@@ -21,7 +21,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { graphConfigSchema } from "../graph/schema";
-
 import { RUN_CONFIG_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

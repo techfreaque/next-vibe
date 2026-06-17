@@ -6,7 +6,6 @@ import "server-only";
  * at /gens/<type>/<YYYY-MM>/<prompt-slug>-<messageId>.md
  * Reconstructed from chatMessages where toolCall.toolName is a generation tool.
  */
-
 import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
 
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";

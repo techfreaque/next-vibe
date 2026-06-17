@@ -1,5 +1,4 @@
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import {
   CRON_DELETE_ALIAS,
@@ -18,15 +17,6 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-
-import {
-  AUDIO_VISION,
-  IMAGE_GEN,
-  MUSIC_GEN,
-  STT,
-  VIDEO_GEN,
-  VOICE,
-} from "../_shared/media-presets";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -36,6 +26,14 @@ import {
   SkillCategory,
   SkillOwnershipType,
 } from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
 
 export const cronManagerSkill: Skill = {
   id: "cron-manager",

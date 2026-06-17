@@ -11,8 +11,8 @@ import { scopedTranslation as meScopedTranslation } from "@/app/api/[locale]/use
 import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { scopedTranslation } from "../i18n";
 
+import { scopedTranslation } from "../i18n";
 import { UnsubscribePage } from "./_components/unsubscribe-page";
 
 interface PageProps {

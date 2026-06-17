@@ -17,6 +17,8 @@ import type { CSSProperties, JSX } from "react";
 import { useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { configScopedTranslation } from "@/config/i18n";
 

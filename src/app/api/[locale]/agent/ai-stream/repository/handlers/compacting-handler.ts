@@ -20,7 +20,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
-import { getChatModelById, type ChatModelId } from "../../models";
+import { type ChatModelId, getChatModelById } from "../../models";
 import type { StreamContext } from "../core/stream-context";
 import { MessageConverter } from "./message-converter";
 

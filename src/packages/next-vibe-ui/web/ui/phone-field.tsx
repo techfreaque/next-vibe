@@ -11,8 +11,8 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "../i18n";
 
+import { uiScopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
 import {

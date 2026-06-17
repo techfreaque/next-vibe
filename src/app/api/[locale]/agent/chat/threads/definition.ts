@@ -3,9 +3,14 @@
  * Defines endpoints for listing and creating chat threads
  */
 
+import { lazy } from "react";
 import { z } from "zod";
 
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  onEventDeleteIncognitoThread,
+  onEventUpdateIncognitoThread,
+} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -24,11 +29,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazy } from "react";
 import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
 
+import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import {
   onEventUpdateIncognitoThread,
   onEventDeleteIncognitoThread,

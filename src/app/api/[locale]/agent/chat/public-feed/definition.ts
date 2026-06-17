@@ -4,10 +4,10 @@
  */
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
+import { lazy } from "react";
 import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

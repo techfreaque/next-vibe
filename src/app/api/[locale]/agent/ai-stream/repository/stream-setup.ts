@@ -7,17 +7,17 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 import { and, eq, sql } from "drizzle-orm";
-import type { NextRequest } from "next-vibe-ui/lib/request";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 
 import {
+  type ChatModelOption,
   getChatModelById,
   getChatModelForProvider,
-  type ChatModelOption,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
@@ -38,6 +38,7 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -60,6 +61,7 @@ import { chatSettings } from "../../chat/settings/db";
 import { DEFAULT_SKILLS } from "../../chat/skills/config";
 import { customSkills } from "../../chat/skills/db";
 import { isUuid, parseSkillId } from "../../chat/slugify";
+import type { AiStreamT } from "../stream/i18n";
 import { createMessagesEmitter } from "../../chat/threads/[threadId]/messages/emitter";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import { type AiStreamPostRequestOutput } from "../stream/definition";
@@ -71,7 +73,7 @@ import {
   isStreamAbort,
 } from "./core/constants";
 import { CreditValidatorHandler } from "./core/credit-validator-handler";
-import { ModalityResolver, type BridgeContext } from "./core/modality-resolver";
+import { type BridgeContext, ModalityResolver } from "./core/modality-resolver";
 import { ProviderFactory as ProviderFactoryClass } from "./core/provider-factory";
 import { StreamRegistry } from "./core/stream-registry";
 import { ToolsSetupHandler } from "./core/tools-setup-handler";
@@ -401,7 +403,6 @@ export async function setupAiStream(params: {
   // File upload promise for server threads (captured for SSE event emission)
   let fileUploadPromise:
     | Promise<{
-    compactTriggerOverride,
         success: boolean;
         userMessageId: string;
         attachments?: Array<{

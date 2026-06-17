@@ -4,6 +4,7 @@
  */
 
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type {
   PackageJson,

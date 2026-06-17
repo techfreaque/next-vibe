@@ -3,8 +3,10 @@
  * GET — all journal entry lines for an account with running balance
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import accountListDefinitions from "@/app/api/[locale]/chart-of-accounts/account/list/definition";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {

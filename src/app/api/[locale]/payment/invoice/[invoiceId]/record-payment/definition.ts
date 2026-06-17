@@ -3,8 +3,11 @@
  * Records a manual payment against an invoice, marking it as PAID if fully settled
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import listDef0 from "@/app/api/[locale]/chart-of-accounts/account/list/definition";
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -18,13 +21,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { ManualPaymentMethod, ManualPaymentMethodOptions } from "../../../enum";
 import { scopedTranslation } from "./i18n";
-import listDef0 from "@/app/api/[locale]/chart-of-accounts/account/list/definition";
 
 const InvoiceRecordPaymentWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.InvoiceRecordPaymentWidget })),

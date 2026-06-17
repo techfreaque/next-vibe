@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import {
@@ -9,7 +10,6 @@ import {
 } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";

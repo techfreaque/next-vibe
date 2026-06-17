@@ -1,5 +1,7 @@
 import { Box, Text } from "ink";
 import type { JSX } from "react";
+import type { JSX } from "react";
+import type { JSX } from "react";
 
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 

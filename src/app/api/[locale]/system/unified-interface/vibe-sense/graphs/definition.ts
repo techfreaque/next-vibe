@@ -2,6 +2,7 @@
  * Vibe Sense - Graphs List + Create Endpoint Definitions
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -20,11 +21,10 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { graphConfigSchema } from "../graph/schema";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { scopedTranslation } from "./i18n";
+import { graphConfigSchema } from "../graph/schema";
 import { VIBE_SENSE_GRAPHS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const GraphListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.GraphListContainer })),

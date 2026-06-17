@@ -5,6 +5,7 @@ import { and, count, eq, like } from "drizzle-orm";
 import { FEATURED_MODELS } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
+import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
 import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
 import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
@@ -14,7 +15,6 @@ import {
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
 import { db } from "@/app/api/[locale]/system/db";
-import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import { cronTasks as cronTasksTable } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { users as usersTable } from "@/app/api/[locale]/user/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";

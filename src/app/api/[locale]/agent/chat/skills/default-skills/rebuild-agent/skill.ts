@@ -1,5 +1,4 @@
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
 import { REBUILD_ALIAS } from "@/app/api/[locale]/system/server/rebuild/constants";
@@ -16,15 +15,6 @@ import {
 } from "../../../../cortex/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-
-import {
-  AUDIO_VISION,
-  IMAGE_GEN,
-  MUSIC_GEN,
-  STT,
-  VIDEO_GEN,
-  VOICE,
-} from "../_shared/media-presets";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -34,6 +24,14 @@ import {
   SkillCategory,
   SkillOwnershipType,
 } from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
 
 export const rebuildAgentSkill: Skill = {
   id: "rebuild-agent",

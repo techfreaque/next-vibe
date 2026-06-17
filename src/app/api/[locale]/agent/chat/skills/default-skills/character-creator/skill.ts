@@ -1,13 +1,12 @@
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
-
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   SKILL_CREATOR_ID,
   SKILLS_LIST_ALIAS,
 } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-
 import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
+
 import {
   FAVORITE_CREATE_ALIAS,
   FAVORITE_DELETE_ALIAS,
@@ -22,15 +21,6 @@ import {
 } from "../../../settings/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-
-import {
-  AUDIO_VISION,
-  IMAGE_GEN,
-  MUSIC_GEN,
-  STT,
-  VIDEO_GEN,
-  VOICE,
-} from "../_shared/media-presets";
 import {
   SKILL_CREATE_ALIAS,
   SKILL_DELETE_ALIAS,
@@ -44,6 +34,14 @@ import {
   SkillCategory,
   SkillOwnershipType,
 } from "../../enum";
+import {
+  AUDIO_VISION,
+  IMAGE_GEN,
+  MUSIC_GEN,
+  STT,
+  VIDEO_GEN,
+  VOICE,
+} from "../_shared/media-presets";
 
 export const skillCreatorSkill: Skill = {
   id: SKILL_CREATOR_ID,

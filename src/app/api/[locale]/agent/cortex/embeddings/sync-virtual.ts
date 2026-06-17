@@ -6,7 +6,6 @@ import "server-only";
  * so it gets an embedding and becomes searchable via vector search.
  * Uses content hashing to skip redundant embedding API calls.
  */
-
 import { db } from "@/app/api/[locale]/system/db";
 
 import { cortexNodes } from "../db";
@@ -16,7 +15,6 @@ import {
   isNativePath,
   parseFrontmatter,
 } from "../repository";
-
 import { queueEmbedding } from "./auto-embed";
 import { computeEmbeddingHash } from "./service";
 

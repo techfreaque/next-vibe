@@ -10,8 +10,9 @@ import { Image as ImageIcon } from "next-vibe-ui/ui/icons/Image";
 import { Music } from "next-vibe-ui/ui/icons/Music";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
-import { memo, useCallback, useState } from "react";
+import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
+import { memo, useCallback, useState } from "react";
 
 import {
   chatColors,
@@ -24,9 +25,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation } from "../i18n";
 import type messagesDefinition from "../definition";
-import { useWidgetItem } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { scopedTranslation } from "../i18n";
 import { useMessageGroupName } from "./embedded-context";
 import { FileAttachments } from "./file-attachments";
 import { MessageAuthorInfo } from "./message-author";

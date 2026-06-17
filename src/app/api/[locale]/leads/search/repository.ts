@@ -21,10 +21,10 @@ import {
   LeadStatusFilter,
   SortOrder,
 } from "../enum";
+import type { LeadsT } from "../i18n";
 import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type { LeadSearchGetResponseOutput } from "./definition";
-import type { LeadsT } from "../i18n";
 import type { LeadsSearchT } from "./i18n";
 
 /**

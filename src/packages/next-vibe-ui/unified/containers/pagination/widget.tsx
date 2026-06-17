@@ -22,6 +22,7 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
+
 import type { ReactWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {

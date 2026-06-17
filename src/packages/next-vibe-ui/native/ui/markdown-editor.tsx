@@ -21,7 +21,6 @@ import type {
   MarkdownEditorProps,
   ToolbarAction,
 } from "../../web/ui/markdown-editor";
-
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

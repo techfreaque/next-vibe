@@ -3,8 +3,8 @@ import "server-only";
 import {
   ErrorResponseTypes,
   fail,
-  success,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -13,9 +13,9 @@ import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { scopedTranslation } from "./i18n";
 
 import type { SystemPromptDebugResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 interface DebugSystemPromptParams {
   rootFolderId: DefaultFolderId;

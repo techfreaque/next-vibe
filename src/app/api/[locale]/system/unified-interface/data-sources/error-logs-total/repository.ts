@@ -6,9 +6,10 @@
 
 import "server-only";
 
+import { and, count, gte, lte, sql } from "drizzle-orm";
 import {
-  success,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 
 import { and, count, gte, lte, sql } from "drizzle-orm";
@@ -22,7 +23,8 @@ import type {
   Resolution,
   TimeRange,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { errorLogs } from "@/app/api/[locale]/system/error-monitor/db";
+import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
+import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 
 export class QueryErrorLogsTotalRepository {
   static async queryErrorLogsTotal(data: {

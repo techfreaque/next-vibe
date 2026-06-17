@@ -1,6 +1,5 @@
 "use client";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";

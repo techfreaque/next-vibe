@@ -1,7 +1,6 @@
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
-
 import {
   ContentLevel,
   IntelligenceLevel,

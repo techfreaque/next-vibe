@@ -2,9 +2,9 @@
 
 import { useMemo } from "react";
 
-import { useSkill } from "@/app/api/[locale]/agent/chat/skills/[id]/hooks";
-import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { useSkill } from "@/app/api/[locale]/agent/chat/skills/[id]/hooks";
 
 import type { SkillData } from "./prompt";
 

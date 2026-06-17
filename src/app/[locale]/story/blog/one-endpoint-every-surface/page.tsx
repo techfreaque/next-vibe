@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Button } from "next-vibe-ui/ui/button";
-import { GITHUB_REPO_URL } from "@/config/constants";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
@@ -10,6 +9,7 @@ import { H1, H2, Muted, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
+import { GITHUB_REPO_URL } from "@/config/constants";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";

@@ -1,6 +1,6 @@
-import { envClient } from "@/config/env-client";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { envClient } from "@/config/env-client";
 
 import { getStorageAdapter } from "./index";
 

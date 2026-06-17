@@ -12,11 +12,13 @@ import { Ul } from "next-vibe-ui/ui/ul";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
+import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import { scopedTranslation } from "./i18n";
 
 import { ImprintClientInteraction } from "./_components/imprint-client-content";

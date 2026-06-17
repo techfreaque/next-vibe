@@ -6,7 +6,6 @@
 import "server-only";
 
 import { eq, lt, or } from "drizzle-orm";
-import { cookies } from "next-vibe-ui/lib/headers";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -14,6 +13,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import { cookies } from "next-vibe-ui/lib/headers";
 
 import { db } from "@/app/api/[locale]/system/db";
 import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
@@ -28,8 +28,8 @@ interface CurrentSessionResult {
   token: string;
 }
 import { SessionErrorReason } from "./enum";
-import { scopedTranslation } from "./i18n";
 import type { SessionT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Session repository implementation

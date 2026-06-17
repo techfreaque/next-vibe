@@ -11,7 +11,6 @@ import "server-only";
  *   SSH    → /home/<username>
  *   (remote connections are handled via cortex-exec, no FS mount needed)
  */
-
 import { and, count as drizzleCount, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";

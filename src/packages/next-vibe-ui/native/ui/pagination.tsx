@@ -1,5 +1,6 @@
 "use client";
 import { cn } from "next-vibe/shared/utils/utils";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 import { ChevronLeftIcon } from "next-vibe-ui/ui/icons/ChevronLeftIcon";
 import { ChevronRightIcon } from "next-vibe-ui/ui/icons/ChevronRightIcon";
 import { DotsHorizontalIcon } from "next-vibe-ui/ui/icons/DotsHorizontalIcon";
@@ -7,7 +8,6 @@ import * as React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "next-vibe-ui/i18n";
 
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";

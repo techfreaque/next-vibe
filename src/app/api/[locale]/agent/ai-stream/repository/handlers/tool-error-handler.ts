@@ -20,14 +20,13 @@ import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { collectServerDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { ToolExecutionContext } from "../../../chat/config";
-
 import { type ToolCall } from "../../../chat/db";
 import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";

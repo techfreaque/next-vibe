@@ -1,12 +1,12 @@
 /**
  * CLI DatePicker - text input accepting YYYY-MM-DD format
  */
-import TextInput from "ink-text-input";
 import { Box, Text } from "ink";
-import { useState } from "react";
-import type { JSX } from "react";
-
+import TextInput from "ink-text-input";
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useState } from "react";
+
 import type { DatePickerProps } from "../../web/ui/date-picker";
 
 export type { DatePickerProps } from "../../web/ui/date-picker";

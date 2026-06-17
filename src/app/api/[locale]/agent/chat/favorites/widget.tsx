@@ -11,13 +11,13 @@
 import {
   closestCenter,
   DndContext,
+  type DragEndEvent,
+  type DraggableAttributes,
+  type DraggableSyntheticListeners,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  type DragEndEvent,
-  type DraggableAttributes,
-  type DraggableSyntheticListeners,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -26,6 +26,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
@@ -48,10 +49,13 @@ import React, { useCallback, useMemo, useState } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
   arrayFieldPath,
+import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
   withValue,
 } from "next-vibe-ui/unified/_shared/field-helpers";
 import {

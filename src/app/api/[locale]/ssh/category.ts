@@ -6,8 +6,8 @@
 
 import { SSH_CONNECTIONS_LIST_ALIAS } from "@/app/api/[locale]/ssh/connections/list/constants";
 import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 export const category: CategoryDefinition = {
   key: "ssh",

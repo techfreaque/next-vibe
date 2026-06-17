@@ -2,15 +2,17 @@
  * Company Members List API Route Definition
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
+import companyListDefinitions from "@/app/api/[locale]/companies/list/definition";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
   requestUrlPathParamsField,
   responseArrayField,
   responseField,
-  customWidgetObject,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -23,10 +25,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
+import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import companyListDefinitions from "@/app/api/[locale]/companies/list/definition";
 
 import { CompanyMemberRole, CompanyMemberRoleOptions } from "../../../enum";
-import { scopedTranslation } from "./i18n";
 import { COMPANY_MEMBERS_LIST_ALIAS } from "./constants";
 
 const MembersListWidgetLazy = lazyWidget(() =>

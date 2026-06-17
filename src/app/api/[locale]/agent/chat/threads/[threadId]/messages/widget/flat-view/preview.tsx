@@ -5,12 +5,12 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { useWindowSize } from "next-vibe-ui/hooks/use-window-size";
 import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useLayoutEffect, useState } from "react";
-import { useWindowSize } from "next-vibe-ui/hooks/use-window-size";
 
 import { getIdColor } from "@/app/[locale]/chat/lib/utils/formatting";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
