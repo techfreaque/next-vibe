@@ -21,9 +21,6 @@ import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useMemo, useState } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -36,6 +33,9 @@ import { DateFieldWidget } from "next-vibe-ui/unified/form-fields/date-field/wid
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import React, { useCallback, useMemo, useState } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 
 import { CronTaskStatus, type CronTaskStatusValue } from "../../enum";
 import { scopedTranslation as tasksScopedTranslation } from "../../i18n";

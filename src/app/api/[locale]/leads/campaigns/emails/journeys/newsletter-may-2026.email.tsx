@@ -13,8 +13,6 @@ import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/emai
 import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
 import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
 
-import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
-
 import { EmailCampaignStage } from "../../../enum";
 import type {
   EmailRenderContext,

@@ -19,11 +19,11 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getCronFrequencyMinutes } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import {
   cronTasks,
   type NewCronTask,
 } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import { getCronFrequencyMinutes } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import {
   CronTaskPriority,
   TaskCategory,

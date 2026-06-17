@@ -4,9 +4,6 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactRequestResponseWidgetProps } from "next-vibe-ui/unified/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
 import {
@@ -15,6 +12,9 @@ import {
   useWidgetLocale,
   useWidgetTranslation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import type { KeyValueWidgetConfig, KeyValueWidgetSchema } from "./types";
 

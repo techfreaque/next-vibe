@@ -4,13 +4,13 @@
  * Fundamental type definitions used throughout the endpoint types system.
  */
 
-import type { z } from "zod";
-
 import type {
   ArrayChildConstraint,
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "next-vibe-ui/unified/_shared/types";
+import type { z } from "zod";
+
 import type { ObjectWidgetConfig } from "../widgets/configs";
 
 // Re-export UnifiedField from configs.ts where it's now defined

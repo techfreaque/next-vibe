@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Test to debug variance issue with CreateApiEndpointAny
-import { z } from "zod";
-
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "next-vibe-ui/unified/_shared/types";
-import type { EventSchemas } from "../../../websocket/types";
+import { z } from "zod";
+
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+
+import type { EndpointEventsMap } from "../../../websocket/structured-events";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
 import { objectField, requestField } from "../../field/utils";
 import type { UnifiedField } from "../../widgets/configs";
@@ -47,7 +47,7 @@ type TestEndpoint = CreateApiEndpoint<
   readonly ["enums.userRole.admin"],
   string,
   typeof testEndpoint_field,
-  EventSchemas
+  EndpointEventsMap<string>
 >;
 
 // Test if it's assignable
@@ -65,7 +65,7 @@ type TestEndpoint2 = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  EventSchemas
+  EndpointEventsMap<string>
 >;
 
 type Test2 = TestEndpoint2 extends CreateApiEndpointAny ? "PASS" : "FAIL";

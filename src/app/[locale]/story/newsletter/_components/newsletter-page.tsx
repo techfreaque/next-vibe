@@ -18,8 +18,9 @@ import { useEffect, useRef } from "react";
 
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { configScopedTranslation } from "@/config/i18n";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { scopedTranslation } from "../i18n";
 
 interface NewsletterPageProps {

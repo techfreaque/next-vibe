@@ -153,10 +153,11 @@ export function useLazyBranchLoader(
     const resolvedLeaf = pathData.resolvedLeafMessageId;
     if (resolvedLeaf && resolvedLeaf !== currentLeaf) {
       // Replace URL (not pushState) - this is a correction, not a navigation
-      if (typeof window !== "undefined") {
-        const url = new URL(window.location.href);
+      const currentHref = getCurrentUrl();
+      if (currentHref) {
+        const url = new URL(currentHref);
         url.searchParams.set("message", resolvedLeaf);
-        window.history.replaceState(null, "", url.toString());
+        silentReplaceState(url.toString());
       }
       // Update the navigation store's leafMessageId to the resolved leaf
       setLeafMessageId?.(resolvedLeaf);
@@ -397,10 +398,11 @@ export function useLazyBranchLoader(
             // Update leafMessageId to the resolved leaf of the newer chunk.
             const resolvedLeaf = data.resolvedLeafMessageId;
             if (resolvedLeaf) {
-              if (typeof window !== "undefined") {
-                const url = new URL(window.location.href);
+              const currentHref = getCurrentUrl();
+              if (currentHref) {
+                const url = new URL(currentHref);
                 url.searchParams.set("message", resolvedLeaf);
-                window.history.replaceState(null, "", url.toString());
+                silentReplaceState(url.toString());
               }
               setLeafMessageId?.(resolvedLeaf);
             }

@@ -985,9 +985,14 @@ const MessageAuthorHeader = memo(function MessageAuthorHeader({
       : null;
 
   // Fetch character name from character ID - seed from SSR boot data to avoid hydration mismatch
-  const { initialSkillData } = useChatBootContext();
+  // Only use initialSkillData if it belongs to this message's skill (not the currently active skill)
+  const { initialSkillData, initialSettingsData } = useChatBootContext();
   const skillInitialData =
-    character && initialSkillData ? initialSkillData : null;
+    character &&
+    initialSkillData &&
+    initialSettingsData?.selectedSkill === character
+      ? initialSkillData
+      : null;
   const characterHook = useSkill(
     character || undefined,
     user,

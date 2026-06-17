@@ -14,9 +14,6 @@ import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
-import React from "react";
-
-import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -30,6 +27,9 @@ import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import React from "react";
+
+import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
 
 import type definition from "./definition";
 

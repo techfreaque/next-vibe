@@ -7,9 +7,6 @@ import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-import { useEffect } from "react";
-
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
@@ -17,6 +14,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useEffect } from "react";
 
 import { DesktopNavHeader } from "../shared/nav-header";
 import type definition from "./definition";

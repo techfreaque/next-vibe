@@ -8,40 +8,6 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Span } from "next-vibe-ui/ui/span";
-import { P } from "next-vibe-ui/ui/typography";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
-import { cn } from "next-vibe/shared/utils";
-
-import {
-  useWidgetContext,
-  useWidgetEndpointMutations,
-  useWidgetForm,
-  useWidgetNavigation,
-  useWidgetOnSubmit,
-  useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { GraphResolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/enum";
-import { scopedTranslation as vibeSenseT } from "@/app/api/[locale]/system/unified-interface/vibe-sense/i18n";
-import {
-  RESOLUTION_MS,
-  type Resolution,
-} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import graphsDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
-
 import type {
   IChartApi,
   ISeriesApi,
@@ -50,6 +16,38 @@ import type {
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
+import { cn } from "next-vibe/shared/utils";
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Span } from "next-vibe-ui/ui/span";
+import { P } from "next-vibe-ui/ui/typography";
+import {
+  useWidgetContext,
+  useWidgetEndpointMutations,
+  useWidgetForm,
+  useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetValue,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { GraphResolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/enum";
+import graphsDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
+import { scopedTranslation as vibeSenseT } from "@/app/api/[locale]/system/unified-interface/vibe-sense/i18n";
+import {
+  type Resolution,
+  RESOLUTION_MS,
+} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

@@ -15,9 +15,9 @@ import {
   LOCAL_BASE_PORT,
   VIBE_START_PID_FILE,
 } from "../../../server/pid";
-import { MCP_ALIAS } from "../../mcp/serve/constants";
 import { REBUILD_ALIAS } from "../../../server/rebuild/constants";
 import { START_ALIASES } from "../../../server/start/constants";
+import { MCP_ALIAS } from "../../mcp/serve/constants";
 import { Platform } from "../../shared/types/platform";
 
 /** CLI-specific platforms (subset of Platform that applies to CLI environments) */

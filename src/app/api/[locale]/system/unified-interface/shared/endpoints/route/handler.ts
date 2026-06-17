@@ -33,11 +33,11 @@ import type {
   UserRole,
   UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
+import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
-import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   collectServerDefaults,
   generateRoleFilteredRequestSchema,

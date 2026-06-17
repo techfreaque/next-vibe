@@ -7,17 +7,16 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import type { JSX } from "react";
-import { useMemo } from "react";
-
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetLocale,
   useWidgetPlatform,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useMemo } from "react";
 
 import { CATEGORY_REGISTRY } from "@/app/api/[locale]/system/generated/category-registry";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import type {
   HelpGetResponseOutput,

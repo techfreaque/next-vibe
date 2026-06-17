@@ -28,6 +28,14 @@ import {
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+
+import {
+  type ChatModelId,
+  getChatModelById,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
+import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { SkillGetResponseOutput } from "../../../../chat/skills/[id]/definition";

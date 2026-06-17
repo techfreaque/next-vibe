@@ -65,7 +65,6 @@ export function ExternalLink({
   title,
 }: ExternalLinkProps): JSX.Element {
   return (
-    // eslint-disable-next-line jsx-capitalization/jsx-capitalization
     <a
       className={className}
       href={href}

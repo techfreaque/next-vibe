@@ -1,1 +1,1 @@
-/// <reference types="../../../node_modules/bun-types" />
+import "../../node_modules/bun-types/index.d.ts";

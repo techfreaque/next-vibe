@@ -3,6 +3,8 @@
  * Single-select field displayed as pill buttons with optional icons
  */
 
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+
 import type { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { EnumWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 

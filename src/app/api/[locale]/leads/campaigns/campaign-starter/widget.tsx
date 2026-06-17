@@ -90,6 +90,8 @@ import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+
+import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
 import { CountryLanguageValues } from "@/i18n/core/config";
 
 import type definition from "./definition";

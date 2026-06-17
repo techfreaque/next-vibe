@@ -19,16 +19,13 @@ import type { JSX } from "react";
 import React from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
-import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
-  useChatNavigationStore,
-  useChatNavigationStore,
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getCurrentUrl } from "next-vibe-ui/utils/browser";
-
 import {
   type ChatNavigationState,
+  useChatNavigationStore,
 } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
 import { scopedTranslation } from "../../i18n";
 import { useMessageGroupName } from "../embedded-context";
@@ -321,7 +318,7 @@ export function ThreadedMessageActions({
             block: "center",
           });
           void navigator.clipboard.writeText(
-            `${window.location.href}#thread-msg-${message.id}`,
+            `${getCurrentUrl()}#thread-msg-${message.id}`,
           );
         }}
         className="flex items-center gap-1 px-2 py-1 rounded hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"

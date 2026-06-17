@@ -23,9 +23,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { GraphSeedsIndexT } from "./i18n";
-import { scopedTranslation } from "./i18n";
-
 import type { LiveIndex } from "../shared/live-index";
 import {
   findFilesRecursively,
@@ -33,6 +30,8 @@ import {
   getRelativeImportPath,
   writeGeneratedFile,
 } from "../shared/utils";
+import type { GraphSeedsIndexT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 interface GenerateOptions {
   outputFile: string;

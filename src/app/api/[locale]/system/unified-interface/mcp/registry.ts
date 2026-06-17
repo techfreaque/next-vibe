@@ -10,14 +10,13 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
+import { VIBE_CHECK_TOOL_NAMES } from "@/app/api/[locale]/system/check/vibe-check/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { McpResultFormatter } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { MCPContent } from "./types";
 
-import { VIBE_CHECK_TOOL_NAMES } from "@/app/api/[locale]/system/check/vibe-check/constants";
 import { makeHeadlessContext } from "../../../agent/chat/config";
 import {
   definitionLoader,
@@ -34,6 +33,7 @@ import type { WidgetData } from "../shared/types/json";
 import { Platform } from "../shared/types/platform";
 import { formatValidationErrorCompact } from "../shared/utils/format-validation-error";
 import { scopedTranslation as mcpScopedTranslation } from "./i18n";
+import type { MCPContent } from "./types";
 import type {
   MCPExecutionContext,
   MCPToolCallResult,

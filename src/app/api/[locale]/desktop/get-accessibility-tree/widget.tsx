@@ -8,9 +8,6 @@ import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Input } from "next-vibe-ui/ui/input";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-import { useEffect, useState } from "react";
-
 import {
   useWidgetForm,
   useWidgetNavigation,
@@ -18,15 +15,16 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-
-import { DesktopNavHeader } from "../shared/nav-header";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useEffect, useState } from "react";
 
+import { DesktopNavHeader } from "../shared/nav-header";
 import type definition from "./definition";
 import type { DesktopGetAccessibilityTreeResponseOutput } from "./definition";
 

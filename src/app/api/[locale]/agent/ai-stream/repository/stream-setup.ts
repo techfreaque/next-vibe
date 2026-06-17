@@ -43,9 +43,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { AiStreamT } from "../stream/i18n";
-
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   FOLDER_DENIED_TOOL_IDS,
   type ToolExecutionContext,
@@ -61,10 +58,10 @@ import { chatSettings } from "../../chat/settings/db";
 import { DEFAULT_SKILLS } from "../../chat/skills/config";
 import { customSkills } from "../../chat/skills/db";
 import { isUuid, parseSkillId } from "../../chat/slugify";
-import type { AiStreamT } from "../stream/i18n";
 import { createMessagesEmitter } from "../../chat/threads/[threadId]/messages/emitter";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import { type AiStreamPostRequestOutput } from "../stream/definition";
+import type { AiStreamT } from "../stream/i18n";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
 import {
   AbortReason,

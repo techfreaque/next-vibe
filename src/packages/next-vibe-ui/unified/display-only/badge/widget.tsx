@@ -7,10 +7,6 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
-import type { JSX } from "react";
-import type z from "zod";
-
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
@@ -21,6 +17,10 @@ import {
   useWidgetContext,
   useWidgetForm,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import type z from "zod";
+
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import { findEnumLabel } from "./shared";
 import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";

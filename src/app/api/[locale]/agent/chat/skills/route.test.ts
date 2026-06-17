@@ -10,41 +10,38 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { and, eq, like } from "drizzle-orm";
+import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-
-import { db } from "@/app/api/[locale]/system/db";
 import { testEndpoint } from "@/app/api/[locale]/system/check/testing/testing-suite";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
+import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
-import { customSkills } from "./db";
-import { isUuid } from "../slugify";
-import {
-  SkillCategory,
-  ModelSelectionType,
-  IntelligenceLevel,
-  SkillStatus,
-  SkillSourceFilter,
-} from "./enum";
 import { ChatModelId } from "../../ai-stream/models";
-
-// ── Definition imports ───────────────────────────────────────────────────────
-
-import skillsListEndpoint from "./definition";
-import skillCreateEndpoint from "./create/definition";
+import { isUuid } from "../slugify";
 import skillSingleEndpoint from "./[id]/definition";
 import skillPublishEndpoint from "./[id]/publish/definition";
-import skillVoteEndpoint from "./[id]/vote/definition";
 import skillReportEndpoint from "./[id]/report/definition";
+import skillVoteEndpoint from "./[id]/vote/definition";
+import skillCreateEndpoint from "./create/definition";
+import { customSkills } from "./db";
+// ── Definition imports ───────────────────────────────────────────────────────
+import skillsListEndpoint from "./definition";
+import {
+  IntelligenceLevel,
+  ModelSelectionType,
+  SkillCategory,
+  SkillSourceFilter,
+  SkillStatus,
+} from "./enum";
 import skillModerationEndpoint from "./moderation/definition";
 
 // ── Part A: Auto-generated endpoint tests ────────────────────────────────────
@@ -275,13 +272,19 @@ describe("Skills CRUD Integration", () => {
         systemPrompt: "You are an updated test assistant.",
         category: SkillCategory.CODING,
         isPublic: false,
-        modelSelection: {
-          selectionType: ModelSelectionType.FILTERS,
-          intelligenceRange: {
-            min: IntelligenceLevel.SMART,
-            max: IntelligenceLevel.BRILLIANT,
+        variants: [
+          {
+            id: "default",
+            isDefault: true,
+            modelSelection: {
+              selectionType: ModelSelectionType.FILTERS,
+              intelligenceRange: {
+                min: IntelligenceLevel.SMART,
+                max: IntelligenceLevel.BRILLIANT,
+              },
+            },
           },
-        },
+        ],
       },
       user: adminUser,
     });
@@ -431,9 +434,7 @@ describe("Skills CRUD Integration", () => {
 
     expect(response.data.skills.length).toBeGreaterThanOrEqual(1);
     const updatedName = `${TEST_SKILL_NAME} Updated`;
-    const reported = response.data.skills.find(
-      (s: Record<string, unknown>) => s.name === updatedName,
-    );
+    const reported = response.data.skills.find((s) => s.name === updatedName);
     expect(
       reported,
       "Reported skill not found in moderation list",

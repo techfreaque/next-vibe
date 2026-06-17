@@ -8,19 +8,14 @@
 import { Command } from "commander";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-// environment must be imported BEFORE @/config/constants - it sets NODE_ENV=production
-// at module load time for preview mode (vibe start/build/rebuild), and constants.ts
-// reads NODE_ENV to compute cookie name suffixes.
-import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
-
 import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { DEFAULT_PROJECT_URL } from "@/config/constants";
 import { enableMcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   DefinitionLoader,
   type GetEndpointFn,
@@ -33,6 +28,10 @@ import {
 import { createEndpointLogger } from "../shared/logger/server-logger";
 import { Platform } from "../shared/types/platform";
 import { scopedTranslation as cliScopedTranslation } from "./i18n";
+// environment must be imported BEFORE @/config/constants - it sets NODE_ENV=production
+// at module load time for preview mode (vibe start/build/rebuild), and constants.ts
+// reads NODE_ENV to compute cookie name suffixes.
+import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
 import {
   ErrorHandler,
   setupGlobalErrorHandlers,
@@ -113,11 +112,12 @@ interface CliOptions {
   verbose?: boolean;
   debug?: boolean;
   interactive?: boolean;
+  agentControl?: boolean;
   dryRun?: boolean;
   platform?: Platform;
-  local?: boolean;
+  hermes?: boolean;
   preview?: boolean;
-  remote?: boolean;
+  thea?: boolean;
 }
 
 const CLI_VERSION = "3.3.3" as const;
@@ -173,10 +173,15 @@ export function runCli({
     .option("-v, --verbose", earlyT("vibe.help.verbose"), false) // eslint-disable-line i18next/no-literal-string
     .option("-x, --debug", earlyT("vibe.help.verbose"), false) // eslint-disable-line i18next/no-literal-string
     .option("-i, --interactive", earlyT("vibe.help.interactive"), false)
+    .option(
+      "--agent-control",
+      "Enable file-based IPC for AI agent control (frame capture + key injection)",
+      false,
+    ) // eslint-disable-line i18next/no-literal-string
     .option("--dry-run", earlyT("vibe.help.dryRun"), false)
-    .option("--local", earlyT("vibe.help.target"), false) // eslint-disable-line i18next/no-literal-string
+    .option("--hermes", earlyT("vibe.help.target"), false) // eslint-disable-line i18next/no-literal-string
     .option("--preview", earlyT("vibe.help.target"), false) // eslint-disable-line i18next/no-literal-string
-    .option("--remote", earlyT("vibe.help.target"), false) // eslint-disable-line i18next/no-literal-string
+    .option("--thea", earlyT("vibe.help.target"), false) // eslint-disable-line i18next/no-literal-string
     .option(
       "--platform <platform>", // eslint-disable-line i18next/no-literal-string
       `Override detected platform. Valid values: ${Object.values(Platform).join(", ")}`, // eslint-disable-line i18next/no-literal-string
@@ -246,9 +251,9 @@ export function runCli({
         const effectivePlatform: CliCompatiblePlatform =
           platformOverride ?? cliPlatform;
 
-        const targetArg: CliTargetValue = options.remote
+        const targetArg: CliTargetValue = options.thea
           ? CliTarget.REMOTE
-          : options.local || options.preview
+          : options.hermes || options.preview
             ? CliTarget.LOCAL
             : CliTarget.DEV;
         let cliTarget: CliTargetValue;
@@ -344,6 +349,7 @@ export function runCli({
                 output: options.output ?? DEFAULT_OUTPUT,
                 verbose: debug ?? false,
                 interactive: options.interactive ?? false,
+                agentControl: options.agentControl ?? false,
                 dryRun: options.dryRun ?? false,
                 cliTarget,
                 remoteUrl: resolvedRemoteUrl,
@@ -387,6 +393,7 @@ export function runCli({
                 output: options.output ?? DEFAULT_OUTPUT,
                 verbose: debug ?? false,
                 interactive: options.interactive ?? false,
+                agentControl: options.agentControl ?? false,
                 dryRun: options.dryRun ?? false,
                 cliTarget,
                 remoteUrl: resolvedRemoteUrl,
@@ -488,6 +495,7 @@ export function runCli({
               output: options.output ?? DEFAULT_OUTPUT,
               verbose: debug ?? false,
               interactive: forceInteractive,
+              agentControl: options.agentControl ?? false,
               dryRun: options.dryRun ?? false,
               cliTarget,
               remoteUrl: resolvedRemoteUrl,

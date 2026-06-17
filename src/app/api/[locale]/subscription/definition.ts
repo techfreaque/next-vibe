@@ -21,8 +21,6 @@ import { UserRole } from "../user/user-roles/enum";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const SubscriptionOverviewContainer = lazyWidget(() =>
   import("./widget").then((m) => ({
     default: m.SubscriptionOverviewContainer,

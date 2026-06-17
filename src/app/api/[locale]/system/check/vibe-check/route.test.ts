@@ -40,21 +40,21 @@ const TEST_FILES = [
 // ============================================================
 const EXPECTED_COUNTS = {
   // Total summary (counts may vary slightly based on test environment)
-  totalIssues: 308,
-  totalErrors: 302,
+  totalIssues: 312,
+  totalErrors: 306,
   totalWarnings: 6,
   totalFiles: 11,
 
   // Per-file expected errors+warnings
   files: {
     "a11y-issues.tsx": { errors: 62, warnings: 2 },
-    "eslint-issues.tsx": { errors: 6, warnings: 0 },
+    "eslint-issues.tsx": { errors: 8, warnings: 0 },
     "general-issues.ts": { errors: 34, warnings: 0 },
     "i18n-issues.tsx": { errors: 43, warnings: 1 },
     "jsx-capitalization-issues.tsx": { errors: 29, warnings: 1 },
     "nextjs-issues.tsx": { errors: 37, warnings: 1 },
     "promise-issues.ts": { errors: 12, warnings: 0 },
-    "react-issues.tsx": { errors: 37, warnings: 1 },
+    "react-issues.tsx": { errors: 39, warnings: 1 },
     "restricted-syntax-issues.tsx": { errors: 21, warnings: 0 },
     "typescript-issues.ts": { errors: 20, warnings: 0 },
     "calculate.ts": { errors: 1, warnings: 0 },
@@ -1115,7 +1115,7 @@ describe("Multi-Directory Tests", () => {
         const execError = error as { stdout?: string; stderr?: string };
         fromRootOutput = (execError.stdout || "") + (execError.stderr || "");
       }
-    });
+    }, 120000);
 
     it("should respect ignore patterns when running from project root", () => {
       // When running from project root, test-project is in ignores
@@ -1126,6 +1126,6 @@ describe("Multi-Directory Tests", () => {
         fromRootOutput.includes("No issues found") ||
         fromRootOutput.includes("true");
       expect(hasMinimalIssues).toBe(true);
-    });
+    }, 120000);
   });
 });

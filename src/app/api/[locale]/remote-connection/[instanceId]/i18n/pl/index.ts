@@ -48,6 +48,7 @@ export const translations: typeof enTranslations = {
     sshLink: "Otwórz połączenia SSH",
     reauthButton: "Ponowna autoryzacja",
     renameButton: "Zmień nazwę",
+    editButton: "Edytuj",
     disconnectButton: "Rozłącz",
     disconnectConfirmTitle: "Rozłączyć tę instancję?",
     disconnectConfirmDescription:
@@ -153,11 +154,6 @@ export const translations: typeof enTranslations = {
       label: "Źródło narzędzi",
       description:
         "Które narzędzia są dostępne w strumieniach AI. Lokalne / Zdalne / Oba.",
-    },
-    routingRules: {
-      label: "Reguły routingu",
-      description:
-        "Deklaratywne reguły: foldery, dostawcy modeli, domyślny fallback.",
     },
     syncScope: {
       label: "Zakres synchronizacji",

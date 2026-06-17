@@ -29,8 +29,6 @@ import { dateSchema } from "../../shared/types/common.schema";
 import { CreditTransactionType } from "../enum";
 import { scopedTranslation } from "../i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const CreditHistoryContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CreditHistoryContainer })),
 );

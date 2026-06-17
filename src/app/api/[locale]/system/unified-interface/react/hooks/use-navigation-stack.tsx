@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, type ReactNode, useContext, useRef } from "react";
-import { createStore, useStore, type StoreApi } from "zustand";
+import { createStore, type StoreApi, useStore } from "zustand";
 
 import type { NavigationStackEntry } from "../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";

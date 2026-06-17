@@ -1,3 +1,4 @@
+// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
 /**
  * Skill Skill Manifest - Dynamic Route
  * GET /api/[locale]/system/unified-interface/ai/skills/[skill-id]-skill.md

@@ -3,7 +3,7 @@
  * Compiles files using Vite
  */
 
-import { devFileLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
+import type { ChildProcess } from "node:child_process";
 import { existsSync, mkdirSync, statSync } from "node:fs";
 import type { Server as NodeHttpServer } from "node:http";
 import { networkInterfaces } from "node:os";
@@ -18,10 +18,10 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import {
-  isRunnableDevEnvironment,
   type BuildOptions,
   type EnvironmentModuleGraph,
   type InlineConfig,
+  isRunnableDevEnvironment,
   type Plugin,
   type PluginOption,
 } from "vite";
@@ -31,6 +31,7 @@ import {
   semantic,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/colors";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { serverFileLog } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
 import { createNextjsFormatter } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import type { BuildProfile, FileToCompile } from "../definition";
@@ -1007,6 +1008,16 @@ export class ViteCompiler {
     close?: () => Promise<void>;
   }> {
     try {
+      // Vite listens for process.stdin "end" to detect parent death and calls
+      // process.exit() when CI !== "true". When vibe dev is backgrounded (no
+      // controlling tty, stdin redirected to /dev/null), stdin emits "end"
+      // immediately, killing the server. Setting CI=true disables that stdin
+      // listener and also disables bindCLIShortcuts (readline on stdin).
+      // We only set it if not already set so that real CI environments keep
+      // whatever value they had.
+      if (!process.env.CI) {
+        Object.assign(process.env, { CI: "true" });
+      }
       const { createServer } = await import("vite");
       const tanstackStartPkg = "@tanstack/react-start/plugin/vite";
       const { tanstackStart } = (await import(
@@ -1052,7 +1063,7 @@ export class ViteCompiler {
         info(msg: string): void {
           const line = `${fmtVite(msg)}\n`;
           process.stdout.write(line);
-          devFileLog(line.trimEnd());
+          serverFileLog(line.trimEnd());
         },
         warn(msg: string): void {
           // Suppress sourcemap warnings for packages that ship without source files
@@ -1062,7 +1073,7 @@ export class ViteCompiler {
           this.hasWarned = true;
           const line = `${fmtVite(msg)}\n`;
           process.stdout.write(line);
-          devFileLog(line.trimEnd());
+          serverFileLog(line.trimEnd());
         },
         warnOnce(msg: string): void {
           if (msg.includes("points to missing source files")) {
@@ -1071,12 +1082,12 @@ export class ViteCompiler {
           this.hasWarned = true;
           const line = `${fmtVite(msg)}\n`;
           process.stdout.write(line);
-          devFileLog(line.trimEnd());
+          serverFileLog(line.trimEnd());
         },
         error(msg: string): void {
           const line = `${fmtVite(msg)}\n`;
           process.stderr.write(line);
-          devFileLog(line.trimEnd());
+          serverFileLog(line.trimEnd());
         },
         clearScreen(): void {
           /* no-op */
@@ -1129,6 +1140,94 @@ export class ViteCompiler {
             name: "bracket-path-rewrite",
             enforce: "pre",
             configureServer(srv) {
+              // widget.tsx files under [locale] are served on-demand via
+              // bracket-path-rewrite and are never in Vite's module graph.
+              // chokidar does not work under Bun (inotify unavailable in Bun's
+              // runtime). Spawn a node subprocess that runs chokidar and pipes
+              // JSON change events back via stdout so we can send a custom
+              // "vibe:widget-update" HMR event to the browser on each save.
+              const localeDir = resolve(ROOT_DIR, "src/app/api/[locale]");
+              const chokidarPkg = resolve(
+                ROOT_DIR,
+                "node_modules/chokidar/index.js",
+              );
+              const watcherScript = [
+                `const { watch } = require(${JSON.stringify(chokidarPkg)});`,
+                `const w = watch(${JSON.stringify(localeDir)}, {`,
+                `  disableGlobbing: true, ignoreInitial: true, ignorePermissionErrors: true,`,
+                `});`,
+                `process.stdout.on('error', () => { w.close().then(() => process.exit(0)); });`,
+                `w.on('change', (f) => { process.stdout.write(JSON.stringify({ file: f }) + '\\n'); });`,
+                `process.on('disconnect', () => w.close().then(() => process.exit(0)));`,
+              ].join("\n");
+              // eslint-disable-next-line @typescript-eslint/no-require-imports -- dynamic require: child_process must not be top-level imported in SSR entry module
+              const { spawn } = require("node:child_process") as {
+                spawn: (
+                  cmd: string,
+                  args: string[],
+                  opts: { stdio: ["ignore", "pipe", "inherit"] },
+                ) => ChildProcess;
+              };
+              const watcher = spawn("node", ["-e", watcherScript], {
+                stdio: ["ignore", "pipe", "inherit"],
+              });
+              watcher.stdout?.on("data", (chunk: Buffer) => {
+                const lines = chunk.toString().split("\n").filter(Boolean);
+                for (const line of lines) {
+                  let parsed: { file?: string };
+                  try {
+                    parsed = JSON.parse(line) as { file?: string };
+                  } catch {
+                    continue;
+                  }
+                  const file = parsed.file;
+                  if (!file?.endsWith("/widget.tsx")) {
+                    continue;
+                  }
+                  // Invalidate client module graph so next request gets fresh code
+                  const clientEnv = srv.environments?.["client"];
+                  if (clientEnv) {
+                    const mod = clientEnv.moduleGraph.getModuleById(file);
+                    if (mod) {
+                      clientEnv.moduleGraph.invalidateModule(mod);
+                    }
+                  }
+                  // Clear SSR runner cache
+                  const ssrEnv = srv.environments?.["ssr"];
+                  if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
+                    ssrEnv.runner.evaluatedModules.clear();
+                  }
+                  // Derive the browser-relative URL (strip absolute prefix up to /src/)
+                  const srcIdx = file.indexOf("/src/");
+                  const browserPath = srcIdx !== -1 ? file.slice(srcIdx) : null;
+
+                  if (browserPath) {
+                    // Send a standard Vite js-update so the browser re-fetches the
+                    // widget module and triggers its injected hot.accept handler,
+                    // which calls window.__vibeWidgetHmr to swap the component.
+                    const timestamp = Date.now();
+                    srv.ws.send({
+                      type: "update",
+                      updates: [
+                        {
+                          type: "js-update",
+                          path: browserPath,
+                          acceptedPath: browserPath,
+                          timestamp,
+                          explicitImportRequired: false,
+                          isWithinCircularImport: false,
+                        },
+                      ],
+                    });
+                    serverFileLog(
+                      `[widget-hmr] sent js-update for ${browserPath}`,
+                    );
+                  }
+                }
+              });
+              srv.httpServer?.on("close", () => {
+                watcher.kill();
+              });
               type ConnectHandle = (
                 req: { url?: string },
                 res: {
@@ -1153,6 +1252,25 @@ export class ViteCompiler {
                     if (!result) {
                       next();
                       return;
+                    }
+                    // Watch the file so Vite's HMR detects changes to [locale] paths.
+                    // The bracket-path-rewrite serves files that were never statically
+                    // imported, so chokidar doesn't watch them by default. Explicitly
+                    // add to the watcher after first serve so subsequent saves trigger HMR.
+                    const cleanUrl = url.replace(/\?.*$/, "");
+                    const absPath = resolve(
+                      ROOT_DIR,
+                      cleanUrl.replace(/^\//, ""),
+                    );
+                    srv.watcher.add(absPath);
+                    // Also register in the client environment's module graph (Vite 6
+                    // environments API) so handleHotUpdate receives the module and
+                    // can send an HMR update to the browser.
+                    const clientEnv = srv.environments?.["client"];
+                    if (clientEnv) {
+                      void clientEnv.transformRequest(url).catch(() => {
+                        /* ignore */
+                      });
                     }
                     res.setHeader(
                       "Content-Type",
@@ -1462,6 +1580,9 @@ export class ViteCompiler {
               } as never);
             },
             handleHotUpdate({ modules, server: viteServer }) {
+              const msg = `[widget-hmr-debug] handleHotUpdate: ${modules.map((m) => m.id).join(", ")} | ${JSON.stringify(modules)}`;
+              process.stdout.write(`${msg}\n`);
+              serverFileLog(msg);
               const srcModules = modules.filter((m) => m.id?.includes("/src/"));
               if (srcModules.length === 0) {
                 return;
@@ -1553,7 +1674,79 @@ export class ViteCompiler {
               };
             },
           } as Plugin,
-        ],
+          // Widget HMR self-accept: widget.tsx files are loaded via React.lazy()
+          // inside lazyWidget(). React.lazy() is an async boundary - Vite can't
+          // propagate HMR updates through it automatically because the lazy module
+          // isn't in the initial synchronous module graph. Without an accept()
+          // handler the update bubbles to a full-page reload (or gets lost).
+          //
+          // Fix: inject `if (import.meta.hot) import.meta.hot.accept()` at the
+          // bottom of every widget.tsx. This makes each widget module self-accepting:
+          // Vite re-evaluates the module in-place on change, the React.lazy promise
+          // is resolved afresh, and the Suspense boundary re-renders with the new
+          // component without a full page reload.
+          // Widget HMR: widget.tsx files are loaded via React.lazy() inside
+          // lazyWidget(). React.lazy caches its resolved promise - even when
+          // the module hot-accepts, React reuses the stale cached component.
+          //
+          // Fix: inject a hot.accept handler into each widget.tsx that calls
+          // window.__vibeWidgetHmr(id, newModule) on update. lazyWidget()
+          // registers a subscriber per factory; on update it swaps the stored
+          // component ref and forces a re-render via a state counter.
+          {
+            name: "widget-hmr",
+            enforce: "post",
+            transform(
+              code: string,
+              id: string,
+            ): { code: string; map: null } | undefined {
+              // Target widget.tsx files in all environments (SSR + client).
+              // The bracket-path-rewrite middleware serves widget files from the
+              // SSR-cached transform result. By injecting the HMR snippet in both
+              // environments, the browser receives the accept handler regardless
+              // of which environment processed the file first.
+              const cleanId = id.replace(/\?.*$/, "");
+              if (!cleanId.endsWith("/widget.tsx")) {
+                return undefined;
+              }
+              // Already has our HMR handler - don't double-inject
+              if (code.includes("__vibeWidgetModuleId")) {
+                return undefined;
+              }
+              // Extract exported function names so we can tag them with moduleId.
+              // lazyWidget's factory does `.then(m => ({default: m.FooComponent}))`,
+              // stripping the module to {default} only. By attaching __vibeWidgetModuleId
+              // to each exported function, the component survives the strip and
+              // lazy-widget.ts can read it from the resolved {default} value.
+              const exportedNames: string[] = [];
+              for (const match of code.matchAll(
+                /export\s+(?:async\s+)?function\s+(\w+)/g,
+              )) {
+                if (match[1]) {
+                  exportedNames.push(match[1]);
+                }
+              }
+              const tagLines = exportedNames
+                .map(
+                  (n) =>
+                    `try { ${n}.__vibeWidgetModuleId = ${JSON.stringify(cleanId)}; } catch(_e){}`,
+                )
+                .join("\n");
+              const hmrSnippet = `
+export const __vibeWidgetModuleId = ${JSON.stringify(cleanId)};
+${tagLines}
+if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
+  import.meta.hot.accept((newMod) => {
+    if (newMod && typeof window !== 'undefined' && window.__vibeWidgetHmr) {
+      window.__vibeWidgetHmr(${JSON.stringify(cleanId)}, newMod);
+    }
+  });
+}
+`;
+              return { code: `${code}${hmrSnippet}`, map: null };
+            },
+          } as Plugin,
+        ] as PluginOption[],
         resolve: {
           tsconfigPaths: true,
           alias: [
@@ -1567,7 +1760,7 @@ export class ViteCompiler {
               }),
             ),
           ],
-        },
+        } as InlineConfig["resolve"],
         // Inject runtime env constants so client bundles get the correct values.
         // process.env has already been patched by patchPublicUrlPort() before createServer().
         define: {
@@ -1604,7 +1797,7 @@ export class ViteCompiler {
                 filePath.endsWith("/messenger/registry/generated.ts") ||
                 filePath.includes("/app-native/") ||
                 filePath.includes("/test-files/") ||
-                filePath.includes("/testing/fixtures/") ||
+                filePath.includes("/testing/") ||
                 filePath.endsWith(".test.ts") ||
                 filePath.endsWith(".test.tsx") ||
                 filePath.endsWith(".spec.ts") ||
@@ -1627,11 +1820,19 @@ export class ViteCompiler {
             publicPort !== null && publicPort !== undefined
               ? { clientPort: publicPort }
               : true,
-        },
+        } as InlineConfig["server"],
         // Use a TanStack-specific cache dir so it doesn't conflict with
         // the Next.js Vite cache in node_modules/.vite/deps/
         cacheDir: resolve(ROOT_DIR, "node_modules/.vite-tanstack"),
         logLevel: "info",
+        build: {
+          // drizzle-zod ships sourcemaps with paths pointing outside its own
+          // package directory (e.g. node_modules/src/...). Tell Rollup to skip
+          // sourcemaps for that package entirely so it never tries to resolve
+          // those invalid paths and never emits the warning.
+          sourcemapIgnoreList: (relativeSourcePath: string) =>
+            relativeSourcePath.includes("drizzle-zod"),
+        } as InlineConfig["build"],
         // Disable auto-discovery: scanning src/app/** pulls in server-only deps
         // (ssh2, react-native, lightningcss, .node binaries) into the client
         // optimizeDeps scan and causes esbuild errors. Instead, list only the
@@ -1794,7 +1995,7 @@ export class ViteCompiler {
         )
         .join("\n");
       process.stdout.write(`${formatted}\n`);
-      devFileLog(formatted);
+      serverFileLog(formatted);
 
       const closeFn = (): Promise<void> => {
         // Force-terminate all keep-alive connections before closing so the TCP

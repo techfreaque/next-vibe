@@ -23,9 +23,6 @@ import { SectionGroup } from "next-vibe-ui/ui/section-group";
 import { Span } from "next-vibe-ui/ui/span";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import React from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -34,9 +31,11 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React from "react";
+
 import { scopedTranslation as leadsI18n } from "@/app/api/[locale]/leads/i18n";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cn } from "@/app/api/[locale]/shared/utils";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

@@ -5,9 +5,6 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import type { JSX } from "react";
-import { useMemo } from "react";
-
 import {
   useWidgetForm,
   useWidgetUser,
@@ -21,6 +18,10 @@ import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-f
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useMemo } from "react";
+
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SshAuthType, SshAuthTypeOptions } from "../../enum";
 import type endpoints from "./definition";

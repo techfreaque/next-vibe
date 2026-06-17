@@ -4,9 +4,11 @@ import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/re
 
 import { stripFrontmatter } from "../_shared/text-utils";
 import {
+  CORTEX_EXEC_ALIAS,
   CORTEX_LIST_ALIAS,
   CORTEX_READ_ALIAS,
   CORTEX_SEARCH_ALIAS,
+  CORTEX_TERMINALS_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "../constants";
 

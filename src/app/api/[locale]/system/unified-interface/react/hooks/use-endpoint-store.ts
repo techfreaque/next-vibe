@@ -78,7 +78,7 @@ function subscribeToKey(key: string, listener: () => void): () => void {
     // If no listeners remain and no owner has registered this key, clean it up
     if (
       entry?.listeners.size === 0 &&
-      !useEndpointInstanceStore.getState().instances.has(key)
+      !endpointInstanceStore.getState().instances.has(key)
     ) {
       valueRegistry.delete(key);
     }
@@ -108,7 +108,7 @@ interface RefCountStore {
 
 const CLEANUP_DELAY = 5 * 60 * 1000;
 
-export const useEndpointInstanceStore = create<RefCountStore>((set, get) => ({
+export const endpointInstanceStore = create<RefCountStore>((set, get) => ({
   instances: new Map(),
 
   register: (key: string, asOwner: boolean): void => {
@@ -273,7 +273,7 @@ export function useEndpointManaged<
   // On key change: unregister from old key synchronously and reset ownership.
   if (prevInstanceKeyRef.current !== instanceKey) {
     if (prevInstanceKeyRef.current !== null) {
-      useEndpointInstanceStore
+      endpointInstanceStore
         .getState()
         .unregister(prevInstanceKeyRef.current, isOwnerRef.current === true);
     }
@@ -282,7 +282,7 @@ export function useEndpointManaged<
   }
 
   if (isOwnerRef.current === null) {
-    isOwnerRef.current = !useEndpointInstanceStore
+    isOwnerRef.current = !endpointInstanceStore
       .getState()
       .hasOwner(instanceKey);
   }
@@ -340,7 +340,7 @@ export function useEndpointManaged<
   // Key-change unregistration is handled synchronously above (prevInstanceKeyRef).
   const registeredKeyRef = useRef<string | null>(null);
   useEffect((): (() => void) => {
-    useEndpointInstanceStore.getState().register(instanceKey, isOwner);
+    endpointInstanceStore.getState().register(instanceKey, isOwner);
     registeredKeyRef.current = instanceKey;
     return (): void => {
       // Only unregister if we haven't already done so synchronously (key change)
@@ -348,7 +348,7 @@ export function useEndpointManaged<
         if (isOwner) {
           isOwnerRef.current = null;
         }
-        useEndpointInstanceStore.getState().unregister(instanceKey, isOwner);
+        endpointInstanceStore.getState().unregister(instanceKey, isOwner);
         registeredKeyRef.current = null;
       }
     };
@@ -381,11 +381,11 @@ export function useEndpointManaged<
 // ---------------------------------------------------------------------------
 
 export function clearEndpointInstances(): void {
-  useEndpointInstanceStore.getState().clearAll();
+  endpointInstanceStore.getState().clearAll();
 }
 
 export function getEndpointInstanceCount(): number {
-  return useEndpointInstanceStore.getState().instances.size;
+  return endpointInstanceStore.getState().instances.size;
 }
 
 export function getEndpointInstanceDetails(): Array<{
@@ -393,7 +393,7 @@ export function getEndpointInstanceDetails(): Array<{
   refCount: number;
   lastAccessed: Date;
 }> {
-  const { instances } = useEndpointInstanceStore.getState();
+  const { instances } = endpointInstanceStore.getState();
   return [...instances.entries()].map(([key, inst]) => ({
     key,
     refCount: inst.refCount,

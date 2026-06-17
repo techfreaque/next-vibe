@@ -9,10 +9,10 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3 } from "next-vibe-ui/ui/typography";
+import { useWidgetLocale } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { useMemo } from "react";
 
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
-import { useWidgetLocale } from "next-vibe-ui/unified/_shared/use-widget-context";
 
 interface CodeQualityItem {
   file: string;

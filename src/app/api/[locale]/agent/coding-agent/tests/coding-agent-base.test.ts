@@ -26,6 +26,7 @@ globalThis.AI_SDK_LOG_WARNINGS = false;
 import { installFetchCache } from "../../ai-stream/testing/fetch-cache";
 installFetchCache();
 
+import { and, eq, like, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -33,16 +34,15 @@ import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { defaultLocale } from "@/i18n/core/config";
-import { and, eq, like, sql } from "drizzle-orm";
-
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
+
 import {
   patchFetchCacheFixtures,
   setFetchCacheContext,
@@ -51,8 +51,8 @@ import {
   fetchThreadMessages,
   getOrCreateFolder,
   runTestStream,
-  toolResultRecord,
   type SlimMessage,
+  toolResultRecord,
 } from "../../ai-stream/testing/headless-test-runner";
 
 // ── Mode configuration ────────────────────────────────────────────────────────
@@ -443,12 +443,9 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
     let suiteRootFolderIdRef: DefaultFolderId;
     beforeAll(async () => {
       const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-      expect(
-        resolved,
-        `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
-      ).toBeTruthy();
       if (!resolved) {
-        return;
+        // oxlint-disable-next-line restricted-syntax
+        throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
       }
       testUser = resolved;
 

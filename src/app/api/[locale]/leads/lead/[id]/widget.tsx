@@ -59,9 +59,6 @@ import { Textarea } from "next-vibe-ui/ui/textarea";
 import { P } from "next-vibe-ui/ui/typography";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetEndpointMutations,
@@ -73,6 +70,9 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 import { configScopedTranslation } from "@/config/i18n";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";

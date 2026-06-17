@@ -1,5 +1,7 @@
 "use client";
 
+import { success } from "next-vibe/shared/types/response.schema";
+import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Dialog,
@@ -18,8 +20,7 @@ import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Input } from "next-vibe-ui/ui/input";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
+import { getCurrentUrl, openInNewTab } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -66,10 +67,11 @@ export function ThreadShareDialog({
 
   /* eslint-disable i18next/no-literal-string */
   const threadUrl = useMemo(() => {
-    if (typeof window === "undefined") {
-      return `/${locale}/threads/shared/${threadId}`;
-    }
-    return `${window.location.origin}/${locale}/threads/shared/${threadId}`;
+    const currentHref = getCurrentUrl();
+    const origin = currentHref ? new URL(currentHref).origin : "";
+    return origin
+      ? `${origin}/${locale}/threads/shared/${threadId}`
+      : `/${locale}/threads/shared/${threadId}`;
   }, [locale, threadId]);
   /* eslint-enable i18next/no-literal-string */
 
@@ -89,7 +91,7 @@ export function ThreadShareDialog({
     /* eslint-disable i18next/no-literal-string */
     const subject = encodeURIComponent(threadTitle);
     const body = encodeURIComponent(threadUrl);
-    window.open(`mailto:${emails}?subject=${subject}&body=${body}`, "_blank");
+    openInNewTab(`mailto:${emails}?subject=${subject}&body=${body}`);
     /* eslint-enable i18next/no-literal-string */
     setEmailInput("");
   }, [emailInput, threadTitle, threadUrl]);

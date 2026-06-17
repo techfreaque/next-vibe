@@ -3,13 +3,11 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Image } from "next-vibe-ui/ui/image";
 import { Camera } from "next-vibe-ui/ui/icons/Camera";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Image } from "next-vibe-ui/ui/image";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
 import {
   useWidgetIsSubmitting,
   useWidgetNavigation,
@@ -21,6 +19,7 @@ import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import type { JSX } from "react";
 
 import { DesktopNavHeader } from "../shared/nav-header";
 import type definition from "./definition";

@@ -31,8 +31,6 @@ import { ActivityType, UserAssociation } from "../../../leads/enum";
 import { EngagementLevel } from "../../../leads/tracking/engagement/enum";
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { emails } from "../db";
-import type { StatsT } from "./i18n";
-
 import {
   mapMessageStatusFilter,
   mapMessageTypeFilter,
@@ -40,11 +38,11 @@ import {
   MessageStatusFilter,
   MessageTypeFilter,
   RetryRange,
+} from "../enum";
+import type {
   EmailStatsByEngagement,
   EmailStatsByProvider,
   EmailStatsByRetryCount,
-} from "../enum";
-import type {
   EmailStatsByStatus,
   EmailStatsByTemplate,
   EmailStatsByType,
@@ -56,9 +54,9 @@ import type {
   EmailStatsRecentActivity,
   EmailStatsTopPerformingProvider,
   EmailStatsTopPerformingTemplate,
-import type { StatsT } from "./i18n";
 } from "./definition";
 import { DateRangePreset, getDateRangeFromPreset, TimePeriod } from "./enum";
+import type { StatsT } from "./i18n";
 
 /**
  * Email Stats Repository

@@ -6,26 +6,24 @@ import "server-only";
  * Falls back to FTS-only when embeddings are unavailable.
  */
 import { and, eq, isNotNull, like, sql } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
 import {
   ErrorResponseTypes,
-  success,
   fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { truncateContent } from "../_shared/text-utils";
 import { cortexNodes } from "../db";
-import type { CortexSearchT } from "./i18n";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
 import { isValidPath, normalizePath } from "../repository";
+import type { CortexSearchT } from "./i18n";
 
 /** Weight for FTS vs vector scoring (FTS 0.4, Vector 0.6) */
 const FTS_WEIGHT = 0.4;

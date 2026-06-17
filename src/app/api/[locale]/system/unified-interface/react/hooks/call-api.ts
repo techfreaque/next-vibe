@@ -6,11 +6,9 @@ import {
 import { validateData } from "next-vibe/shared/utils";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { Platform } from "../../shared/types/platform";
-
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { scopedTranslation as authScopedTranslation } from "@/app/api/[locale]/user/auth/i18n";
 import { authClientRepository } from "@/app/api/[locale]/user/auth/repository-client";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -23,8 +21,9 @@ import { envClient, platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
-import { scopedTranslation as hooksTranslation } from "./i18n";
+import { Platform } from "../../shared/types/platform";
 import { containsFile, objectToFormData } from "./api-utils-shared";
+import { scopedTranslation as hooksTranslation } from "./i18n";
 
 const MUTATING_METHODS = new Set([
   Methods.POST,

@@ -7,8 +7,6 @@ import { Eye } from "next-vibe-ui/ui/icons/Eye";
 import { Keyboard } from "next-vibe-ui/ui/icons/Keyboard";
 import { Type } from "next-vibe-ui/ui/icons/Type";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
 import {
   useWidgetForm,
   useWidgetNavigation,
@@ -19,9 +17,9 @@ import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import type { JSX } from "react";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
 
 import { DesktopNavHeader } from "../shared/nav-header";
 import type definition from "./definition";

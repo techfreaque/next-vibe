@@ -6,8 +6,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, H4, P } from "next-vibe-ui/ui/typography";
-import { type JSX } from "react";
-
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -15,8 +13,10 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { type JSX } from "react";
 
 import { EstimateStatus } from "@/app/api/[locale]/payment/enum";
+
 import type definition from "./definition";
 
 function fmt(n: number): string {

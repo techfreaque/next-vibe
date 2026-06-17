@@ -45,37 +45,33 @@ import {
   PopoverTrigger,
 } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useMemo, useState } from "react";
-
-import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
-import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
   arrayFieldPath,
-import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
   withValue,
 } from "next-vibe-ui/unified/_shared/field-helpers";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetNavigation,
   useWidgetSelector,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
 import IconWidget from "next-vibe-ui/unified/display-only/icon/widget";
 import TextWidget from "next-vibe-ui/unified/display-only/text/widget";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-
-import { cn } from "../../../shared/utils";
-import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
 import {
   Icon,
   type IconKey,
 } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import React, { useCallback, useMemo, useState } from "react";
+
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { cn } from "../../../shared/utils";
 import { getTtsModelById } from "../../text-to-speech/models";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";

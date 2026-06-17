@@ -6,11 +6,11 @@
  *
  *   RN1  — renameSelf() updates instanceIdentities + remoteConnections.remoteInstanceId locally
  *   RN2  — propagation: atlas renames itself → hermes's chatFolders.name updated to new name
- *   RN3  — routingRules.folderIds UUID is stable after rename (folder UUID does not change)
- *   RN4  — after rename: starting a stream from the subfolder (now with new name) still routes
- *           to hermes (prod DB receives messages — folderIds UUID still in routingRules)
+ *   RN3  — folder UUID is stable after rename (only name changes, UUID is the same)
+ *   RN4  — after rename: starting a stream from the subfolder still routes to hermes
+ *           (REMOTE-folder routing is deterministic — no folderIds DB setting needed)
  *   RN5  — reverse: hermes renames itself → atlas's chatFolders.name updated (via _rename HTTP)
- *   RN6  — after reverse rename: atlas's routingRules.folderIds UUID is still stable
+ *   RN6  — after reverse rename: folder UUID still exists, REMOTE routing still resolves correctly
  *
  * PREREQUISITES
  * ─────────────
@@ -22,14 +22,14 @@
 
 import "server-only";
 
-import { and, eq, isNull, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
+
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
-import type { RoutingRules } from "@/app/api/[locale]/remote-connection/db";
 import {
   instanceIdentities,
   remoteConnections,
@@ -46,16 +46,17 @@ import {
 import { runTestStream } from "../../agent/ai-stream/testing/headless-test-runner";
 import {
   ATLAS_INSTANCE_ID,
-  HERMES_INSTANCE_ID,
   connectToHermes,
   disconnectFromHermes,
   ensureRemoteUserCredits,
   failSuitePrerequisites,
   getProdDb,
+  HERMES_INSTANCE_ID,
   resolveDevUser,
   resolveProdAdminToken,
   resolveProdUserId,
   resolveRemoteUrl,
+  restoreHermesIdentity,
   triggerPull,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
@@ -93,7 +94,8 @@ async function pollUntil<T>(
     }
     await sleep(200);
   }
-  expect.fail(`[pollUntil] ${label}: timed out after ${timeoutMs}ms`);
+  // oxlint-disable-next-line restricted-syntax
+  throw new Error(`[pollUntil] ${label}: timed out after ${timeoutMs}ms`);
 }
 
 // ── Suite ─────────────────────────────────────────────────────────────────────
@@ -126,12 +128,15 @@ if (_remoteUrl) {
       }
       testUser = resolved;
 
+      // Pre-clean both sides before attempting connection to avoid "Already Connected"
+      // from stale rows left by failed previous runs.
       await disconnectFromHermes(testUser.id);
+      prodUserId = await resolveProdUserId();
+      await restoreHermesIdentity();
+      await unregisterDevFromHermes(prodUserId);
 
       await connectToHermes(testUser, _remoteUrl!);
       await triggerPull();
-
-      prodUserId = await resolveProdUserId();
 
       const remoteAdminToken = await resolveProdAdminToken(_remoteUrl!);
       await ensureRemoteUserCredits(
@@ -413,8 +418,8 @@ if (_remoteUrl) {
         `RN2: renameSelf response must have success=true`,
       ).toBe(true);
 
-      // Give the fire-and-forget propagation time to reach hermes
-      // Poll hermes prod DB for the renamed folder
+      // Give the fire-and-forget propagation time to reach hermes-dev
+      // Poll hermes-dev DB for the renamed folder
       const pdb = getProdDb();
       const renamedFolder = await pollUntil(
         `RN2: hermes chatFolders.name must be updated to ${newName}`,
@@ -483,37 +488,12 @@ if (_remoteUrl) {
       appliedNewDevName = null;
     }, 60_000);
 
-    // ── RN3: routingRules.folderIds UUID stable after rename ──────────────────
+    // ── RN3: folder UUID stable after rename ─────────────────────────────────
 
-    it("RN3: routingRules.folderIds UUID is stable after rename (folder UUID does not change)", async () => {
-      // After connect(), localFolderId was captured. After any rename operations,
-      // the UUID must still be in routingRules.folderIds — only the folder name changed.
-      const [conn] = await db
-        .select({ routingRules: remoteConnections.routingRules })
-        .from(remoteConnections)
-        .where(
-          and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-          ),
-        )
-        .limit(1);
-
-      expect(conn, "RN3: remoteConnections row missing").toBeDefined();
-      const rules = conn?.routingRules as RoutingRules | null | undefined;
-
-      expect(
-        rules?.folderIds,
-        "RN3: routingRules.folderIds must be an array",
-      ).toBeInstanceOf(Array);
-
-      expect(
-        rules?.folderIds?.includes(localFolderId),
-        `RN3: routingRules.folderIds must still contain ${localFolderId} after rename. ` +
-          `UUID is stable — only the folder name changes, the UUID and routing config do not.`,
-      ).toBe(true);
-
-      // Also verify the folder still exists (same UUID, possibly new name)
+    it("RN3: folder UUID is stable after rename (only the name changes)", async () => {
+      // After connect(), localFolderId was captured. After rename operations,
+      // the folder must still exist with the same UUID — only its name changes.
+      // REMOTE-folder routing is deterministic (by folder ancestry), no DB folderIds needed.
       const [folder] = await db
         .select({ id: chatFolders.id, name: chatFolders.name })
         .from(chatFolders)
@@ -527,7 +507,7 @@ if (_remoteUrl) {
 
       expect(
         folder?.id,
-        `RN3: chatFolders row with id=${localFolderId} must still exist after rename`,
+        `RN3: chatFolders row with id=${localFolderId} must still exist after rename — UUID is stable`,
       ).toBe(localFolderId);
     }, 15_000);
 
@@ -537,7 +517,7 @@ if (_remoteUrl) {
       setFetchCacheContext("rename-rn4-");
 
       // Run a stream from the localFolderId (remote/hermes subfolder).
-      // routingRules.folderIds contains localFolderId → stream relays to hermes.
+      // REMOTE-folder routing is deterministic — folder ancestry resolves to hermes.
       const { result } = await runTestStream({
         user: testUser,
         prompt: "[RN4 routing-after-rename] Reply with exactly: ROUTE_STABLE",
@@ -709,36 +689,27 @@ if (_remoteUrl) {
       appliedNewHermesName = null;
     }, 60_000);
 
-    // ── RN6: after reverse rename — routingRules.folderIds UUID stable ────────
+    // ── RN6: after reverse rename — folder UUID stable, REMOTE routing works ──
 
-    it("RN6: after hermes rename — atlas routingRules.folderIds UUID unchanged (routing still works)", async () => {
-      // After RN5 restores everything, routingRules.folderIds must still contain localFolderId.
-      const [conn] = await db
-        .select({ routingRules: remoteConnections.routingRules })
-        .from(remoteConnections)
+    it("RN6: after hermes rename — folder UUID unchanged, REMOTE routing still resolves to hermes", async () => {
+      // After RN5 restores everything, localFolderId must still exist in atlas DB.
+      // Rename only changes the folder name — UUID is stable.
+      // REMOTE-folder routing is deterministic: folder ancestry resolves to hermes connection.
+      const [folder] = await db
+        .select({ id: chatFolders.id })
+        .from(chatFolders)
         .where(
           and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
+            eq(chatFolders.id, localFolderId),
+            eq(chatFolders.userId, testUser.id),
           ),
         )
         .limit(1);
 
       expect(
-        conn,
-        "RN6: remoteConnections row for hermes must exist",
-      ).toBeDefined();
-      const rules = conn?.routingRules as RoutingRules | null | undefined;
-
-      expect(
-        rules?.folderIds,
-        "RN6: folderIds must be an array",
-      ).toBeInstanceOf(Array);
-      expect(
-        rules?.folderIds?.includes(localFolderId),
-        `RN6: routingRules.folderIds must still contain ${localFolderId} after hermes rename. ` +
-          `Rename only changes folder name — UUID and routing config are stable.`,
-      ).toBe(true);
+        folder?.id,
+        `RN6: chatFolders row with id=${localFolderId} must still exist after hermes rename — UUID is stable`,
+      ).toBe(localFolderId);
     }, 15_000);
   });
 }

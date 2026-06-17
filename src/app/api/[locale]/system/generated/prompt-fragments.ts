@@ -9,6 +9,8 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
+import type { PromptFragmentModule, PromptFragmentModuleEntry } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+
 /**
  * All registered prompt fragment IDs.
  * Auto-generated - do not edit manually.
@@ -43,64 +45,87 @@ export const PROMPT_FRAGMENT_IDS = [
 
 export type PromptFragmentId = (typeof PROMPT_FRAGMENT_IDS)[number];
 
+type ModuleExportValue = PromptFragmentModuleEntry | ((arg: never) => string) | ((arg: never) => void) | Record<string, string | number> | string | number | boolean | null | undefined;
+
+function isFragmentEntry(value: ModuleExportValue): value is PromptFragmentModuleEntry {
+  if (typeof value !== "object" || value === null) { return false; }
+  const entry = value as Partial<PromptFragmentModuleEntry>;
+  return (
+    typeof entry.id === "string" &&
+    (entry.placement === "leading" || entry.placement === "trailing") &&
+    typeof entry.priority === "number" &&
+    typeof entry.build === "function"
+  );
+}
+
+function toFragmentModule<T extends Record<string, ModuleExportValue>>(mod: T): PromptFragmentModule {
+  const result: PromptFragmentModule = {};
+  for (const [key, value] of Object.entries(mod)) {
+    if (isFragmentEntry(value)) {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 /**
  * Dynamically import a prompt fragment module by ID.
  * Returns the module with the fragment export(s) from its prompt.ts.
  */
 export async function getPromptFragment(
   id: PromptFragmentId,
-): Promise<Record<string, unknown>> {
+): Promise<PromptFragmentModule> {
   switch (id) {
     case "autonomy-status":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "bootstrap":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "coding-agent-setting":
-      return import("@/app/api/[locale]/agent/chat/settings/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/chat/settings/system-prompt/prompt").then(toFragmentModule);
     case "contact":
-      return import("@/app/api/[locale]/contact/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/contact/system-prompt/prompt").then(toFragmentModule);
     case "cortex":
-      return import("@/app/api/[locale]/agent/cortex/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/cortex/system-prompt/prompt").then(toFragmentModule);
     case "desktop":
-      return import("@/app/api/[locale]/desktop/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/desktop/system-prompt/prompt").then(toFragmentModule);
     case "extra-instructions":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "favorites":
-      return import("@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt").then(toFragmentModule);
     case "folder-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "formatting":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "guest-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "headless-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "identity":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "language":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "media-capabilities":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "message-metadata":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "platform-overview":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "remote-instances":
-      return import("@/app/api/[locale]/remote-connection/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/remote-connection/system-prompt/prompt").then(toFragmentModule);
     case "skill":
-      return import("@/app/api/[locale]/agent/chat/skills/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/chat/skills/system-prompt/prompt").then(toFragmentModule);
     case "ssh-connections":
-      return import("@/app/api/[locale]/remote-connection/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/remote-connection/system-prompt/prompt").then(toFragmentModule);
     case "sub-agent-guard":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "system-context":
-      return import("@/app/api/[locale]/remote-connection/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/remote-connection/system-prompt/prompt").then(toFragmentModule);
     case "tool-execution-control":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "user-name":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt").then(toFragmentModule);
     case "web":
-      return import("@/app/api/[locale]/agent/search/system-prompt/prompt") as Promise<Record<string, unknown>>;
+      return import("@/app/api/[locale]/agent/search/system-prompt/prompt").then(toFragmentModule);
     default:
       return {};
   }

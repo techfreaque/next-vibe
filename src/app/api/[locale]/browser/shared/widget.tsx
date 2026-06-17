@@ -2,13 +2,13 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetPlatform,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 interface ContentBlock {
   type: string;

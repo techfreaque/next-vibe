@@ -39,8 +39,6 @@ import {
 import { leadsBatchFilterFields } from "../shared-filter-fields";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const LeadsBatchDeleteContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadsBatchDeleteContainer })),
 );

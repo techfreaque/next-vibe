@@ -2,9 +2,8 @@
  * Container Widget Type Definitions
  */
 
-import type { z } from "zod";
-
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import type { z } from "zod";
 
 import type { InferSchemaFromField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type {
@@ -13,6 +12,7 @@ import type {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 import type {
   ArrayChildConstraint,
   BaseArrayWidgetConfig,

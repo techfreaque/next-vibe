@@ -5,8 +5,6 @@
 
 "use client";
 
-import type { z } from "zod";
-
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -17,19 +15,16 @@ import {
   FormMessage,
 } from "next-vibe-ui/ui/form/form";
 import { Search } from "next-vibe-ui/ui/icons/Search";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { Input } from "next-vibe-ui/ui/input";
-import type { z } from "zod";
 import { Span } from "next-vibe-ui/ui/span";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
+import type { z } from "zod";
 
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
-
-
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
 import type { ReactStaticWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {

@@ -10,31 +10,28 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { and, eq, like } from "drizzle-orm";
+import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-
-import { db } from "@/app/api/[locale]/system/db";
 import { testEndpoint } from "@/app/api/[locale]/system/check/testing/testing-suite";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
+import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
-import { chatFavorites } from "./db";
+import { IntelligenceLevel,ModelSelectionType } from "../skills/enum";
 import { isUuid } from "../slugify";
-import { ModelSelectionType, IntelligenceLevel } from "../skills/enum";
-
-// ── Definition imports ───────────────────────────────────────────────────────
-
-import favoritesListEndpoint from "./definition";
-import favoriteCreateEndpoint from "./create/definition";
 import favoriteSingleEndpoint from "./[id]/definition";
+import favoriteCreateEndpoint from "./create/definition";
+import { chatFavorites } from "./db";
+// ── Definition imports ───────────────────────────────────────────────────────
+import favoritesListEndpoint from "./definition";
 import favoriteReorderEndpoint from "./reorder/definition";
 
 // ── Part A: Auto-generated endpoint tests ────────────────────────────────────
@@ -250,9 +247,7 @@ describe("Favorites CRUD Integration", () => {
       return;
     }
 
-    const found = response.data.favorites.find(
-      (f: Record<string, unknown>) => f.id === createdFavSlug1,
-    );
+    const found = response.data.favorites.find((f) => f.id === createdFavSlug1);
     expect(found, "Created favorite not found in list").toBeTruthy();
     if (!found) {
       return;
@@ -326,12 +321,8 @@ describe("Favorites CRUD Integration", () => {
       return;
     }
 
-    const fav1 = response.data.favorites.find(
-      (f: Record<string, unknown>) => f.id === createdFavSlug1,
-    );
-    const fav2 = response.data.favorites.find(
-      (f: Record<string, unknown>) => f.id === createdFavSlug2,
-    );
+    const fav1 = response.data.favorites.find((f) => f.id === createdFavSlug1);
+    const fav2 = response.data.favorites.find((f) => f.id === createdFavSlug2);
 
     if (fav1 && fav2) {
       expect(
@@ -381,8 +372,7 @@ describe("Favorites CRUD Integration", () => {
     }
 
     const updatedFav = listResponse.data.favorites.find(
-      (f: Record<string, unknown>) =>
-        f.customVariantName === "Test Fav Route 1 Updated",
+      (f) => f.customVariantName === "Test Fav Route 1 Updated",
     );
     expect(updatedFav, "Updated favorite not found in list").toBeTruthy();
     if (!updatedFav) {
@@ -455,8 +445,7 @@ describe("Favorites CRUD Integration", () => {
     }
 
     const testFavs = response.data.favorites.filter(
-      (f: Record<string, unknown>) =>
-        f.id === createdFavSlug1 || f.id === createdFavSlug2,
+      (f) => f.id === createdFavSlug1 || f.id === createdFavSlug2,
     );
     expect(testFavs.length).toBe(0);
   });

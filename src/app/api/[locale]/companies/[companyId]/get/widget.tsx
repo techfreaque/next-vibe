@@ -14,8 +14,6 @@ import { ShoppingBag } from "next-vibe-ui/ui/icons/ShoppingBag";
 import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX, ReactNode } from "react";
-
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -24,6 +22,7 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX, ReactNode } from "react";
 
 import type { CompanyTypeValue } from "../../enum";
 import { CompanyType } from "../../enum";

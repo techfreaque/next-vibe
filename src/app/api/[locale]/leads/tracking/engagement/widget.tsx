@@ -16,9 +16,6 @@ import { MousePointerClick } from "next-vibe-ui/ui/icons/MousePointerClick";
 import { User } from "next-vibe-ui/ui/icons/User";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetNavigation,
@@ -26,6 +23,9 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import React, { useCallback } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type definition from "./definition";
 

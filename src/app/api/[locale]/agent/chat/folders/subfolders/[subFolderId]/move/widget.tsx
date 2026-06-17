@@ -4,11 +4,6 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-import { useMemo } from "react";
-
-import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -16,6 +11,11 @@ import {
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useMemo } from "react";
+
+import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 
 import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import type { FolderListResponseOutput } from "../../../[rootFolderId]/definition";

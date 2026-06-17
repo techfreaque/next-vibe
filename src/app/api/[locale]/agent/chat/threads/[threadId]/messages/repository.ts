@@ -314,10 +314,26 @@ export class MessagesRepository {
     newParentId: string;
     logger: EndpointLogger;
   }): Promise<void> {
-    await db
+    const now = new Date();
+    // Bump the message updatedAt so cross-instance sync re-serves the
+    // re-parented row (the threads provider filters/LWW by updatedAt; a
+    // parentId-only change would otherwise be invisible to a peer that already
+    // mirrored the message).
+    const [updated] = await db
       .update(chatMessages)
-      .set({ parentId: params.newParentId })
-      .where(eq(chatMessages.id, params.messageId));
+      .set({ parentId: params.newParentId, updatedAt: now })
+      .where(eq(chatMessages.id, params.messageId))
+      .returning({ threadId: chatMessages.threadId });
+
+    // Also bump the THREAD updatedAt: the sync provider selects threads to
+    // serve by thread.updatedAt, so a message-only change in an
+    // already-synced thread would never re-serve without this.
+    if (updated?.threadId) {
+      await db
+        .update(chatThreads)
+        .set({ updatedAt: now })
+        .where(eq(chatThreads.id, updated.threadId));
+    }
 
     params.logger.debug("Re-parented user message after compacting", {
       messageId: params.messageId,

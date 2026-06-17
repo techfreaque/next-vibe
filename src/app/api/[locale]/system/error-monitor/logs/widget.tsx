@@ -19,9 +19,6 @@ import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useState } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -36,6 +33,9 @@ import { DateFieldWidget } from "next-vibe-ui/unified/form-fields/date-field/wid
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import React, { useCallback, useState } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type endpoints from "./definition";
 import type { ErrorLogsResponseOutput } from "./definition";

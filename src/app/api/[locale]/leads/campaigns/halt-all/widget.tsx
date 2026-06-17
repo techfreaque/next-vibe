@@ -23,18 +23,16 @@ import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import React from "react";
-
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import React from "react";
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import React from "react";
 
 import type definition from "./definition";
 

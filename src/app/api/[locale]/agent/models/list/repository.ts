@@ -21,9 +21,6 @@ import { allModelDefinitions, getModelPrice } from "../all-models";
 import { ModelUtility } from "../enum";
 import type { AnyModelOption, ModelDefinition } from "../models";
 import { modelProviders } from "../models";
-import { IntelligenceLevelDB } from "../../chat/skills/enum";
-import { ModelUtility } from "../enum";
-
 import type { ModelListGetResponseOutput, ModelListItem } from "./definition";
 
 // Flat list of all model options across all roles

@@ -5,10 +5,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
-import type { JSX } from "react";
-import { useCallback, useMemo } from "react";
-
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   useWidgetEndpoint,
   useWidgetForm,
@@ -26,6 +22,11 @@ import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-f
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useCallback, useMemo } from "react";
+
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SshAuthType, SshAuthTypeOptions } from "../../enum";
 import type endpoints from "./definition";

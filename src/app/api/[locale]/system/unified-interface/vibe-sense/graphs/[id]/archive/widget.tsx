@@ -14,16 +14,14 @@ import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import React, { useCallback } from "react";
-
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import React, { useCallback } from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import React, { useCallback } from "react";
 
 import type definition from "./definition";
 

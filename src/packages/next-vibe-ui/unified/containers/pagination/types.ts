@@ -4,13 +4,13 @@
 
 import z from "zod";
 
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-
 import type { SpacingSize } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+
 import type {
   BaseObjectWidgetConfig,
   FieldUsageConfig,

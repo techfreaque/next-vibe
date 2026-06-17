@@ -3,15 +3,15 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import type {
+  CollapsibleContentProps,
   CollapsibleProps,
   CollapsibleTriggerProps,
-  CollapsibleContentProps,
 } from "../../web/ui/collapsible";
 
 export type {
+  CollapsibleContentProps,
   CollapsibleProps,
   CollapsibleTriggerProps,
-  CollapsibleContentProps,
 } from "../../web/ui/collapsible";
 
 // CLI: always expanded - no interactivity in terminal

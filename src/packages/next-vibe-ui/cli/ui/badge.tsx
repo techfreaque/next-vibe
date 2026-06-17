@@ -5,8 +5,6 @@ import type { JSX } from "react";
 
 import type { BadgeProps } from "../../web/ui/badge";
 
-import { cva } from "class-variance-authority";
-
 export const badgeVariants = cva("");
 export const badgeTextVariants = cva("");
 export type { BadgeVariant } from "../../web/ui/badge";

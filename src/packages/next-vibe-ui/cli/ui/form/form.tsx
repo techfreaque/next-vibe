@@ -7,33 +7,33 @@ import { CliFocusManager } from "@/packages/next-vibe-ui/cli/lib/focus-manager";
 import { parseClassesToInkProps } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
 
 import type {
-  FormProps,
+  FormComboboxProps,
+  FormControlProps,
+  FormDatePickerProps,
+  FormDescriptionProps,
   FormFieldContextValue,
+  FormFieldProps,
   FormItemContextValue,
-  UseFormFieldReturn,
   FormItemProps,
   FormLabelProps,
-  FormControlProps,
-  FormDescriptionProps,
   FormMessageProps,
-  FormFieldProps,
-  FormComboboxProps,
-  FormDatePickerProps,
+  FormProps,
+  UseFormFieldReturn,
 } from "../../../web/ui/form/form";
 
 export type {
-  FormProps,
+  FormComboboxProps,
+  FormControlProps,
+  FormDatePickerProps,
+  FormDescriptionProps,
   FormFieldContextValue,
+  FormFieldProps,
   FormItemContextValue,
-  UseFormFieldReturn,
   FormItemProps,
   FormLabelProps,
-  FormControlProps,
-  FormDescriptionProps,
   FormMessageProps,
-  FormFieldProps,
-  FormComboboxProps,
-  FormDatePickerProps,
+  FormProps,
+  UseFormFieldReturn,
 } from "../../../web/ui/form/form";
 
 const COLON = "\u003A";

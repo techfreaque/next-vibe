@@ -4,6 +4,7 @@
  */
 
 import { parseError } from "next-vibe/shared/utils";
+import { hasChildren } from "next-vibe-ui/unified/_shared/type-guards";
 import type { z } from "zod";
 
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
@@ -12,7 +13,6 @@ import { isEmptySchema } from "../../../../shared/utils/validation";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { SchemaUIHandler } from "../../unified-ui/renderers/cli/response/schema-handler";
-import { hasChildren } from "../../unified-ui/widgets/_shared/type-guards";
 
 /**
  * CLI Input Parser - Static class for all input parsing and handling
@@ -715,8 +715,10 @@ export class CliInputParser {
           Object.keys(parsed.data as Record<string, WidgetData>).length > 0
         ) {
           inputData.urlPathParams = parsed.data as CliUrlParams;
-        } else {
-          // Fall back to interactive prompt when data doesn't satisfy the schema
+        } else if (interactive) {
+          // Fall back to interactive prompt when data doesn't satisfy the schema.
+          // Skip when interactive:false — the Ink UI will collect URL params via
+          // form fields / EntityPickerField instead of raw prompts.
           logger.info("🔗 URL Parameters:");
           const formData = await CliInputParser.generateFormFromEndpoint(
             endpoint,

@@ -47,7 +47,7 @@ export function useWidgetValue<TEndpoint extends CreateApiEndpointAny>():
 
 /**
  * Subscribe to a specific slice of the response data.
- * Re-renders ONLY when the selected slice changes.
+ * Re-renders when the selected slice changes (reference equality).
  * TSelected is inferred from the selector's return type - no second type param needed.
  *
  *   const total = useWidgetSelector<typeof definition.GET>()(d => d?.total ?? 0);
@@ -66,26 +66,23 @@ export function useWidgetSelector<TEndpoint extends CreateApiEndpointAny>(): <
 >(
   selector: (data: ResponseOutput<TEndpoint> | undefined) => TSelected,
 ) => TSelected {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const store = useWidgetContextStore<TEndpoint>();
+  const data = store(
+    (state: WidgetContextStore<TEndpoint, ReactWidgetContext<TEndpoint>>) =>
+      selectData(state),
+  );
   return function select<TSelected>(
     selector: (data: ResponseOutput<TEndpoint> | undefined) => TSelected,
   ): TSelected {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return store(
-      useShallow(
-        (state: WidgetContextStore<TEndpoint, ReactWidgetContext<TEndpoint>>) =>
-          selector(selectData(state)),
-      ),
-    );
+    return selector(data);
   };
 }
 
 /**
  * Subscribe to a single item inside a nested array in the response data.
- * Re-renders ONLY when that specific item changes - not when other items change.
+ * Re-renders when the full data changes.
  *
- * Use this to avoid prop-drilling re-render cascades in list renderers.
+ * Use this to avoid prop-drilling in list renderers.
  *
  *   const message = useWidgetItem<typeof definition.GET>()(
  *     (d) => d?.messages,   // pick the array from response
@@ -106,8 +103,11 @@ export function useWidgetItem<TEndpoint extends CreateApiEndpointAny>(): <
   keyFn: (item: TItem) => string | number,
   id: string | number,
 ) => TItem | undefined {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const store = useWidgetContextStore<TEndpoint>();
+  const data = store(
+    (state: WidgetContextStore<TEndpoint, ReactWidgetContext<TEndpoint>>) =>
+      selectData(state),
+  );
   return function selectItem<TItem>(
     arraySelector: (
       data: ResponseOutput<TEndpoint> | undefined,
@@ -115,19 +115,10 @@ export function useWidgetItem<TEndpoint extends CreateApiEndpointAny>(): <
     keyFn: (item: TItem) => string | number,
     id: string | number,
   ): TItem | undefined {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return store(
-      useShallow(
-        (
-          state: WidgetContextStore<TEndpoint, ReactWidgetContext<TEndpoint>>,
-        ) => {
-          const arr = arraySelector(selectData(state));
-          if (!arr) {
-            return undefined;
-          }
-          return arr.find((item) => keyFn(item) === id);
-        },
-      ),
-    );
+    const arr = arraySelector(data);
+    if (!arr) {
+      return undefined;
+    }
+    return arr.find((item) => keyFn(item) === id);
   };
 }

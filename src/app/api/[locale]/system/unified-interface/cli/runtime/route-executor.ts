@@ -194,6 +194,8 @@ export interface CliExecutionOptions {
   platform: CliCompatiblePlatform;
   dryRun: boolean | undefined;
   interactive: boolean | undefined;
+  /** Enable file-based IPC for AI agent control (frame capture + key injection) */
+  agentControl: boolean | undefined;
   verbose: boolean | undefined;
   output: "json" | "pretty" | undefined;
   /** Execution target: dev, local, or remote */
@@ -344,6 +346,7 @@ export class RouteDelegationHandler {
           user: cliUser,
           debug: options.verbose || false,
           initialData: inputData.data,
+          agentControl: options.agentControl || false,
         });
 
         // Ink handled all rendering - return empty output
@@ -403,20 +406,23 @@ export class RouteDelegationHandler {
         };
       }
 
-      // Remote execution: delegate to HTTP remote executor
+      // Remote execution: transport-aware dispatch
       if (
         options.cliTarget === CliTarget.REMOTE &&
         options.remoteUrl &&
         endpoint
       ) {
-        const { RemoteExecutor } = await import("./remote-executor");
-        const remoteResult = await RemoteExecutor.execute({
+        const remoteResult = await executeRemoteEndpoint({
           endpoint,
           data: inputData.data || {},
+          urlPathParams: inputData.urlPathParams,
           locale: options.locale,
           logger,
           remoteUrl: options.remoteUrl,
           userId: !cliUser.isPublic && cliUser.id ? cliUser.id : undefined,
+          user: cliUser,
+          signal: options.signal,
+          platform: options.platform,
         });
 
         const routeResult: RouteExecutionResult = {
@@ -478,28 +484,7 @@ export class RouteDelegationHandler {
           logger,
           platform: options.platform,
           preloadedHandler: routeHandler,
-          streamContext: {
-            rootFolderId: DefaultFolderId.BACKGROUND,
-            threadId: undefined,
-            aiMessageId: undefined,
-            skillId: undefined,
-            headless: undefined,
-            subAgentDepth: 0,
-            currentToolMessageId: undefined,
-            callerToolCallId: undefined,
-            pendingToolMessages: undefined,
-            pendingTimeoutMs: undefined,
-            leafMessageId: undefined,
-            waitingForRemoteResult: undefined,
-            favoriteId: undefined,
-            abortSignal: options.signal,
-            callerCallbackMode: undefined,
-            onEscalatedTaskCancel: undefined,
-            escalateToTask: undefined,
-
-            isRevival: undefined,
-            providerOverride: undefined,
-          },
+          streamContext: makeHeadlessContext(options.signal),
         });
 
       // 7. Convert ResponseType to RouteExecutionResult
@@ -573,5 +558,287 @@ export class RouteDelegationHandler {
         formattedOutput: "",
       };
     }
+  }
+}
+
+// ── Remote endpoint execution ──────────────────────────────────────────────────
+//
+// Login/logout use raw fetch to access Set-Cookie headers.
+// Everything else goes through RouteExecuteRepository.runInProcess with the instanceId
+// from the DB session, which handles direct-http and reverse-ws transports uniformly.
+
+const LOGIN_PATH = "user/public/login";
+const LOGOUT_PATH = "user/auth/logout";
+
+interface RemoteEndpointResponse {
+  success: boolean;
+  data?: Record<
+    string,
+    | string
+    | number
+    | boolean
+    | null
+    | Record<string, string | number | boolean | null>
+    | Record<string, string | number | boolean | null>[]
+  >;
+  message?: string;
+  errorType?: string;
+  messageParams?: Record<string, string>;
+}
+
+async function executeRemoteEndpoint(params: {
+  endpoint: CreateApiEndpointAny;
+  data: Record<string, WidgetData>;
+  urlPathParams?: Record<string, string | number | boolean | null | undefined>;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+  remoteUrl: string;
+  userId: string | undefined;
+  user: JwtPayloadType;
+  signal: AbortSignal;
+  platform: CliCompatiblePlatform;
+}): Promise<ResponseType<WidgetData>> {
+  const {
+    endpoint,
+    data,
+    urlPathParams,
+    locale,
+    logger,
+    remoteUrl,
+    userId,
+    user,
+    signal,
+    platform,
+  } = params;
+  const { scopedTranslation: cliT } = await import("../i18n");
+  const { t } = cliT.scopedT(locale);
+
+  const endpointPath = endpoint.path.join("/");
+  const isLoginEndpoint = endpointPath === LOGIN_PATH;
+  const isLogoutEndpoint = endpointPath === LOGOUT_PATH;
+
+  const { getRemoteSession } = await import("../auth/remote-session-cache");
+  const { buildRemoteUrl, buildRemoteHeaders } =
+    await import("@/app/api/[locale]/remote-connection/dispatch");
+  const { Methods } = await import("../../shared/types/enums");
+
+  // Resolve session from DB
+  let resolvedToken: string | null = null;
+  let resolvedLeadId: string | null = null;
+  let resolvedRemoteUrl = remoteUrl;
+  let resolvedInstanceId: string | null = null;
+
+  if (userId) {
+    const dbSession = await getRemoteSession(userId);
+    if (dbSession) {
+      resolvedToken = dbSession.token;
+      resolvedLeadId = dbSession.leadId;
+      resolvedRemoteUrl = dbSession.remoteUrl;
+      resolvedInstanceId = dbSession.instanceId;
+    }
+  }
+
+  if (!resolvedToken && !isLoginEndpoint) {
+    return fail({
+      message: t("vibe.errors.remoteNotLoggedIn"),
+      errorType: ErrorResponseTypes.UNAUTHORIZED,
+    });
+  }
+
+  // Login: bootstrap leadId from remote host if we don't have one
+  let leadId: string | null = resolvedLeadId;
+  if (isLoginEndpoint && !leadId) {
+    leadId = await bootstrapRemoteLeadId(resolvedRemoteUrl, logger);
+    if (!leadId) {
+      return fail({
+        message: t("vibe.errors.remoteNoLeadId"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  if (!leadId) {
+    return fail({
+      message: t("vibe.errors.remoteNoLeadId"),
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
+  }
+
+  const effectiveLeadId = leadId;
+  const token = resolvedToken ?? "";
+
+  // Non-login/logout: all tool calls go through the unified execute-tool repository.
+  // RouteExecuteRepository.runInProcess handles routing rule resolution, direct-http and
+  // reverse-ws transports, all callback modes, platform-based permission gating, and
+  // long-running task creation.
+  if (!isLoginEndpoint && !isLogoutEndpoint) {
+    if (userId && resolvedInstanceId) {
+      const { createEndpointLogger } =
+        await import("../../shared/logger/server-logger");
+      const transportLogger = createEndpointLogger(false, Date.now(), locale);
+      const { RouteExecuteRepository } =
+        await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+      return RouteExecuteRepository.runInProcessTyped({
+        definition: endpoint,
+        input: data,
+        urlPathParams,
+        instanceId: resolvedInstanceId,
+        callbackMode: "wait",
+        user,
+        locale,
+        logger: transportLogger,
+        streamContext: makeHeadlessContext(signal),
+        platform,
+      });
+    }
+    return fail({
+      message: t("vibe.errors.remoteNotLoggedIn"),
+      errorType: ErrorResponseTypes.UNAUTHORIZED,
+    });
+  }
+
+  // Login/logout: direct fetch to access raw Set-Cookie headers
+  const url = buildRemoteUrl(
+    resolvedRemoteUrl,
+    locale,
+    endpoint,
+    data as RemoteCallData,
+  );
+  const headers = buildRemoteHeaders(token, effectiveLeadId);
+
+  const response = await fetch(url, {
+    method: endpoint.method,
+    headers,
+    body: endpoint.method === Methods.GET ? undefined : JSON.stringify(data),
+    redirect: "manual",
+  });
+
+  if (isLoginEndpoint && response.ok && userId) {
+    await handleRemoteLoginResponse(
+      response,
+      resolvedRemoteUrl,
+      userId,
+      logger,
+    );
+  }
+
+  if (isLogoutEndpoint && response.ok && userId) {
+    const { db } = await import("@/app/api/[locale]/system/db");
+    const { remoteConnections } =
+      await import("@/app/api/[locale]/remote-connection/db");
+    const { eq, and } = await import("drizzle-orm");
+    await db
+      .delete(remoteConnections)
+      .where(
+        and(
+          eq(remoteConnections.userId, userId),
+          eq(remoteConnections.remoteUrl, resolvedRemoteUrl),
+        ),
+      );
+    logger.info(`[REMOTE] Logged out from ${resolvedRemoteUrl}`);
+  }
+
+  try {
+    return (await response.json()) as ResponseType<
+      RemoteEndpointResponse["data"]
+    >;
+  } catch {
+    return fail({
+      message: t("vibe.errors.remoteServerError"),
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
+  }
+}
+
+function parseSetCookie(
+  setCookieHeader: string,
+  name: string,
+): string | undefined {
+  const cookies = setCookieHeader.split(/,\s*(?=[^;]*=)/);
+  for (const cookie of cookies) {
+    const match = cookie.match(new RegExp(`${name}=([^;]*)`));
+    if (match?.[1]) {
+      return match[1];
+    }
+  }
+  return undefined;
+}
+
+async function bootstrapRemoteLeadId(
+  host: string,
+  logger: EndpointLogger,
+): Promise<string | null> {
+  try {
+    const response = await fetch(host, { method: "GET", redirect: "manual" });
+    const setCookie = response.headers.get("set-cookie");
+    if (setCookie) {
+      const leadId = parseSetCookie(setCookie, LEAD_ID_COOKIE_NAME);
+      if (leadId) {
+        return leadId;
+      }
+    }
+    const location = response.headers.get("location");
+    if (location) {
+      const redirectUrl = location.startsWith("http")
+        ? location
+        : `${host}${location}`;
+      const redirectResponse = await fetch(redirectUrl, {
+        method: "GET",
+        redirect: "manual",
+      });
+      const redirectCookie = redirectResponse.headers.get("set-cookie");
+      if (redirectCookie) {
+        const leadId = parseSetCookie(redirectCookie, LEAD_ID_COOKIE_NAME);
+        if (leadId) {
+          return leadId;
+        }
+      }
+    }
+    logger.warn("[REMOTE] Could not bootstrap leadId from remote host");
+    return null;
+  } catch (error) {
+    logger.error(`[REMOTE] Failed to bootstrap leadId: ${String(error)}`);
+    return null;
+  }
+}
+
+async function handleRemoteLoginResponse(
+  response: Response,
+  host: string,
+  userId: string,
+  logger: EndpointLogger,
+): Promise<void> {
+  const setCookie = response.headers.get("set-cookie");
+  if (!setCookie) {
+    logger.warn("[REMOTE] Login succeeded but no Set-Cookie header received");
+    return;
+  }
+
+  const token = parseSetCookie(setCookie, AUTH_TOKEN_COOKIE_NAME);
+  const leadId = parseSetCookie(setCookie, LEAD_ID_COOKIE_NAME);
+
+  if (!token) {
+    logger.error("[REMOTE] Login succeeded but no token in Set-Cookie");
+    return;
+  }
+  if (!leadId) {
+    logger.error("[REMOTE] Login succeeded but no leadId in Set-Cookie");
+    return;
+  }
+
+  const { RemoteConnectionRepository } =
+    await import("@/app/api/[locale]/remote-connection/repository");
+  const result = await RemoteConnectionRepository.upsertRemoteConnection({
+    userId,
+    remoteUrl: host,
+    token,
+    leadId,
+    logger,
+  });
+
+  if (result.success) {
+    logger.info(`[REMOTE] Logged in to ${host} (userId: ${userId})`);
+  } else {
+    logger.error("[REMOTE] Failed to store session in DB after login");
   }
 }

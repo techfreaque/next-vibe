@@ -7,12 +7,19 @@ import "server-only";
 
 import { and, count, eq, inArray, ne, or, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { z } from "zod";
 
+import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
+import { referralCodes } from "@/app/api/[locale]/referral/db";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -27,23 +34,15 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/search/in-memory-search";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { isAgentPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { users } from "@/app/api/[locale]/user/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { getBestChatModel } from "../../ai-stream/models";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
-
-import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
-import { referralCodes } from "@/app/api/[locale]/referral/db";
-import { users } from "@/app/api/[locale]/user/db";
-import { getBestChatModel } from "../../ai-stream/models";
 import { chatFavorites } from "../favorites/db";
 import {
   ensureUniqueSlug,
@@ -61,10 +60,10 @@ import type {
 } from "./[id]/definition";
 import skillIdDefinitions from "./[id]/definition";
 import {
-  type Skill,
-  type SkillVariant,
   DEFAULT_SKILLS,
   NO_SKILL,
+  type Skill,
+  type SkillVariant,
 } from "./config";
 import { NO_SKILL_ID } from "./constants";
 import type {
@@ -72,8 +71,8 @@ import type {
   SkillCreateResponseOutput,
 } from "./create/definition";
 import {
-  type SkillVariantData,
   customSkills,
+  type SkillVariantData,
   skillVariantSchema,
   skillVotes,
 } from "./db";
@@ -85,13 +84,14 @@ import type {
 } from "./definition";
 import skillsDefinitions from "./definition";
 import {
-  type SkillCategoryValue,
-  type SkillOwnershipTypeValue,
-  type SkillTrustLevelValue,
   CATEGORY_CONFIG,
   ModelSelectionType,
+  SkillCategory,
+  type SkillCategoryValue,
   SkillOwnershipType,
+  type SkillOwnershipTypeValue,
   SkillSourceFilter,
+  type SkillTrustLevelValue,
 } from "./enum";
 import type { SkillsT, SkillsTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
@@ -1255,16 +1255,25 @@ export class SkillsRepository {
           defaultSkillId: skillId,
         });
 
-        // Fall back to the default skill's icon if not provided
+        // Fall back to the default skill's values for any PATCH field omitted
+        // (PATCH is partial — when cloning a default skill, unset fields inherit
+        // from the default).
         const defaultSkillForIcon = DEFAULT_SKILLS.find(
           (c) => c.id === skillId,
         );
         const iconToUse = data.icon ?? defaultSkillForIcon?.icon ?? "sparkles";
+        const nameToUse = data.name ?? defaultSkillForIcon?.name ?? skillId;
+        const descriptionToUse =
+          data.description ?? defaultSkillForIcon?.description ?? "";
+        const taglineToUse = data.tagline ?? defaultSkillForIcon?.tagline ?? "";
+        const categoryToUse =
+          data.category ??
+          defaultSkillForIcon?.category ??
+          SkillCategory.ASSISTANT;
 
         // Generate slug for the new custom skill derived from a default skill
-        const derivedSlug = await SkillsRepository.generateUniqueSkillSlug(
-          data.name,
-        );
+        const derivedSlug =
+          await SkillsRepository.generateUniqueSkillSlug(nameToUse);
 
         // Variants are the source of truth for model selection
         const derivedVariants: SkillVariantData[] | null =
@@ -1277,12 +1286,12 @@ export class SkillsRepository {
           .values({
             userId,
             slug: derivedSlug,
-            name: data.name,
-            description: data.description,
-            tagline: data.tagline,
+            name: nameToUse,
+            description: descriptionToUse,
+            tagline: taglineToUse,
             icon: iconToUse,
             systemPrompt: data.systemPrompt,
-            category: data.category,
+            category: categoryToUse,
             // Sync top-level columns from default variant for backward compat
             voiceModelSelection: SkillsRepository.normalizeTtsSelection(
               derivedDefaultVariant?.voiceModelSelection ?? null,

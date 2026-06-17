@@ -5,9 +5,10 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { cn } from "next-vibe/shared/utils";
+import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import type { JSX } from "react";
 import React, { memo, useMemo } from "react";
 
@@ -20,7 +21,6 @@ import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models"
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 
 import { BRANCH_INDEX_KEY } from "../../hooks/use-branch-management";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";

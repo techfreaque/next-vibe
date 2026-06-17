@@ -10,8 +10,6 @@
 import type { BunPlugin } from "bun";
 import { z } from "zod";
 
-import type { PackageManifest } from "./repository/vibe-package/types";
-
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -28,9 +26,9 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { BUILDER_ALIAS } from "./constants";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { BUILDER_ALIAS } from "./constants";
 import {
   BuildProfileEnum,
   BuildProfileOptions,

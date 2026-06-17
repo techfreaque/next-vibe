@@ -22,9 +22,6 @@ import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-import { useState } from "react";
-
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetNavigation,
@@ -32,11 +29,11 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import type { JSX } from "react";
-import { useState } from "react";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import type { JSX } from "react";
+import { useState } from "react";
 
 import type definition from "./definition";
 

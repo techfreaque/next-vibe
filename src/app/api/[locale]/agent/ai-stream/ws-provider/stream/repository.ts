@@ -213,6 +213,7 @@ function buildDelegatedTools(
         logger.debug("[WsProvider] Delegating tool to local", {
           toolName: spec.name,
           callId,
+          aiToolCallId,
         });
 
         // 1. Register pending resolver before emitting - avoid race condition.
@@ -295,7 +296,6 @@ export class WsProviderStreamRepository {
     request?: NextRequest;
   }): Promise<ResponseType<WsProviderStreamPostResponseOutput>> {
     // Get AI stream translation function (needed for createAiStream and error messages)
-          aiToolCallId,
     const { scopedTranslation: aiStreamI18n } =
       await import("@/app/api/[locale]/agent/ai-stream/stream/i18n");
     const t: AiStreamT = aiStreamI18n.scopedT(locale).t;

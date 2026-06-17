@@ -2,21 +2,21 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
+import {
+  useWidgetLogger,
+  useWidgetUser,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 
 import favoritesEndpoint from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
 import {
-  scopedTranslation as chatScopedTranslation,
   type ChatT,
+  scopedTranslation as chatScopedTranslation,
 } from "@/app/api/[locale]/agent/chat/i18n";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import {
-  useWidgetLogger,
-  useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 const SelectorOnboarding = lazy(() =>

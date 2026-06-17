@@ -61,53 +61,47 @@ import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-
-  getChatModelById,
-  getChatModelById,
 import {
   type ChatModelId,
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
   type ChatModelSelection,
+  getChatModelById,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
-import favoritesEndpoint from "@/app/api/[locale]/agent/chat/favorites/definition";
-import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/chat/favorites/favorite-select-context";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import { getDefaultTimezone } from "@/i18n/core/localization-utils";
-
 import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
 import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
+import favoritesEndpoint from "@/app/api/[locale]/agent/chat/favorites/definition";
+import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/chat/favorites/favorite-select-context";
 import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/hooks";
 import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/chat/skills/config";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   SearchProvider,
   SearchProviderOptions,
 } from "@/app/api/[locale]/agent/search/enum";
 import { scopedTranslation as searchScopedTranslation } from "@/app/api/[locale]/agent/search/i18n";
-import {
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
+import taskExecuteEndpoints from "@/app/api/[locale]/system/unified-interface/tasks/execute/definition";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { getDefaultTimezone } from "@/i18n/core/localization-utils";
+
 import type definition from "./definition";
 import type { ChatSettingsUpdateRequestOutput } from "./definition";
-  generateRandomDreamerSchedule,
-  MAMA_DEFAULT_SCHEDULE,
 import { useChatSettings } from "./hooks";
 import { scopedTranslation } from "./i18n";
 import {
   AUTOPILOT_DEFAULT_SCHEDULE,
   DREAM_DEFAULT_SCHEDULE,
   generateRandomAutopilotSchedule,
+  generateRandomDreamerSchedule,
+  MAMA_DEFAULT_SCHEDULE,
 } from "./pulse/constants";
 
 const MIN_VALUE = 1_000;

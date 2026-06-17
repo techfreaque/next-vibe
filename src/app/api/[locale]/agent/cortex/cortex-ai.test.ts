@@ -34,14 +34,22 @@ installFetchCache();
 import { and, eq, like } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
-import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
+import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
+import {
+  runTestStream,
+  type SlimMessage,
+  toolResultRecord,
+} from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import {
   SkillCategory,
   SkillOwnershipType,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
@@ -50,18 +58,11 @@ import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
-import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
-import {
-  runTestStream,
-  toolResultRecord,
-  type SlimMessage,
-} from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
+import { defaultLocale } from "@/i18n/core/config";
 
 import { cortexNodes } from "./db";
+import { CortexNodeType } from "./enum";
 
 // ── Verdict helpers ──────────────────────────────────────────────────────────
 
@@ -1786,26 +1787,46 @@ describe("Cortex Mount: /searches and cortex-search", () => {
       "SR2: search must return at least 1 result",
     ).toBeGreaterThanOrEqual(1);
 
-    // quantum-flux should appear in the results - skip gracefully if vector similarity
-    // ranks other nodes higher (embedding vectors in test fixtures are approximate)
-    const allPaths = results.map((r) =>
-      String(
-        (r as Record<string, WidgetData>).resultPath ??
-          (r as Record<string, WidgetData>).path ??
-          "",
-      ),
-    );
-    if (!allPaths.some((p) => p.includes("quantum-flux"))) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `SR2: quantum-flux not in top results - skipping (got: ${allPaths.slice(0, 3).join(", ")})`,
-      );
-      return;
-    }
+    // "quantum-flux" is a unique token, so FTS (keyword) matches it
+    // deterministically regardless of vector ranking — it MUST appear.
+    const allPaths = results.map((r) => {
+      if (r !== null && typeof r === "object" && !Array.isArray(r)) {
+        const rp = "resultPath" in r ? r.resultPath : undefined;
+        const p = "path" in r ? r.path : undefined;
+        if (typeof rp === "string") {
+          return rp;
+        }
+        if (typeof p === "string") {
+          return p;
+        }
+      }
+      return "";
+    });
+    expect(
+      allPaths.some((p) => p.includes("quantum-flux")),
+      `SR2: quantum-flux must be in results (got: ${allPaths.slice(0, 5).join(", ")})`,
+    ).toBe(true);
 
-    const first = results[0] as Record<string, WidgetData>;
-    const score = typeof first.score === "number" ? first.score : 0;
-    expect(score, "SR2: first result score must be > 0").toBeGreaterThan(0);
+    const quantumResult = results.find(
+      (r) =>
+        r !== null &&
+        typeof r === "object" &&
+        !Array.isArray(r) &&
+        "resultPath" in r &&
+        typeof r.resultPath === "string" &&
+        r.resultPath.includes("quantum-flux"),
+    );
+    const score =
+      quantumResult !== null &&
+      typeof quantumResult === "object" &&
+      !Array.isArray(quantumResult) &&
+      "score" in quantumResult &&
+      typeof quantumResult.score === "number"
+        ? quantumResult.score
+        : 0;
+    expect(score, "SR2: quantum-flux result score must be > 0").toBeGreaterThan(
+      0,
+    );
 
     const aiMsg = lastAiMessage(messages);
     expect(aiMsg, "SR2: no AI response").toBeTruthy();
@@ -2249,29 +2270,53 @@ describe("Cortex System Prompt Injection", () => {
 
   beforeAll(async () => {
     const user = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+    expect(
+      user,
+      "SP setup: admin user must resolve (run vibe seed)",
+    ).toBeTruthy();
     if (!user) {
       return;
     }
     testUser = user;
     await ensureCredits(testUser);
 
-    // Ensure test memories exist - upsert so repeated runs are safe
-    const { upsertVirtualNode } = await import("./embeddings/sync-virtual");
-    await upsertVirtualNode(
-      user.id,
-      "/memories/identity/name.md",
-      TEST_MEMORY_CONTENT,
-    );
-    await upsertVirtualNode(
-      user.id,
-      "/memories/expertise/skills.md",
-      TEST_SKILLS_CONTENT,
-    );
-    await upsertVirtualNode(
-      user.id,
-      "/memories/expertise/background.md",
-      TEST_BACKGROUND_CONTENT,
-    );
+    // Write test memories AND synchronously embed them so vector relevance is
+    // guaranteed available — the whole point of SP4/SP5 is to prove relevance
+    // surfaces into the system prompt, so the data must be embedded, not skipped.
+    const { embedNodeNow } = await import("./embeddings/auto-embed");
+    const memories: Array<{ path: string; content: string }> = [
+      { path: "/memories/identity/name.md", content: TEST_MEMORY_CONTENT },
+      { path: "/memories/expertise/skills.md", content: TEST_SKILLS_CONTENT },
+      {
+        path: "/memories/expertise/background.md",
+        content: TEST_BACKGROUND_CONTENT,
+      },
+    ];
+    for (const { path, content } of memories) {
+      const size = Buffer.byteLength(content, "utf8");
+      const [row] = await db
+        .insert(cortexNodes)
+        .values({
+          userId: user.id,
+          path,
+          nodeType: CortexNodeType.FILE,
+          content,
+          size,
+        })
+        .onConflictDoUpdate({
+          target: [cortexNodes.userId, cortexNodes.path],
+          set: { content, size, isDeleted: false, updatedAt: new Date() },
+        })
+        .returning({ id: cortexNodes.id });
+      expect(row?.id, `SP setup: failed to upsert ${path}`).toBeTruthy();
+      if (row?.id) {
+        const embedded = await embedNodeNow(row.id, path, content);
+        expect(
+          embedded,
+          `SP setup: embedding for ${path} must be generated (OPENROUTER_API_KEY set?)`,
+        ).toBe(true);
+      }
+    }
   }, SP_TIMEOUT);
 
   // ── SP1: loadCortexData returns test-created memories ─────────────────────
@@ -2480,14 +2525,12 @@ describe("Cortex System Prompt Injection", () => {
           : [],
       );
 
-      if (allFileEntries.length === 0) {
-        // No embeddings available in this env - skip gracefully (same as SP5)
-        // eslint-disable-next-line no-console
-        console.warn(
-          "SP4: no relevant context returned (embeddings may be unavailable) - skipping",
-        );
-        return;
-      }
+      // The beforeAll embedded TypeScript/React expertise memories, so a query
+      // about TypeScript skills MUST surface relevant scored files. No skipping.
+      expect(
+        allFileEntries.length,
+        "SP4: vector search must return scored relevant files for the query",
+      ).toBeGreaterThan(0);
 
       // Scores must be in valid range
       for (const node of allFileEntries) {
@@ -2537,19 +2580,27 @@ describe("Cortex System Prompt Injection", () => {
         lastUserMessage: "TypeScript React expertise and technical skills",
       });
 
-      const allRelevant = data.tree.flatMap((e) =>
+      // A score badge renders only for NON-pinned scored files (pinned files
+      // suppress the score — see renderFileEntryLines). Count those, since they
+      // are exactly the entries that must produce a `[NN%]` badge.
+      const { renderCortexTree } = await import("./system-prompt/prompt");
+      const renderedTree = renderCortexTree(data);
+      const scoredRenderableFiles = data.tree.flatMap((e) =>
         e.kind === "dir"
-          ? e.children.filter((c) => c.kind === "file" && c.score !== undefined)
+          ? e.children.filter(
+              (c) =>
+                c.kind === "file" && c.score !== undefined && c.pinned !== true,
+            )
           : [],
       );
-      if (allRelevant.length === 0) {
-        // No embeddings available in this env - skip gracefully
-        // eslint-disable-next-line no-console
-        console.warn(
-          "SP5: no relevant context returned (embeddings may be unavailable) - skipping",
-        );
-        return;
-      }
+
+      // Embeddings MUST be present for the admin user in the dev DB (the suite
+      // materializes + backfills them). Assert relevance actually surfaced —
+      // do not silently skip.
+      expect(
+        scoredRenderableFiles.length,
+        "SP5: at least one non-pinned scored (relevant) file must surface — embeddings missing? run cortex-embed-backfill",
+      ).toBeGreaterThan(0);
 
       const prompt = cortexFragment.build(data);
       expect(prompt, "SP5: prompt must be non-null").toBeTruthy();
@@ -2557,11 +2608,16 @@ describe("Cortex System Prompt Injection", () => {
         return;
       }
 
-      // Relevant results are shown inline in their mount section with a score
-      // badge in the current `[NN%]` format (see renderCortexTree).
-      expect(prompt, "SP5: must show score % for relevant results").toMatch(
-        /\[\d+%\]/,
-      );
+      // Both the standalone tree render and the full fragment must show the
+      // relevant results inline with the current `[NN%]` score badge.
+      expect(
+        renderedTree,
+        "SP5: renderCortexTree must show a [NN%] score badge",
+      ).toMatch(/\[\d+%\]/);
+      expect(
+        prompt,
+        "SP5: cortexFragment must show a [NN%] score badge",
+      ).toMatch(/\[\d+%\]/);
     },
     SP_TIMEOUT,
   );

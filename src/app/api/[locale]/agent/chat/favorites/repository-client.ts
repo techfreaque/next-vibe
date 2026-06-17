@@ -23,15 +23,13 @@ import type { ChatModelSelection } from "../../ai-stream/models";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
 import type { VoiceModelSelection } from "../../text-to-speech/models";
-import { generateFavoriteSlug, generateSlug, parseSkillId } from "../slugify";
-
 import type { TtsModelId } from "../../text-to-speech/models";
 import { STORAGE_KEYS } from "../constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
-import { generateFavoriteSlug, generateSlug, parseSkillId } from "../slugify";
 import { ModelSelectionType } from "../skills/enum";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
+import { generateFavoriteSlug, generateSlug, parseSkillId } from "../slugify";
 import type {
   FavoriteGetResponseOutput,
   FavoriteUpdateRequestOutput,

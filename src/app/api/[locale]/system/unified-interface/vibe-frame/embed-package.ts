@@ -27,9 +27,8 @@ export { createFrameBridge, createParentBridge } from "./bridge";
  *   <script src="/vibe-frame/vibe-frame.js"></script>
  */
 export type { FrameBridge, ParentBridge } from "./bridge";
-export { VibeFrame, getConfig, subscribeConfig } from "./embed";
+export { getConfig, subscribeConfig, VibeFrame } from "./embed";
 export { setupTrigger } from "./triggers";
-export { DEFAULT_SANDBOX, generateFrameId } from "./types";
 export type {
   BridgeAction,
   BridgeActionMap,
@@ -56,3 +55,4 @@ export type {
   VibeFramePublicAPI,
   VibeFrameSharedOptions,
 } from "./types";
+export { DEFAULT_SANDBOX, generateFrameId } from "./types";

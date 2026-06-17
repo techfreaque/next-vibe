@@ -45,7 +45,6 @@ import { parseError } from "next-vibe/shared/utils";
 import { hasCustomDirective } from "@/app/api/[locale]/system/unified-interface/shared/utils/custom-directive";
 import { findFilesByName } from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-
 import { defaultLocale } from "@/i18n/core/config";
 
 import type { TanstackT } from "../i18n";
@@ -264,7 +263,7 @@ export class GenerateTanstackRoutesRepository {
     }
 
     // Emit a root index route that redirects / → /<defaultLocale>/
-    GenerateTanstackRoutesRepository.emitRootRedirect(defaultLocale, result);
+    GenerateTanstackRoutesRepository.emitRootRedirect(result);
 
     return result;
   }
@@ -276,21 +275,20 @@ export class GenerateTanstackRoutesRepository {
   /**
    * Emit a root index route that redirects / → /<defaultLocale>/
    */
-  private static emitRootRedirect(
-    locale: string,
-    result: GenerationResult,
-  ): void {
+  private static emitRootRedirect(result: GenerationResult): void {
     const outPath = join(
       GenerateTanstackRoutesRepository.ROUTES_DIR,
       "index.tsx",
     );
     const content = [
-      `// AUTO-GENERATED - redirects / to the default locale.`,
-      `import { createFileRoute, redirect } from "@tanstack/react-router";`,
+      `// AUTO-GENERATED - middleware handles locale redirect, this loader should never run.`,
+      `import { createFileRoute } from "@tanstack/react-router";`,
       ``,
       `export const Route = createFileRoute("/")({`,
-      `  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax`,
-      `  loader: () => { throw redirect({ to: "/${locale}/", replace: true }); },`,
+      `  loader: () => {`,
+      `    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax`,
+      `    throw new Error("This should never be called - middleware should have redirected");`,
+      `  },`,
       `  component: () => null,`,
       `});`,
       ``,

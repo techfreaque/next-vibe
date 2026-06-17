@@ -21,21 +21,13 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
-import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
-
-import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
-import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 import type { DefaultFolderId } from "../../../chat/config";
-import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
-
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { ChatMessage } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
+import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
 import type { ChatModelOption } from "../../models";
 import { createMetadataSystemMessage } from "../system-prompt/message-metadata";
+import { extractDocumentText, isDocumentMimeType } from "./document-extractor";
 
 export class MessageConverter {
   /**

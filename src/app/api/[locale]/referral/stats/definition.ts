@@ -21,8 +21,6 @@ import { UserRole } from "../../user/user-roles/enum";
 import { scopedTranslation } from "../i18n";
 import { REFERRAL_STATS_ALIAS } from "./constants";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const ReferralStatsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ReferralStatsContainer })),
 );

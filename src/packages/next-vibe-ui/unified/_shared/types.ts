@@ -2,25 +2,24 @@ import type { Path } from "react-hook-form";
 import type z from "zod";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
-
 import type { UseNavigationStackReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { InferResponseOutput } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { ServerDefaultContext } from "@/app/api/[locale]/system/unified-interface/shared/types/server-default";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   DisplayOnlyWidgetConfig,
   ObjectWidgetConfig,
   UnifiedField,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams } from "@/i18n/core/static-types";
 
 /**
  * Base widget renderer props (before value is added to field)

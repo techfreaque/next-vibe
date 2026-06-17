@@ -4,13 +4,12 @@ import "server-only";
  * Cortex Shared Repository
  * Path utilities and common operations for the virtual filesystem
  */
-
 import { and, eq, like, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { cortexNodes, type CortexNode } from "./db";
+import { type CortexNode, cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";
 import { scopedTranslation } from "./i18n";
 

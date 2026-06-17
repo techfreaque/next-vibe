@@ -7,6 +7,17 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
+import type {
+  ReactRequestResponseWidgetProps,
+  ReactStaticWidgetProps,
+  ReactWidgetPropsNoValue,
+} from "next-vibe-ui/unified/_shared/react-types";
+import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
+import { useWidgetForm } from "next-vibe-ui/unified/_shared/use-widget-context";
+import {
+  Icon,
+  type IconKey,
+} from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { type JSX, useMemo } from "react";
 
 import type {
@@ -20,17 +31,6 @@ import {
   getContainerSizeClassName,
   getIconSizeClassName,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
-import type {
-  ReactRequestResponseWidgetProps,
-  ReactStaticWidgetProps,
-  ReactWidgetPropsNoValue,
-} from "next-vibe-ui/unified/_shared/react-types";
-import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
-import { useWidgetForm } from "next-vibe-ui/unified/_shared/use-widget-context";
-import {
-  Icon,
-  type IconKey,
-} from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
 import type { IconWidgetConfig } from "./types";
 

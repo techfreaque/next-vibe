@@ -82,9 +82,9 @@ export const translations = {
       memories: "Memories",
       documents: "Documents",
       skills: "Skills",
-      tasks: "Tasks",
-      cortex: "Cortex files",
-      defaultNote: "All enabled by default. Adjust after connecting.",
+      favorites: "Favorites",
+      threads: "Threads",
+      defaultNote: "All disabled by default. Enable after connecting.",
     },
     advancedSettings: "Advanced Settings",
     credentialWarning:

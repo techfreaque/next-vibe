@@ -13,36 +13,37 @@
  * their IDs so the dialog can auto-focus the first item on open and keep
  * Tab/Shift+Tab cycling within the scope.
  */
-import { Box, Text, useFocus, useFocusManager, useInput, useStdin } from "ink";
 import process from "node:process";
+
+import { Box, Text, useFocus, useFocusManager, useInput, useStdin } from "ink";
 import * as React from "react";
 
 export type {
-  DialogRootProps,
-  DialogTriggerProps,
-  DialogPortalProps,
   DialogCloseProps,
+  DialogContentProps,
+  DialogDescriptionProps,
+  DialogFooterProps,
+  DialogHeaderProps,
   DialogOverlayProps,
-  DialogContentProps,
-  DialogHeaderProps,
-  DialogFooterProps,
-  DialogTitleProps,
-  DialogDescriptionProps,
-} from "../../web/ui/dialog";
-
-import type {
-  DialogRootProps,
-  DialogContentProps,
-  DialogHeaderProps,
-  DialogFooterProps,
-  DialogTitleProps,
-  DialogDescriptionProps,
-  DialogTriggerProps,
-  DialogCloseProps,
   DialogPortalProps,
+  DialogRootProps,
+  DialogTitleProps,
+  DialogTriggerProps,
 } from "../../web/ui/dialog";
 
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+
+import type {
+  DialogCloseProps,
+  DialogContentProps,
+  DialogDescriptionProps,
+  DialogFooterProps,
+  DialogHeaderProps,
+  DialogPortalProps,
+  DialogRootProps,
+  DialogTitleProps,
+  DialogTriggerProps,
+} from "../../web/ui/dialog";
 
 // ─── Overlay Lock ────────────────────────────────────────────────────────────
 // Module-level overlay counter with subscriber notification.

@@ -1,5 +1,5 @@
-import { Await, RouterProvider } from "@tanstack/react-router";
 import type { AnyRouter } from "@tanstack/react-router";
+import { Await, RouterProvider } from "@tanstack/react-router";
 import { hydrateStart } from "@tanstack/react-start/client";
 import { TSR_DEFERRED_PROMISE } from "@tanstack/router-core";
 import { StrictMode } from "react";

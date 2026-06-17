@@ -20,15 +20,12 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
-import { cn } from "next-vibe/shared/utils";
-
 import {
   useWidgetContext,
-import React from "react";
-import React from "react";
   useWidgetForm,
   useWidgetSelector,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React from "react";
 
 import { DefaultFolderId } from "../../config";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
@@ -64,6 +61,7 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
   const { locale } = useWidgetContext();
   const { t } = scopedTranslation.scopedT(locale);
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
+  const { pushState } = useSilentHistory();
 
   const handleClick = (): void => {
     setNavigation({
@@ -74,7 +72,7 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
     const url = item.folderId
       ? `/${locale}/threads/${DefaultFolderId.PUBLIC}/${item.folderId}/${item.id}`
       : `/${locale}/threads/${DefaultFolderId.PUBLIC}/${item.id}`;
-    window.history.pushState(null, "", url);
+    pushState(url);
   };
 
   const hoursSinceCreation =

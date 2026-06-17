@@ -12,8 +12,6 @@ import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3 } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -24,9 +22,9 @@ import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
 import { UrlFieldWidget } from "next-vibe-ui/unified/form-fields/url-field/widget";
-import type { JSX } from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
 
 import type definition from "./definition";
 

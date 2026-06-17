@@ -3,7 +3,8 @@ import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import * as React from "react";
 
 import { parseClassesToInkProps } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+
+import type { TitleProps } from "../../web/ui/title";
 
 export function Title({
   children,

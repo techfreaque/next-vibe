@@ -1,13 +1,12 @@
 /**
  * Remote Transport Routing — AI Stream E2E Tests
  *
- * Tests that routing rules correctly route AI streams to the remote instance,
+ * Tests that routing correctly routes AI streams to the remote instance,
  * and that thread mirroring works correctly across the bidirectional connection.
  *
- * Routing suites — each validates one routing path end-to-end:
- *   Suite 1 — isDefault = true        → fallback for unmatched requests
- *   Suite 2 — folderIds = ["cron"]    → folder-based routing (runTestStream uses "cron")
- *   Suite 3 — handlesModelProviders   → model-provider-based routing (UNBOTTLED)
+ * Routing: REMOTE root folder → deterministic per-instance subfolder routing.
+ * A thread under REMOTE/<instanceId>/... routes to that connection by folder ancestry.
+ * No DB routing rules (isDefault / handlesModelProviders) exist.
  *
  * Thread mirroring suite (TM1–TM2):
  *   TM1 — Stream from remote/hermes subfolder → thread appears locally in that folder
@@ -26,6 +25,7 @@ import "server-only";
 import { installFetchCache } from "../../agent/ai-stream/testing/fetch-cache";
 installFetchCache();
 
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -35,19 +35,18 @@ import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { and, eq, isNull, sql } from "drizzle-orm";
+
 import { DEFAULT_CHAT_MODEL_ID } from "../../agent/ai-stream/constants";
-import { describeStreamSuite } from "../../agent/ai-stream/stream/tests/route-base.test";
 import { setFetchCacheContext } from "../../agent/ai-stream/testing/fetch-cache";
 import { runTestStream } from "../../agent/ai-stream/testing/headless-test-runner";
 import {
   ATLAS_INSTANCE_ID,
-  HERMES_INSTANCE_ID,
   connectToHermes,
   disconnectFromHermes,
   ensureRemoteUserCredits,
   failSuitePrerequisites,
   getProdDb,
+  HERMES_INSTANCE_ID,
   isHermesInFixtureMode,
   resolveDevUser,
   resolveProdAdminToken,
@@ -74,163 +73,8 @@ if (!_remoteUrl) {
   );
 }
 
-// ── Shared teardown state ─────────────────────────────────────────────────────
-
-let _prodUserId: string | null = null;
-
-async function teardownRoutingConnection(
-  testUser: JwtPrivatePayloadType,
-): Promise<void> {
-  const tasks: Promise<void>[] = [disconnectFromHermes(testUser.id)];
-  if (_prodUserId) {
-    tasks.push(unregisterDevFromHermes(_prodUserId));
-  }
-  await Promise.all(tasks);
-  _prodUserId = null;
-}
-
-/**
- * Shared setup: connect to hermes, pull capabilities, top up credits on both sides.
- * Overwrites routingRules after connect so each suite exercises the right routing path.
- */
-async function setupRoutingConnection(
-  testUser: JwtPrivatePayloadType,
-  routingRules: {
-    folderIds: string[];
-    handlesModelProviders: string[];
-    isDefault: boolean;
-  },
-): Promise<void> {
-  await disconnectFromHermes(testUser.id);
-  await connectToHermes(testUser, _remoteUrl ?? "http://localhost:3002");
-  await triggerPull();
-
-  _prodUserId = await resolveProdUserId();
-  // Top up credits on the remote — non-fatal if the remote admin login fails
-  // (e.g. Vite dev server temporarily unresponsive after capability sync).
-  // In fixture mode the remote uses cached responses and rarely needs live credits.
-  try {
-    const remoteAdminToken = await resolveProdAdminToken(
-      _remoteUrl ?? "http://localhost:3002",
-    );
-    await ensureRemoteUserCredits(
-      _remoteUrl ?? "http://localhost:3002",
-      remoteAdminToken,
-      _prodUserId!,
-      20000,
-    );
-    await ensureRemoteUserCredits(
-      _remoteUrl ?? "http://localhost:3002",
-      remoteAdminToken,
-      testUser.id,
-      20000,
-    );
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      "[setupRoutingConnection] Remote credit top-up skipped:",
-      err instanceof Error ? err.message : String(err),
-    );
-  }
-
-  await db
-    .update(remoteConnections)
-    .set({ routingRules, updatedAt: new Date() })
-    .where(
-      and(
-        eq(remoteConnections.userId, testUser.id),
-        eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-      ),
-    );
-}
-
-// ── Suite 1 — isDefault routing ───────────────────────────────────────────────
-
-async function setupIsDefaultRouting(
-  testUser: JwtPrivatePayloadType,
-): Promise<void> {
-  await setupRoutingConnection(testUser, {
-    folderIds: [],
-    handlesModelProviders: [],
-    isDefault: true,
-  });
-}
-
-// ── Suite 2 — folderId routing ────────────────────────────────────────────────
-
-async function setupFolderIdRouting(
-  testUser: JwtPrivatePayloadType,
-): Promise<void> {
-  // "cron" is DefaultFolderId.BACKGROUND — the folder runTestStream uses by default
-  await setupRoutingConnection(testUser, {
-    folderIds: ["cron"],
-    handlesModelProviders: [],
-    isDefault: false,
-  });
-}
-
-// ── Suite 3 — modelProvider routing ───────────────────────────────────────────
-
-async function setupModelProviderRouting(
-  testUser: JwtPrivatePayloadType,
-): Promise<void> {
-  await setupRoutingConnection(testUser, {
-    folderIds: [],
-    handlesModelProviders: ["UNBOTTLED"],
-    isDefault: false,
-  });
-}
-
-// ── Suite registration — routing suites ───────────────────────────────────────
-
-if (_remoteUrl && _isFixtureMode) {
-  describeStreamSuite({
-    label: `Remote Transport — isDefault routing (${_remoteUrl}, transportMode='direct-http')`,
-    cachePrefix: "transport-default-",
-    // No remoteInstanceId: the AI runs on the remote instance directly,
-    // so tool calls are local to the remote (no execute-tool wrapper needed).
-    // depends on the remote AI model which may not report usage.
-    // the wait-for-task revival runs on the remote in a separate stream whose
-    // backfilled tool result is not visible to the local relay processor.
-    // in relay mode the AI runs remotely and the confirmation never arrives.
-    // attachments are only stored on the remote side.
-    // specific cachePrefix — no transport-* fixtures exist; live API calls would
-    // hit real providers (modelslab, etc.) and are non-deterministic.
-    // assertSystemPromptFromLocal: the AI loop runs on the remote but the system prompt
-    // is built on the local client — T-SYS asserts the AI identifies as the local instance.
-    assertSystemPromptFromLocal: true,
-    setup: setupIsDefaultRouting,
-    teardown: teardownRoutingConnection,
-  });
-
-  describeStreamSuite({
-    label: `Remote Transport — folderId routing (folderIds=['cron'], ${_remoteUrl})`,
-    cachePrefix: "transport-folder-",
-    assertSystemPromptFromLocal: true,
-    setup: setupFolderIdRouting,
-    teardown: teardownRoutingConnection,
-  });
-
-  // Suite 3: handlesModelProviders routing — no-match fallback path.
-  //
-  // The routing rule is set to handlesModelProviders=['UNBOTTLED']. The test
-  // model's apiProvider is NOT 'UNBOTTLED', so the rule does NOT fire and
-  // resolveTarget returns null (run locally). This validates:
-  //   - Setting up handlesModelProviders rules works without errors.
-  //   - When no rule matches, the stream runs locally (correct fallback).
-  //   - The remote routing table update does not corrupt subsequent local streams.
-  //
-  // To test that handlesModelProviders routing FIRES, a model with
-  // apiProvider='UNBOTTLED' would need to be in the fixture cache. That
-  // requires a dedicated fixture recording run — covered separately in
-  // transport.test.ts unit tests (resolveTarget with modelProvider argument).
-  describeStreamSuite({
-    label: `Remote Transport — modelProvider no-match fallback (handlesModelProviders=['UNBOTTLED'], ${_remoteUrl})`,
-    cachePrefix: "transport-model-",
-    setup: setupModelProviderRouting,
-    teardown: teardownRoutingConnection,
-  });
-}
+// REMOTE root folder routing is tested in route.remote-chat-root.test.ts
+// (deterministic — folder ancestry, no DB routing setting needed).
 
 // ── Thread mirroring suite ────────────────────────────────────────────────────
 //
@@ -312,8 +156,8 @@ if (_remoteUrl && _isFixtureMode) {
         setTimeout(resolve, 30000);
       });
 
-      // connect() → Step 6b: creates remote/hermes subfolder on atlas + adds folderId
-      //             to routingRules so streams from that folder route to hermes.
+      // connect() + register(): creates remote/hermes subfolder on atlas and
+      // remote/atlas subfolder on hermes. REMOTE-folder routing is deterministic.
       // register() on hermes side: creates remote/atlas subfolder on hermes.
       await connectToHermes(testUser, _remoteUrl!);
       await triggerPull();

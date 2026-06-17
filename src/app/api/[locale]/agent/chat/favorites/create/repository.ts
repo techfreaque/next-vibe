@@ -14,18 +14,20 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { DEFAULT_SKILLS } from "../../skills/config";
+import { SkillsRepository } from "../../skills/repository";
 import {
   ensureUniqueSlug,
   formatSkillId,
@@ -33,9 +35,9 @@ import {
   parseSkillId,
 } from "../../slugify";
 import { chatFavorites } from "../db";
+import favoritesDefinitions from "../definition";
 import { ChatFavoritesRepositoryClient } from "../repository-client";
 import type {
-import favoritesDefinitions from "../definition";
   FavoriteCreateRequestOutput,
   FavoriteCreateResponseOutput,
 } from "./definition";
@@ -177,9 +179,27 @@ export class FavoritesCreateRepository {
       );
       let musicGenModelSelectionToStore = data.musicGenModelSelection ?? null;
       let videoGenModelSelectionToStore = data.videoGenModelSelection ?? null;
-      // If a variantId is provided (from merged skillId), resolve model selections from the variant.
-      // Explicit fields from the request override variant defaults.
-      let modelSelectionToStore = data.modelSelection;
+      // A favorite of a skill is a thin pointer: its PRIMARY chat model resolves
+      // through the skill→variant cascade at read time (resolveFavorite). So a
+      // chat selection that merely echoes the skill's (resolved) variant is
+      // nulled here — the favorite stays a pointer and never freezes a stale
+      // model. A genuinely-overriding selection is kept as provided.
+      let modelSelectionToStore = data.modelSelection ?? null;
+      if (modelSelectionToStore && character) {
+        const skillVariant =
+          (effectiveVariantId
+            ? character.variants.find((v) => v.id === effectiveVariantId)
+            : undefined) ??
+          character.variants.find((v) => v.isDefault) ??
+          character.variants[0];
+        if (
+          skillVariant?.modelSelection &&
+          JSON.stringify(modelSelectionToStore) ===
+            JSON.stringify(skillVariant.modelSelection)
+        ) {
+          modelSelectionToStore = null;
+        }
+      }
       if (effectiveVariantId && resolvedSkillId) {
         const skillResult = await SkillsRepository.getSkillById(
           { id: resolvedSkillId },
@@ -192,9 +212,6 @@ export class FavoritesCreateRepository {
             (v) => v.id === effectiveVariantId,
           );
           if (variant) {
-            if (!modelSelectionToStore) {
-              modelSelectionToStore = variant.modelSelection ?? null;
-            }
             // Seed per-modality selections from variant if not explicitly provided
             if (!voiceToStore && variant.voiceModelSelection) {
               voiceToStore = normalizeTtsSelection(variant.voiceModelSelection);

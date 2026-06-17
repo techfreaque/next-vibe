@@ -64,30 +64,14 @@ import { SkillOwnershipType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import creditsDef from "@/app/api/[locale]/credits/definition";
 import configDef from "@/app/api/[locale]/lead-magnet/config/definition";
 import referralDef from "@/app/api/[locale]/referral/definition";
-import {
-  useWidgetForm,
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetNavigation,
-  useWidgetOnSubmit,
-  useWidgetTranslation,
-  useWidgetUser,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { ColorFieldWidget } from "next-vibe-ui/unified/form-fields/color-field/widget";
-import { FileFieldWidget } from "next-vibe-ui/unified/form-fields/file-field/widget";
-import { MarkdownTextareaFieldWidget } from "next-vibe-ui/unified/form-fields/markdown-textarea-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
-import { UrlFieldWidget } from "next-vibe-ui/unified/form-fields/url-field/widget";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import passwordDef from "@/app/api/[locale]/user/private/me/password/definition";
-import sessionsDef from "@/app/api/[locale]/user/private/sessions/definition";
-import { envClient } from "@/config/env-client";
-
 import subscriptionDef from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import logoutDef from "@/app/api/[locale]/user/private/logout/definition";
 import addressesDef from "@/app/api/[locale]/user/private/me/addresses/definition";
+import passwordDef from "@/app/api/[locale]/user/private/me/password/definition";
+import sessionsDef from "@/app/api/[locale]/user/private/sessions/definition";
+import { envClient } from "@/config/env-client";
+
 import { apiClient } from "../../../system/unified-interface/react/hooks/store";
 import { useApiQuery } from "../../../system/unified-interface/react/hooks/use-api-query";
 import { scopedTranslation as userRoleScopedTranslation } from "../../user-roles/i18n";

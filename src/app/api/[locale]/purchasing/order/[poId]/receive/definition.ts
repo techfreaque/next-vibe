@@ -24,9 +24,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
-import orderListDefinitions from "@/app/api/[locale]/purchasing/order/list/definition";
 import { scopedTranslation } from "../../../i18n";
 
 const OrderReceiveWidgetLazy = lazyWidget(() =>

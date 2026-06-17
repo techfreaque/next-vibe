@@ -16,13 +16,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-
 import {
   formatCount,
   formatDuration,
   formatGenerator,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+
 import { stripProjectRoot } from "../shared/utils";
 import type { GeneratorsEnvT } from "./i18n";
 import type { EnvValidationErrorType } from "./validator";
@@ -487,7 +487,7 @@ import "server-only";
 import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
-import type { EnvExample } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
+import type { EnvExample, EnvRecord } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -502,7 +502,7 @@ const platform = {
 };
 
 // Module registry for introspection
-export const envModules: Record<string, { env: Record<string, unknown>; schema: z.ZodObject<Record<string, z.ZodTypeAny>>; examples: EnvExample[] }> = {
+export const envModules: Record<string, { env: EnvRecord; schema: z.ZodObject<Record<string, z.ZodTypeAny>>; examples: EnvExample[] }> = {
 ${moduleEntries}
 };
 

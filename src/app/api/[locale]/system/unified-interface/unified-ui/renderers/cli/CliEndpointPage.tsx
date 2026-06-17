@@ -7,6 +7,16 @@
  */
 
 import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
+import { resolve } from "node:path";
+import { PassThrough } from "node:stream";
+
+import {
   Box,
   render,
   Text,
@@ -18,26 +28,16 @@ import {
 import type { JSX, ReactNode } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  unlinkSync,
-  writeFileSync,
-} from "node:fs";
-import { resolve } from "node:path";
-import { PassThrough } from "node:stream";
-
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { LoggerProvider } from "@/hooks/logger-provider";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { scopedTranslation as cliScopedTranslation } from "../../../cli/i18n";
-import { Platform } from "../../../shared/types/platform";
 import { QueryProvider } from "../../../react/hooks/query-provider";
-import { LoggerProvider } from "@/hooks/logger-provider";
+import { Platform } from "../../../shared/types/platform";
 import { EndpointsPage } from "../react/EndpointsPage";
 
 // ─── Error Boundary ──────────────────────────────────────────────────────────

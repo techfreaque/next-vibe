@@ -5,13 +5,14 @@
  * This file must NOT import from widgets/configs.ts
  */
 
+import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
+import type { AnyChildrenConstrain } from "next-vibe-ui/unified/_shared/types";
+import type { z } from "zod";
+
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { z } from "zod";
-import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/cli-types";
-import type { AnyChildrenConstrain } from "next-vibe-ui/unified/_shared/types";
-import type { CreateApiEndpoint } from "../endpoints/definition/create";
 import type { EndpointEventsMap } from "../../websocket/structured-events";
+import type { CreateApiEndpoint } from "../endpoints/definition/create";
 import type { UnifiedField } from "./endpoint";
 import type { Methods } from "./enums";
 

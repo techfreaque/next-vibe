@@ -13,14 +13,6 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-import { useEffect, useMemo, useState } from "react";
-
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import {
   useWidgetDisabled,
   useWidgetLocale,
@@ -28,6 +20,14 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
 import type definition from "./definition";
 

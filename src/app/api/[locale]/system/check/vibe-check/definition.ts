@@ -22,11 +22,8 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-
-
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { envClient } from "@/config/env-client";
+
 import { Environment } from "../../../shared/utils";
 import { UserRole } from "../../../user/user-roles/enum";
 import { VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT } from "./constants";

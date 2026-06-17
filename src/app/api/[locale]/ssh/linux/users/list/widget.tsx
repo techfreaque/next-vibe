@@ -18,15 +18,13 @@ import {
   TableRow,
 } from "next-vibe-ui/ui/table";
 import { P } from "next-vibe-ui/ui/typography";
-import React, { useCallback } from "react";
-
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
-import React, { useCallback } from "react";
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, { useCallback } from "react";
 
 import type endpoints from "./definition";
 

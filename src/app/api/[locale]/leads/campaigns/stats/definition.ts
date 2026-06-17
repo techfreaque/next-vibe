@@ -3,6 +3,7 @@
  * GET endpoint for email campaign performance statistics
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -26,13 +27,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import {
   EmailJourneyVariantFilter,
   EmailJourneyVariantFilterOptions,
 } from "../../enum";
-import { scopedTranslation } from "./i18n";
 import { CAMPAIGN_STATS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 const CampaignStatsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CampaignStatsWidget })),
 );

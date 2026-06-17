@@ -9,16 +9,16 @@ import { FilePlus } from "next-vibe-ui/ui/icons/FilePlus";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
-import { type JSX } from "react";
-
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { type JSX } from "react";
 
 import { InvoiceStatus } from "@/app/api/[locale]/payment/enum";
+
 import type definition from "./definition";
 import type { PaymentDashboardResponseOutput } from "./definition";
 

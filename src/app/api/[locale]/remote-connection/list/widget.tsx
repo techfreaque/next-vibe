@@ -32,10 +32,6 @@ import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-import { useState } from "react";
-
-import { GITHUB_REPO_URL } from "@/config/constants";
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
@@ -43,6 +39,11 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useState } from "react";
+
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { GITHUB_REPO_URL } from "@/config/constants";
 import { envClient } from "@/config/env-client";
 
 import type endpoints from "./definition";
@@ -479,6 +480,15 @@ function SyncSettingsCard({
   const [isToggling, setIsToggling] = useState(false);
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
+  isAdmin,
   const logger = useWidgetLogger();
   isAdmin,
   isAdmin,
@@ -574,6 +584,7 @@ function LocalView({
   t,
   onPick,
   isPickerMode,
+  isAdmin,
 }: {
   connections: RemoteConnection[];
   selfInstanceId: string | null;

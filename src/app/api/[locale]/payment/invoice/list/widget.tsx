@@ -4,13 +4,11 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
-import { FolderX } from "next-vibe-ui/ui/icons/FolderX";
 import { FilePlus } from "next-vibe-ui/ui/icons/FilePlus";
+import { FolderX } from "next-vibe-ui/ui/icons/FolderX";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetLocale,
@@ -18,7 +16,10 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+
 import { InvoiceStatus } from "@/app/api/[locale]/payment/enum";
+
 import type definition from "./definition";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

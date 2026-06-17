@@ -17,12 +17,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { ConnectionHealthSchema } from "@/app/api/[locale]/remote-connection/db";
-
-import { scopedTranslation } from "./i18n";
-import { scopedTranslation } from "./i18n";
 import { SshAuthType, SshAuthTypeDB } from "../../enum";
 import { SSH_CONNECTIONS_LIST_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const ConnectionTypeSchema = z.enum(["local", "ssh", "remote"]);
 const AuthTypeWithRemoteDB = [...SshAuthTypeDB, "remote"] as const;

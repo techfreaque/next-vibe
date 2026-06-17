@@ -3,8 +3,10 @@
  * Defines endpoint for creating new favorites
  */
 
+import { lazy } from "react";
 import { z } from "zod";
 
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
@@ -35,8 +37,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
-import { lazy } from "react";
 import { iconSchema } from "../../../../shared/types/common.schema";
 import type {
   FiltersModelSelection,
@@ -45,7 +45,6 @@ import type {
 import { IntelligenceLevel, ModelSelectionType } from "../../skills/enum";
 import { parseSkillId } from "../../slugify";
 import { FAVORITE_CREATE_ALIAS } from "../constants";
-
 import { scopedTranslation } from "./i18n";
 
 const FavoriteCreateContainer = lazy(() =>

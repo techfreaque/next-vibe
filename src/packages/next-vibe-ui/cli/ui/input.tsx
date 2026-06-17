@@ -1,21 +1,22 @@
-import TextInput from "ink-text-input";
 import { Text } from "ink";
+import TextInput from "ink-text-input";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { useCliFieldFocus } from "@/packages/next-vibe-ui/cli/lib/focus-manager";
+
 import type { InputProps } from "../../web/ui/input";
 
 export type {
-  InputProps,
+  InferValueType,
   InputChangeEvent,
+  InputEventTarget,
   InputFocusEvent,
+  InputGenericTarget,
   InputKeyboardEvent,
   InputMouseEvent,
+  InputProps,
   InputRefObject,
-  InputEventTarget,
-  InputGenericTarget,
-  InferValueType,
 } from "../../web/ui/input";
 
 const BRACKET_OPEN = "\u005B";

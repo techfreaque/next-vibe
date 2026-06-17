@@ -17,8 +17,6 @@ import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unifi
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation } from "@/app/[locale]/cortex/i18n";
-
 interface CortexModalContentProps {
   locale: CountryLanguage;
   user: JwtPayloadType;

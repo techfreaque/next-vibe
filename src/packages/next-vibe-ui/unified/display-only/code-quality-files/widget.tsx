@@ -7,17 +7,17 @@
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3 } from "next-vibe-ui/ui/typography";
-import type { ReactElement } from "react";
-import type { z } from "zod";
-
-import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactRequestResponseWidgetProps } from "next-vibe-ui/unified/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
 import {
   useWidgetForm,
   useWidgetLocale,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { ReactElement } from "react";
+import type { z } from "zod";
+
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import type {
   CodeQualityFilesSchema,

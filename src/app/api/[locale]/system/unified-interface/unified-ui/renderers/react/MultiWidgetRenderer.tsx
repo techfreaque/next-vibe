@@ -1,16 +1,6 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import type { JSX } from "react";
-import { useMemo } from "react";
-import type { Path } from "react-hook-form";
-import { useWatch } from "react-hook-form";
-import type z from "zod";
-
-import type { InferResponseOutput } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-
 import { withValueNonStrict } from "next-vibe-ui/unified/_shared/field-helpers";
 import type {
   AnyChildrenConstrain,
@@ -25,6 +15,16 @@ import {
   useWidgetResponseOnly,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useMemo } from "react";
+import type { Path } from "react-hook-form";
+import { useWatch } from "react-hook-form";
+import type z from "zod";
+
+import type { InferResponseOutput } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 import {
   ChildrenDataRenderer,
   type ProcessedChildren,

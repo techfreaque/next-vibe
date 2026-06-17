@@ -19,6 +19,9 @@ import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/wid
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
+import { useTranslation } from "@/i18n/core/client";
+
+import { CortexNav } from "../_shared/cortex-nav";
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
 

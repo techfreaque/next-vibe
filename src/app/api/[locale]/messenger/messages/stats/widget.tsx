@@ -21,10 +21,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
-import React, { useCallback } from "react";
-
-import { cn, objectEntries } from "@/app/api/[locale]/shared/utils";
-import { isValidEnumValue } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import { Span } from "next-vibe-ui/ui/span";
+import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -34,6 +33,10 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, { useCallback } from "react";
+
+import { cn, objectEntries } from "@/app/api/[locale]/shared/utils";
+import { isValidEnumValue } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
 import type {
   MessageSortFieldValue,

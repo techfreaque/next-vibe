@@ -5,11 +5,6 @@
  * These utilities were moved from individual definition files for better organization.
  */
 
-import { z } from "zod";
-
-import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,
@@ -26,6 +21,11 @@ import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons"
 import type { NavigateButtonWidgetConfig } from "next-vibe-ui/unified/interactive/navigate-button/types";
 import type { SearchBarWidgetConfig } from "next-vibe-ui/unified/interactive/search-bar/types";
 import type { SubmitButtonWidgetConfig } from "next-vibe-ui/unified/interactive/submit-button/types";
+import { z } from "zod";
+
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+
 import type { EndpointLogger } from "../logger/endpoint";
 import type { InferSchemaFromField, UnifiedField } from "../types/endpoint";
 import type { CreateApiEndpointAny } from "../types/endpoint-base";

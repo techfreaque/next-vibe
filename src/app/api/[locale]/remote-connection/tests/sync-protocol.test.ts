@@ -27,20 +27,15 @@
 
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
+
+import { and, eq, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
 import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
 import type { SyncScope } from "@/app/api/[locale]/remote-connection/db";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
-
 import {
   applySyncPayloads,
   buildSyncPayloads,
@@ -48,6 +43,11 @@ import {
   registerSyncProvider,
   type SyncProvider,
 } from "@/app/api/[locale]/remote-connection/sync-provider";
+import { db } from "@/app/api/[locale]/system/db";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
 import {
   closeProdDb,
@@ -87,7 +87,8 @@ async function pollUntil<T>(
     }
     await sleep(200);
   }
-  expect.fail(`[pollUntil] ${label}: timed out after ${timeoutMs}ms`);
+  // oxlint-disable-next-line restricted-syntax
+  throw new Error(`[pollUntil] ${label}: timed out after ${timeoutMs}ms`);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -101,63 +102,122 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
     await ensureProvidersRegistered();
   });
 
-  it("SP6a: hash match → zero payloads returned", async () => {
+  it("SP6a: cursor advancement — documents return 0 items after cursor is current", async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
-    expect(resolved, "SP6a: admin user not found — run: vibe dev").toBeTruthy();
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
 
-    // Compute current hashes, then send them back as "incoming" — should be identical → no payloads
-    const { computeSyncHashes } =
-      await import("@/app/api/[locale]/remote-connection/sync-provider");
-    const { perProvider: currentHashes } = await computeSyncHashes(resolved.id);
+    // Write a unique document so the first full scan always finds ≥1 item
+    const syncId = randomUUID();
+    const path = `/documents/sp6a-${syncId}.md`;
+    const content = "SP6a cursor test";
+    await db.insert(cortexNodes).values({
+      userId: resolved.id,
+      path,
+      content,
+      size: content.length,
+      nodeType: CortexNodeType.FILE,
+      syncId,
+      frontmatter: {},
+      tags: [],
+    });
 
-    const { syncPayloads } = await buildSyncPayloads(
-      currentHashes,
-      resolved.id,
-      logger,
-    );
+    try {
+      // First call: no cursor → full sync; returns ourCursors at current high-water mark
+      const { syncPayloads: firstPayloads, syncCounts: firstCounts, ourCursors } = await buildSyncPayloads(
+        {},
+        resolved.id,
+        logger,
+      );
+      expect(Object.keys(firstPayloads).length, "SP6a: at least one provider expected").toBeGreaterThan(0);
+      expect(firstCounts.documents ?? 0, "SP6a: documents must have ≥1 item on first full scan").toBeGreaterThan(0);
 
-    expect(
-      Object.keys(syncPayloads).length,
-      "SP6a: no payloads when hashes match",
-    ).toBe(0);
+      // Second call: pass ourCursors — no new records written between calls
+      // documents must return 0 items (nothing newer than the cursor)
+      const { syncCounts: secondCounts } = await buildSyncPayloads(
+        ourCursors,
+        resolved.id,
+        logger,
+      );
+      expect(
+        secondCounts.documents ?? 0,
+        "SP6a: documents must return 0 items when cursor is current",
+      ).toBe(0);
+    } finally {
+      await db
+        .delete(cortexNodes)
+        .where(and(eq(cortexNodes.userId, resolved.id), eq(cortexNodes.path, path)));
+    }
   }, 30_000);
 
-  it("SP6b: one provider differs → only that provider serialized", async () => {
+  it("SP6b: stale cursor for one provider → only that provider has new records", async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
 
-    const { computeSyncHashes } =
-      await import("@/app/api/[locale]/remote-connection/sync-provider");
-    const { perProvider: currentHashes } = await computeSyncHashes(resolved.id);
+    // First call: get current cursors (up-to-date)
+    const { ourCursors } = await buildSyncPayloads({}, resolved.id, logger);
 
-    // Corrupt only the "documents" hash
-    const incomingHashes = { ...currentHashes, documents: "stale-hash-12345" };
+    // Write a new document AFTER capturing the cursor
+    const syncId = randomUUID();
+    const path = `/documents/sp6b-${syncId}.md`;
+    const content = "SP6b cursor test";
+    await db.insert(cortexNodes).values({
+      userId: resolved.id,
+      path,
+      content,
+      size: content.length,
+      nodeType: CortexNodeType.FILE,
+      syncId,
+      frontmatter: {},
+      tags: [],
+    });
 
-    const { syncPayloads } = await buildSyncPayloads(
-      incomingHashes,
-      resolved.id,
-      logger,
-    );
+    try {
+      // Second call: use the cursor from before the write for "documents",
+      // current cursor for everything else → only documents should return records
+      const staleDocCursor = ourCursors.documents;
+      const cursorsWithStaleDoc = staleDocCursor
+        ? { ...ourCursors }
+        : ourCursors;
+      // Remove documents cursor to force a full-scan of documents
+      const { documents: _removed, ...cursorsWithoutDoc } = cursorsWithStaleDoc;
+      void _removed;
 
-    expect(
-      "documents" in syncPayloads,
-      "SP6b: documents must be in payloads (hash differed)",
-    ).toBe(true);
-    expect(
-      "skills" in syncPayloads,
-      "SP6b: skills must NOT be in payloads (hash matched)",
-    ).toBe(false);
+      const { syncPayloads, syncCounts } = await buildSyncPayloads(
+        cursorsWithoutDoc,
+        resolved.id,
+        logger,
+      );
+
+      // documents must appear (cursor absent → full scan includes our new doc)
+      expect(
+        "documents" in syncPayloads,
+        "SP6b: documents must be in payloads (cursor absent)",
+      ).toBe(true);
+      expect(
+        syncCounts.documents ?? 0,
+        "SP6b: documents payload must include the newly written node",
+      ).toBeGreaterThanOrEqual(1);
+    } finally {
+      // Cleanup
+      await db
+        .delete(cortexNodes)
+        .where(
+          and(eq(cortexNodes.userId, resolved.id), eq(cortexNodes.path, path)),
+        );
+    }
   }, 30_000);
 
   it("SP6c: all providers differ → all serialized", async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
 
     // Send empty hashes → all providers will differ
@@ -176,7 +236,8 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   it("SP7a: applySyncPayloads routes to correct provider by key", async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
 
     // Apply an empty skills payload — should not throw, returns 0 synced
@@ -192,7 +253,8 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   it("SP7b: unregistered key in applySyncPayloads → no throw, key absent from results", async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
 
     const results = await applySyncPayloads(
@@ -210,7 +272,8 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   it("SP8a: conflict resolution — incoming updatedAt > local → overwrite", async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
 
     const syncId = randomUUID();
@@ -240,7 +303,7 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
         syncId,
         path,
         content: newerContent,
-        nodeType: "file",
+        nodeType: CortexNodeType.FILE,
         frontmatter: {},
         tags: [],
         size: newerContent.length,
@@ -277,7 +340,8 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   it("SP8b: conflict resolution — incoming updatedAt < local → keep local", async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
 
     const syncId = randomUUID();
@@ -307,7 +371,7 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
         syncId,
         path,
         content: staleContent,
-        nodeType: "file",
+        nodeType: CortexNodeType.FILE,
         frontmatter: {},
         tags: [],
         size: staleContent.length,
@@ -344,7 +408,8 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   it("SP8c: conflict resolution — same updatedAt → remote wins (>=)", async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
 
     const syncId = randomUUID();
@@ -372,7 +437,7 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
         syncId,
         path,
         content: remoteContent,
-        nodeType: "file",
+        nodeType: CortexNodeType.FILE,
         frontmatter: {},
         tags: [],
         size: remoteContent.length,
@@ -412,11 +477,12 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
 
     const testProvider: SyncProvider = {
       key: testKey,
-      async getHashEntries() {
-        return [];
+      labelI18nKey: "test.label",
+      async getCursor() {
+        return { updatedAt: new Date(0).toISOString() };
       },
-      async serializeToJson() {
-        return "[]";
+      async serializeFromCursor() {
+        return { json: "[]", cursor: { updatedAt: new Date(0).toISOString() } };
       },
       async upsertFromJson() {
         upsertCalled = true;
@@ -428,7 +494,8 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
 
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
 
     await applySyncPayloads({ [testKey]: "[]" }, resolved.id, logger);
@@ -481,17 +548,20 @@ if (_remoteUrl) {
       await closeProdDb();
     });
 
-    // ── SP1: after pull, remoteSyncHashes written to DB ───────────────────────
+    // ── SP1: after pull, lastSyncedAt + syncCursors written to DB ────────────────
 
     it(
-      "SP1: after pull, remoteSyncHashes written to remoteConnections row",
+      "SP1: after pull, lastSyncedAt is set and syncCursors is populated",
       async () => {
-        // triggerPull in beforeAll already fired — check DB for remoteSyncHashes
+        // triggerPull in beforeAll already fired — check DB for lastSyncedAt and syncCursors
         const row = await pollUntil(
-          "SP1: remoteSyncHashes must be written after pull",
+          "SP1: lastSyncedAt must be set after pull",
           async () => {
             const [r] = await db
-              .select({ remoteSyncHashes: remoteConnections.remoteSyncHashes })
+              .select({
+                lastSyncedAt: remoteConnections.lastSyncedAt,
+                syncCursors: remoteConnections.syncCursors,
+              })
               .from(remoteConnections)
               .where(
                 and(
@@ -500,20 +570,15 @@ if (_remoteUrl) {
                 ),
               )
               .limit(1);
-            const hashes = r?.remoteSyncHashes as Record<string, string> | null;
-            return hashes && Object.keys(hashes).length > 0 ? r : false;
+            return r?.lastSyncedAt ? r : false;
           },
         );
 
-        const hashes = row.remoteSyncHashes as Record<string, string>;
-        expect(
-          typeof hashes.documents,
-          "SP1: remoteSyncHashes must include documents key",
-        ).toBe("string");
-        expect(
-          typeof hashes.skills,
-          "SP1: remoteSyncHashes must include skills key",
-        ).toBe("string");
+        expect(row.lastSyncedAt, "SP1: lastSyncedAt must be set after pull").toBeTruthy();
+        // syncCursors may be null if no providers returned data, but the pull itself must have completed
+        if (row.syncCursors) {
+          expect(typeof row.syncCursors, "SP1: syncCursors must be an object if set").toBe("object");
+        }
       },
       SP_TIMEOUT,
     );
@@ -682,11 +747,11 @@ if (_remoteUrl) {
           .update(remoteConnections)
           .set({
             syncScope: {
-              cortex: true,
               documents: true,
               skills: false,
               threads: true,
               memories: true,
+              favorites: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -735,11 +800,11 @@ if (_remoteUrl) {
           .update(remoteConnections)
           .set({
             syncScope: {
-              cortex: true,
               documents: true,
               skills: true,
               threads: true,
               memories: true,
+              favorites: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })

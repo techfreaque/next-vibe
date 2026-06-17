@@ -4,7 +4,7 @@ import type { JSX } from "react";
 
 import type { CountryData, PhoneFieldProps } from "../../web/ui/phone-field";
 
-export type { PhoneFieldProps, CountryData } from "../../web/ui/phone-field";
+export type { CountryData, PhoneFieldProps } from "../../web/ui/phone-field";
 // COUNTRIES is a large data array only needed for web phone input UI
 export const COUNTRIES: CountryData[] = [];
 

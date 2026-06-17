@@ -8,11 +8,9 @@ import "./reconciler-polyfill";
 
 import { Chalk } from "chalk";
 import cliBoxes from "cli-boxes";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { BoxProps, StaticProps, TextProps } from "ink";
 import { Box, Static, Text } from "ink";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import React, {
   type JSXElementConstructor,
   type ReactElement,
@@ -23,6 +21,8 @@ import {
   DefaultEventPriority,
   LegacyRoot,
 } from "react-reconciler/constants.js";
+
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 // NoEventPriority is available at runtime but not in type definitions
 const NoEventPriority = 0;

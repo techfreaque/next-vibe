@@ -49,42 +49,43 @@ globalThis.AI_SDK_LOG_WARNINGS = false;
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
+import { and, eq, like, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
-import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { contacts } from "@/app/api/[locale]/contact/db";
-import { ContactSubject } from "@/app/api/[locale]/contact/enum";
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { defaultLocale } from "@/i18n/core/config";
-import { and, eq, like, sql } from "drizzle-orm";
-
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 import {
   ContentLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import {
   ImageGenModelId,
   type ImageGenModelSelection,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import { contacts } from "@/app/api/[locale]/contact/db";
+import { ContactSubject } from "@/app/api/[locale]/contact/enum";
+import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import { db } from "@/app/api/[locale]/system/db";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
+
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import {
   ChatModelId,
-  chatModelOptionsIndex,
   type ChatModelOption,
+  chatModelOptionsIndex,
 } from "../../models";
 import { runHeadlessAiStream } from "../../repository/headless";
 import {
@@ -98,9 +99,9 @@ import {
   getOrCreateFolder,
   resolveUser,
   runTestStream,
+  type SlimMessage,
   toolResultRecord,
   waitForThreadIdle,
-  type SlimMessage,
 } from "../../testing/headless-test-runner";
 import { scopedTranslation } from "../i18n";
 

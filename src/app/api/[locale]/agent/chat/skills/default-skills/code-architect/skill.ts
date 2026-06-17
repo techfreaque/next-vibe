@@ -6,9 +6,9 @@ import { REBUILD_ALIAS } from "@/app/api/[locale]/system/server/rebuild/constant
 import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import { WAIT_FOR_TASK_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { envClient } from "@/config/env-client";
+
+import { AI_RUN_ALIAS } from "../../../../ai-stream/run/constants";
 import {
   CORTEX_EDIT_ALIAS,
   CORTEX_READ_ALIAS,

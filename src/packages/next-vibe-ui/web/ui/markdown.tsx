@@ -12,8 +12,8 @@ import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "../i18n";
 
+import { uiScopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 
 // Constants for non-translatable values

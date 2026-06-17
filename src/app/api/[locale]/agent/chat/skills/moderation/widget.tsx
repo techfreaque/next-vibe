@@ -12,16 +12,15 @@ import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { EyeOff } from "next-vibe-ui/ui/icons/EyeOff";
 import { Span } from "next-vibe-ui/ui/span";
-import { useState, type JSX } from "react";
-
+import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
-import { type JSX, useState } from "react";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { type JSX, useState } from "react";
 
 import type definition from "./definition";
 

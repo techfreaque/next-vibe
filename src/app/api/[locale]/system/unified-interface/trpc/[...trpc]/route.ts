@@ -1,3 +1,4 @@
+// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- tRPC adapter uses raw Response handlers, cannot use endpointsHandler
 /**
  * tRPC API Route Handler
  * Handles all tRPC requests with locale support
@@ -5,9 +6,9 @@
  */
 
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
-import type { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";

@@ -1,6 +1,5 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string -- code examples are not user-facing text */
 import type { Metadata } from "next";
-import { GITHUB_REPO_URL } from "@/config/constants";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
@@ -14,6 +13,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { GITHUB_REPO_URL } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 

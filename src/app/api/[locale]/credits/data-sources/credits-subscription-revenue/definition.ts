@@ -3,6 +3,8 @@
  * Client+server safe. No server imports.
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -20,8 +22,6 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CREDITS_SUBSCRIPTION_REVENUE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 const CreditsSubscriptionRevenueWidget = lazyWidget(() =>
   import("./widget").then((m) => ({
     default: m.CreditsSubscriptionRevenueWidget,

@@ -33,8 +33,6 @@ import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 import { dateSchema } from "../../../shared/types/common.schema";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const UserDeleteContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UserDeleteContainer })),
 );

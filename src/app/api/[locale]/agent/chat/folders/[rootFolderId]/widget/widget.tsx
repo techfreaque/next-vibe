@@ -6,6 +6,8 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Dialog,
@@ -28,7 +30,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
-import { cn } from "next-vibe/shared/utils";
+import {
+  useWidgetContext,
+  useWidgetValue,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -41,15 +47,10 @@ import {
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
-import cortexSearchDefinitions from "@/app/api/[locale]/agent/cortex/search/definition";
 import folderContentsDefinition from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
+import cortexSearchDefinitions from "@/app/api/[locale]/agent/cortex/search/definition";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import {
-  useWidgetContext,
-  useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { useChatBootContext } from "../../../hooks/context";
@@ -295,6 +296,7 @@ export function FoldersListContainer(): React.JSX.Element {
   const activeFolderId = useChatNavigationStore((s) => s.currentSubFolderId);
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
+  const { pushState } = useSilentHistory();
 
   // --- Cortex vector search for threads ---
   const searchEndpoint = useEndpoint(
@@ -419,7 +421,7 @@ export function FoldersListContainer(): React.JSX.Element {
     const url = needsNewThread
       ? `${rootFolderUrl}/${NEW_MESSAGE_ID}`
       : rootFolderUrl;
-    window.history.pushState(null, "", url);
+    pushState(url);
   };
 
   const handleCreateThread = (): void => {
@@ -428,11 +430,7 @@ export function FoldersListContainer(): React.JSX.Element {
       currentRootFolderId: activeRootFolderId,
       currentSubFolderId: null,
     });
-    window.history.pushState(
-      null,
-      "",
-      `/${locale}/threads/${activeRootFolderId}/${NEW_MESSAGE_ID}`,
-    );
+    pushState(`/${locale}/threads/${activeRootFolderId}/${NEW_MESSAGE_ID}`);
   };
 
   const isOnNewThreadPage =

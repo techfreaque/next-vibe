@@ -13,18 +13,6 @@ import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-import { useEffect, useMemo, useState } from "react";
-
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import {
-  useEndpoint,
-  type UseEndpointOptions,
-} from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { endpoints as cronTaskEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -37,6 +25,18 @@ import {
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import {
+  useEndpoint,
+  type UseEndpointOptions,
+} from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import { endpoints as cronTaskEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
 import { CronTaskStatus } from "../enum";
 import type endpoints from "./definition";

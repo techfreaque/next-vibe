@@ -4,8 +4,6 @@ import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Span } from "next-vibe-ui/ui/span";
-import { type JSX } from "react";
-
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -13,6 +11,7 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { type JSX } from "react";
 
 import type definition from "./definition";
 

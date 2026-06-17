@@ -1,5 +1,6 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
+import { Button } from "next-vibe-ui/ui/button";
 import { Details } from "next-vibe-ui/ui/details";
 import { Div } from "next-vibe-ui/ui/div";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
@@ -8,8 +9,6 @@ import { Summary } from "next-vibe-ui/ui/summary";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
-
-import { Button } from "next-vibe-ui/ui/button";
 
 export function AdvancedPreview(): JSX.Element {
   const [showMotion, setShowMotion] = useState(true);

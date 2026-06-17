@@ -16,12 +16,12 @@ import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
-import { useCallback, useState } from "react";
-
 import {
   useWidgetSelector,
   useWidgetTranslation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { useCallback, useState } from "react";
+
 import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { REFERRAL_CONFIG } from "../../config";

@@ -19,9 +19,6 @@ import { TrendingDown } from "next-vibe-ui/ui/icons/TrendingDown";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useMemo } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -30,6 +27,9 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import React, { useCallback, useMemo } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 
 import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import type statsEndpoints from "./definition";

@@ -1,16 +1,16 @@
 /**
  * Remote Connection — Folder Creation Assertions
  *
- * Validates that connect() and register() create the expected subfolders and
- * routing rules on BOTH sides of the bidirectional connection:
+ * Validates that connect() and register() create the expected subfolders on
+ * BOTH sides of the bidirectional connection:
  *
  *   connect() on atlas (local side):
  *     → creates chatFolders(name=HERMES_INSTANCE_ID, rootFolderId=REMOTE) in local DB
- *     → sets remoteConnections.routingRules.folderIds to contain that folder UUID
+ *     → REMOTE-folder routing is deterministic (no DB routing rule written)
  *
  *   register() on hermes (remote side, called by connect() via HTTP):
  *     → creates chatFolders(name=ATLAS_INSTANCE_ID, rootFolderId=REMOTE) in prod DB
- *     → sets remoteConnections.routingRules.folderIds to contain that folder UUID
+ *     → REMOTE-folder routing is deterministic (no DB routing rule written)
  *
  * These are pure DB assertions — no AI streams are run here.
  * The folder assertions are the prerequisite for TM1/TM2 in route.transport.test.ts.
@@ -20,12 +20,11 @@
 
 import "server-only";
 
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { defaultLocale } from "@/i18n/core/config";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
-import type { RoutingRules } from "@/app/api/[locale]/remote-connection/db";
 import {
   instanceIdentities,
   remoteConnections,
@@ -33,15 +32,15 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { defaultLocale } from "@/i18n/core/config";
 
 import {
   ATLAS_INSTANCE_ID,
-  HERMES_INSTANCE_ID,
   connectToHermes,
   disconnectFromHermes,
   failSuitePrerequisites,
   getProdDb,
+  HERMES_INSTANCE_ID,
   resolveDevUser,
   resolveProdUserId,
   resolveRemoteUrl,
@@ -134,9 +133,9 @@ if (_remoteUrl) {
       expect(folder.name).toBe(HERMES_INSTANCE_ID);
     });
 
-    // ── CF2: local side — routing rule references the subfolder ──────────
+    // ── CF2: local side — REMOTE-folder routing resolves deterministically ────
 
-    it("CF2: connect() sets routingRules.folderIds on local remoteConnections to include the subfolder UUID", async () => {
+    it("CF2: a thread in REMOTE/hermes resolves to the hermes connection without any DB routing rule", async () => {
       const [folder] = await db
         .select({ id: chatFolders.id })
         .from(chatFolders)
@@ -161,31 +160,9 @@ if (_remoteUrl) {
         );
       }
 
-      const [conn] = await db
-        .select({ routingRules: remoteConnections.routingRules })
-        .from(remoteConnections)
-        .where(
-          and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-          ),
-        )
-        .limit(1);
-
-      expect(
-        conn,
-        `CF2: remoteConnections row for instanceId=${HERMES_INSTANCE_ID} missing after connect()`,
-      ).toBeDefined();
-
-      // REMOTE-folder threads route natively by folder ancestry — connect()
-      // must NOT write the folder into routingRules.
-      const rules = conn?.routingRules as RoutingRules | null | undefined;
-      expect(
-        rules?.folderIds?.includes(folder.id) ?? false,
-        "CF2: routingRules.folderIds must NOT contain the instance folder — REMOTE-folder routing is native",
-      ).toBe(false);
-
-      // The folder (and any nested subfolder) must resolve to the connection.
+      // Routing for threads in REMOTE/<instanceId> is purely deterministic —
+      // transport.ts step 2 traverses folder ancestors back to the REMOTE root
+      // and matches the top-level name to a connection's instanceId.
       const { RemoteTransport } =
         await import("@/app/api/[locale]/remote-connection/transport");
       const { createEndpointLogger } =
@@ -199,7 +176,7 @@ if (_remoteUrl) {
       });
       expect(
         target?.instanceId,
-        `CF2: a thread in REMOTE/${HERMES_INSTANCE_ID} must resolve to the ${HERMES_INSTANCE_ID} connection natively`,
+        `CF2: a thread in REMOTE/${HERMES_INSTANCE_ID} must resolve to the ${HERMES_INSTANCE_ID} connection via folder ancestry — no DB routing rule needed`,
       ).toBe(HERMES_INSTANCE_ID);
     });
 
@@ -224,33 +201,16 @@ if (_remoteUrl) {
       expect(rows.rows[0]?.name).toBe(ATLAS_INSTANCE_ID);
     });
 
-    // ── CF4: remote side — routing rule references the subfolder ─────────
+    // ── CF4: remote side — connection row uses flat columns, no routing_rules ──
 
-    it("CF4: register() sets routingRules.folderIds on prod remoteConnections to include the subfolder UUID", async () => {
+    it("CF4: prod remoteConnections row exists for this instance — routing is deterministic via REMOTE folder ancestry", async () => {
       const pdb = getProdDb();
 
-      const folderRows = await pdb.execute<{ id: string }>(
-        sql`SELECT id FROM chat_folders
-                WHERE user_id = ${prodUserId}
-                  AND root_folder_id = ${DefaultFolderId.REMOTE}
-                  AND name = ${ATLAS_INSTANCE_ID}
-                  AND parent_id IS NULL
-                LIMIT 1`,
-      );
-
-      expect(
-        folderRows.rows[0],
-        "CF4: prerequisite — prod subfolder must exist (CF3 must pass first)",
-      ).toBeDefined();
-      if (!folderRows.rows[0]) {
-        return;
-      }
-      const remoteFolderId = folderRows.rows[0].id;
-
       const connRows = await pdb.execute<{
-        routing_rules: RoutingRules | string;
+        instance_id: string;
+        transport_mode: string;
       }>(
-        sql`SELECT routing_rules FROM remote_connections
+        sql`SELECT instance_id, transport_mode FROM remote_connections
                 WHERE user_id = ${prodUserId}
                   AND instance_id = ${ATLAS_INSTANCE_ID}
                 LIMIT 1`,
@@ -258,27 +218,8 @@ if (_remoteUrl) {
 
       expect(
         connRows.rows[0],
-        `CF4: remoteConnections row for instanceId=${ATLAS_INSTANCE_ID} missing in prod DB after connect()`,
+        `CF4: remoteConnections row for instanceId=${ATLAS_INSTANCE_ID} missing in prod DB after connect() — routing via REMOTE folder ancestry requires the row to exist`,
       ).toBeDefined();
-      if (!connRows.rows[0]) {
-        return;
-      }
-
-      const rawRules = connRows.rows[0].routing_rules;
-      const rules: RoutingRules =
-        typeof rawRules === "string"
-          ? (JSON.parse(rawRules) as RoutingRules)
-          : rawRules;
-
-      expect(
-        rules?.folderIds,
-        "CF4: prod routingRules.folderIds must be an array",
-      ).toBeInstanceOf(Array);
-      expect(
-        rules?.folderIds?.includes(remoteFolderId),
-        `CF4: prod routingRules.folderIds must contain subfolder UUID ${remoteFolderId}. ` +
-          `register/repository.ts must call addFolderToRoutingRules() after creating the subfolder.`,
-      ).toBe(true);
     });
 
     // ── CF5: local remoteInstanceId is our own identity ─────────────────

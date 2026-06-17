@@ -43,8 +43,7 @@ import {
 } from "../enum";
 import { MessageChannel, MessageChannelDB } from "../enum";
 import { MESSENGER_ACCOUNTS_ALIAS } from "./constants";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { scopedTranslation } from "./i18n";
 
 const MessengerAccountsListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({

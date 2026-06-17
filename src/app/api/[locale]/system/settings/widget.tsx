@@ -29,11 +29,6 @@ import {
 } from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import { Switch } from "next-vibe-ui/ui/switch";
-import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -42,6 +37,11 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
 import { ServerFramework } from "../server/enum";
 import type endpoints from "./definition";

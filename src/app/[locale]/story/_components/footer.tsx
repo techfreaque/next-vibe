@@ -24,11 +24,8 @@ import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation } from "./i18n";
-import { scopedTranslation } from "./i18n";
-import { scopedTranslation } from "./i18n";
-
 import { Logo } from "../../_components/logo";
+import { scopedTranslation } from "./i18n";
 
 interface FooterProps {
   locale: CountryLanguage;

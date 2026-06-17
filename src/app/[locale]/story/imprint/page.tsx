@@ -17,11 +17,8 @@ import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
-import { scopedTranslation } from "./i18n";
-import { scopedTranslation } from "./i18n";
-import { scopedTranslation } from "./i18n";
-
 import { ImprintClientInteraction } from "./_components/imprint-client-content";
+import { scopedTranslation } from "./i18n";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;

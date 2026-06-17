@@ -9,11 +9,8 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import type { NowpaymentsCliT } from "./i18n";
-import type { NowpaymentsCliT } from "./i18n";
-import type { NowpaymentsCliT } from "./i18n";
-
 import type { RequestSchema, ResponseSchema } from "./definition";
+import type { NowpaymentsCliT } from "./i18n";
 
 interface NgrokTunnel {
   proto: string;

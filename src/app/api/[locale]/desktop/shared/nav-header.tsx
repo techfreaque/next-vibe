@@ -4,13 +4,11 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetLocale,
-import type { JSX, ReactNode } from "react";
-import type { JSX, ReactNode } from "react";
   useWidgetNavigation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX, ReactNode } from "react";
 
 /**
  * Shared navigation header for desktop widgets.

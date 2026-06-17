@@ -11,15 +11,15 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewUser } from "./db";
 import { UserDetailLevel } from "./enum";
-import userProfileEndpoints from "./private/me/definition";
-import type { UserRepositoryType } from "./repository";
+import userProfileEndpoints, {
+  type MeGetResponseOutput,
+} from "./private/me/definition";
 import type {
   ExtendedUserDetailLevel,
   ExtendedUserType,
   StandardUserType,
   UserFetchOptions,
   UserSearchOptions,
-  UserType,
 } from "./types";
 import type { UserRoleValue } from "./user-roles/enum";
 
@@ -31,7 +31,6 @@ export class UserRepository {
     count: number;
     timestamp: number;
   } | null = null;
-  // eslint-disable-next-line @typescript-eslint/class-literal-property-style
   private static readonly CACHE_DURATION_MS = 0;
 
   static async getUserById<
@@ -66,36 +65,15 @@ export class UserRepository {
     throw new Error("getUserByEmail is not implemented on native");
   }
 
-  static async getUserByAuth<
-    T extends typeof UserDetailLevel.MINIMAL | ExtendedUserDetailLevel =
-      typeof UserDetailLevel.MINIMAL,
-  >(
+  static async getUserByAuth(
     // oxlint-disable-next-line no-unused-vars
-    _options: Omit<UserFetchOptions, "detailLevel"> & { detailLevel?: T },
+    _options: Omit<UserFetchOptions, "detailLevel"> & {
+      detailLevel?: ExtendedUserDetailLevel;
+    },
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UserType<T>>> {
-    const response = await nativeEndpoint(
-      userProfileEndpoints.GET,
-      {},
-      logger,
-      locale,
-    );
-
-    if (response.success) {
-      return {
-        success: true,
-        data: response.data,
-        message: response.message,
-      };
-    }
-
-    return {
-      success: false,
-      errorType: response.errorType,
-      message: response.message,
-      messageParams: response.messageParams,
-    };
+  ): Promise<ResponseType<MeGetResponseOutput>> {
+    return nativeEndpoint(userProfileEndpoints.GET, {}, logger, locale);
   }
 
   static async exists(
@@ -242,7 +220,3 @@ export class UserRepository {
     throw new Error("getUserPublicName is not implemented on native");
   }
 }
-
-// Compile-time type check
-const _typeCheck: UserRepositoryType = UserRepository;
-void _typeCheck;

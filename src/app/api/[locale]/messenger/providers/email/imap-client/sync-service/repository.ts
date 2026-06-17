@@ -36,8 +36,6 @@ import { MessengerAccountStatus } from "../../../../accounts/enum";
 import { MessageChannel } from "../../../../accounts/enum";
 import type { SpecialFolderTypeValue } from "../../../../messages/enum";
 import { MessageType, SpecialFolderType } from "../../../../messages/enum";
-
-import { MessageChannel } from "../../../../accounts/enum";
 import { ImapConnectionRepository } from "../connection/repository";
 import type { ImapAccountShape } from "../db";
 import { toImapShape } from "../db";

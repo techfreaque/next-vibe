@@ -35,14 +35,6 @@ import { configScopedTranslation } from "@/config/i18n";
 import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import {
-  ChatModelId,
-  FEATURED_MODELS,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
-import type { ModelCountsByContentLevel } from "@/app/api/[locale]/agent/models/all-models";
-import { configScopedTranslation } from "@/config/i18n";
-
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
 

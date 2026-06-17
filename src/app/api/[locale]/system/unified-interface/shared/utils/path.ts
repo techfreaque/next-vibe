@@ -4,6 +4,7 @@
  */
 
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
+import type { Methods } from "../types/enums";
 
 /**
  * Lazy-loaded alias map. The generated file may not exist during bootstrap
@@ -100,6 +101,24 @@ export function getPreferredToolName(endpoint: CreateApiEndpointAny): string {
     return endpoint.aliases[0];
   }
   return endpointToToolName(endpoint);
+}
+
+/**
+ * Get the URL path segment(s) for an endpoint in the /tools/ browser.
+ * Uses the first alias (single flat segment) if available.
+ * Otherwise uses path segments + METHOD joined with "/" so the URL is
+ * unambiguous without guessing (e.g. "leads/lead/[id]/GET").
+ * Always use this instead of building the string manually.
+ */
+export function endpointToUrlSegment(endpoint: {
+  aliases?: readonly string[] | null;
+  path: readonly string[];
+  method: Methods;
+}): string {
+  if (endpoint.aliases?.[0]) {
+    return endpoint.aliases[0];
+  }
+  return [...endpoint.path, endpoint.method].join("/");
 }
 
 /**

@@ -3,6 +3,8 @@ import type { JSX } from "react";
 
 import { parseClassesToTextProps } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
 
+import type { TdProps } from "../../web/ui/td";
+
 export type { TdProps } from "../../web/ui/td";
 
 export function Td({

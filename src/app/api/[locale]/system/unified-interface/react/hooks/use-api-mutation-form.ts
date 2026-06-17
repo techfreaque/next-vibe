@@ -15,13 +15,13 @@ import { storage } from "next-vibe-ui/lib/storage";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm, type UseFormProps } from "react-hook-form";
 
-import { containsFile } from "./api-utils-shared";
 import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
+import { containsFile } from "./api-utils-shared";
 import { scopedTranslation as hooksTranslation } from "./i18n";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import { useApiStore } from "./store";
@@ -303,119 +303,130 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   );
 
   // Create a submit handler that validates and submits the form
-  const submitForm = ((
-    submitOptions: TEndpoint["types"]["UrlVariablesOutput"] extends undefined
-      ? undefined
-      : SubmitFormFunctionOptions<
-          TEndpoint["types"]["RequestOutput"],
-          TEndpoint["types"]["ResponseOutput"],
-          TEndpoint["types"]["UrlVariablesOutput"]
-        >,
-  ): void => {
-    const _submitForm = async (
-      validatedData: TEndpoint["types"]["RequestOutput"],
-    ): Promise<void> => {
-      logger.debug("Submitting form", {
-        endpoint: endpoint.path.join("/"),
-        keys: Object.keys(validatedData),
-      });
-      try {
-        // Clear any previous errors
-        clearFormError();
-
-        // Call the API with the validated form data using React Query mutation
-        const urlPathParams = submitOptions?.urlParamVariables;
-
-        const result = await mutation.mutateAsync({
-          requestData: validatedData,
-          urlPathParams,
+  const submitForm = useCallback(
+    ((
+      submitOptions: TEndpoint["types"]["UrlVariablesOutput"] extends undefined
+        ? undefined
+        : SubmitFormFunctionOptions<
+            TEndpoint["types"]["RequestOutput"],
+            TEndpoint["types"]["ResponseOutput"],
+            TEndpoint["types"]["UrlVariablesOutput"]
+          >,
+    ): void => {
+      const _submitForm = async (
+        validatedData: TEndpoint["types"]["RequestOutput"],
+      ): Promise<void> => {
+        logger.debug("Submitting form", {
+          endpoint: endpoint.path.join("/"),
+          keys: Object.keys(validatedData),
         });
+        try {
+          // Clear any previous errors
+          clearFormError();
 
-        if (result === undefined) {
-          logger.error("Mutation result is undefined", {
-            endpoint: [...endpoint.path].join("/"),
-          });
-          return undefined;
-        }
+          // Call the API with the validated form data using React Query mutation
+          const urlPathParams = submitOptions?.urlParamVariables;
 
-        // Extract the data from the ResponseType
-        const responseData = result.success
-          ? result.data
-          : (undefined as TEndpoint["types"]["ResponseOutput"]);
-
-        // Cast the result to TResponse to satisfy the type system
-        const onSuccessResult = submitOptions?.onSuccess?.({
-          responseData: responseData as TEndpoint["types"]["ResponseOutput"],
-          pathParams: submitOptions?.urlParamVariables,
-          requestData: validatedData,
-        });
-
-        // If onSuccess returns an error, treat it as an error
-        if (onSuccessResult) {
-          setError(onSuccessResult);
-          submitOptions?.onError?.({
-            error: onSuccessResult,
+          const result = await mutation.mutateAsync({
             requestData: validatedData,
+            urlPathParams,
+          });
+
+          if (result === undefined) {
+            logger.error("Mutation result is undefined", {
+              endpoint: [...endpoint.path].join("/"),
+            });
+            return undefined;
+          }
+
+          // Extract the data from the ResponseType
+          const responseData = result.success
+            ? result.data
+            : (undefined as TEndpoint["types"]["ResponseOutput"]);
+
+          // Cast the result to TResponse to satisfy the type system
+          const onSuccessResult = submitOptions?.onSuccess?.({
+            responseData: responseData as TEndpoint["types"]["ResponseOutput"],
+            pathParams: submitOptions?.urlParamVariables,
+            requestData: validatedData,
+          });
+
+          // If onSuccess returns an error, treat it as an error
+          if (onSuccessResult) {
+            setError(onSuccessResult);
+            submitOptions?.onError?.({
+              error: onSuccessResult,
+              requestData: validatedData,
+              pathParams: submitOptions?.urlParamVariables,
+            });
+          }
+        } catch (error) {
+          const formSnapshot = formMethods.getValues();
+          logger.error("[client] Error in submitForm", parseError(error), {
+            endpoint: endpoint.path.join("/"),
+            fieldKeys: Object.keys(formSnapshot).join(", "),
+            hasFiles: containsFile(formSnapshot),
+          });
+
+          // Handle any errors that occur during submission
+          // If the error is already an ErrorResponseType, use it directly
+          const errorResponse = isErrorResponseType(error)
+            ? error
+            : fail({
+                message: hooksTranslation
+                  .scopedT(locale)
+                  .t("mutationForm.post.errors.mutation_failed.title"),
+                errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              });
+
+          setError(errorResponse);
+          const formData = formMethods.getValues();
+          submitOptions?.onError?.({
+            error: errorResponse,
+            requestData: formData,
             pathParams: submitOptions?.urlParamVariables,
           });
         }
-      } catch (error) {
-        const formSnapshot = formMethods.getValues();
-        logger.error("[client] Error in submitForm", parseError(error), {
-          endpoint: endpoint.path.join("/"),
-          fieldKeys: Object.keys(formSnapshot).join(", "),
-          hasFiles: containsFile(formSnapshot),
+      };
+      void formMethods.handleSubmit(_submitForm, (errors) => {
+        logger.error("Form validation errors", {
+          endpoint: [...endpoint.path].join("/"),
+          errors: JSON.stringify(errors),
         });
 
-        // Handle any errors that occur during submission
-        // If the error is already an ErrorResponseType, use it directly
-        const errorResponse = isErrorResponseType(error)
-          ? error
-          : fail({
-              message: hooksTranslation
-                .scopedT(locale)
-                .t("mutationForm.post.errors.mutation_failed.title"),
-              errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            });
+        // Create an error response for form validation errors
+        const errorResponse = fail({
+          message: hooksTranslation
+            .scopedT(locale)
+            .t("mutationForm.post.errors.validation_error.title"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: { formErrors: JSON.stringify(errors) },
+        });
 
+        // Set the error in the form state so it's displayed
         setError(errorResponse);
-        const formData = formMethods.getValues();
+
         submitOptions?.onError?.({
           error: errorResponse,
-          requestData: formData,
+          requestData: formMethods.getValues(),
           pathParams: submitOptions?.urlParamVariables,
         });
-      }
-    };
-    void formMethods.handleSubmit(_submitForm, (errors) => {
-      logger.error("Form validation errors", {
-        endpoint: [...endpoint.path].join("/"),
-        errors: JSON.stringify(errors),
-      });
-
-      // Create an error response for form validation errors
-      const errorResponse = fail({
-        message: hooksTranslation
-          .scopedT(locale)
-          .t("mutationForm.post.errors.validation_error.title"),
-        errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: { formErrors: JSON.stringify(errors) },
-      });
-
-      // Set the error in the form state so it's displayed
-      setError(errorResponse);
-
-      submitOptions?.onError?.({
-        error: errorResponse,
-        requestData: formMethods.getValues(),
-        pathParams: submitOptions?.urlParamVariables,
-      });
-    })();
-  }) as SubmitFormFunction<
-    TEndpoint["types"]["RequestOutput"],
-    TEndpoint["types"]["ResponseOutput"],
-    TEndpoint["types"]["UrlVariablesOutput"]
-  >;
+      })();
+    }) as SubmitFormFunction<
+      TEndpoint["types"]["RequestOutput"],
+      TEndpoint["types"]["ResponseOutput"],
+      TEndpoint["types"]["UrlVariablesOutput"]
+    >,
+    [
+      clearFormError,
+      endpoint.path,
+      formMethods,
+      locale,
+      logger,
+      mutation,
+      setError,
+    ],
+  );
 
   // Create the response object from mutation data
   const response:
@@ -444,9 +455,15 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
       clearSavedForm,
       setErrorType,
     }),
-    // formMethods is stable (useForm returns stable ref), submitForm/clearSavedForm/setErrorType
-    // are useCallback-stable. Only reactive values need to be deps.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [response, mutation.isSuccess, submitError, mutation.isPending],
+    [
+      response,
+      mutation.isSuccess,
+      submitError,
+      mutation.isPending,
+      formMethods,
+      submitForm,
+      clearSavedForm,
+      setErrorType,
+    ],
   );
 }

@@ -29,12 +29,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { ServerFramework } from "../enum";
-
-import { ServerFramework } from "../enum";
-import { ServerFramework } from "../enum";
 import { scopedTranslation as checkScopedTranslation } from "../../check/vibe-check/i18n";
 import { DatabaseMigrationRepository } from "../../db/migrate/repository";
+import { ServerFramework } from "../enum";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
 import type {
   RebuildRequestOutput,

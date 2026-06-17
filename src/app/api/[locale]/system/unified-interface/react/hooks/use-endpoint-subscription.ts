@@ -33,9 +33,9 @@ import {
   removeFromCache,
 } from "../../websocket/cache-merger";
 import { buildUserChannel, buildWsChannel } from "../../websocket/channel";
+import { subscribeToChannel } from "../../websocket/client";
 import type { EndpointEventEnvelope } from "../../websocket/structured-events";
 import { eventDeclarationHasFields } from "../../websocket/structured-events";
-import { subscribeToChannel } from "../../websocket/client";
 import { queryClient } from "./store";
 
 export function useEndpointSubscription(
@@ -189,8 +189,5 @@ export function useEndpointSubscription(
         unsub();
       }
     };
-    // urlPathParamsKey is a stable JSON string - re-subscribe only when values actually change.
-    // userId is derived from user so we don't need user in the dep array too.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, endpoint, urlPathParamsKey, logger, cacheKey, userId]);
 }

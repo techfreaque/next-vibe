@@ -17,13 +17,16 @@ import SelectInput from "ink-select-input";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+} from "@/app/api/[locale]/agent/chat/config";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { EndpointMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

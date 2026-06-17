@@ -1,11 +1,8 @@
 import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { Skill } from "../../config";
-import type { Skill } from "../../config";
-import type { Skill } from "../../config";
-
 import { ChatModelId } from "../../../../ai-stream/models";
+import type { Skill } from "../../config";
 import {
   ContentLevel,
   IntelligenceLevel,

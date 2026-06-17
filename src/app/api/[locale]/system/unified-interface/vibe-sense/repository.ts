@@ -17,14 +17,11 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-
-
 import { RESOLUTION_MS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import { pipelineDatapoints, pipelineGraphs } from "./db";
 import { runBacktest } from "./engine/backtest";
 import { runGraph } from "./engine/runner";

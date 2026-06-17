@@ -1,3 +1,4 @@
+// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
 /**
  * PUBLIC_USER_AI_RUN.md - AI Run Guide (Public + Authenticated Tier)
  * GET /api/[locale]/system/unified-interface/ai/skills/PUBLIC_USER_AI_RUN.md

@@ -20,12 +20,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import graphsListDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { graphConfigSchema } from "../../../graph/schema";
-import { graphConfigSchema } from "../../../graph/schema";
-import { graphConfigSchema } from "../../../graph/schema";
 
-import React from "react";
-
+import { graphConfigSchema } from "../../../graph/schema";
 import { scopedTranslation } from "./i18n";
 
 // Lazy import to avoid TDZ circular dependency in MCP context

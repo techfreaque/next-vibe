@@ -8,6 +8,10 @@
 
 "use client";
 
+import {
+  useSearchParams,
+  useSilentHistory,
+} from "next-vibe-ui/hooks/use-navigation";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
@@ -22,6 +26,7 @@ import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
 import { Wifi } from "next-vibe-ui/ui/icons/Wifi";
+import { Input } from "next-vibe-ui/ui/input";
 import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { SectionGroup } from "next-vibe-ui/ui/section-group";
@@ -31,8 +36,6 @@ import type { TextareaKeyboardEvent } from "next-vibe-ui/ui/textarea";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { type JSX, useCallback, useEffect, useMemo, useState } from "react";
-
 import {
   useWidgetContext,
   useWidgetForm,
@@ -45,16 +48,11 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-
-import {
-  useSilentHistory,
-  useSearchParams,
-} from "next-vibe-ui/hooks/use-navigation";
 import { getCurrentUrl } from "next-vibe-ui/utils/browser";
-import { Input } from "next-vibe-ui/ui/input";
+import { type JSX, useCallback, useEffect, useMemo, useState } from "react";
 
-import connectionsListDefinitions from "@/app/api/[locale]/ssh/connections/list/definition";
 import cortexListDefinitions from "@/app/api/[locale]/agent/cortex/list/definition";
+import connectionsListDefinitions from "@/app/api/[locale]/ssh/connections/list/definition";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 
 import type endpoints from "./definition";

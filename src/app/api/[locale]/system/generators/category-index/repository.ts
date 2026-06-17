@@ -22,8 +22,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-
 import type {
   CategoryDefinition,
   SubcategoryDefinition,
@@ -34,6 +32,7 @@ import {
   formatDuration,
   formatGenerator,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { LiveIndex } from "../shared/live-index";
 import {

@@ -16,10 +16,12 @@ import "server-only";
 import { installFetchCache } from "../../ai-stream/testing/fetch-cache";
 installFetchCache();
 
+import { and, eq } from "drizzle-orm";
+
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { and, eq } from "drizzle-orm";
+
 import { describeCodingAgentSuite } from "./coding-agent-base.test";
 
 const HERMES_INSTANCE_ID = "hermes";

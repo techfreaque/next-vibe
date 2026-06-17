@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 // AUTO-GENERATED from src/app/[locale]/user/(account)/layout.tsx. Add "use custom" to this file to preserve customizations.
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";

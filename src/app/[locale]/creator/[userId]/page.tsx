@@ -9,17 +9,17 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/config/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { CreatorProfileRepository } from "@/app/api/[locale]/user/public/creator/[userId]/repository";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation } from "@/app/api/[locale]/user/public/creator/[userId]/i18n";
+import { CreatorProfileRepository } from "@/app/api/[locale]/user/public/creator/[userId]/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { CreatorProfilePage, type CreatorPageData } from "./page-client";
+import { configScopedTranslation } from "@/config/i18n";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { type CreatorPageData, CreatorProfilePage } from "./page-client";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage; userId: string }>;

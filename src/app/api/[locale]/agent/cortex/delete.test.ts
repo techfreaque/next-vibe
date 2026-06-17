@@ -32,14 +32,9 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";
-
-import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { cortexNodes } from "./db";
-import { CortexNodeType } from "./enum";
-import { removeVirtualNodesByEntityId } from "./embeddings/sync-virtual";
-
 import deleteEndpoint from "./delete/definition";
 import { removeVirtualNodesByEntityId } from "./embeddings/sync-virtual";
 import { CortexNodeType } from "./enum";

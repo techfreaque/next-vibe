@@ -3,45 +3,48 @@ import "server-only";
 /**
  * Skills Sync Provider
  * Registers custom skills for cross-instance sync via the unified SyncProvider interface.
+ *
+ * Lossless upsert: all columns are serialized and written back to `customSkills` directly.
+ * This preserves variants, trustLevel, availableTools, model selections, etc.
+ * Community metrics (voteCount, reportCount) are NOT synced — they are instance-local.
  */
-
 import { and, asc, eq, gt, inArray, sql } from "drizzle-orm";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
-import { db } from "@/app/api/[locale]/system/db";
-import {
-  type SyncProvider,
-  toStandardCursor,
-} from "@/app/api/[locale]/remote-connection/sync-provider";
-import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
-import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import type { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
+import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
+import {
+  type SyncProvider,
+  toStandardCursor,
+} from "@/app/api/[locale]/remote-connection/sync-provider";
+import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
+import { db } from "@/app/api/[locale]/system/db";
+
+import { customSkills, type NewCustomSkill, skillVariantSchema } from "./db";
+import {
+  SkillCategory,
+  SkillOwnershipType,
+  SkillStatus,
+  SkillTrustLevel,
+  SkillTrustLevelDB,
+  SkillType,
+} from "./enum";
+
 // ─── Wire Schema ─────────────────────────────────────────────────────────────
 
 const syncedSkillSchema = z.object({
   id: z.string().uuid(),
-
-import { customSkills, skillVariantSchema, type NewCustomSkill } from "./db";
-import {
-  SkillCategory,
-  SkillOwnershipType,
-  SkillTrustLevel,
-  SkillTrustLevelDB,
-  SkillType,
-  SkillStatus,
-} from "./enum";
-
   slug: z.string(),
   name: z.string(),
   description: z.string(),
@@ -60,12 +63,57 @@ import {
     SkillCategory.CONTROVERSIAL,
     SkillCategory.BACKGROUND,
   ]),
-  modelSelection: chatModelSelectionSchema,
   ownershipType: z.enum([
     SkillOwnershipType.SYSTEM,
     SkillOwnershipType.USER,
     SkillOwnershipType.PUBLIC,
   ]),
+  // Model selections
+  voiceModelSelection: voiceModelSelectionSchema.nullable().optional(),
+  sttModelSelection: sttModelSelectionSchema.nullable().optional(),
+  imageVisionModelSelection: imageVisionModelSelectionSchema
+    .nullable()
+    .optional(),
+  videoVisionModelSelection: videoVisionModelSelectionSchema
+    .nullable()
+    .optional(),
+  audioVisionModelSelection: audioVisionModelSelectionSchema
+    .nullable()
+    .optional(),
+  imageGenModelSelection: imageGenModelSelectionSchema.nullable().optional(),
+  musicGenModelSelection: musicGenModelSelectionSchema.nullable().optional(),
+  videoGenModelId: z.string().nullable().optional(),
+  // Variants
+  variants: z.array(skillVariantSchema).nullable().optional(),
+  // Behavior
+  compactTrigger: z.number().int().nullable().optional(),
+  memoryLimit: z.number().int().nullable().optional(),
+  availableTools: z
+    .array(z.object({ toolId: z.string(), requiresConfirmation: z.boolean() }))
+    .nullable()
+    .optional(),
+  pinnedTools: z
+    .array(z.object({ toolId: z.string(), requiresConfirmation: z.boolean() }))
+    .nullable()
+    .optional(),
+  deniedTools: z
+    .array(z.object({ toolId: z.string(), requiresConfirmation: z.boolean() }))
+    .nullable()
+    .optional(),
+  skillType: z
+    .enum([SkillType.PERSONA, SkillType.SPECIALIST, SkillType.TOOL_BUNDLE])
+    .nullable()
+    .optional(),
+  status: z
+    .enum([SkillStatus.DRAFT, SkillStatus.PUBLISHED, SkillStatus.UNLISTED])
+    .nullable()
+    .optional(),
+  companionPrompt: z.string().nullable().optional(),
+  trustLevel: z.enum(SkillTrustLevelDB).optional(),
+  longContent: z.string().nullable().optional(),
+  publishedAt: z.string().nullable().optional(),
+  changeNote: z.string().nullable().optional(),
+  // Timestamps
   updatedAt: z.string(),
   isDeleted: z.boolean().optional(),
 });
@@ -76,28 +124,50 @@ type SyncedSkill = z.infer<typeof syncedSkillSchema>;
 
 export const skillsSyncProvider: SyncProvider = {
   key: "skills",
+  labelI18nKey: "remoteConnection.sync.skills",
 
-  async getHashEntries(userId) {
-    const rows = await db
-      .select({ syncId: customSkills.id, updatedAt: customSkills.updatedAt })
+  async getCursor(userId): Promise<StandardSyncCursor> {
+    const [row] = await db
+      .select({ updatedAt: customSkills.updatedAt })
       .from(customSkills)
-      .where(eq(customSkills.userId, userId));
+      .where(eq(customSkills.userId, userId))
+      .orderBy(sql`${customSkills.updatedAt} DESC`)
+      .limit(1);
 
-    return rows.map((r) => ({
-      syncId: r.syncId,
-      updatedAt: r.updatedAt,
-    }));
+    return {
+      updatedAt: row?.updatedAt.toISOString() ?? new Date(0).toISOString(),
+    };
   },
 
-  async serializeToJson(userId, logger) {
+  async serializeFromCursor(userId, cursor, logger) {
+    const typedCursor = toStandardCursor(cursor);
+    const fallbackCursor: StandardSyncCursor = typedCursor ?? {
+      updatedAt: new Date(0).toISOString(),
+    };
     try {
+      // Serves EVERYTHING newer than the cursor. Rows are ordered ascending
+      // by updatedAt so the cursor of the last served item is a valid
+      // watermark. Tombstones (isDeleted) travel inline in the same ordered
+      // stream.
       const rows = await db
         .select()
         .from(customSkills)
-        .where(eq(customSkills.userId, userId))
-        .limit(200);
+        .where(
+          typedCursor
+            ? and(
+                eq(customSkills.userId, userId),
+                // Millisecond-precision compare so a current cursor short-
+                // circuits to empty (toISOString is ms, Postgres stores µs).
+                gt(
+                  sql`date_trunc('milliseconds', ${customSkills.updatedAt})`,
+                  new Date(typedCursor.updatedAt),
+                ),
+              )
+            : eq(customSkills.userId, userId),
+        )
+        .orderBy(asc(customSkills.updatedAt));
 
-      const result = rows.map(
+      const items = rows.map(
         (r): SyncedSkill => ({
           id: r.id,
           slug: r.slug,
@@ -105,24 +175,73 @@ export const skillsSyncProvider: SyncProvider = {
           description: r.description,
           tagline: r.tagline,
           icon: r.icon,
-          systemPrompt: r.systemPrompt,
+          systemPrompt: r.systemPrompt ?? null,
           category: r.category,
-          modelSelection: r.modelSelection,
           ownershipType: r.ownershipType,
+          voiceModelSelection: r.voiceModelSelection ?? null,
+          sttModelSelection: r.sttModelSelection ?? null,
+          imageVisionModelSelection: r.imageVisionModelSelection ?? null,
+          videoVisionModelSelection: r.videoVisionModelSelection ?? null,
+          audioVisionModelSelection: r.audioVisionModelSelection ?? null,
+          imageGenModelSelection: r.imageGenModelSelection ?? null,
+          musicGenModelSelection: r.musicGenModelSelection ?? null,
+          videoGenModelId: r.videoGenModelId ?? null,
+          variants: r.variants ?? null,
+          compactTrigger: r.compactTrigger ?? null,
+          memoryLimit: r.memoryLimit ?? null,
+          availableTools: r.availableTools ?? null,
+          pinnedTools: r.pinnedTools ?? null,
+          deniedTools: r.deniedTools ?? null,
+          skillType: r.skillType ?? null,
+          status: r.status ?? null,
+          companionPrompt: r.companionPrompt ?? null,
+          trustLevel: r.trustLevel,
+          longContent: r.longContent ?? null,
+          publishedAt: r.publishedAt?.toISOString() ?? null,
+          changeNote: r.changeNote ?? null,
           updatedAt: r.updatedAt.toISOString(),
+          ...(r.isDeleted ? { isDeleted: true } : {}),
         }),
       );
 
-      return JSON.stringify(result);
+      const lastIncluded = items[items.length - 1];
+      return {
+        json: JSON.stringify(items),
+        // Cursor derived from the served items — the batch high-water mark.
+        cursor: lastIncluded
+          ? { updatedAt: lastIncluded.updatedAt }
+          : fallbackCursor,
+      };
     } catch (error) {
       logger.error("Failed to serialize skills for sync", parseError(error));
-      return "[]";
+      // Serve nothing and keep the peer's cursor unchanged — never advance
+      // past data that was not delivered.
+      return { json: "[]", cursor: fallbackCursor };
     }
   },
 
   async upsertFromJson(json, userId, logger) {
     const remoteSkills = z.array(syncedSkillSchema).parse(JSON.parse(json));
     let synced = 0;
+
+    // Load existing skills for all incoming ids up front
+    const remoteIds = remoteSkills.map((s) => s.id);
+    const existingRows =
+      remoteIds.length > 0
+        ? await db
+            .select({ id: customSkills.id, updatedAt: customSkills.updatedAt })
+            .from(customSkills)
+            .where(
+              and(
+                inArray(customSkills.id, remoteIds),
+                eq(customSkills.userId, userId),
+              ),
+            )
+        : [];
+    const existingById = new Map(existingRows.map((r) => [r.id, r]));
+
+    // New rows are collected and inserted in batches after the loop
+    const insertRows: NewCustomSkill[] = [];
 
     for (const remoteSkill of remoteSkills) {
       try {
@@ -136,83 +255,78 @@ export const skillsSyncProvider: SyncProvider = {
                 eq(customSkills.userId, userId),
               ),
             );
-          try {
-            const { deleteFromDisk } =
-              await import("@/app/api/[locale]/agent/cortex/fs-provider/fs-sync");
-            await deleteFromDisk(`/skills/${remoteSkill.id}.md`);
-          } catch {
-            // Best-effort
-          }
+          existingById.delete(remoteSkill.id);
           synced++;
           continue;
         }
 
         // Match by UUID
-        const [existing] = await db
-          .select({ id: customSkills.id, updatedAt: customSkills.updatedAt })
-          .from(customSkills)
-          .where(
-            and(
-              eq(customSkills.id, remoteSkill.id),
-              eq(customSkills.userId, userId),
-            ),
-          )
-          .limit(1);
+        const existing = existingById.get(remoteSkill.id);
 
         const remoteTime = new Date(remoteSkill.updatedAt).getTime();
 
+        // Build the full lossless update/insert payload.
+        // Community metrics (voteCount, reportCount) are NOT synced — instance-local.
+        const skillPayload: Omit<NewCustomSkill, "id" | "slug" | "userId"> = {
+          name: remoteSkill.name,
+          description: remoteSkill.description,
+          tagline: remoteSkill.tagline,
+          icon: remoteSkill.icon,
+          systemPrompt: remoteSkill.systemPrompt ?? null,
+          category: remoteSkill.category,
+          ownershipType: remoteSkill.ownershipType,
+          voiceModelSelection: remoteSkill.voiceModelSelection ?? null,
+          sttModelSelection: remoteSkill.sttModelSelection ?? null,
+          imageVisionModelSelection:
+            remoteSkill.imageVisionModelSelection ?? null,
+          videoVisionModelSelection:
+            remoteSkill.videoVisionModelSelection ?? null,
+          audioVisionModelSelection:
+            remoteSkill.audioVisionModelSelection ?? null,
+          imageGenModelSelection: remoteSkill.imageGenModelSelection ?? null,
+          musicGenModelSelection: remoteSkill.musicGenModelSelection ?? null,
+          videoGenModelId: (remoteSkill.videoGenModelId ??
+            null) as VideoGenModelId | null,
+          variants: remoteSkill.variants ?? null,
+          compactTrigger: remoteSkill.compactTrigger ?? null,
+          memoryLimit: remoteSkill.memoryLimit ?? null,
+          availableTools: (remoteSkill.availableTools ?? null) as
+            | ToolConfigItem[]
+            | null,
+          pinnedTools: (remoteSkill.pinnedTools ?? null) as
+            | ToolConfigItem[]
+            | null,
+          deniedTools: (remoteSkill.deniedTools ?? null) as
+            | ToolConfigItem[]
+            | null,
+          skillType: remoteSkill.skillType ?? null,
+          status: remoteSkill.status ?? null,
+          companionPrompt: remoteSkill.companionPrompt ?? null,
+          trustLevel: remoteSkill.trustLevel ?? SkillTrustLevel.COMMUNITY,
+          longContent: remoteSkill.longContent ?? null,
+          publishedAt: remoteSkill.publishedAt
+            ? new Date(remoteSkill.publishedAt)
+            : null,
+          changeNote: remoteSkill.changeNote ?? null,
+          updatedAt: new Date(remoteSkill.updatedAt),
+        };
+
         if (existing) {
-          // Last-writer-wins
-          if (remoteTime > existing.updatedAt.getTime()) {
+          // Last-writer-wins; tie → remote wins (deterministic tiebreak per spec)
+          if (remoteTime >= existing.updatedAt.getTime()) {
             await db
               .update(customSkills)
-              .set({
-                name: remoteSkill.name,
-                description: remoteSkill.description,
-                tagline: remoteSkill.tagline,
-                icon: remoteSkill.icon,
-                systemPrompt: remoteSkill.systemPrompt,
-                category: remoteSkill.category,
-                ownershipType: remoteSkill.ownershipType,
-                updatedAt: new Date(remoteSkill.updatedAt),
-              })
+              .set(skillPayload)
               .where(eq(customSkills.id, remoteSkill.id));
           }
         } else {
-          // New skill
-          await db.insert(customSkills).values({
+          // New skill — collected for batch insert below
+          insertRows.push({
             id: remoteSkill.id,
             slug: remoteSkill.slug,
             userId,
-            name: remoteSkill.name,
-            description: remoteSkill.description,
-            tagline: remoteSkill.tagline,
-            icon: remoteSkill.icon,
-            systemPrompt: remoteSkill.systemPrompt,
-            category: remoteSkill.category,
-            modelSelection: remoteSkill.modelSelection,
-            ownershipType: remoteSkill.ownershipType,
-            updatedAt: new Date(remoteSkill.updatedAt),
+            ...skillPayload,
           });
-        }
-
-        // Disk write-through
-        try {
-          const { syncToDisk } =
-            await import("@/app/api/[locale]/agent/cortex/fs-provider/fs-sync");
-          const frontmatter = [
-            "---",
-            `skillId: "${remoteSkill.id}"`,
-            `name: "${remoteSkill.name.replace(/"/g, '\\"')}"`,
-            `ownership: "${remoteSkill.ownershipType}"`,
-            "---",
-          ].join("\n");
-          await syncToDisk(
-            `/skills/${remoteSkill.id}.md`,
-            `${frontmatter}\n\n${remoteSkill.systemPrompt ?? ""}`,
-          );
-        } catch {
-          // Best-effort
         }
 
         synced++;
@@ -221,6 +335,17 @@ export const skillsSyncProvider: SyncProvider = {
           id: remoteSkill.id,
           ...parseError(error),
         });
+      }
+    }
+
+    // New skills - onConflictDoNothing handles slug uniqueness violations
+    // (another user may already own that slug on this instance).
+    for (let i = 0; i < insertRows.length; i += 1000) {
+      const batch = insertRows.slice(i, i + 1000);
+      try {
+        await db.insert(customSkills).values(batch).onConflictDoNothing();
+      } catch (error) {
+        logger.error("Failed to upsert shared skill", parseError(error));
       }
     }
 

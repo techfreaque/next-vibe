@@ -9,6 +9,11 @@
 import { AlertCircle, Calendar } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import { safeGetRequiredFields } from "next-vibe/shared/utils/zod-required-fields";
+import { getTheme } from "next-vibe-ui/unified/form-fields/_shared/constants";
+import {
+  Icon,
+  type IconKey,
+} from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import * as React from "react";
 import type {
@@ -18,6 +23,10 @@ import type {
   FieldValues,
 } from "react-hook-form";
 
+import {
+  scopedTranslation as unifiedInterfaceScopedTranslation,
+  type UnifiedInterfaceT,
+} from "@/app/api/[locale]/system/unified-interface/i18n";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -27,15 +36,6 @@ import type {
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { getTheme } from "next-vibe-ui/unified/form-fields/_shared/constants";
-import {
-  Icon,
-  type IconKey,
-} from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import {
-  scopedTranslation as unifiedInterfaceScopedTranslation,
-  type UnifiedInterfaceT,
-} from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";

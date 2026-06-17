@@ -4,11 +4,12 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import { useWindowSize } from "next-vibe-ui/hooks/use-window-size";
 import { Button } from "next-vibe-ui/ui/button";
 import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useLayoutEffect, useState } from "react";
 
@@ -51,17 +52,17 @@ export function UserIdHoverCard({
     setEl(node);
   }, []);
   const [clampedLeft, setClampedLeft] = useState<number>(position.x);
+  const { width: vw } = useWindowSize();
 
   useLayoutEffect(() => {
     if (!el) {
       return;
     }
     const { width } = el.getBoundingClientRect();
-    const vw = window.innerWidth;
     // Align left edge to anchor, then clamp so it stays within viewport
     const left = Math.max(8, Math.min(position.x - width / 2, vw - width - 8));
     setClampedLeft(left);
-  }, [el, position.x, position.y]);
+  }, [el, position.x, position.y, vw]);
 
   return (
     <Div

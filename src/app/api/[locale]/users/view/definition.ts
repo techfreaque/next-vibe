@@ -23,8 +23,7 @@ import {
 
 import { UserRole } from "../../user/user-roles/enum";
 import { USERS_VIEW_ALIAS } from "./constants";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { scopedTranslation } from "./i18n";
 
 const UserViewContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UserViewContainer })),

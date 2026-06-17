@@ -23,11 +23,13 @@
 
 import "server-only";
 
-import { and, eq, like, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
+
+import { and, eq, like, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
+import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   closeProdDb,
   connectToHermes,
@@ -39,6 +41,12 @@ import {
   triggerPull,
   unregisterDevFromHermes,
 } from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  ChatMessageRole,
+  ThreadStatus,
+} from "@/app/api/[locale]/agent/chat/enum";
+import { SkillCategory } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { callEndpoint } from "@/app/api/[locale]/remote-connection/call-endpoint";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import {
@@ -57,13 +65,6 @@ import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
-import { SkillCategory } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  ChatMessageRole,
-  ThreadStatus,
-} from "@/app/api/[locale]/agent/chat/enum";
 import { cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";
 import { resolveVirtualList, resolveVirtualRead } from "./mounts/resolver";
@@ -2490,11 +2491,95 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
 describe("Mount hierarchy: /threads", () => {
   let adminUser: JwtPrivatePayloadType;
 
+  // Fixtures: a root-level thread (for T3) and a subfolder with a thread (for T4),
+  // both in the private root folder. Deterministic ids keyed by a unique token.
+  // NOTE: the title token must NOT contain a UUID — the threads mount derives
+  // the threadId from the filename via a UUID regex, and a UUID inside the
+  // slugified title would shadow the real thread id appended after the slug.
+  const MH_RUN_ID = Date.now().toString(36);
+  const MH_ROOT_THREAD_ID = randomUUID();
+  const MH_SUB_THREAD_ID = randomUUID();
+  const MH_SUBFOLDER_ID = randomUUID();
+  const MH_THREAD_TITLE = `Mount Threads Fixture ${MH_RUN_ID}`;
+  const MH_SUBFOLDER_NAME = `mh-subfolder-${MH_RUN_ID}`;
+
   beforeAll(async () => {
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
     if (resolved) {
       adminUser = resolved;
     }
+    if (!adminUser) {
+      return;
+    }
+
+    const { chatThreads: ct, chatFolders: cf } =
+      await import("@/app/api/[locale]/agent/chat/db");
+
+    // Root-level thread in /threads/private (no folder) → surfaces as a file at
+    // the private root, giving T3 a real thread to read.
+    await db
+      .insert(ct)
+      .values({
+        id: MH_ROOT_THREAD_ID,
+        userId: adminUser.id,
+        title: MH_THREAD_TITLE,
+        rootFolderId: DefaultFolderId.PRIVATE,
+        status: ThreadStatus.ACTIVE,
+        defaultModel: ChatModelId.GPT_5_4_NANO,
+        pinned: false,
+        archived: false,
+        tags: ["mount", "fixture"],
+      })
+      .onConflictDoNothing();
+
+    // Subfolder under the private root → surfaces as a dir for T4.
+    await db
+      .insert(cf)
+      .values({
+        id: MH_SUBFOLDER_ID,
+        userId: adminUser.id,
+        rootFolderId: DefaultFolderId.PRIVATE,
+        name: MH_SUBFOLDER_NAME,
+        parentId: null,
+        sortOrder: 0,
+      })
+      .onConflictDoNothing();
+
+    // A thread inside the subfolder so listing the subfolder returns content.
+    await db
+      .insert(ct)
+      .values({
+        id: MH_SUB_THREAD_ID,
+        userId: adminUser.id,
+        title: `${MH_THREAD_TITLE} (sub)`,
+        rootFolderId: DefaultFolderId.PRIVATE,
+        folderId: MH_SUBFOLDER_ID,
+        status: ThreadStatus.ACTIVE,
+        defaultModel: ChatModelId.GPT_5_4_NANO,
+        pinned: false,
+        archived: false,
+        tags: [],
+      })
+      .onConflictDoNothing();
+  }, MOUNT_TIMEOUT);
+
+  afterAll(async () => {
+    if (!adminUser) {
+      return;
+    }
+    const { chatThreads: ct, chatFolders: cf } =
+      await import("@/app/api/[locale]/agent/chat/db");
+    await db
+      .delete(ct)
+      .where(
+        and(
+          eq(ct.userId, adminUser.id),
+          like(ct.title, `Mount Threads Fixture ${MH_RUN_ID}%`),
+        ),
+      );
+    await db
+      .delete(cf)
+      .where(and(eq(cf.userId, adminUser.id), eq(cf.id, MH_SUBFOLDER_ID)));
   }, MOUNT_TIMEOUT);
 
   it(
@@ -2555,7 +2640,7 @@ describe("Mount hierarchy: /threads", () => {
         return;
       }
 
-      // Find a real thread to read
+      // Find our fixture thread to read (beforeAll inserted it at the private root).
       const entries = await resolveVirtualList(
         adminUser.id,
         "/threads/private",
@@ -2563,12 +2648,17 @@ describe("Mount hierarchy: /threads", () => {
         true,
       );
       const threadFile = entries.find(
-        (e) => e.nodeType === "file" && e.name.endsWith(".md"),
+        (e) =>
+          e.nodeType === "file" &&
+          e.name.endsWith(".md") &&
+          e.name.includes(MH_ROOT_THREAD_ID),
       );
 
+      expect(
+        threadFile,
+        "T3: fixture thread must be listed at /threads/private",
+      ).toBeTruthy();
       if (!threadFile) {
-        // eslint-disable-next-line no-console
-        console.info("[T3] No threads found in /threads/private — skipping");
         return;
       }
 
@@ -2604,11 +2694,16 @@ describe("Mount hierarchy: /threads", () => {
         "/threads",
         true,
       );
-      const subfolder = rootEntries.find((e) => e.nodeType === "dir");
+      // beforeAll created a named subfolder; find it explicitly.
+      const subfolder = rootEntries.find(
+        (e) => e.nodeType === "dir" && e.name === MH_SUBFOLDER_NAME,
+      );
 
+      expect(
+        subfolder,
+        "T4: fixture subfolder must be listed at /threads/private",
+      ).toBeTruthy();
       if (!subfolder) {
-        // eslint-disable-next-line no-console
-        console.info("[T4] No subfolders in /threads/private — skipping");
         return;
       }
 
@@ -2622,6 +2717,14 @@ describe("Mount hierarchy: /threads", () => {
         Array.isArray(subEntries),
         "T4: subfolder list must return array",
       ).toBe(true);
+      // The subfolder contains the fixture thread → must surface it as a file.
+      const subThreadFile = subEntries.find(
+        (e) => e.nodeType === "file" && e.name.includes(MH_SUB_THREAD_ID),
+      );
+      expect(
+        subThreadFile,
+        "T4: subfolder must list its thread file",
+      ).toBeTruthy();
     },
     MOUNT_TIMEOUT,
   );
@@ -2658,11 +2761,48 @@ describe("Mount hierarchy: /threads", () => {
 describe("Mount hierarchy: /favorites", () => {
   let adminUser: JwtPrivatePayloadType;
 
+  const FAV_RUN_ID = randomUUID();
+  const FAV_ID = randomUUID();
+  const FAV_SLUG = `mh-favorite-${FAV_RUN_ID}`;
+
   beforeAll(async () => {
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
     if (resolved) {
       adminUser = resolved;
     }
+    if (!adminUser) {
+      return;
+    }
+
+    const { chatFavorites } =
+      await import("@/app/api/[locale]/agent/chat/favorites/db");
+    await db
+      .insert(chatFavorites)
+      .values({
+        id: FAV_ID,
+        slug: FAV_SLUG,
+        userId: adminUser.id,
+        skillId: "vibe-coder",
+        variantId: "default",
+        position: 0,
+      })
+      .onConflictDoNothing();
+  }, MOUNT_TIMEOUT);
+
+  afterAll(async () => {
+    if (!adminUser) {
+      return;
+    }
+    const { chatFavorites } =
+      await import("@/app/api/[locale]/agent/chat/favorites/db");
+    await db
+      .delete(chatFavorites)
+      .where(
+        and(
+          eq(chatFavorites.userId, adminUser.id),
+          eq(chatFavorites.id, FAV_ID),
+        ),
+      );
   }, MOUNT_TIMEOUT);
 
   it(
@@ -2701,15 +2841,16 @@ describe("Mount hierarchy: /favorites", () => {
         "/favorites",
         true,
       );
-      if (entries.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[F2] No favorites found — skipping");
+      // beforeAll inserted a favorite with a unique slug → must be listed.
+      const favEntry = entries.find((e) => e.name === `${FAV_SLUG}.md`);
+      expect(favEntry, "F2: fixture favorite must be listed").toBeTruthy();
+      if (!favEntry) {
         return;
       }
 
       const result = await resolveVirtualRead(
         adminUser.id,
-        entries[0]!.path,
+        favEntry.path,
         "/favorites",
         true,
         defaultLocale,
@@ -2733,11 +2874,46 @@ describe("Mount hierarchy: /favorites", () => {
 describe("Mount hierarchy: /tasks", () => {
   let adminUser: JwtPrivatePayloadType;
 
+  const TK_RUN_ID = randomUUID();
+  const TK_TASK_ID = `mh-task-${TK_RUN_ID}`;
+
   beforeAll(async () => {
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
     if (resolved) {
       adminUser = resolved;
     }
+    if (!adminUser) {
+      return;
+    }
+
+    const { cronTasks } =
+      await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+    const { CronTaskPriority, TaskCategory } =
+      await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
+    await db
+      .insert(cronTasks)
+      .values({
+        id: TK_TASK_ID,
+        shortId: TK_RUN_ID.slice(0, 8),
+        routeId: "noop",
+        displayName: `Mount Task Fixture ${TK_RUN_ID}`,
+        description: "Fixture cron task for /tasks mount hierarchy test.",
+        category: TaskCategory.SYSTEM,
+        schedule: "0 0 * * *",
+        priority: CronTaskPriority.LOW,
+        enabled: false,
+        userId: adminUser.id,
+      })
+      .onConflictDoNothing();
+  }, MOUNT_TIMEOUT);
+
+  afterAll(async () => {
+    if (!adminUser) {
+      return;
+    }
+    const { cronTasks } =
+      await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+    await db.delete(cronTasks).where(eq(cronTasks.id, TK_TASK_ID));
   }, MOUNT_TIMEOUT);
 
   it(
@@ -2776,15 +2952,16 @@ describe("Mount hierarchy: /tasks", () => {
         "/tasks",
         true,
       );
-      if (entries.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[TK2] No tasks found — skipping");
+      // beforeAll inserted a cron task with a unique id → must be listed.
+      const taskEntry = entries.find((e) => e.name === `${TK_TASK_ID}.md`);
+      expect(taskEntry, "TK2: fixture task must be listed").toBeTruthy();
+      if (!taskEntry) {
         return;
       }
 
       const result = await resolveVirtualRead(
         adminUser.id,
-        entries[0]!.path,
+        taskEntry.path,
         "/tasks",
         true,
         defaultLocale,
@@ -2807,11 +2984,69 @@ describe("Mount hierarchy: /tasks", () => {
 describe("Mount hierarchy: /uploads", () => {
   let adminUser: JwtPrivatePayloadType;
 
+  // Uploads derive from chatMessages.metadata.attachments. Create a thread +
+  // a user message carrying an image attachment so /uploads/images has content.
+  const UP_RUN_ID = randomUUID();
+  const UP_THREAD_ID = randomUUID();
+  const UP_MSG_ID = randomUUID();
+  const UP_FILENAME = `mh-upload-${UP_RUN_ID}.png`;
+
   beforeAll(async () => {
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
     if (resolved) {
       adminUser = resolved;
     }
+    if (!adminUser) {
+      return;
+    }
+
+    const { chatThreads: ct, chatMessages: cm } =
+      await import("@/app/api/[locale]/agent/chat/db");
+    await db
+      .insert(ct)
+      .values({
+        id: UP_THREAD_ID,
+        userId: adminUser.id,
+        title: `Mount Uploads Fixture ${UP_RUN_ID}`,
+        rootFolderId: DefaultFolderId.PRIVATE,
+        status: ThreadStatus.ACTIVE,
+        pinned: false,
+        archived: false,
+        tags: [],
+      })
+      .onConflictDoNothing();
+    await db
+      .insert(cm)
+      .values({
+        id: UP_MSG_ID,
+        threadId: UP_THREAD_ID,
+        role: ChatMessageRole.USER,
+        content: `Uploading an image ${UP_RUN_ID}`,
+        metadata: {
+          attachments: [
+            {
+              id: randomUUID(),
+              url: `https://example.test/${UP_FILENAME}`,
+              filename: UP_FILENAME,
+              mimeType: "image/png",
+              size: 1234,
+            },
+          ],
+        },
+      })
+      .onConflictDoNothing();
+  }, MOUNT_TIMEOUT);
+
+  afterAll(async () => {
+    if (!adminUser) {
+      return;
+    }
+    const { chatThreads: ct, chatMessages: cm } =
+      await import("@/app/api/[locale]/agent/chat/db");
+    await db.delete(cm).where(eq(cm.threadId, UP_THREAD_ID));
+    await db
+      .delete(ct)
+      .where(and(eq(ct.userId, adminUser.id), eq(ct.id, UP_THREAD_ID)));
   }, MOUNT_TIMEOUT);
 
   it(
@@ -2878,19 +3113,27 @@ describe("Mount hierarchy: /uploads", () => {
         "/uploads",
         true,
       );
-      if (threadDirs.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[U3] No image uploads found — skipping");
+      // beforeAll created an image attachment → its thread dir must be present.
+      const fixtureDir = threadDirs.find((d) => d.path.includes(UP_THREAD_ID));
+      expect(
+        fixtureDir,
+        "U3: fixture upload thread dir must be listed under /uploads/images",
+      ).toBeTruthy();
+      if (!fixtureDir) {
         return;
       }
 
       const files = await resolveVirtualList(
         adminUser.id,
-        threadDirs[0]!.path,
+        fixtureDir.path,
         "/uploads",
         true,
       );
       expect(Array.isArray(files), "U3: must return an array").toBe(true);
+      expect(
+        files.length,
+        "U3: thread dir must list upload files",
+      ).toBeGreaterThan(0);
 
       for (const file of files) {
         expect(file.nodeType, "U3: uploads are files").toBe("file");
@@ -2906,30 +3149,32 @@ describe("Mount hierarchy: /uploads", () => {
         return;
       }
 
-      // Traverse: /uploads/images → first thread → first file
+      // Traverse: /uploads/images → fixture thread dir → fixture file
       const threadDirs = await resolveVirtualList(
         adminUser.id,
         "/uploads/images",
         "/uploads",
         true,
       );
-      if (threadDirs.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[U4] No image uploads — skipping");
+      const fixtureDir = threadDirs.find((d) => d.path.includes(UP_THREAD_ID));
+      expect(
+        fixtureDir,
+        "U4: fixture upload thread dir must be listed",
+      ).toBeTruthy();
+      if (!fixtureDir) {
         return;
       }
 
       const files = await resolveVirtualList(
         adminUser.id,
-        threadDirs[0]!.path,
+        fixtureDir.path,
         "/uploads",
         true,
       );
-      if (files.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[U4] No files in first thread — skipping");
-        return;
-      }
+      expect(
+        files.length,
+        "U4: fixture thread dir must list its upload file",
+      ).toBeGreaterThan(0);
 
       const result = await resolveVirtualRead(
         adminUser.id,
@@ -2957,11 +3202,75 @@ describe("Mount hierarchy: /uploads", () => {
 describe("Mount hierarchy: /searches", () => {
   let adminUser: JwtPrivatePayloadType;
 
+  // Searches derive from tool messages with toolCall.toolName="web-search".
+  const SR_RUN_ID = randomUUID();
+  const SR_THREAD_ID = randomUUID();
+  const SR_MSG_ID = randomUUID();
+  const SR_QUERY = `mount fixture query ${SR_RUN_ID}`;
+
   beforeAll(async () => {
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
     if (resolved) {
       adminUser = resolved;
     }
+    if (!adminUser) {
+      return;
+    }
+
+    const { chatThreads: ct, chatMessages: cm } =
+      await import("@/app/api/[locale]/agent/chat/db");
+    await db
+      .insert(ct)
+      .values({
+        id: SR_THREAD_ID,
+        userId: adminUser.id,
+        title: `Mount Searches Fixture ${SR_RUN_ID}`,
+        rootFolderId: DefaultFolderId.PRIVATE,
+        status: ThreadStatus.ACTIVE,
+        pinned: false,
+        archived: false,
+        tags: [],
+      })
+      .onConflictDoNothing();
+    await db
+      .insert(cm)
+      .values({
+        id: SR_MSG_ID,
+        threadId: SR_THREAD_ID,
+        role: ChatMessageRole.TOOL,
+        content: null,
+        metadata: {
+          toolCall: {
+            toolCallId: randomUUID(),
+            toolName: "web-search",
+            args: { query: SR_QUERY },
+            result: {
+              usedProvider: "brave",
+              output: "Fixture search answer.",
+              results: [
+                {
+                  title: "Fixture Result",
+                  url: "https://example.test/result",
+                  snippet: "A fixture search result snippet.",
+                },
+              ],
+            },
+          },
+        },
+      })
+      .onConflictDoNothing();
+  }, MOUNT_TIMEOUT);
+
+  afterAll(async () => {
+    if (!adminUser) {
+      return;
+    }
+    const { chatThreads: ct, chatMessages: cm } =
+      await import("@/app/api/[locale]/agent/chat/db");
+    await db.delete(cm).where(eq(cm.threadId, SR_THREAD_ID));
+    await db
+      .delete(ct)
+      .where(and(eq(ct.userId, adminUser.id), eq(ct.id, SR_THREAD_ID)));
   }, MOUNT_TIMEOUT);
 
   it(
@@ -3003,19 +3312,29 @@ describe("Mount hierarchy: /searches", () => {
         "/searches",
         true,
       );
-      if (months.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[SR2] No search results found — skipping");
-        return;
-      }
+      // beforeAll inserted a search → at least one month folder must exist.
+      expect(
+        months.length,
+        "SR2: at least the fixture's month folder must exist",
+      ).toBeGreaterThan(0);
+
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const monthDir =
+        months.find((m) => m.name === currentMonth) ?? months[0]!;
 
       const results = await resolveVirtualList(
         adminUser.id,
-        months[0]!.path,
+        monthDir.path,
         "/searches",
         true,
       );
       expect(Array.isArray(results), "SR2: must return an array").toBe(true);
+      // The fixture search must be present in its month.
+      const fixtureResult = results.find((r) => r.name.includes(SR_MSG_ID));
+      expect(
+        fixtureResult,
+        "SR2: fixture search result must be listed in its month",
+      ).toBeTruthy();
 
       for (const result of results) {
         expect(result.nodeType, "SR2: search results are files").toBe("file");
@@ -3038,27 +3357,33 @@ describe("Mount hierarchy: /searches", () => {
         "/searches",
         true,
       );
-      if (months.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[SR3] No search results — skipping");
-        return;
-      }
+      expect(
+        months.length,
+        "SR3: at least the fixture's month folder must exist",
+      ).toBeGreaterThan(0);
+
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const monthDir =
+        months.find((m) => m.name === currentMonth) ?? months[0]!;
 
       const results = await resolveVirtualList(
         adminUser.id,
-        months[0]!.path,
+        monthDir.path,
         "/searches",
         true,
       );
-      if (results.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[SR3] No results in first month — skipping");
+      const fixtureResult = results.find((r) => r.name.includes(SR_MSG_ID));
+      expect(
+        fixtureResult,
+        "SR3: fixture search result must be listed",
+      ).toBeTruthy();
+      if (!fixtureResult) {
         return;
       }
 
       const content = await resolveVirtualRead(
         adminUser.id,
-        results[0]!.path,
+        fixtureResult.path,
         "/searches",
         true,
         defaultLocale,
@@ -3081,11 +3406,69 @@ describe("Mount hierarchy: /searches", () => {
 describe("Mount hierarchy: /gens", () => {
   let adminUser: JwtPrivatePayloadType;
 
+  // Gens derive from tool messages with toolName="generate_image".
+  const GEN_RUN_ID = randomUUID();
+  const GEN_THREAD_ID = randomUUID();
+  const GEN_MSG_ID = randomUUID();
+  const GEN_PROMPT = `mount fixture image prompt ${GEN_RUN_ID}`;
+
   beforeAll(async () => {
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
     if (resolved) {
       adminUser = resolved;
     }
+    if (!adminUser) {
+      return;
+    }
+
+    const { chatThreads: ct, chatMessages: cm } =
+      await import("@/app/api/[locale]/agent/chat/db");
+    await db
+      .insert(ct)
+      .values({
+        id: GEN_THREAD_ID,
+        userId: adminUser.id,
+        title: `Mount Gens Fixture ${GEN_RUN_ID}`,
+        rootFolderId: DefaultFolderId.PRIVATE,
+        status: ThreadStatus.ACTIVE,
+        pinned: false,
+        archived: false,
+        tags: [],
+      })
+      .onConflictDoNothing();
+    await db
+      .insert(cm)
+      .values({
+        id: GEN_MSG_ID,
+        threadId: GEN_THREAD_ID,
+        role: ChatMessageRole.TOOL,
+        content: null,
+        metadata: {
+          toolCall: {
+            toolCallId: randomUUID(),
+            toolName: "generate_image",
+            args: { prompt: GEN_PROMPT },
+            status: "completed",
+            result: {
+              imageUrl: "https://example.test/fixture-image.png",
+              creditCost: 1,
+            },
+          },
+        },
+      })
+      .onConflictDoNothing();
+  }, MOUNT_TIMEOUT);
+
+  afterAll(async () => {
+    if (!adminUser) {
+      return;
+    }
+    const { chatThreads: ct, chatMessages: cm } =
+      await import("@/app/api/[locale]/agent/chat/db");
+    await db.delete(cm).where(eq(cm.threadId, GEN_THREAD_ID));
+    await db
+      .delete(ct)
+      .where(and(eq(ct.userId, adminUser.id), eq(ct.id, GEN_THREAD_ID)));
   }, MOUNT_TIMEOUT);
 
   it(
@@ -3149,19 +3532,28 @@ describe("Mount hierarchy: /gens", () => {
         "/gens",
         true,
       );
-      if (months.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[G3] No image gens found — skipping");
-        return;
-      }
+      // beforeAll inserted an image gen → at least one month folder must exist.
+      expect(
+        months.length,
+        "G3: at least the fixture's month folder must exist",
+      ).toBeGreaterThan(0);
+
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const monthDir =
+        months.find((m) => m.name === currentMonth) ?? months[0]!;
 
       const gens = await resolveVirtualList(
         adminUser.id,
-        months[0]!.path,
+        monthDir.path,
         "/gens",
         true,
       );
       expect(Array.isArray(gens), "G3: must return an array").toBe(true);
+      const fixtureGen = gens.find((g) => g.name.includes(GEN_MSG_ID));
+      expect(
+        fixtureGen,
+        "G3: fixture gen must be listed in its month",
+      ).toBeTruthy();
 
       for (const gen of gens) {
         expect(gen.nodeType, "G3: gens are files").toBe("file");
@@ -3183,27 +3575,30 @@ describe("Mount hierarchy: /gens", () => {
         "/gens",
         true,
       );
-      if (months.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[G4] No image gens — skipping");
-        return;
-      }
+      expect(
+        months.length,
+        "G4: at least the fixture's month folder must exist",
+      ).toBeGreaterThan(0);
+
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const monthDir =
+        months.find((m) => m.name === currentMonth) ?? months[0]!;
 
       const gens = await resolveVirtualList(
         adminUser.id,
-        months[0]!.path,
+        monthDir.path,
         "/gens",
         true,
       );
-      if (gens.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[G4] No gens in first month — skipping");
+      const fixtureGen = gens.find((g) => g.name.includes(GEN_MSG_ID));
+      expect(fixtureGen, "G4: fixture gen must be listed").toBeTruthy();
+      if (!fixtureGen) {
         return;
       }
 
       const content = await resolveVirtualRead(
         adminUser.id,
-        gens[0]!.path,
+        fixtureGen.path,
         "/gens",
         true,
         defaultLocale,
@@ -3231,6 +3626,13 @@ describe("Mount hierarchy: /ssh", () => {
     if (resolved) {
       adminUser = resolved;
     }
+    if (!adminUser) {
+      return;
+    }
+    // Guarantee the built-in "Local Machine" connection exists so SSH2 always
+    // has a connection to read. ensureLocalConnection is idempotent.
+    const { ensureLocalConnection } = await import("./mounts/ssh");
+    await ensureLocalConnection(adminUser.id, true);
   }, MOUNT_TIMEOUT);
 
   it(
@@ -3269,15 +3671,18 @@ describe("Mount hierarchy: /ssh", () => {
         "/ssh",
         true,
       );
-      if (connections.length === 0) {
-        // eslint-disable-next-line no-console
-        console.info("[SSH2] No SSH connections found — skipping");
-        return;
-      }
+      // beforeAll ensured the local-machine connection exists.
+      expect(
+        connections.length,
+        "SSH2: at least the local-machine connection must be listed",
+      ).toBeGreaterThan(0);
+
+      const localConn =
+        connections.find((c) => c.name === "local-machine") ?? connections[0]!;
 
       const result = await resolveVirtualRead(
         adminUser.id,
-        connections[0]!.path,
+        localConn.path,
         "/ssh",
         true,
         defaultLocale,

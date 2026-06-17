@@ -22,9 +22,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import orderListDefinitions from "@/app/api/[locale]/purchasing/order/list/definition";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 import { scopedTranslation } from "../../../i18n";
 

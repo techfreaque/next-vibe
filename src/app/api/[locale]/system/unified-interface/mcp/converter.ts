@@ -1,5 +1,10 @@
 import "server-only";
 
+import {
+  hasChild,
+  hasChildren,
+} from "next-vibe-ui/unified/_shared/type-guards";
+import type { SchemaTypes } from "next-vibe-ui/unified/_shared/types";
 import { z } from "zod";
 
 import {
@@ -11,11 +16,6 @@ import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-int
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import {
-  hasChild,
-  hasChildren,
-} from "next-vibe-ui/unified/_shared/type-guards";
-import type { SchemaTypes } from "next-vibe-ui/unified/_shared/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { MCPTool } from "./types";

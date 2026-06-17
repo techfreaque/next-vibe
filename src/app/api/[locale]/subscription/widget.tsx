@@ -20,10 +20,6 @@ import { Bitcoin } from "next-vibe-ui/ui/icons/Bitcoin";
 import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import type { JSX } from "react";
-
-import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
-import { useCustomerPortal } from "@/app/api/[locale]/payment/portal/hooks";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -31,6 +27,11 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+
+import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
+import { useCustomerPortal } from "@/app/api/[locale]/payment/portal/hooks";
+
 import type definition from "./definition";
 import { SubscriptionStatus } from "./enum";
 

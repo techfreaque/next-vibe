@@ -50,6 +50,7 @@ export const translations: typeof enTranslations = {
     sshLink: "SSH-Verbindungen öffnen",
     reauthButton: "Erneut authentifizieren",
     renameButton: "Umbenennen",
+    editButton: "Bearbeiten",
     disconnectButton: "Trennen",
     disconnectConfirmTitle: "Diese Instanz trennen?",
     disconnectConfirmDescription:
@@ -156,11 +157,6 @@ export const translations: typeof enTranslations = {
       label: "Tool-Quelle",
       description:
         "Welche Tools in KI-Streams dieser Verbindung verfügbar sind. Lokal: eigene Tools. Remote: nur Remote-Tools. Beide: zusammengeführt.",
-    },
-    routingRules: {
-      label: "Routing-Regeln",
-      description:
-        "Deklarative Routing-Regeln: Ordner-IDs, Modellanbieter und Standard-Fallback.",
     },
     syncScope: {
       label: "Sync-Umfang",

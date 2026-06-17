@@ -12,12 +12,10 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import { and, count, gte, lte, sql } from "drizzle-orm";
-
+import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
+import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
 import { db } from "@/app/api/[locale]/system/db";
-import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
-import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
-
 import type {
   DataPoint,
   Resolution,

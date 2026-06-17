@@ -22,9 +22,6 @@ import { User } from "next-vibe-ui/ui/icons/User";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import React, { useCallback, useState } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -38,6 +35,9 @@ import { UuidFieldWidget } from "next-vibe-ui/unified/form-fields/uuid-field/wid
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import React, { useCallback, useState } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";

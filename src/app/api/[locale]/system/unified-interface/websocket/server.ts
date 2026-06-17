@@ -23,7 +23,6 @@ import http from "node:http";
 import type { ServerWebSocket } from "bun";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { WsChannelEntry } from "./ws-channel-registry";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
@@ -38,6 +37,7 @@ import type {
   WsConnectionData,
   WsWireMessage,
 } from "./types";
+import type { WsChannelEntry } from "./ws-channel-registry";
 
 // ============================================================================
 // CHANNEL REGISTRY (singleton)

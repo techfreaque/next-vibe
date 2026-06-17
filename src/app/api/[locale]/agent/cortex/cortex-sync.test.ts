@@ -2,7 +2,7 @@
  * Cortex Cross-Instance Sync Integration Tests
  *
  * Tests the cursor-first sync protocol between atlas (port 3000) and
- * hermes (port 3001). Verifies:
+ * hermes-dev (port 3002). Verifies:
  *
  *   1. Cursor engine: getCursor advances when a provider's data changes
  *   2. Cursor short-circuit: no payload when cursors are current (tiny request per tick)
@@ -17,8 +17,8 @@
  *
  * PREREQUISITES
  * ─────────────
- * Hermes must be running at localhost:3001:
- *   cd <hermes-repo> && vibe start
+ * Hermes-dev must be running at localhost:3002:
+ *   vibe --hermes dev
  * Or skip sync tests:
  *   bun test cortex-sync --skip-sync
  *
@@ -29,27 +29,18 @@
 
 import "server-only";
 
+import { randomUUID } from "node:crypto";
+
 import { and, eq, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { randomUUID } from "node:crypto";
 import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
-
 import {
-  PROD_URL,
   closeProdDb,
   connectToHermes,
   disconnectFromHermes,
+  LOCAL_DEV_URL,
   resolveProdAdminToken,
   resolveProdUserId,
   triggerHermesPull,
@@ -63,14 +54,24 @@ import {
   ensureProvidersRegistered,
   type SyncProvider,
 } from "@/app/api/[locale]/remote-connection/sync-provider";
+import { db } from "@/app/api/[locale]/system/db";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import * as userSchema from "@/app/api/[locale]/user/db";
+import { userRoles } from "@/app/api/[locale]/user/db";
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
+import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
+
 import { cortexNodes } from "./db";
 import { documentsSyncProvider } from "./sync-provider";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const SYNC_TIMEOUT = 60_000;
-const HERMES_SKIP_REASON = "hermes not reachable at localhost:3001";
+const HERMES_SKIP_REASON = "hermes-dev not reachable at localhost:3002";
 
 // Note: test paths use "/documents/sync-test-" prefix for isolation and cleanup
 
@@ -131,7 +132,7 @@ async function resolveUser(
 /** Check if hermes is reachable - used to conditionally skip live sync tests */
 async function isHermesReachable(): Promise<boolean> {
   try {
-    const resp = await fetch(`${PROD_URL}/api/en-US/user/public/login`, {
+    const resp = await fetch(`${LOCAL_DEV_URL}/api/en-US/user/public/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: "noop@noop", password: "noop" }),
@@ -195,9 +196,11 @@ describe("Sync hash short-circuit (unit)", () => {
       await ensureProvidersRegistered();
 
       const adminUser = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+      expect(
+        adminUser,
+        "admin user must exist for the sync short-circuit test (run vibe seed)",
+      ).toBeTruthy();
       if (!adminUser) {
-        // eslint-disable-next-line no-console
-        console.warn("admin user not found - skipping short-circuit test");
         return;
       }
 
@@ -235,6 +238,10 @@ describe("Sync hash short-circuit (unit)", () => {
       await ensureProvidersRegistered();
 
       const adminUser = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+      expect(
+        adminUser,
+        "admin user must exist (run vibe seed) — sync tests require it",
+      ).toBeTruthy();
       if (!adminUser) {
         return;
       }
@@ -274,6 +281,10 @@ describe("Sync hash short-circuit (unit)", () => {
       await ensureProvidersRegistered();
 
       const adminUser = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+      expect(
+        adminUser,
+        "admin user must exist (run vibe seed) — sync tests require it",
+      ).toBeTruthy();
       if (!adminUser) {
         return;
       }
@@ -300,6 +311,10 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
 
   beforeAll(async () => {
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+    expect(
+      resolved,
+      "admin user must exist (run vibe seed) — sync tests require it",
+    ).toBeTruthy();
     if (resolved) {
       adminUser = resolved;
     }
@@ -717,6 +732,10 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
 
   beforeAll(async () => {
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+    expect(
+      resolved,
+      "admin user must exist (run vibe seed) — sync tests require it",
+    ).toBeTruthy();
     if (resolved) {
       adminUser = resolved;
     }
@@ -904,7 +923,7 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
         );
     }
 
-    // Clean up test nodes on hermes prod DB
+    // Clean up test nodes on hermes-dev DB
     if (prodUserId) {
       try {
         await prodDb.execute(
@@ -971,7 +990,7 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
       );
 
       // Step 2: Trigger hermes to pull from atlas (behind-NAT mode)
-      // hermes (port 3001) contacts atlas (port 3000), receives hash diff,
+      // hermes-dev (port 3002) contacts atlas (port 3000), receives hash diff,
       // gets the new syncId in the documents payload.
       await triggerHermesPull(prodAdminToken);
 
@@ -1195,7 +1214,7 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
   }, SYNC_TIMEOUT);
 
   afterAll(async () => {
-    // Cleanup hermes prod DB
+    // Cleanup hermes-dev DB
     if (prodUserId) {
       try {
         await prodDb.execute(
@@ -1351,6 +1370,10 @@ describe("Sync: scalability and efficiency", () => {
 
   beforeAll(async () => {
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+    expect(
+      resolved,
+      "admin user must exist (run vibe seed) — sync tests require it",
+    ).toBeTruthy();
     if (resolved) {
       adminUser = resolved;
     }

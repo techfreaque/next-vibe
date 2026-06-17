@@ -4,17 +4,15 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-import type { JSX } from "react";
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { DateFieldWidget } from "next-vibe-ui/unified/form-fields/date-field/widget";
+import type { JSX } from "react";
 
 import { LineType } from "../../enum";
 import { scopedTranslation as coaScopedTranslation } from "../../i18n";

@@ -99,14 +99,15 @@ function createChatNavigationStore(opts?: {
     setLeafMessageId: (leafMessageId): void => {
       set({ leafMessageId });
       // Sync to URL without triggering server re-render
-      if (typeof window !== "undefined") {
-        const url = new URL(window.location.href);
+      const currentUrl = getCurrentUrl();
+      if (currentUrl) {
+        const url = new URL(currentUrl);
         if (leafMessageId) {
           url.searchParams.set("message", leafMessageId);
         } else {
           url.searchParams.delete("message");
         }
-        window.history.pushState(null, "", url.toString());
+        silentPushState(url.toString());
       }
     },
     setNavigation: (state): void => {
@@ -117,10 +118,13 @@ function createChatNavigationStore(opts?: {
       const threadChanged =
         state.activeThreadId !== undefined &&
         state.activeThreadId !== current.activeThreadId;
-      if (threadChanged && typeof window !== "undefined") {
-        const url = new URL(window.location.href);
-        url.searchParams.delete("message");
-        window.history.replaceState(null, "", url.toString());
+      if (threadChanged) {
+        const currentUrl = getCurrentUrl();
+        if (currentUrl) {
+          const url = new URL(currentUrl);
+          url.searchParams.delete("message");
+          silentReplaceState(url.toString());
+        }
       }
       set(threadChanged ? { ...state, leafMessageId: null } : state);
     },

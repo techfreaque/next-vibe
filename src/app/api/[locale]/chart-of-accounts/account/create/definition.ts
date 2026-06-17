@@ -21,16 +21,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 import {
   AccountSubtype,
   AccountSubtypeOptions,
   AccountType,
   AccountTypeOptions,
-import { scopedTranslation } from "./i18n";
 } from "../../enum";
 import listDef1 from "../list/definition";
+import { scopedTranslation } from "./i18n";
 
 const CoaAccountCreateWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CoaAccountCreateWidget })),

@@ -286,6 +286,27 @@ export class ChatFoldersRepository {
         });
       }
 
+      // Validate parentId exists and belongs to this user + rootFolderId
+      if (data.parentId) {
+        const parentFolder = await db
+          .select({ id: chatFolders.id })
+          .from(chatFolders)
+          .where(
+            and(
+              eq(chatFolders.id, data.parentId),
+              eq(chatFolders.rootFolderId, rootFolderId),
+              eq(chatFolders.userId, userIdentifier),
+            ),
+          )
+          .limit(1);
+        if (!parentFolder[0]) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+      }
+
       // Get the next sort order
       const existingFolders = await db
         .select()

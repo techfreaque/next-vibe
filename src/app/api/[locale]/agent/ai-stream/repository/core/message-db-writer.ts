@@ -30,8 +30,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-
 import {
   chatMessages,
   type MessageMetadata,

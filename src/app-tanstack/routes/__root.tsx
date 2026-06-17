@@ -31,8 +31,8 @@ export const Route = createRootRoute({
     const locale = location.pathname.split("/")[1] ?? "";
     return loadLayout({ data: { locale } });
   },
-  shellComponent: ({ children }) => (
-    <RootLayout {...Route.useLoaderData()}>{children}</RootLayout>
-  ),
+  shellComponent: function ShellComponent({ children }) {
+    return <RootLayout {...Route.useLoaderData()}>{children}</RootLayout>;
+  },
   component: () => <Outlet />,
 });

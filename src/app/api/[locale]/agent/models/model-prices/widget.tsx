@@ -4,13 +4,11 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, H4 } from "next-vibe-ui/ui/typography";
-
 import {
   useWidgetLocale,
-import type { JSX } from "react";
-import type { JSX } from "react";
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
 
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";

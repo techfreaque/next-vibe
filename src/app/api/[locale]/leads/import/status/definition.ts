@@ -33,8 +33,6 @@ import {
 import { scopedTranslation } from "../i18n";
 import { LEADS_IMPORT_STATUS_ALIAS } from "./constants";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const ImportStatusContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ImportStatusContainer })),
 );

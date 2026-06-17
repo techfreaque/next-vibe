@@ -9,6 +9,9 @@
  */
 
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { UserPermissionRole } from "../../user/user-roles/enum";
 import type { pathToAliasMap } from "../generated/alias-map";
 

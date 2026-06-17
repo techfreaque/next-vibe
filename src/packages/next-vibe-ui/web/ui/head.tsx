@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-head-element -- platform-agnostic HTML wrapper, not a Next.js page */
 import type { JSX, ReactNode } from "react";
 
 export interface HeadProps {
@@ -17,7 +16,6 @@ const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem("theme_v2");if(
 export function Head({ children }: HeadProps): JSX.Element {
   return (
     <head>
-      {/* eslint-disable-next-line react/no-danger -- blocking inline script must run before stylesheet to prevent FOUC */}
       <script
         dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
         suppressHydrationWarning

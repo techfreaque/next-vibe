@@ -12,9 +12,6 @@ import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Tag } from "next-vibe-ui/ui/icons/Tag";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useEffect } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetLocale,
@@ -28,10 +25,12 @@ import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-f
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import React, { useCallback, useEffect } from "react";
 
-import { scopedTranslation as leadsScopedTranslation } from "../i18n";
-import { scopedTranslation as leadsScopedTranslation } from "../i18n";
+import { cn } from "@/app/api/[locale]/shared/utils";
+
 import { LeadStatus } from "../enum";
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import type definition from "./definition";
 
 interface CustomWidgetProps {

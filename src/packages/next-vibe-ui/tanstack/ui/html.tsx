@@ -20,7 +20,6 @@ export function Html({
   suppressHydrationWarning,
 }: HtmlProps): JSX.Element {
   return (
-    // eslint-disable-next-line jsx-a11y/html-has-lang -- lang is optional at root shell level, set on $locale route
     <html
       lang={lang}
       className={className}

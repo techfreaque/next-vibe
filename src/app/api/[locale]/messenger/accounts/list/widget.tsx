@@ -17,9 +17,6 @@ import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useMemo } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetContext,
@@ -30,6 +27,9 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, { useCallback, useMemo } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 
 import messengerAccountCreateDefinition from "../create/definition";
 import messengerAccountEditDefinition from "../edit/[id]/definition";

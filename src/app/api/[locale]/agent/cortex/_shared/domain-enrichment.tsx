@@ -11,11 +11,8 @@
 
 "use client";
 
-import React, { Suspense, useMemo } from "react";
-import React, { Suspense, useMemo } from "react";
-import React, { Suspense, useMemo } from "react";
-
 import { useWidgetLocale } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, { Suspense, useMemo } from "react";
 
 import { scopedTranslation } from "../i18n";
 import { findMountWidget } from "../mounts/widget-registry";
@@ -29,18 +26,17 @@ export function DomainEnrichment({
 }: DomainEnrichmentProps): React.JSX.Element | null {
   const locale = useWidgetLocale();
   const match = useMemo(() => findMountWidget(responsePath), [responsePath]);
+  const LazyWidget = useMemo(
+    () => (match ? React.lazy(match.config.loadWidget) : null),
+    [match],
+  );
 
-  if (!match) {
+  if (!match || !LazyWidget) {
     return null;
   }
 
   const { t } = scopedTranslation.scopedT(locale);
   const mountLabel = t(match.config.translationKey);
-
-  const LazyWidget = useMemo(
-    () => React.lazy(match.config.loadWidget),
-    [match.config],
-  );
 
   return (
     <Suspense fallback={null}>

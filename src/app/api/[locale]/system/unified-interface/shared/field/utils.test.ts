@@ -8,31 +8,42 @@
 import { describe, expect, it } from "bun:test";
 import { z } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
 import { extractSchemaDefaults } from "./utils";
+
+const noopLogger: EndpointLogger = {
+  info: () => undefined,
+  error: () => undefined,
+  warn: () => undefined,
+  vibe: () => undefined,
+  debug: () => undefined,
+  isDebugEnabled: false,
+};
 
 describe("extractSchemaDefaults", () => {
   describe("ZodDefault handling", () => {
     it("extracts default value from a string field with default", () => {
       const schema = z.string().default("hello");
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBe("hello");
     });
 
     it("extracts default value from a number field with default", () => {
       const schema = z.coerce.number().default(42);
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBe(42);
     });
 
     it("extracts default value from a boolean field with default", () => {
       const schema = z.boolean().default(true);
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBe(true);
     });
 
     it("extracts default value from an enum field with default", () => {
       const schema = z.enum(["asc", "desc"]).default("desc");
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBe("desc");
     });
 
@@ -42,7 +53,7 @@ describe("extractSchemaDefaults", () => {
         DESC = "desc",
       }
       const schema = z.enum(SortOrder).default(SortOrder.DESC);
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBe(SortOrder.DESC);
     });
   });
@@ -53,7 +64,7 @@ describe("extractSchemaDefaults", () => {
         name: z.string(),
         age: z.coerce.number(),
       });
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({});
     });
 
@@ -63,7 +74,7 @@ describe("extractSchemaDefaults", () => {
         age: z.coerce.number().default(18),
         active: z.boolean().default(true),
       });
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({
         age: 18,
         active: true,
@@ -80,7 +91,7 @@ describe("extractSchemaDefaults", () => {
           }),
         }),
       });
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({
         user: {
           settings: {
@@ -102,7 +113,7 @@ describe("extractSchemaDefaults", () => {
           limit: z.coerce.number().optional().default(20),
         }),
       });
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({
         sortingOptions: {
           sortBy: "createdAt",
@@ -119,13 +130,13 @@ describe("extractSchemaDefaults", () => {
   describe("ZodOptional handling", () => {
     it("extracts default from optional field with default", () => {
       const schema = z.string().optional().default("default value");
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBe("default value");
     });
 
     it("returns undefined for optional field without default", () => {
       const schema = z.string().optional();
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBeUndefined();
     });
 
@@ -137,7 +148,7 @@ describe("extractSchemaDefaults", () => {
           })
           .optional(),
       });
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({
         filter: {
           status: "active",
@@ -149,13 +160,13 @@ describe("extractSchemaDefaults", () => {
   describe("ZodNullable handling", () => {
     it("extracts default from nullable field with default", () => {
       const schema = z.string().nullable().default("default value");
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBe("default value");
     });
 
     it("returns undefined for nullable field without default", () => {
       const schema = z.string().nullable();
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBeUndefined();
     });
 
@@ -163,7 +174,7 @@ describe("extractSchemaDefaults", () => {
       const schema = z.object({
         maybeValue: z.coerce.number().nullable().default(100),
       });
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({
         maybeValue: 100,
       });
@@ -173,13 +184,13 @@ describe("extractSchemaDefaults", () => {
   describe("ZodArray handling", () => {
     it("returns undefined for array without default", () => {
       const schema = z.array(z.string());
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBeUndefined();
     });
 
     it("extracts default array value", () => {
       const schema = z.array(z.string()).default(["a", "b"]);
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual(["a", "b"]);
     });
   });
@@ -213,7 +224,7 @@ describe("extractSchemaDefaults", () => {
         }),
       });
 
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({
         statusFilters: {},
         sortingOptions: {
@@ -240,7 +251,7 @@ describe("extractSchemaDefaults", () => {
         }),
       });
 
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({
         withDefault: "has default",
         optionalWithDefault: "optional default",
@@ -256,7 +267,7 @@ describe("extractSchemaDefaults", () => {
   describe("Edge cases", () => {
     it("handles empty object schema", () => {
       const schema = z.object({});
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({});
     });
 
@@ -325,7 +336,7 @@ describe("extractSchemaDefaults", () => {
 
     it("handles null default value", () => {
       const schema = z.string().nullable().default(null);
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toBeNull();
     });
 
@@ -337,7 +348,7 @@ describe("extractSchemaDefaults", () => {
         })
         .default({ a: "outer-a", b: 20 });
 
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       // The outer default should be merged with inner defaults
       // Outer default takes precedence
       expect(result).toEqual({
@@ -353,7 +364,7 @@ describe("extractSchemaDefaults", () => {
         enabled: z.coerce.boolean().default(true),
       });
 
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({
         page: 1,
         limit: 20,
@@ -381,7 +392,7 @@ describe("extractSchemaDefaults", () => {
       });
 
       // No logger passed - should not throw
-      const result = extractSchemaDefaults(schema);
+      const result = extractSchemaDefaults(schema, noopLogger);
       expect(result).toEqual({ value: "test" });
     });
 

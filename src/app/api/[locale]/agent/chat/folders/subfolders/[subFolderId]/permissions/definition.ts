@@ -27,8 +27,6 @@ import {
 
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const FolderPermissionsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.FolderPermissionsContainer })),
 );

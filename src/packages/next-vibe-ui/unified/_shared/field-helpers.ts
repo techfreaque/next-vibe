@@ -10,9 +10,6 @@
 
 import type { z, ZodTypeAny } from "zod";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TParams } from "@/i18n/core/static-types";
-
 import type {
   InferSchemaFromField,
   UnifiedField,
@@ -21,6 +18,9 @@ import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-int
 import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TParams } from "@/i18n/core/static-types";
+
 import { hasChildren } from "./type-guards";
 import type {
   AnyChildrenConstrain,

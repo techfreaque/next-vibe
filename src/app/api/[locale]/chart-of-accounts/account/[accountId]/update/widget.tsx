@@ -7,8 +7,6 @@ import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Span } from "next-vibe-ui/ui/span";
-import { useEffect, useMemo, type JSX } from "react";
-
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -19,14 +17,14 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { type JSX, useEffect, useMemo } from "react";
 
-import { getCachedAccount } from "../../_shared/account-picker-cache";
 import { scopedTranslation as coaScopedTranslation } from "../../../i18n";
-
+import { getCachedAccount } from "../../_shared/account-picker-cache";
 import type getDefinition from "../get/definition";
 import type definition from "./definition";
 

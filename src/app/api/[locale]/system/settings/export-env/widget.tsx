@@ -11,15 +11,12 @@ import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Pre } from "next-vibe-ui/ui/pre";
-
 import {
-import type { JSX } from "react";
-import { useState } from "react";
-import type { JSX } from "react";
-import { useState } from "react";
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useState } from "react";
 
 import type endpoints from "./definition";
 

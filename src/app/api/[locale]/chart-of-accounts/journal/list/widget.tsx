@@ -4,8 +4,6 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
 import { Span } from "next-vibe-ui/ui/span";
-import { useEffect, useRef, type JSX } from "react";
-
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
@@ -13,6 +11,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { type JSX, useEffect, useRef } from "react";
 
 import type definition from "./definition";
 import type { CoaJournalListResponseOutput } from "./definition";

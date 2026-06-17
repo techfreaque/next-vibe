@@ -12,17 +12,15 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import { and, gte, inArray, lte, sql, sum } from "drizzle-orm";
-
 import { db } from "@/app/api/[locale]/system/db";
-import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
-import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
-
 import type {
   DataPoint,
   Resolution,
   TimeRange,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
+import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
+
 import { creditTransactions } from "../../db";
 import { CreditTransactionType } from "../../enum";
 

@@ -20,14 +20,17 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+
 import { CortexNav } from "../_shared/cortex-nav";
 import { DomainEnrichment } from "../_shared/domain-enrichment";
 import { formatBytes } from "../_shared/format-bytes";
 import type definition from "./definition";
+
 interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
-
 
 export function CortexReadWidget({
   field,

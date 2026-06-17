@@ -20,9 +20,6 @@ import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useMemo, useState } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -33,6 +30,9 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { DateFieldWidget } from "next-vibe-ui/unified/form-fields/date-field/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import React, { useCallback, useMemo, useState } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 
 import { PulseExecutionStatus } from "../../enum";
 import type endpoints from "./definition";

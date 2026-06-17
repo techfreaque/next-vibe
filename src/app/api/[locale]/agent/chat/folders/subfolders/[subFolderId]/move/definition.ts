@@ -19,8 +19,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazy } from "react";
-
 import { scopedTranslation } from "./i18n";
 
 const FolderMoveContainer = lazy(() =>

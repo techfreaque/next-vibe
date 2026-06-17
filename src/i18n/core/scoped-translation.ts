@@ -4,7 +4,8 @@
  */
 
 import { z } from "zod";
-import { defaultLocale, type CountryLanguage, type Languages } from "./config";
+
+import { type CountryLanguage, defaultLocale, type Languages } from "./config";
 import { getLanguageFromLocale } from "./language-utils";
 import {
   navigateTranslationObject,

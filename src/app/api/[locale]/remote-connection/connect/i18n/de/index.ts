@@ -82,9 +82,10 @@ export const translations: typeof enTranslations = {
       memories: "Erinnerungen",
       documents: "Dokumente",
       skills: "Skills",
-      tasks: "Aufgaben",
-      cortex: "Cortex-Dateien",
-      defaultNote: "Alle standardmäßig aktiv. Nach dem Verbinden anpassbar.",
+      favorites: "Favoriten",
+      threads: "Threads",
+      defaultNote:
+        "Standardmäßig alles deaktiviert. Nach dem Verbinden aktivierbar.",
     },
     advancedSettings: "Erweiterte Einstellungen",
     credentialWarning:

@@ -11,20 +11,17 @@ import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H3 } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
-
 import {
   useWidgetDisabled,
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetValue,
-import type { JSX } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { DEFAULT_TTS_VOICE_ID } from "./constants";
 import type definition from "./definition";

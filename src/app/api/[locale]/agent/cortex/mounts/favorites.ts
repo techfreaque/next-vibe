@@ -4,15 +4,15 @@ import "server-only";
  * Favorites Virtual Mount
  * Renders user favorites (skill + model/tool loadouts) as markdown files at /favorites/<slug>.md
  */
-
 import { and, count as drizzleCount, eq } from "drizzle-orm";
 
+import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import { db } from "@/app/api/[locale]/system/db";
 
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
+
 /**
-import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
-import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
  * Read a favorite as markdown
  * Path: /favorites/<slug> or /favorites/<uuid>
  */
@@ -24,7 +24,6 @@ export async function readFavoritePath(
   if (segments.length < 2) {
     return null;
   }
-
   const slugOrId = segments[1].replace(/\.md$/, "");
 
   const { chatFavorites } =

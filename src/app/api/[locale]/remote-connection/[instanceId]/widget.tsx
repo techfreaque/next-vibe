@@ -1,13 +1,13 @@
 /**
  * Remote Connection by Instance ID Widget
  *
- * GET    → view: status + behavior + sync sections, with Edit / Disconnect actions
- * PATCH  → edit: sectioned form (rename, reauth, transport, behavior, sync scope)
+ * GET    → view: status + behavior + sync scope (per-provider) + cortex/SSH cross-refs
+ * PATCH  → edit: rename, reauth, transport, behavior flags, per-provider sync toggles
  * DELETE → confirm: disconnect confirmation
  *
  * Admin vs customer:
  * - forceSystemProvider shown only to ADMIN in both view and edit
- * - Transport / behavior settings shown to both (they are per-user settings)
+ * - transport / behavior / sync scope visible to ADMIN only in edit
  */
 
 "use client";
@@ -45,13 +45,6 @@ import { Switch } from "next-vibe-ui/ui/switch";
 import { Code, P } from "next-vibe-ui/ui/typography";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { Code, P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-import { useMemo, useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
-
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   useWidgetEndpoint,
   useWidgetEndpointMutations,
@@ -68,22 +61,86 @@ import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/wid
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useMemo, useState } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
+
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import connectDefinitions from "../connect/definition";
 import type { SyncScope } from "../db";
-import definitions from "./definition";
 import type { default as definitionsType } from "./definition";
+import definitions from "./definition";
 import { scopedTranslation } from "./i18n";
 
+// The widget is registered for all three methods; field shape varies per method.
+// We use the PATCH definition (most complete) for the shared prop type.
 interface RemoteConnectionByIdWidgetProps {
-  field: {
-    urlPathParams?: { instanceId?: string };
-    children: (typeof definitionsType.GET)["fields"]["children"];
-  };
+  field: (typeof definitionsType.PATCH)["fields"];
 }
 
-// ─── View (GET) ──────────────────────────────────────────────────────────────
+const SYNC_SCOPE_KEYS = [
+  "memories",
+  "documents",
+  "skills",
+  "favorites",
+  "threads",
+] as const;
+type SyncScopeKey = (typeof SYNC_SCOPE_KEYS)[number];
+
+// ─── Sync scope editor (form-context aware) ───────────────────────────────────
+
+function SyncScopeEditor({
+  t,
+}: {
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+}): JSX.Element {
+  const { setValue } = useFormContext();
+  const syncScope = useWatch({ name: "syncScope" }) as SyncScope | undefined;
+
+  const current: SyncScope = {
+    memories: syncScope?.memories ?? true,
+    documents: syncScope?.documents ?? true,
+    skills: syncScope?.skills ?? true,
+    favorites: syncScope?.favorites ?? false,
+    threads: syncScope?.threads ?? false,
+  };
+
+  const toggle = (key: SyncScopeKey): void => {
+    setValue(
+      "syncScope",
+      { ...current, [key]: !current[key] },
+      { shouldDirty: true },
+    );
+  };
+
+  return (
+    <SectionGroup title={t("patch.syncScope.label")}>
+      <P className="text-xs text-muted-foreground mb-3">
+        {t("patch.syncScope.description")}
+      </P>
+      <Div className="grid grid-cols-1 gap-2">
+        {SYNC_SCOPE_KEYS.map((key: SyncScopeKey) => (
+          <Div
+            key={key}
+            className="flex items-center justify-between rounded-md border px-3 py-2 bg-background"
+          >
+            <P className="text-sm">{t(`patch.syncScope.${key}` as const)}</P>
+            <Switch
+              checked={current[key]}
+              onCheckedChange={() => toggle(key)}
+              aria-label={t(`patch.syncScope.${key}` as const)}
+            />
+          </Div>
+        ))}
+      </Div>
+    </SectionGroup>
+  );
+}
+
+// ─── View (GET) ───────────────────────────────────────────────────────────────
 
 function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
   const locale = useWidgetLocale();
@@ -96,7 +153,7 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
 
   const status = useWidgetValue<typeof definitionsType.GET>();
   const isAdmin =
-    !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN);
+    !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN) === true;
 
   if (user.isPublic) {
     return (
@@ -200,6 +257,24 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
     });
   };
 
+  const handleOpenCortex = (e: ButtonMouseEvent): void => {
+    e.stopPropagation();
+    void (async (): Promise<void> => {
+      const defs =
+        await import("@/app/api/[locale]/agent/cortex/list/definition");
+      navigate(defs.default.GET, {});
+    })();
+  };
+
+  const handleOpenTerminals = (e: ButtonMouseEvent): void => {
+    e.stopPropagation();
+    void (async (): Promise<void> => {
+      const defs =
+        await import("@/app/api/[locale]/agent/cortex/terminals/definition");
+      navigate(defs.default.GET, {});
+    })();
+  };
+
   return (
     <WidgetShell>
       <WidgetHeader
@@ -236,7 +311,7 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
               className="gap-1.5"
             >
               <Pencil className="h-3.5 w-3.5" />
-              {t("widget.renameButton")}
+              {t("widget.editButton")}
             </Button>
             <Button
               type="button"
@@ -306,46 +381,57 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
         </DetailGrid>
       </SectionGroup>
 
-      {/* ── Behavior ───────────────────────────────────────────────────── */}
-      <SectionGroup title={t("widget.behaviorSection")}>
-        <DetailGrid columns={2}>
-          {status.loopLocation && (
-            <DetailField
-              label={t("patch.loopLocation.label")}
-              value={status.loopLocation}
-            />
-          )}
-          {status.threadMirrorMode && (
-            <DetailField
-              label={t("patch.threadMirrorMode.label")}
-              value={status.threadMirrorMode}
-            />
-          )}
-          {status.toolSource && (
-            <DetailField
-              label={t("patch.toolSource.label")}
-              value={status.toolSource}
-            />
-          )}
-          <DetailField
-            label={t("patch.isInferenceProvider.label")}
-            value={
-              <StatusPill
-                status={status.isInferenceProvider ? "enabled" : "disabled"}
-                variant={status.isInferenceProvider ? "success" : "default"}
+      {/* ── Sync scope — per provider ──────────────────────────────────── */}
+      {status.syncScope && (
+        <SectionGroup title={t("widget.syncSection")}>
+          <DetailGrid columns={3}>
+            {SYNC_SCOPE_KEYS.map((key: SyncScopeKey) => (
+              <DetailField
+                key={key}
+                label={t(`widget.syncScope.${key}` as const)}
+                value={
+                  <StatusPill
+                    status={status.syncScope?.[key] ? "on" : "off"}
+                    variant={status.syncScope?.[key] ? "success" : "default"}
+                  />
+                }
               />
-            }
-          />
-          <DetailField
-            label={t("patch.isDefault.label")}
-            value={
-              <StatusPill
-                status={status.isDefault ? "default" : "no"}
-                variant={status.isDefault ? "info" : "default"}
+            ))}
+          </DetailGrid>
+        </SectionGroup>
+      )}
+
+      {/* ── Behavior — admin only ──────────────────────────────────────── */}
+      {isAdmin && (
+        <SectionGroup title={t("widget.behaviorSection")}>
+          <DetailGrid columns={2}>
+            {status.loopLocation && (
+              <DetailField
+                label={t("patch.loopLocation.label")}
+                value={status.loopLocation}
               />
-            }
-          />
-          {isAdmin && (
+            )}
+            {status.threadMirrorMode && (
+              <DetailField
+                label={t("patch.threadMirrorMode.label")}
+                value={status.threadMirrorMode}
+              />
+            )}
+            {status.toolSource && (
+              <DetailField
+                label={t("patch.toolSource.label")}
+                value={status.toolSource}
+              />
+            )}
+            <DetailField
+              label={t("patch.isInferenceProvider.label")}
+              value={
+                <StatusPill
+                  status={status.isInferenceProvider ? "enabled" : "disabled"}
+                  variant={status.isInferenceProvider ? "success" : "default"}
+                />
+              }
+            />
             <DetailField
               label={t("patch.forceSystemProvider.label")}
               value={
@@ -355,29 +441,67 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
                 />
               }
             />
-          )}
-        </DetailGrid>
-      </SectionGroup>
-
-      {/* ── Sync & Access ──────────────────────────────────────────────── */}
-      {status.syncScope && (
-        <SectionGroup title={t("widget.syncSection")}>
-          <DetailGrid columns={3}>
-            {Object.entries(status.syncScope).map(([key, enabled]) => (
-              <DetailField
-                key={key}
-                label={key}
-                value={
-                  <StatusPill
-                    status={enabled ? "on" : "off"}
-                    variant={enabled ? "success" : "default"}
-                  />
-                }
-              />
-            ))}
           </DetailGrid>
         </SectionGroup>
       )}
+
+      {/* ── Cortex cross-reference ─────────────────────────────────────── */}
+      <SectionGroup title={t("widget.cortexSection")}>
+        <Card className="border shadow-none">
+          <CardHeader className="pb-2">
+            <Div className="flex items-center justify-between gap-3">
+              <Div className="flex items-center gap-2">
+                <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm">
+                  {t("widget.cortexSection")}
+                </CardTitle>
+              </Div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleOpenCortex}
+                className="gap-1.5 text-xs h-7"
+              >
+                <ExternalLink className="h-3 w-3" />
+                {t("widget.cortexLink")}
+              </Button>
+            </Div>
+            <CardDescription className="text-xs">
+              {t("widget.cortexDescription")}
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </SectionGroup>
+
+      {/* ── SSH & Terminal cross-reference ─────────────────────────────── */}
+      <SectionGroup title={t("widget.sshSection")}>
+        <Card className="border shadow-none">
+          <CardHeader className="pb-2">
+            <Div className="flex items-center justify-between gap-3">
+              <Div className="flex items-center gap-2">
+                <Terminal className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm">
+                  {t("widget.sshSection")}
+                </CardTitle>
+              </Div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleOpenTerminals}
+                className="gap-1.5 text-xs h-7"
+              >
+                <ExternalLink className="h-3 w-3" />
+                {t("widget.sshLink")}
+              </Button>
+            </Div>
+            <CardDescription className="text-xs">
+              {t("widget.sshDescription")}
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </SectionGroup>
 
       {/* ── Disconnect confirmation ────────────────────────────────────── */}
       <AlertDialog open={pendingDisconnect} onOpenChange={setPendingDisconnect}>
@@ -406,22 +530,17 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
 
 // ─── Edit (PATCH) ─────────────────────────────────────────────────────────────
 
-function EditWidget({
-  field,
-}: {
-  field: RemoteConnectionByIdWidgetProps["field"];
-}): JSX.Element {
+function EditWidget({ field }: RemoteConnectionByIdWidgetProps): JSX.Element {
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const user = useWidgetUser();
   const { pop, canGoBack } = useWidgetNavigation();
+  const emptyField = useMemo(() => ({}), []);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const isAdmin =
-    !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN);
-  // The PATCH definition has the same children shape — cast is safe since
-  // the widget is only mounted when endpoint.method === Methods.PATCH.
-  const patchChildren =
-    field.children as unknown as (typeof definitionsType.PATCH)["fields"]["children"];
+    !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN) === true;
+  const children = field.children;
 
   return (
     <WidgetShell>
@@ -439,30 +558,21 @@ function EditWidget({
             {t("widget.back")}
           </Button>
         ) : (
-          <NavigateButtonWidget
-            field={{ icon: "arrow-left", variant: "outline" }}
-          />
+          <NavigateButtonWidget field={emptyField} />
         )}
         <Div className="ml-auto flex items-center gap-2">
-          <SubmitButtonWidget<typeof definitionsType.PATCH>
-            field={{
-              text: "patch.success.title",
-              loadingText: "patch.success.title",
-              icon: "save",
-              variant: "primary",
-            }}
-          />
+          <SubmitButtonWidget field={emptyField} />
         </Div>
       </Div>
 
-      <FormAlertWidget field={{}} />
+      <FormAlertWidget field={emptyField} />
 
       <Div className="px-4 py-4 flex flex-col gap-6">
         {/* ── Rename ────────────────────────────────────────────────── */}
         <SectionGroup title={t("patch.newInstanceId.label")}>
           <TextFieldWidget
             fieldName="newInstanceId"
-            field={patchChildren.newInstanceId}
+            field={children.newInstanceId}
           />
         </SectionGroup>
 
@@ -472,59 +582,71 @@ function EditWidget({
             {t("patch.email.description")}
           </P>
           <Div className="flex flex-col gap-3">
-            <EmailFieldWidget fieldName="email" field={patchChildren.email} />
+            <EmailFieldWidget fieldName="email" field={children.email} />
             <PasswordFieldWidget
               fieldName="password"
-              field={patchChildren.password}
+              field={children.password}
             />
           </Div>
         </SectionGroup>
 
-        {/* ── Transport ─────────────────────────────────────────────── */}
-        <SectionGroup title={t("patch.transportMode.label")}>
-          <Div className="flex flex-col gap-3">
-            <SelectFieldWidget
-              fieldName="transportMode"
-              field={patchChildren.transportMode}
-            />
-            <BooleanFieldWidget
-              fieldName="allowTaskQueue"
-              field={patchChildren.allowTaskQueue}
-            />
-          </Div>
-        </SectionGroup>
+        {/* ── Transport + Behavior + Sync — admin only ──────────────── */}
+        {isAdmin && (
+          <>
+            {/* Advanced settings toggle */}
+            <Div
+              className="flex items-center gap-2 cursor-pointer select-none py-1 border-t pt-3"
+              onClick={() => setShowAdvanced((v) => !v)}
+            >
+              {showAdvanced ? (
+                <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+              )}
+              <P className="text-xs font-medium text-muted-foreground">
+                {t("widget.behaviorSection")}
+              </P>
+            </Div>
 
-        {/* ── Behavior ──────────────────────────────────────────────── */}
-        <SectionGroup title={t("widget.behaviorSection")}>
-          <Div className="flex flex-col gap-3">
-            <BooleanFieldWidget
-              fieldName="isInferenceProvider"
-              field={patchChildren.isInferenceProvider}
-            />
-            <BooleanFieldWidget
-              fieldName="isDefault"
-              field={patchChildren.isDefault}
-            />
-            <SelectFieldWidget
-              fieldName="loopLocation"
-              field={patchChildren.loopLocation}
-            />
-            <SelectFieldWidget
-              fieldName="threadMirrorMode"
-              field={patchChildren.threadMirrorMode}
-            />
-            <SelectFieldWidget
-              fieldName="toolSource"
-              field={patchChildren.toolSource}
-            />
-            {isAdmin && (
-              <BooleanFieldWidget
-                fieldName="forceSystemProvider"
-                field={patchChildren.forceSystemProvider}
-              />
+            {showAdvanced && (
+              <Div className="flex flex-col gap-5 border rounded-md px-4 py-4 bg-muted/20">
+                {/* Transport is auto-negotiated — read-only status shown in
+                    the status section, never an editable setting (spec.md) */}
+
+                {/* AI behavior */}
+                <SectionGroup title={t("patch.isInferenceProvider.label")}>
+                  <Div className="flex flex-col gap-3">
+                    <BooleanFieldWidget
+                      fieldName="isInferenceProvider"
+                      field={children.isInferenceProvider}
+                    />
+                    <SelectFieldWidget
+                      fieldName="loopLocation"
+                      field={children.loopLocation}
+                    />
+                    <SelectFieldWidget
+                      fieldName="threadMirrorMode"
+                      field={children.threadMirrorMode}
+                    />
+                    <SelectFieldWidget
+                      fieldName="toolSource"
+                      field={children.toolSource}
+                    />
+                  </Div>
+                </SectionGroup>
+
+                {/* Force system provider */}
+                <BooleanFieldWidget
+                  fieldName="forceSystemProvider"
+                  field={children.forceSystemProvider}
+                />
+
+                {/* Sync scope — per provider */}
+                <SyncScopeEditor t={t} />
+              </Div>
             )}
-          </Div>
-        </SectionGroup>
+          </>
+        )}
       </Div>
     </WidgetShell>
   );
@@ -533,21 +655,13 @@ function EditWidget({
 // ─── Delete (DELETE) ──────────────────────────────────────────────────────────
 
 function DeleteWidget(): JSX.Element {
+  const emptyField = useMemo(() => ({}), []);
   return (
     <Div className="flex flex-col gap-4 px-6 py-6">
-      <FormAlertWidget field={{}} />
+      <FormAlertWidget field={emptyField} />
       <Div className="flex flex-row gap-2">
-        <NavigateButtonWidget
-          field={{ icon: "arrow-left", variant: "outline" }}
-        />
-        <SubmitButtonWidget<typeof definitionsType.DELETE>
-          field={{
-            text: "delete.title",
-            loadingText: "delete.title",
-            icon: "trash",
-            variant: "destructive",
-          }}
-        />
+        <NavigateButtonWidget field={emptyField} />
+        <SubmitButtonWidget field={emptyField} />
       </Div>
     </Div>
   );
@@ -559,7 +673,9 @@ export function RemoteConnectionByIdWidget({
   field,
 }: RemoteConnectionByIdWidgetProps): JSX.Element {
   const endpoint = useWidgetEndpoint();
-  const instanceId = field.urlPathParams?.instanceId ?? "";
+  const instanceId =
+    (field as { urlPathParams?: { instanceId?: string } }).urlPathParams
+      ?.instanceId ?? "";
 
   if (endpoint.method === Methods.DELETE) {
     return <DeleteWidget />;

@@ -3,7 +3,7 @@ import type { JSX } from "react";
 
 import type { TagOption, TagsFieldProps } from "../../web/ui/tags-field";
 
-export type { TagsFieldProps, TagOption } from "../../web/ui/tags-field";
+export type { TagOption, TagsFieldProps } from "../../web/ui/tags-field";
 
 // CLI: show tags as comma-separated list
 export function TagsField<TKey extends string>({

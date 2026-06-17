@@ -7,6 +7,7 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -33,7 +34,7 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
-import { cn } from "next-vibe/shared/utils";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -71,18 +72,18 @@ import {
   imageGenModelOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import {
-  getModelPrice,
   type AnyModelOptionWithVision,
+  getModelPrice,
 } from "@/app/api/[locale]/agent/models/all-models";
 import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
+  type AnyModelId,
+  type AnyModelOption,
   ApiProvider,
   apiProviderDisplayNames,
   isModelProviderAvailable,
   modelProviders,
-  type AnyModelId,
-  type AnyModelOption,
   type ModelType,
 } from "@/app/api/[locale]/agent/models/models";
 import {
@@ -109,7 +110,6 @@ import {
   VideoGenModelId,
   videoGenModelOptions,
 } from "@/app/api/[locale]/agent/video-generation/models";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

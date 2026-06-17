@@ -3,19 +3,16 @@
  * Centralized constants for chat system including storage keys, limits, and defaults
  */
 
-import { envClient } from "@/config/env-client";
-
+import {
+  DEFAULT_AI_PINNED_IDS,
+  DEFAULT_WEB_PINNED_IDS,
+} from "@/app/api/[locale]/system/generated/endpoints-meta/default-pins";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   UserPermissionRole,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import {
-  DEFAULT_AI_PINNED_IDS,
-  DEFAULT_WEB_PINNED_IDS,
-} from "@/app/api/[locale]/system/generated/endpoints-meta/default-pins";
-
-import { DefaultFolderId } from "./config";
+import { envClient } from "@/config/env-client";
 
 import { CODING_AGENT_ALIAS } from "../coding-agent/constants";
 import {
@@ -27,10 +24,10 @@ import {
   CORTEX_MOVE_ALIAS,
   CORTEX_READ_ALIAS,
   CORTEX_SEARCH_ALIAS,
-import { DefaultFolderId } from "./config";
   CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "../cortex/constants";
+import { DefaultFolderId } from "./config";
 
 /**
  * Storage keys for localStorage persistence

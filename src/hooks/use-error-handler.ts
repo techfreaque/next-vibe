@@ -25,15 +25,15 @@ export default function useErrorHandler(
   options: ErrorHandlerOptions = {},
 ): string | undefined {
   const { onError } = options;
+  const logger = useLogger();
 
   useEffect(() => {
-    const logger = useLogger();
     logger.error("errors.application.generic", error);
     // Call custom error handler if provided
     if (onError) {
       onError(error);
     }
-  }, [error, onError, locale]);
+  }, [error, onError, locale, logger]);
 
   return error.digest;
 }

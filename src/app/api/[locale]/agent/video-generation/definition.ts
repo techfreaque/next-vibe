@@ -24,9 +24,6 @@ import {
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
-import { lazy } from "react";
-
 import { VIDEO_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

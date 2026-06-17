@@ -13,13 +13,12 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import type { UITranslationKey } from "next-vibe-ui/i18n";
 import type * as IconsLibrary from "next-vibe-ui/ui/icons";
 import { loadIconModule } from "next-vibe-ui/ui/icons/loader";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
-
-import type { UITranslationKey } from "next-vibe-ui/i18n";
 
 /**
  * Type for React components that accept className prop

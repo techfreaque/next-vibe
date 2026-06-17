@@ -33,8 +33,6 @@ import {
   MusicDuration,
   MusicDurationOptions,
 } from "./enum";
-
-import { MUSIC_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const MusicGenerationContainer = lazy(() =>

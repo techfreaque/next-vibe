@@ -26,14 +26,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
-import { scopedTranslation } from "./i18n";
-import { scopedTranslation } from "./i18n";
-import companiesListDefinitions from "@/app/api/[locale]/companies/list/definition";
-import categoryListDefinitions from "@/app/api/[locale]/products/category/list/definition";
 import { ProductType, ProductTypeOptions } from "../../enum";
 import { PRODUCTS_CATALOG_LIST_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const CatalogListWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CatalogListWidget })),

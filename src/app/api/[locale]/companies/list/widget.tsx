@@ -9,8 +9,6 @@ import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import { type JSX } from "react";
-
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetLocale,
@@ -18,12 +16,13 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { type JSX } from "react";
 
 import type { CompanyMemberRoleValue, CompanyTypeValue } from "../enum";
 import { CompanyMemberRole, CompanyType } from "../enum";
 import { scopedTranslation as companiesScopedTranslation } from "../i18n";
-import type { CompanyListGetResponseOutput } from "./definition";
 import type definition from "./definition";
+import type { CompanyListGetResponseOutput } from "./definition";
 
 type CompanyItem = NonNullable<
   CompanyListGetResponseOutput["companies"]

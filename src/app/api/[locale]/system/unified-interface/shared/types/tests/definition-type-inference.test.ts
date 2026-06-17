@@ -14,6 +14,11 @@ import type {
   ResponseType,
   SuccessResponseType,
 } from "next-vibe/shared/types/response.schema";
+import type {
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+  ObjectChildrenConstraint,
+} from "next-vibe-ui/unified/_shared/types";
 import type { z } from "zod";
 
 import type imapAccountsListDefinition from "@/app/api/[locale]/messenger/accounts/list/definition";
@@ -35,11 +40,6 @@ import type {
   ObjectWidgetConfig,
   RequestResponseWidgetConfig,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
-import type {
-  ConstrainedChildUsage,
-  FieldUsageConfig,
-  ObjectChildrenConstraint,
-} from "next-vibe-ui/unified/_shared/types";
 
 // Legacy ObjectField type alias for backward compatibility in tests
 // ObjectField<TChildren, TUsage, TKey> → ObjectWidgetConfig<TKey, TUsage, "object", TChildren>

@@ -6,14 +6,14 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import * as React from "react";
-
 import {
   Icon,
   type IconKey,
 } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import * as React from "react";
 
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+
 import { Span } from "./span";
 
 export interface RangeSliderOption {

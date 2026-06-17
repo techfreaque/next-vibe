@@ -37,9 +37,6 @@ import {
 
 import { dateSchema } from "../../shared/types/common.schema";
 import { scopedTranslation } from "./i18n";
-import leadsListDefinitions from "@/app/api/[locale]/leads/list/definition";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const UserCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UserCreateContainer })),

@@ -16,8 +16,6 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 
-import { Link2 } from "next-vibe-ui/ui/icons/Link2";
-
 import { REFERRAL_CONFIG } from "../config";
 import type definition from "./definition";
 

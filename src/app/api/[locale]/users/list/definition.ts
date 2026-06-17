@@ -48,8 +48,6 @@ import {
 import { USERS_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const UsersListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UsersListContainer })),
 );

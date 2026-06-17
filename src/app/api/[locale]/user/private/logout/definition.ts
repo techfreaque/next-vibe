@@ -16,12 +16,9 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { LogoutWidget } from "./widget";
-
-import { LogoutWidget } from "./widget";
-import { LogoutWidget } from "./widget";
 import { UserRole } from "../../user-roles/enum";
 import { scopedTranslation } from "./i18n";
+import { LogoutWidget } from "./widget";
 
 export const LOGOUT_ALIAS = "logout" as const;
 

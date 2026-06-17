@@ -2,13 +2,11 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Users } from "next-vibe-ui/ui/icons/Users";
-import type { JSX } from "react";
-
+import { Span } from "next-vibe-ui/ui/span";
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetForm,
@@ -17,12 +15,13 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
 
 import type { CompanyMemberRoleValue } from "../../../enum";
 import { CompanyMemberRole } from "../../../enum";
 import { scopedTranslation as companiesScopedTranslation } from "../../../i18n";
-import type { MembersListGetResponseOutput } from "./definition";
 import type definition from "./definition";
+import type { MembersListGetResponseOutput } from "./definition";
 
 type Member = NonNullable<MembersListGetResponseOutput["members"]>[number];
 

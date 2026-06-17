@@ -14,8 +14,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
-import { ensureGlobals } from "./lazy-widget";
 import type { UpdateCallback } from "./lazy-widget";
+import { ensureGlobals } from "./lazy-widget";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dispatch-boundary
 type AnyComponent = React.ComponentType<any>;
@@ -98,8 +98,7 @@ export function HmrWrapper({
     return (): void => {
       cleanup?.();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- factory is stable per lazyWidget call
-  }, []);
+  }, [factory, state]);
 
   // If the component was preloaded (SSR path or first client render before HMR),
   // render it directly - no Suspense, no streaming gap, no flash.

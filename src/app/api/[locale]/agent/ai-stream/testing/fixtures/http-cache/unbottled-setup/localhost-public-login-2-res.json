@@ -1,0 +1,20 @@
+{
+  "type": "json",
+  "url": "http://localhost:3002/api/en-GLOBAL/user/public/login",
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "date": "Wed, 17 Jun 2026 12:11:19 GMT, Wed, 17 Jun 2026 12:11:20 GMT",
+    "transfer-encoding": "chunked",
+    "vary": "sec-fetch-dest",
+    "set-cookie": "lead_id_3002=433203ef-33c9-4c91-9e0f-41ff7cf7b360; Max-Age=315360000; Path=/; HttpOnly; SameSite=Lax"
+  },
+  "body": {
+    "success": true,
+    "data": {
+      "message": "Welcome back! You have successfully logged in.",
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImY0MzFiY2U0LTgwZTUtNDkxOC1iZDU2LWEyNzI2ODY3ODk4YSIsImxlYWRJZCI6IjQzMzIwM2VmLTMzYzktNGM5MS05ZTBmLTQxZmY3Y2Y3YjM2MCIsImlzUHVibGljIjpmYWxzZSwicm9sZXMiOlsiZW51bXMudXNlclJvbGUuYWRtaW4iXSwiaWF0IjoxNzgxNjk4MjgwLCJleHAiOjQ5MzUyOTgyODB9.f0E9OfR7315PT9r1Cw_bspugyao90woHFdmof1d9UQE",
+      "leadId": "433203ef-33c9-4c91-9e0f-41ff7cf7b360"
+    }
+  }
+}

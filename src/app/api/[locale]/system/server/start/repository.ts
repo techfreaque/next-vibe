@@ -27,7 +27,6 @@ import {
   truncateServerLog,
   writeServerLogOfflineHint,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
-import { formatLogPrefix } from "@/app/api/[locale]/system/unified-interface/shared/logger/logger-core";
 import {
   createNextjsFormatter,
   formatConfig,
@@ -40,6 +39,7 @@ import {
   formatTask,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import { formatLogPrefix } from "@/app/api/[locale]/system/unified-interface/shared/logger/logger-core";
 import type { WebSocketServerHandle } from "@/app/api/[locale]/system/unified-interface/websocket/server";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";

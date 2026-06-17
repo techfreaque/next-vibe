@@ -21,7 +21,6 @@ import {
   truncateServerLog,
   writeServerLogOfflineHint,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/file-logger";
-import { formatLogPrefix } from "@/app/api/[locale]/system/unified-interface/shared/logger/logger-core";
 import {
   createNextjsFormatter,
   formatActionCommand,
@@ -36,18 +35,19 @@ import {
   formatTask,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import { formatLogPrefix } from "@/app/api/[locale]/system/unified-interface/shared/logger/logger-core";
 import { UnifiedTaskRunnerRepository } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/repository";
 import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { closeDatabase, reopenDatabase } from "../../db";
 import { DatabaseGenerateRepository } from "../../db/generate/repository";
 import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { scopedTranslation as dockerScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { DockerOperationsRepository } from "../../db/utils/docker-operations/repository";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { DbUtilsRepository } from "../../db/utils/repository";
-import { closeDatabase } from "../../db";
 import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/constants";
 import { ServerFramework } from "../enum";
 import {

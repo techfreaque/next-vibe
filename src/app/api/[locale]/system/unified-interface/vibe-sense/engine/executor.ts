@@ -16,14 +16,12 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { defaultLocale } from "@/i18n/core/config";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-
 import { GraphResolution } from "../enum";
 import type { GraphNodeConfig } from "../graph/schema";
 import type { GraphEdge } from "../graph/types";
-  DataPointSchema,
 import {
   type DataPoint,
+  DataPointSchema,
   type Resolution,
   type SignalEvent,
   type TimeRange,

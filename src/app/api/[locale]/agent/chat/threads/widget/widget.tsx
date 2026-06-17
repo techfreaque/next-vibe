@@ -5,7 +5,10 @@
 
 "use client";
 
+import { success } from "next-vibe/shared/types/response.schema";
+import { cn } from "next-vibe/shared/utils";
 import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,8 +52,12 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
+import {
+  useWidgetContext,
+  useWidgetValue,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import React, { useEffect, useMemo, useState } from "react";
 
 import {
@@ -59,28 +66,21 @@ import {
 } from "@/app/[locale]/chat/lib/design-tokens";
 import type { FolderListResponseOutput } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition";
 import foldersDefinition from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition";
+import {
+  type ChatT,
+  scopedTranslation as chatScopedTranslation,
+} from "@/app/api/[locale]/agent/chat/i18n";
 import { ThreadPermissionsDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/widget";
 import { ThreadShareDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/widget";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
-import {
-  useWidgetContext,
-  useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import {
-  scopedTranslation as chatScopedTranslation,
-  type ChatT,
-} from "@/app/api/[locale]/agent/chat/i18n";
 
 import { DefaultFolderId } from "../../config";
 import type { ChatThread } from "../../db";
 import { useChatStore } from "../../hooks/store";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
-import type { ThreadListResponseOutput } from "../definition";
 import type definition from "../definition";
+import type { ThreadListResponseOutput } from "../definition";
 import { scopedTranslation } from "../i18n";
 
 type ThreadFromResponse = ThreadListResponseOutput["threads"][number];

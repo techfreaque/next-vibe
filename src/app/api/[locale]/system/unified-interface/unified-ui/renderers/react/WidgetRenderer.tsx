@@ -1,14 +1,5 @@
 "use client";
 
-import React, { Suspense, type JSX } from "react";
-import type { z } from "zod";
-
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import {
-  FieldDataType,
-  WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-
 import type { ReactWidgetProps } from "next-vibe-ui/unified/_shared/react-types";
 import type {
   AnyChildrenConstrain,
@@ -36,6 +27,15 @@ import FormAlertWidget from "next-vibe-ui/unified/interactive/form-alert/widget"
 import NavigateButtonWidget from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import SearchBarWidget from "next-vibe-ui/unified/interactive/search-bar/widget";
 import SubmitButtonWidget from "next-vibe-ui/unified/interactive/submit-button/widget";
+import React, { type JSX, Suspense } from "react";
+import type { z } from "zod";
+
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import {
+  FieldDataType,
+  WidgetType,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
 import { WidgetErrorBoundary } from "./ErrorBoundary";
 import { resolvedCache } from "./widget-preloader";
 

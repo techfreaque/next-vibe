@@ -5,11 +5,8 @@
 
 "use client";
 
-import type { JSX } from "react";
-import type { JSX } from "react";
-import type { JSX } from "react";
-
 import { P } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
 
 interface Props {
   description?: string;

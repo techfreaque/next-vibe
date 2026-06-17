@@ -4,8 +4,8 @@
  * Common formatting functions used across the chat application.
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { MessagesT } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/i18n";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as chatScopedTranslation } from "../../i18n";
 

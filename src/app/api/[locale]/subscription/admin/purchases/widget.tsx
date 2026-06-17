@@ -13,8 +13,6 @@ import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback } from "react";
-
 import {
   useWidgetContext,
   useWidgetForm,
@@ -25,6 +23,9 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import React, { useCallback } from "react";
+
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 

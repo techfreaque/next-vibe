@@ -32,9 +32,6 @@ import {
   createTrackingContext,
   type TrackingContext,
 } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
-
-import { FEATURED_MODELS } from "../agent/ai-stream/models";
-import { contactClientRepository } from "../contact/repository-client";
 import { getPricingParams } from "../products/repository-client";
 import {
   scopedTranslation as subscriptionScopedTranslation,

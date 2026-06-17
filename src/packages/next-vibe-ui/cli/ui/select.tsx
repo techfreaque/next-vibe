@@ -3,6 +3,8 @@
  * Items are collected via SelectItem children, Select manages state
  */
 import { Box, Text, useFocus, useInput } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
 import {
   createContext,
   useCallback,
@@ -12,32 +14,29 @@ import {
   useRef,
   useState,
 } from "react";
-import type { JSX } from "react";
 
+import type {
+  SelectContentProps,
+  SelectGroupProps,
+  SelectItemProps,
+  SelectLabelProps,
+  SelectRootProps,
+  SelectSeparatorProps,
+  SelectTriggerProps,
+  SelectValueProps,
+} from "../../web/ui/select";
 import { useFocusScopeRegister, useShouldFocus } from "./dialog";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
-import type {
-  SelectRootProps,
-  SelectGroupProps,
-  SelectValueProps,
-  SelectTriggerProps,
-  SelectContentProps,
-  SelectItemProps,
-  SelectLabelProps,
-  SelectSeparatorProps,
-} from "../../web/ui/select";
-
 export type {
-  SelectRootProps,
-  SelectGroupProps,
-  SelectValueProps,
-  SelectTriggerProps,
   SelectContentProps,
+  SelectGroupProps,
   SelectItemProps,
   SelectLabelProps,
-  SelectSeparatorProps,
   SelectOption,
+  SelectRootProps,
+  SelectSeparatorProps,
+  SelectTriggerProps,
+  SelectValueProps,
 } from "../../web/ui/select";
 
 interface SelectContextType {
@@ -184,8 +183,17 @@ export function Select<TValue extends string>({
       items: itemsRef.current,
       isFocused,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [value, onValueChange, disabled, open, cursor, registerItem, isFocused],
+    [
+      value,
+      onValueChange,
+      disabled,
+      open,
+      setOpen,
+      cursor,
+      setCursor,
+      registerItem,
+      isFocused,
+    ],
   );
 
   return (
@@ -291,11 +299,11 @@ export function SelectItem({
   const isMcp = useIsMcp();
   const label = typeof children === "string" ? children : (value ?? "");
 
+  const { registerItem } = ctx;
   // Register this item with the parent Select
   useEffect(() => {
-    return ctx.registerItem(value, label, disabled);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, label, disabled]);
+    return registerItem(value, label, disabled);
+  }, [registerItem, value, label, disabled]);
 
   // In MCP mode, show nothing (Select collects items via registration)
   if (isMcp) {

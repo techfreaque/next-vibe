@@ -6,7 +6,6 @@
 import "server-only";
 
 import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
-import type { NextRequest } from "next-vibe-ui/lib/request";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -14,6 +13,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 
 // Removed unused import - using direct database operations instead
 import { db } from "@/app/api/[locale]/system/db";

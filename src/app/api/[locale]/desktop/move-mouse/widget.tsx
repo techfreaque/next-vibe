@@ -5,23 +5,18 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Camera } from "next-vibe-ui/ui/icons/Camera";
 import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-
-import type { JSX } from "react";
-import type { JSX } from "react";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { DesktopNavHeader } from "../shared/nav-header";
-import { DesktopNavHeader } from "../shared/nav-header";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
 
+import { DesktopNavHeader } from "../shared/nav-header";
 import type definition from "./definition";
 
 interface CustomWidgetProps {

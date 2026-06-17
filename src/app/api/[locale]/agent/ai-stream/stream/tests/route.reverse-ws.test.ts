@@ -28,12 +28,16 @@ import "server-only";
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
+import { and, eq } from "drizzle-orm";
+
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { and, eq } from "drizzle-orm";
+
 import {
+  ATLAS_INSTANCE_ID,
   failSuitePrerequisites,
+  HERMES_INSTANCE_ID,
   isHermesInFixtureMode,
   resolveRemoteUrl,
 } from "../../testing/remote-setup";

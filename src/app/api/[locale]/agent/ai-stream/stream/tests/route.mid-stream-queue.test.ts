@@ -44,18 +44,19 @@ installFetchCache();
 
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
+import { AiStreamRepository } from "../../repository";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
 import { scopedTranslation } from "../../stream/i18n";
-import { AiStreamRepository } from "../../repository";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import { env } from "@/config/env";
 import {
   setFetchCacheContext,
   waitForInflightFetches,
@@ -67,7 +68,6 @@ import {
   resolveUser,
   type SlimMessage,
 } from "../../testing/headless-test-runner";
-import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 
 // ── Test timeouts ─────────────────────────────────────────────────────────────
 

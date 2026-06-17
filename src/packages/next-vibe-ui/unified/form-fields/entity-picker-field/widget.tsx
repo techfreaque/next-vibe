@@ -23,12 +23,6 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import { useRef, useState, type JSX } from "react";
-
-import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { ReactFormFieldProps } from "next-vibe-ui/unified/_shared/react-types";
 import type { FieldUsageConfig } from "next-vibe-ui/unified/_shared/types";
 import {
@@ -38,6 +32,12 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { type JSX, useRef, useState } from "react";
+
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 
 import type { EntityPickerFieldWidgetConfig } from "./types";

@@ -19,9 +19,6 @@ import { tool } from "../../config";
 import { SkillCategory, SkillOwnershipType } from "../../enum";
 import { THEA_CORE_PROMPT } from "../thea/core";
 import { THEA_VARIANTS } from "../thea/skill";
-import { THEA_CORE_PROMPT } from "../thea/core";
-
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 
 export const MAMA_SYSTEM_PROMPT = `${THEA_CORE_PROMPT}
 

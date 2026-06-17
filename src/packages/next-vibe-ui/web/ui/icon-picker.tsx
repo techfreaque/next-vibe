@@ -5,18 +5,18 @@
  */
 
 import { cn } from "next-vibe/shared/utils";
-import type { JSX } from "react";
-import { useMemo, useState } from "react";
-
 import type { CategoryKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import {
   Icon,
   ICON_CATEGORIES,
   type IconKey,
 } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "../i18n";
+import type { JSX } from "react";
+import { useMemo, useState } from "react";
 
+import { useTranslation } from "@/i18n/core/client";
+
+import { uiScopedTranslation } from "../i18n";
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogTrigger } from "./dialog";
 import { Div } from "./div";

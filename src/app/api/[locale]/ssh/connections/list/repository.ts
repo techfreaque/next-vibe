@@ -59,7 +59,6 @@ export class ConnectionsListRepository {
             instanceId: remoteConnections.instanceId,
             remoteUrl: remoteConnections.remoteUrl,
             isActive: remoteConnections.isActive,
-            routingRules: remoteConnections.routingRules,
             lastSyncedAt: remoteConnections.lastSyncedAt,
             transportMode: remoteConnections.transportMode,
             createdAt: remoteConnections.createdAt,
@@ -81,9 +80,7 @@ export class ConnectionsListRepository {
       if (isAdmin) {
         const hasLocal = sshRows.some((c) => c.authType === SshAuthType.LOCAL);
         if (!hasLocal) {
-          const hasDefault =
-            sshRows.some((c) => c.isDefault) ||
-            remoteRows.some((c) => c.routingRules?.isDefault === true);
+          const hasDefault = sshRows.some((c) => c.isDefault);
           const [inserted] = await db
             .insert(sshConnections)
             .values({
@@ -144,7 +141,7 @@ export class ConnectionsListRepository {
           port: 0,
           username: r.instanceId,
           authType: "remote",
-          isDefault: r.routingRules?.isDefault ?? false,
+          isDefault: false,
           fingerprint: null,
           notes: null,
           createdAt: r.createdAt.toISOString(),

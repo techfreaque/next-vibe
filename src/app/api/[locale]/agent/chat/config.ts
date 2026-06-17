@@ -3,6 +3,8 @@
  * Default folder definitions and utilities
  */
 
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+
 import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
 import {
   CORTEX_DELETE_ALIAS,
@@ -19,15 +21,15 @@ import {
 import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import {
   type CallbackModeValue,
+  EXECUTE_TOOL_ALIAS,
 } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-  EXECUTE_TOOL_ALIAS,
 import {
   type UserPermissionRoleValue,
   UserRole,
+} from "@/app/api/[locale]/user/user-roles/enum";
 
 /**
-} from "@/app/api/[locale]/user/user-roles/enum";
  * Default folder IDs
  * These are special system folder IDs that exist outside the database
  * They use simple string IDs (not UUIDs) for easy reference

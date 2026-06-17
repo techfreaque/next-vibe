@@ -3,6 +3,8 @@ import * as React from "react";
 
 import { parseClassesToInkProps } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
 
+import type { DivProps, DivRefObject } from "../../web/ui/div";
+
 /**
  * Wrap bare string/number children in <Text> so Ink doesn't crash.
  * In HTML, <div> can contain bare text. In Ink, <Box> cannot.

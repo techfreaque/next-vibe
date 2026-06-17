@@ -5,6 +5,8 @@
 
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 
+import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+
 import { ModelUtility, type ModelUtilityValue } from "../../models/enum";
 import type { ModelsTranslationKey } from "../../models/i18n";
 import { scopedTranslation as modelsScopedTranslation } from "../../models/i18n";

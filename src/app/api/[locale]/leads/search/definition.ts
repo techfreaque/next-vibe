@@ -33,8 +33,7 @@ import {
   LeadStatusDB,
 } from "../enum";
 import { LEADS_SEARCH_ALIAS } from "./constants";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { scopedTranslation } from "./i18n";
 
 const LeadsSearchContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadsSearchContainer })),

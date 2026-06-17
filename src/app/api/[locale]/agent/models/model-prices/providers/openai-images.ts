@@ -9,6 +9,8 @@
 import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
+import { imageGenModelDefinitions } from "../../../image-generation/models";
 import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";

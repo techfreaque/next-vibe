@@ -25,8 +25,6 @@ import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { formatValidationErrorCompact } from "../shared/utils/format-validation-error";
 
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
 /**
  * Wraps a validated success response in NextResponse
  * Validation is already done by genericHandler

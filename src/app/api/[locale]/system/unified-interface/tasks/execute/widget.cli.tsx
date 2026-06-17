@@ -7,14 +7,14 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import type { JSX } from "react";
-import { useMemo } from "react";
-
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetLocale,
   useWidgetPlatform,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useMemo } from "react";
+
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import { CronTaskStatus } from "../enum";
 import type { TaskExecuteResponseOutput } from "./definition";

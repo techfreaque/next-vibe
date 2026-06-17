@@ -12,6 +12,10 @@
  * root-folder tabs, new-chat button, search, and the top-level EndpointsPage call.
  */
 
+import { success } from "next-vibe/shared/types/response.schema";
+import { cn } from "next-vibe/shared/utils";
+import { useRouter, useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
+import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,8 +60,14 @@ import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
+import {
+  useWidgetContext,
+  useWidgetForm,
+  useWidgetValue,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { useMemo, useState } from "react";
 
 import {
@@ -79,21 +89,6 @@ import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { useRouter, useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
-import {
-  useWidgetContext,
-  useWidgetForm,
-  useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import {
-  scopedTranslation as chatScopedTranslation,
-  type ChatT,
-} from "../../i18n";
-import { ThreadShareDialog } from "../../threads/[threadId]/share-links/widget";
 
 import type { ChatFolder } from "../../db";
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";
@@ -104,6 +99,11 @@ import { FolderPermissionsDialog } from "../../folders/[rootFolderId]/widget/fol
 import renameDefinitions from "../../folders/subfolders/[subFolderId]/rename/definition";
 import { useChatBootContext } from "../../hooks/context";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
+import {
+  type ChatT,
+  scopedTranslation as chatScopedTranslation,
+} from "../../i18n";
+import { ThreadShareDialog } from "../../threads/[threadId]/share-links/widget";
 import { scopedTranslation as threadsScopedTranslation } from "../../threads/i18n";
 import type { FolderContentsItem } from "./definition";
 import definitions from "./definition";

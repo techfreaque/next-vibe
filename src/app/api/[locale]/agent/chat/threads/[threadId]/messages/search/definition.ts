@@ -99,7 +99,9 @@ const { GET } = createEndpoint({
       // === URL PARAMS ===
       threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: threadsDefinitions.GET,
+        labelField: "title",
         label: "search.get.threadId.label" as const,
         description: "search.get.threadId.description" as const,
         schema: z.uuid(),

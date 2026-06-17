@@ -6,9 +6,9 @@ import "server-only";
 
 import type { JSONValue, LanguageModel, ModelMessage } from "ai";
 import {
-  streamText as aiStreamText,
   stepCountIs,
   type StopCondition,
+  streamText as aiStreamText,
 } from "ai";
 
 const DEFAULT_TEMPERATURE = 0.7;
@@ -57,10 +57,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ChatModelId, ChatModelOption } from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
-import { MAX_TOOL_CALLS } from "../core/constants";
+import {
+  AbortReason,
+  MAX_TOOL_CALLS,
+  StreamAbortError,
+} from "../core/constants";
 import type { ProviderFactory } from "../core/provider-factory";
-import { QueueRegistry } from "../core/stream-registry";
 import type { StreamContext } from "../core/stream-context";
+import { QueueRegistry } from "../core/stream-registry";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import type { SystemPromptParams } from "../system-prompt/builder";
 import { StreamCompletionHandler } from "./stream-completion-handler";

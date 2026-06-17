@@ -13,6 +13,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type {
+  EmailTemplateDefinitionAny,
+  TemplateCachedMetadata,
+} from "@/app/api/[locale]/messenger/registry/template";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
@@ -21,10 +25,6 @@ import {
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
-import type {
-  EmailTemplateDefinitionAny,
-  TemplateCachedMetadata,
-} from "@/app/api/[locale]/messenger/registry/template";
 import type { LiveIndex } from "../shared/live-index";
 import {
   findFilesRecursively,

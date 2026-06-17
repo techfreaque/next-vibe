@@ -10,8 +10,6 @@ import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { scopedTranslation as referralScopedTranslation } from "@/app/[locale]/user/(account)/referral/i18n";
 import {
   buildCommissionRows,
@@ -19,6 +17,7 @@ import {
   getChainTotal,
   getReferralParams,
 } from "@/app/[locale]/user/(account)/referral/i18n/utils";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ReferralShowcaseProps {
   locale: CountryLanguage;

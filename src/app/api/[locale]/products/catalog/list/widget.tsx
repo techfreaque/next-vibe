@@ -12,8 +12,6 @@ import {
   SelectValue,
 } from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetForm,
@@ -22,8 +20,10 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import { ProductType } from "../../enum";
 import type definition from "./definition";
 import type { CatalogListGetResponseOutput } from "./definition";

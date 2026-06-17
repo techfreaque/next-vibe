@@ -29,9 +29,6 @@ import { SKILL_MODERATION_ALIAS } from "../constants";
 import skillsDefinitions from "../definition";
 import { SkillStatus, SkillStatusDB } from "../enum";
 import { scopedTranslation } from "./i18n";
-import skillsDefinitions from "../definition";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const SkillModerationContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillModerationContainer })),

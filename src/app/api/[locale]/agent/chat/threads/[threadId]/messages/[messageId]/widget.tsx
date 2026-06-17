@@ -2,22 +2,20 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-import { useEffect } from "react";
-
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
   useWidgetForm,
   useWidgetPlatform,
   useWidgetTranslation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import type { JSX } from "react";
+import { useEffect } from "react";
+
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import type definitions from "./definition";
 

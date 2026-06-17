@@ -23,16 +23,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 import {
   CompanyMemberRole,
   CompanyMemberRoleOptions,
   CompanyType,
   CompanyTypeOptions,
-import { scopedTranslation } from "./i18n";
 } from "../enum";
 import { COMPANIES_LIST_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const CompanyListWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CompanyListContainer })),

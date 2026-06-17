@@ -139,6 +139,16 @@ interface OxlintConfigOptions {
     builtin?: boolean;
   };
   globals?: Record<string, "readonly" | "writable" | "off">;
+  overrides?: Array<{
+    files: string[];
+    rules?: LintConfigElement;
+    categories?: {
+      correctness?: Severity;
+      suspicious?: Severity;
+      pedantic?: Severity;
+      style?: Severity;
+    };
+  }>;
 }
 
 /** Oxlint disabled - no other settings required */

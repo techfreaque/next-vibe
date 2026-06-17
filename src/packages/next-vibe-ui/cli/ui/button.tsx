@@ -5,22 +5,21 @@
  * Focusable button with Enter/Space to activate onClick.
  * Uses Ink's useFocus for Tab navigation.
  */
+import { cva } from "class-variance-authority";
 import { Text, useFocus, useInput, useStdin } from "ink";
+import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX, ReactNode } from "react";
 import { Children, isValidElement, useEffect, useRef } from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { ButtonProps } from "../../web/ui/button";
 import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
 import { useDropdownTrigger } from "./dropdown-menu";
 import { usePopoverTrigger } from "./popover";
 
-import { cva } from "class-variance-authority";
-
 // Stub variants for CLI - CSS classes are unused in terminal rendering
 export const buttonVariants = cva("");
 export const buttonTextVariants = cva("");
-export type { ButtonVariant, ButtonSize } from "../../web/ui/button";
+export type { ButtonSize, ButtonVariant } from "../../web/ui/button";
 
 /**
  * True if a string is a meaningful label (more than just an icon/emoji).

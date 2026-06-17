@@ -20,9 +20,6 @@ import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useState } from "react";
-
-import { MimeType } from "@/app/api/[locale]/leads/enum";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -34,6 +31,9 @@ import {
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import React, { useCallback, useState } from "react";
+
+import { MimeType } from "@/app/api/[locale]/leads/enum";
 
 import type definition from "./definition";
 

@@ -1,24 +1,26 @@
 import "server-only";
+
 import {
-  installFetchCache,
   addLocalhostPort,
+  installFetchCache,
   setFetchCacheContext,
 } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 installFetchCache();
 import { installWsFixture } from "@/app/api/[locale]/agent/ai-stream/testing/ws-fixture";
 installWsFixture();
+import { eq } from "drizzle-orm";
+
+import { runTestStream } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { env } from "@/config/env";
+import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
-import { eq } from "drizzle-orm";
-import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { runTestStream } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
 
 async function main(): Promise<void> {
   addLocalhostPort(3001);

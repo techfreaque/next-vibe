@@ -29,6 +29,14 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
+import { db } from "@/app/api/[locale]/system/db";
+import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+
 import type { RunRequestOutput, RunResponseOutput } from "./definition";
 import type { CodingAgentT } from "./i18n";
 import { claudeCodeConfig } from "./providers/claude-code/repository";

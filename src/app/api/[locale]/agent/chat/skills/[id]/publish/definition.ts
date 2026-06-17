@@ -35,8 +35,6 @@ import skillsListDefinition from "../../definition";
 import { SkillStatus, SkillStatusOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const SkillPublishContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillPublishContainer })),
 );

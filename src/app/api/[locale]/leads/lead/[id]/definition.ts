@@ -48,10 +48,6 @@ import {
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import leadsSearchDefinitions from "@/app/api/[locale]/leads/search/definition";
-import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
-
 const LeadDetailContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadDetailContainer })),
 );

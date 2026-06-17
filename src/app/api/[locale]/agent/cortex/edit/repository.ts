@@ -5,18 +5,16 @@ import "server-only";
  * Find-and-replace or line-range editing within document workspace files
  */
 import { and, eq } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
 import {
   ErrorResponseTypes,
-  success,
   fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -24,14 +22,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { applyFindReplace, applyLineReplace } from "../_shared/edit-operations";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
-  getNode,
 import {
   getMountPrefix,
+  getNode,
   isValidPath,
   isVirtualWritable,
-  normalizeToCanonicalPath,
   isWritablePath,
   normalizePath,
+  normalizeToCanonicalPath,
   parseFrontmatter,
 } from "../repository";
 import type { CortexEditT } from "./i18n";

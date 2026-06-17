@@ -16,7 +16,6 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-
 import type { ZodTypeAny } from "zod";
 
 import type { EnvExample } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";

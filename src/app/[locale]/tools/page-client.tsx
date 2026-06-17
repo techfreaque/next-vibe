@@ -1,21 +1,21 @@
 "use client";
 
+import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
-import { Div } from "next-vibe-ui/ui/div";
-import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type {
-  HelpGetResponseOutput,
   HelpGetRequestInput,
+  HelpGetResponseOutput,
 } from "@/app/api/[locale]/system/help/definition";
+import helpDefinitions from "@/app/api/[locale]/system/help/definition";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useLogger } from "@/hooks/use-logger";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 function parseInitialState(
   searchParams: ReturnType<typeof useSearchParams>,

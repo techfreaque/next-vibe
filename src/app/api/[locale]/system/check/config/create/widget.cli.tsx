@@ -11,19 +11,19 @@
 
 import chalk from "chalk";
 import { Box, Text, useInput, useStdin } from "ink";
-import type { JSX } from "react";
-import { useCallback, useState } from "react";
-
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetPlatform,
   useWidgetResponseOnly,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useCallback, useState } from "react";
 
-import type { ConfigCreateResponseOutput } from "./definition";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+
 import type defintion from "./definition";
+import type { ConfigCreateResponseOutput } from "./definition";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 

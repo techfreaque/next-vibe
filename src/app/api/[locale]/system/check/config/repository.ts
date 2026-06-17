@@ -20,12 +20,12 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
 import { scopedTranslation } from "./i18n";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type {
   CheckConfig,
   CreateDefaultCheckConfigResult,
@@ -958,6 +958,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       settings?: typeof oxlintConfig.settings;
       env?: typeof oxlintConfig.env;
       globals?: typeof oxlintConfig.globals;
+      overrides?: typeof oxlintConfig.overrides;
     } = {};
 
     if (oxlintConfig.$schema !== undefined) {
@@ -986,6 +987,9 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     }
     if (oxlintConfig.globals !== undefined) {
       oxlintConfigForFile.globals = oxlintConfig.globals;
+    }
+    if (oxlintConfig.overrides !== undefined) {
+      oxlintConfigForFile.overrides = oxlintConfig.overrides;
     }
 
     if (resolvedJsPlugins.length > 0) {

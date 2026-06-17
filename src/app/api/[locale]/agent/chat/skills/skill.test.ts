@@ -23,9 +23,8 @@ import "server-only";
 import { installFetchCache } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 installFetchCache();
 
-import { beforeAll, describe, expect, it } from "vitest";
-
 import { and, eq, ilike } from "drizzle-orm";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import { resolveFavorite } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
@@ -35,7 +34,6 @@ import {
   toolResultRecord,
 } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { scopedTranslation as favoritesScopedTranslation } from "@/app/api/[locale]/agent/chat/favorites/i18n";
 import { ChatFavoritesRepository } from "@/app/api/[locale]/agent/chat/favorites/repository";
 import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
@@ -45,15 +43,16 @@ import {
   SkillCategory,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -391,7 +390,7 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
         if (!subThreadId) {
           return;
         }
-        const subMessages = await fetchThreadMessages(subThreadId);
+        const subMessages = await fetchThreadMessages(subThreadId, testUser);
         // eslint-disable-next-line no-console
         console.log(
           "[SC1 DEBUG] subAgent messages:",

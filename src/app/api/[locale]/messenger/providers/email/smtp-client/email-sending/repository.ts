@@ -5,8 +5,6 @@
 
 import "server-only";
 
-import type { JSX } from "react";
-
 import { render } from "@react-email/render";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -15,15 +13,16 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { configScopedTranslation } from "@/config/i18n";
-import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
+import type { JSX } from "react";
 
 import type {
   EmailCampaignStageValue,
   EmailJourneyVariantValue,
 } from "@/app/api/[locale]/leads/enum";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { configScopedTranslation } from "@/config/i18n";
+import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
+
 import type { CampaignTypeValue } from "../../../../accounts/enum";
 import { CampaignType } from "../../../../accounts/enum";
 import { scopedTranslation } from "../i18n";

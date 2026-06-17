@@ -1,6 +1,3 @@
-import type z from "zod";
-
-import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type {
   BaseObjectWidgetConfig,
   BasePrimitiveWidgetConfig,
@@ -9,6 +6,9 @@ import type {
   ObjectChildrenConstraint,
 } from "next-vibe-ui/unified/_shared/types";
 import type { BaseContainerLayoutProps } from "next-vibe-ui/unified/containers/container/types";
+import type z from "zod";
+
+import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 /**
  * Custom widget config - allows custom React component renderer

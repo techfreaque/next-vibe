@@ -13,6 +13,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import {
   agentEnvAvailability,
@@ -20,15 +21,14 @@ import {
   PROVIDER_SETUP_INSTRUCTIONS,
 } from "@/app/api/[locale]/agent/env-availability";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import { DEFAULT_STT_MODEL_ID } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import type { SttModelId } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { DEFAULT_STT_MODEL_ID } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
-import type { SttModelId } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { CreditRepository } from "../../credits/repository";
 import {
   CREDIT_VALUE_USD,

@@ -8,16 +8,16 @@ import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-import { useMemo, useState } from "react";
-
-import type { AnyModelId } from "@/app/api/[locale]/agent/models/models";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetLocale,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useMemo, useState } from "react";
+
+import type { AnyModelId } from "@/app/api/[locale]/agent/models/models";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 
 import type definition from "./definition";
 import type { ModelListItem } from "./definition";
@@ -168,10 +168,20 @@ function ModelGrid({
   models,
   t,
   locale,
+  onPick,
 }: {
   models: ModelListItem[];
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
   locale: Parameters<typeof ModelCreditDisplay>[0]["locale"];
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
+  onPick,
   onPick,
   onPick,
   onPick,

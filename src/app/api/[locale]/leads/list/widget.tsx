@@ -28,13 +28,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { StatusPill } from "next-vibe-ui/ui/status-pill";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import React, { useCallback, useMemo } from "react";
-
-import {
-  type LeadsTranslationKey,
-  scopedTranslation as leadsScopedTranslation,
-} from "@/app/api/[locale]/leads/i18n";
-import { cn, objectEntries } from "@/app/api/[locale]/shared/utils";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -48,7 +42,13 @@ import { MultiSelectFieldWidget } from "next-vibe-ui/unified/form-fields/multise
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+import React, { useCallback, useMemo } from "react";
+
+import {
+  type LeadsTranslationKey,
+  scopedTranslation as leadsScopedTranslation,
+} from "@/app/api/[locale]/leads/i18n";
+import { cn, objectEntries } from "@/app/api/[locale]/shared/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 

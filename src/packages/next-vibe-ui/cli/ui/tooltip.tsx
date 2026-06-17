@@ -9,18 +9,16 @@ import { Text } from "ink";
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
 import * as React from "react";
 
-import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+export type {
   TooltipContentProps,
   TooltipPortalProps,
-
-export type {
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
 } from "../../web/ui/tooltip";
-  TooltipContentProps,
 
 import type {
+  TooltipContentProps,
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,

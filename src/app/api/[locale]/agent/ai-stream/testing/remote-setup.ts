@@ -21,9 +21,9 @@ import "server-only";
 import { existsSync, readFileSync } from "node:fs";
 
 import { and, eq, sql } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";

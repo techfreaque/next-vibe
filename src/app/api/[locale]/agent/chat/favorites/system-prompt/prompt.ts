@@ -1,6 +1,7 @@
 /* eslint-disable i18next/no-literal-string */
 
 import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+
 import { SKILL_CREATE_ALIAS, SKILLS_LIST_ALIAS } from "../../skills/constants";
 import {
   FAVORITE_CREATE_ALIAS,

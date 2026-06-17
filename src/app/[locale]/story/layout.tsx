@@ -14,13 +14,13 @@ import { SubscriptionRepository } from "@/app/api/[locale]/subscription/reposito
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { navItems } from "../story/_components/nav/nav-constants";
 import { SITE_FOOTER_ID } from "./constants";
 

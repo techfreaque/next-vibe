@@ -16,20 +16,20 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Star } from "next-vibe-ui/ui/icons/Star";
 import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
 import {
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SearchBarWidget } from "next-vibe-ui/unified/interactive/search-bar/widget";
+import type { JSX } from "react";
+
+import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 
 import { SearchProvider } from "../enum";
 import type definition from "./definition";

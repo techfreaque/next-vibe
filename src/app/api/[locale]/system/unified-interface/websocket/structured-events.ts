@@ -7,6 +7,9 @@
  */
 
 import type { QueryClient } from "@tanstack/react-query";
+
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 import type { EndpointLogger } from "../shared/logger/endpoint";
 
 // ============================================================================
@@ -112,10 +115,7 @@ export type EventOperation = "merge" | "append" | "remove";
  * a safe structural subset of TResponseOutput. The precise per-event type
  * flows from types.EventPayloads[K] at the subscription hook level.
  */
-export interface EndpointEventHandlerContext<
-  TResponseOutput,
-  TRequestOutput = Record<string, WidgetData>,
-> {
+export interface EndpointEventHandlerContext<TResponseOutput, TRequestOutput> {
   partial: { readonly [K in keyof TResponseOutput]?: TResponseOutput[K] };
   urlPathParams: { readonly [K in string]: string };
   requestData: TRequestOutput;
@@ -135,7 +135,7 @@ export interface EndpointEventDeclarationWithFlatFields<
     keyof TResponseOutput,
     ...(keyof TResponseOutput)[],
   ],
-  TRequestOutput = Record<string, WidgetData>,
+  TRequestOutput,
 > {
   readonly fields: TFields;
   readonly operation: EventOperation;
@@ -147,7 +147,7 @@ export interface EndpointEventDeclarationWithFlatFields<
 export interface EndpointEventDeclarationWithNestedFields<
   TResponseOutput,
   TSpec extends NestedFieldSpec<TResponseOutput>,
-  TRequestOutput = Record<string, WidgetData>,
+  TRequestOutput,
 > {
   readonly fields: TSpec;
   readonly operation: EventOperation;

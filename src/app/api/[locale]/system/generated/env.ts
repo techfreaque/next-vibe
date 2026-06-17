@@ -10,10 +10,7 @@ import "server-only";
 import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
-import type {
-  EnvExample,
-  EnvRecord,
-} from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
+import type { EnvExample, EnvRecord } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -64,47 +61,16 @@ const platform = {
 };
 
 // Module registry for introspection
-export const envModules: Record<
-  string,
-  {
-    env: EnvRecord;
-    schema: z.ZodObject<Record<string, z.ZodTypeAny>>;
-    examples: EnvExample[];
-  }
-> = {
+export const envModules: Record<string, { env: EnvRecord; schema: z.ZodObject<Record<string, z.ZodTypeAny>>; examples: EnvExample[] }> = {
   env: { env: env_env, schema: env_envSchema, examples: envExamples },
   agent: { env: agentEnv, schema: agentEnvSchema, examples: agentEnvExamples },
-  browser: {
-    env: browserEnv,
-    schema: browserEnvSchema,
-    examples: browserEnvExamples,
-  },
-  leadsCampaigns: {
-    env: leadsCampaignsEnv,
-    schema: leadsCampaignsEnvSchema,
-    examples: leadsCampaignsEnvExamples,
-  },
-  messenger: {
-    env: messengerEnv,
-    schema: messengerEnvSchema,
-    examples: messengerEnvExamples,
-  },
-  imap: {
-    env: imapClientEnv,
-    schema: imapClientEnvSchema,
-    examples: imapClientEnvExamples,
-  },
-  payment: {
-    env: paymentEnv,
-    schema: paymentEnvSchema,
-    examples: paymentEnvExamples,
-  },
+  browser: { env: browserEnv, schema: browserEnvSchema, examples: browserEnvExamples },
+  leadsCampaigns: { env: leadsCampaignsEnv, schema: leadsCampaignsEnvSchema, examples: leadsCampaignsEnvExamples },
+  messenger: { env: messengerEnv, schema: messengerEnvSchema, examples: messengerEnvExamples },
+  imap: { env: imapClientEnv, schema: imapClientEnvSchema, examples: imapClientEnvExamples },
+  payment: { env: paymentEnv, schema: paymentEnvSchema, examples: paymentEnvExamples },
   sms: { env: smsEnv, schema: smsEnvSchema, examples: smsEnvExamples },
-  serverSystem: {
-    env: serverSystemEnv,
-    schema: serverSystemEnvSchema,
-    examples: serverSystemEnvExamples,
-  },
+  serverSystem: { env: serverSystemEnv, schema: serverSystemEnvSchema, examples: serverSystemEnvExamples },
 };
 
 // Combined schema using merge

@@ -9,12 +9,13 @@
  * and this file is NOT imported (allowing target: "node" builds).
  */
 
-import { plugin } from "bun";
-import { resolve } from "node:path";
-
 // Pre-cache JSX runtimes before NODE_ENV changes.
 import "react/jsx-dev-runtime";
 import "react/jsx-runtime";
+
+import { resolve } from "node:path";
+
+import { plugin } from "bun";
 
 import { createCliWidgetPlugin } from "./cli-widget-plugin-factory";
 

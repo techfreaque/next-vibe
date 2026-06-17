@@ -51,6 +51,7 @@ export function MessagePreview({
   }, []);
   const [clampedLeft, setClampedLeft] = useState<number>(position.x);
   const [flipBelow, setFlipBelow] = useState(false);
+  const { width: vw, height: vh } = useWindowSize();
 
   useLayoutEffect(() => {
     if (!el) {
@@ -58,8 +59,6 @@ export function MessagePreview({
     }
 
     const { width, height } = el.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
 
     // Center-align horizontally, then clamp to viewport
     let left = position.x - width / 2;
@@ -69,7 +68,7 @@ export function MessagePreview({
     // Flip below if not enough space above
     const spaceAbove = position.y - height - MARGIN;
     setFlipBelow(spaceAbove < 0 && position.y + height + MARGIN < vh);
-  }, [el, position.x, position.y]);
+  }, [el, position.x, position.y, vw, vh]);
 
   const top = flipBelow ? position.y + MARGIN : position.y - MARGIN;
   const transform = flipBelow ? "translateY(0)" : "translateY(-100%)";

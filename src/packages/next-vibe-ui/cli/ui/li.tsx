@@ -4,7 +4,7 @@ import type { JSX } from "react";
 
 import type { LiProps } from "../../web/ui/li";
 
-export type { LiProps, LiMouseEvent } from "../../web/ui/li";
+export type { LiMouseEvent, LiProps } from "../../web/ui/li";
 
 export function Li({ children, value }: LiProps): JSX.Element {
   const isMcp = useIsMcp();

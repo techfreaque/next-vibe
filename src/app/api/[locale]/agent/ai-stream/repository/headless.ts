@@ -24,8 +24,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../../chat/config";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-
 import type { MessageMetadata } from "../../chat/db";
 import { chatMessages } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";

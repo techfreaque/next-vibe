@@ -4,14 +4,14 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import type { JSX } from "react";
-
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetPlatform,
   useWidgetResponseOnly,
   useWidgetTranslation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import type endpoints from "./definition";
 import type { RebuildResponseOutput } from "./definition";

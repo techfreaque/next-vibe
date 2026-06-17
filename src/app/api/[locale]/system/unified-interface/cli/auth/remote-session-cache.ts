@@ -2,7 +2,7 @@
  * Remote Session
  *
  * Reads per-user remote connection config from `remote_connections` DB.
- * --remote uses the dev DB by default, or the preview DB when combined with --local.
+ * --thea uses the dev DB by default, or the preview DB when combined with --hermes.
  * The active db singleton is always correct when this is called.
  */
 
@@ -10,6 +10,7 @@ export interface RemoteSession {
   token: string;
   leadId: string;
   remoteUrl: string;
+  instanceId: string;
 }
 
 /**
@@ -20,7 +21,7 @@ export async function getRemoteSession(
   userId: string,
 ): Promise<RemoteSession | null> {
   const { RemoteConnectionRepository } =
-    await import("@/app/api/[locale]/user/remote-connection/repository");
+    await import("@/app/api/[locale]/remote-connection/repository");
 
   const record =
     await RemoteConnectionRepository.getRemoteConnectionRecord(userId);
@@ -32,5 +33,6 @@ export async function getRemoteSession(
     token: record.token,
     leadId: record.leadId,
     remoteUrl: record.remoteUrl,
+    instanceId: record.instanceId,
   };
 }

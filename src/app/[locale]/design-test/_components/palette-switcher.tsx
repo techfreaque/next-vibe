@@ -5,8 +5,8 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
-import { useCallback, useState } from "react";
 import type { JSX } from "react";
+import { useCallback, useState } from "react";
 
 import { platform } from "@/config/env-client";
 

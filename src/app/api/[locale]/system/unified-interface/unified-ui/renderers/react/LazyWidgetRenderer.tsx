@@ -8,9 +8,6 @@
 
 "use client";
 
-import React from "react";
-import type { z } from "zod";
-
 import type { InlineButtonInfo } from "next-vibe-ui/unified/_shared/field-helpers";
 import type {
   AnyChildrenConstrain,
@@ -18,6 +15,9 @@ import type {
   DispatchField,
   FieldUsageConfig,
 } from "next-vibe-ui/unified/_shared/types";
+import React from "react";
+import type { z } from "zod";
+
 import { WidgetRenderer } from "./WidgetRenderer";
 
 /** Props accepted by the WidgetRenderer (type-only, no runtime cost) */

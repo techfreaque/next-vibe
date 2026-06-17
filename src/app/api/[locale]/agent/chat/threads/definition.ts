@@ -32,16 +32,8 @@ import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
-
-import { scopedTranslation } from "./i18n";
-import { scopedTranslation } from "./i18n";
-import {
-  onEventUpdateIncognitoThread,
-  onEventDeleteIncognitoThread,
-} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
-
-import { scopedTranslation } from "./i18n";
 import { CHAT_THREADS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const ThreadsListContainer = lazy(() =>
   import("./widget/widget").then((m) => ({ default: m.ThreadsListContainer })),

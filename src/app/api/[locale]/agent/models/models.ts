@@ -1,7 +1,8 @@
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { agentEnvAvailability } from "../env-availability";
+
 import { STANDARD_MARKUP_PERCENTAGE } from "../../products/constants";
 import type { ChatModelId, ChatModelOption } from "../ai-stream/models";
 import type {
@@ -21,6 +22,7 @@ import {
   PriceLevelDB,
 } from "../chat/skills/enum";
 import type { SkillsT } from "../chat/skills/i18n";
+import { agentEnvAvailability } from "../env-availability";
 import type { AgentTranslationKey } from "../i18n";
 import type {
   ImageGenModelId,

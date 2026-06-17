@@ -1,0 +1,14 @@
+{
+  "url": "http://localhost:3002/api/en-GLOBAL/remote-connection/register",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "[redacted]"
+  },
+  "body": {
+    "instanceId": "atlas-rn2-25f35585",
+    "localUrl": "http://localhost:3000",
+    "reverseToken": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFiN2IzMmNhLWFhZmEtNDU2Ni1hNmI3LTJiZGFiYjc3MjBiNSIsImxlYWRJZCI6IjgyZGZiNGU3LTY3M2UtNDMzNy04Y2NhLWU0NTc5YmNmNWI0OCIsImlzUHVibGljIjpmYWxzZSwicm9sZXMiOlsiZW51bXMudXNlclJvbGUuYWRtaW4iXSwiaWF0IjoxNzgxNjk4MjY4LCJleHAiOjQ5MzUyOTgyNjh9.VLBwQ-HnqUKmUYYuf-aHiZUC7TeOTa3pQs4fIDP6dV4",
+    "reverseLeadId": "82dfb4e7-673e-4337-8cca-e4579bcf5b48"
+  }
+}

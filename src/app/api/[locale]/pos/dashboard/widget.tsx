@@ -6,16 +6,15 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
 import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { posTerminalNameMap } from "../terminal/list/widget";
+import type { JSX } from "react";
 
+import { posTerminalNameMap } from "../terminal/list/widget";
 import type definition from "./definition";
 import type { PosDashboardGetResponseOutput } from "./definition";
 

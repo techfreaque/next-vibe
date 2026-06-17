@@ -4,8 +4,8 @@
  */
 
 import {
-  type ResponseType,
   fail,
+  type ResponseType,
   success,
 } from "next-vibe/shared/types/response.schema";
 

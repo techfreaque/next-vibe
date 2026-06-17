@@ -12,28 +12,29 @@ import type {
 } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { runHeadlessAiStream } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import type {
   ChatMessage,
   MessageMetadata,
 } from "@/app/api/[locale]/agent/chat/db";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "@/app/api/[locale]/user/auth/types";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
-import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
+
 import { scopedTranslation } from "../stream/i18n";
 
 /**
@@ -540,7 +541,6 @@ export async function runTestStream(
     operationOverride: callerOperationOverride,
     abortSignal = new AbortController().signal,
     availableTools,
-    compactTriggerOverride,
   } = params;
 
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -581,7 +581,6 @@ export async function runTestStream(
     favoriteConfig: paramFavoriteConfig ?? null,
     abortSignal,
     availableTools: availableTools ?? null,
-    compactTriggerOverride,
   });
 
   let messages: SlimMessage[] = [];

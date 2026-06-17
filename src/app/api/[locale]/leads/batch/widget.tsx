@@ -14,10 +14,6 @@ import { List } from "next-vibe-ui/ui/icons/List";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback } from "react";
-
-import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -33,6 +29,10 @@ import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/wid
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import React, { useCallback } from "react";
+
+import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
+import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type definition from "./definition";
 

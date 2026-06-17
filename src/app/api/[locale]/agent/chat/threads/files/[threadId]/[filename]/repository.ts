@@ -9,6 +9,12 @@ import path from "node:path";
 import { eq } from "drizzle-orm";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import {
+  createFileResponse,
+  ErrorResponseTypes,
+  fail,
+  type HandlerResponse,
+} from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -16,7 +22,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatFolders, chatThreads } from "../../../../db";
 import { canViewThread } from "../../../../permissions/permissions";
+import type { ChatFileResponseOutput } from "./definition";
 import type { ChatFileUrlVariablesOutput } from "./definition";
+import type { ChatFileT } from "./i18n";
 
 interface FileResult {
   buffer: Buffer;
@@ -176,5 +184,32 @@ export class ChatFileRepository {
         contentType: "text/plain",
       };
     }
+  }
+  static async getFileResponse(
+    urlPathParams: ChatFileUrlVariablesOutput,
+    user: JwtPayloadType | undefined,
+    logger: EndpointLogger,
+    t: ChatFileT,
+    locale: CountryLanguage,
+  ): Promise<HandlerResponse<ChatFileResponseOutput>> {
+    const result = await ChatFileRepository.getFile(
+      urlPathParams,
+      user,
+      logger,
+      locale,
+    );
+
+    if (result.buffer.length === 0) {
+      return fail({
+        message: t("get.errors.notFound.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    return createFileResponse(result.buffer, result.contentType, {
+      "Cache-Control": "public, max-age=31536000, immutable",
+      "Content-Length": String(result.buffer.length),
+      "Accept-Ranges": "bytes",
+    });
   }
 }

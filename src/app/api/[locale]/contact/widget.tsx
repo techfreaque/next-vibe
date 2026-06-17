@@ -9,8 +9,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Span } from "next-vibe-ui/ui/span";
-import React from "react";
-
 import {
   useWidgetTranslation,
   useWidgetValue,
@@ -19,9 +17,9 @@ import { EmailFieldWidget } from "next-vibe-ui/unified/form-fields/email-field/w
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
-import React from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import React from "react";
 
 import type definition from "./definition";
 

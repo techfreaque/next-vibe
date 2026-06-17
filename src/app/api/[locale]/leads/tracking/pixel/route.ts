@@ -1,10 +1,12 @@
+// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- Pixel tracking serves raw binary GIF response, cannot use endpointsHandler
+import "server-only";
+
+import { Environment } from "next-vibe/shared/utils/env-util";
 /**
  * Email Tracking Pixel Endpoint
  * Handles 1x1 pixel requests for email open tracking
  */
-
 import type { NextRequest } from "next-vibe-ui/lib/request";
-import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { env } from "@/config/env";

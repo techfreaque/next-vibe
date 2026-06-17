@@ -32,8 +32,6 @@ import { SKILL_REPORT_ALIAS } from "../../constants";
 import skillsListDefinition from "../../definition";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const SkillReportContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillReportContainer })),
 );

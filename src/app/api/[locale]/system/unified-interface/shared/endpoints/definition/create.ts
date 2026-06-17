@@ -12,6 +12,11 @@
  * - Support for all 5 interfaces
  */
 
+import type {
+  AnyChildrenConstrain,
+  FieldUsageConfig,
+} from "next-vibe-ui/unified/_shared/types";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { z } from "zod";
 
 import type {
@@ -37,11 +42,6 @@ import type {
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type {
-  AnyChildrenConstrain,
-  FieldUsageConfig,
-} from "next-vibe-ui/unified/_shared/types";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import {
   UserRole,
   type UserRoleValue,
@@ -54,7 +54,6 @@ import type {
   ComputeEventPayloads,
   EndpointEventsMap,
 } from "../../../websocket/structured-events";
-
 import type { EndpointLogger } from "../../logger/endpoint";
 
 // Extract schema type directly from field, bypassing complex field structure

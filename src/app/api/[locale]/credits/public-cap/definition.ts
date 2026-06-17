@@ -22,8 +22,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CREDITS_PUBLIC_CAP_ALIAS } from "./constants";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { scopedTranslation } from "./i18n";
 
 const PublicCapContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PublicCapContainer })),

@@ -5,8 +5,6 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Span } from "next-vibe-ui/ui/span";
-import { type JSX } from "react";
-
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -16,6 +14,9 @@ import {
 import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { type JSX } from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type definition from "./definition";
 import type { PosOrderGetResponseOutput } from "./definition";

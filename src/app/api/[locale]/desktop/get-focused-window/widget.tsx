@@ -10,15 +10,14 @@ import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Type } from "next-vibe-ui/ui/icons/Type";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-import { useEffect } from "react";
-
 import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useEffect } from "react";
 
 import { DesktopNavHeader } from "../shared/nav-header";
 import type definition from "./definition";

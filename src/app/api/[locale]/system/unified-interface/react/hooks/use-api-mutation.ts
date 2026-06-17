@@ -238,7 +238,6 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
       failureReason: mutation.failureReason,
       context: mutation.context,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       mutation.mutate,
       mutation.mutateAsync,
@@ -249,6 +248,10 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
       mutation.data,
       mutation.reset,
       mutation.status,
+      mutation.variables,
+      mutation.failureCount,
+      mutation.failureReason,
+      mutation.context,
       localError,
       setErrorType,
     ],

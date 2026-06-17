@@ -21,8 +21,6 @@ import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
 import { StatusPill } from "next-vibe-ui/ui/status-pill";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { type JSX, useCallback } from "react";
-
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
@@ -30,6 +28,7 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { type JSX, useCallback } from "react";
 
 import type endpoints from "./definition";
 

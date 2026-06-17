@@ -34,8 +34,6 @@ import {
   ImageSize,
   ImageSizeOptions,
 } from "./enum";
-
-import { IMAGE_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const ImageGenerationContainer = lazy(() =>

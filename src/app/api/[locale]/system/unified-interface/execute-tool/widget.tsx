@@ -25,32 +25,12 @@ import {
 import { Pre } from "next-vibe-ui/ui/pre";
 import { useThemeToggle } from "next-vibe-ui/ui/theme-provider";
 import { P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-import { useEffect, useMemo, useState } from "react";
-
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import helpEndpoints from "@/app/api/[locale]/system/help/definition";
-import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetOnCancel,
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import helpEndpoints from "@/app/api/[locale]/system/help/definition";
-import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-frame/VibeFrameHost";
   useWidgetOnSubmit,
   useWidgetPlatform,
   useWidgetResponseOnly,
@@ -58,8 +38,19 @@ import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-frame/VibeFrameHost";
+import type { JSX } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import remoteConnectionListDefinition from "@/app/api/[locale]/remote-connection/list/definition";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import helpEndpoints from "@/app/api/[locale]/system/help/definition";
+import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-frame/VibeFrameHost";
 
 import type definition from "./definition";
 import { scopedTranslation as executeToolScopedTranslation } from "./i18n";

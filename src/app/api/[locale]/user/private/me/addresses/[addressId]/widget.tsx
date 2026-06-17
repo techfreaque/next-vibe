@@ -3,14 +3,13 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
-import type { JSX } from "react";
-
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-import type { JSX } from "react";
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
 
 import type definition from "./definition";
 

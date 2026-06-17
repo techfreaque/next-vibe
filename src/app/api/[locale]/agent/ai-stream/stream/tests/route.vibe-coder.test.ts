@@ -27,6 +27,7 @@ globalThis.AI_SDK_LOG_WARNINGS = false;
 import { installFetchCache } from "../../testing/fetch-cache";
 installFetchCache();
 
+import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -41,9 +42,8 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { eq } from "drizzle-orm";
-
 import { env } from "@/config/env";
+
 import { ChatModelId } from "../../models";
 import { setFetchCacheContext } from "../../testing/fetch-cache";
 import { getOrCreateFolder, resolveUser, runTestStream } from "../../testing/headless-test-runner";

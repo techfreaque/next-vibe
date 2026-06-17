@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 // AUTO-GENERATED from src/app/[locale]/story/blog/one-endpoint-every-surface/page.tsx. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";

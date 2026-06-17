@@ -6,15 +6,12 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
-import type { JSX } from "react";
-import React, { useCallback, useRef } from "react";
-import type { JSX } from "react";
-import React, { useCallback, useRef } from "react";
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import React, { useCallback, useRef } from "react";
 
 import type endpoints from "./definition";
 import type { CapturesListResponseOutput } from "./definition";

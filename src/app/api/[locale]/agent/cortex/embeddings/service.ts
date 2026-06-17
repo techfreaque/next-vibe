@@ -5,7 +5,6 @@ import "server-only";
  * Generates text embeddings via OpenRouter (qwen/qwen3-embedding-8b, 3072 dims).
  * Used for semantic search across cortex nodes.
  */
-
 import { createHash } from "node:crypto";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";

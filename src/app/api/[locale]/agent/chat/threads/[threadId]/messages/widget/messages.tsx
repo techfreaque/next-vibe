@@ -357,10 +357,11 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
           const resolvedLeaf = data.resolvedLeafMessageId;
           const currentLeaf = leafMessageIdRef.current;
           if (resolvedLeaf && resolvedLeaf !== currentLeaf) {
-            if (typeof window !== "undefined") {
-              const url = new URL(window.location.href);
+            const currentHref = getCurrentUrl();
+            if (currentHref) {
+              const url = new URL(currentHref);
               url.searchParams.set("message", resolvedLeaf);
-              window.history.replaceState(null, "", url.toString());
+              silentReplaceState(url.toString());
             }
             setLeafMessageId(resolvedLeaf);
           }

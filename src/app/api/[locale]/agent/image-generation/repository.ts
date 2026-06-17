@@ -12,9 +12,13 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
+import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 import {
   getImageGenModelById,
+  getImageGenModelUnderlyingProvider,
   type ImageGenModelId,
+  type ImageGenModelOption,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import {
   ApiProvider,
@@ -23,13 +27,12 @@ import {
   type ModelOptionImageBased,
   type ModelOptionTokenBased,
 } from "@/app/api/[locale]/agent/models/models";
+import { isSelfRelayUrl } from "@/app/api/[locale]/agent/shared/unbottled-media-relay";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
+import type { RemoteTarget } from "@/app/api/[locale]/remote-connection/transport";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
-import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 
 import { chatModelOptionsIndex } from "../ai-stream/models";
 import { runHeadlessAiStream } from "../ai-stream/repository/headless";
@@ -51,6 +54,7 @@ import { generateImageWithModelsLab } from "./providers/modelslab";
 import { generateWithOpenAI } from "./providers/openai";
 import { generateWithOpenRouter } from "./providers/openrouter";
 import { generateWithReplicate } from "./providers/replicate";
+import { generateImageWithUnbottled } from "./providers/unbottled";
 
 interface MediaGenStreamContext {
   threadId?: string | undefined;
@@ -229,7 +233,6 @@ export class ImageGenerationRepository {
           aspectRatio: data.aspectRatio,
           inputMediaUrl: data.inputMediaUrl,
           logger,
-          locale,
         });
         break;
 
@@ -274,7 +277,6 @@ export class ImageGenerationRepository {
           size: data.size,
           inputMediaUrl: data.inputMediaUrl,
           logger,
-          locale,
         });
         break;
 

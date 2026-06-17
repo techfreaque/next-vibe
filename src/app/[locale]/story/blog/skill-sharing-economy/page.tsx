@@ -8,8 +8,6 @@ import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
 import { Languages } from "next-vibe-ui/ui/icons/Languages";
 import { Palette } from "next-vibe-ui/ui/icons/Palette";
 import { ShieldOff } from "next-vibe-ui/ui/icons/ShieldOff";
-import { Languages } from "next-vibe-ui/ui/icons/Languages";
-
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";

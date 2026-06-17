@@ -20,9 +20,6 @@ import { SectionGroup } from "next-vibe-ui/ui/section-group";
 import { StatusPill } from "next-vibe-ui/ui/status-pill";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import React, { useCallback } from "react";
-
-import { CsvImportJobStatus } from "@/app/api/[locale]/leads/import/enum";
 import {
   useWidgetContext,
   useWidgetNavigation,
@@ -31,6 +28,9 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import React, { useCallback } from "react";
+
+import { CsvImportJobStatus } from "@/app/api/[locale]/leads/import/enum";
 
 import type definition from "./definition";
 import type retryDefinition from "./retry/definition";

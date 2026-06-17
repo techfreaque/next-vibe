@@ -17,8 +17,6 @@ import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, H4, P } from "next-vibe-ui/ui/typography";
-import { useState, type JSX } from "react";
-
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -28,8 +26,8 @@ import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import { type JSX, useState } from "react";
 
-
 import { BillStatus } from "@/app/api/[locale]/payment/enum";
+
 import type definition from "./definition";
 
 function fmt(n: number): string {

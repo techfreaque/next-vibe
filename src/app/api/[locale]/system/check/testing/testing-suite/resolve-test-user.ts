@@ -12,8 +12,8 @@ import { userRoles } from "@/app/api/[locale]/user/db";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
 let cached: JwtPrivatePayloadType | null = null;
 

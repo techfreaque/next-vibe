@@ -72,6 +72,75 @@ function InteractiveMessages(): React.JSX.Element {
 }
 
 /**
+ * CLI polling hook — fetches messages directly inside the React tree via
+ * executeQuery + useState. React Query's setQueryData from outside the render
+ * cycle doesn't trigger Ink's reconciler; this hook guarantees re-renders.
+ */
+function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
+  const isCli = typeof window === "undefined" && !platform.isReactNative;
+  const [cliMessages, setCliMessages] = useState<ChatMessage[] | null>(null);
+  const locale = useWidgetLocale();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
+  const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
+
+  const poll = useCallback(async () => {
+    if (!activeThreadId) {
+      return;
+    }
+    const { executeQuery } =
+      await import("@/app/api/[locale]/system/unified-interface/react/hooks/query-executor");
+    const response = await executeQuery<typeof messagesDefinition.GET>({
+      endpoint: messagesDefinition.GET,
+      logger,
+      requestData: {
+        rootFolderId,
+      } as (typeof messagesDefinition.GET)["types"]["RequestOutput"],
+      pathParams: {
+        threadId: activeThreadId,
+      } as (typeof messagesDefinition.GET)["types"]["UrlVariablesOutput"],
+      locale,
+      user,
+    });
+    if (response?.success) {
+      setCliMessages(
+        response.data.messages.map((msg) => ({
+          ...msg,
+          createdAt:
+            msg.createdAt instanceof Date
+              ? msg.createdAt
+              : new Date(msg.createdAt),
+          updatedAt:
+            msg.updatedAt instanceof Date
+              ? msg.updatedAt
+              : new Date(msg.updatedAt),
+        })),
+      );
+    }
+  }, [activeThreadId, rootFolderId, logger, locale, user]);
+
+  useEffect(() => {
+    if (!isCli || !activeThreadId) {
+      return;
+    }
+    // Initial fetch
+    void poll();
+    const interval = setInterval(() => {
+      void poll();
+    }, 1000);
+    return (): void => {
+      clearInterval(interval);
+    };
+  }, [isCli, activeThreadId, poll]);
+
+  if (!isCli) {
+    return widgetMessages;
+  }
+  return cliMessages ?? widgetMessages;
+}
+
+/**
  * Read-only messages - renders LinearMessageView with all callbacks null.
  * Used by ai-stream/run embeds where no ChatBootProvider exists.
  */
@@ -79,6 +148,7 @@ function ReadOnlyMessages(): React.JSX.Element {
   const locale = useWidgetLocale();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const inputHeight = useInputHeight();
 
   // Subscribe only to the messages array - re-renders when messages change,
   // NOT when streamingState or backgroundTasks change.
@@ -86,11 +156,15 @@ function ReadOnlyMessages(): React.JSX.Element {
     (d) => d?.messages || [],
   );
 
+  // CLI: poll directly inside React tree since setQueryData from outside
+  // doesn't trigger Ink's reconciler
+  const effectiveMessages = useCliMessages(rawMessages);
+
   const messages: ChatMessage[] = useMemo(() => {
-    if (rawMessages.length === 0) {
+    if (effectiveMessages.length === 0) {
       return [];
     }
-    return rawMessages.map((msg) => {
+    return effectiveMessages.map((msg) => {
       const createdAt =
         msg.createdAt instanceof Date ? msg.createdAt : new Date(msg.createdAt);
       const updatedAt =
@@ -112,42 +186,50 @@ function ReadOnlyMessages(): React.JSX.Element {
   }
 
   return (
-    <Div className="flex flex-col gap-5">
-      <LinearMessageView
-        messages={path}
-        branchInfo={branchInfo}
-        locale={locale}
-        logger={logger}
-        currentUserId={null}
-        user={user}
-        collapseState={null}
-        rootFolderId={DefaultFolderId.PRIVATE}
-        subFolderId={null}
-        onRetryMessage={null}
-        onSwitchBranch={null}
-        onBranchMessage={null}
-        onStartEdit={null}
-        onStartRetry={null}
-        onStartAnswer={null}
-        answerAsAI={null}
-        onCancelAction={null}
-        onCancelQueued={null}
-        editingMessageId={null}
-        retryingMessageId={null}
-        answeringMessageId={null}
-        answerContent=""
-        onSetAnswerContent={null}
-        editorAttachments={emptyAttachments}
-        isLoadingRetryAttachments={false}
-        selectedSkill={null}
-        selectedModel={null}
-        sendMessage={null}
-        onLoadNewerHistory={null}
-        isLoadingNewerHistory={false}
-        onVoteMessage={null}
-        ttsAutoplay={false}
-        voiceId={undefined}
-      />
+    <Div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+      <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 flex flex-col gap-5 pt-15 w-full">
+        <Div
+          style={{
+            paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
+          }}
+        >
+          <LinearMessageView
+            messages={path}
+            branchInfo={branchInfo}
+            locale={locale}
+            logger={logger}
+            currentUserId={null}
+            user={user}
+            collapseState={null}
+            rootFolderId={DefaultFolderId.PRIVATE}
+            subFolderId={null}
+            onRetryMessage={null}
+            onSwitchBranch={null}
+            onBranchMessage={null}
+            onStartEdit={null}
+            onStartRetry={null}
+            onStartAnswer={null}
+            answerAsAI={null}
+            onCancelAction={null}
+            onCancelQueued={null}
+            editingMessageId={null}
+            retryingMessageId={null}
+            answeringMessageId={null}
+            answerContent=""
+            onSetAnswerContent={null}
+            editorAttachments={emptyAttachments}
+            isLoadingRetryAttachments={false}
+            selectedSkill={null}
+            selectedModel={null}
+            sendMessage={null}
+            onLoadNewerHistory={null}
+            isLoadingNewerHistory={false}
+            onVoteMessage={null}
+            ttsAutoplay={false}
+            voiceId={undefined}
+          />
+        </Div>
+      </Div>
     </Div>
   );
 }

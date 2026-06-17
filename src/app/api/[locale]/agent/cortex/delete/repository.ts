@@ -1,33 +1,31 @@
 import "server-only";
 
 import { and, eq, or, sql } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
 import {
   ErrorResponseTypes,
-  success,
   fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
-  getNode,
 import {
   getMountPrefix,
+  getNode,
   isValidPath,
   isVirtualWritable,
-  normalizeToCanonicalPath,
   isWritablePath,
-import type { CortexDeleteT } from "./i18n";
   normalizePath,
+  normalizeToCanonicalPath,
 } from "../repository";
+import type { CortexDeleteT } from "./i18n";
 
 interface DeleteParams {
   userId: string;

@@ -22,8 +22,6 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const ConnectionTestContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ConnectionTestContainer })),
 );

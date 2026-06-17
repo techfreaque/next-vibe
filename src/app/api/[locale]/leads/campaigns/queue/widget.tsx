@@ -11,17 +11,18 @@ import { List } from "next-vibe-ui/ui/icons/List";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
-import React from "react";
-
-import { scopedTranslation as leadsI18n } from "@/app/api/[locale]/leads/i18n";
-import { scopedTranslation as messengerAccountsI18n } from "@/app/api/[locale]/messenger/accounts/i18n";
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetLocale,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React from "react";
+
+import { scopedTranslation as leadsI18n } from "@/app/api/[locale]/leads/i18n";
+import { scopedTranslation as messengerAccountsI18n } from "@/app/api/[locale]/messenger/accounts/i18n";
+import { cn } from "@/app/api/[locale]/shared/utils";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type definition from "./definition";
 

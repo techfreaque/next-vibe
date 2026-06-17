@@ -2,6 +2,10 @@
  * Email Template Registry Types
  */
 
+import type {
+  ErrorResponseType,
+  SuccessResponseType,
+} from "next-vibe/shared/types/response.schema";
 import type { JSX, ReactElement } from "react";
 import type { z } from "zod";
 
@@ -11,10 +15,6 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
-import type {
-  ErrorResponseType,
-  SuccessResponseType,
-} from "next-vibe/shared/types/response.schema";
 
 import type { TrackingContext } from "../providers/email/smtp-client/components/tracking_context.email";
 

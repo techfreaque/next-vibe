@@ -8,9 +8,6 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Span } from "next-vibe-ui/ui/span";
-import React from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -18,6 +15,9 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import React from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import { MessageStatus } from "../enum";

@@ -17,6 +17,15 @@
 
 "use client";
 
+import type {
+  IChartApi,
+  ISeriesApi,
+  SeriesDefinition,
+  SeriesType,
+  Time,
+  UTCTimestamp,
+} from "lightweight-charts";
+import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -41,17 +50,6 @@ import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
-import { cn } from "next-vibe/shared/utils";
-
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   useWidgetEndpointMutations,
   useWidgetLocale,
@@ -61,29 +59,27 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-import type {
-  IChartApi,
-  ISeriesApi,
-  SeriesDefinition,
-  SeriesType,
-  Time,
-  UTCTimestamp,
-} from "lightweight-charts";
-
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
-  RESOLUTION_MS,
   type Resolution,
+  RESOLUTION_MS,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { GraphOwnerType, GraphResolution } from "../../../enum";
 
+import { GraphOwnerType, GraphResolution } from "../../../enum";
 import type { GraphNodeConfig } from "../../../graph/schema";
 import type { GraphConfig } from "../../../graph/types";
-import type definition from "./definition";
-import definitions from "./definition";
-
 import editDefinitions from "../edit/definition";
 import versionsDefinitions from "../versions/definition";
+import type definition from "./definition";
+import definitions from "./definition";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

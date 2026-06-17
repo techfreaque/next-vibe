@@ -39,16 +39,6 @@ import { ChatMessageRole } from "../../../enum";
 import threadsDefinitions from "../../definition";
 import { THREAD_MESSAGES_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import {
-  onEventPersistMessage,
-  persistMessageIfIncognito,
-  finishIncognitoThreadIfIncognito,
-} from "@/app/api/[locale]/agent/chat/incognito/event-persist";
-
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
-import { scopedTranslation } from "./i18n";
-import { THREAD_MESSAGES_ALIAS } from "./constants";
-import threadsDefinitions from "../../definition";
 
 const MessagesWidget = lazy(() =>
   import("./widget/widget").then((m) => ({ default: m.MessagesWidget })),

@@ -5,6 +5,8 @@
 
 "use client";
 
+import { useMemo } from "react";
+
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import endpoints from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";

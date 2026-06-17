@@ -7,14 +7,14 @@
  */
 
 import { Box, Text } from "ink";
-import type { JSX } from "react";
-
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetPlatform,
   useWidgetResponseOnly,
   useWidgetTranslation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import type definition from "./definition";
 import type { ReleaseResponseType } from "./definition";

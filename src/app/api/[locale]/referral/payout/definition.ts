@@ -7,8 +7,6 @@
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import { z } from "zod";
 
-import { REFERRAL_CONFIG } from "../config";
-
 import { translatedValueSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -24,13 +22,11 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { REFERRAL_CONFIG } from "../config";
 
 import { UserRole } from "../../user/user-roles/enum";
+import { REFERRAL_CONFIG } from "../config";
 import { PayoutCurrency, PayoutCurrencyDB, PayoutStatusDB } from "../enum";
 import { scopedTranslation } from "../i18n";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const ReferralPayoutContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ReferralPayoutContainer })),

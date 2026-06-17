@@ -24,19 +24,6 @@ import { SectionGroup } from "next-vibe-ui/ui/section-group";
 import { Span } from "next-vibe-ui/ui/span";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import React, { useCallback, useMemo, useState } from "react";
-
-import {
-  LeadSource,
-  LeadSourceFilter,
-  LeadStatus,
-  LeadStatusFilter,
-} from "@/app/api/[locale]/leads/enum";
-import {
-  type LeadsTranslationKey,
-  scopedTranslation as leadsScopedTranslation,
-} from "@/app/api/[locale]/leads/i18n";
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -50,6 +37,19 @@ import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import React, { useCallback, useMemo, useState } from "react";
+
+import {
+  LeadSource,
+  LeadSourceFilter,
+  LeadStatus,
+  LeadStatusFilter,
+} from "@/app/api/[locale]/leads/enum";
+import {
+  type LeadsTranslationKey,
+  scopedTranslation as leadsScopedTranslation,
+} from "@/app/api/[locale]/leads/i18n";
+import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type definition from "./definition";
 

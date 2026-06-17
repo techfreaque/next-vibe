@@ -29,18 +29,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import {
-import { scopedTranslation } from "./i18n";
-import { scopedTranslation } from "./i18n";
-  ENV_KEYS,
-  type EnvFieldType,
-  type EnvKeyMeta,
-  type EnvKeyName,
-} from "@/app/api/[locale]/system/generated/env-keys";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-import { scopedTranslation } from "./i18n";
 import { SYSTEM_SETTINGS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const SystemSettingsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SystemSettingsWidget })),

@@ -7,14 +7,13 @@ import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
 
 import type definition from "./definition";
 import type { PosTerminalListGetResponseOutput } from "./definition";

@@ -20,12 +20,12 @@ import {
 } from "../../../enum";
 import type { LeadWithEmailType } from "../../../types";
 import { scopedTranslation } from "../journeys/i18n";
+import { newsletterMay2026JourneyTemplates } from "../journeys/newsletter-may-2026.email";
 import { quietRecommendationJourneyTemplates } from "../journeys/quiet-recommendation.email";
 import { retentionJourneyTemplates } from "../journeys/retention.email";
 import { sideHustleJourneyTemplates } from "../journeys/side-hustle.email";
 import { signupNurtureJourneyTemplates } from "../journeys/signup-nurture.email";
 import { uncensoredConvertJourneyTemplates } from "../journeys/uncensored-convert.email";
-import { newsletterMay2026JourneyTemplates } from "../journeys/newsletter-may-2026.email";
 import { winbackJourneyTemplates } from "../journeys/winback.email";
 import type {
   EmailTemplateData,

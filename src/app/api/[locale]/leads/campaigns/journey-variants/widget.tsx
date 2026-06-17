@@ -18,14 +18,12 @@ import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { Switch } from "next-vibe-ui/ui/switch";
 import { P } from "next-vibe-ui/ui/typography";
-
 import {
   useWidgetContext,
   useWidgetTranslation,
-import React, { useCallback, useState } from "react";
-import React, { useCallback, useState } from "react";
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, { useCallback, useState } from "react";
 
 import type definition from "./definition";
 

@@ -38,19 +38,25 @@ installFetchCache();
 import { installWsFixture } from "../../testing/ws-fixture";
 installWsFixture();
 
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { defaultLocale } from "@/i18n/core/config";
+
 import {
   addLocalhostPort,
   clearLocalhostPorts,
-  setFetchCacheContext,
   setFetchCacheStrictMode,
 } from "../../testing/fetch-cache";
-
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { env } from "@/config/env";
-import { LOCAL_DEV_URL } from "../../testing/remote-setup";
+import {
+  connectToHermes,
+  disconnectFromHermes,
+  HERMES_INSTANCE_ID,
+  LOCAL_DEV_URL,
+} from "../../testing/remote-setup";
 import { describeStreamSuite } from "./route-base.test";
 
 /** hermes port for HTTP fixture interception */

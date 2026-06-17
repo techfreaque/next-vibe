@@ -16,8 +16,6 @@ import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
-
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   type ContentBlock,
@@ -28,9 +26,9 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { env } from "@/config/env";

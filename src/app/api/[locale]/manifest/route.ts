@@ -1,3 +1,4 @@
+// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- Returns web app manifest JSON, cannot use endpointsHandler
 /**
  * Manifest API Route
  * GET /api/[locale]/manifest

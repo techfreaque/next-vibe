@@ -11,6 +11,11 @@
  * 5. Type inference works through the entire chain
  */
 
+import type {
+  AnyChildrenConstrain,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+} from "next-vibe-ui/unified/_shared/types";
 import { z } from "zod";
 
 import {
@@ -19,11 +24,6 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type {
-  AnyChildrenConstrain,
-  ConstrainedChildUsage,
-  FieldUsageConfig,
-} from "next-vibe-ui/unified/_shared/types";
 import type { EventSchemas } from "../../../websocket/types";
 import type {
   ApiEndpoint,

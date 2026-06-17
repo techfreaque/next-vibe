@@ -3,16 +3,27 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Input } from "next-vibe-ui/ui/input";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Video as VideoIcon } from "next-vibe-ui/ui/icons/Video";
+import { Input } from "next-vibe-ui/ui/input";
 import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H3 } from "next-vibe-ui/ui/typography";
 import { Video } from "next-vibe-ui/ui/video";
+import {
+  useWidgetDisabled,
+  useWidgetForm,
+  useWidgetIsSubmitting,
+  useWidgetLocale,
+  useWidgetUser,
+  useWidgetValue,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -28,17 +39,6 @@ import {
   getBestVideoGenModel,
   getVideoGenModelById,
 } from "@/app/api/[locale]/agent/video-generation/models";
-import {
-  useWidgetDisabled,
-  useWidgetForm,
-  useWidgetIsSubmitting,
-  useWidgetLocale,
-  useWidgetUser,
-  useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 
 import { objectValues } from "../../shared/utils";
 import type definition from "./definition";

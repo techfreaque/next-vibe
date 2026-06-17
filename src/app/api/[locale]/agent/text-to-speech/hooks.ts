@@ -16,9 +16,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { type TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { chunkTextForTTS } from "./chunking";
 import textToSpeechDefinitions from "./definition";
 import { getTtsRefs, resetTtsRefs, useTtsStore } from "./tts-store";

@@ -19,26 +19,26 @@ import {
   addEdge,
   Background,
   BaseEdge,
+  type Connection,
   Controls,
+  type Edge,
   EdgeLabelRenderer,
+  type EdgeProps,
+  type EdgeTypes,
   getBezierPath,
   Handle,
   MiniMap,
+  type Node,
+  type NodeProps,
+  type NodeTypes,
+  type OnEdgesChange,
+  type OnNodesChange,
   Position,
   ReactFlow,
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
   useReactFlow,
-  type Connection,
-  type Edge,
-  type EdgeProps,
-  type EdgeTypes,
-  type Node,
-  type NodeProps,
-  type NodeTypes,
-  type OnEdgesChange,
-  type OnNodesChange,
 } from "@xyflow/react";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
@@ -83,16 +83,6 @@ import {
 } from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -103,23 +93,31 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
+import { cn } from "@/app/api/[locale]/shared/utils";
+import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import { endpointsMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { ResolutionValues } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+
 import { GraphResolution } from "../../../enum";
+import type { GraphNodeConfig } from "../../../graph/schema";
 import type {
   GraphConfig,
   GraphEdge,
   NodePosition,
   TriggerConfig,
 } from "../../../graph/types";
-
-import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import { endpointsMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
-import { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-
-import type { GraphNodeConfig } from "../../../graph/schema";
 import parentDefinitions from "../data/definition";
 import versionsDefinitions from "../versions/definition";
 import type definition from "./definition";

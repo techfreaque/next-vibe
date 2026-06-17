@@ -40,16 +40,14 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
-import { env } from "@/config/env";
-
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
 import { generateInvoiceViewToken } from "../../token";
-  InvoiceSendUrlPathParams,
 import type {
-import { scopedTranslation } from "./i18n";
   InvoiceSendResponseOutput,
+  InvoiceSendUrlPathParams,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class InvoiceSendRepository {
   static async sendInvoice(

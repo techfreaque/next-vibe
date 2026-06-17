@@ -8,8 +8,6 @@ import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "next-vibe-ui/i18n";
-
 // Import all types and constants from web (web is source of truth)
 import type {
   CountryData,

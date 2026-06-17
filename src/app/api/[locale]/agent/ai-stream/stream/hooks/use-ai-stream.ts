@@ -12,14 +12,15 @@
  */
 
 import { parseError } from "next-vibe/shared/utils";
-import { useCallback, useMemo } from "react";
-
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
+import { toast } from "next-vibe-ui/hooks/use-toast";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { useCallback, useMemo } from "react";
+
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 
 import { preWarmChannel } from "../../../../system/unified-interface/websocket/client";
 import { buildMessagesChannel } from "../../../chat/threads/[threadId]/messages/channel";

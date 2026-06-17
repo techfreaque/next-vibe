@@ -16,13 +16,13 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { AuthContext } from "@/app/api/[locale]/system/unified-interface/shared/server-only/auth/base-auth-handler";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import type { CompleteUserType } from "@/app/api/[locale]/user/types";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UserRoleValue } from "../user-roles/enum";
-import { scopedTranslation } from "./i18n";
 import type { AuthT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import type { AuthRepositoryType } from "./repository";
 import type { InferUserType } from "./types";
 

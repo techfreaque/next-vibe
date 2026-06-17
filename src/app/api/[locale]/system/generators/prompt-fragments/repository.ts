@@ -513,6 +513,8 @@ ${fragments
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
+import type { PromptFragmentModule, PromptFragmentModuleEntry } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+
 /**
  * All registered prompt fragment IDs.
  * Auto-generated - do not edit manually.

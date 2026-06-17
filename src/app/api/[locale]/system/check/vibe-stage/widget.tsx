@@ -20,10 +20,6 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import {
   useWidgetEndpointMutations,
   useWidgetNavigation,
@@ -31,6 +27,10 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import type definition from "./definition";
 

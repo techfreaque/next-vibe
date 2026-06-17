@@ -1,14 +1,14 @@
 "use client";
 
-import { Div } from "next-vibe-ui/ui/div";
-import { H3, P } from "next-vibe-ui/ui/typography";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import type { EventData } from "next-vibe-ui/ui/joyride";
-import { ACTIONS, EVENTS, Joyride, STATUS } from "next-vibe-ui/ui/joyride";
-
 import { useSilentHistory } from "next-vibe-ui/hooks/use-navigation";
 import { useWindowSize } from "next-vibe-ui/hooks/use-window-size";
 import { storage } from "next-vibe-ui/lib/storage";
+import { Div } from "next-vibe-ui/ui/div";
+import type { EventData } from "next-vibe-ui/ui/joyride";
+import { ACTIONS, EVENTS, Joyride, STATUS } from "next-vibe-ui/ui/joyride";
+import { H3, P } from "next-vibe-ui/ui/typography";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";

@@ -17,12 +17,12 @@ import {
   getPreferredToolName,
 } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 
-import type { PackageManifest } from "./types";
 import {
   findFilesRecursively,
   generateFileHeader,
   writeGeneratedFile,
 } from "../../../generators/shared/utils";
+import type { PackageManifest } from "./types";
 
 // ============================================================================
 // Types

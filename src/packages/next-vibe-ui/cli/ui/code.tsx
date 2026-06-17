@@ -1,9 +1,6 @@
 import { Text } from "ink";
-import type { JSX, ReactNode } from "react";
-import type { JSX, ReactNode } from "react";
-import type { JSX, ReactNode } from "react";
-
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX, ReactNode } from "react";
 
 export interface CodeProps {
   children?: ReactNode;

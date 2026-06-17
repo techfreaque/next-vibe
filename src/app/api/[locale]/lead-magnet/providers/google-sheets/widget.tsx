@@ -16,20 +16,15 @@ import {
   SelectValue,
 } from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
-import { Input } from "next-vibe-ui/ui/input";
-import { Label } from "next-vibe-ui/ui/label";
-
 import {
   useWidgetContext,
-import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
-import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
   useWidgetLocale,
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import type endpoints from "./definition";
 

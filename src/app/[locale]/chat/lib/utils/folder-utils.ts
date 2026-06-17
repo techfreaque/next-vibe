@@ -3,6 +3,9 @@
  * Helper functions for working with folders in the new API structure
  */
 
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+
+import { scopedTranslation as chatScopedTranslation } from "@/app/[locale]/chat/i18n";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
   DEFAULT_FOLDER_CONFIGS,
@@ -10,8 +13,6 @@ import {
 } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import { scopedTranslation as chatScopedTranslation } from "@/app/[locale]/chat/i18n";
 
 /**
  * Check if a folder ID is a default/root folder

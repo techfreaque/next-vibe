@@ -10,8 +10,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Crown } from "next-vibe-ui/ui/icons/Crown";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useMemo } from "react";
-
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -19,9 +17,11 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React, { useCallback, useMemo } from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type definition from "./definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 const variantColorMap: Record<
   "default" | "success" | "warning" | "danger" | "info",

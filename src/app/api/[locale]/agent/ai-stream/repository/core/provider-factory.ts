@@ -2,10 +2,10 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import type { JSONValue } from "ai";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import type { ModelOptionBase } from "@/app/api/[locale]/agent/models/models";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { ModelOptionBase } from "@/app/api/[locale]/agent/models/models";
 import { createClaudeCode } from "../../providers/claude-code";
 import { createFreedomGPT } from "../../providers/freedomgpt";
 import { createGabAI } from "../../providers/gab-ai";

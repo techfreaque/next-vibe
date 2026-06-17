@@ -4,6 +4,13 @@
  */
 
 import { cn } from "next-vibe/shared/utils";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
+import type { CategoryKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import {
+  Icon,
+  ICON_CATEGORIES,
+  ICON_CATEGORIES_LIST,
+} from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import {
@@ -15,14 +22,7 @@ import {
   View,
 } from "react-native";
 
-import type { CategoryKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import {
-  Icon,
-  ICON_CATEGORIES,
-  ICON_CATEGORIES_LIST,
-} from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "next-vibe-ui/i18n";
 
 import type { IconPickerProps } from "../../web/ui/icon-picker";
 import { Text } from "./text";

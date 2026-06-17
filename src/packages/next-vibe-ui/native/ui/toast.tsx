@@ -1,11 +1,10 @@
 import { cn } from "next-vibe/shared/utils/utils";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "next-vibe-ui/i18n";
-
 import type {
   ToastActionProps,
   ToastCloseProps,

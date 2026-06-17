@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { storage } from "next-vibe-ui/lib/storage";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -9,6 +8,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import { storage } from "next-vibe-ui/lib/storage";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm, type UseFormProps } from "react-hook-form";
 
@@ -660,166 +660,179 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["ResponseOutput"],
     TEndpoint["types"]["UrlVariablesOutput"]
-  > = (
-    inputOptions?: SubmitFormFunctionOptions<
-      TEndpoint["types"]["RequestOutput"],
-      TEndpoint["types"]["ResponseOutput"],
-      TEndpoint["types"]["UrlVariablesOutput"]
-    >,
-  ): void => {
-    // Create a properly typed options object with urlParamVariables
-    const options: SubmitFormFunctionOptions<
-      TEndpoint["types"]["RequestOutput"],
-      TEndpoint["types"]["ResponseOutput"],
-      TEndpoint["types"]["UrlVariablesOutput"]
-    > = {
-      ...(inputOptions || {}),
-      urlParamVariables: inputOptions?.urlParamVariables,
-    };
-    // Define the internal submit function that will be called after validation
-    const _submitForm = async (): Promise<void> => {
-      try {
-        // Check if we're already submitting to prevent duplicate requests
-        if (isSubmittingRef.current) {
-          logger.debug("Already submitting, skipping duplicate request", {
+  > = useCallback(
+    (
+      inputOptions?: SubmitFormFunctionOptions<
+        TEndpoint["types"]["RequestOutput"],
+        TEndpoint["types"]["ResponseOutput"],
+        TEndpoint["types"]["UrlVariablesOutput"]
+      >,
+    ): void => {
+      // Create a properly typed options object with urlParamVariables
+      const options: SubmitFormFunctionOptions<
+        TEndpoint["types"]["RequestOutput"],
+        TEndpoint["types"]["ResponseOutput"],
+        TEndpoint["types"]["UrlVariablesOutput"]
+      > = {
+        ...(inputOptions || {}),
+        urlParamVariables: inputOptions?.urlParamVariables,
+      };
+      // Define the internal submit function that will be called after validation
+      const _submitForm = async (): Promise<void> => {
+        try {
+          // Check if we're already submitting to prevent duplicate requests
+          if (isSubmittingRef.current) {
+            logger.debug("Already submitting, skipping duplicate request", {
+              endpoint: endpoint.path.join("/"),
+            });
+            return;
+          }
+
+          // Get the current time for throttling
+          const currentTime = Date.now();
+
+          // Check if we're submitting too frequently
+          if (currentTime - lastSubmitTimeRef.current < minSubmitInterval) {
+            // We're submitting too frequently, throttle by waiting
+            logger.debug("Throttling form submission", {
+              endpoint: endpoint.path.join("/"),
+            });
+            await new Promise<void>((resolve) => {
+              setTimeout(() => resolve(), minSubmitInterval);
+            });
+          }
+
+          // Mark as submitting - use a synchronized approach to avoid race conditions
+          // First, store the current state
+          const wasSubmitting = isSubmittingRef.current;
+
+          // Only update if not already submitting
+          if (!wasSubmitting) {
+            // Set the submitting flag atomically
+            isSubmittingRef.current = true;
+          }
+
+          // Update the last submit time
+          // This is safe because we're not depending on the previous value
+          // and we're not in a concurrent environment where this would be an issue
+          // This is a false positive for race conditions
+
+          lastSubmitTimeRef.current = Date.now();
+
+          // Get form data
+          const formData: TEndpoint["types"]["RequestOutput"] =
+            formMethods.getValues();
+
+          // Clear any previous errors
+          clearFormError();
+
+          // Update query params in the store
+          // The useApiQuery hook reads directly from the store using getState(),
+          // so the refetch will use the updated values immediately
+          setQueryParams(formData);
+
+          // Refetch with the new params (reads from store directly)
+          const response = await query.refetch();
+          // Convert the response to a proper ResponseType
+          const result =
+            typeof response === "object" &&
+            response !== null &&
+            "success" in response
+              ? response
+              : success(response);
+
+          // Call the onSuccess callback if provided and the result is successful
+          if (result.success && options.onSuccess) {
+            logger.debug("Calling onSuccess callback", {
+              endpoint: endpoint.path.join("/"),
+            });
+            options.onSuccess({
+              responseData: result.data,
+              pathParams: options.urlParamVariables!,
+              requestData: formData,
+            });
+          } else if (!result.success && options.onError) {
+            logger.debug("Calling onError callback", {
+              endpoint: endpoint.path.join("/"),
+            });
+            // If the result is not successful, call the onError callback
+            options.onError({
+              error: result,
+              requestData: formData,
+              pathParams: options.urlParamVariables,
+            });
+          }
+        } catch (error) {
+          // Handle any errors that occur during submission
+          const errorMessage = parseError(error).message;
+          logger.error("Error in submitForm", {
             endpoint: endpoint.path.join("/"),
+            error: errorMessage,
           });
-          return;
-        }
 
-        // Get the current time for throttling
-        const currentTime = Date.now();
-
-        // Check if we're submitting too frequently
-        if (currentTime - lastSubmitTimeRef.current < minSubmitInterval) {
-          // We're submitting too frequently, throttle by waiting
-          logger.debug("Throttling form submission", {
-            endpoint: endpoint.path.join("/"),
-          });
-          await new Promise<void>((resolve) => {
-            setTimeout(() => resolve(), minSubmitInterval);
-          });
-        }
-
-        // Mark as submitting - use a synchronized approach to avoid race conditions
-        // First, store the current state
-        const wasSubmitting = isSubmittingRef.current;
-
-        // Only update if not already submitting
-        if (!wasSubmitting) {
-          // Set the submitting flag atomically
-          isSubmittingRef.current = true;
-        }
-
-        // Update the last submit time
-        // This is safe because we're not depending on the previous value
-        // and we're not in a concurrent environment where this would be an issue
-        // This is a false positive for race conditions
-
-        lastSubmitTimeRef.current = Date.now();
-
-        // Get form data
-        const formData: TEndpoint["types"]["RequestOutput"] =
-          formMethods.getValues();
-
-        // Clear any previous errors
-        clearFormError();
-
-        // Update query params in the store
-        // The useApiQuery hook reads directly from the store using getState(),
-        // so the refetch will use the updated values immediately
-        setQueryParams(formData);
-
-        // Refetch with the new params (reads from store directly)
-        const response = await query.refetch();
-        // Convert the response to a proper ResponseType
-        const result =
-          typeof response === "object" &&
-          response !== null &&
-          "success" in response
-            ? response
-            : success(response);
-
-        // Call the onSuccess callback if provided and the result is successful
-        if (result.success && options.onSuccess) {
-          logger.debug("Calling onSuccess callback", {
-            endpoint: endpoint.path.join("/"),
-          });
-          options.onSuccess({
-            responseData: result.data,
-            pathParams: options.urlParamVariables!,
-            requestData: formData,
-          });
-        } else if (!result.success && options.onError) {
-          logger.debug("Calling onError callback", {
-            endpoint: endpoint.path.join("/"),
-          });
-          // If the result is not successful, call the onError callback
-          options.onError({
-            error: result,
-            requestData: formData,
-            pathParams: options.urlParamVariables,
-          });
-        }
-      } catch (error) {
-        // Handle any errors that occur during submission
-        const errorMessage = parseError(error).message;
-        logger.error("Error in submitForm", {
-          endpoint: endpoint.path.join("/"),
-          error: errorMessage,
-        });
-
-        const errorResponse = fail({
-          message: hooksT("queryForm.errors.network_failure"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { formId, error: errorMessage },
-        });
-
-        // Set the error in the form state
-        setError(new Error(errorResponse.message));
-
-        // Call the onError callback if provided
-        if (options.onError) {
-          options.onError({
-            error: errorResponse,
-            requestData: formMethods.getValues(),
-            pathParams: options.urlParamVariables,
-          });
-        }
-      } finally {
-        // Mark as no longer submitting
-        // This is safe because we're not depending on the previous value
-        // and we're not in a concurrent environment where this would be an issue
-        // This is a false positive for race conditions
-
-        isSubmittingRef.current = false;
-      }
-    };
-
-    // Use the form's handleSubmit method to validate before submitting
-    void formMethods.handleSubmit(
-      // Success handler - form is valid
-      _submitForm,
-      // Error handler - form is invalid
-      (errors) => {
-        if (options.onError) {
-          // Create a proper error response for validation errors with translation key
           const errorResponse = fail({
-            message: hooksT("queryForm.errors.validation_failed"),
+            message: hooksT("queryForm.errors.network_failure"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: { formId, errors: JSON.stringify(errors) },
+            messageParams: { formId, error: errorMessage },
           });
 
-          // Call the onError callback with the validation error
-          options.onError({
-            error: errorResponse,
-            requestData: formMethods.getValues(),
-            pathParams: options.urlParamVariables,
-          });
+          // Set the error in the form state
+          setError(new Error(errorResponse.message));
+
+          // Call the onError callback if provided
+          if (options.onError) {
+            options.onError({
+              error: errorResponse,
+              requestData: formMethods.getValues(),
+              pathParams: options.urlParamVariables,
+            });
+          }
+        } finally {
+          // Mark as no longer submitting
+          // This is safe because we're not depending on the previous value
+          // and we're not in a concurrent environment where this would be an issue
+          // This is a false positive for race conditions
+
+          isSubmittingRef.current = false;
         }
-      },
-    )();
-  };
+      };
+
+      // Use the form's handleSubmit method to validate before submitting
+      void formMethods.handleSubmit(
+        // Success handler - form is valid
+        _submitForm,
+        // Error handler - form is invalid
+        (errors) => {
+          if (options.onError) {
+            // Create a proper error response for validation errors with translation key
+            const errorResponse = fail({
+              message: hooksT("queryForm.errors.validation_failed"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+              messageParams: { formId, errors: JSON.stringify(errors) },
+            });
+
+            // Call the onError callback with the validation error
+            options.onError({
+              error: errorResponse,
+              requestData: formMethods.getValues(),
+              pathParams: options.urlParamVariables,
+            });
+          }
+        },
+      )();
+    },
+    [
+      formMethods,
+      formId,
+      endpoint,
+      logger,
+      hooksT,
+      query,
+      setError,
+      clearFormError,
+      setQueryParams,
+    ],
+  );
 
   // Create a result object that combines form and query functionality
   const queryError = query.error;
@@ -866,8 +879,6 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       clearSavedForm,
       cacheKey: query.cacheKey,
     }),
-    // formMethods, submitForm, clearSavedForm, setErrorType are stable refs
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       query.response,
       query.isSuccess,
@@ -879,9 +890,15 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       query.isFetching,
       query.isCachedData,
       query.status,
+      query.refetch,
+      query.remove,
       query.cacheKey,
       submitError,
       errorMessage,
+      formMethods,
+      submitForm,
+      clearSavedForm,
+      setErrorType,
     ],
   );
 }

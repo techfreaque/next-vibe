@@ -20,8 +20,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import React from "react";
-
 import { UserRole } from "../../../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 

@@ -27,9 +27,6 @@ import { configScopedTranslation } from "@/config/i18n";
 import { useLogger } from "@/hooks/use-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { configScopedTranslation } from "@/config/i18n";
-
-import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
 

@@ -1,10 +1,12 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span, type SpanMouseEvent } from "next-vibe-ui/ui/span";
-import { cn } from "next-vibe/shared/utils";
+import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import React, { memo, useCallback, useMemo } from "react";
 
@@ -15,13 +17,11 @@ import {
   getIdColor,
 } from "@/app/[locale]/chat/lib/utils/formatting";
 import { formatPostNumber } from "@/app/[locale]/chat/lib/utils/post-numbers";
+import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
-import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

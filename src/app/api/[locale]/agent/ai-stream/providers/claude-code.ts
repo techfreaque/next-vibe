@@ -26,11 +26,11 @@ import type {
   LanguageModelV2Usage,
 } from "@ai-sdk/provider";
 // Import from the agent SDK's bundled @anthropic-ai/sdk to match the stream event types it emits
-import type { BetaRawMessageStreamEvent } from "@anthropic-ai/claude-agent-sdk/node_modules/@anthropic-ai/sdk/resources/beta/messages/messages.mjs";
+import type { BetaRawMessageStreamEvent } from "@anthropic-ai/claude-agent-sdk/node_modules/@anthropic-ai/sdk/resources/beta/messages/messages.js";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { withClaudeCodeFixture } from "../testing/claude-code-fixture-store";
 
+import { withClaudeCodeFixture } from "../testing/claude-code-fixture-store";
 import { AgentToolExecutorRegistry } from "./anthropic-agent-tool-bridge";
 import { logProviderRequest } from "./shared/debug-file-logger";
 

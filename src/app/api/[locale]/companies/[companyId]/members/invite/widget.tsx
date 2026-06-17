@@ -6,8 +6,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Span } from "next-vibe-ui/ui/span";
-import { type JSX } from "react";
-
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetNavigation,
@@ -16,9 +14,9 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { EmailFieldWidget } from "next-vibe-ui/unified/form-fields/email-field/widget";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
-import { type JSX } from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { type JSX } from "react";
 
 import type definition from "./definition";
 

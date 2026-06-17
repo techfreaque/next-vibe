@@ -8,8 +8,6 @@ import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
 import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
-import React from "react";
-
 import {
   useWidgetForm,
   useWidgetLogger,
@@ -24,6 +22,8 @@ import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-butt
 import React from "react";
 
 import type { MessengerAccountsListGETResponseOutput } from "@/app/api/[locale]/messenger/accounts/list/definition";
+import { useMessengerAccountsList } from "@/app/api/[locale]/messenger/accounts/list/hooks";
+
 import type definition from "./definition";
 
 interface CustomWidgetProps {

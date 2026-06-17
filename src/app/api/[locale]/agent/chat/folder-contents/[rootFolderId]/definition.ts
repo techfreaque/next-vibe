@@ -540,6 +540,54 @@ const { GET } = createEndpoint({
         ] as const,
       },
       operation: "merge" as const,
+      onEvent({ partial, requestData, queryClient, cacheKey }) {
+        // The merge operation (above) runs before onEvent and appends new items
+        // into ALL folder-contents caches for this rootFolderId, regardless of
+        // subFolderId. Remove threads that don't belong in this cache level.
+        if (!cacheKey) {
+          return;
+        }
+        const items = partial.items;
+        if (!items || items.length === 0) {
+          return;
+        }
+        // subFolderId from the cache's request data (null = root level)
+        const subFolderId =
+          (requestData.subFolderId as string | null | undefined) ?? null;
+        // Collect ids of threads that don't belong here
+        const wrongIds = new Set<string>();
+        for (const item of items) {
+          if (!item) {
+            continue;
+          }
+          // Only new threads trigger this issue - if already in cache it was just updated
+          // folderId null/undefined = root level, otherwise subfolder
+          const normalizedItemFolder = item.folderId ?? null;
+          if (normalizedItemFolder !== subFolderId) {
+            wrongIds.add(item.id);
+          }
+        }
+        if (wrongIds.size === 0) {
+          return;
+        }
+        const existing = queryClient.getQueryData<{
+          success: boolean;
+          data?: { items: (typeof items)[number][] };
+        }>([cacheKey]);
+        if (!existing?.success || !Array.isArray(existing.data?.items)) {
+          return;
+        }
+        const filtered = existing.data.items.filter(
+          (it) => !wrongIds.has(it.id),
+        );
+        if (filtered.length === existing.data.items.length) {
+          return;
+        }
+        queryClient.setQueryData([cacheKey], {
+          ...existing,
+          data: { ...existing.data, items: filtered },
+        });
+      },
     },
     // Folder CRUD - emitted by folders/subfolders/[subFolderId]/repository.ts
     "folder-created": {
@@ -555,6 +603,47 @@ const { GET } = createEndpoint({
         ] as const,
       },
       operation: "merge" as const,
+      onEvent({ partial, requestData, queryClient, cacheKey }) {
+        if (!cacheKey) {
+          return;
+        }
+        const items = partial.items;
+        if (!items || items.length === 0) {
+          return;
+        }
+        const subFolderId = requestData.subFolderId ?? null;
+        const wrongIds = new Set<string>();
+        for (const item of items) {
+          if (!item) {
+            continue;
+          }
+          // Folders use parentId to indicate which level they belong to
+          const normalizedParent = item.parentId ?? null;
+          if (normalizedParent !== subFolderId) {
+            wrongIds.add(item.id);
+          }
+        }
+        if (wrongIds.size === 0) {
+          return;
+        }
+        const existing = queryClient.getQueryData<{
+          success: boolean;
+          data?: { items: (typeof items)[number][] };
+        }>([cacheKey]);
+        if (!existing?.success || !Array.isArray(existing.data?.items)) {
+          return;
+        }
+        const filtered = existing.data.items.filter(
+          (it) => !wrongIds.has(it.id),
+        );
+        if (filtered.length === existing.data.items.length) {
+          return;
+        }
+        queryClient.setQueryData([cacheKey], {
+          ...existing,
+          data: { ...existing.data, items: filtered },
+        });
+      },
     },
     "folder-updated": {
       fields: {

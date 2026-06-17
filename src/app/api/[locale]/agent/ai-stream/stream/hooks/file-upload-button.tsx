@@ -30,9 +30,9 @@ import type { JSX } from "react";
 import { memo, useRef, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 import { isAllowedFileType } from "../../../chat/incognito/file-utils";
+import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 interface FileUploadButtonProps {
   disabled?: boolean;

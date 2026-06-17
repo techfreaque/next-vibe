@@ -15,14 +15,15 @@
  *      }
  */
 
-import type { ChatFolder, ChatThread } from "../db";
+import type { QueryClient } from "@tanstack/react-query";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 
 import { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatThread } from "../db";
-// ─── Minimal context interface ────────────────────────────────────────────────
 
+// ─── Minimal context interface ────────────────────────────────────────────────
 
 interface MinCtx {
   readonly partial: { readonly [K: string]: WidgetData | undefined };
@@ -30,6 +31,7 @@ interface MinCtx {
   readonly requestData: { readonly [K: string]: WidgetData | undefined };
   readonly queryClient: QueryClient;
   readonly logger: EndpointLogger;
+  readonly cacheKey: string | undefined;
 }
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────

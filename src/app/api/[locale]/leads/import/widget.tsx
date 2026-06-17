@@ -25,8 +25,6 @@ import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Code } from "next-vibe-ui/ui/typography";
 import { Ul } from "next-vibe-ui/ui/ul";
-import React from "react";
-
 import {
   useWidgetContext,
   useWidgetNavigation,
@@ -38,9 +36,9 @@ import { FileFieldWidget } from "next-vibe-ui/unified/form-fields/file-field/wid
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import React from "react";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import React from "react";
 
 import type definition from "./definition";
 

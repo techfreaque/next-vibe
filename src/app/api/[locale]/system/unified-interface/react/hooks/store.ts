@@ -10,11 +10,11 @@ import { create } from "zustand";
 import { generateStorageKey } from "@/app/api/[locale]/system/unified-interface/react/utils/storage-storage-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { executeQuery } from "./query-executor";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";

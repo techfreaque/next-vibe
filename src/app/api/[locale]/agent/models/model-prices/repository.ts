@@ -18,11 +18,16 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import type { ModelDefinition } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-
+import { chatModelDefinitions } from "../../ai-stream/models";
+import { imageGenModelDefinitions } from "../../image-generation/models";
+import { musicGenModelDefinitions } from "../../music-generation/models";
+import { sttModelDefinitions } from "../../speech-to-text/models";
+import { ttsModelDefinitions } from "../../text-to-speech/models";
+import { videoGenModelDefinitions } from "../../video-generation/models";
 import type { ModelPricesGetResponseOutput } from "./definition";
 import type { ModelPricesT } from "./i18n";
 import type {
@@ -45,13 +50,6 @@ import { OpenRouterTokenPriceFetcher } from "./providers/openrouter-token";
 import { ReplicatePriceFetcher } from "./providers/replicate";
 import { UnbottledPriceFetcher } from "./providers/unbottled";
 import { UncensoredAiPriceFetcher } from "./providers/uncensored-ai";
-
-import { chatModelDefinitions } from "../../ai-stream/models";
-import { imageGenModelDefinitions } from "../../image-generation/models";
-import { musicGenModelDefinitions } from "../../music-generation/models";
-import { sttModelDefinitions } from "../../speech-to-text/models";
-import { ttsModelDefinitions } from "../../text-to-speech/models";
-import { videoGenModelDefinitions } from "../../video-generation/models";
 
 export type { PriceFetcher, ProviderPriceResult };
 

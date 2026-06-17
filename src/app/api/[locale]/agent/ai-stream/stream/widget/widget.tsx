@@ -8,34 +8,56 @@
 
 "use client";
 
+import { usePathname, useRouter } from "next-vibe-ui/hooks/use-navigation";
+import { useResizeObserver } from "next-vibe-ui/hooks/use-resize-observer";
 import { useSafeAreaInsets } from "next-vibe-ui/hooks/use-safe-area-insets";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "next-vibe-ui/ui/alert-dialog";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
+import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { KeyboardAvoidingView } from "next-vibe-ui/ui/keyboard-avoiding-view";
+import {
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetUser,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { JSX } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import publicFeedDefinition from "@/app/api/[locale]/agent/chat/public-feed/definition";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
+import { useDeleteDialogStore } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
+import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/widget/new-thread/empty-state";
 import { CortexModal } from "@/app/api/[locale]/agent/cortex/widget/cortex-modal";
+import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { AIToolsModal } from "@/app/api/[locale]/agent/tools/widget/ai-tools-modal";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import {
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { platform } from "@/config/env-client";
+import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "../definition";
 import type { AiStreamPostResponseOutput } from "../definition";
+import { SidebarWrapper } from "./chat-ui/sidebar/sidebar-wrapper";
+import { TopBar } from "./chat-ui/top-area/top-bar";
+import { WelcomeTour } from "./chat-ui/welcome-tour/welcome-tour";
 import { ChatInputContainer } from "./input-container";
 import { ChatToolbar } from "./toolbar";
 

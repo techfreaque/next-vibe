@@ -7,19 +7,17 @@ import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, H4, P } from "next-vibe-ui/ui/typography";
-import { type JSX } from "react";
-
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { EntityPickerFieldWidget } from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
-import { type JSX } from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
-import { InvoiceStatus } from "@/app/api/[locale]/payment/enum";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { type JSX } from "react";
 
+import { InvoiceStatus } from "@/app/api/[locale]/payment/enum";
 import invoiceRecordPaymentDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/record-payment/definition";
 import invoiceSendDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/send/definition";
 import invoiceSendReminderDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/send-reminder/definition";

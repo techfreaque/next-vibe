@@ -35,8 +35,6 @@ import {
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const LeadClickTrackingContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.LeadClickTrackingContainer })),
 );

@@ -11,8 +11,6 @@ import React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "next-vibe-ui/i18n";
-
 import type {
   BreadcrumbEllipsisProps,
   BreadcrumbItemProps,

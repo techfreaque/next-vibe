@@ -10,7 +10,6 @@
 import "server-only";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -26,8 +25,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { messengerAccounts } from "../accounts/db";
 import type { MessageChannelValue } from "../accounts/enum";
-import { emails, messengerFolders } from "../messages/db";
 import { scopedTranslation as providerScopedTranslation } from "../i18n";
+import { emails, messengerFolders } from "../messages/db";
 import type {
   InboxFolder,
   InboxMessage,

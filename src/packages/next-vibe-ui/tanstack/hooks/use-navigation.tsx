@@ -2,15 +2,13 @@
  * TanStack Start implementation of Next.js navigation hooks
  * Mirrors the web/hooks/use-navigation.tsx interface
  */
-import { useMemo, useRef } from "react";
-
 import {
   useLocation,
   useNavigate,
   useParams,
-import { useMemo, useRef } from "react";
   useRouter as useTanStackRouter,
 } from "@tanstack/react-router";
+import { useMemo, useRef } from "react";
 
 /**
  * Get the router instance

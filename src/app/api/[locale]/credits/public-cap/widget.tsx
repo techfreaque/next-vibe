@@ -20,16 +20,14 @@ import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3 } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-
 import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-import type { JSX } from "react";
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import type { JSX } from "react";
 
 import type definition from "./definition";
 

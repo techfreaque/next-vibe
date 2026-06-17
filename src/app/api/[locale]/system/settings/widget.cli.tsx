@@ -5,15 +5,9 @@
  * MCP: Compact plain text summary
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import chalk from "chalk";
 import { Box, Text, useApp, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
-import type { JSX } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-
-import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -21,9 +15,15 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import endpoints from "./definition";
+import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { SystemSettingsGetResponseOutput } from "./definition";
+import endpoints from "./definition";
 
 type Module = SystemSettingsGetResponseOutput["modules"][number];
 type Setting = Module["settings"][number];

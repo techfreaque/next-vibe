@@ -5,15 +5,15 @@
  * is not assignable to CreateApiEndpointAny
  */
 
-import { z } from "zod";
-
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-
 import type {
   AnyChildrenConstrain,
   ConstrainedChildUsage,
   FieldUsageConfig,
 } from "next-vibe-ui/unified/_shared/types";
+import { z } from "zod";
+
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+
 import type { EventSchemas } from "../../../websocket/types";
 import type {
   ApiEndpoint,

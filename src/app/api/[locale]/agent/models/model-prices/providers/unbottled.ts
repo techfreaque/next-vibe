@@ -17,29 +17,28 @@
 import "server-only";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
-
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { ChatModelId, chatModelDefinitions } from "../../../ai-stream/models";
+import { chatModelDefinitions, ChatModelId } from "../../../ai-stream/models";
 import {
-  ImageGenModelId,
   imageGenModelDefinitions,
+  ImageGenModelId,
 } from "../../../image-generation/models";
 import {
-  MusicGenModelId,
   musicGenModelDefinitions,
+  MusicGenModelId,
 } from "../../../music-generation/models";
 import {
-  SttModelId,
   sttModelDefinitions,
+  SttModelId,
 } from "../../../speech-to-text/models";
 import {
-  TtsModelId,
   ttsModelDefinitions,
+  TtsModelId,
 } from "../../../text-to-speech/models";
 import {
-  VideoGenModelId,
   videoGenModelDefinitions,
+  VideoGenModelId,
 } from "../../../video-generation/models";
 import type { ModelDefinition, ModelProviderConfig } from "../../models";
 import { ApiProvider } from "../../models";

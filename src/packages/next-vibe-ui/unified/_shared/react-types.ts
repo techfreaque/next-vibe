@@ -2,14 +2,14 @@ import type React from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type z from "zod";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
 import type {
   CancelButtonConfig,
   SubmitButtonConfig,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type {
   AnyChildrenConstrain,
   BaseWidgetContext,

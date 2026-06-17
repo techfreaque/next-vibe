@@ -4,8 +4,6 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import { useRef, type JSX } from "react";
-
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -17,9 +15,9 @@ import {
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { posTerminalNameMap } from "../../terminal/list/widget";
 import { type JSX, useRef } from "react";
 
+import { posTerminalNameMap } from "../../terminal/list/widget";
 import type definition from "./definition";
 
 interface PosSessionOpenWidgetProps {

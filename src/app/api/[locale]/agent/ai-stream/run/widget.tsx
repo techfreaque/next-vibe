@@ -32,15 +32,6 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -53,30 +44,13 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import type { JSX } from "react";
-import type { FavoriteCard } from "../../chat/favorites/definition";
 import React, {
   useCallback,
   useEffect,
@@ -87,13 +61,22 @@ import React, {
 
 import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
 import { type ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import helpDefinitions from "@/app/api/[locale]/system/help/definition";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { platform } from "@/config/env-client";
-import { scopedTranslation as runScopedTranslation } from "./i18n";
-import { scopedTranslation as runScopedTranslation } from "./i18n";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { CortexModal } from "../../../agent/cortex/widget/cortex-modal";
 import { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
+import type { FavoriteCard } from "../../chat/favorites/definition";
 import type { EnabledTool } from "../../chat/hooks/store";
 import {
   ChatNavigationProvider,
@@ -101,13 +84,12 @@ import {
 } from "../../chat/hooks/use-chat-navigation-store";
 import messagesDefinition from "../../chat/threads/[threadId]/messages/definition";
 import { AIToolsModal } from "../../tools/widget/ai-tools-modal";
-
-import type { FavoriteCard } from "../../chat/favorites/definition";
 import cancelEndpoints from "../cancel/definition";
 import { WidgetChatInput } from "../stream/widget/chat-input";
 import { EmbeddedMessagesView } from "../stream/widget/embedded-messages";
 import type definition from "./definition";
 import type { AiStreamRunPostRequestOutput } from "./definition";
+import { scopedTranslation as runScopedTranslation } from "./i18n";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

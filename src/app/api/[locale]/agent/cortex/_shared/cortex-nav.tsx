@@ -24,11 +24,11 @@ import { Save } from "next-vibe-ui/ui/icons/Save";
 import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetLocale,
   useWidgetNavigation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+
 import { scopedTranslation } from "../i18n";
 
 export type CortexNavAction =

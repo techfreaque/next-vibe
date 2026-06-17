@@ -8,9 +8,10 @@
 
 "use client";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { JSX } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { createParentBridge, type ParentBridge } from "./bridge";
 import type {

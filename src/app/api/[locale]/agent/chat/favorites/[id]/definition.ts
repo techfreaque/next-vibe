@@ -3,14 +3,13 @@
  * Defines endpoints for getting, updating, and deleting a single favorite
  */
 
+import { lazy } from "react";
 import { z } from "zod";
 
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-
 import {
+  type ChatModelSelection,
   chatModelSelectionSchema,
   filterChatModels,
-  type ChatModelSelection,
   type getBestChatModel,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
@@ -18,6 +17,7 @@ import {
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
@@ -27,6 +27,7 @@ import {
   dateSchema,
   iconSchema,
 } from "@/app/api/[locale]/shared/types/common.schema";
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -51,7 +52,7 @@ import {
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazy } from "react";
+import { ChatModelId } from "../../../ai-stream/models";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
@@ -67,11 +68,8 @@ import {
   FAVORITE_GET_ALIAS,
   FAVORITE_UPDATE_ALIAS,
 } from "../constants";
-
-import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
-import { ChatModelId } from "../../../ai-stream/models";
-import { scopedTranslation } from "./i18n";
 import favoritesListDefinition from "../definition";
+import { scopedTranslation } from "./i18n";
 
 const FavoriteEditContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.FavoriteEditContainer })),

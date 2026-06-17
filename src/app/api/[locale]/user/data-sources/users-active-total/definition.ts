@@ -3,6 +3,8 @@
  * Client+server safe. No server imports.
  */
 
+import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import { customWidgetObject } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -18,11 +20,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
-
 import { USERS_ACTIVE_TOTAL_ALIAS } from "./constants";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
+import { scopedTranslation } from "./i18n";
 const UsersActiveTotalWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UsersActiveTotalWidget })),
 );

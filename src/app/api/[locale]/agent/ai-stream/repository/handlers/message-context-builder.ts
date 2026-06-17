@@ -1,18 +1,20 @@
 import "server-only";
 
-import type { ModelMessage, streamText } from "ai";
+import type { JSONValue, ModelMessage, streamText } from "ai";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, MessageMetadata, ToolCall } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
-import { fetchAncestorBranch } from "../core/branch-utils";
 import {
-  getChatModelById,
   type ChatModelId,
   type ChatModelOption,
+  getChatModelById,
 } from "../../models";
+import { fetchAncestorBranch } from "../core/branch-utils";
 import { COMPACT_TRIGGER, COMPACT_TRIGGER_PERCENTAGE } from "../core/constants";
 import {
   CONTEXT_LINE_PREFIX,
@@ -683,7 +685,10 @@ export class MessageContextBuilder {
       messageHistory,
       systemPrompt,
       tools,
-      model,
+      modelConfig,
+      timezone,
+      rootFolderId,
+      locale,
       logger,
       compactTrigger,
     } = params;
@@ -794,8 +799,11 @@ export class MessageContextBuilder {
 
     const totalTokens = this.calculateTotalTokens(
       messagesForTokenCount,
-      systemPrompt,
-      tools,
+      logger,
+      timezone,
+      rootFolderId,
+      locale,
+      modelConfig,
     );
 
     // Calculate dynamic trigger based on model's context window

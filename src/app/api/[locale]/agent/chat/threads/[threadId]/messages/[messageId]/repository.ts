@@ -340,6 +340,39 @@ export class MessageRepository {
         .where(eq(chatMessages.id, urlPathParams.messageId))
         .returning();
 
+      // Clean up materialized cortex index rows derived from this message so
+      // search never surfaces orphaned embeddings. /searches and /gens paths
+      // embed the messageId; /uploads paths embed the threadId (attachments may
+      // remain on sibling messages, so only prune /searches and /gens here).
+      const cleanupUserId = thread.userId;
+      void (async (): Promise<void> => {
+        if (!cleanupUserId) {
+          return; // cortex is user-scoped; lead-owned threads have no nodes
+        }
+        try {
+          const { removeVirtualNodesByEntityId } =
+            await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+          await removeVirtualNodesByEntityId(
+            cleanupUserId,
+            "/searches",
+            urlPathParams.messageId,
+          );
+          await removeVirtualNodesByEntityId(
+            cleanupUserId,
+            "/gens",
+            urlPathParams.messageId,
+          );
+        } catch (cleanupError) {
+          logger.warn("[message-delete] cortex cleanup failed", {
+            messageId: urlPathParams.messageId,
+            error:
+              cleanupError instanceof Error
+                ? cleanupError.message
+                : String(cleanupError),
+          });
+        }
+      })();
+
       return success({
         role: deletedMessage.role,
         content: deletedMessage.content,

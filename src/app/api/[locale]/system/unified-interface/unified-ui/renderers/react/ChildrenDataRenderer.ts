@@ -12,14 +12,6 @@
  * - Union variant selection and discriminator extraction
  */
 
-import type z from "zod";
-
-import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-
-import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-
 import {
   isRequestField,
   isResponseField,
@@ -31,6 +23,12 @@ import type {
   ObjectChildrenConstraint,
   SchemaTypes,
 } from "next-vibe-ui/unified/_shared/types";
+import type z from "zod";
+
+import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
+import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 /**
  * Type guard to check if a variant has object-like children that can be indexed

@@ -2,13 +2,11 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-
 import {
   useWidgetTranslation,
-import React from "react";
-import React from "react";
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import React from "react";
 
 import type endpoints from "./definition";
 

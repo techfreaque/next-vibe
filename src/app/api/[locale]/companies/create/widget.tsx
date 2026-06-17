@@ -6,8 +6,6 @@ import { Building } from "next-vibe-ui/ui/icons/Building";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Span } from "next-vibe-ui/ui/span";
-import { type JSX } from "react";
-
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetNavigation,
@@ -19,9 +17,9 @@ import { PhoneFieldWidget } from "next-vibe-ui/unified/form-fields/phone-field/w
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { UrlFieldWidget } from "next-vibe-ui/unified/form-fields/url-field/widget";
-import { type JSX } from "react";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { type JSX } from "react";
 
 import type definition from "./definition";
 

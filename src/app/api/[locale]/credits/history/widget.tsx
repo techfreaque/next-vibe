@@ -13,6 +13,8 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { PaginationWidget } from "next-vibe-ui/unified/containers/pagination/widget";
+import NavigateButtonWidget from "next-vibe-ui/unified/interactive/navigate-button/widget";
+
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";

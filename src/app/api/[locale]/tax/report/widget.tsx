@@ -2,8 +2,6 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
-
 import {
   useWidgetLocale,
   useWidgetTranslation,
@@ -11,8 +9,10 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import type definition from "./definition";
 import type { TaxReportResponseOutput } from "./definition";
 
@@ -95,7 +95,6 @@ export function TaxReportWidget(_props: {
                 <Span className="text-right">{labelTax}</Span>
               </Div>
               {data.rows.map((row, idx) => (
-                // eslint-disable-next-line react/no-array-index-key
                 <TaxReportRow
                   key={`${row.period}-${row.taxRateCode}-${idx}`}
                   row={row}

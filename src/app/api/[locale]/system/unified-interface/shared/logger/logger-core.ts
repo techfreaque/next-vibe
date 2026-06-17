@@ -9,11 +9,10 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { enableDebugLogger, mcpSilentMode } from "@/config/debug";
-
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger, ErrorLogLevel, LoggerMetadata } from "./endpoint";
 import { colors, maybeColorize, semantic } from "./colors";
+import type { EndpointLogger, ErrorLogLevel, LoggerMetadata } from "./endpoint";
 
 function serializeDebugMeta(meta: LoggerMetadata[]): string {
   if (meta.length === 0) {

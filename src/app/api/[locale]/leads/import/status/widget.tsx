@@ -16,13 +16,6 @@ import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
 import { Strong } from "next-vibe-ui/ui/strong";
-import React from "react";
-
-import {
-  CsvImportJobStatus,
-  type CsvImportJobStatusValue,
-} from "@/app/api/[locale]/leads/import/enum";
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -32,6 +25,13 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import React from "react";
+
+import {
+  CsvImportJobStatus,
+  type CsvImportJobStatusValue,
+} from "@/app/api/[locale]/leads/import/enum";
+import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type definition from "./definition";
 import type { ImportJobsStatusGetResponseOutput } from "./definition";

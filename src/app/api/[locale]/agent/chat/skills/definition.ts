@@ -34,8 +34,6 @@ import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 
 import { iconSchema } from "../../../shared/types/common.schema";
 import { allModelDefinitions } from "../../models/all-models";
-
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 import createFavoriteDefinitions from "../favorites/create/definition";
 import { NO_SKILL_ID, SKILLS_LIST_ALIAS } from "./constants";
 import {

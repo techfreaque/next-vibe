@@ -31,19 +31,10 @@ import {
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef } from "react";
-
-import { Extension } from "@tiptap/core";
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-
-import LinkExtension from "@tiptap/extension-link";
-import Placeholder from "@tiptap/extension-placeholder";
 import {
   Markdown as TiptapMarkdown,
   type MarkdownStorage,
 } from "tiptap-markdown";
-
-import type { Editor } from "@tiptap/core";
 
 import type { StyleType } from "../utils/style-type";
 

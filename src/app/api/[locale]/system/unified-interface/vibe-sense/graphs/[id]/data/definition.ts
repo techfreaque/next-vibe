@@ -32,9 +32,6 @@ import {
   GraphResolutionDB,
 } from "../../../enum";
 import { graphConfigSchema } from "../../../graph/schema";
-
-import React from "react";
-
 import { scopedTranslation } from "./i18n";
 
 // Lazy import to avoid TDZ circular dependency in MCP context

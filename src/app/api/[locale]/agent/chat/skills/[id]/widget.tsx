@@ -4,13 +4,9 @@
 
 "use client";
 
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
+import { useWindowSize } from "next-vibe-ui/hooks/use-window-size";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "next-vibe-ui/ui/form/form";
 import {
   Collapsible,
   CollapsibleContent,
@@ -23,6 +19,12 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "next-vibe-ui/ui/form/form";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
@@ -55,8 +57,34 @@ import { Input } from "next-vibe-ui/ui/input";
 import { Link } from "next-vibe-ui/ui/link";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
+import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
+import {
+  useWidgetContext,
+  useWidgetForm,
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetNavigation,
+  useWidgetTranslation,
+  useWidgetUser,
+  useWidgetValue,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { AlertWidget } from "next-vibe-ui/unified/display-only/alert/widget";
+import { MarkdownWidget } from "next-vibe-ui/unified/display-only/markdown/widget";
+import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
+import EntityPickerFieldWidget from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
+import {
+  Icon,
+  type IconKey,
+} from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { IconFieldWidget } from "next-vibe-ui/unified/form-fields/icon-field/widget";
+import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { getCurrentUrl, openUrl } from "next-vibe-ui/utils/browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { createPortal } from "react-dom";
 
 import {
@@ -66,26 +94,26 @@ import {
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "@/app/api/[locale]/agent/ai-stream/constants";
 import {
+  type ChatModelSelection,
   chatModelSelectionSchema,
   getBestChatModel,
-  type ChatModelSelection,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
+  type AudioVisionModelSelection,
   audioVisionModelSelectionSchema,
   getBestAudioVisionModel,
   getBestImageVisionModel,
   getBestVideoVisionModel,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-  type AudioVisionModelSelection,
   type ImageVisionModelSelection,
+  imageVisionModelSelectionSchema,
   type VideoVisionModelSelection,
+  videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
   getBestImageGenModel,
-  imageGenModelSelectionSchema,
   type ImageGenModelSelection,
+  imageGenModelSelectionSchema,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import { type AnyModelOptionWithVision } from "@/app/api/[locale]/agent/models/all-models";
 import { modelProviders } from "@/app/api/[locale]/agent/models/models";
@@ -97,64 +125,39 @@ import {
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
 import {
   getBestMusicGenModel,
-  musicGenModelSelectionSchema,
   type MusicGenModelSelection,
+  musicGenModelSelectionSchema,
 } from "@/app/api/[locale]/agent/music-generation/models";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import {
   getBestSttModel,
-  sttModelSelectionSchema,
   type SttModelSelection,
+  sttModelSelectionSchema,
 } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import {
   getBestTtsModel,
   ttsModelOptions,
-  voiceModelSelectionSchema,
   type VoiceModelSelection,
+  voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import {
   getBestVideoGenModel,
-  videoGenModelSelectionSchema,
   type VideoGenModelSelection,
+  videoGenModelSelectionSchema,
 } from "@/app/api/[locale]/agent/video-generation/models";
 import { cn } from "@/app/api/[locale]/shared/utils";
-import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
-import {
-  useWidgetContext,
-  useWidgetForm,
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetNavigation,
-  useWidgetTranslation,
-  useWidgetUser,
-  useWidgetValue,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/widget";
-import { MarkdownWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/markdown/widget";
-import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/widget";
-import {
-  Icon,
-  type IconKey,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/widget";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/widget";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/widget";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import {
   ToolsConfigEdit,
   type ToolsConfigValue,
 } from "../../../tools/widget/tools-config-widget";
-import { formatSkillId, parseSkillId } from "../../slugify";
 import {
+  type SkillDataForFavorite,
   useAddToFavorites,
   useFavoriteCreate,
-  type SkillDataForFavorite,
 } from "../../favorites/create/hooks";
 import type { FavoriteCard } from "../../favorites/definition";
 import { useChatFavorites } from "../../favorites/hooks/hooks";
@@ -165,6 +168,7 @@ import {
   SkillOwnershipType,
   type SkillOwnershipTypeValue,
 } from "../../skills/enum";
+import { formatSkillId, parseSkillId } from "../../slugify";
 import type {
   default as definitionGet,
   default as definitionPatch,

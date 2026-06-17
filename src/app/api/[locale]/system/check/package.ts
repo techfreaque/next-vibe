@@ -21,6 +21,8 @@
  */
 
 import { GITHUB_REPO_URL } from "@/config/constants";
+
+import type { PackageManifest } from "../builder/repository/vibe-package/types";
 import { CHECK_CONFIG_CREATE_ALIAS } from "./config/create/constants";
 import { VIBE_CHECK_ALIAS } from "./vibe-check/constants";
 

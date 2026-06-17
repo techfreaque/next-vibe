@@ -4,6 +4,11 @@ import { ActionCard } from "next-vibe-ui/ui/action-card";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
+import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
+import { BarChart } from "next-vibe-ui/ui/icons/BarChart";
+import { Download } from "next-vibe-ui/ui/icons/Download";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { UserSearch } from "next-vibe-ui/ui/icons/UserSearch";
 import { ListItem } from "next-vibe-ui/ui/list-item";
 import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { MetricCard } from "next-vibe-ui/ui/metric-card";
@@ -12,13 +17,6 @@ import { ProgressBlock } from "next-vibe-ui/ui/progress-block";
 import { SectionGroup } from "next-vibe-ui/ui/section-group";
 import { StatusPill } from "next-vibe-ui/ui/status-pill";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
-import { BarChart } from "next-vibe-ui/ui/icons/BarChart";
-import { Download } from "next-vibe-ui/ui/icons/Download";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { UserSearch } from "next-vibe-ui/ui/icons/UserSearch";
-import { type JSX } from "react";
-
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -26,6 +24,7 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { type JSX } from "react";
 
 import { LeadStatus } from "../enum";
 import { scopedTranslation as leadsScopedTranslation } from "../i18n";

@@ -80,9 +80,9 @@ export const translations: typeof enTranslations = {
       memories: "Wspomnienia",
       documents: "Dokumenty",
       skills: "Umiejętności",
-      tasks: "Zadania",
-      cortex: "Pliki Cortex",
-      defaultNote: "Wszystkie domyślnie włączone. Dostosuj po połączeniu.",
+      favorites: "Ulubione",
+      threads: "Wątki",
+      defaultNote: "Domyślnie wszystko wyłączone. Włącz po połączeniu.",
     },
     advancedSettings: "Ustawienia zaawansowane",
     credentialWarning:

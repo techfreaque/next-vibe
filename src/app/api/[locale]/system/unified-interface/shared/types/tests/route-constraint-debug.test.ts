@@ -4,14 +4,14 @@
  * Tests constraint validation for endpoint creation and field configuration.
  */
 
-import type { z } from "zod";
-
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "next-vibe-ui/unified/_shared/types";
+import type { z } from "zod";
+
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+
 import type { EventSchemas } from "../../../websocket/types";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
 import { objectField } from "../../field/utils";

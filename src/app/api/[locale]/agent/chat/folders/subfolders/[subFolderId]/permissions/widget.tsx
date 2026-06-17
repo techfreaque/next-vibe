@@ -26,8 +26,6 @@ import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-
 import type definition from "./definition";
 import type { FolderPermissionsTranslationKey } from "./i18n";
 
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-
 /**
  * Props for custom widget
  */

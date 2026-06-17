@@ -14,6 +14,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
+import {
+  extractAllFields,
+  scanForInlineButtons,
+  withValueNonStrict,
+} from "next-vibe-ui/unified/_shared/field-helpers";
+import type {
+  EndpointFormValues,
+  ReactWidgetContext,
+} from "next-vibe-ui/unified/_shared/react-types";
+import { isResponseField } from "next-vibe-ui/unified/_shared/type-guards";
+import { WidgetContextProvider } from "next-vibe-ui/unified/_shared/WidgetContextProvider";
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
 import type {
@@ -29,10 +40,11 @@ import type {
   ContentBlock,
   ResponseType,
 } from "@/app/api/[locale]/shared/types/response.schema";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+
 import {
   useNavigationStack,
   type UseNavigationStackReturn,
@@ -41,18 +53,6 @@ import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import { WidgetType } from "../../../shared/types/enums";
 import { Platform } from "../../../shared/types/platform";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import {
-  extractAllFields,
-  scanForInlineButtons,
-  withValueNonStrict,
-} from "next-vibe-ui/unified/_shared/field-helpers";
-import type {
-  EndpointFormValues,
-  ReactWidgetContext,
-} from "next-vibe-ui/unified/_shared/react-types";
-import { isResponseField } from "next-vibe-ui/unified/_shared/type-guards";
-import { WidgetContextProvider } from "next-vibe-ui/unified/_shared/WidgetContextProvider";
 import { ContentBlocksRenderer } from "./ContentBlocksRenderer";
 import { LazyWidgetRenderer } from "./LazyWidgetRenderer";
 

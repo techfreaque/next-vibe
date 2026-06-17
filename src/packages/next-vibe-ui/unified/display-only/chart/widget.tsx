@@ -9,12 +9,12 @@ import type { JSX } from "react";
 import type z from "zod";
 
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
-
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/widget-helpers";
+
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,

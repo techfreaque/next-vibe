@@ -21,7 +21,6 @@ export function Head({ children }: HeadProps): JSX.Element {
             }}
             suppressHydrationWarning
           />
-          {/* eslint-disable-next-line react/no-danger -- Vite HMR + React Fast Refresh preamble required in dev */}
           <script
             type="module"
             dangerouslySetInnerHTML={{

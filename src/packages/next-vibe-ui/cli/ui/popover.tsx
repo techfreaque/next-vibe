@@ -5,40 +5,42 @@
  * PopoverTrigger registers with Ink's useFocus for Tab navigation.
  * Enter/Space opens, Esc closes. Content renders inline below trigger.
  */
-import { Box, Text, useFocus, useFocusManager, useInput, useStdin } from "ink";
 import process from "node:process";
+
+import { Box, Text, useFocus, useFocusManager, useInput, useStdin } from "ink";
 import * as React from "react";
 import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
 
 export type {
+  PopoverAnchorProps,
+  PopoverCloseProps,
+  PopoverContentProps,
+  PopoverPortalProps,
   PopoverRootProps,
   PopoverTriggerProps,
-  PopoverAnchorProps,
-  PopoverPortalProps,
-  PopoverContentProps,
-  PopoverCloseProps,
-} from "../../web/ui/popover";
-
-import type {
-  PopoverRootProps,
-  PopoverTriggerProps,
-  PopoverAnchorProps,
-  PopoverPortalProps,
-  PopoverContentProps,
-  PopoverCloseProps,
 } from "../../web/ui/popover";
 
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+
+import type {
+  PopoverAnchorProps,
+  PopoverCloseProps,
+  PopoverContentProps,
+  PopoverPortalProps,
+  PopoverRootProps,
+  PopoverTriggerProps,
+} from "../../web/ui/popover";
 import {
   FocusScopeProvider,
-  useOverlayLock,
   useFocusScopeRegister,
+  useOverlayLock,
   useShouldFocus,
 } from "./dialog";
 
@@ -168,8 +170,10 @@ function PopoverTriggerAsChild({
     toggle: toggleFn,
     registerFocusId: registerFocusIdFn,
   });
-  toggleRef.current.toggle = toggleFn;
-  toggleRef.current.registerFocusId = registerFocusIdFn;
+  useEffect(() => {
+    toggleRef.current.toggle = toggleFn;
+    toggleRef.current.registerFocusId = registerFocusIdFn;
+  });
 
   if (isMcp) {
     return null;

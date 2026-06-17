@@ -7,14 +7,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { ChatFileResponseRepository } from "./repository";
+import { ChatFileRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: ({ urlPathParams, user, logger, t, locale }) =>
-      ChatFileResponseRepository.getFileResponse(
+      ChatFileRepository.getFileResponse(
         urlPathParams,
         user,
         logger,

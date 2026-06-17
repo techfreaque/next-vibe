@@ -3,14 +3,11 @@
  * Compound widget: large text input + submit button in one row.
  */
 
-import type { z } from "zod";
-import type { z } from "zod";
-import type { z } from "zod";
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-
-
+import type { z } from "zod";
 
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,

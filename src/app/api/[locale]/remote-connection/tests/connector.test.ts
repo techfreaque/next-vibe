@@ -11,7 +11,7 @@
  *   CN3  — acquireConnection() increments ref-count; idle timer starts on last release;
  *           timer fires → connection closed
  *   CN4  — re-acquire before idle timer fires cancels the timer; connection stays open
- *   CN5  — syncScope filtering: cortex=false strips documents+memories from WS sync-event payload
+ *   CN5  — syncScope filtering: documents=false strips documents from WS sync-event payload
  *   CN6  — syncScope filtering: skills=false strips skills from WS sync-event payload
  *   CN7  — control "rename": WS message updates remoteConnections.instanceId + renames REMOTE subfolder
  *   CN8  — control "settings-update": WS message updates syncScope in DB
@@ -28,8 +28,10 @@
 
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
+
+import { and, eq, sql } from "drizzle-orm";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
@@ -38,25 +40,23 @@ import type { SyncScope } from "@/app/api/[locale]/remote-connection/db";
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
 import {
-  HERMES_INSTANCE_ID,
   closeProdDb,
   connectToHermes,
   disconnectFromHermes,
   failSuitePrerequisites,
   getProdDb,
+  HERMES_INSTANCE_ID,
   resolveDevUser,
   resolveProdUserId,
   resolveRemoteUrl,
   triggerPull,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
-
 import {
   acquireConnection,
   closeConnection,
@@ -100,7 +100,8 @@ async function pollUntil<T>(
     }
     await sleep(200);
   }
-  expect.fail(`[pollUntil] ${label}: timed out after ${timeoutMs}ms`);
+  // oxlint-disable-next-line restricted-syntax
+  throw new Error(`[pollUntil] ${label}: timed out after ${timeoutMs}ms`);
 }
 
 /**
@@ -137,23 +138,27 @@ async function loadConnectionConfig(
     leadId: row.leadId,
     userId: row.userId,
     capabilitiesVersion: row.capabilitiesVersion ?? null,
+    sentCapabilitiesVersion: row.sentCapabilitiesVersion ?? null,
     syncScope: (row.syncScope as SyncScope) ?? null,
+    syncCursors: row.syncCursors ?? null,
+    pushCursors: row.pushCursors ?? null,
   };
 }
 
 // ── Shared WS broadcast helper ────────────────────────────────────────────────
 
 /**
- * Broadcast a WS message to a channel via the local Bun proxy /ws/broadcast endpoint.
- * This is how the server-side code pushes events to connected clients.
+ * Broadcast a WS message to a channel on the remote (Hermes) WS broker.
+ * The WsConnection subscribes to system/control on the REMOTE server, so
+ * the broadcast must go to the remote's /ws/broadcast, not Atlas's.
  */
 async function broadcastToChannel(
   channel: string,
   event: string,
   data: Record<string, Record<string, boolean> | string>,
 ): Promise<void> {
-  const port = 3000;
-  const resp = await fetch(`http://127.0.0.1:${port}/ws/broadcast`, {
+  const broadcastUrl = `${_remoteUrl!.replace(/\/$/, "")}/ws/broadcast`;
+  const resp = await fetch(broadcastUrl, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ channel, event, data }),
@@ -380,21 +385,21 @@ if (_remoteUrl) {
       CN_TIMEOUT,
     );
 
-    // ── CN5: syncScope cortex=false strips documents+memories ─────────────────
+    // ── CN5: syncScope documents=false strips documents from sync ─────────────
 
     it(
-      "CN5: syncScope.cortex=false → documents+memories stripped from WS sync-event before apply",
+      "CN5: syncScope.documents=false → documents stripped from WS sync-event before apply",
       async () => {
-        // Set syncScope.cortex=false on the connection
+        // Set syncScope.documents=false on the connection
         await db
           .update(remoteConnections)
           .set({
             syncScope: {
-              cortex: false,
               documents: false,
               skills: true,
               threads: true,
               memories: false,
+              favorites: false,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -428,11 +433,11 @@ if (_remoteUrl) {
         const scopedConfig: ConnectionConfig = {
           ...config,
           syncScope: {
-            cortex: false,
             documents: false,
             skills: true,
             threads: true,
             memories: false,
+            favorites: false,
           } satisfies SyncScope,
         };
         openConnection(scopedConfig);
@@ -479,7 +484,7 @@ if (_remoteUrl) {
         // Wait enough for any sync processing to complete
         await sleep(3000);
 
-        // The document must NOT appear on prod (cortex=false strips documents)
+        // The document must NOT appear on prod (documents=false strips documents)
         const pdb = getProdDb();
         const prodRows = await pdb.execute<{ sync_id: string }>(
           sql`SELECT sync_id FROM cortex_nodes WHERE user_id = ${prodUserId} AND sync_id = ${docSyncId} LIMIT 1`,
@@ -487,7 +492,7 @@ if (_remoteUrl) {
 
         expect(
           prodRows.rows.length,
-          "CN5: document must NOT appear on prod when syncScope.cortex=false",
+          "CN5: document must NOT appear on prod when syncScope.documents=false",
         ).toBe(0);
 
         // Cleanup
@@ -505,11 +510,11 @@ if (_remoteUrl) {
           .update(remoteConnections)
           .set({
             syncScope: {
-              cortex: true,
               documents: true,
               skills: true,
               threads: true,
               memories: true,
+              favorites: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -534,11 +539,11 @@ if (_remoteUrl) {
           .update(remoteConnections)
           .set({
             syncScope: {
-              cortex: true,
               documents: true,
               skills: false,
               threads: true,
               memories: true,
+              favorites: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -561,11 +566,11 @@ if (_remoteUrl) {
         openConnection({
           ...config,
           syncScope: {
-            cortex: true,
             documents: true,
             skills: false,
             threads: true,
             memories: true,
+            favorites: true,
           } satisfies SyncScope,
         });
 
@@ -631,7 +636,7 @@ if (_remoteUrl) {
           .update(remoteConnections)
           .set({
             syncScope: {
-              cortex: true,
+              favorites: true,
               documents: true,
               skills: true,
               threads: true,
@@ -793,10 +798,10 @@ if (_remoteUrl) {
           return c?.isConnected() ? c : false;
         });
 
-        // Send settings-update via control channel
+        // Send settings-update via control channel (valid SyncScope fields only)
         const controlChannel = `system/control/${testUser.id}`;
         await broadcastToChannel(controlChannel, "settings-update", {
-          syncScope: { cortex: false, skills: true },
+          syncScope: { memories: false, skills: true },
         });
 
         // Poll DB for updated syncScope
@@ -814,18 +819,18 @@ if (_remoteUrl) {
               )
               .limit(1);
             const scope = row?.syncScope as {
-              cortex?: boolean;
+              memories?: boolean;
               skills?: boolean;
             } | null;
-            return scope?.cortex === false ? row : false;
+            return scope?.memories === false ? row : false;
           },
         );
 
         const scope = updatedRow.syncScope as {
-          cortex: boolean;
+          memories: boolean;
           skills: boolean;
         } | null;
-        expect(scope?.cortex, "CN8: cortex must be false").toBe(false);
+        expect(scope?.memories, "CN8: memories must be false").toBe(false);
         expect(scope?.skills, "CN8: skills must be true").toBe(true);
 
         // Restore
@@ -833,7 +838,7 @@ if (_remoteUrl) {
           .update(remoteConnections)
           .set({
             syncScope: {
-              cortex: true,
+              favorites: true,
               documents: true,
               skills: true,
               threads: true,

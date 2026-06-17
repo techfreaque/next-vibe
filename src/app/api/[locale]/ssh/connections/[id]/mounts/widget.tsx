@@ -18,10 +18,6 @@ import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
 import { Span } from "next-vibe-ui/ui/span";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import type { JSX } from "react";
-import { useCallback } from "react";
-
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   useWidgetEndpoint,
   useWidgetForm,
@@ -33,6 +29,10 @@ import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-fie
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import type { JSX } from "react";
+import { useCallback } from "react";
+
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import type detailDefinition from "./[mountId]/definition";
 import type createDefinition from "./create/definition";

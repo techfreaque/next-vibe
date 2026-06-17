@@ -1,6 +1,19 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Edit,
+  ExternalLink as ExternalLinkIcon,
+  FileText,
+  Inbox,
+  Loader2,
+  Minus,
+  Search,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
 import { Badge } from "next-vibe-ui/ui/badge";
@@ -46,20 +59,6 @@ import { Title } from "next-vibe-ui/ui/title";
 import { Code, H2, H3, Muted, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
-
-import {
-  ChevronLeft,
-  ChevronRight,
-  Edit,
-  ExternalLink as ExternalLinkIcon,
-  FileText,
-  Inbox,
-  Loader2,
-  Minus,
-  Search,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
 
 const WIDGET_BASE = "src/packages/next-vibe-ui/unified";
 

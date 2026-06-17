@@ -11,46 +11,47 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
 
 export type {
-  DropdownMenuRootProps,
-  DropdownMenuTriggerProps,
-  DropdownMenuGroupProps,
-  DropdownMenuPortalProps,
-  DropdownMenuSubProps,
-  DropdownMenuRadioGroupProps,
-  DropdownMenuSubTriggerProps,
-  DropdownMenuSubContentProps,
-  DropdownMenuContentProps,
-  DropdownMenuItemProps,
   DropdownMenuCheckboxItemProps,
-  DropdownMenuRadioItemProps,
+  DropdownMenuContentProps,
+  DropdownMenuGroupProps,
+  DropdownMenuItemProps,
   DropdownMenuLabelProps,
+  DropdownMenuPortalProps,
+  DropdownMenuRadioGroupProps,
+  DropdownMenuRadioItemProps,
+  DropdownMenuRootProps,
   DropdownMenuSeparatorProps,
   DropdownMenuShortcutProps,
-} from "../../web/ui/dropdown-menu";
-
-import type {
-  DropdownMenuRootProps,
-  DropdownMenuTriggerProps,
-  DropdownMenuGroupProps,
-  DropdownMenuPortalProps,
-  DropdownMenuSubProps,
-  DropdownMenuRadioGroupProps,
-  DropdownMenuSubTriggerProps,
   DropdownMenuSubContentProps,
-  DropdownMenuContentProps,
-  DropdownMenuItemProps,
-  DropdownMenuCheckboxItemProps,
-  DropdownMenuRadioItemProps,
-  DropdownMenuLabelProps,
-  DropdownMenuShortcutProps,
+  DropdownMenuSubProps,
+  DropdownMenuSubTriggerProps,
+  DropdownMenuTriggerProps,
 } from "../../web/ui/dropdown-menu";
 
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+
+import type {
+  DropdownMenuCheckboxItemProps,
+  DropdownMenuContentProps,
+  DropdownMenuGroupProps,
+  DropdownMenuItemProps,
+  DropdownMenuLabelProps,
+  DropdownMenuPortalProps,
+  DropdownMenuRadioGroupProps,
+  DropdownMenuRadioItemProps,
+  DropdownMenuRootProps,
+  DropdownMenuShortcutProps,
+  DropdownMenuSubContentProps,
+  DropdownMenuSubProps,
+  DropdownMenuSubTriggerProps,
+  DropdownMenuTriggerProps,
+} from "../../web/ui/dropdown-menu";
 import { useShouldFocus } from "./dialog";
 
 /**
@@ -198,8 +199,10 @@ function DropdownMenuTriggerAsChild({
     toggle: toggleFn,
     registerFocusId: registerFocusIdFn,
   });
-  toggleRef.current.toggle = toggleFn;
-  toggleRef.current.registerFocusId = registerFocusIdFn;
+  useEffect(() => {
+    toggleRef.current.toggle = toggleFn;
+    toggleRef.current.registerFocusId = registerFocusIdFn;
+  });
 
   if (isMcp) {
     return null;

@@ -9,6 +9,7 @@ import { cn } from "next-vibe/shared/utils";
 import { safeGetRequiredFields } from "next-vibe/shared/utils/zod-required-fields";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import type {
   ControllerRenderProps,
@@ -18,6 +19,10 @@ import type {
 } from "react-hook-form";
 import { View } from "react-native";
 
+import {
+  scopedTranslation as unifiedInterfaceScopedTranslation,
+  type UnifiedInterfaceT,
+} from "@/app/api/[locale]/system/unified-interface/i18n";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -26,11 +31,6 @@ import type {
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
-import {
-  scopedTranslation as unifiedInterfaceScopedTranslation,
-  type UnifiedInterfaceT,
-} from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 

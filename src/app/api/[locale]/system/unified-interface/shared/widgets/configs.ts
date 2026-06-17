@@ -5,8 +5,6 @@
  * This ensures type safety across CLI and React implementations.
  */
 
-import type { z } from "zod";
-
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,
@@ -53,6 +51,7 @@ import type { DateFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/dat
 import type { DateRangeFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/date-range-field/types";
 import type { DateTimeFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/datetime-field/types";
 import type { EmailFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/email-field/types";
+import type { EntityPickerFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/entity-picker-field/types";
 import type { FileFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/file-field/types";
 import type { FilterPillsFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/filter-pills-field/types";
 import type { IconFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/icon-field/types";
@@ -60,31 +59,32 @@ import type { IntFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/int-
 import type { JsonFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/json-field/types";
 import type { LanguageSelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/language-select-field/types";
 import type { MarkdownEditorWidgetConfig } from "next-vibe-ui/unified/form-fields/markdown-editor/types";
+import type { MarkdownTextareaFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/markdown-textarea-field/types";
 import type { MultiSelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/multiselect-field/types";
 import type { NumberFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/number-field/types";
 import type { PasswordFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/password-field/types";
 import type { PhoneFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/phone-field/types";
 import type { RangeSliderFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/range-slider-field/types";
 import type { SelectFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/select-field/types";
+import type { SignalsFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/signals-field/types";
 import type { SliderFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/slider-field/types";
 import type { TagsFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/tags-field/types";
 import type { TextArrayFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/text-array-field/types";
 import type { TextFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/text-field/types";
 import type { TextareaFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/textarea-field/types";
-import type { MarkdownTextareaFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/markdown-textarea-field/types";
 import type { TimeFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/time-field/types";
 import type { TimeRangeFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/time-range-field/types";
-import type { SignalsFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/signals-field/types";
 import type { TimeSeriesFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/time-series-field/types";
 import type { TimezoneFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/timezone-field/types";
 import type { UrlFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/url-field/types";
-import type { EntityPickerFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/entity-picker-field/types";
 import type { UuidFieldWidgetConfig } from "next-vibe-ui/unified/form-fields/uuid-field/types";
 import type { ButtonWidgetConfig } from "next-vibe-ui/unified/interactive/button/types";
 import type { FormAlertWidgetConfig } from "next-vibe-ui/unified/interactive/form-alert/types";
 import type { NavigateButtonWidgetConfig } from "next-vibe-ui/unified/interactive/navigate-button/types";
 import type { SearchBarWidgetConfig } from "next-vibe-ui/unified/interactive/search-bar/types";
 import type { SubmitButtonWidgetConfig } from "next-vibe-ui/unified/interactive/submit-button/types";
+import type { z } from "zod";
+
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
 
 // Union type for all form field widgets

@@ -1,3 +1,4 @@
+// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
 /**
  * USER_WITH_ACCOUNT_SKILL.md - Account-Required Skill Manifest
  * GET /api/[locale]/system/unified-interface/ai/skills/USER_WITH_ACCOUNT_SKILL.md

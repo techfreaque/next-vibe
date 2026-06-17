@@ -11,8 +11,6 @@ import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Receipt } from "next-vibe-ui/ui/icons/Receipt";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import { useState, type JSX } from "react";
-
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetForm,
@@ -21,7 +19,10 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { type JSX, useState } from "react";
+
 import { BillStatus } from "@/app/api/[locale]/payment/enum";
+
 import type definition from "./definition";
 
 function statusVariant(

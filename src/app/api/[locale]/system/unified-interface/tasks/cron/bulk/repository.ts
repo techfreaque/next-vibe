@@ -28,8 +28,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { createTaskEmitters } from "@/app/api/[locale]/system/unified-interface/tasks/cron/emitter";
-
 import type {
   CronBulkRequestOutput,
   CronBulkResponseOutput,

@@ -4,8 +4,7 @@ import "server-only";
  * Threads Virtual Mount
  * Renders chat threads as markdown files at /threads/<rootFolder>/<folder>/<thread>.md
  */
-
-import { and, desc, count as drizzleCount, eq, isNull } from "drizzle-orm";
+import { and, count as drizzleCount, desc, eq, isNull } from "drizzle-orm";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {

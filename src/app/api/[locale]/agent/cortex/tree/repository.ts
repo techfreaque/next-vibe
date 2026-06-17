@@ -5,19 +5,16 @@ import "server-only";
  * Builds a compact directory tree representation
  */
 import { and, asc, eq, like } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -27,10 +24,10 @@ import { CortexNodeType } from "../enum";
 import {
   basename,
   DOCUMENTS_PREFIX,
-  normalizeToCanonicalPath,
   isValidPath,
   MEMORIES_PREFIX,
   normalizePath,
+  normalizeToCanonicalPath,
   pathDepth,
 } from "../repository";
 import type { CortexTreeT } from "./i18n";

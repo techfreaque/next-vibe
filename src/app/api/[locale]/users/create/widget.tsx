@@ -18,9 +18,6 @@ import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { UserCheck } from "next-vibe-ui/ui/icons/UserCheck";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useState } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -28,6 +25,9 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import React, { useState } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";

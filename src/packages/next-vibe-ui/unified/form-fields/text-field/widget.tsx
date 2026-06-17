@@ -30,11 +30,10 @@ import type { ReactFormFieldProps } from "next-vibe-ui/unified/_shared/react-typ
 import type { JSX } from "react";
 
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
-import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
-import type { ReactFormFieldProps } from "next-vibe-ui/unified/_shared/react-types";
-
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
+
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
   useWidgetContext,

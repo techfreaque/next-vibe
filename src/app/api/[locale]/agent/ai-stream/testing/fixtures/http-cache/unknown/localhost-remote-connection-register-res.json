@@ -1,0 +1,19 @@
+{
+  "type": "json",
+  "url": "http://localhost:3002/api/en-GLOBAL/remote-connection/register",
+  "status": 200,
+  "headers": {
+    "content-length": "71",
+    "content-type": "application/json",
+    "date": "Wed, 17 Jun 2026 12:07:30 GMT, Wed, 17 Jun 2026 12:07:30 GMT",
+    "vary": "sec-fetch-dest",
+    "set-cookie": "csrf_token_3002=7c3f61e632884907b3c6a521cfed2ea0; Path=/; Max-Age=86400; SameSite=strict"
+  },
+  "body": {
+    "success": true,
+    "data": {
+      "registered": true,
+      "remoteInstanceId": "hermes"
+    }
+  }
+}

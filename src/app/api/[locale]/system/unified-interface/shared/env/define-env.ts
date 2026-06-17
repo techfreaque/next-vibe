@@ -137,6 +137,12 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { envValidationLogger } from "./validation-logger";
 
+/** Concrete env var value type — all env vars resolve to one of these primitives. */
+export type EnvValue = string | number | boolean | undefined;
+
+/** A record of environment variable values keyed by name. */
+export type EnvRecord = Record<string, EnvValue>;
+
 export type EnvFieldType =
   | "text"
   | "boolean"

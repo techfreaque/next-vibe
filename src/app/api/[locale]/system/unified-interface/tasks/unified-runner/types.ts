@@ -8,15 +8,13 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-
 import type {
   GenericHandlerBase,
   GenericHandlerReturnType,
 } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPrivatePayloadType } from "../../../../user/auth/types";

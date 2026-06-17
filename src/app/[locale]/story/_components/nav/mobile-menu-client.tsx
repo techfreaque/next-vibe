@@ -17,8 +17,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { ThemeToggleMobile } from "../../../_components/theme-toggle";
-import type { BadgeVariant } from "next-vibe-ui/ui/badge";
-
+import { scopedTranslation } from "../i18n";
 import type { NavItemType } from "./nav-constants";
 
 interface MobileMenuClientProps {

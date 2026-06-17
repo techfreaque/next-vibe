@@ -20,9 +20,6 @@ import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetContext,
@@ -36,7 +33,9 @@ import {
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+import React, { useCallback } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 

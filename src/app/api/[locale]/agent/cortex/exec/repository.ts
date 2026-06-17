@@ -40,9 +40,6 @@ import {
   sessionPool,
   updateSessionCwd,
 } from "../../../ssh/session/pool";
-
-import { db } from "@/app/api/[locale]/system/db";
-
 import type {
   CortexExecRequestOutput,
   CortexExecResponseOutput,

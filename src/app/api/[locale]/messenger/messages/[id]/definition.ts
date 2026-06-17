@@ -28,8 +28,6 @@ import { MessageStatus, MessageType } from "../enum";
 import messagesListDefinition from "../list/definition";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const EmailDetailContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.EmailDetailContainer })),
 );

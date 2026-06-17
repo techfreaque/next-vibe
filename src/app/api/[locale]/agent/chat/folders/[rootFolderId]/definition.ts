@@ -28,8 +28,6 @@ import {
   UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazy } from "react";
-
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
 import { DefaultFolderId } from "../../config";
 import { scopedTranslation } from "./i18n";

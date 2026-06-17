@@ -12,6 +12,8 @@ import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Cloud } from "next-vibe-ui/ui/icons/Cloud";
+import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { ShieldPlus } from "next-vibe-ui/ui/icons/ShieldPlus";
 import type { InputChangeEvent } from "next-vibe-ui/ui/input";
@@ -25,13 +27,6 @@ import {
 } from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import { Switch } from "next-vibe-ui/ui/switch";
-import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
-
-import { Cloud } from "next-vibe-ui/ui/icons/Cloud";
-import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -39,8 +34,12 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
+import { cn } from "@/app/api/[locale]/shared/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import type endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";
 

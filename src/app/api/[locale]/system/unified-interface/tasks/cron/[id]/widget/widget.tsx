@@ -21,13 +21,6 @@ import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useEffect, useState } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -40,23 +33,22 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
-import React, { useCallback, useEffect, useState } from "react";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import { cn } from "@/app/api/[locale]/shared/utils";
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { NumberFieldWidget } from "next-vibe-ui/unified/form-fields/number-field/widget";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import React, { useCallback, useEffect, useState } from "react";
 
+import { cn } from "@/app/api/[locale]/shared/utils";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import { formatCronScheduleShort } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 
 import { CronTaskPriority, CronTaskStatus } from "../../../enum";

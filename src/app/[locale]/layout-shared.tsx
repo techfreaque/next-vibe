@@ -13,9 +13,6 @@ import { LoggerProvider } from "@/hooks/logger-provider";
 import { TranslationProvider } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { LoggerProvider } from "@/hooks/logger-provider";
-
-import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
 import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
 /**
  * Shared root providers for both web and native

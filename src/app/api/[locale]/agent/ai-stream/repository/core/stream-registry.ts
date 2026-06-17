@@ -18,8 +18,6 @@ import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cro
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
-
 import { AbortReason, StreamAbortError } from "./constants";
 
 interface StreamEntry {

@@ -38,11 +38,6 @@ import {
   SelectValue,
 } from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
-import { useEffect, useMemo, useState } from "react";
-
-import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
@@ -52,20 +47,22 @@ import {
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
-import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import BadgeWidget from "next-vibe-ui/unified/display-only/badge/widget";
 import IconWidget from "next-vibe-ui/unified/display-only/icon/widget";
 import { SeparatorWidget } from "next-vibe-ui/unified/display-only/separator/widget";
 import TextWidget from "next-vibe-ui/unified/display-only/text/widget";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { usePathname } from "next-vibe-ui/hooks/use-pathname";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+import { useEffect, useMemo, useState } from "react";
+
+import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
+import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
 import { cn } from "../../../shared/utils";
 import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/selector/selector-onboarding/context";
-
-import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import { useAddToFavorites } from "../favorites/create/hooks";
 import { useChatFavorites } from "../favorites/hooks/hooks";
 import { useChatSettings } from "../settings/hooks";

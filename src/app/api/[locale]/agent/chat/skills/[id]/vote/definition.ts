@@ -31,8 +31,6 @@ import { SKILL_VOTE_ALIAS } from "../../constants";
 import skillsListDefinition from "../../definition";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const SkillVoteContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillVoteContainer })),
 );

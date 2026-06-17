@@ -52,6 +52,7 @@ export const translations = {
     // ── Actions ────────────────────────────────────────────────────────────
     reauthButton: "Re-authenticate",
     renameButton: "Rename",
+    editButton: "Edit",
     disconnectButton: "Disconnect",
     disconnectConfirmTitle: "Disconnect this instance?",
     disconnectConfirmDescription:
@@ -161,11 +162,6 @@ export const translations = {
       label: "Tool Source",
       description:
         "Which tools are available in AI streams routed to this connection. Local: your local tools. Remote: remote tools only. Both: merge both.",
-    },
-    routingRules: {
-      label: "Routing Rules",
-      description:
-        "Declarative routing rules: folder IDs whose AI streams route here, model providers handled by this connection, and whether it is the default fallback.",
     },
     // ── Sync scope ──────────────────────────────────────────────────────────
     syncScope: {

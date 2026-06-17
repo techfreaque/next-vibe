@@ -3,6 +3,8 @@ import * as React from "react";
 
 import { parseClassesToInkProps } from "@/packages/next-vibe-ui/cli/utils/tailwind-to-ink";
 
+import type { MainProps } from "../../web/ui/main";
+
 export function Main({
   className,
   children,

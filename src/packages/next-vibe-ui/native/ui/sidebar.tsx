@@ -4,12 +4,12 @@ import * as Slot from "@rn-primitives/slot";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
+import { uiScopedTranslation } from "next-vibe-ui/i18n";
 import * as React from "react";
 import type { PressableProps, ViewProps } from "react-native";
 import { Dimensions, Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
-import { uiScopedTranslation } from "next-vibe-ui/i18n";
 
 import { applyStyleType } from "../../web/utils/style-type";
 import { useIsMobile } from "../hooks/use-mobile";

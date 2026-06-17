@@ -24,8 +24,6 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import connectionsListDefinition from "../../../list/definition";
 import { scopedTranslation } from "../i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const MountCreateWidget = lazyWidget(() =>
   import("../widget").then((m) => ({ default: m.MountCreateWidget })),
 );

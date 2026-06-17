@@ -26,8 +26,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
-
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -187,7 +185,6 @@ export class VideoGenerationRepository {
           resolution: data.resolution,
           inputImageUrl: data.inputMediaUrl,
           logger,
-          locale,
         });
         break;
 

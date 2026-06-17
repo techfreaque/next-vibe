@@ -19,9 +19,7 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useState } from "react";
-
-import { cn } from "@/app/api/[locale]/shared/utils";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -34,7 +32,9 @@ import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/wid
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
+import React, { useCallback, useState } from "react";
+
+import { cn } from "@/app/api/[locale]/shared/utils";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import { LeadStatus } from "../enum";

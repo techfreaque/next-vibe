@@ -20,15 +20,18 @@ import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/wid
 import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+
+import { useTranslation } from "@/i18n/core/client";
+
 import { CortexNav } from "../_shared/cortex-nav";
 import { DomainEnrichment } from "../_shared/domain-enrichment";
 import { formatBytes } from "../_shared/format-bytes";
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
+
 interface CustomWidgetProps {
   field: (typeof definition.POST)["fields"];
 }
-
 
 export function CortexWriteWidget({
   field,

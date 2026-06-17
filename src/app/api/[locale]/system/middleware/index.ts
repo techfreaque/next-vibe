@@ -4,9 +4,9 @@
  * This file exports the middleware system for Next.js applications.
  */
 
+import { Environment } from "next-vibe/shared/utils";
 import type { NextRequest, NextResponse } from "next-vibe-ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe-ui/lib/request";
-import { Environment } from "next-vibe/shared/utils";
 
 import {
   AUTH_TOKEN_COOKIE_NAME,

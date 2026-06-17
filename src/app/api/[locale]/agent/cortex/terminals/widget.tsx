@@ -19,8 +19,6 @@ import { Span } from "next-vibe-ui/ui/span";
 import { StatusPill } from "next-vibe-ui/ui/status-pill";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { type JSX } from "react";
-
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -28,6 +26,7 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { type JSX } from "react";
 
 import type definition from "./definition";
 

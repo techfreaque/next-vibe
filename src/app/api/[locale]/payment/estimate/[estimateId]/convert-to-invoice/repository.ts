@@ -15,16 +15,12 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
-
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
-import { CurrenciesArr } from "@/i18n/core/config";
-import { CurrenciesArr } from "@/i18n/core/config";
+import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { CurrenciesArr } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
 import {
@@ -32,13 +28,13 @@ import {
   paymentEstimates,
   paymentInvoiceLines,
   paymentInvoices,
-  EstimateConvertToInvoiceUrlPathParams,
 } from "../../../db";
-import { scopedTranslation } from "./i18n";
 import { EstimateStatus, InvoiceStatus } from "../../../enum";
 import type {
   EstimateConvertToInvoiceResponseOutput,
+  EstimateConvertToInvoiceUrlPathParams,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class EstimateConvertToInvoiceRepository {
   static async convertToInvoice(

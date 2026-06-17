@@ -20,10 +20,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { StatusPill } from "next-vibe-ui/ui/status-pill";
 import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
 import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import React, { useCallback, useMemo } from "react";
-
-import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/messenger/messages/i18n";
-import { cn } from "@/app/api/[locale]/shared/utils";
+import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -35,6 +32,10 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { SelectFieldWidget } from "next-vibe-ui/unified/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
+import React, { useCallback, useMemo } from "react";
+
+import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/messenger/messages/i18n";
+import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type { MessengerChannelFilterValue } from "../../accounts/enum";
 import {

@@ -18,12 +18,9 @@ import {
   Platform,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { env } from "@/config/env";
-import type { CheckVibeCheckT, CheckVibeCheckTranslationKey } from "./i18n";
-
-
 import type { CountryLanguage } from "@/i18n/core/config";
-
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+
 import { ConfigRepositoryImpl } from "../config/repository";
 import type { CheckConfig } from "../config/types";
 import type { LintResponseOutput } from "../lint/definition";
@@ -36,10 +33,10 @@ import type { TypecheckResponseOutput } from "../typecheck/definition";
 import { scopedTranslation as typecheckScopedTranslation } from "../typecheck/i18n";
 import { TypecheckRepository } from "../typecheck/repository";
 import type {
-import type { CheckVibeCheckT, CheckVibeCheckTranslationKey } from "./i18n";
   VibeCheckRequestOutput,
   VibeCheckResponseOutput,
 } from "./definition";
+import type { CheckVibeCheckT, CheckVibeCheckTranslationKey } from "./i18n";
 
 type CheckType = "oxlint" | "eslint" | "typecheck";
 
@@ -106,7 +103,11 @@ export class VibeCheckRepository {
       config,
     );
     const oxlintMsg = `✓ Oxlint check completed with ${result.success ? result.data.items?.length : 0} issues`;
-    isCliPlatform(platform) ? logger.info(oxlintMsg) : logger.debug(oxlintMsg);
+    if (isCliPlatform(platform)) {
+      logger.info(oxlintMsg);
+    } else {
+      logger.debug(oxlintMsg);
+    }
     return {
       type: "oxlint",
       result,
@@ -145,7 +146,11 @@ export class VibeCheckRepository {
       locale,
     );
     const eslintMsg = `✓ ESLint check completed with ${result.success ? result.data.items?.length : 0} issues`;
-    isCliPlatform(platform) ? logger.info(eslintMsg) : logger.debug(eslintMsg);
+    if (isCliPlatform(platform)) {
+      logger.info(eslintMsg);
+    } else {
+      logger.debug(eslintMsg);
+    }
     return {
       type: "eslint",
       result,
@@ -185,9 +190,11 @@ export class VibeCheckRepository {
     );
 
     const typecheckMsg = `✓ TypeScript check completed with ${result.success ? result.data.items?.length : 0} issues`;
-    isCliPlatform(platform)
-      ? logger.info(typecheckMsg)
-      : logger.debug(typecheckMsg);
+    if (isCliPlatform(platform)) {
+      logger.info(typecheckMsg);
+    } else {
+      logger.debug(typecheckMsg);
+    }
     return {
       type: "typecheck",
       result,
@@ -321,9 +328,11 @@ export class VibeCheckRepository {
           pathsToCheck.length === 0
             ? baseDir
             : pathsToCheck.map((p) => p || baseDir);
-        isCliPlatform(platform)
-          ? logger.info("Starting Oxlint check...")
-          : logger.debug("Starting Oxlint check...");
+        if (isCliPlatform(platform)) {
+          logger.info("Starting Oxlint check...");
+        } else {
+          logger.debug("Starting Oxlint check...");
+        }
         promises.push(
           this.runOxlintCheck(
             Array.isArray(oxlintPaths) ? oxlintPaths : [oxlintPaths],
@@ -355,9 +364,11 @@ export class VibeCheckRepository {
           Array.isArray(eslintPaths) && eslintPaths.length === 1
             ? eslintPaths[0]
             : eslintPaths;
-        isCliPlatform(platform)
-          ? logger.info("Starting ESLint check...")
-          : logger.debug("Starting ESLint check...");
+        if (isCliPlatform(platform)) {
+          logger.info("Starting ESLint check...");
+        } else {
+          logger.debug("Starting ESLint check...");
+        }
         promises.push(
           this.runEslintCheck(
             eslintPath,
@@ -391,9 +402,11 @@ export class VibeCheckRepository {
             : nonEmptyPaths.length === 1
               ? nonEmptyPaths[0]
               : nonEmptyPaths;
-        isCliPlatform(platform)
-          ? logger.info("Starting TypeScript check...")
-          : logger.debug("Starting TypeScript check...");
+        if (isCliPlatform(platform)) {
+          logger.info("Starting TypeScript check...");
+        } else {
+          logger.debug("Starting TypeScript check...");
+        }
         promises.push(
           this.runTypecheckCheck(
             typecheckPath,

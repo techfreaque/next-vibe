@@ -1,0 +1,19 @@
+{
+  "type": "json",
+  "url": "http://localhost:3002/api/en-GLOBAL/agent/ai-stream/ws-provider/stream",
+  "status": 200,
+  "headers": {
+    "content-length": "134",
+    "content-type": "application/json",
+    "date": "Wed, 17 Jun 2026 12:07:42 GMT, Wed, 17 Jun 2026 12:07:42 GMT",
+    "vary": "sec-fetch-dest",
+    "set-cookie": "csrf_token_3002=fcbd680bb62c48f8a17a2ffbc6954a6a; Path=/; Max-Age=86400; SameSite=strict"
+  },
+  "body": {
+    "success": true,
+    "data": {
+      "responseThreadId": "4adc7f90-c7f4-45ca-879b-aed880c61401",
+      "messageId": "a9674407-c5f6-471b-97c5-258a6c9c56f4"
+    }
+  }
+}

@@ -3,6 +3,7 @@
 import "next-vibe-ui/global-css";
 
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next-vibe-ui/lib/headers";
 import { Body } from "next-vibe-ui/ui/body";
 import { inter } from "next-vibe-ui/ui/font";
 import { Head } from "next-vibe-ui/ui/head";
@@ -11,16 +12,14 @@ import { Outlet } from "next-vibe-ui/ui/outlet";
 import { Script } from "next-vibe-ui/ui/script";
 import { Scripts } from "next-vibe-ui/ui/scripts";
 import type { JSX, ReactNode } from "react";
-import { cookies } from "next-vibe-ui/lib/headers";
 
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
+import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
 import { scopedTranslation } from "./layout-i18n";
-
 import { RootProviders } from "./layout-shared";
 
 export const viewport: Viewport = {

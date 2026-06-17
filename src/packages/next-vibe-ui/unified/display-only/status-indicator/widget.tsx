@@ -6,14 +6,14 @@
 "use client";
 
 import { Badge } from "next-vibe-ui/ui/badge";
-import type { JSX } from "react";
-
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactRequestResponseWidgetProps } from "next-vibe-ui/unified/_shared/react-types";
 import {
   useWidgetForm,
   useWidgetTranslation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import type {

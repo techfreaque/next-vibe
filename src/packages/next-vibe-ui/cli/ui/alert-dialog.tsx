@@ -9,33 +9,33 @@ import * as React from "react";
 import { useRef } from "react";
 
 export type {
-  AlertDialogRootProps,
-  AlertDialogTriggerProps,
-  AlertDialogPortalProps,
+  AlertDialogActionProps,
+  AlertDialogCancelProps,
+  AlertDialogContentProps,
+  AlertDialogDescriptionProps,
+  AlertDialogFooterProps,
+  AlertDialogHeaderProps,
   AlertDialogOverlayProps,
-  AlertDialogContentProps,
-  AlertDialogHeaderProps,
-  AlertDialogFooterProps,
-  AlertDialogTitleProps,
-  AlertDialogDescriptionProps,
-  AlertDialogActionProps,
-  AlertDialogCancelProps,
-} from "../../web/ui/alert-dialog";
-
-import type {
-  AlertDialogRootProps,
-  AlertDialogTriggerProps,
   AlertDialogPortalProps,
-  AlertDialogContentProps,
-  AlertDialogHeaderProps,
-  AlertDialogFooterProps,
+  AlertDialogRootProps,
   AlertDialogTitleProps,
-  AlertDialogDescriptionProps,
-  AlertDialogActionProps,
-  AlertDialogCancelProps,
+  AlertDialogTriggerProps,
 } from "../../web/ui/alert-dialog";
 
 import { useIsMcp } from "next-vibe-ui/unified/_shared/use-widget-context";
+
+import type {
+  AlertDialogActionProps,
+  AlertDialogCancelProps,
+  AlertDialogContentProps,
+  AlertDialogDescriptionProps,
+  AlertDialogFooterProps,
+  AlertDialogHeaderProps,
+  AlertDialogPortalProps,
+  AlertDialogRootProps,
+  AlertDialogTitleProps,
+  AlertDialogTriggerProps,
+} from "../../web/ui/alert-dialog";
 
 let alertBtnIdCounter = 0;
 

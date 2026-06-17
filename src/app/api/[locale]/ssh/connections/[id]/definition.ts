@@ -34,8 +34,6 @@ import {
 import connectionsListDefinition from "../list/definition";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const ConnectionDetailContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ConnectionDetailContainer })),
 );

@@ -9,15 +9,13 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-
 import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
-import type { JSX } from "react";
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import type { JSX } from "react";
 
 import type definition from "./definition";
 

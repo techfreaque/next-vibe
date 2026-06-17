@@ -35,8 +35,6 @@ import { dateSchema } from "../../../shared/types/common.schema";
 import { SUBSCRIPTION_ADMIN_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
-
 const SubscriptionStatsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SubscriptionStatsContainer })),
 );

@@ -16,6 +16,7 @@ import {
   type ResponseType,
   success,
 } from "next-vibe/shared/types/response.schema";
+import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { z } from "zod";
 
 import {
@@ -23,6 +24,8 @@ import {
   zodSchemaToJsonSchema,
 } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/endpoint-to-metadata";
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   PlatformMarker,
   UserPermissionRole,
@@ -31,7 +34,6 @@ import {
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { CliCompatiblePlatform } from "../unified-interface/cli/runtime/route-executor";
 import { generateSchemaForUsage } from "../unified-interface/shared/field/utils";
 import {
@@ -41,7 +43,6 @@ import {
 import type { CreateApiEndpointAny } from "../unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "../unified-interface/shared/types/enums";
 import { Platform } from "../unified-interface/shared/types/platform";
-
 import type {
   HelpGetRequestOutput,
   HelpGetResponseOutput,
@@ -190,6 +191,7 @@ export class HelpRepository {
         m.allowedRoles,
         userRoles,
         isPublic,
+        platform,
       );
     });
   }

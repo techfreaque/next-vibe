@@ -7,6 +7,7 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
@@ -25,7 +26,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
-import { cn } from "next-vibe/shared/utils";
+import {
+  useWidgetContext,
+  useWidgetDisabled,
+  useWidgetForm,
+  useWidgetIsSubmitting,
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetOnSubmit,
+  useWidgetResponse,
+  useWidgetUser,
+  useWidgetValue,
+} from "next-vibe-ui/unified/_shared/use-widget-context";
+import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -43,20 +57,6 @@ import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import {
-  useWidgetContext,
-  useWidgetDisabled,
-  useWidgetForm,
-  useWidgetIsSubmitting,
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetOnSubmit,
-  useWidgetResponse,
-  useWidgetUser,
-  useWidgetValue,
-} from "next-vibe-ui/unified/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
