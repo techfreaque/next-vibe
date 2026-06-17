@@ -102,11 +102,13 @@ export function testEndpoint<
       endpoint,
       executeWith: async ({ data, urlPathParams, user }) => {
         return await sendTestRequest<
-          TMethod,
-          TUserRoleValue,
-          TScopedTranslationKey,
-          TFields,
-          TEvents
+          CreateApiEndpoint<
+            TMethod,
+            TUserRoleValue,
+            TScopedTranslationKey,
+            TFields,
+            TEvents
+          >
         >({
           endpoint,
           data,

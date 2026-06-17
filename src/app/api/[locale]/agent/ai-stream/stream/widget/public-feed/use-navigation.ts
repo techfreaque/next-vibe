@@ -2,7 +2,7 @@
  * Navigation hooks for chat interface
  * Updates the Zustand navigation store + pushes URL via history API.
  * Store update is instant (re-renders immediately), URL follows synchronously.
- * Uses window.history.pushState to avoid triggering server component re-renders.
+ * Uses useSilentHistory to update URL without triggering server component re-renders.
  */
 
 "use client";
@@ -90,6 +90,7 @@ export function useNavigation(
   logger: EndpointLogger,
   threads: Record<string, ChatThread>,
 ): NavigationOperations {
+  const { pushState } = useSilentHistory();
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
 
   const navigateToThread = useCallback(
@@ -106,9 +107,9 @@ export function useNavigation(
 
       // Update URL without triggering server re-render
       const url = buildThreadUrl(locale, threadId, threads);
-      window.history.pushState(null, "", url);
+      pushState(url);
     },
-    [locale, logger, threads, setNavigation],
+    [locale, logger, threads, setNavigation, pushState],
   );
 
   const navigateToFolder = useCallback(
@@ -125,9 +126,9 @@ export function useNavigation(
       });
 
       const url = buildFolderUrl(locale, rootFolderId, subFolderId);
-      window.history.pushState(null, "", url);
+      pushState(url);
     },
-    [locale, logger, setNavigation],
+    [locale, logger, setNavigation, pushState],
   );
 
   const navigateToNewThread = useCallback(
@@ -144,9 +145,9 @@ export function useNavigation(
       });
 
       const url = buildNewThreadUrl(locale, rootFolderId, subFolderId);
-      window.history.pushState(null, "", url);
+      pushState(url);
     },
-    [locale, logger, setNavigation],
+    [locale, logger, setNavigation, pushState],
   );
 
   return {

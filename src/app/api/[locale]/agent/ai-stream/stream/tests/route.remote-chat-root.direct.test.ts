@@ -2,7 +2,7 @@
  * AI Stream Integration — Remote Chat Root: Direct-HTTP relay + REMOTE folder
  *
  * Streams go into the REMOTE/hermes subfolder. connectToHermes sets
- * routingRules.isDefault=true so the AI loop runs on hermes (loopLocation='server').
+ * isDefault=true so the AI loop runs on hermes (loopLocation='server').
  *
  * Thread mirroring (threadMirrorMode='both'):
  *   - Atlas:  REMOTE/<hermes-subfolder-uuid>
@@ -59,7 +59,6 @@ import {
   resolveProdAdminToken,
   resolveProdUserId,
   resolveRemoteUrl,
-  triggerPull,
   unregisterDevFromHermes,
 } from "../../testing/remote-setup";
 import { describeStreamSuite } from "./route-base.test";
@@ -73,7 +72,6 @@ let _mainProdUserId: string | null = null;
 async function setup(testUser: JwtPrivatePayloadType): Promise<void> {
   await disconnectFromHermes(testUser.id);
   await connectToHermes(testUser, _remoteUrl ?? "http://localhost:3002");
-  await triggerPull();
 
   _mainProdUserId = await resolveProdUserId();
   const remoteAdminToken = await resolveProdAdminToken(

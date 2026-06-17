@@ -2419,6 +2419,10 @@ export const translations = {
         error: "Failed to connect to MCP server",
         failedToInitialize: "Failed to initialize Chrome DevTools MCP server",
       },
+      closePage: {
+        noSession: "No active session — nothing to close",
+        switchedToPage: "Closed page, switched to page {{pageId}}",
+      },
       tool: {
         call: {
           start: "Calling MCP tool",

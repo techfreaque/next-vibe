@@ -393,9 +393,13 @@ function useEndpointNodeInfo(
   const [infoMap, setInfoMap] = useState<Map<string, EndpointNodeInfo>>(
     new Map(),
   );
+  const endpointPathsKey = useMemo(
+    () => [...new Set(endpointPaths)].join(","),
+    [endpointPaths],
+  );
 
   useEffect(() => {
-    const uniquePaths = [...new Set(endpointPaths)];
+    const uniquePaths = endpointPathsKey ? endpointPathsKey.split(",") : [];
     let cancelled = false;
 
     const load = async (): Promise<void> => {
@@ -460,7 +464,7 @@ function useEndpointNodeInfo(
     return (): void => {
       cancelled = true;
     };
-  }, [endpointPaths.join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [endpointPathsKey]);
 
   return infoMap;
 }
@@ -2305,8 +2309,7 @@ function EditFormInner({
         urlPathParams: { id: savedResponse.newId },
       });
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only fire on new save
-  }, [savedResponse?.newId]);
+  }, [savedResponse?.newId, navigation]);
 
   // ── Load parent graph ──
   const parentOptions = useMemo(
@@ -2403,8 +2406,7 @@ function EditFormInner({
         }, 300);
       }, 100);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- sync only on server config change
-  }, [graphConfig, isLoading]);
+  }, [graphConfig, isLoading, endpointInfoMap, reactFlow, setNodes, setEdges]);
 
   // When endpointInfoMap resolves new entries (e.g. after adding a node),
   // patch handles/category in-place without wiping unsaved local state.
@@ -2428,8 +2430,7 @@ function EditFormInner({
         };
       }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- patch handles only when map changes
-  }, [endpointInfoMap]);
+  }, [endpointInfoMap, setNodes]);
 
   const selectedNodeConfig = selectedNodeId
     ? workingNodes[selectedNodeId]

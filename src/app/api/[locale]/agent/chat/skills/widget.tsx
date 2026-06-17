@@ -110,38 +110,6 @@ export function SkillsListContainer({
     (state) => state.setModelSelectorOpen,
   );
 
-  // CLI picker mode: render a keyboard-navigable Select instead of the full card UI.
-  // onPick is set when this list was pushed via navigation.push with a pickerCallback.
-  if (onPick && platform !== undefined && isCliPlatform(platform)) {
-    const allSkills = skillsData?.sections.flatMap((s) => s.skills) ?? [];
-    return (
-      <Select
-        onValueChange={(id) => {
-          const skill = allSkills.find(
-            (s) => parseSkillId(s.skillId).skillId === id,
-          );
-          if (skill) {
-            onPick({ id, name: skill.name });
-          }
-        }}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder={t("get.search.placeholder")} />
-        </SelectTrigger>
-        <SelectContent>
-          {allSkills.map((skill) => {
-            const id = parseSkillId(skill.skillId).skillId;
-            return (
-              <SelectItem key={id} value={id}>
-                {skill.name}
-              </SelectItem>
-            );
-          })}
-        </SelectContent>
-      </Select>
-    );
-  }
-
   // Read active favorite from settings so activate state reflects correctly
   const { settings } = useChatSettings(user, logger);
   const settingsActiveFavoriteId = settings?.activeFavoriteId ?? null;
@@ -221,6 +189,38 @@ export function SkillsListContainer({
       },
     ];
   }, [skillsData?.sections, searchQuery, t]);
+
+  // CLI picker mode: render a keyboard-navigable Select instead of the full card UI.
+  // onPick is set when this list was pushed via navigation.push with a pickerCallback.
+  if (onPick && platform !== undefined && isCliPlatform(platform)) {
+    const allSkills = skillsData?.sections.flatMap((s) => s.skills) ?? [];
+    return (
+      <Select
+        onValueChange={(id) => {
+          const skill = allSkills.find(
+            (s) => parseSkillId(s.skillId).skillId === id,
+          );
+          if (skill) {
+            onPick({ id, name: skill.name });
+          }
+        }}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder={t("get.search.placeholder")} />
+        </SelectTrigger>
+        <SelectContent>
+          {allSkills.map((skill) => {
+            const id = parseSkillId(skill.skillId).skillId;
+            return (
+              <SelectItem key={id} value={id}>
+                {skill.name}
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+    );
+  }
 
   // Get companion skill name for onboarding banner
   const companionSkill = companionSkillId

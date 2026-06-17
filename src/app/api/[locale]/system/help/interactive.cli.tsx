@@ -741,37 +741,18 @@ function InteractiveHelp({
     const { tool } = view;
     setIsExecuting(true);
 
-    void import("../unified-interface/shared/endpoints/route/executor")
-      .then(({ RouteExecutionExecutor }) =>
-        RouteExecutionExecutor.executeGenericHandler<WidgetData>({
+    void import("../unified-interface/execute-tool/repository")
+      .then(({ RouteExecuteRepository }) =>
+        RouteExecuteRepository.runInProcess({
           toolName: tool.toolName,
-          data: {},
-          urlPathParams: {},
+          input: {},
           user,
           locale,
           logger: createEndpointLogger(false, Date.now(), locale),
           platform,
           streamContext: {
+            ...makeHeadlessContext(),
             rootFolderId: DefaultFolderId.PRIVATE,
-            threadId: undefined,
-            aiMessageId: undefined,
-            skillId: undefined,
-            headless: undefined,
-            subAgentDepth: 0,
-            isRevival: undefined,
-
-            providerOverride: undefined,
-            currentToolMessageId: undefined,
-            callerToolCallId: undefined,
-            pendingToolMessages: undefined,
-            pendingTimeoutMs: undefined,
-            leafMessageId: undefined,
-            waitingForRemoteResult: undefined,
-            favoriteId: undefined,
-            abortSignal: new AbortController().signal,
-            callerCallbackMode: undefined,
-            onEscalatedTaskCancel: undefined,
-            escalateToTask: undefined,
           },
         }),
       )

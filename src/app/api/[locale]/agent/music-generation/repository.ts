@@ -19,7 +19,7 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import {
   getMusicGenModelById,
-  getMusicGenModelUnderlyingProvider,
+  getMusicGenModelForProvider,
   type MusicGenModelOption,
 } from "@/app/api/[locale]/agent/music-generation/models";
 import { isSelfRelayUrl } from "@/app/api/[locale]/agent/shared/unbottled-media-relay";
@@ -129,20 +129,27 @@ export class MusicGenerationRepository {
     // dispatches in-process via the cheapest non-UNBOTTLED entry while the
     // marked-up UNBOTTLED creditCost (computed above) still applies.
     let dispatchModel: MusicGenModelOption = audioModel;
-    let unbottledSession: UnbottledCloudSession | null = null;
+    let inferenceTarget: RemoteTarget | null = null;
     if (audioModel.apiProvider === ApiProvider.UNBOTTLED) {
-      unbottledSession = getUnbottledMediaSession();
-      if (!unbottledSession) {
+      if (!user.isPublic && "id" in user) {
+        const { RemoteTransport } =
+          await import("@/app/api/[locale]/remote-connection/transport");
+        inferenceTarget = await RemoteTransport.resolveInferenceProvider({
+          userId: user.id,
+          logger,
+        });
+      }
+      if (!inferenceTarget) {
         return fail({
           message: t("post.errors.notConfigured", {
             label: audioModel.apiProvider,
-            envKey: "UNBOTTLED_CLOUD_CREDENTIALS",
+            envKey: "N/A",
             url: "https://unbottled.ai",
           }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
-      if (isSelfRelayUrl(unbottledSession.remoteUrl)) {
+      if (isSelfRelayUrl(inferenceTarget.remoteUrl)) {
         const underlying = getMusicGenModelUnderlyingProvider(data.model);
         if (!underlying) {
           return fail({
@@ -155,15 +162,15 @@ export class MusicGenerationRepository {
           });
         }
         dispatchModel = underlying;
-        unbottledSession = null;
+        inferenceTarget = null;
       }
     }
 
     let generationResult: ResponseType<{ audioUrl: string }>;
 
-    if (unbottledSession) {
+    if (inferenceTarget) {
       generationResult = await generateMusicWithUnbottled({
-        session: unbottledSession,
+        session: inferenceTarget,
         providerModel: dispatchModel.providerModel,
         prompt: data.prompt,
         duration: data.duration,

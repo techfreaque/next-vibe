@@ -38,8 +38,11 @@ installFetchCache();
 import { installWsFixture } from "../../testing/ws-fixture";
 installWsFixture();
 
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
+import { and, eq } from "drizzle-orm";
+
+import { reloadWsProviderConnector } from "@/app/api/[locale]/remote-connection/connector";
+import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
+import { db } from "@/app/api/[locale]/system/db";
 import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -49,73 +52,101 @@ import { defaultLocale } from "@/i18n/core/config";
 import {
   addLocalhostPort,
   clearLocalhostPorts,
+  setFetchCacheContext,
   setFetchCacheStrictMode,
 } from "../../testing/fetch-cache";
-import {
-  connectToHermes,
-  disconnectFromHermes,
-  HERMES_INSTANCE_ID,
-  LOCAL_DEV_URL,
-} from "../../testing/remote-setup";
+import { connectToHermes, LOCAL_DEV_URL } from "../../testing/remote-setup";
 import { describeStreamSuite } from "./route-base.test";
 
 /** hermes port for HTTP fixture interception */
 const HERMES_PORT = 3002;
 
-let savedCredentials: string | undefined;
-let savedUnbottledAvailability: boolean;
-
-async function resolveHermesSession(): Promise<{
-  token: string;
-  leadId: string;
-}> {
-  const response = await fetch(`${LOCAL_DEV_URL}/api/en-US/user/public/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: env.VIBE_ADMIN_USER_EMAIL,
-      password: env.VIBE_ADMIN_USER_PASSWORD,
-    }),
-  });
-  if (!response.ok) {
-    const err = await response.text().catch(() => "unknown");
-    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-    throw new Error(
-      `resolveHermesSession: login failed ${String(response.status)} ${err}`,
+/** Delete all local remote_connections rows pointing at LOCAL_DEV_URL for this user via the DELETE endpoint so cache invalidation fires. */
+async function cleanupHermesConnections(testUser: JwtPrivatePayloadType): Promise<void> {
+  const rows = await db
+    .select({ instanceId: remoteConnections.instanceId })
+    .from(remoteConnections)
+    .where(
+      and(
+        eq(remoteConnections.userId, testUser.id),
+        eq(remoteConnections.remoteUrl, LOCAL_DEV_URL),
+      ),
     );
+
+  if (rows.length === 0) {
+    return;
   }
-  const json = (await response.json()) as {
-    success: boolean;
-    data?: { token?: string; leadId?: string };
-  };
-  if (!json.success || !json.data?.token) {
-    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-    throw new Error("resolveHermesSession: no token in login response");
+
+  const connByIdDef =
+    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+
+  for (const row of rows) {
+    await RouteExecuteRepository.runInProcessTyped({
+      definition: connByIdDef.default.DELETE,
+      input: {},
+      urlPathParams: { instanceId: row.instanceId },
+      user: testUser,
+      locale: defaultLocale,
+      platform: Platform.AI,
+      logger: createEndpointLogger(false, Date.now(), defaultLocale),
+    });
   }
-  return {
-    token: json.data.token,
-    leadId: json.data.leadId ?? "unknown",
-  };
 }
 
-// oxlint-disable-next-line no-unused-vars -- required by ModeConfig setup signature
-async function setupUnbottled(_testUser: JwtPrivatePayloadType): Promise<void> {
+async function setupUnbottled(testUser: JwtPrivatePayloadType): Promise<void> {
   addLocalhostPort(HERMES_PORT);
 
-  // Login to hermes and set UNBOTTLED_CLOUD_CREDENTIALS.
-  // The login call is cached under its own context so it replays offline.
+  // Cache setup HTTP calls (login + connect + PATCH) so they replay offline.
+  // This also resets WS call counters so setup calls don't bleed into test fixtures.
   setFetchCacheContext("unbottled-setup");
-  const session = await resolveHermesSession();
-  savedCredentials = agentEnv.UNBOTTLED_CLOUD_CREDENTIALS;
-  Object.assign(agentEnv, {
-    UNBOTTLED_CLOUD_CREDENTIALS: `${session.leadId}:${session.token}:${LOCAL_DEV_URL}`,
-  });
 
-  // agentEnvAvailability.unbottled is a frozen singleton computed at startup from
-  // NEXT_PUBLIC_AGENT_UNBOTTLED - which is false when UNBOTTLED_CLOUD_CREDENTIALS
-  // is not in .env. Patch it so isModelProviderAvailable() returns true for UNBOTTLED.
-  savedUnbottledAvailability = agentEnvAvailability.unbottled;
-  Object.assign(agentEnvAvailability, { unbottled: true });
+  // Idempotent: clean up any leftover connection from a previous failed run.
+  // Delete by remoteUrl (not instanceId) — hermes may report a different instanceId
+  // than the hardcoded constant depending on its self-identity configuration.
+  await cleanupHermesConnections(testUser);
+
+  // Close any stale WsConnections from previous test runs that may still be alive
+  // in the module-level _connections map. connectToHermes will create a fresh one
+  // and immediately close it (direct-http = no persistent WS).
+  reloadWsProviderConnector();
+
+  // Create the remote connection DB row by logging into hermes and registering atlas.
+  // connectToHermes sets transportMode='direct-http', loopLocation='server',
+  // toolSource='local', threadMirrorMode='both' by default.
+  await connectToHermes(testUser, LOCAL_DEV_URL);
+
+  // Resolve the actual instanceId that hermes reported (may differ from "hermes").
+  const [connRow] = await db
+    .select({ instanceId: remoteConnections.instanceId })
+    .from(remoteConnections)
+    .where(
+      and(
+        eq(remoteConnections.userId, testUser.id),
+        eq(remoteConnections.remoteUrl, LOCAL_DEV_URL),
+        eq(remoteConnections.isReverseEntry, false),
+      ),
+    )
+    .limit(1);
+
+  if (!connRow) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+    throw new Error("setupUnbottled: no connection row found after connectToHermes");
+  }
+
+  // Mark hermes as the UNBOTTLED inference provider for this connection.
+  // isInferenceProvider=true means RemoteTransport.resolveInferenceProvider()
+  // will find this row and route all UNBOTTLED model requests to hermes.
+  const connByIdDef =
+    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+  await RouteExecuteRepository.runInProcessTyped({
+    definition: connByIdDef.default.PATCH,
+    input: { isInferenceProvider: true },
+    urlPathParams: { instanceId: connRow.instanceId },
+    user: testUser,
+    locale: defaultLocale,
+    platform: Platform.AI,
+    logger: createEndpointLogger(false, Date.now(), defaultLocale),
+  });
 
   // Note: strict mode is NOT enabled here so that first-run fixture recording
   // can make live calls to localhost:3002. On replay runs, all calls hit
@@ -125,13 +156,9 @@ async function setupUnbottled(_testUser: JwtPrivatePayloadType): Promise<void> {
 }
 
 async function teardownUnbottled(
-  // oxlint-disable-next-line no-unused-vars -- required by ModeConfig teardown signature
-  _testUser: JwtPrivatePayloadType,
+  testUser: JwtPrivatePayloadType,
 ): Promise<void> {
-  Object.assign(agentEnv, { UNBOTTLED_CLOUD_CREDENTIALS: savedCredentials });
-  Object.assign(agentEnvAvailability, {
-    unbottled: savedUnbottledAvailability,
-  });
+  await cleanupHermesConnections(testUser);
   clearLocalhostPorts();
   setFetchCacheStrictMode(false);
 }
@@ -139,7 +166,7 @@ async function teardownUnbottled(
 describeStreamSuite({
   label: "AI Stream Integration - UNBOTTLED Remote Mode",
   cachePrefix: "unbottled-",
-  providerOverride: ApiProvider.UNBOTTLED,
+  useExecuteToolWrapping: true,
   setup: setupUnbottled,
   teardown: teardownUnbottled,
   // Detach tasks (T5/T5b) run on the hermes remote instance (port 3002), not locally.

@@ -27,7 +27,7 @@ import {
 } from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import {
   calculateNextExecutionTime,
@@ -339,12 +339,14 @@ export function ScheduleAutocomplete({
   // "custom" mode = value is set but doesn't match any preset
   const isCustom = value !== "" && matchedPreset === null;
 
-  // Whether builder can represent the current value
-  const builderState = useMemo(
-    () => (isCustom ? cronToCustomState(value) : null),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+  // Whether builder can represent the current value — computed once from initial value
+  const builderStateRef = useRef<
+    ReturnType<typeof cronToCustomState> | null | undefined
+  >(undefined);
+  if (builderStateRef.current === undefined) {
+    builderStateRef.current = isCustom ? cronToCustomState(value) : null;
+  }
+  const builderState = builderStateRef.current;
 
   // Which panel is open: none (collapsed), builder, or advanced
   const [panelMode, setPanelMode] = useState<CustomPanelMode>(() => {

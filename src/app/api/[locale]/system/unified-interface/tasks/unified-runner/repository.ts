@@ -355,8 +355,6 @@ export class UnifiedTaskRunnerRepository {
           onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
           isRevival: undefined,
-
-          providerOverride: undefined,
         },
       });
 

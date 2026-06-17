@@ -11,7 +11,15 @@ import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons"
 import type { z } from "zod";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  type ChatModelSelection,
+  chatModelSelectionSchema,
+} from "@/app/api/[locale]/agent/ai-stream/models";
+import {
+  type AgentEnvAvailability,
+  agentEnvAvailability,
+  getInstanceAvailability,
+} from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
@@ -86,7 +94,6 @@ import skillsDefinitions from "./definition";
 import {
   CATEGORY_CONFIG,
   ModelSelectionType,
-  SkillCategory,
   type SkillCategoryValue,
   SkillOwnershipType,
   type SkillOwnershipTypeValue,
@@ -397,6 +404,7 @@ export class SkillsRepository {
                   externalId,
                   t,
                   user,
+                  skillsAvailability,
                 ),
               );
             } else {
@@ -417,6 +425,11 @@ export class SkillsRepository {
                   },
                   t,
                   user,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  skillsAvailability,
                 ),
               );
             }
@@ -449,6 +462,7 @@ export class SkillsRepository {
                 char.id,
                 t,
                 user,
+                skillsAvailability,
               ),
             );
           }
@@ -520,6 +534,7 @@ export class SkillsRepository {
               char.id,
               t,
               user,
+              skillsAvailability,
             ),
           );
         }
@@ -588,6 +603,7 @@ export class SkillsRepository {
                 externalId,
                 t,
                 user,
+                skillsAvailability,
               ),
             );
           } else {
@@ -608,6 +624,11 @@ export class SkillsRepository {
                 },
                 t,
                 user,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                skillsAvailability,
               ),
             );
           }
@@ -1161,6 +1182,11 @@ export class SkillsRepository {
           },
           t,
           user,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          createAvailability,
         );
         emitSkills("skill-created", {
           wsEvent: {
@@ -1346,6 +1372,11 @@ export class SkillsRepository {
             },
             t,
             user,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            updateAvailability,
           );
           emitSkillsCreate("skill-created", {
             wsEvent: {
@@ -1798,6 +1829,7 @@ export class SkillsRepository {
         variant.variantName ? t(variant.variantName) : "",
         true,
         variant.isDefault ?? false,
+        availability,
       ),
     );
   }

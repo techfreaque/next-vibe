@@ -115,6 +115,16 @@ export interface EmailResolvedData {
 }
 
 /**
+ * Returned by render when the email has no recipient in this context
+ * (e.g. an optional confirmation and the submitter left no address).
+ * The sender skips the send - no SMTP attempt, no error.
+ */
+export interface EmailRenderSkip {
+  skip: true;
+  reason: string;
+}
+
+/**
  * Props passed to the render function on a template.
  * TRequest/TResponse/TUrlVariables come from the endpoint; TScopedTranslationKey from the template.
  */
@@ -193,8 +203,11 @@ export interface EmailTemplateDefinition<
       TUserRoles
     >,
   ) =>
-    | Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType>
-    | SuccessResponseType<EmailResolvedData>
+    | Promise<
+        | SuccessResponseType<EmailResolvedData | EmailRenderSkip>
+        | ErrorResponseType
+      >
+    | SuccessResponseType<EmailResolvedData | EmailRenderSkip>
     | ErrorResponseType;
 }
 

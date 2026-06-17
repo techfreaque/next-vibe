@@ -700,8 +700,6 @@ export class PulseHealthRepository {
                         headless: undefined,
                         subAgentDepth: 0,
                         isRevival: undefined,
-
-                        providerOverride: undefined,
                         waitingForRemoteResult: undefined,
                         abortSignal: taskAbortController.signal,
                         callerCallbackMode: undefined,

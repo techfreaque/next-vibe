@@ -14,16 +14,10 @@ import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { testEndpoint } from "@/app/api/[locale]/system/check/testing/testing-suite";
+import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import { IntelligenceLevel,ModelSelectionType } from "../skills/enum";
 import { isUuid } from "../slugify";
@@ -46,46 +40,6 @@ testEndpoint(favoriteReorderEndpoint.POST);
 // ── Part B: CRUD Integration Tests ───────────────────────────────────────────
 
 const TEST_TIMEOUT = 60_000;
-
-async function resolveUser(
-  email: string,
-): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await UserRepository.getUserByEmail(
-    email,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  const user = result.data;
-
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-    }),
-    db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-  ]);
-
-  if (!link) {
-    return null;
-  }
-
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-
-  return {
-    isPublic: false,
-    id: user.id,
-    leadId: link.leadId,
-    roles,
-  };
-}
 
 /** Assert a string is a slug (lowercase, dashes, digits - never a UUID). */
 function expectSlug(value: string, label: string): void {
@@ -118,15 +72,7 @@ describe("Favorites CRUD Integration", () => {
   const createdSlugs: string[] = [];
 
   beforeAll(async () => {
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    expect(
-      resolved,
-      `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
-    ).toBeTruthy();
-    if (!resolved) {
-      return;
-    }
-    adminUser = resolved;
+    adminUser = await resolveTestAdminUser();
 
     // Clean up any leftover test favorites from previous runs
     // Test favorites are created with "thea" skill → slugs start with "thea"
@@ -174,7 +120,7 @@ describe("Favorites CRUD Integration", () => {
       name,
       async () => {
         if (suiteFailed) {
-          return;
+          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
         }
         try {
           await fn();

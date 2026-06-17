@@ -21,6 +21,7 @@ import {
   type VideoVisionModelOption,
 } from "../ai-stream/vision-models";
 import { ContentLevel } from "../chat/skills/enum";
+import { agentEnvAvailability } from "../env-availability";
 import {
   imageGenModelDefinitions,
   type ImageGenModelOption,

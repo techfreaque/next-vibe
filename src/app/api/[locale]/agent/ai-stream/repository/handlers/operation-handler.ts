@@ -11,10 +11,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ChatMessageRole } from "../../../chat/enum";
-import {
-  getBestSttModel,
-  type SttModelSelection,
-} from "../../../speech-to-text/models";
+import type { SttModelSelection } from "../../../speech-to-text/models";
 import { SpeechToTextRepository } from "../../../speech-to-text/repository";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
 
@@ -77,7 +74,7 @@ export class OperationHandler {
               user,
               locale,
               logger,
-              resolvedSttModelId,
+              sttModelSelection,
             );
 
           if (!transcriptionResult.success) {

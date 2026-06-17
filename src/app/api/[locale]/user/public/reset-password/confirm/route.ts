@@ -22,7 +22,8 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: true,
       },
     ],
-    handler: async ({ data, logger, locale, t }) => PasswordRepository.confirmPasswordReset(
+    handler: async ({ data, logger, locale, t }) =>
+      PasswordRepository.confirmPasswordReset(
         data.token,
         data.email,
         data.password,

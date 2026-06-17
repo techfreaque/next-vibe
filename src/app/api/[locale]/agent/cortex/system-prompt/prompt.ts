@@ -137,10 +137,12 @@ Shared memory between you and the user. Persists across conversations. You read 
 ${langNote}${emptyNotice}
 ${treeStr}
 
-**Tools:** \`${CORTEX_WRITE_ALIAS}\` · \`${CORTEX_READ_ALIAS}\` · \`${CORTEX_SEARCH_ALIAS}\` · \`${CORTEX_LIST_ALIAS}\` (+ edit/move/delete/mkdir/tree - \`tool-help query="cortex"\`)
-**Rules:** One idea per file. <200 words. Names: \`specific-kebab-case.md\`. Write proactively. Consolidate duplicates. Archive (\`archived: true\` frontmatter) over deleting. Pin critical files (\`pinned: true\`) - always shown, never trimmed.
+**Tools:** \`${CORTEX_WRITE_ALIAS}\` (create/overwrite) · \`cortex-edit\` (targeted edits — prefer over write) · \`${CORTEX_READ_ALIAS}\` · \`${CORTEX_SEARCH_ALIAS}\` · \`${CORTEX_LIST_ALIAS}\` (+ move/delete/mkdir/tree - \`tool-help query="cortex"\`)
+**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use \`cortex-edit\` to update existing files, \`${CORTEX_WRITE_ALIAS}\` only for new files or full rewrites.
+**Rules:** One idea per file. <200 words. Names: \`specific-kebab-case.md\`. Consolidate duplicates. Archive (\`archived: true\` frontmatter) over deleting. Pin critical files (\`pinned: true\`) - always shown.
 **Writable:** ${memoriesPath}/ (knowledge) · ${documentsPath}/ (working files) · /skills/ (custom skills)
-**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ - use \`${CORTEX_READ_ALIAS}\` or \`${CORTEX_LIST_ALIAS}\` only`;
+**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use \`${CORTEX_READ_ALIAS}\` or \`${CORTEX_LIST_ALIAS}\` only
+**SSH/Machines:** \`${CORTEX_LIST_ALIAS}(path="/ssh")\` → machines + their mounts. \`${CORTEX_EXEC_ALIAS}(path="/ssh/<machine>", command="...")\` → run commands (only /ssh/ paths). \`${CORTEX_TERMINALS_ALIAS}\` → active terminals with cwd. Mounts at \`/ssh/<machine>/<mount>/\` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. \`${CORTEX_LIST_ALIAS}(path="/ssh/<machine>/<mount>/")\` → browse mount. \`${CORTEX_READ_ALIAS}(path="/ssh/<machine>/path")\` → read file.`;
   },
 };
 

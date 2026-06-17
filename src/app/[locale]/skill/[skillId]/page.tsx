@@ -15,6 +15,7 @@ import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
 import { modelProviders } from "@/app/api/[locale]/agent/models/models";
 import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
@@ -138,7 +139,11 @@ export async function tanstackLoader({
   const resolvedVariants: ResolvedSkillModels["variants"] = [];
   for (const v of initialSkillData?.variants ?? []) {
     const chatSel = v.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
-    const chatModel = getBestChatModel(chatSel, skillUser);
+    const chatModel = getBestChatModel(
+      chatSel,
+      skillUser,
+      agentEnvAvailability,
+    );
     const provider = chatModel
       ? (modelProviders[chatModel.provider] ?? null)
       : null;
@@ -162,12 +167,13 @@ export async function tanstackLoader({
 
     const voiceSel = v.voiceModelSelection ?? null;
     const voiceName = voiceSel
-      ? (getBestTtsModel(voiceSel, skillUser)?.name ?? null)
+      ? (getBestTtsModel(voiceSel, skillUser, agentEnvAvailability)?.name ??
+        null)
       : null;
 
     const imageGenSel = v.imageGenModelSelection ?? null;
     const imageGenModel = imageGenSel
-      ? getBestImageGenModel(imageGenSel, skillUser)
+      ? getBestImageGenModel(imageGenSel, skillUser, agentEnvAvailability)
       : null;
     const imageGenName = imageGenModel?.name ?? null;
     const imageGenCreditCost =
@@ -177,12 +183,14 @@ export async function tanstackLoader({
 
     const musicGenSel = v.musicGenModelSelection ?? null;
     const musicGenName = musicGenSel
-      ? (getBestMusicGenModel(musicGenSel, skillUser)?.name ?? null)
+      ? (getBestMusicGenModel(musicGenSel, skillUser, agentEnvAvailability)
+          ?.name ?? null)
       : null;
 
     const videoGenSel = v.videoGenModelSelection ?? null;
     const videoGenName = videoGenSel
-      ? (getBestVideoGenModel(videoGenSel, skillUser)?.name ?? null)
+      ? (getBestVideoGenModel(videoGenSel, skillUser, agentEnvAvailability)
+          ?.name ?? null)
       : null;
 
     resolvedVariants.push({
@@ -219,22 +227,25 @@ export async function tanstackLoader({
 
   const voiceSel = defaultVariant?.voiceModelSelection ?? null;
   const voiceName = voiceSel
-    ? (getBestTtsModel(voiceSel, skillUser)?.name ?? null)
+    ? (getBestTtsModel(voiceSel, skillUser, agentEnvAvailability)?.name ?? null)
     : null;
 
   const imageGenSel = defaultVariant?.imageGenModelSelection ?? null;
   const imageGenName = imageGenSel
-    ? (getBestImageGenModel(imageGenSel, skillUser)?.name ?? null)
+    ? (getBestImageGenModel(imageGenSel, skillUser, agentEnvAvailability)
+        ?.name ?? null)
     : null;
 
   const musicGenSel = defaultVariant?.musicGenModelSelection ?? null;
   const musicGenName = musicGenSel
-    ? (getBestMusicGenModel(musicGenSel, skillUser)?.name ?? null)
+    ? (getBestMusicGenModel(musicGenSel, skillUser, agentEnvAvailability)
+        ?.name ?? null)
     : null;
 
   const videoGenSel = defaultVariant?.videoGenModelSelection ?? null;
   const videoGenName = videoGenSel
-    ? (getBestVideoGenModel(videoGenSel, skillUser)?.name ?? null)
+    ? (getBestVideoGenModel(videoGenSel, skillUser, agentEnvAvailability)
+        ?.name ?? null)
     : null;
 
   const hasStt = !!defaultVariant?.sttModelSelection;

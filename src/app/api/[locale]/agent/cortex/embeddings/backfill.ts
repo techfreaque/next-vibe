@@ -6,14 +6,12 @@ import "server-only";
  * Step 2: Find all cortex_nodes with NULL embeddings and generate them in batches.
  * Rate-limited to avoid API throttling.
  */
-
-import { eq, isNull, and, notInArray, isNotNull, sql } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, notInArray, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
-
 import { computeEmbeddingHash, generateEmbedding } from "./service";
 
 /** Process N nodes per batch, with a delay between batches */
@@ -25,6 +23,43 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+/**
+ * Resolve the text to embed for a node. Native paths (/documents, /memories)
+ * carry their content in the column. Virtual mounts store NULL content — their
+ * content is re-derived live from the source table via the resolver so the
+ * cortex_nodes row stays a pure index (no duplicated content).
+ *
+ * Returns "" when content cannot be resolved (skips embedding for this node).
+ */
+async function resolveNodeContentForEmbedding(
+  userId: string,
+  path: string,
+  storedContent: string | null,
+): Promise<string> {
+  const { isNativePath, getMountPrefix } = await import("../repository");
+  const { defaultLocale } = await import("@/i18n/core/config");
+  if (isNativePath(path, defaultLocale)) {
+    return storedContent ?? "";
+  }
+  // Virtual mounts use canonical English prefixes — locale only matters for
+  // native locale-aware paths, already handled above.
+  const mountPrefix = getMountPrefix(path, defaultLocale);
+  if (mountPrefix === null) {
+    return storedContent ?? "";
+  }
+  const { resolveVirtualRead } = await import("../mounts/resolver");
+  // Backfill runs without a request admin context; /ssh is never materialized,
+  // so isAdmin=false is safe here.
+  const result = await resolveVirtualRead(
+    userId,
+    path,
+    mountPrefix,
+    false,
+    defaultLocale,
+  ).catch(() => null);
+  return result?.content ?? "";
 }
 
 /**
@@ -90,10 +125,47 @@ async function materializeVirtualMounts(userId: string): Promise<number> {
     }
   };
 
-  // --- Threads (already synced by syncThreadEmbedding, but backfill any gaps) ---
-  // Threads use cortexNodes path /threads/<rootFolderId>/<slug>-<threadId>.md
-  // They're synced on stream end, so most should already exist. Skip here to avoid
-  // a huge query - the embedding backfill will pick up any that slipped through.
+  // --- Threads (thin references - title + tags + preview only) ---
+  {
+    const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+    const { desc } = await import("drizzle-orm");
+    const { buildThinThreadContent } =
+      await import("@/app/api/[locale]/agent/ai-stream/repository/core/message-db-writer");
+
+    const recentThreads = await db
+      .select({
+        id: chatThreads.id,
+        userId: chatThreads.userId,
+        title: chatThreads.title,
+        rootFolderId: chatThreads.rootFolderId,
+        tags: chatThreads.tags,
+        preview: chatThreads.preview,
+      })
+      .from(chatThreads)
+      .where(eq(chatThreads.userId, userId))
+      .orderBy(desc(chatThreads.updatedAt))
+      .limit(200);
+
+    for (const thread of recentThreads) {
+      const content = buildThinThreadContent(thread);
+      const slug = (thread.title ?? "thread")
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, "-")
+        .slice(0, 50);
+      await upsertVirtualNode(
+        userId,
+        `/threads/${thread.rootFolderId}/${slug}-${thread.id}.md`,
+        content,
+      ).catch(() => undefined);
+      upserted++;
+    }
+  }
+
+  // --- Built-in skills ---
+  {
+    const { ensureUserCortexReady } = await import("../ensure-ready");
+    await ensureUserCortexReady(userId);
+  }
 
   // --- Skills ---
   const skillRoot = await listSkillPath(userId, "/skills").catch(() => []);
@@ -148,11 +220,50 @@ async function materializeVirtualMounts(userId: string): Promise<number> {
 }
 
 /**
+ * Reclaim duplicated content from virtual-mount index rows.
+ *
+ * cortex_nodes is an embedding/search INDEX: virtual mounts resolve content
+ * live from their source table, so their rows must not persist content. Older
+ * rows materialized before this rule still carry a content copy — NULL it out
+ * (and zero size) for every non-native path. Idempotent: rows already NULL are
+ * skipped by the WHERE clause. Embeddings/hashes are untouched (the embedding
+ * was already computed; nulling the stored column does not invalidate it).
+ *
+ * Returns the number of rows cleaned.
+ */
+async function reclaimVirtualMountContent(): Promise<number> {
+  const cleared = await db
+    .update(cortexNodes)
+    .set({ content: null, size: 0 })
+    .where(
+      and(
+        isNotNull(cortexNodes.content),
+        sql`${cortexNodes.path} NOT LIKE '/documents/%'`,
+        sql`${cortexNodes.path} NOT LIKE '/documents'`,
+        sql`${cortexNodes.path} NOT LIKE '/memories/%'`,
+        sql`${cortexNodes.path} NOT LIKE '/memories'`,
+      ),
+    )
+    .returning({ id: cortexNodes.id });
+  return cleared.length;
+}
+
+/**
  * Materialize virtual mounts for all users.
  * Step 1 of backfill - populates cortexNodes rows without embeddings.
  * Fast: only DB reads + upserts, no embedding API calls.
  */
 export async function materializeAllVirtualMounts(): Promise<number> {
+  // One-time idempotent reclaim of any content duplicated onto virtual index
+  // rows by older materialization runs (cortex = index, source owns content).
+  const reclaimed = await reclaimVirtualMountContent().catch(() => 0);
+  if (reclaimed > 0) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `[cortex-backfill] Reclaimed content from ${reclaimed} virtual index rows`,
+    );
+  }
+
   const userIds = await getAllUserIds();
   // eslint-disable-next-line no-console
   console.log(
@@ -228,6 +339,7 @@ export async function backfillEmbeddings(force = false): Promise<{
     const batch = await db
       .select({
         id: cortexNodes.id,
+        userId: cortexNodes.userId,
         path: cortexNodes.path,
         content: cortexNodes.content,
       })
@@ -240,8 +352,14 @@ export async function backfillEmbeddings(force = false): Promise<{
     }
 
     for (const node of batch) {
-      // Embed content only - path is for filtering/display, not semantic match
-      const textToEmbed = node.content ?? "";
+      // Embed content only - path is for filtering/display, not semantic match.
+      // Native paths keep content in the column; virtual mounts store NULL
+      // content, so re-derive it live from the source table at embed time.
+      const textToEmbed = await resolveNodeContentForEmbedding(
+        node.userId,
+        node.path,
+        node.content,
+      );
 
       if (textToEmbed.trim().length === 0) {
         skipped++;
@@ -257,7 +375,7 @@ export async function backfillEmbeddings(force = false): Promise<{
         continue;
       }
 
-      const contentHash = computeEmbeddingHash(node.path, node.content ?? "");
+      const contentHash = computeEmbeddingHash(node.path, textToEmbed);
 
       await db
         .update(cortexNodes)

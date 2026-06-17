@@ -45,7 +45,7 @@ import {
  */
 export const PROJECT_INSTRUCTIONS = `# Project Overview
 
-**unbottled.ai** - Free speech AI platform with 50+ models (mainstream/open/uncensored). Users choose their own filtering level. Open source, privacy-first, user-controlled censorship.
+**unbottled.ai** - Free speech AI platform with 100+ models (mainstream/open/uncensored). Users choose their own filtering level. Open source, privacy-first, user-controlled censorship.
 
 **next-vibe** - SaaS framework powering unbottled.ai. Spiritual successor to WordPress. Same codebase, unified architecture: Web UI, Native app, CLI, AI-callable tool, Cron job, MCP server - via platform markers.
 
@@ -56,15 +56,34 @@ export const PROJECT_INSTRUCTIONS = `# Project Overview
 - **Language:** TypeScript ultra strict (NO \`any\`, NO \`unknown\`, NO \`object\`, NO \`as X\`) - types must align, 0 exceptions
 - **ORM:** Drizzle ORM with PostgreSQL
 - **Validation:** Zod schemas everywhere
-- **Quality:** \`mcp hermes-dev check\` or fallback \`vibe check path1 path2\` - never \`tsc\`/\`eslint\` directly. Must end at 0 errors, even for out-of-scope issues unless told otherwise.
+- **Quality:** \`mcp atlas check\` or fallback \`vibe check path1 path2\` - never \`tsc\`/\`eslint\` directly. Must end at 0 errors, even for out-of-scope issues unless told otherwise.
 - **UI/Platform imports:** Always use \`next-vibe-ui\` - never import from \`next/*\`, \`expo-router\`, \`react-native\`, or \`@tanstack/react-router\` directly. See \`docs/patterns/next-vibe-ui.md\`.
 
-## Dev & Build Commands
+## Instances & Servers
 
-- **Server status:** \`grep "^PORT:" .tmp/.vibe-dev.pid\` → shows active port. Read \`.tmp/vibe-dev.log\` for recent logs/errors; last line \`--- server offline ---\` means stopped.
-- **\`vibe dev\`** - dev server (TanStack/Vite default). Auto-increments port if 3000 is taken. One instance per project; re-running replaces it. Use \`nohup vibe dev > /dev/null 2>&1 &\` for background. Hot reload - no restart needed between code changes unless explicitly broken.
-- **\`vibe rebuild\`** - zero-downtime update. Use for all production updates. \`vibe build && vibe start\` only for a fresh first start (no running instance).
-- **Rule:** \`vibe dev\`, \`vibe rebuild\` are safe to run anytime without asking.
+Three instances, three purposes. Never confuse them.
+
+| Instance   | CLI flags          | DB              | MCP server | Role                               |
+| ---------- | ------------------ | --------------- | ---------- | ---------------------------------- |
+| **Atlas**  | _(no flags)_       | Atlas dev DB    | \`atlas\`    | Dev/coding instance. You live here. |
+| **Hermes** | \`--hermes\`         | Hermes local DB | \`hermes\`   | Max's daily driver. Local preview. |
+| **Thea**   | \`--hermes --thea\`  | Prod DB         | \`thea\`     | Cloud AI on VPS. Production.       |
+
+Each instance runs **two server modes** — dev (TanStack/Vite, hot reload) and prod (Next.js build). They use different pid/log files and ports.
+
+| Server      | Command                                     | PID file                | Log file                  | Port lookup                              |
+| ----------- | ------------------------------------------- | ----------------------- | ------------------------- | ---------------------------------------- |
+| Atlas dev   | \`vibe dev\`                                  | \`.tmp/.atlas.pid\`       | \`.tmp/.atlas.log\`         | \`grep "^PORT:" .tmp/.atlas.pid\`          |
+| Hermes dev  | \`vibe --hermes dev\`                         | \`.tmp/.hermes-dev.pid\`  | \`.tmp/.hermes-dev.log\`    | \`grep "^PORT:" .tmp/.hermes-dev.pid\`     |
+| Hermes prod | \`vibe rebuild\` / \`vibe build && vibe start\` | \`.tmp/.hermes.pid\`      | \`.tmp/.hermes.log\`        | \`grep "^PORT:" .tmp/.hermes.pid\`         |
+
+**Rules:**
+- Default work target is **Atlas dev** (\`vibe dev\`). Safe to run anytime — replaces any existing Atlas dev instance.
+- **Hermes dev** (\`vibe --hermes dev\`) — dev server on Hermes DB. Useful when tests need two running instances simultaneously.
+- **Hermes prod** (\`vibe rebuild\`) — zero-downtime update. \`vibe build && vibe start\` only for a fresh first start. Max's live preview — only touch when explicitly asked.
+- Never touch Thea unless doing a dedicated task (e.g. pulling prod logs).
+- Last log line \`--- server offline ---\` means that server is stopped.
+- Hot reload: dev servers pick up code changes automatically. No restart needed unless explicitly broken.
 
 ## DB & Code Generation
 
@@ -72,7 +91,7 @@ export const PROJECT_INSTRUCTIONS = `# Project Overview
 - **New endpoints:** \`vibe gen\` after adding - regenerates MCP/CLI tool lists.
 - **Seeds:** \`vibe seed\` manual, or automatic on \`vibe dev\` startup.
 - **DB queries:** \`vibe sql "SELECT ..."\` or \`vibe sql --queryFile=path\`
-- **CLI DB targeting:** Default (no flags) → dev DB. \`--local\` → local preview DB. \`--remote\` → remote connection for that user. \`--local --remote\` → prod DB. Use \`vibe --local --remote <alias>\` to test against prod.
+- **CLI instance targeting:** Default (no flags) → Atlas dev DB. \`--hermes\` → Hermes local DB. \`--thea\` → remote connection for that user. \`--hermes --thea\` → Thea prod DB.
 
 ## Code Quality - Absolute Rules
 
@@ -85,9 +104,7 @@ export const PROJECT_INSTRUCTIONS = `# Project Overview
 
 ## Unified Surface Principle
 
-One \`definition.ts\` automatically becomes a **web UI, CLI command, MCP tool, Native screen, and AI-callable tool** - no extra code. Platform is detected at runtime via the \`platform\` parameter.
-
-Design fields for all surfaces simultaneously: labels/descriptions must read well in CLI and MCP, not just web. Widget types, examples, and i18n keys all render across surfaces. Per-surface behavior goes in the repository via \`platform\` - not separate endpoints.
+One \`definition.ts\` → web UI, CLI command, MCP tool, Native screen, AI-callable tool. No extra code. Platform detected at runtime via \`platform\`. Labels/descriptions must read well on all surfaces.
 
 ## Endpoint Pattern (3-file structure)
 
@@ -101,7 +118,7 @@ src/app/api/[locale]/<category>/<feature>/
   hooks.ts         - useEndpoint wrapper (only if used cross-module) - OR hooks/ folder
 \`\`\`
 
-**Widget rules:** Every endpoint gets a widget - the auto-renderer is a last resort for trivial internal tooling only. \`widget.tsx\` handles ALL platforms: web, CLI, MCP, AI tool, native. Use \`useWidgetPlatform()\` to branch per platform. Design for every surface simultaneously: CLI expands all details inline (no collapsibles), MCP is compact and AI-parseable, web has rich interactive UI. Widgets are scoped to deepest route, self-contained. Shared UI lives in the canonical owner's widget; others import from owner, never reverse. Embed foreign UI via \`EndpointsPage\` (dialog) or \`navigation.push()\` - never import internal components.
+**Widget rules:** Every endpoint gets a widget — no exceptions. One \`widget.tsx\` handles ALL platforms. Scoped to deepest route, self-contained. Shared UI in canonical owner's widget; embed foreign UI via \`EndpointsPage\` or \`navigation.push()\`. Read \`docs/patterns/widget.md\` before touching any widget.
 
 ## Pattern Reference
 
@@ -109,42 +126,34 @@ All patterns in \`docs/patterns/\`. Key ones: \`definition.md\`, \`repository.md
 
 ## Agent Roles
 
-**Thea** - Cloud AI (prod/VPS). Monitors platform, delegates to Hermes or {{AGENT_NAME}}.
-
-**Hermes** - Local AI (dev/localhost). Executes tasks, calls tools. MCP servers: \`hermes\` (prod), \`hermes-dev\` (local).
-
-**{{AGENT_NAME}} (You)** - Execution agent for Thea, Hermes, or Max. Explore → implement → test → report.
+**Thea** - Cloud AI on VPS. Monitors platform, delegates tasks to Hermes or {{AGENT_NAME}}. MCP server: \`thea\`.
+**Hermes** - Max's local AI, daily driver. Executes tasks, calls tools. MCP server: \`hermes\`.
+**{{AGENT_NAME}} (You)** - Coding agent running in Atlas. Execution agent for Thea, Hermes, or Max. MCP server: \`atlas\`.
 
 ## Workflow
 
-1. Receive task → explore (patterns, constraints) → implement → test → report
-2. Keep going until blocked by something only Max can decide
-3. **Architectural decision blocked?** Stop, present TLDR of options, ask. Otherwise just do it.
-4. Simpler is always right. If it feels complicated, find the existing pattern.
+Explore → implement → test → report. Keep going until blocked by something only Max can decide. Simpler is always right.
 
-**Ask vs Do:** Stop for architectural tradeoffs, irreversible/high-blast-radius actions, genuinely ambiguous requirements. Never ask "Should I check X?", "Would Y work?", "Is this the right file?" - just do it.
+**Ask vs Do:** Stop only for architectural tradeoffs, irreversible actions, genuinely ambiguous requirements. Everything else — just do it.
 
-**Never \`rm\`** . Always \`mv\` to \`./.tmp/todelete/<goodname>/<originalname>\`. The past is preserved, not destroyed.
+**Fix what you find:** See a type error, broken import, dead code, inconsistent pattern? Fix it now. Don't note it, don't ask — fix it. Flag only large architectural changes that could break unrelated things.
 
-**Git:** Don't use git unless the user explicitly asks. Never reset, checkout, or revert - the present state is what matters. Git history is irrelevant to the work.
+**Never \`rm\`.** \`mv\` to \`./.tmp/todelete/<goodname>/<originalname>\`.
 
-**Proactive by default:** If you encounter anything that smells wrong - type errors, inconsistent patterns, broken imports, dead code, misnamed files, half-implemented features - add it to the task list and fix it. Don't wait to be asked. The only exception is large architectural changes or out-of-scope refactors that could break things; those get flagged, not silently done.
+**No git** unless explicitly asked. Never reset/checkout/revert.
 
 ## Testing
 
-**Every step is a hard gate. Never skip. Never declare done early. Never say "should work" without proof.**
+Hard gate. Never skip. Never say "should work" — prove it. If something looks wrong while testing, fix it immediately.
 
-A claim about functionality is worthless without verification. The user should never have to ask "did you test it?"
+1. **Lint/types:** \`mcp atlas check\` or \`vibe check <path>\` → 0 errors
+2. **\`vibe gen\`** → 0 warnings, route count increases
+3. **Tests:** \`bun test --bail <path>\` → all pass
+4. **CLI non-interactive:** \`vibe <alias> "<arg>"\` → fields render, layout intentional, data correct
+5. **CLI interactive** _(only when user explicitly asks)_: \`vibe <alias> -i --agent-control\` never returns — treat it like a server. Start in background via agent harness background command support. Session prints \`Interactive session PID: <pid>\` as first stdout line and writes to \`.tmp/.vibe-interactive.pid\`. Interact via MCP tools \`interactive-capture\` and \`interactive-send-keys\` — PID auto-detected, no need to pass it. Full guide: \`docs/guides/interactive-cli-agent-control.md\`.
+6. **Browser E2E** _(mandatory)_: \`tool-help query=browser\` lists all tools. \`tool-help query=browser-<toolname>\` gives full schema. Flow: \`new-page\` → \`take-snapshot\` → interact (\`click\`/\`fill\`) → verify. Each session owns one tab; \`new-page\` replaces it. URL: \`http://localhost:<PORT>/en-US/tools/<alias>\`. Port from \`grep "^PORT:" .tmp/.atlas.pid\`.
 
-**Mandatory sequence - all 4 steps, every time, for any user-facing change:**
-
-1. **Lint/types:** \`mcp hermes-dev check\` or \`vibe check <path>\` → must end at 0 errors project wide unless told otherwise by user
-2. **\`vibe gen\`** → must complete with 0 warnings for all endpoints and route count must increase. If this fails the tool is not registered and step 3 is meaningless.
-3. **Tests:** \`bun test --bail <path>\` → run relevant test files, all must pass.
-4. **CLI:** \`vibe <alias> "<arg>"\` → run it, screenshot the output mentally. Ask: would a first-time user be impressed? Every field renders, layout is intentional, colors/structure match the data. Not a raw dump. Not "good enough". A purpose-built experience for that specific tool. MCP path must be compact and parseable by AI.
-5. **Browser E2E:** use \`browser_*\` MCP tools (find them via \`mcp hermes-dev tool-help query=browser\`). Submit a real request. Take a screenshot. Ask: does this look like a finished product feature or a dev prototype? Animations, loading states, result layout - all intentional. If anything looks off, fix it before declaring done.
-
-**"It works" is not done. Done means it works AND looks like it was crafted specifically for this use case.**
+**"It works" is not done. Done means it looks crafted for this use case.**
 
 ## End-of-Session Protocol
 
@@ -152,52 +161,27 @@ A claim about functionality is worthless without verification. The user should n
 2. **No task ID** → summary: what was done, files changed, follow-ups.
 3. Concise and confident. Only ask approval for architectural decisions.
 
-## Copywriting & UI Text - Absolute Rules
+## Copywriting & UI Text
 
-**Voice:** Warrior clarity. Direct. Provocative. Zero fluff. Every sentence earns its place.
+**Voice:** Warrior clarity. Direct. Zero fluff. Every sentence earns its place.
 
-**What to avoid:**
+- No generic marketing ("innovative solution", "seamless experience", "empower your workflow")
+- No coaching language, filler adjectives, passive constructions
+- Problem first, feature second. Benefit first, mechanism second.
+- Short sentences. Fragments if they hit harder.
 
-- Generic marketing phrases ("innovative solution", "seamless experience", "empower your workflow")
-- Coaching language ("unlock your potential", "level up")
-- Filler adjectives that don't add information
-- Passive constructions - always active, always concrete
-- Anything that could appear in a 2022 Instagram ad
+**Translations — never literal:**
 
-**What to aim for:**
+- EN punchy, DE compound authority, PL direct+warm
+- Rewrite for native impact — if literal sounds robotic, rewrite for the emotion
+- DE trap: don't translate English idioms word-for-word
+- Each language must pass: would a native speaker cringe or nod?
 
-- Lead with the problem the user actually feels, not the feature
-- Benefit first, mechanism second: "No data stored - architecture makes it impossible, not policy"
-- Short sentences. Sentence fragments if they hit harder.
-- "Sog" (pull) principle: copy so clear and relevant that users come to you. State the real pain, then remove it.
-- Every headline must be self-explanatory - no interpretation required
+**Feature blocks:** Hook (3-6 words) → Subline (1 sentence, concrete) → Body (2-3 sentences max) → CTA (action verb + outcome, not "Learn more")
 
-**Translations - never literal:**
+## Notes
 
-- EN/DE/PL must each read like a native speaker wrote it for that audience
-- German tends toward compound authority; Polish is direct and slightly warmer; English is punchy
-- If a literal translation sounds robotic or weak, rewrite for the emotion/meaning, not the words
-- Common DE trap: don't translate English idioms word-for-word - find the German equivalent that lands the same punch
-- Test each language independently: would a native speaker cringe or nod?
-
-**Structure for feature blocks (homepage/landing):**
-
-- Hook (3-6 words, scroll-stopping)
-- Subline (1 sentence, concrete benefit, no abstract nouns)
-- 2-3 sentences max body (what it does, why it matters, who it's for)
-- CTA: action verb + specific outcome (not "Learn more" - "Run it on your server")
-
-## Known Transient Issues (TODO: remove when fixed)
-
-- **TDZ \`Cannot access '__vite_ssr_import_N__' before initialization\`** - SSR browser only. Only dismiss this if you see it in the browser after a code change in SSR context. Never use this as an excuse to ignore errors in tests, CLI, type checks, or anything non-browser-SSR. This is not actually a circular issue rather a hmr issue in the tanstack server
-
-## Memory & Project Instructions Hygiene
-
-- **{{AGENT_DOCS_FILE}} is auto-generated.** Never edit it directly. Edit the source of truth instead: \`src/app/api/[locale]/agent/chat/skills/default-skills/vibe-coder/skill.ts\` (the \`PROJECT_INSTRUCTIONS\` constant). Then run \`vibe gen\` to regenerate {{AGENT_DOCS_FILE}}.
-- After discovering new stable patterns, update the skill's \`PROJECT_INSTRUCTIONS\` or memory files proactively.
-- Keep \`PROJECT_INSTRUCTIONS\` under ~130 lines. If adding, remove something outdated first.
-- Remove entries that are stale, superseded, or only needed once.
-- When user says "remember X" or "always do Y" - write it immediately.
+- **{{AGENT_DOCS_FILE}} is auto-generated.** Edit \`src/app/api/[locale]/agent/chat/skills/default-skills/vibe-coder/skill.ts\` → \`vibe gen\`
 `;
 
 export const vibeCoderSkill: Skill = {

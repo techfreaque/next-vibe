@@ -83,7 +83,6 @@ async function setupWsProviderConnection(
     ensureRemoteUserCredits,
     resolveProdAdminToken,
     resolveProdUserId,
-    triggerPull,
   } = await import("../../testing/remote-setup");
 
   // Idempotent: clean up any leftover connection from a previous failed run
@@ -109,9 +108,6 @@ async function setupWsProviderConnection(
     platform: Platform.AI,
     logger: createEndpointLogger(false, Date.now(), defaultLocale),
   });
-
-  // Ensure capabilities are populated before tests run
-  await triggerPull();
 
   _mainProdUserId = await resolveProdUserId();
 

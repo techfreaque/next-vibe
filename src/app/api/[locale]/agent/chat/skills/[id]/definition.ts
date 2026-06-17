@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -47,9 +48,9 @@ import {
   SKILL_GET_ALIAS,
   SKILL_UPDATE_ALIAS,
 } from "../constants";
-import listDef0 from "../definition";
-import { type SkillListResponseOutput } from "../definition";
+import type { SkillListResponseOutput } from "../definition";
 import { CategoryOptions, SkillCategory } from "../enum";
+import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
 
 const SkillEditContainer = lazyWidget(() =>
@@ -70,6 +71,7 @@ const { DELETE } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "delete.title" as const,
+  titleShort: "delete.titleShort" as const,
   description: "delete.description" as const,
   dynamicTitle: ({ response }) => {
     if (response?.name && typeof response.name === "string") {
@@ -81,8 +83,8 @@ const { DELETE } = createEndpoint({
     return undefined;
   },
   icon: "trash" as const,
-  category: "endpointCategories.skills",
-  subCategory: "endpointCategories.skillsManagement",
+  category: "ai",
+  subCategory: "skillsManagement",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_DELETE_ALIAS],
@@ -167,7 +169,9 @@ const { DELETE } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: listDef0.GET,
+        labelField: "name",
         label: "delete.id.label" as const,
         description: "delete.id.description" as const,
         hidden: true,
@@ -301,6 +305,7 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
+  titleShort: "patch.titleShort" as const,
   description: "patch.container.description" as const,
   dynamicTitle: ({ request }) => {
     if (request?.name && typeof request.name === "string") {
@@ -312,8 +317,8 @@ const { PATCH } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "endpointCategories.skills",
-  subCategory: "endpointCategories.skillsManagement",
+  category: "ai",
+  subCategory: "skillsManagement",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_UPDATE_ALIAS],
@@ -399,6 +404,7 @@ const { PATCH } = createEndpoint({
                       ? getBestChatModel(
                           defaultVariant.modelSelection,
                           data.user,
+                          availability,
                         )
                       : null;
 
@@ -474,10 +480,11 @@ const { PATCH } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
         label: "patch.id.label" as const,
-        hidden: true,
         schema: z.string(),
+        listEndpoint: listDef0.GET,
+        labelField: "name",
       }),
 
       // === RESPONSE ===
@@ -487,6 +494,7 @@ const { PATCH } = createEndpoint({
       }),
 
       name: requestField(scopedTranslation, {
+        // Free user text, not a translation key — PATCH is partial, so optional.
         schema: z
           .string()
           .min(2, {
@@ -494,7 +502,8 @@ const { PATCH } = createEndpoint({
           })
           .max(100, {
             message: "patch.name.validation.maxLength" as const,
-          }) as z.ZodType<SkillsTranslationKey>,
+          })
+          .optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.name.label" as const,
@@ -507,6 +516,7 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       tagline: requestField(scopedTranslation, {
+        // Free user text, not a translation key — PATCH is partial, so optional.
         schema: z
           .string()
           .min(2, {
@@ -514,7 +524,8 @@ const { PATCH } = createEndpoint({
           })
           .max(500, {
             message: "patch.tagline.validation.maxLength" as const,
-          }) as z.ZodType<SkillsTranslationKey>,
+          })
+          .optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.tagline.label" as const,
@@ -527,7 +538,7 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       icon: requestField(scopedTranslation, {
-        schema: iconSchema,
+        schema: iconSchema.optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
         label: "patch.icon.label" as const,
@@ -539,6 +550,7 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       description: requestField(scopedTranslation, {
+        // Free user text, not a translation key — PATCH is partial, so optional.
         schema: z
           .string()
           .min(10, {
@@ -546,7 +558,8 @@ const { PATCH } = createEndpoint({
           })
           .max(500, {
             message: "patch.description.validation.maxLength" as const,
-          }) as z.ZodType<SkillsTranslationKey>,
+          })
+          .optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.description.label" as const,
@@ -559,7 +572,7 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       category: requestField(scopedTranslation, {
-        schema: z.enum(SkillCategory),
+        schema: z.enum(SkillCategory).optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "patch.category.label" as const,
@@ -572,7 +585,7 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       isPublic: requestField(scopedTranslation, {
-        schema: z.boolean(),
+        schema: z.boolean().optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.isPublic.label" as const,
@@ -585,7 +598,7 @@ const { PATCH } = createEndpoint({
       }),
 
       systemPrompt: requestField(scopedTranslation, {
-        schema: z.string().nullable(),
+        schema: z.string().nullable().optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "patch.systemPrompt.label" as const,
@@ -750,6 +763,7 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.PUBLIC] as const,
 
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   dynamicTitle: ({ response }) => {
     if (response?.name && typeof response.name === "string") {
@@ -761,8 +775,8 @@ const { GET } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "endpointCategories.skills",
-  subCategory: "endpointCategories.skillsManagement",
+  category: "ai",
+  subCategory: "skillsManagement",
   tags: ["tags.skills" as const],
 
   aliases: [SKILL_GET_ALIAS],
@@ -774,7 +788,9 @@ const { GET } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: listDef0.GET,
+        labelField: "name",
         label: "get.id.label" as const,
         hidden: true,
         schema: z.string(),

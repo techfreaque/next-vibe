@@ -30,6 +30,7 @@ import {
   videoVisionModelOptions,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import {
   type ImageGenModelOption,
@@ -233,6 +234,7 @@ export class SkillsRepositoryClient {
       return this.applyHardFilters(
         { ...modelSelection, selectionType: ModelSelectionType.FILTERS },
         user,
+        availability,
       );
     }
 
@@ -260,6 +262,7 @@ export class SkillsRepositoryClient {
       favoriteModelSelection,
       skillModelSelection,
       user,
+      availability,
     );
     return candidates.length > 0 ? candidates[0] : null;
   }
@@ -282,6 +285,7 @@ export class SkillsRepositoryClient {
     const candidates = this.getFilteredModelsForSkill(
       skillModelSelection,
       user,
+      availability,
     );
     return candidates.length > 0 ? candidates[0] : null;
   }

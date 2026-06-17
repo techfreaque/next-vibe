@@ -6,9 +6,9 @@
     "Authorization": "[redacted]"
   },
   "body": {
-    "instanceId": "atlas-rn2-25f35585",
+    "instanceId": "atlas",
     "localUrl": "http://localhost:3000",
-    "reverseToken": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFiN2IzMmNhLWFhZmEtNDU2Ni1hNmI3LTJiZGFiYjc3MjBiNSIsImxlYWRJZCI6IjgyZGZiNGU3LTY3M2UtNDMzNy04Y2NhLWU0NTc5YmNmNWI0OCIsImlzUHVibGljIjpmYWxzZSwicm9sZXMiOlsiZW51bXMudXNlclJvbGUuYWRtaW4iXSwiaWF0IjoxNzgxNjk4MjY4LCJleHAiOjQ5MzUyOTgyNjh9.VLBwQ-HnqUKmUYYuf-aHiZUC7TeOTa3pQs4fIDP6dV4",
-    "reverseLeadId": "82dfb4e7-673e-4337-8cca-e4579bcf5b48"
+    "reverseToken": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjdhZDQwYTQyLWUyNTctNGI1My1hYmNmLTI2ZWNkZmJlZWIzYyIsImxlYWRJZCI6IjhhY2IyN2JkLTRmZTctNDU5Yy05NTVjLWI0YTkzZTg4YTJkNyIsImlzUHVibGljIjpmYWxzZSwicm9sZXMiOlsiZW51bXMudXNlclJvbGUuYWRtaW4iXSwiaWF0IjoxNzgxNzIyMzg3LCJleHAiOjQ5MzUzMjIzODd9.lwpcmnngqpfvprb2YgVzSJV3AfE1zdibfgYNfYIbUmQ",
+    "reverseLeadId": "8acb27bd-4fe7-459c-955c-b4a93e88a2d7"
   }
 }

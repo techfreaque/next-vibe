@@ -612,6 +612,10 @@ function useMultiPaneRenderer(
   onLastValuesRef.current = onLastValues;
   const displayConfigsRef = useRef(displayConfigs);
   displayConfigsRef.current = displayConfigs;
+  const seriesRef = useRef(series);
+  seriesRef.current = series;
+  const signalsRef = useRef(signals);
+  signalsRef.current = signals;
 
   const panTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const enableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -941,8 +945,8 @@ function useMultiPaneRenderer(
 
       // Render any already-available data immediately (avoids race with data effect)
       renderSeriesData(
-        series,
-        signals,
+        seriesRef.current,
+        signalsRef.current,
         panesRef,
         LineSeriesCtorRef,
         displayConfigsRef,
@@ -986,8 +990,7 @@ function useMultiPaneRenderer(
         enableTimer.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- chartKey + paneKey are the intentional triggers
-  }, [chartKey, paneKey]);
+  }, [chartKey, paneKey, paneNumbers, paneContainerRef]);
 
   // ── Data rendering ──────────────────────────────────────────────────────
 
@@ -1870,8 +1873,7 @@ export function GraphChartView(): React.JSX.Element {
       // ignore malformed localStorage
     }
     setHiddenSeries(hidden);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only sync on graph ID change
-  }, [graph?.id]);
+  }, [graph]);
 
   // ── Versions endpoint: DB ancestor chain for prev/next version nav ─────────
   const versionsOptions = useMemo(
@@ -2022,7 +2024,6 @@ export function GraphChartView(): React.JSX.Element {
     }
     setAccSeries((prev) => mergeSeries(prev, responseData.series ?? []));
     setAccSignals((prev) => mergeSignals(prev, responseData.signals ?? []));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run when responseData reference changes
   }, [responseData]);
 
   const handleResolutionChange = useCallback(

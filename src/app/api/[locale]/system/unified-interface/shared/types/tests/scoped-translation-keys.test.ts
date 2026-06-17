@@ -21,6 +21,8 @@ import {
   scopedTranslation,
 } from "@/app/api/[locale]/contact/i18n";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { ExtractScopedKeyType } from "@/i18n/core/static-types";
 
 import { createEndpoint } from "../../endpoints/definition/create";
@@ -410,6 +412,14 @@ testR_fn(testF_scoped, {
 // END PROGRESSIVE TESTS - Run bun check to see where errors appear
 // ============================================================================
 
+const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+const genericScopedTranslation = {
+  ScopedTranslationKey: "" as string,
+  scopedT: (_locale: CountryLanguage): { t: (key: string) => TranslatedKeyType } => ({
+    t: (key: string): TranslatedKeyType => key as TranslatedKeyType,
+  }),
+};
+
 // ============================================================================
 // HELPER: All error types for test endpoints
 // ============================================================================
@@ -562,8 +572,9 @@ const globalEndpointWithAllErrorTypes = createEndpoint({
   method: Methods.POST,
   path: ["test", "global", "complete"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "app.ui.footer.company.title",
+  category: "account",
   icon: "check",
   tags: ["tags.contactForm"] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -614,16 +625,17 @@ const globalEndpointWithAllErrorTypes = createEndpoint({
 
 // Invalid title key - only errors when translationsKeyTypesafety = true
 const globalEndpointInvalidTitle = createEndpoint({
+  scopedTranslation: genericScopedTranslation,
   method: Methods.POST,
   path: ["test", "global", "invalid", "title"],
-  // @ts-expect-error - Invalid title key
   title: "this.key.does.not.exist.in.translations",
+  titleShort: "this.key.does.not.exist.in.translations",
   description: "app.common.active",
-  category: "app.ui.footer.company.title",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -644,8 +656,9 @@ const globalEndpointInvalidWidgetLabel = createEndpoint({
   method: Methods.POST,
   path: ["test", "global", "invalid", "widget"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "app.ui.footer.company.title",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -658,7 +671,6 @@ const globalEndpointInvalidWidgetLabel = createEndpoint({
       name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        // @ts-expect-error - Invalid widget label
         label: "invalid.widget.label.does.not.exist",
         columns: 12,
         schema: z.string(),
@@ -675,15 +687,17 @@ const globalEndpointInvalidWidgetLabel = createEndpoint({
 
 // Invalid error title - only errors when translationsKeyTypesafety = true
 const globalEndpointInvalidErrorTitle = createEndpoint({
+  scopedTranslation: genericScopedTranslation,
   method: Methods.POST,
   path: ["test", "global", "invalid", "error"],
   title: "app.common.active",
+  titleShort: "app.common.active",
   description: "app.common.cancel",
-  category: "app.ui.footer.company.title",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -694,9 +708,7 @@ const globalEndpointInvalidErrorTitle = createEndpoint({
   errorTypes: {
     ...allGlobalErrorTypes,
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      // @ts-expect-error - Invalid error title
       title: "invalid.error.title.key.does.not.exist" as const,
-      // @ts-expect-error - Invalid error description
       description: "app.common.validationFailed" as const,
     },
   },
@@ -721,8 +733,9 @@ const scopedEndpointCorrect = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "correct"],
   title: "title", // Scoped key (relative to app.api.contact)
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: ["tags.contactForm", "tags.contactUs"] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -787,12 +800,13 @@ const scopedEndpointInvalidTitle = createEndpoint({
   path: ["test", "scoped", "invalid", "title"],
   // @ts-expect-error - Invalid scoped title key (key doesn't exist in contact translations)
   title: "invalid.title.key.does.not.exist",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -813,12 +827,13 @@ const scopedEndpointGlobalKey = createEndpoint({
   path: ["test", "scoped", "invalid", "global"],
   // @ts-expect-error - Global key in scoped context (app.common.save is global, not scoped)
   title: "app.common.save",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -839,13 +854,14 @@ const scopedEndpointInvalidDescription = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "description"],
   title: "title",
+  titleShort: "title",
   // @ts-expect-error - Invalid description key
   description: "invalid.description.key",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -866,13 +882,14 @@ const scopedEndpointInvalidCategory = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "category"],
   title: "title",
+  titleShort: "title",
   description: "description",
   // @ts-expect-error - Invalid category key
   category: "invalid.category.key",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -893,13 +910,14 @@ const scopedEndpointInvalidTags = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "tags"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   // @ts-expect-error - Invalid tag key in array
   tags: ["invalid.tag.key"] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -920,12 +938,13 @@ const scopedEndpointInvalidErrorTitle = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "error", "title"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -984,12 +1003,13 @@ const scopedEndpointInvalidSuccessTitle = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "success", "title"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -1011,12 +1031,13 @@ const scopedEndpointInvalidSuccessDescription = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "success", "description"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -1045,18 +1066,19 @@ const scopedEndpointInvalidTextFieldLabel = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "text", "label"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      name: requestField({
+      name: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "invalid.field.label.key",
@@ -1078,18 +1100,19 @@ const scopedEndpointInvalidTextFieldLabelWithType = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "text", "label", "with-type"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      name: requestField({
+      name: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "invalid.field.label.key",
@@ -1114,8 +1137,9 @@ const scopedEndpointInvalidTextFieldPlaceholder = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "text", "placeholder"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -1151,8 +1175,9 @@ const scopedEndpointInvalidEmailFieldLabel = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "email", "label"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -1165,7 +1190,6 @@ const scopedEndpointInvalidEmailFieldLabel = createEndpoint({
       email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        // @ts-expect-error - Invalid email field label key
         label: "invalid.email.field.label.key",
         columns: 12,
         schema: z.string().email(),
@@ -1189,8 +1213,9 @@ const scopedEndpointInvalidTextareaFieldDescription = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "textarea", "description"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -1204,7 +1229,6 @@ const scopedEndpointInvalidTextareaFieldDescription = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "form.fields.message.label",
-        // @ts-expect-error - Invalid textarea field description key
         description: "invalid.textarea.field.description.key",
         columns: 12,
         schema: z.string(),
@@ -1228,8 +1252,9 @@ const scopedEndpointInvalidPasswordFieldHelpText = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "password", "helptext"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -1243,7 +1268,6 @@ const scopedEndpointInvalidPasswordFieldHelpText = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "form.fields.name.label",
-        // @ts-expect-error - Invalid password field helpText key
         helpText: "invalid.password.field.helptext.key",
         columns: 12,
         schema: z.string(),
@@ -1267,8 +1291,9 @@ const scopedEndpointInvalidSelectFieldOptionLabel = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "select", "option"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -1352,8 +1377,9 @@ const scopedEndpointInvalidNumberFieldLabel = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "number", "label"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -1366,7 +1392,6 @@ const scopedEndpointInvalidNumberFieldLabel = createEndpoint({
       amount: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        // @ts-expect-error - Invalid number field label key
         label: "invalid.number.field.label.key",
         columns: 12,
         schema: z.number(),
@@ -1388,8 +1413,9 @@ const scopedEndpointInvalidBooleanFieldLabel = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "boolean", "label"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -1402,7 +1428,6 @@ const scopedEndpointInvalidBooleanFieldLabel = createEndpoint({
       active: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        // @ts-expect-error - Invalid boolean field label key
         label: "invalid.boolean.field.label.key",
         columns: 12,
         schema: z.boolean(),
@@ -1425,19 +1450,20 @@ const scopedEndpointInvalidDateFieldLabel = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "date", "label"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
       // NOTE: requestField does NOT enforce key validation at the property level.
-      date: requestField({
+      date: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "invalid.date.field.label.key",
@@ -1462,8 +1488,9 @@ const scopedEndpointInvalidMultiselectFieldOptionLabel = createEndpoint({
   method: Methods.POST,
   path: ["test", "scoped", "invalid", "field", "multiselect", "option"],
   title: "title",
+  titleShort: "title",
   description: "description",
-  category: "endpointCategories.contact",
+  category: "account",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
@@ -1532,7 +1559,6 @@ const test6A_validField = requestField(scopedTranslation, {
 const test6A_invalidField = requestField(scopedTranslation, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
-  // @ts-expect-error - Invalid key
   label: "invalid.key",
   columns: 12,
   schema: z.string(),
@@ -1543,7 +1569,7 @@ const test6A_invalidField = requestField(scopedTranslation, {
 // When we try to assign a field to UnifiedField<ContactTranslationKey>,
 // TypeScript validates that the field's TKey matches ContactTranslationKey
 // ---------------------------------------------------------------------------
-const test6B_validField = requestField({
+const test6B_validField = requestField(genericST, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
   label: "form.fields.name.label", // Valid key
@@ -1553,7 +1579,7 @@ const test6B_validField = requestField({
 
 // NOTE: requestField does NOT enforce translation key validation at the property level.
 // The label "invalid.key" does not produce a compile error here - no @ts-expect-error needed.
-const test6B_invalidField = requestField({
+const test6B_invalidField = requestField(genericST, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
   label: "invalid.key", // requestField does not validate this key at property level
@@ -1566,14 +1592,14 @@ const test6B_invalidField = requestField({
 // objectField uses global TranslationKey - container title must be a global key.
 // "form.label" is a scoped contact key, NOT a global key - use a global key here.
 // ---------------------------------------------------------------------------
-const test6C_validObject = objectField({
+const test6C_validObject = objectField(genericST, {
   type: WidgetType.CONTAINER,
   title: "app.common.active", // Valid global key
   layoutType: LayoutType.GRID,
   columns: 12,
   usage: { request: "data", response: true },
   children: {
-    name: requestField({
+    name: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "app.common.filter", // Valid global key
@@ -1585,14 +1611,14 @@ const test6C_validObject = objectField({
 
 // NOTE: requestField does NOT enforce key validation at the property level inside objectField either.
 // Child label keys in requestField are not validated - no @ts-expect-error needed.
-const test6C_invalidObject = objectField({
+const test6C_invalidObject = objectField(genericST, {
   type: WidgetType.CONTAINER,
   title: "app.common.active", // Valid global key
   layoutType: LayoutType.GRID,
   columns: 12,
   usage: { request: "data", response: true },
   children: {
-    name: requestField({
+    name: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "bad.invalid.key.xyz", // requestField does not validate this at property level

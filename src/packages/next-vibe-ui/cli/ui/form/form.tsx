@@ -63,29 +63,23 @@ export function Form<TRequest extends FieldValues>({
   );
 }
 
-export function FormField<
+function FormFieldInContext<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
->({ render, name, control }: FormFieldProps<TFieldValues, TName>): JSX.Element {
-  // If control is provided, use real RHF Controller for value/onChange
-  if (control) {
-    return <Controller control={control} name={name} render={render} />;
+>({
+  render,
+  name,
+}: {
+  render: FormFieldProps<TFieldValues, TName>["render"];
+  name: TName;
+}): JSX.Element {
+  const formContext = useFormContext<TFieldValues>();
+  if (formContext?.control) {
+    return (
+      <Controller control={formContext.control} name={name} render={render} />
+    );
   }
-
-  // Fallback: try to get form context (for FormProvider usage)
-  try {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const formContext = useFormContext<TFieldValues>();
-    if (formContext) {
-      return (
-        <Controller control={formContext.control} name={name} render={render} />
-      );
-    }
-  } catch {
-    // No form context available
-  }
-
-  // Last resort: render with empty stubs (display-only, responseOnly mode)
+  // No form context — display-only stub
   return (
     <Box flexDirection="column">
       {render({
@@ -108,6 +102,16 @@ export function FormField<
       })}
     </Box>
   );
+}
+
+export function FormField<
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+>({ render, name, control }: FormFieldProps<TFieldValues, TName>): JSX.Element {
+  if (control) {
+    return <Controller control={control} name={name} render={render} />;
+  }
+  return <FormFieldInContext render={render} name={name} />;
 }
 
 export function FormItem({ children }: FormItemProps): JSX.Element {

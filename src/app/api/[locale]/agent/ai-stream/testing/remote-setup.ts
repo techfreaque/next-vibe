@@ -49,14 +49,8 @@ export const ATLAS_INSTANCE_ID = "atlas";
 /** Dev server URL (vibe dev proxy) */
 export const ATLAS_URL = "http://localhost:3000";
 
-/** Prod server URL (hermes, vibe start) */
-export const PROD_URL = "http://localhost:3001";
-
-/** Local-dev server URL (hermes, vibe --hermes dev) */
+/** Hermes-dev server URL (vibe --hermes dev) */
 export const LOCAL_DEV_URL = "http://localhost:3002";
-
-/** PID file for vibe start (hermes prod build) */
-export const VIBE_START_PID_FILE_PATH = ".tmp/.hermes.pid";
 
 /** PID file for vibe --hermes dev (hermes local dev) */
 export const HERMES_DEV_PID_FILE_PATH = ".tmp/.hermes-dev.pid";
@@ -262,8 +256,8 @@ export async function resolveProdUserId(): Promise<string> {
 }
 
 /**
- * Ensure the prod (hermes) admin user has at least `minCredits` permanent credits.
- * Used by direct-mode tests that send tool calls to hermes (3001) directly - hermes
+ * Ensure the hermes-dev admin user has at least `minCredits` permanent credits.
+ * Used by direct-mode tests that send tool calls to hermes-dev (3002) directly — hermes
  * checks credits in its own DB, so we must top up there, not in the local DB.
  *
  * Credits live in credit_packs (not just credit_wallets.balance), so we insert a
@@ -428,7 +422,7 @@ function isConnectTransientFailure(msg: string | undefined): boolean {
  * Establish atlas → hermes connection in-process via connectRemote.
  *
  * Calls RemoteConnectionConnectRepository.connectRemote directly (no HTTP overhead).
- * This logs into hermes (prod, port 3001) with email+password, stores the token
+ * This logs into hermes-dev (port 3002) with email+password, stores the token
  * locally in atlas's DB, and registers atlas on hermes (reverse row).
  * Capability sync happens automatically inside connectRemote.
  */
@@ -550,10 +544,12 @@ export async function connectToHermes(
   // transportMode is normally set asynchronously by the remote ping when the
   // reverse connection is registered on hermes. For tests we know hermes
   // (localhost:3002) is directly reachable, so set it explicitly here.
-  // Also lock in the relay settings for E2E tests: local client always provides
-  // system prompt + tools; remote runs the AI loop; threads mirrored on both
-  // sides; isDefault=true makes hermes the inference provider for ALL threads
-  // (REMOTE-folder threads route natively without any rules).
+  // Lock in relay settings: local client provides system prompt + tools;
+  // remote runs the AI loop; threads mirrored on both sides.
+  // REMOTE-folder threads route natively by folder ancestry — no DB setting needed.
+  //
+  // Use remoteUrl as the WHERE key because connectRemote creates the row with hermes's
+  // self-reported instanceId (e.g. "hermes-rn5-e9d42bf3"), not the constant "hermes".
   await db
     .update(remoteConnections)
     .set({
@@ -569,26 +565,23 @@ export async function connectToHermes(
         skills: true,
         threads: true,
       },
-      routingRules: {
-        folderIds: [],
-        handlesModelProviders: [],
-        isDefault: true,
-      },
       updatedAt: new Date(),
     })
     .where(
       and(
         eq(remoteConnections.userId, user.id),
-        eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
+        eq(remoteConnections.remoteUrl, remoteUrl),
+        eq(remoteConnections.isReverseEntry, false),
       ),
     );
 
-  // Close any persistent WS connection that was opened by connectRemote() before
-  // we changed transportMode to direct-http. For direct-http, no persistent WS
-  // should be maintained — relayStream() opens a per-stream dedicated WS instead.
-  const { closeConnection } =
+  // Close all persistent WS connections opened by connectRemote().
+  // For direct-http, no persistent WS should be maintained —
+  // relayStream() opens a per-stream dedicated WS instead.
+  // reloadWsProviderConnector() handles any instanceId variant (e.g. "hermes-rn5-*").
+  const { reloadWsProviderConnector } =
     await import("@/app/api/[locale]/remote-connection/connector");
-  closeConnection(HERMES_INSTANCE_ID);
+  reloadWsProviderConnector();
 
   // Hermes's reverse entry for atlas defaults to all sync domains enabled
   // (register sets REVERSE_ENTRY_SYNC_SCOPE) — no test-side patch needed.
@@ -599,7 +592,7 @@ export async function connectToHermes(
  *
  * Same as connectToHermes but configured for "AI stays on atlas, tools run on hermes":
  *   - transportMode='reverse-ws'  → execute-tool dispatches via reverse-WS connector
- *   - routingRules.isDefault=false → resolveTarget() returns null → AI loop on atlas
+ *   - AI loop stays on atlas; only REMOTE-folder threads route to hermes (by folder ancestry)
  *   - Opens hermes's reverse-WS connector (PATCHes its atlas row) so it's ready to
  *     pick up tool-execute-request events immediately when the AI calls execute-tool.
  *
@@ -611,21 +604,16 @@ export async function connectToHermesLocalAi(
 ): Promise<void> {
   // Idempotent: clean up any leftover connection before reconnecting.
   await disconnectFromHermes(user.id);
-  // Full connect flow (registers both sides, syncs capabilities, sets isDefault=true).
+  // Full connect flow (registers both sides, syncs capabilities).
   await connectToHermes(user, remoteUrl);
 
   // Override the connection settings set by connectToHermes:
-  //   isDefault=false → only REMOTE-folder threads route to hermes (native)
   //   transportMode=reverse-ws → traffic rides the reverse-WS connector
+  //   REMOTE-folder threads route to hermes by folder ancestry — deterministic, no DB setting
   await db
     .update(remoteConnections)
     .set({
       transportMode: "reverse-ws",
-      routingRules: {
-        folderIds: [],
-        handlesModelProviders: [],
-        isDefault: false,
-      },
       updatedAt: new Date(),
     })
     .where(
@@ -679,14 +667,11 @@ export async function disconnectFromHermesLocalAi(
  * Remove the atlas → hermes connection from atlas's local DB.
  */
 export async function disconnectFromHermes(userId: string): Promise<void> {
-  await db
-    .delete(remoteConnections)
-    .where(
-      and(
-        eq(remoteConnections.userId, userId),
-        eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-      ),
-    );
+  // Delete exact 'hermes' row plus any renamed variants (e.g. 'hermes-rn5-*')
+  // left behind by failed rename tests.
+  await db.execute(
+    sql`DELETE FROM remote_connections WHERE user_id = ${userId} AND instance_id LIKE ${"hermes%"}`,
+  );
 }
 
 /**
@@ -696,8 +681,24 @@ export async function unregisterDevFromHermes(
   prodUserId: string,
 ): Promise<void> {
   const pdb = getProdDb();
+  // Delete exact 'atlas' row plus any renamed variants (e.g. 'atlas-rn2-*')
+  // left behind by failed rename tests.
   await pdb.execute(
-    sql`DELETE FROM remote_connections WHERE user_id = ${prodUserId} AND instance_id = ${ATLAS_INSTANCE_ID}`,
+    sql`DELETE FROM remote_connections WHERE user_id = ${prodUserId} AND instance_id LIKE ${"atlas%"}`,
+  );
+}
+
+/**
+ * Restore hermes's own instanceIdentity to the canonical 'hermes' name.
+ * RN5 tests rename hermes's identity — if they fail mid-test the identity stays
+ * as the renamed value (e.g. 'hermes-rn5-*'). Call this before connecting so
+ * connectRemote gets the correct remoteInstanceId back from hermes.
+ */
+export async function restoreHermesIdentity(): Promise<void> {
+  const pdb = getProdDb();
+  await pdb.execute(
+    sql`UPDATE instance_identities SET instance_id = ${HERMES_INSTANCE_ID}, updated_at = NOW()
+        WHERE is_default = true AND instance_id != ${HERMES_INSTANCE_ID}`,
   );
 }
 
@@ -801,7 +802,7 @@ async function seedCapabilitiesForAllConnections(
 // ── Prod admin token ──────────────────────────────────────────────────────────
 
 /**
- * Login to hermes (prod, port 3001) as admin and return a valid admin JWT.
+ * Login to hermes-dev (port 3002) as admin and return a valid admin JWT.
  * Uses VIBE_ADMIN_USER_EMAIL + VIBE_ADMIN_USER_PASSWORD from env.
  * The stored remoteConnections token is a device token (Public role), not admin.
  */
@@ -838,7 +839,7 @@ export async function resolveProdAdminToken(
 // ── Hermes pull trigger ───────────────────────────────────────────────────────
 
 /**
- * Trigger hermes (prod, port 3001) to pull memory/capability updates from atlas.
+ * Trigger hermes-dev (port 3002) to pull memory/capability updates from atlas.
  * Used by cortex-sync tests to verify cross-instance memory synchronization.
  *
  * Calls the admin-only sync/trigger-pull endpoint which runs pullFromRemote in-process.
@@ -934,7 +935,7 @@ export async function assertProdDbEmpty(
 }
 
 /**
- * Assert that a thread exists in the hermes prod DB inside the given folder.
+ * Assert that a thread exists in the hermes-dev DB inside the given folder.
  * Used by remote-chat-root tests to verify bidirectional thread mirroring.
  */
 export async function assertProdDbHasThread(
@@ -948,7 +949,7 @@ export async function assertProdDbHasThread(
   const { expect: expectBun } = await import("bun:test");
   expectBun(
     rows.rows.length,
-    `[assertProdDbHasThread] Thread ${threadId} not found in hermes prod DB`,
+    `[assertProdDbHasThread] Thread ${threadId} not found in hermes-dev DB`,
   ).toBeGreaterThan(0);
   expectBun(
     rows.rows[0]?.folder_id,
@@ -957,7 +958,7 @@ export async function assertProdDbHasThread(
 }
 
 /**
- * Assert that a thread in the hermes prod DB has at least minCount messages.
+ * Assert that a thread in the hermes-dev DB has at least minCount messages.
  * Used by remote-chat-root tests to confirm the AI loop ran on hermes.
  */
 export async function assertProdDbHasMessages(
@@ -972,7 +973,7 @@ export async function assertProdDbHasMessages(
   const { expect: expectBun } = await import("bun:test");
   expectBun(
     count,
-    `[assertProdDbHasMessages] Thread ${threadId} expected at least ${String(minCount)} messages in hermes prod DB, got ${String(count)}`,
+    `[assertProdDbHasMessages] Thread ${threadId} expected at least ${String(minCount)} messages in hermes-dev DB, got ${String(count)}`,
   ).toBeGreaterThanOrEqual(minCount);
 }
 

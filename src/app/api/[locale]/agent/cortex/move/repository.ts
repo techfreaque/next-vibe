@@ -65,16 +65,6 @@ export class CortexMoveRepository {
       });
     }
 
-    // Filesystem backend for preview-mode admin
-    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
-    if (!user.isPublic && !isVirtualWritable(from) && !isVirtualWritable(to)) {
-      const { isFilesystemMode } = await import("../fs-provider");
-      if (isFilesystemMode(user)) {
-        const { fsMoveNode } = await import("../fs-provider/fs-move");
-        return fsMoveNode(from, to, { t });
-      }
-    }
-
     // Virtual writable mount - both paths must share the same mount
     const fromMount = getMountPrefix(from, locale);
     const toMount = getMountPrefix(to, locale);
@@ -180,22 +170,6 @@ export class CortexMoveRepository {
       const nodesAffected = result.rowCount ?? 0;
       logger.info(`Cortex move: ${from} → ${to} (${nodesAffected} nodes)`);
 
-      // Disk write-through: delete old path, content is preserved in DB at new path
-      try {
-        const { deleteFromDisk } = await import("../fs-provider/fs-sync");
-        await deleteFromDisk(from);
-        // For the new path, we'd need to read the content back - the DB already has it.
-        // The next fs-populate cycle or explicit read will sync it. For single file moves,
-        // read the node at the new path and sync.
-        const movedNode = await getNode(userId, to);
-        if (movedNode?.content !== null && movedNode?.content !== undefined) {
-          const { syncToDisk } = await import("../fs-provider/fs-sync");
-          await syncToDisk(to, movedNode.content);
-        }
-      } catch {
-        // Best-effort
-      }
-
       // Re-queue embedding for the moved node - path changed so embedding text changed
       try {
         const movedFile = await getNode(userId, to);
@@ -217,6 +191,27 @@ export class CortexMoveRepository {
       } catch {
         // Best-effort
       }
+
+      // WS-push sync: broadcast to connected remote instances
+      void (async (): Promise<void> => {
+        try {
+          const { serializeProviders } =
+            await import("@/app/api/[locale]/remote-connection/sync-provider");
+          const { broadcastSyncNotify } =
+            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+          const providerKey = from.startsWith("/memories")
+            ? "memories"
+            : "documents";
+          const syncPayloads = await serializeProviders(
+            [providerKey],
+            userId,
+            logger,
+          );
+          broadcastSyncNotify(userId, syncPayloads, logger);
+        } catch {
+          // Best-effort: cron fallback handles missed syncs
+        }
+      })();
 
       return success({ responseFrom: from, responseTo: to, nodesAffected });
     } catch (error) {

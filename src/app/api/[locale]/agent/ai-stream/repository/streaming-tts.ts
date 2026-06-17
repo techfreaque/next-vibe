@@ -10,7 +10,10 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
+import {
+  type AgentEnvAvailability,
+  buildMissingKeyMessage,
+} from "@/app/api/[locale]/agent/env-availability";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
@@ -72,6 +75,7 @@ export class StreamingTTSHandler {
   private readonly locale: CountryLanguage;
   private readonly voiceModelSelection: VoiceModelSelection;
   private readonly user: JwtPayloadType;
+  private readonly availability: AgentEnvAvailability;
   private isEnabled: boolean;
   private isCancelled = false;
   /**
@@ -94,12 +98,14 @@ export class StreamingTTSHandler {
     voiceModelSelection: VoiceModelSelection;
     user: JwtPayloadType;
     enabled: boolean;
+    availability: AgentEnvAvailability;
   }) {
     this.wsEmit = params.wsEmit;
     this.logger = params.logger;
     this.locale = params.locale;
     this.voiceModelSelection = params.voiceModelSelection;
     this.user = params.user;
+    this.availability = params.availability;
     this.isEnabled = params.enabled;
   }
 
@@ -341,9 +347,13 @@ export class StreamingTTSHandler {
     // Resolve model once and cache. Emit WS error only on first failed resolution.
     if (this.resolvedTtsModel === false) {
       // Resolution: MANUAL → cheapest available provider for that model → FILTERS fallback using selection constraints.
-      // All logic lives in getBestTtsModel → filterRoleModels → agentEnvAvailability imported directly.
+      // All logic lives in getBestTtsModel → filterRoleModels → availability resolved per user.
       this.resolvedTtsModel =
-        getBestTtsModel(this.voiceModelSelection, this.user) ?? null;
+        getBestTtsModel(
+          this.voiceModelSelection,
+          this.user,
+          this.availability,
+        ) ?? null;
 
       if (!this.resolvedTtsModel) {
         const message = buildMissingKeyMessage("openAiTts");
@@ -757,6 +767,7 @@ export function createStreamingTTSHandler(params: {
   voiceModelSelection: VoiceModelSelection;
   user: JwtPayloadType;
   enabled: boolean;
+  availability: AgentEnvAvailability;
 }): StreamingTTSHandler {
   return new StreamingTTSHandler(params);
 }

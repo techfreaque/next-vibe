@@ -14,9 +14,10 @@ import {
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   getImageGenModelById,
-  getImageGenModelUnderlyingProvider,
+  getImageGenModelForProvider,
   type ImageGenModelId,
   type ImageGenModelOption,
 } from "@/app/api/[locale]/agent/image-generation/models";

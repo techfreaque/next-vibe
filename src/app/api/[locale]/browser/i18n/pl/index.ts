@@ -2458,6 +2458,10 @@ export const translations: typeof enTranslations = {
         failedToInitialize:
           "Nie udaÅo siÄ zainicjowaÄ serwera Chrome DevTools MCP",
       },
+      closePage: {
+        noSession: "Brak aktywnej sesji — nic do zamknięcia",
+        switchedToPage: "Zamknięto stronę, przełączono na stronę {{pageId}}",
+      },
       tool: {
         call: {
           start: "WywoÅujÄ narzÄdzie MCP",

@@ -21,7 +21,7 @@
  *
  * Standalone assertions (ET-LOCAL, ET-REMOTE-TOOL, ET-RESULT, ET-WAKEUP):
  *   ET-LOCAL        — thread created in atlas DB (AI ran locally)
- *   ET-REMOTE-TOOL  — hermes prod DB has cron_tasks rows for execute-tool dispatches
+ *   ET-REMOTE-TOOL  — hermes-dev DB has cron_tasks rows for execute-tool dispatches
  *   ET-RESULT       — TOOL message in atlas DB has non-null result (roundtrip completed)
  *   ET-WAKEUP       — WAKE_UP detach: hermes cron_tasks row exists; atlas thread revives
  *
@@ -70,7 +70,7 @@ let _mainProdUserId: string | null = null;
  * Set up atlas → hermes connection with LOCAL AI loop (no isDefault routing).
  *
  * Key difference from setupDirectConnection:
- *   - routingRules.isDefault = false → resolveTarget() returns null → AI runs on atlas
+ *   - isDefault = false → resolveTarget() returns null → AI runs on atlas
  *   - Connection still exists so execute-tool(instanceId='hermes') can resolve it
  *   - transportMode='direct-http' so callToolDirect is used for tool dispatch
  */
@@ -83,17 +83,16 @@ async function setupExecuteToolRemoteConnection(
     ensureRemoteUserCredits,
     resolveProdAdminToken,
     resolveProdUserId,
-    triggerPull,
   } = await import("../../testing/remote-setup");
 
   // Idempotent: clean up any leftover connection from a previous failed run
   await disconnectFromHermes(testUser.id);
 
   // E2E: log into remote, register atlas, sync capabilities.
-  // connectToHermes sets routingRules.isDefault=true by default — we override below.
+  // connectToHermes sets isDefault=true by default — we override below.
   await connectToHermes(testUser, _remoteUrl ?? "http://localhost:3002");
 
-  // Override to LOCAL AI: set routingRules.isDefault=false so resolveTarget() returns
+  // Override to LOCAL AI: set isDefault=false so resolveTarget() returns
   // null and the AI loop stays on atlas. The connection row must still exist so that
   // execute-tool(instanceId='hermes') can find and use it for tool dispatch.
   // transportMode='direct-http' (default): tools are dispatched via callToolDirect.
@@ -102,11 +101,6 @@ async function setupExecuteToolRemoteConnection(
     .update(remoteConnections)
     .set({
       transportMode: "direct-http",
-      routingRules: {
-        folderIds: [],
-        handlesModelProviders: [],
-        isDefault: false,
-      },
       updatedAt: new Date(),
     })
     .where(
@@ -115,9 +109,6 @@ async function setupExecuteToolRemoteConnection(
         eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
       ),
     );
-
-  // Ensure capabilities are populated before tests run
-  await triggerPull();
 
   _mainProdUserId = await resolveProdUserId();
 
@@ -285,7 +276,7 @@ if (_remoteUrl && _isFixtureMode) {
       ).toBeTruthy();
     }, 30_000);
 
-    it("ET-REMOTE-TOOL: hermes prod DB has cron_tasks rows for the execute-tool dispatches", async () => {
+    it("ET-REMOTE-TOOL: hermes-dev DB has cron_tasks rows for the execute-tool dispatches", async () => {
       // When execute-tool is called with instanceId='hermes' and callbackMode='detach' or 'wait',
       // hermes may create cron_tasks rows. For 'wait' calls, hermes executes synchronously
       // (no cron row). Check for either: cron row OR the direct tool result in atlas DB
@@ -293,7 +284,7 @@ if (_remoteUrl && _isFixtureMode) {
       //
       // For async (detach/wakeUp) calls, hermes creates a cron_tasks row with
       // targetInstance=null (it's the local task on hermes). We assert it by checking
-      // the hermes prod DB for any cron_tasks that reference our threadId.
+      // the hermes-dev DB for any cron_tasks that reference our threadId.
       const { getProdDb } = await import("../../testing/remote-setup");
       const pdb = getProdDb();
 
@@ -383,7 +374,7 @@ if (_remoteUrl && _isFixtureMode) {
 
       expect(
         cronRows.rows.length,
-        "ET-WAKEUP: hermes prod DB must have at least one cron_tasks row for the wakeUp dispatch",
+        "ET-WAKEUP: hermes-dev DB must have at least one cron_tasks row for the wakeUp dispatch",
       ).toBeGreaterThan(0);
 
       // Check the thread in atlas eventually revives (either already idle or waiting)

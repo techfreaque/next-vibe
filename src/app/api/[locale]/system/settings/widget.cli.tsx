@@ -296,7 +296,7 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
         user,
         locale,
         logger,
-        platform: platform as Platform,
+        platform: platform,
         streamContext: makeHeadlessContext(),
       });
       setSaveMsg("Saved \u2713");
@@ -715,7 +715,7 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
         user,
         locale,
         logger,
-        platform: platform as Platform,
+        platform: platform,
         streamContext: makeHeadlessContext(),
       });
       setSaveMsg("Saved ✓");
@@ -1061,8 +1061,7 @@ export function SystemSettingsPatchWidget(): JSX.Element {
         setLoading(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user, locale, logger, platform, t]);
 
   // Keyboard: 'w' = wizard, 'e' = editor, 'q'/Escape = exit when idle
   useInput(

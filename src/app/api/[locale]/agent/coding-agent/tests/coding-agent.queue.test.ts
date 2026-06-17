@@ -41,7 +41,6 @@ async function setupCloudOnlyConnection(
     disconnectFromHermes,
     resolveProdUserId,
     resolveProdAdminToken,
-    triggerPull,
   } = await import("../../ai-stream/testing/remote-setup");
 
   // Idempotent: clean up any leftover connection from a previous failed run

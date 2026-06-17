@@ -182,6 +182,9 @@ export class DevRepository {
     }
     // 5. Wait for database to be ready
     await DevRepository.waitForDatabaseConnection(logger);
+
+    // 6. Reopen the shared pool/db client (closed in step 0 above)
+    reopenDatabase();
   }
 
   /**

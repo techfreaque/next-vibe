@@ -2,7 +2,7 @@
  * Catalog Product Ownership tests
  *
  * Tests the ownership and authorization logic in:
- * - products/catalog/[productId]/update/repository.ts
+ * - products/catalog/[productId]/update/route.ts
  *
  * Scenarios:
  * - Personal product (no companyId): any call without ownerUserId match fails NOT_FOUND
@@ -13,66 +13,33 @@
  * Uses real DB. Creates and cleans up test fixtures.
  */
 
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { eq } from "drizzle-orm";
-
+import { and, eq } from "drizzle-orm";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { defaultLocale } from "@/i18n/core/config";
-import { env } from "@/config/env";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { companies, companyMembers } from "../../companies/db";
 import { CompanyMemberRole } from "../../companies/enum";
+import updateEndpoints from "../catalog/[productId]/update/definition";
 import { catalogProducts } from "../db";
-import { CatalogUpdateRepository } from "../catalog/[productId]/update/repository";
 
 const TEST_TIMEOUT = 60_000;
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function makeLogger(): EndpointLogger {
-  return createEndpointLogger(false, Date.now(), defaultLocale);
-}
-
-async function resolveUserId(email: string): Promise<string | null> {
-  const logger = makeLogger();
-  const result = await UserRepository.getUserByEmail(
-    email,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  return result.data.id;
-}
 
 // ── Test suite ────────────────────────────────────────────────────────────────
 
 describe("Catalog Product Ownership Auth", () => {
-  let adminUserId: string;
+  let adminUser: JwtPrivatePayloadType;
   let testCompanyId: string;
   let personalProductId: string;
   let companyProductId: string;
 
-  const nonExistentUserId = "00000000-0000-0000-0000-000000000011";
-
   beforeAll(async () => {
-    const userId = await resolveUserId(env.VIBE_ADMIN_USER_EMAIL);
-    expect(
-      userId,
-      `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
-    ).toBeTruthy();
-    if (!userId) {
-      return;
-    }
-    adminUserId = userId;
+    adminUser = await resolveTestAdminUser();
+    const adminUserId = adminUser.id;
 
     // Create a test company
     const [company] = await db
@@ -85,7 +52,10 @@ describe("Catalog Product Ownership Auth", () => {
       })
       .returning({ id: companies.id });
 
-    expect(company, "Failed to create test company").toBeTruthy();
+    if (!company) {
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error("Failed to create test company");
+    }
     testCompanyId = company.id;
 
     // Add admin as ADMIN of the company (for company product tests)
@@ -113,7 +83,10 @@ describe("Catalog Product Ownership Auth", () => {
       })
       .returning({ id: catalogProducts.id });
 
-    expect(personalProduct, "Failed to create personal product").toBeTruthy();
+    if (!personalProduct) {
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error("Failed to create personal product");
+    }
     personalProductId = personalProduct.id;
 
     // Create a company product (has companyId)
@@ -129,7 +102,10 @@ describe("Catalog Product Ownership Auth", () => {
       })
       .returning({ id: catalogProducts.id });
 
-    expect(companyProduct, "Failed to create company product").toBeTruthy();
+    if (!companyProduct) {
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error("Failed to create company product");
+    }
     companyProductId = companyProduct.id;
   }, TEST_TIMEOUT);
 
@@ -155,13 +131,12 @@ describe("Catalog Product Ownership Auth", () => {
   it(
     "CP1: personal product owner can update it successfully",
     async () => {
-      const result = await CatalogUpdateRepository.updateProduct(
-        personalProductId,
-        adminUserId,
-        { fields: { name: "Updated Personal Product" } },
-        makeLogger(),
-        defaultLocale,
-      );
+      const result = await sendTestRequest({
+        endpoint: updateEndpoints.PATCH,
+        data: { fields: { name: "Updated Personal Product" } },
+        urlPathParams: { productId: personalProductId },
+        user: adminUser,
+      });
 
       expect(result.success, `Update failed: ${result.success ? "" : JSON.stringify(result)}`).toBe(true);
       if (result.success) {
@@ -175,13 +150,17 @@ describe("Catalog Product Ownership Auth", () => {
   it(
     "CP2: non-owner cannot update personal product (NOT_FOUND)",
     async () => {
-      const result = await CatalogUpdateRepository.updateProduct(
-        personalProductId,
-        nonExistentUserId,
-        { fields: { name: "Hacked" } },
-        makeLogger(),
-        defaultLocale,
-      );
+      // Same roles as admin but different id — passes endpoint auth, fails product ownership check
+      const nonOwnerUser: JwtPrivatePayloadType = {
+        ...adminUser,
+        id: "00000000-0000-0000-0000-000000000011",
+      };
+      const result = await sendTestRequest({
+        endpoint: updateEndpoints.PATCH,
+        data: { fields: { name: "Hacked" } },
+        urlPathParams: { productId: personalProductId },
+        user: nonOwnerUser,
+      });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -197,13 +176,12 @@ describe("Catalog Product Ownership Auth", () => {
   it(
     "CP3: empty fields object returns VALIDATION_ERROR",
     async () => {
-      const result = await CatalogUpdateRepository.updateProduct(
-        personalProductId,
-        adminUserId,
-        { fields: {} },
-        makeLogger(),
-        defaultLocale,
-      );
+      const result = await sendTestRequest({
+        endpoint: updateEndpoints.PATCH,
+        data: { fields: {} },
+        urlPathParams: { productId: personalProductId },
+        user: adminUser,
+      });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -221,13 +199,12 @@ describe("Catalog Product Ownership Auth", () => {
     "CP4: company product owner with ADMIN role can update it",
     async () => {
       // Admin has ADMIN role in the company (set in beforeAll)
-      const result = await CatalogUpdateRepository.updateProduct(
-        companyProductId,
-        adminUserId,
-        { fields: { name: "Updated Company Product" } },
-        makeLogger(),
-        defaultLocale,
-      );
+      const result = await sendTestRequest({
+        endpoint: updateEndpoints.PATCH,
+        data: { fields: { name: "Updated Company Product" } },
+        urlPathParams: { productId: companyProductId },
+        user: adminUser,
+      });
 
       expect(result.success, `Update failed: ${result.success ? "" : JSON.stringify(result)}`).toBe(true);
       if (result.success) {
@@ -240,8 +217,9 @@ describe("Catalog Product Ownership Auth", () => {
   it(
     "CP5: company product — downgraded to MEMBER role returns FORBIDDEN",
     async () => {
+      const adminUserId = adminUser.id;
+
       // Downgrade to MEMBER
-      const { and } = await import("drizzle-orm");
       await db
         .update(companyMembers)
         .set({ role: CompanyMemberRole.MEMBER })
@@ -252,13 +230,12 @@ describe("Catalog Product Ownership Auth", () => {
           ),
         );
 
-      const result = await CatalogUpdateRepository.updateProduct(
-        companyProductId,
-        adminUserId,
-        { fields: { name: "Should Fail" } },
-        makeLogger(),
-        defaultLocale,
-      );
+      const result = await sendTestRequest({
+        endpoint: updateEndpoints.PATCH,
+        data: { fields: { name: "Should Fail" } },
+        urlPathParams: { productId: companyProductId },
+        user: adminUser,
+      });
 
       expect(result.success).toBe(false);
       if (!result.success) {

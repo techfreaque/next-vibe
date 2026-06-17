@@ -1,0 +1,1 @@
+ALTER TABLE "remote_connections" DROP COLUMN "routing_rules";

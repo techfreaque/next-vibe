@@ -14,7 +14,6 @@ import { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { EventSchemas } from "../../../websocket/types";
 import type {
   ApiEndpoint,
   CreateApiEndpoint,
@@ -38,6 +37,8 @@ import type {
   Methods,
 } from "../../types/enums";
 import { FieldDataType, WidgetType } from "../../types/enums";
+
+const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
 
 // ============================================================================
 // LEVEL 1: Test basic type parameter assignability
@@ -70,7 +71,7 @@ const test1_4: Test1_4_TupleExtends = "PASS";
 // ============================================================================
 
 // Test 2.1: ApiEndpoint with literal type parameters
-const test2_1_field = objectField({
+const test2_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {},
@@ -80,8 +81,7 @@ type Test2_1_LiteralEndpoint = ApiEndpoint<
   Methods.POST,
   readonly ["enums.userRole.admin"],
   string,
-  typeof test2_1_field,
-  EventSchemas
+  typeof test2_1_field
 >;
 
 // Test 2.2: Can it be assigned to ApiEndpoint with generic parameters?
@@ -95,8 +95,7 @@ type Test2_2_Result =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -113,8 +112,7 @@ type Test2_3_WithVariance =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -125,11 +123,11 @@ const test2_3: Test2_3_WithVariance = "PASS"; // Passes with 'out' variance!
 // ============================================================================
 
 // Test 3.1: CreateApiEndpoint with literal type parameters
-const test3_1_field = objectField({
+const test3_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "urlPathParams", response: true },
   children: {
-    jobId: requestUrlPathParamsField({
+    jobId: requestUrlPathParamsField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.UUID,
       // oxlint-disable-next-line no-explicit-any -- Test file: plain string label for readability
@@ -144,7 +142,7 @@ type Test3_1_LiteralCreate = CreateApiEndpoint<
   readonly ["enums.userRole.admin"],
   string,
   typeof test3_1_field,
-  EventSchemas
+  never
 >;
 
 // Test 3.2: Can it be assigned to CreateApiEndpointAny?
@@ -172,7 +170,7 @@ type Test3_4_FullCheck =
     readonly ["enums.userRole.admin"],
     string,
     typeof test3_1_field,
-    EventSchemas
+    never
   > extends CreateApiEndpointAny
     ? "PASS"
     : "FAIL";
@@ -230,8 +228,7 @@ type Test3_7_ApiEndpointBase =
     Methods.POST,
     readonly ["enums.userRole.admin"],
     string,
-    TestObjectField,
-    EventSchemas
+    TestObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
@@ -241,8 +238,7 @@ type Test3_7_ApiEndpointBase =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -261,7 +257,7 @@ type Test3_8_Direct =
 const test3_8: Test3_8_Direct = "PASS"; // We WANT objectField to extend UnifiedField
 
 // Test 3.9: Test SimpleObjectField
-const simpleObjectFieldValue = objectField({
+const simpleObjectFieldValue = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {},
@@ -273,8 +269,7 @@ type Test3_10_SimpleObject =
     Methods.POST,
     readonly ["enums.userRole.admin"],
     string,
-    SimpleObjectField,
-    EventSchemas
+    SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
@@ -284,8 +279,7 @@ type Test3_10_SimpleObject =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -391,8 +385,7 @@ type Test3_14_ActualApiEndpoint =
     Methods,
     readonly UserRoleValue[],
     string,
-    SimpleObjectField,
-    EventSchemas
+    SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
@@ -402,8 +395,7 @@ type Test3_14_ActualApiEndpoint =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -526,8 +518,7 @@ type Test3_20_OnlyExampleKeySpecific =
     Methods, // generic
     readonly UserRoleValue[], // generic
     string, // generic
-    SimpleObjectField,
-    EventSchemas
+    SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
@@ -537,8 +528,7 @@ type Test3_20_OnlyExampleKeySpecific =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -550,8 +540,7 @@ type Test3_21_OnlyMethodSpecific =
     Methods.POST, // SPECIFIC
     readonly UserRoleValue[], // generic
     string, // generic
-    SimpleObjectField,
-    EventSchemas
+    SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
@@ -561,8 +550,7 @@ type Test3_21_OnlyMethodSpecific =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -574,8 +562,7 @@ type Test3_22_OnlyRolesSpecific =
     Methods, // generic
     readonly ["enums.userRole.admin"], // SPECIFIC tuple
     string, // generic
-    SimpleObjectField,
-    EventSchemas
+    SimpleObjectField
   > extends ApiEndpoint<
     Methods,
     readonly UserRoleValue[],
@@ -585,8 +572,7 @@ type Test3_22_OnlyRolesSpecific =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -830,7 +816,7 @@ type Test3_29_Specific = CreateApiEndpoint<
   readonly ["enums.userRole.admin"],
   "app.api.someScope.title",
   SimpleObjectField,
-  EventSchemas
+  never
 >;
 type Test3_29_Result = Test3_29_Specific extends CreateApiEndpointAny
   ? "PASS"
@@ -857,8 +843,7 @@ type Test3_31_SpecificApi = ApiEndpoint<
   Methods.POST,
   readonly ["enums.userRole.admin"],
   "app.api.someScope.title",
-  SimpleObjectField,
-  EventSchemas
+  SimpleObjectField
 >;
 type Test3_31_GenericApi = ApiEndpoint<
   Methods,
@@ -869,8 +854,7 @@ type Test3_31_GenericApi = ApiEndpoint<
     z.ZodTypeAny,
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
-  >,
-  EventSchemas
+  >
 >;
 type Test3_31_Result = Test3_31_SpecificApi extends Test3_31_GenericApi
   ? "PASS"
@@ -892,7 +876,7 @@ type Test4_1_GenericExample = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >,
-  EventSchemas
+  never
 >;
 type Test4_1_Result = Test4_1_GenericExample extends CreateApiEndpointAny
   ? "PASS"
@@ -910,7 +894,7 @@ type Test4_2_GenericMethod = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >,
-  EventSchemas
+  never
 >;
 type Test4_2_Result = Test4_2_GenericMethod extends CreateApiEndpointAny
   ? "PASS"
@@ -928,7 +912,7 @@ type Test4_3_GenericRoles = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >,
-  EventSchemas
+  never
 >;
 type Test4_3_Result = Test4_3_GenericRoles extends CreateApiEndpointAny
   ? "PASS"
@@ -946,7 +930,7 @@ type Test4_4_OnlyRoleIssue = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >,
-  EventSchemas
+  never
 >;
 type Test4_4_Result = Test4_4_OnlyRoleIssue extends CreateApiEndpointAny
   ? "PASS"
@@ -1003,8 +987,7 @@ type Test6_1_WithOutVariance = ApiEndpoint<
     z.ZodTypeAny,
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
-  >,
-  EventSchemas
+  >
 >;
 type Test6_1_Result =
   Test6_1_WithOutVariance extends ApiEndpoint<
@@ -1016,8 +999,7 @@ type Test6_1_Result =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "PASS"
     : "FAIL";
@@ -1038,7 +1020,7 @@ type Test7_1_CreateWithOut = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >,
-  EventSchemas
+  never
 >;
 type Test7_1_Result = Test7_1_CreateWithOut extends CreateApiEndpointAny
   ? "PASS"

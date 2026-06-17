@@ -223,7 +223,7 @@ function buildHeartbeatGroup(t: ScopedT): MessageGroup {
     tid,
     seq,
     "toolu_mem1",
-    "memories-search",
+    "cortex-search",
     { query: t("home.personal.demos.heartbeat.memoryQuery") },
     {
       results: [

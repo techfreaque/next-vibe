@@ -122,7 +122,12 @@ export const favoritesSyncProvider: SyncProvider = {
           typedCursor
             ? and(
                 eq(chatFavorites.userId, userId),
-                gt(chatFavorites.updatedAt, new Date(typedCursor.updatedAt)),
+                // Millisecond-precision compare so a current cursor short-
+                // circuits to empty (toISOString is ms, Postgres stores µs).
+                gt(
+                  sql`date_trunc('milliseconds', ${chatFavorites.updatedAt})`,
+                  new Date(typedCursor.updatedAt),
+                ),
               )
             : eq(chatFavorites.userId, userId),
         )

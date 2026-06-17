@@ -54,7 +54,6 @@ import {
   resolveDevUser,
   resolveProdUserId,
   resolveRemoteUrl,
-  triggerPull,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
 import {
@@ -198,7 +197,6 @@ if (_remoteUrl) {
       }
 
       await connectToHermes(testUser, _remoteUrl!);
-      await triggerPull();
       prodUserId = await resolveProdUserId();
     }, 120_000);
 

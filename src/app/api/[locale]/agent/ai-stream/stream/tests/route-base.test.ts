@@ -150,11 +150,11 @@ export interface ModeConfig {
    */
   pulse?: (threadId: string) => Promise<void>;
   /**
-   * Force all model resolution (chat + image/music/video gen) to a specific API provider.
-   * Used by UNBOTTLED self-relay: routes all inference through UNBOTTLED provider,
-   * preserving the same test flow and fixtures as direct mode.
+   * When true, image gen in T9 is routed through execute-tool instead of calling
+   * generate_image directly. Set this for UNBOTTLED/hermes mode where inference runs
+   * on a remote connection and all non-native tools go through execute-tool.
    */
-  providerOverride?: ApiProvider;
+  useExecuteToolWrapping?: boolean;
   /**
    * Override image gen model selection for all runStream calls in this mode.
    * When not set, uses the skill's own imageGenModelSelection (no override).
@@ -201,14 +201,6 @@ export interface ModeConfig {
    * Set after connection setup when the remote/hermes subfolder UUID is known.
    */
   subFolderIdOverride?: string;
-  /**
-   * Disable compacting for all streams in this mode.
-   * Sets compactTriggerOverride = Number.MAX_SAFE_INTEGER so the token threshold
-   * is never reached and no compacting LLM call is made.
-   * Use for fixture-based tests where compacting would consume fixture slots
-   * and cause test failures.
-   */
-  disableCompacting?: boolean;
 }
 
 // ── Remote-mode helpers ────────────────────────────────────────────────────────
@@ -873,8 +865,6 @@ async function pullRemoteMirror(remoteFolder: boolean): Promise<void> {
   if (!remoteFolder) {
     return;
   }
-  const { triggerPull } = await import("../../testing/remote-setup");
-  await triggerPull();
 }
 
 /**
@@ -1106,7 +1096,7 @@ const CHEAP_MODE = true;
 
 // 600s: remote (direct-http) tests make live API calls (image/video/music gen) that can take 5+ minutes.
 const TEST_TIMEOUT = 600_000;
-// Queue tests need extra time: WS connector + coding-agent AI inference on hermes 3001 (up to 60s each)
+// Queue tests need extra time: WS connector + coding-agent AI inference on hermes-dev 3002 (up to 60s each)
 const QUEUE_TEST_TIMEOUT = 600_000;
 
 export function describeStreamSuite(cfg: ModeConfig): void {
@@ -1427,16 +1417,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         ...params,
         rootFolderId: effectiveRootFolderId,
         subFolderId: effectiveSubFolderId,
-        providerOverride: params.providerOverride ?? cfg.providerOverride,
         mediaModelOverrides: {
           ...(cfg.imageGenModelOverride
             ? { imageGenModelSelection: cfg.imageGenModelOverride }
             : {}),
           ...params.mediaModelOverrides,
         },
-        compactTriggerOverride:
-          params.compactTriggerOverride ??
-          (cfg.disableCompacting ? Number.MAX_SAFE_INTEGER : undefined),
       });
 
       // Waiting-state handling — two flavors:
@@ -1459,13 +1445,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         if (cfg.rootFolderIdOverride === DefaultFolderId.REMOTE) {
           const MIRROR_WAIT_MS = 60_000;
           const mirrorStart = Date.now();
-          const { triggerPull: pullMirror } =
-            await import("../../testing/remote-setup");
-          // Always pull once: out-of-band owner writes (compacting re-parent +
-          // compacting message, detach/wakeUp backfill) reach this caller only
-          // by sync. direct-http has no live push channel, so drive a pull and
-          // converge the mirror to the owner's state before asserting.
-          await pullMirror();
           for (;;) {
             const snapshot = await getMessages(tid);
             // Two convergence conditions, both must clear:
@@ -1473,10 +1452,12 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             //  2. No dead-end compacting message — a compacting node with no
             //     child means the owner's re-parent of the following turn has
             //     not synced yet (the turn still points at the pre-compacting
-            //     leaf locally). Both resolve once the next pull applies the
+            //     leaf locally). Both resolve once sync applies the
             //     owner-authoritative state.
             const childIds = new Set(
-              snapshot.map((m) => m.parentId).filter((id): id is string => !!id),
+              snapshot
+                .map((m) => m.parentId)
+                .filter((id): id is string => !!id),
             );
             const pendingAsync = snapshot.filter(
               (m) =>
@@ -1499,9 +1480,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             ) {
               break;
             }
-            // Pull hermes→atlas: applies the owner-authoritative thread state
-            // (re-parent + backfill) when no live push channel delivered it.
-            await pullMirror();
             await new Promise<void>((resolve) => {
               setTimeout(resolve, 500);
             });
@@ -1663,9 +1641,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // content (wakeUp phases: the wrap-up). When the stream died
           // before answering (queue WAIT shape), the revival assistant
           // carries the answer instead.
-          const streamOwnAi = firstResult.result.success
+          const firstStreamResult = firstResult.result;
+          const streamOwnAi = firstStreamResult.success
             ? revivedMessages.find(
-                (m) => m.id === firstResult.result.data.lastAiMessageId,
+                (m) => m.id === firstStreamResult.data.lastAiMessageId,
               )
             : undefined;
           const streamAnswered = (streamOwnAi?.content ?? "").trim() !== "";
@@ -1829,7 +1808,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           name,
           async () => {
             if (suiteFailed) {
-              return;
+              throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
             }
             try {
               await fn();
@@ -2182,10 +2161,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                   like(cortexNodes.path, `${cheapNodePath}%`),
                 ),
               );
-            if (cfg.remoteInstanceId || cfg.rootFolderIdOverride === DefaultFolderId.REMOTE) {
+            if (
+              cfg.remoteInstanceId ||
+              cfg.rootFolderIdOverride === DefaultFolderId.REMOTE
+            ) {
               const { getProdDb } = await import("../../testing/remote-setup");
               await getProdDb().execute(
-                sql`DELETE FROM cortex_nodes WHERE path LIKE ${cheapNodePath + "%"}`,
+                sql`DELETE FROM cortex_nodes WHERE path LIKE ${`${cheapNodePath}%`}`,
               );
             }
           }
@@ -2274,7 +2256,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               // cortex-write normalizes the path to a file node (appends `.md`),
               // so match by prefix rather than the exact requested path.
               const remoteRows = await pdb.execute<{ content: string | null }>(
-                sql`SELECT content FROM cortex_nodes WHERE path LIKE ${cheapNodePath + "%"} ORDER BY updated_at DESC LIMIT 1`,
+                sql`SELECT content FROM cortex_nodes WHERE path LIKE ${`${cheapNodePath}%`} ORDER BY updated_at DESC LIMIT 1`,
               );
               const remoteNode = remoteRows.rows[0];
               expect(
@@ -2286,7 +2268,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 "T2 cheap: remote node content must be T2_CHEAP_OK",
               ).toBe("T2_CHEAP_OK");
               await pdb.execute(
-                sql`DELETE FROM cortex_nodes WHERE path LIKE ${cheapNodePath + "%"}`,
+                sql`DELETE FROM cortex_nodes WHERE path LIKE ${`${cheapNodePath}%`}`,
               );
             }
           } else {
@@ -2789,7 +2771,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         // Video gen: VEO_3_1 via modelslab + chat model tokens.
         // In remote mode the video gen credits are deducted on the remote instance, not locally.
         // Only the LLM stream tokens are charged locally, so min=0 in remote mode.
-        await assertDeducted(testUser, 
+        await assertDeducted(
+          testUser,
           beforeVideo,
           afterVideo,
           cfg.remoteInstanceId ? 0 : 5,
@@ -2818,10 +2801,11 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T5 detach-dispatch] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wait-for-task-test' and callbackMode='detach'")}. Check that the result has a taskId string and status field, and does NOT have an imageUrl. End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.`,
+            prompt: `[T5 detach-dispatch] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='wait-for-task-test' and callbackMode='detach'")}. Check that the immediate result has a taskId string and does NOT have an imageUrl (the task runs in the background). End your reply with STEP_OK and the exact taskId value like: STEP_OK taskId=<value>. Or FAILED: <reason> if anything was wrong.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
+            allowToolErrors: true,
           });
 
           expect(result.success).toBe(true);
@@ -3397,9 +3381,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 !m.isCompacting &&
                 (m.content ?? "").trim() !== "",
             );
-            const phaseText = phaseAssistants.map((m) => m.content ?? "").join(
-              "\n---\n",
-            );
+            const phaseText = phaseAssistants
+              .map((m) => m.content ?? "")
+              .join("\n---\n");
             expect(
               phaseText.includes("STEP_OK") || phaseText.includes("WAKEUP_OK"),
               `T6a: a phase assistant must confirm STEP_OK (dispatch) or WAKEUP_OK (revival) - got:\n\n${phaseText.slice(0, 600)}`,
@@ -3439,7 +3423,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               !revivalLanded &&
               Date.now() - revivalStart < REVIVAL_TIMEOUT_MS
             ) {
-              await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+              await pullRemoteMirror(
+                cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+              );
               const currentMsgs = await getMessages(threadId);
               const deferredExists = currentMsgs.some(
                 (m) =>
@@ -3530,7 +3516,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             let deferredTool: SlimMessage | undefined;
             let revivalAi: SlimMessage | undefined;
             while (Date.now() < deadline) {
-              await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+              await pullRemoteMirror(
+                cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+              );
               messages = await getMessages(threadId);
               deferredTool = messages.find(
                 (m) =>
@@ -3700,7 +3688,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             }
 
             // Re-fetch after goroutine settles, then verify chain integrity.
-            await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+            await pullRemoteMirror(
+              cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+            );
             messages = await getMessages(threadId);
             assertNoOrphans(
               messages,
@@ -3822,7 +3812,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           let deferredTool: SlimMessage | undefined;
           let revivalAi: SlimMessage | undefined;
           while (Date.now() < deadline) {
-            await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+            await pullRemoteMirror(
+              cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+            );
             messages = await getMessages(threadId);
             const t6cMsgs = newMessages(messages, t6cInitialIds);
             deferredTool = t6cMsgs.find(
@@ -3914,7 +3906,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // Walk to the actual leaf — model may have called generate_image multiple times,
           // creating multiple deferred + revival pairs in a linear chain.
-          await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+          await pullRemoteMirror(
+            cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+          );
           messages = await getMessages(threadId);
           const t6cMsgsSorted = [
             ...newMessages(messages, t6cInitialIds),
@@ -4025,7 +4019,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           let deferredTool: SlimMessage | undefined;
           let revivalAi: SlimMessage | undefined;
           while (Date.now() < deadline) {
-            await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+            await pullRemoteMirror(
+              cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+            );
             messages = await getMessages(threadId);
             const t6dMsgs = newMessages(messages, t6dInitialIds);
             deferredTool = t6dMsgs.find(
@@ -4115,7 +4111,9 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // Walk to the actual leaf — model may have called generate_image multiple times,
           // creating multiple deferred + revival pairs in a linear chain.
-          await pullRemoteMirror(cfg.rootFolderIdOverride === DefaultFolderId.REMOTE);
+          await pullRemoteMirror(
+            cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
+          );
           messages = await getMessages(threadId);
           const t6dMsgsSorted = [
             ...newMessages(messages, t6dInitialIds),
@@ -4168,7 +4166,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 {
                   // execute-tool wrapping: remoteInstanceId mode or unbottled/hermes mode
                   toolId:
-                    (cfg.remoteInstanceId ?? cfg.providerOverride)
+                    (cfg.remoteInstanceId ?? cfg.useExecuteToolWrapping)
                       ? "execute-tool"
                       : "generate_image",
                   requiresConfirmation: true,
@@ -4888,18 +4886,18 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T9 preCalls] An image was already generated for you before this message. Look at the ${(cfg.remoteInstanceId ?? cfg.providerOverride) ? "execute-tool" : "generate_image"} tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.`,
+            prompt: `[T9 preCalls] An image was already generated for you before this message. Look at the ${(cfg.remoteInstanceId ?? cfg.useExecuteToolWrapping) ? "execute-tool" : "generate_image"} tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
             preCalls: [
               {
                 routeId:
-                  (cfg.remoteInstanceId ?? cfg.providerOverride)
+                  (cfg.remoteInstanceId ?? cfg.useExecuteToolWrapping)
                     ? "execute-tool"
                     : "generate_image",
                 args:
-                  (cfg.remoteInstanceId ?? cfg.providerOverride)
+                  (cfg.remoteInstanceId ?? cfg.useExecuteToolWrapping)
                     ? {
                         toolName: "generate_image",
                         ...(cfg.remoteInstanceId
@@ -6488,17 +6486,16 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         creditCost?: number;
         source: string;
       }> = [];
-      let savedCredentials: string | undefined;
+      /** instanceId used in the local DB for the self-relay remote_connections row */
+      const SELF_RELAY_INSTANCE_ID = "self-relay-test";
       const testModelId = DEFAULT_CHAT_MODEL_ID;
 
       beforeAll(async () => {
         const { readFileSync, writeFileSync } = await import("node:fs");
-        savedCredentials = agentEnv.UNBOTTLED_CLOUD_CREDENTIALS;
 
         // ── Step 1: Run the price updater against local instance ──
-        // Temporarily clear credentials so getSession() uses local fallback
-        // (in-process WsProviderModelsRepository.listModels).
-        Object.assign(agentEnv, { UNBOTTLED_CLOUD_CREDENTIALS: "" });
+        // Price fetcher uses WsProviderModelsRepository.listModels in-process
+        // (no credentials needed — it queries the local DB directly).
         const { UnbottledPriceFetcher } =
           await import("@/app/api/[locale]/agent/models/model-prices/providers/unbottled");
         const priceFetcher = new UnbottledPriceFetcher();
@@ -6584,7 +6581,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           `Price updater did not return an add op for ${testModelId}`,
         ).toBe(true);
 
-        // ── Step 4: Set credentials pointing at ourselves (self-relay) ──
+        // ── Step 4: Create a remote_connections row pointing at ourselves (self-relay) ──
+        // RemoteTransport.resolveInferenceProvider() queries the DB for a row with
+        // isInferenceProvider=true. We insert one pointing at NEXT_PUBLIC_APP_URL
+        // (self) so UNBOTTLED dispatch routes back to the local instance.
         const { resolveLocalAdminSession } =
           await import("@/app/api/[locale]/agent/models/model-prices/providers/local-session-helper");
         const localSession = await resolveLocalAdminSession(
@@ -6594,8 +6594,28 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           localSession,
           "resolveLocalAdminSession failed - admin user missing?",
         ).toBeTruthy();
-        Object.assign(agentEnv, {
-          UNBOTTLED_CLOUD_CREDENTIALS: `${localSession!.leadId}:${localSession!.token}:${localSession!.remoteUrl}`,
+        // Clean up any leftover row from a previous failed run before inserting.
+        await db
+          .delete(remoteConnections)
+          .where(
+            and(
+              eq(remoteConnections.userId, testUser.id),
+              eq(remoteConnections.instanceId, SELF_RELAY_INSTANCE_ID),
+            ),
+          );
+        await db.insert(remoteConnections).values({
+          userId: testUser.id,
+          instanceId: SELF_RELAY_INSTANCE_ID,
+          remoteUrl: localSession!.remoteUrl,
+          token: localSession!.token,
+          leadId: localSession!.leadId,
+          isInferenceProvider: true,
+          isActive: true,
+          isReverseEntry: false,
+          transportMode: "direct-http",
+          threadMirrorMode: "cloud",
+          loopLocation: "server",
+          toolSource: "local",
         });
 
         // ── Step 5: Resolve test favorites via endpoint (reuse existing, create if absent) ──
@@ -6703,14 +6723,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           appliedOps = [];
         }
 
-        // Restore credentials on agentEnv
-        if (savedCredentials !== undefined) {
-          Object.assign(agentEnv, {
-            UNBOTTLED_CLOUD_CREDENTIALS: savedCredentials,
-          });
-        } else {
-          Object.assign(agentEnv, { UNBOTTLED_CLOUD_CREDENTIALS: "" });
-        }
+        // Remove the self-relay remote_connections row inserted in beforeAll
+        await db
+          .delete(remoteConnections)
+          .where(
+            and(
+              eq(remoteConnections.userId, testUser.id),
+              eq(remoteConnections.instanceId, SELF_RELAY_INSTANCE_ID),
+            ),
+          );
         // (strict mode was never enabled for UNBOTTLED tests)
       });
 

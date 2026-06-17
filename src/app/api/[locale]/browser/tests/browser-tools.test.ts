@@ -23,7 +23,6 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import closePageEndpoints from "@/app/api/[locale]/browser/close-page/definition";
 import emulateEndpoints from "@/app/api/[locale]/browser/emulate/definition";
 import evaluateScriptEndpoints from "@/app/api/[locale]/browser/evaluate-script/definition";
@@ -39,6 +38,7 @@ import selectPageEndpoints from "@/app/api/[locale]/browser/select-page/definiti
 import takeScreenshotEndpoints from "@/app/api/[locale]/browser/take-screenshot/definition";
 import takeSnapshotEndpoints from "@/app/api/[locale]/browser/take-snapshot/definition";
 import waitForEndpoints from "@/app/api/[locale]/browser/wait-for/definition";
+import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";
 import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
@@ -102,27 +102,17 @@ async function resolveUser(
   return { isPublic: false, id: user.id, leadId: link.leadId, roles };
 }
 
-/** Run a browser tool via RouteExecuteRepository with Platform.CLI (instanceId field active). */
+/** Run a browser tool via sendTestRequest with Platform.CLI (instanceId field active). */
 async function run<TDef extends CreateApiEndpointAny>(
   definition: TDef,
   input: TDef["types"]["RequestOutput"],
   user: JwtPrivatePayloadType,
-  platform: Platform = Platform.CLI,
 ): Promise<{
   success: boolean;
   data: TDef["types"]["ResponseOutput"];
   error?: string;
 }> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await RouteExecuteRepository.runInProcessTyped({
-    definition,
-    input,
-    user,
-    locale: defaultLocale,
-    logger,
-    streamContext: makeHeadlessContext(),
-    platform,
-  });
+  const result = await sendTestRequest({ endpoint: definition, data: input, user });
   if (!result.success) {
     return {
       success: false,
@@ -235,6 +225,7 @@ describe("Browser Tools", () => {
     if (!chromeAvailable) {
       return;
     }
+
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
     expect(
       resolved,
@@ -487,8 +478,8 @@ describe("Browser Tools", () => {
       }
 
       const [resA, resB] = await Promise.all([
-        run(takeScreenshotEndpoints.POST, { instanceId: SESSION_A }, testUser),
-        run(takeScreenshotEndpoints.POST, { instanceId: SESSION_B }, testUser),
+        run(takeScreenshotEndpoints.POST, { instanceId: SESSION_A, format: "png" as const }, testUser),
+        run(takeScreenshotEndpoints.POST, { instanceId: SESSION_B, format: "png" as const }, testUser),
       ]);
 
       expect(resA.success, `Session A screenshot: ${resA.error ?? ""}`).toBe(
@@ -556,12 +547,12 @@ describe("Browser Tools", () => {
       const [resA, resB] = await Promise.all([
         run(
           listNetworkRequestsEndpoints.POST,
-          { instanceId: SESSION_A },
+          { instanceId: SESSION_A, includePreservedRequests: false },
           testUser,
         ),
         run(
           listNetworkRequestsEndpoints.POST,
-          { instanceId: SESSION_B },
+          { instanceId: SESSION_B, includePreservedRequests: false },
           testUser,
         ),
       ]);
@@ -617,12 +608,12 @@ describe("Browser Tools", () => {
       const [resA, resB] = await Promise.all([
         run(
           listConsoleMessagesEndpoints.POST,
-          { instanceId: SESSION_A },
+          { instanceId: SESSION_A, includePreservedMessages: false },
           testUser,
         ),
         run(
           listConsoleMessagesEndpoints.POST,
-          { instanceId: SESSION_B },
+          { instanceId: SESSION_B, includePreservedMessages: false },
           testUser,
         ),
       ]);
@@ -661,12 +652,12 @@ describe("Browser Tools", () => {
       const [startA, startB] = await Promise.all([
         run(
           performanceStartTraceEndpoints.POST,
-          { instanceId: SESSION_A },
+          { instanceId: SESSION_A, reload: false, autoStop: false },
           testUser,
         ),
         run(
           performanceStartTraceEndpoints.POST,
-          { instanceId: SESSION_B },
+          { instanceId: SESSION_B, reload: false, autoStop: false },
           testUser,
         ),
       ]);
@@ -730,12 +721,12 @@ describe("Browser Tools", () => {
       const [resA, resB] = await Promise.all([
         run(
           waitForEndpoints.POST,
-          { text: "Example Domain", instanceId: SESSION_A },
+          { text: ["Example Domain"], instanceId: SESSION_A, captureSnapshot: false },
           testUser,
         ),
         run(
           waitForEndpoints.POST,
-          { text: "Example Domain", instanceId: SESSION_B },
+          { text: ["Example Domain"], instanceId: SESSION_B, captureSnapshot: false },
           testUser,
         ),
       ]);
@@ -764,12 +755,12 @@ describe("Browser Tools", () => {
       const [resA, resB] = await Promise.all([
         run(
           emulateEndpoints.POST,
-          { device: "iPhone 12", instanceId: SESSION_A },
+          { userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)", instanceId: SESSION_A },
           testUser,
         ),
         run(
           emulateEndpoints.POST,
-          { device: "iPad", instanceId: SESSION_B },
+          { userAgent: "Mozilla/5.0 (iPad; CPU OS 15_0 like Mac OS X)", instanceId: SESSION_B },
           testUser,
         ),
       ]);

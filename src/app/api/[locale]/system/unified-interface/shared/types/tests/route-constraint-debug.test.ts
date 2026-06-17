@@ -12,10 +12,11 @@ import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { EventSchemas } from "../../../websocket/types";
+import type { EndpointEventsMap } from "../../../websocket/structured-events";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
 import { objectField } from "../../field/utils";
 import type { UnifiedField } from "../../types/endpoint";
+const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
 import { WidgetType } from "../../types/enums";
 import type { RequestResponseWidgetConfig } from "../../widgets/configs";
 import type { CreateApiEndpointAny } from "../endpoint-base";
@@ -69,7 +70,7 @@ const test3_1: Test3_1_PrimitiveFieldVariance = "PASS";
 
 // Test 4.1: ObjectField with specific TKey extends UnifiedField<string, z.ZodTypeAny>
 // Tests that an objectField with specific literal TKey extends generic UnifiedField
-const test4_1_field = objectField({
+const test4_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {},
@@ -88,11 +89,11 @@ const test4_1: Test4_1_ObjectFieldVariance = "PASS";
 
 // Test 4.2: ObjectField with children extends UnifiedField<string, z.ZodTypeAny>
 // Tests that an objectField containing nested fields extends the generic UnifiedField constraint
-const test4_2_field = objectField({
+const test4_2_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    nested: objectField({
+    nested: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {},
@@ -149,7 +150,7 @@ type GenericEndpoint = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  EventSchemas
+  EndpointEventsMap<string>
 >;
 
 type Test6_1_GenericEndpointExtendsAny =
@@ -167,7 +168,7 @@ type SpecificEndpoint = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  EventSchemas
+  EndpointEventsMap<string>
 >;
 
 type Test6_2_SpecificEndpointExtendsAny =

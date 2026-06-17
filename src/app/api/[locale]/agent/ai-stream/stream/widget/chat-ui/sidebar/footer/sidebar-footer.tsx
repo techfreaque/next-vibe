@@ -231,7 +231,7 @@ export function SidebarFooter({
 
               {/* Admin Dashboard */}
               {isLoggedIn && user.roles?.includes(UserRole.ADMIN) && (
-                <Link href={`/${locale}/admin`}>
+                <Link href={`/${locale}/tools`}>
                   <Button
                     variant="ghost"
                     size="sm"

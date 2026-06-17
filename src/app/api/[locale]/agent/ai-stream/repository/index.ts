@@ -6,22 +6,31 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
-import type { NextRequest } from "next-vibe-ui/lib/request";
+import { asc, desc, eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
-  success,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
+import type { NextRequest } from "next-vibe-ui/lib/request";
+import { z } from "zod";
 
+import { db } from "@/app/api/[locale]/system/db";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
+import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ToolCall } from "../../chat/db";
 import { DefaultFolderId } from "../../chat/config";
+import { getDefaultToolIdsForUser } from "../../chat/constants";
+import type { ToolCall } from "../../chat/db";
+import { chatMessages, chatThreads } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { buildFavoriteConfig } from "../../chat/favorites/repository";
 import { parseSkillId } from "../../chat/slugify";
@@ -37,6 +46,7 @@ import { ApiProvider } from "../../models/models";
 import type { MusicGenModelSelection } from "../../music-generation/models";
 import { DEFAULT_TTS_VOICE_ID } from "../../text-to-speech/constants";
 import type { VideoGenModelSelection } from "../../video-generation/models";
+import { getChatModelById } from "../models";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
@@ -56,11 +66,13 @@ import {
 import { serializeError } from "./error-utils";
 import { CompactingHandler } from "./handlers/compacting-handler";
 import { GapFillExecutor } from "./handlers/gap-fill-executor";
+import { HeadlessRelayProcessor } from "./handlers/headless-relay-processor";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
 import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { StreamErrorCatchHandler } from "./handlers/stream-error-catch-handler";
 import { StreamExecutionHandler } from "./handlers/stream-execution-handler";
 import { StreamStartHandler } from "./handlers/stream-start-handler";
+import { UserMessageHandler } from "./handlers/user-message-handler";
 import type { HeadlessAiStreamResult } from "./headless";
 import { setupAiStream } from "./stream-setup";
 import { buildSystemPrompt } from "./system-prompt/builder";

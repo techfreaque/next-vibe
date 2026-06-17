@@ -2,7 +2,14 @@ import "server-only";
 
 /**
  * Favorites Virtual Mount
- * Renders user favorites (skill + model/tool loadouts) as markdown files at /favorites/<slug>.md
+ *
+ * Structure:
+ *   /favorites/                          → all user favorites
+ *   /favorites/<skillId>-<variantId>.md  → a saved skill+variant loadout
+ *
+ * Filename = slug (from DB), which follows <skillId>-<variantId> convention.
+ * Built-in skills: thea-brilliant, vibe-coder-max, etc.
+ * Custom skills: <slug>-<variantId> or just <slug> for single-variant.
  */
 import { and, count as drizzleCount, eq } from "drizzle-orm";
 
@@ -24,7 +31,8 @@ export async function readFavoritePath(
   if (segments.length < 2) {
     return null;
   }
-  const slugOrId = segments[1].replace(/\.md$/, "");
+
+  const fileKey = segments[1]!.replace(/\.md$/, "");
 
   const { chatFavorites } =
     await import("@/app/api/[locale]/agent/chat/favorites/db");
@@ -32,34 +40,64 @@ export async function readFavoritePath(
   const UUID_RE =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-  const idClause = UUID_RE.test(slugOrId)
-    ? or(eq(chatFavorites.slug, slugOrId), eq(chatFavorites.id, slugOrId))
-    : eq(chatFavorites.slug, slugOrId);
+  let fav: typeof chatFavorites.$inferSelect | undefined;
 
-  const rows = await db
-    .select()
-    .from(chatFavorites)
-    .where(and(eq(chatFavorites.userId, userId), idClause))
-    .limit(1);
+  if (UUID_RE.test(fileKey)) {
+    const rows = await db
+      .select()
+      .from(chatFavorites)
+      .where(
+        and(eq(chatFavorites.userId, userId), eq(chatFavorites.id, fileKey)),
+      )
+      .limit(1);
+    fav = rows[0];
+  } else {
+    // Match listFavoritePath's filename derivation: slug if present, else
+    // <skillId>-<variantId> (or just <skillId> for the default variant). Try
+    // slug first, then resolve the composite key by scanning the user's rows.
+    const slugRows = await db
+      .select()
+      .from(chatFavorites)
+      .where(
+        and(eq(chatFavorites.userId, userId), eq(chatFavorites.slug, fileKey)),
+      )
+      .limit(1);
+    fav = slugRows[0];
+    if (!fav) {
+      const all = await db
+        .select()
+        .from(chatFavorites)
+        .where(eq(chatFavorites.userId, userId));
+      fav = all.find((f) => {
+        if (f.slug) {
+          return f.slug === fileKey;
+        }
+        const composite =
+          f.variantId && f.variantId !== "default"
+            ? `${f.skillId}-${f.variantId}`
+            : f.skillId;
+        return composite === fileKey;
+      });
+    }
+  }
 
-  const fav = rows[0];
   if (!fav) {
     return null;
   }
 
-  const frontmatterLines = [
+  const slug = fav.slug || fav.id;
+  const fm = [
     "---",
     `favoriteId: "${fav.id}"`,
-    `slug: "${fav.slug}"`,
+    `file: "${slug}.md"`,
     `skillId: "${fav.skillId}"`,
   ];
 
+  if (fav.variantId) {
+    fm.push(`variantId: "${fav.variantId}"`);
+  }
   if (fav.customVariantName) {
-    frontmatterLines.push(
-      `variantName: "${fav.customVariantName.replace(/"/g, '\\"')}"`,
-    );
-  } else if (fav.variantId) {
-    frontmatterLines.push(`variantId: "${fav.variantId}"`);
+    fm.push(`variantName: "${fav.customVariantName.replace(/"/g, '\\"')}"`);
   }
 
   if (fav.modelSelection) {
@@ -67,10 +105,10 @@ export async function readFavoritePath(
       modelId?: string;
     };
     const modelId = "modelId" in sel && sel.modelId ? sel.modelId : "filters";
-    frontmatterLines.push(`model: "${modelId}"`);
+    fm.push(`model: "${modelId}"`);
   }
 
-  frontmatterLines.push(
+  fm.push(
     `position: ${fav.position}`,
     `created: "${fav.createdAt.toISOString()}"`,
     "---",
@@ -78,12 +116,14 @@ export async function readFavoritePath(
 
   const bodyLines: string[] = [];
 
+  if (fav.promptAppend) {
+    bodyLines.push("## Prompt append", "", fav.promptAppend, "");
+  }
+
   if (fav.color) {
     bodyLines.push(`color: ${fav.color}`);
   }
-  if (fav.promptAppend) {
-    bodyLines.push("", "## Prompt append", "", fav.promptAppend);
-  }
+
   if (
     fav.availableTools &&
     (fav.availableTools as ToolConfigItem[]).length > 0
@@ -91,19 +131,19 @@ export async function readFavoritePath(
     const toolNames = (fav.availableTools as ToolConfigItem[])
       .map((t) => t.toolId)
       .join(", ");
-    bodyLines.push("", `tools: ${toolNames}`);
+    bodyLines.push(`tools: ${toolNames}`);
   }
 
   return {
-    content:
-      `${frontmatterLines.join("\n")}\n\n${bodyLines.join("\n")}`.trimEnd(),
+    content: `${fm.join("\n")}\n\n${bodyLines.join("\n")}`.trimEnd(),
     nodeType: "file",
     updatedAt: fav.updatedAt.toISOString(),
   };
 }
 
 /**
- * List all favorites for a user
+ * List all favorites for a user.
+ * Filename is always the slug (<skillId>-<variantId> convention).
  */
 export async function listFavoritePath(
   userId: string,
@@ -120,6 +160,8 @@ export async function listFavoritePath(
     .select({
       id: chatFavorites.id,
       slug: chatFavorites.slug,
+      skillId: chatFavorites.skillId,
+      variantId: chatFavorites.variantId,
       updatedAt: chatFavorites.updatedAt,
     })
     .from(chatFavorites)
@@ -127,7 +169,14 @@ export async function listFavoritePath(
     .orderBy(chatFavorites.position, chatFavorites.slug);
 
   return rows.map((f) => {
-    const fileKey = f.slug || f.id;
+    // Use slug if available, else fall back to <skillId>-<variantId> or just skillId
+    let fileKey = f.slug || "";
+    if (!fileKey) {
+      fileKey =
+        f.variantId && f.variantId !== "default"
+          ? `${f.skillId}-${f.variantId}`
+          : f.skillId;
+    }
     return {
       name: `${fileKey}.md`,
       path: `/favorites/${fileKey}`,

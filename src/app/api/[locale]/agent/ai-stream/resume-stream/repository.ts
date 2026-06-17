@@ -53,6 +53,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { NO_SKILL_ID } from "../../chat/skills/constants";
 import { parseSkillId } from "../../chat/slugify";
+import { getInstanceAvailability } from "../../env-availability";
 import { walkToLeafMessage } from "../repository/core/branch-utils";
 import { publishWakeUpSignal } from "../repository/core/wake-up-channel";
 import { resolveFavorite, runHeadlessAiStream } from "../repository/headless";
@@ -323,6 +324,7 @@ export class ResumeStreamRepository {
               resolvedFavoriteConfig?.modelSelection ?? undefined,
               skillVariant?.modelSelection ?? undefined,
               user,
+              availability,
             );
             if (cascadeModel) {
               resolvedModel = cascadeModel;

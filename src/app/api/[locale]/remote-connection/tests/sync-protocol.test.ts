@@ -56,9 +56,10 @@ import {
   getProdDb,
   HERMES_INSTANCE_ID,
   resolveDevUser,
+  resolveProdAdminToken,
   resolveProdUserId,
   resolveRemoteUrl,
-  triggerPull,
+  triggerHermesPull,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
 
@@ -516,6 +517,7 @@ if (_remoteUrl) {
     const SP_TIMEOUT = 60_000;
     let testUser: JwtPrivatePayloadType;
     let prodUserId: string;
+    let prodAdminToken: string;
 
     beforeAll(async () => {
       const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
@@ -535,7 +537,7 @@ if (_remoteUrl) {
       }
 
       await connectToHermes(testUser, _remoteUrl!);
-      await triggerPull();
+      prodAdminToken = await resolveProdAdminToken(_remoteUrl!);
       prodUserId = await resolveProdUserId();
     }, 120_000);
 
@@ -553,7 +555,7 @@ if (_remoteUrl) {
     it(
       "SP1: after pull, lastSyncedAt is set and syncCursors is populated",
       async () => {
-        // triggerPull in beforeAll already fired — check DB for lastSyncedAt and syncCursors
+        // connectToHermes triggers pull-on-connect — check DB for lastSyncedAt and syncCursors
         const row = await pollUntil(
           "SP1: lastSyncedAt must be set after pull",
           async () => {
@@ -602,8 +604,8 @@ if (_remoteUrl) {
 
         const beforeTs = beforeRow?.lastSyncedAt?.getTime() ?? 0;
 
-        // Trigger a second pull (nothing changed since SP1)
-        await triggerPull();
+        // Trigger a second reconnect (nothing changed since SP1)
+        await triggerHermesPull(prodAdminToken, _remoteUrl!);
 
         // lastSyncedAt must advance (pull was attempted)
         const updatedRow = await pollUntil(
@@ -659,8 +661,8 @@ if (_remoteUrl) {
           "SP3: capabilitiesVersion must be set after initial pull",
         ).toBeTruthy();
 
-        // Second pull: same capabilities version — server should NOT resend capabilities
-        await triggerPull();
+        // Second reconnect: same capabilities version — server should NOT resend capabilities
+        await triggerHermesPull(prodAdminToken, _remoteUrl!);
 
         await sleep(2000); // let pull complete
 
@@ -702,8 +704,8 @@ if (_remoteUrl) {
             ),
           );
 
-        // Trigger pull — server will see version mismatch, include capabilities in response
-        await triggerPull();
+        // Trigger reconnect — server will see version mismatch, include capabilities in response
+        await triggerHermesPull(prodAdminToken, _remoteUrl!);
 
         // Poll for capabilitiesVersion to be re-written
         const row = await pollUntil(
@@ -770,8 +772,8 @@ if (_remoteUrl) {
               VALUES (gen_random_uuid(), ${prodUserId}, 'SP5 Scope Skill', ${spSkillSlug}, 'SP5 test', 'sp5', 'test', 'enums.category.assistant', 'enums.ownershipType.user', 'community', NOW(), NOW())`,
         );
 
-        // Trigger pull from atlas
-        await triggerPull();
+        // Trigger reconnect — hermes reconnects and pulls from atlas, syncScope.skills=false
+        await triggerHermesPull(prodAdminToken, _remoteUrl!);
 
         // Wait 4s to let any sync process complete
         await sleep(4000);

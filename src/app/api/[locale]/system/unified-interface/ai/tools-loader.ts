@@ -22,16 +22,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { CallbackMode, EXECUTE_TOOL_ALIAS } from "../execute-tool/constants";
 import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
-import { CallbackMode, EXECUTE_TOOL_ALIAS } from "./execute-tool/constants";
 
 /**
  * CoreTool type from AI SDK
@@ -273,10 +273,22 @@ function createToolFromEndpoint(
             toolName === EXECUTE_TOOL_ALIAS
               ? restParams.callbackMode
               : callbackMode;
+          // For execute-tool: only eagerly set waitingForRemoteResult when there IS a remote
+          // instanceId (remote WAIT creates a task that blocks the stream). For local inline
+          // execution (no instanceId), execute-tool runs generate_image etc. synchronously and
+          // the result is returned inline — setting waitingForRemoteResult=true here would cause
+          // processToolResult to skip writing the result to DB (it checks the flag before execute()
+          // returns and resets it), leaving the thread with a tool-call but no tool-result →
+          // AI_MissingToolResultsError on the next step.
+          const isRemoteExecuteToolWait =
+            toolName === EXECUTE_TOOL_ALIAS &&
+            restParams.instanceId !== undefined &&
+            restParams.instanceId !== null;
           const didEagerlySetWaiting =
             (earlyCallbackMode === CallbackMode.WAIT ||
               earlyCallbackMode === CallbackMode.END_LOOP) &&
-            !!context.streamContext;
+            !!context.streamContext &&
+            (toolName !== EXECUTE_TOOL_ALIAS || isRemoteExecuteToolWait);
           if (didEagerlySetWaiting) {
             context.streamContext.waitingForRemoteResult = true;
           }
@@ -319,7 +331,7 @@ function createToolFromEndpoint(
           }
 
           const { RouteExecuteRepository } =
-            await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/repository");
+            await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
           const { scopedTranslation: executeScopedT } =
             await import("@/app/api/[locale]/system/unified-interface/ai/i18n");
           const { t: execT } = executeScopedT.scopedT(context.locale);
@@ -377,6 +389,17 @@ function createToolFromEndpoint(
           // perCallStreamContext started with waitingForRemoteResult=false; execute() sets it
           // to true only when a real remote WAIT/END_LOOP task was created.
           // If execute() did NOT create a WAIT task, reset the eager flag we set above.
+          // Propagate the confirmation gate back to the shared streamContext.
+          // execute-tool's gate sets the flag on the per-call snapshot; stopWhen
+          // and finish-step read the shared context - without this the stream
+          // would start the AI-response turn despite the pending confirmation.
+          if (
+            perCallStreamContext?.stepHasToolsAwaitingConfirmation &&
+            context.streamContext
+          ) {
+            context.streamContext.stepHasToolsAwaitingConfirmation = true;
+          }
+
           if (perCallStreamContext?.waitingForRemoteResult) {
             // Confirm: a real WAIT task was created - keep the shared flag true
             if (context.streamContext) {
@@ -388,10 +411,18 @@ function createToolFromEndpoint(
           }
 
           if (!result.success) {
-            const errorMsg = result.message ?? "Tool execution failed";
-            // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
-            // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
-            throw new Error(errorMsg);
+            // Return { success: false, message } so tool-result-handler's isErrorResponse
+            // check fires (looks for output.success === false + output.message: string).
+            // The handler extracts message, creates toolCall.error, sets status="failed".
+            // Returning { error: string } loses the structured shape and the tool renders
+            // as success in the UI.
+            const errMsg: string = result.messageParams?.error
+              ? typeof result.messageParams.error === "string" &&
+                !result.message.includes(result.messageParams.error)
+                ? `${String(result.message)}: ${result.messageParams.error}`
+                : String(result.message)
+              : String(result.message);
+            return { success: false as const, message: errMsg };
           }
 
           return result.data as WidgetData;
@@ -481,7 +512,7 @@ const allCallbackModes = ["detach", "wakeUp", "endLoop", "approve"];
  * Combines RequestData and RequestUrlParams for AI tools
  * @param userRoles - Caller roles for field-level visibility enforcement
  */
-function generateInputSchema(
+export function generateInputSchema(
   endpoint: CreateApiEndpointAny,
   userRoles?: ReturnType<typeof filterUserPermissionRoles>,
 ): z.ZodObject<Record<string, z.ZodTypeAny>> {
@@ -564,7 +595,7 @@ function createRemoteTool(params: {
       const executeRemoteInline = async (): Promise<WidgetData> => {
         // Delegate to execute-tool which routes to the remote
         const { RouteExecuteRepository } =
-          await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/repository");
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
         const { scopedTranslation: executeScopedT } =
           await import("@/app/api/[locale]/system/unified-interface/ai/i18n");
         const { t } = executeScopedT.scopedT(locale);
@@ -573,7 +604,7 @@ function createRemoteTool(params: {
         const { callbackMode: inputCallbackMode, ...restInput } = (input ??
           {}) as Record<string, WidgetData>;
         const { CallbackMode: CM } =
-          await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
+          await import("@/app/api/[locale]/system/unified-interface/execute-tool/constants");
         const callbackMode =
           typeof inputCallbackMode === "string" &&
           Object.values(CM).includes(inputCallbackMode as never)
@@ -780,7 +811,7 @@ export async function loadTools(params: {
       }
 
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/user/remote-connection/repository");
+        await import("@/app/api/[locale]/remote-connection/repository");
 
       for (const [instanceId, names] of byInstance) {
         const capabilities = await RemoteConnectionRepository.getCapabilities(

@@ -49,7 +49,14 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { getCurrentUrl } from "next-vibe-ui/utils/browser";
-import { type JSX, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  type JSX,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import cortexListDefinitions from "@/app/api/[locale]/agent/cortex/list/definition";
 import connectionsListDefinitions from "@/app/api/[locale]/ssh/connections/list/definition";
@@ -228,17 +235,17 @@ function FileBrowser({
   const user = useWidgetUser();
   const t = useWidgetTranslation<typeof endpoints.POST>();
 
+  const initialMachinePathRef = useRef(machinePath);
   const listEndpoint = useEndpoint(
     cortexListDefinitions,
     useMemo(
       () => ({
         read: {
-          initialState: { path: machinePath },
+          initialState: { path: initialMachinePathRef.current },
           formOptions: { autoSubmit: true, debounceMs: 0 },
           queryOptions: { staleTime: 0, refetchOnWindowFocus: false },
         },
       }),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       [],
     ),
     logger,
@@ -370,13 +377,17 @@ export function CortexExecWidget(_props: {
   const command = form.watch("command") ?? "";
 
   // Read ?path= from URL on first render and apply to form
+  const didInitPathRef = useRef(false);
   useEffect(() => {
+    if (didInitPathRef.current) {
+      return;
+    }
+    didInitPathRef.current = true;
     const urlPath = searchParams.get("path");
     if (urlPath && !form.getValues("path")) {
       form.setValue("path", urlPath, { shouldDirty: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams, form]);
 
   // Sync path to URL search param on every change
   useEffect(() => {

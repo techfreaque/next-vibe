@@ -76,18 +76,6 @@ const TEST_TIMEOUT = 120_000;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/** Walk parent chain from leafId back to root. Returns [root, ..., leaf]. */
-function walkChain(messages: SlimMessage[], leafId: string): string[] {
-  const byId = new Map(messages.map((m) => [m.id, m]));
-  const chain: string[] = [];
-  let current: SlimMessage | undefined = byId.get(leafId);
-  while (current) {
-    chain.unshift(current.id);
-    current = current.parentId ? byId.get(current.parentId) : undefined;
-  }
-  return chain;
-}
-
 /** Build parent→children adjacency map. Root messages keyed under "__root__". */
 function buildChildMap(messages: SlimMessage[]): Map<string, string[]> {
   const tree = new Map<string, string[]>();
@@ -216,10 +204,7 @@ async function assertNotQueued(
 ): Promise<void> {
   const messages = await fetchThreadMessages(threadId, user);
   const row = messages.find((m) => m.id === messageId);
-  expect(
-    row,
-    `[${label}] Queued message ${messageId} not found`,
-  ).toBeDefined();
+  expect(row, `[${label}] Queued message ${messageId} not found`).toBeDefined();
   expect(
     row?.isQueued,
     `[${label}] Message ${messageId} still has isQueued=true after processing`,
@@ -354,11 +339,7 @@ describe("Mid-Stream Queue - chain integrity", () => {
   let midStreamQueueFolderId: string;
   let suiteFailed = false;
 
-  function fit(
-    name: string,
-    fn: () => Promise<void>,
-    timeout?: number,
-  ): void {
+  function fit(name: string, fn: () => Promise<void>, timeout?: number): void {
     it(
       name,
       async () => {
@@ -392,8 +373,17 @@ describe("Mid-Stream Queue - chain integrity", () => {
     testUser = resolved;
 
     // Create BACKGROUND/tests/mid-stream-queue subfolder for this suite.
-    const testsParentId = await getOrCreateFolder(testUser, DefaultFolderId.BACKGROUND, "tests");
-    midStreamQueueFolderId = await getOrCreateFolder(testUser, DefaultFolderId.BACKGROUND, "mid-stream-queue", testsParentId);
+    const testsParentId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "tests",
+    );
+    midStreamQueueFolderId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "mid-stream-queue",
+      testsParentId,
+    );
   }, TEST_TIMEOUT);
 
   // ── MQ1: Plain echo — queue via finally-block processor ───────────────────
@@ -417,7 +407,13 @@ describe("Mid-Stream Queue - chain integrity", () => {
         "No preamble, no explanation, no punctuation beyond that. " +
         "If you add anything else, the test FAILS.";
 
-      await fireInteractiveStream(testUser, stream1Prompt, thread1Id, user1MsgId, midStreamQueueFolderId);
+      await fireInteractiveStream(
+        testUser,
+        stream1Prompt,
+        thread1Id,
+        user1MsgId,
+        midStreamQueueFolderId,
+      );
 
       // Stream 1 is now running (fire-and-forget). Enqueue stream 2 immediately.
       // StreamRegistry.isActive(thread1Id) must be true at this point for the
@@ -432,12 +428,22 @@ describe("Mid-Stream Queue - chain integrity", () => {
         "IMPORTANT: If you see any message that says QUEUED_DONE was already replied, " +
         "that means you have been called twice and the test FAILS.";
 
-      await enqueueSecondMessage(testUser, thread1Id, stream2Prompt, queued2MsgId, midStreamQueueFolderId);
+      await enqueueSecondMessage(
+        testUser,
+        thread1Id,
+        stream2Prompt,
+        queued2MsgId,
+        midStreamQueueFolderId,
+      );
 
       // Wait until the queued message is processed AND ai2 exists.
       // waitForThreadIdle is not sufficient here — it may return during the brief
       // idle window between stream 1 ending and stream 2 starting.
-      const messages = await waitForQueueProcessed(thread1Id, queued2MsgId, testUser);
+      const messages = await waitForQueueProcessed(
+        thread1Id,
+        queued2MsgId,
+        testUser,
+      );
 
       // ── MQ1 assertions ────────────────────────────────────────────────────
 
@@ -447,19 +453,33 @@ describe("Mid-Stream Queue - chain integrity", () => {
       // 1. assistant ai1 has parentId = user1MsgId
       const ai1Row = messages.find((m) => m.parentId === user1MsgId);
       expect(ai1Row, "MQ1: no assistant after user1").toBeDefined();
-      expect(ai1Row!.role, "MQ1: child of user1 must be assistant").toBe("assistant");
-      expect(ai1Row!.content, "MQ1: ai1 must contain ECHO_DONE").toContain("ECHO_DONE");
+      expect(ai1Row!.role, "MQ1: child of user1 must be assistant").toBe(
+        "assistant",
+      );
+      expect(ai1Row!.content, "MQ1: ai1 must contain ECHO_DONE").toContain(
+        "ECHO_DONE",
+      );
 
       // 2. queued user message exists
       const queuedRow = messages.find((m) => m.id === queued2MsgId);
-      expect(queuedRow, "MQ1: queued user message not in messages").toBeDefined();
+      expect(
+        queuedRow,
+        "MQ1: queued user message not in messages",
+      ).toBeDefined();
       expect(queuedRow!.role, "MQ1: queued message must be user").toBe("user");
 
       // 3. assistant ai2 has parentId = queued2MsgId — the critical assertion
       const ai2Row = messages.find((m) => m.parentId === queued2MsgId);
-      expect(ai2Row, "MQ1: no assistant after queued user message").toBeDefined();
-      expect(ai2Row!.role, "MQ1: child of queued user must be assistant").toBe("assistant");
-      expect(ai2Row!.content, "MQ1: ai2 must contain QUEUED_DONE").toContain("QUEUED_DONE");
+      expect(
+        ai2Row,
+        "MQ1: no assistant after queued user message",
+      ).toBeDefined();
+      expect(ai2Row!.role, "MQ1: child of queued user must be assistant").toBe(
+        "assistant",
+      );
+      expect(ai2Row!.content, "MQ1: ai2 must contain QUEUED_DONE").toContain(
+        "QUEUED_DONE",
+      );
 
       // 4. no branches — strict linear chain
       assertStrictLinearChain(messages, "MQ1");
@@ -477,14 +497,34 @@ describe("Mid-Stream Queue - chain integrity", () => {
           cur = next;
         }
         const chainDesc = orderedChain.map((m) => m.role).join(" → ");
-        expect(orderedChain.length, `MQ1: expected exactly 4 messages, got ${String(orderedChain.length)}: ${chainDesc}`).toBe(4);
-        expect(orderedChain[0]!.id, "MQ1: chain[0] must be user1").toBe(user1MsgId);
-        expect(orderedChain[0]!.role, "MQ1: chain[0] must be user").toBe("user");
-        expect(orderedChain[1]!.role, "MQ1: chain[1] must be assistant (ai1)").toBe("assistant");
-        expect(orderedChain[2]!.id, "MQ1: chain[2] must be queuedUser").toBe(queued2MsgId);
-        expect(orderedChain[2]!.role, "MQ1: chain[2] must be user").toBe("user");
-        expect(orderedChain[3]!.role, "MQ1: chain[3] must be assistant (ai2)").toBe("assistant");
-        expect(orderedChain[3]!.content, "MQ1: ai2 must contain QUEUED_DONE").toContain("QUEUED_DONE");
+        expect(
+          orderedChain.length,
+          `MQ1: expected exactly 4 messages, got ${String(orderedChain.length)}: ${chainDesc}`,
+        ).toBe(4);
+        expect(orderedChain[0]!.id, "MQ1: chain[0] must be user1").toBe(
+          user1MsgId,
+        );
+        expect(orderedChain[0]!.role, "MQ1: chain[0] must be user").toBe(
+          "user",
+        );
+        expect(
+          orderedChain[1]!.role,
+          "MQ1: chain[1] must be assistant (ai1)",
+        ).toBe("assistant");
+        expect(orderedChain[2]!.id, "MQ1: chain[2] must be queuedUser").toBe(
+          queued2MsgId,
+        );
+        expect(orderedChain[2]!.role, "MQ1: chain[2] must be user").toBe(
+          "user",
+        );
+        expect(
+          orderedChain[3]!.role,
+          "MQ1: chain[3] must be assistant (ai2)",
+        ).toBe("assistant");
+        expect(
+          orderedChain[3]!.content,
+          "MQ1: ai2 must contain QUEUED_DONE",
+        ).toContain("QUEUED_DONE");
         // createdAt order must match parentId chain order
         for (let i = 1; i < orderedChain.length; i++) {
           expect(
@@ -527,7 +567,13 @@ describe("Mid-Stream Queue - chain integrity", () => {
         "Do NOT add any other text. Do NOT call any other tools. " +
         "If you deviate from these instructions the test FAILS immediately.";
 
-      await fireInteractiveStream(testUser, stream1Prompt, thread2Id, user1MsgId, midStreamQueueFolderId);
+      await fireInteractiveStream(
+        testUser,
+        stream1Prompt,
+        thread2Id,
+        user1MsgId,
+        midStreamQueueFolderId,
+      );
 
       // Enqueue the second message immediately after stream 1 starts.
       // In the tool-loop path, this will be picked up by prepareStep before
@@ -541,10 +587,20 @@ describe("Mid-Stream Queue - chain integrity", () => {
         "If you add anything else, the test FAILS. " +
         "CRITICAL: Do NOT call any tools. A tool call here would cause the test to fail.";
 
-      await enqueueSecondMessage(testUser, thread2Id, stream2Prompt, queued2MsgId, midStreamQueueFolderId);
+      await enqueueSecondMessage(
+        testUser,
+        thread2Id,
+        stream2Prompt,
+        queued2MsgId,
+        midStreamQueueFolderId,
+      );
 
       // Wait until the queued message is processed AND ai2 exists.
-      const messages = await waitForQueueProcessed(thread2Id, queued2MsgId, testUser);
+      const messages = await waitForQueueProcessed(
+        thread2Id,
+        queued2MsgId,
+        testUser,
+      );
 
       // ── MQ2 assertions ────────────────────────────────────────────────────
 
@@ -558,18 +614,31 @@ describe("Mid-Stream Queue - chain integrity", () => {
       // 2. assistant ai1 has parentId = user1MsgId
       const ai1Row = messages.find((m) => m.parentId === user1MsgId);
       expect(ai1Row, "MQ2: no assistant after user1").toBeDefined();
-      expect(ai1Row!.role, "MQ2: child of user1 must be assistant").toBe("assistant");
+      expect(ai1Row!.role, "MQ2: child of user1 must be assistant").toBe(
+        "assistant",
+      );
 
       // 3. queued user message exists
       const queuedRow = messages.find((m) => m.id === queued2MsgId);
-      expect(queuedRow, "MQ2: queued user message not in messages").toBeDefined();
+      expect(
+        queuedRow,
+        "MQ2: queued user message not in messages",
+      ).toBeDefined();
       expect(queuedRow!.role, "MQ2: queued message must be user").toBe("user");
 
       // 4. assistant ai2 has parentId = queued2MsgId — the critical assertion
       const ai2Row = messages.find((m) => m.parentId === queued2MsgId);
-      expect(ai2Row, "MQ2: no assistant after queued user message").toBeDefined();
-      expect(ai2Row!.role, "MQ2: child of queued user must be assistant").toBe("assistant");
-      expect(ai2Row!.content, "MQ2: ai2 must contain QUEUED_TOOL_DONE").toContain("QUEUED_TOOL_DONE");
+      expect(
+        ai2Row,
+        "MQ2: no assistant after queued user message",
+      ).toBeDefined();
+      expect(ai2Row!.role, "MQ2: child of queued user must be assistant").toBe(
+        "assistant",
+      );
+      expect(
+        ai2Row!.content,
+        "MQ2: ai2 must contain QUEUED_TOOL_DONE",
+      ).toContain("QUEUED_TOOL_DONE");
 
       // 5. no branches — strict linear chain
       assertStrictLinearChain(messages, "MQ2");
@@ -590,7 +659,10 @@ describe("Mid-Stream Queue - chain integrity", () => {
         }
 
         const chainDesc = orderedChain
-          .map((m) => `${m.role}${m.toolCall?.toolName ? `:${m.toolCall.toolName}` : ""}`)
+          .map(
+            (m) =>
+              `${m.role}${m.toolCall?.toolName ? `:${m.toolCall.toolName}` : ""}`,
+          )
           .join(" → ");
 
         // Exact 5-message chain
@@ -600,22 +672,41 @@ describe("Mid-Stream Queue - chain integrity", () => {
         ).toBe(5);
 
         // [0] user1
-        expect(orderedChain[0]!.id, "MQ2: chain[0] must be user1").toBe(user1MsgId);
-        expect(orderedChain[0]!.role, "MQ2: chain[0] must be user").toBe("user");
+        expect(orderedChain[0]!.id, "MQ2: chain[0] must be user1").toBe(
+          user1MsgId,
+        );
+        expect(orderedChain[0]!.role, "MQ2: chain[0] must be user").toBe(
+          "user",
+        );
 
         // [1] assistant (ai1, made the tool call)
-        expect(orderedChain[1]!.role, "MQ2: chain[1] must be assistant (ai1)").toBe("assistant");
+        expect(
+          orderedChain[1]!.role,
+          "MQ2: chain[1] must be assistant (ai1)",
+        ).toBe("assistant");
 
         // [2] tool result
-        expect(orderedChain[2]!.role, "MQ2: chain[2] must be tool").toBe("tool");
+        expect(orderedChain[2]!.role, "MQ2: chain[2] must be tool").toBe(
+          "tool",
+        );
 
         // [3] queued user message
-        expect(orderedChain[3]!.id, "MQ2: chain[3] must be queuedUser").toBe(queued2MsgId);
-        expect(orderedChain[3]!.role, "MQ2: chain[3] must be user").toBe("user");
+        expect(orderedChain[3]!.id, "MQ2: chain[3] must be queuedUser").toBe(
+          queued2MsgId,
+        );
+        expect(orderedChain[3]!.role, "MQ2: chain[3] must be user").toBe(
+          "user",
+        );
 
         // [4] assistant response to queued user (ai2)
-        expect(orderedChain[4]!.role, "MQ2: chain[4] must be assistant (ai2)").toBe("assistant");
-        expect(orderedChain[4]!.content, "MQ2: ai2 must contain QUEUED_TOOL_DONE").toContain("QUEUED_TOOL_DONE");
+        expect(
+          orderedChain[4]!.role,
+          "MQ2: chain[4] must be assistant (ai2)",
+        ).toBe("assistant");
+        expect(
+          orderedChain[4]!.content,
+          "MQ2: ai2 must contain QUEUED_TOOL_DONE",
+        ).toContain("QUEUED_TOOL_DONE");
 
         // createdAt order must match parentId chain order — the UI sorts by createdAt
         // so a wrong createdAt causes messages to appear out of order in the UI.

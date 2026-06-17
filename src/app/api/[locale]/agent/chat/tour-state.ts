@@ -61,6 +61,15 @@ export const useTourState = create<TourState>()(
       version: 2,
       // Only persist what's needed across refresh - not transient UI state
       partialize: () => ({}),
+      // Avoid "storage is currently unavailable" warnings in non-browser envs (CLI)
+      storage:
+        typeof window !== "undefined"
+          ? undefined // default localStorage
+          : {
+              getItem: (): null => null,
+              setItem: (): void => undefined,
+              removeItem: (): void => undefined,
+            },
     },
   ),
 );

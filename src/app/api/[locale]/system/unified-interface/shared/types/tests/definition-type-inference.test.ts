@@ -27,6 +27,8 @@ import {
   objectField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+
+const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
 import type {
   InferSchemaFromField,
   UnifiedField,
@@ -484,7 +486,7 @@ type Test11f_IsNotNever = Test11f_InferredSchema extends z.ZodNever
 // ============================================================================
 
 // Test 12a: Create a simple field and check its TKey (using proper TextWidgetConfig with content)
-const simpleTestField = responseField({
+const simpleTestField = responseField(genericST, {
   type: WidgetType.TEXT,
   content: "app.common.active" as const,
   schema: {} as z.ZodString,
@@ -502,13 +504,13 @@ type Test12a_ExtractTKey =
 // What is TKey here? Should be "app.common.test" if const preserves it
 
 // Test 12b: Create an object field with children
-const containerField = objectField({
+const containerField = objectField(genericST, {
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.GRID,
   columns: 12,
   usage: { response: true },
   children: {
-    name: responseField({
+    name: responseField(genericST, {
       type: WidgetType.TEXT,
       content: "app.common.active" as const,
       schema: {} as z.ZodString,
@@ -730,7 +732,7 @@ type Test14h_Method = typeof imapAccountsListDefinition.GET.method;
 // ============================================================================
 
 // Test 15a: Call objectField directly and check the return type
-const directObjectField = objectField({
+const directObjectField = objectField(genericST, {
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.GRID,
   columns: 12,
@@ -762,14 +764,14 @@ type Test15e_ExtractTKey =
     : "no-match";
 
 // Test 15f: Create field with explicit string literals for translation keys
-const fieldWithLabels = objectField({
+const fieldWithLabels = objectField(genericST, {
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.GRID,
   columns: 12,
   title: "app.common.active" as const,
   usage: { response: true },
   children: {
-    test: responseField({
+    test: responseField(genericST, {
       type: WidgetType.TEXT,
       content: "app.common.active" as const,
       schema: {} as z.ZodString,

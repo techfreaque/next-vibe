@@ -38,7 +38,7 @@ type Equal<X, Y> =
 // Minimal mock scopedTranslation for test endpoints (all keys use `as any`)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockScopedTranslation = {
-  ScopedTranslationKey: "test" as any,
+  ScopedTranslationKey: "test" as const,
   scopedT: (_locale: any): { t(_key: any, _params?: any): any } => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: (_key: any, _params?: any): any => "test" as any,
@@ -55,13 +55,14 @@ const testPublicOnlyEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["test", "public-only"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField({
+  fields: objectField(mockScopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data" },
@@ -114,13 +115,14 @@ const testAdminOnlyEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["test", "admin-only"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
-  fields: objectField({
+  fields: objectField(mockScopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data" },
@@ -173,13 +175,14 @@ const testMixedRolesEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["test", "mixed-roles"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC, UserRole.ADMIN] as const,
-  fields: objectField({
+  fields: objectField(mockScopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data" },

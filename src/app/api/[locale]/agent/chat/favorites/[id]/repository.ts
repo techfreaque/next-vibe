@@ -337,36 +337,39 @@ export class SingleFavoriteRepository {
 
       // Only store bridge models if different from character defaults (null = cascade to skill)
       // Also normalize against platform defaults: store null if value equals platform default
-      const voiceModelSelectionToStore = normalizeTtsSelection(
+      // undefined means "not provided" → omit from UPDATE (keep existing value in DB).
+      const voiceModelSelectionToStore =
         data.voiceModelSelection !== undefined
-          ? data.voiceModelSelection
-          : null,
-      );
-      const sttModelSelectionToStore = normalizeSttSelection(
-        data.sttModelSelection !== undefined ? data.sttModelSelection : null,
-      );
+          ? normalizeTtsSelection(data.voiceModelSelection)
+          : undefined;
+      const sttModelSelectionToStore =
+        data.sttModelSelection !== undefined
+          ? normalizeSttSelection(data.sttModelSelection)
+          : undefined;
       const imageVisionModelSelectionToStore =
         data.imageVisionModelSelection !== undefined
           ? data.imageVisionModelSelection
-          : null;
+          : undefined;
       const videoVisionModelSelectionToStore =
         data.videoVisionModelSelection !== undefined
           ? data.videoVisionModelSelection
-          : null;
+          : undefined;
       const audioVisionModelSelectionToStore =
         data.audioVisionModelSelection !== undefined
           ? data.audioVisionModelSelection
-          : null;
-      const imageGenModelSelectionToStore = normalizeImageGenSelection(
+          : undefined;
+      const imageGenModelSelectionToStore =
         data.imageGenModelSelection !== undefined
-          ? data.imageGenModelSelection
-          : null,
-      );
+          ? normalizeImageGenSelection(data.imageGenModelSelection)
+          : undefined;
       const musicGenModelSelectionToStore =
         data.musicGenModelSelection !== undefined
           ? data.musicGenModelSelection
-          : null;
-      const videoGenModelSelectionToStore = data.videoGenModelSelection ?? null;
+          : undefined;
+      const videoGenModelSelectionToStore =
+        data.videoGenModelSelection !== undefined
+          ? data.videoGenModelSelection
+          : undefined;
       // Store modelSelection directly (null = use character defaults)
       const modelSelectionToStore = data.modelSelection;
 

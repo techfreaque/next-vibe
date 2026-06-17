@@ -212,7 +212,7 @@ describe("FTS excerpt preferred for shared paths", () => {
 
 describe("results limit", () => {
   it("respects the limit parameter", () => {
-    const fts = Array.from({ length: 10 }, (_, i) =>
+    const fts = [...Array(10).keys()].map((i) =>
       makeFts(`/file-${i}.md`, 1 - i * 0.05),
     );
     const results = mergeResults(fts, [], 5);

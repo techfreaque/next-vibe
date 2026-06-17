@@ -22,9 +22,7 @@ import {
   type UserRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { EventSchemas } from "../../../websocket/types";
 import type {
   ApiEndpoint,
   CreateApiEndpoint,
@@ -47,13 +45,15 @@ import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Methods } from "../../types/enums";
 import { FieldDataType, WidgetType } from "../../types/enums";
 
+const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+
 // ============================================================================
 // LEVEL 1: Test basic field types
 // ============================================================================
 
 // Test 1.1: PrimitiveField extends UnifiedField (checked via Test1_2)
 // Test 1.2: ObjectField with record children extends UnifiedField
-const test1_2_field = objectField({
+const test1_2_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {},
@@ -71,11 +71,11 @@ type Test1_2_Result =
 const test1_2: Test1_2_Result = "✓ PASS";
 
 // Test 1.3: ObjectField with specific children extends UnifiedField
-const test1_3_field = objectField({
+const test1_3_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    nested: objectField({
+    nested: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {},
@@ -95,11 +95,11 @@ type Test1_3_Result =
 const test1_3: Test1_3_Result = "✓ PASS";
 
 // Test 1.4: ObjectField with flexible usage extends UnifiedField
-const test1_4_field = objectField({
+const test1_4_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
-    nested: objectField({
+    nested: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data", response: true },
       children: {},
@@ -120,19 +120,19 @@ const test1_4: Test1_4_Result = "✓ PASS";
 
 // Test 1.5: ArrayField extends UnifiedField
 const test1_5_field = requestDataArrayField(
-  { type: WidgetType.CONTAINER },
-  objectField({
+  genericST,
+  { type: WidgetType.CONTAINER, child: objectField(genericST, {
     type: WidgetType.CONTAINER,
     usage: { request: "data" },
     children: {
-      item: requestField({
+      item: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "item.name",
         schema: z.string(),
       }),
     },
-  }),
+  }) },
 );
 
 type Test1_5_Result =
@@ -151,31 +151,31 @@ const test1_5: Test1_5_Result = "✓ PASS";
 // ============================================================================
 
 // Test 2.1: Nested ObjectField extends UnifiedField
-const test2_1_field = objectField({
+const test2_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    credentials: objectField({
+    credentials: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        email: objectField({
+        email: objectField(genericST, {
           type: WidgetType.CONTAINER,
           usage: { request: "data" },
           children: {},
         }),
-        password: objectField({
+        password: objectField(genericST, {
           type: WidgetType.CONTAINER,
           usage: { request: "data" },
           children: {},
         }),
       },
     }),
-    options: objectField({
+    options: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        rememberMe: objectField({
+        rememberMe: objectField(genericST, {
           type: WidgetType.CONTAINER,
           usage: { request: "data" },
           children: {},
@@ -201,15 +201,15 @@ const test2_1: Test2_1_Result = "✓ PASS";
 // ============================================================================
 
 // Test 3.1: Can we create an ApiEndpoint with specific ObjectField?
-const test3_1_field = objectField({
+const test3_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    name: objectField({
+    name: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        value: requestField({
+        value: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "name.value",
@@ -224,8 +224,7 @@ type Test3_1_Endpoint = ApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  typeof test3_1_field,
-  EventSchemas
+  typeof test3_1_field
 >;
 
 // Just verify it's a valid ApiEndpoint type
@@ -239,8 +238,7 @@ type Test3_1_Result =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -251,8 +249,7 @@ type Test3_2_Endpoint = ApiEndpoint<
   Methods.PUT,
   readonly UserRoleValue[],
   string,
-  typeof test2_1_field,
-  EventSchemas
+  typeof test2_1_field
 >;
 type Test3_2_Result =
   Test3_2_Endpoint extends ApiEndpoint<
@@ -264,8 +261,7 @@ type Test3_2_Result =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >,
-    EventSchemas
+    >
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -277,16 +273,15 @@ const test3_2: Test3_2_Result = "✓ PASS";
 
 // Test 4.1: CreateApiEndpoint with optional object field
 const test4_1_field = objectOptionalField(
-  { type: WidgetType.CONTAINER },
-  { request: "data" },
-  {
-    value: requestField({
+  genericST,
+  { type: WidgetType.CONTAINER, usage: { request: "data" }, children: {
+    value: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "test4_1_field.value",
       schema: z.string(),
     }),
-  },
+  } },
 );
 
 type Test4_1_CreateEndpoint = CreateApiEndpoint<
@@ -294,7 +289,7 @@ type Test4_1_CreateEndpoint = CreateApiEndpoint<
   readonly UserRoleValue[],
   string,
   typeof test4_1_field,
-  EventSchemas
+  never
 >;
 type Test4_1_Result =
   Test4_1_CreateEndpoint extends CreateApiEndpoint<
@@ -302,18 +297,18 @@ type Test4_1_Result =
     readonly UserRoleValue[],
     string,
     typeof test4_1_field,
-    EventSchemas
+    never
   >
     ? "✓ PASS"
     : "✗ FAIL";
 const test4_1: Test4_1_Result = "✓ PASS";
 
 // Test 4.2: CreateApiEndpoint with nested ObjectField
-const test4_2_field = objectField({
+const test4_2_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    nested: objectField({
+    nested: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {},
@@ -326,7 +321,7 @@ type Test4_2_CreateEndpoint = CreateApiEndpoint<
   readonly UserRoleValue[],
   string,
   typeof test4_2_field,
-  EventSchemas
+  never
 >;
 type Test4_2_Result =
   Test4_2_CreateEndpoint extends CreateApiEndpoint<
@@ -334,7 +329,7 @@ type Test4_2_Result =
     readonly UserRoleValue[],
     string,
     typeof test4_2_field,
-    EventSchemas
+    never
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -345,11 +340,11 @@ const test4_2: Test4_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 5.1: Simple request-only field
-const test5_1_request_field = objectField({
+const test5_1_request_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    name: requestField({
+    name: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "user.name",
@@ -360,58 +355,57 @@ const test5_1_request_field = objectField({
 
 // Test 5.1b: Response-only array field
 const test5_1_response_field = responseArrayField(
-  { type: WidgetType.CONTAINER },
-  objectField({
+  genericST,
+  { type: WidgetType.CONTAINER, child: objectField(genericST, {
     type: WidgetType.CONTAINER,
     usage: { response: true },
     children: {
-      id: responseField({
+      id: responseField(genericST, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
     },
-  }),
+  }) },
 );
 
 // Test 5.1c: Optional login history
 const test5_1_optional_field = responseArrayOptionalField(
-  { type: WidgetType.CONTAINER },
-  objectField({
+  genericST,
+  { type: WidgetType.CONTAINER, child: objectField(genericST, {
     type: WidgetType.CONTAINER,
     usage: { response: true },
     children: {
-      amount: responseField({
+      amount: responseField(genericST, {
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
     },
-  }),
+  }) },
 );
 
 // Test 5.1d: Request data with optional settings
 const test5_1_request_optional = objectOptionalField(
-  { type: WidgetType.CONTAINER },
-  { request: "data" },
-  {
-    url: requestField({
+  genericST,
+  { type: WidgetType.CONTAINER, usage: { request: "data" }, children: {
+    url: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.URL,
       label: "settings.url",
       schema: z.string().url(),
     }),
-  },
+  } },
 );
 
 // Test 5.1e: Mixed request/response structure with nested fields
-const test5_1_field = objectField({
+const test5_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
-    login: objectField({
+    login: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        username: requestField({
+        username: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "login.username",
@@ -420,29 +414,28 @@ const test5_1_field = objectField({
       },
     }),
     preferences: objectOptionalField(
-      { type: WidgetType.CONTAINER },
-      { request: "data" },
-      {
-        theme: requestField({
+      genericST,
+      { type: WidgetType.CONTAINER, usage: { request: "data" }, children: {
+        theme: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "preferences.theme",
           schema: z.string(),
         }),
-      },
+      } },
     ),
     results: responseArrayField(
-      { type: WidgetType.CONTAINER },
-      objectField({
+      genericST,
+      { type: WidgetType.CONTAINER, child: objectField(genericST, {
         type: WidgetType.CONTAINER,
         usage: { response: true },
         children: {
-          value: responseField({
+          value: responseField(genericST, {
             type: WidgetType.TEXT,
             schema: z.number(),
           }),
         },
-      }),
+      }) },
     ),
   },
 });
@@ -516,7 +509,7 @@ type Test5_2_MixedEndpoint = CreateApiEndpoint<
   readonly UserRoleValue[],
   string,
   typeof test5_1_field,
-  EventSchemas
+  never
 >;
 
 type Test5_2_Result =
@@ -530,7 +523,7 @@ type Test5_2_Result =
       FieldUsageConfig,
       AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
     >,
-    EventSchemas
+    never
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -548,28 +541,28 @@ type Test5_2c_GenericEndpoint = CreateApiEndpoint<
   readonly UserRoleValue[],
   string,
   typeof test5_1_field,
-  EventSchemas
+  never
 >;
 type Test5_2c_Result = Test5_2c_GenericEndpoint extends CreateApiEndpointAny
   ? "✓ PASS"
   : "✗ FAIL";
 const test5_2c: Test5_2c_Result = "✓ PASS";
 
-// Test 5.2d: With TranslationKey as TScopedTranslationKey and matching TKey in fields
+// Test 5.2d: With string as TScopedTranslationKey and matching TKey in fields
 type Test5_2d_MatchingTKeys = CreateApiEndpoint<
   Methods,
   readonly UserRoleValue[],
-  TranslationKey,
+  string,
   UnifiedField<
-    TranslationKey,
+    string,
     z.ZodTypeAny,
     FieldUsageConfig,
     AnyChildrenConstrain<
-      TranslationKey,
+      string,
       ConstrainedChildUsage<FieldUsageConfig>
     >
   >,
-  EventSchemas
+  never
 >;
 type Test5_2d_Result = Test5_2d_MatchingTKeys extends CreateApiEndpointAny
   ? "✓ PASS"
@@ -581,16 +574,16 @@ const test5_2d: Test5_2d_Result = "✓ PASS";
 // ============================================================================
 
 // Create a login fields structure for testing
-const test6_loginFields = objectField({
+const test6_loginFields = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
-    credentials: objectField({
+    credentials: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {},
     }),
-    options: objectField({
+    options: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {},
@@ -601,18 +594,18 @@ const test6_loginFields = objectField({
 // Test 6.1: Direct constraint check
 type Test6_1_DirectCheck<
   T extends UnifiedField<
-    TranslationKey,
+    string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<TranslationKey, FieldUsageConfig>
+    AnyChildrenConstrain<string, FieldUsageConfig>
   >,
 > = T;
 type Test6_1_Result =
   Test6_1_DirectCheck<typeof test6_loginFields> extends UnifiedField<
-    TranslationKey,
+    string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<TranslationKey, FieldUsageConfig>
+    AnyChildrenConstrain<string, FieldUsageConfig>
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -621,10 +614,10 @@ const test6_1: Test6_1_Result = "✓ PASS";
 // Test 6.2: Constraint in function parameter position
 type Test6_2_FunctionParam = <
   T extends UnifiedField<
-    TranslationKey,
+    string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<TranslationKey, FieldUsageConfig>
+    AnyChildrenConstrain<string, FieldUsageConfig>
   >,
 >(
   fields: T,
@@ -642,7 +635,7 @@ type Test6_3_LoginEndpoint = CreateApiEndpoint<
   readonly UserRoleValue[],
   string,
   typeof test6_loginFields,
-  EventSchemas
+  never
 >;
 
 // Test 6.3: Constraint in nested generic
@@ -671,7 +664,7 @@ type Test7_LoginEndpoint = CreateApiEndpoint<
   readonly UserRoleValue[],
   string,
   typeof test5_1_field,
-  EventSchemas
+  never
 >;
 
 // Test 7.1: Simplified useApiForm signature (with any instead of UnifiedField)
@@ -692,17 +685,17 @@ type Test7_2_AcceptsAnyEndpoint = (
   endpoint: CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     UnifiedField<
-      TranslationKey,
+      string,
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<
-        TranslationKey,
+        string,
         ConstrainedChildUsage<FieldUsageConfig>
       >
     >,
-    EventSchemas
+    never
   >,
 ) => void;
 
@@ -765,25 +758,25 @@ const test9_2: Test9_2_HasChildren = "✓ PASS";
 
 // Test 10.1: Array with nested object children with id and name fields
 const test10_1_field = requestDataArrayField(
-  { type: WidgetType.CONTAINER },
-  objectField({
+  genericST,
+  { type: WidgetType.CONTAINER, child: objectField(genericST, {
     type: WidgetType.CONTAINER,
     usage: { request: "data" },
     children: {
-      id: requestField({
+      id: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "ID",
         schema: z.string(),
       }),
-      name: requestField({
+      name: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "Name",
         schema: z.string(),
       }),
     },
-  }),
+  }) },
 );
 
 type Test10_1_Result =
@@ -798,19 +791,19 @@ type Test10_1_Result =
 const test10_1: Test10_1_Result = "✓ PASS";
 
 // Test 10.2: Deeply nested ObjectFields (3 levels)
-const test10_2_field = objectField({
+const test10_2_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    level1: objectField({
+    level1: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        level2: objectField({
+        level2: objectField(genericST, {
           type: WidgetType.CONTAINER,
           usage: { request: "data" },
           children: {
-            level3: requestField({
+            level3: requestField(genericST, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "Level 3",
@@ -835,22 +828,22 @@ type Test10_2_Result =
 const test10_2: Test10_2_Result = "✓ PASS";
 
 // Test 10.3: Mixed usage configurations
-const test10_3_field = objectField({
+const test10_3_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
-    requestOnly: requestField({
+    requestOnly: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "Request Only",
       schema: z.string(),
     }),
-    responseOnly: responseField({
+    responseOnly: responseField(genericST, {
       type: WidgetType.TEXT,
       content: "Response Only",
       schema: z.string(),
     }),
-    both: requestResponseField({
+    both: requestResponseField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       // oxlint-disable-next-line no-explicit-any -- Test file: plain string label for readability
@@ -873,18 +866,18 @@ const test10_3: Test10_3_Result = "✓ PASS";
 
 // Test 10.4: Nested arrays (array of arrays)
 const test10_4_innerArray = requestDataArrayField(
-  { type: WidgetType.CONTAINER },
-  requestField({
+  genericST,
+  { type: WidgetType.CONTAINER, child: requestField(genericST, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
     label: "String",
     schema: z.string(),
-  }),
+  }) },
 );
 
 const test10_4_field = requestDataArrayField(
-  { type: WidgetType.CONTAINER },
-  test10_4_innerArray,
+  genericST,
+  { type: WidgetType.CONTAINER, child: test10_4_innerArray },
 );
 
 type Test10_4_Result =
@@ -905,7 +898,7 @@ const test10_4: Test10_4_Result = "✓ PASS";
 // Test 11.1: Record of endpoints with different methods
 
 // Create GET endpoint field for test 11
-const test11_1_getField = objectField({
+const test11_1_getField = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { response: true },
   children: {},
@@ -916,9 +909,9 @@ interface Test11_1_LoginEndpoints {
   GET: CreateApiEndpoint<
     Methods.GET,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     typeof test11_1_getField,
-    EventSchemas
+    never
   >;
 }
 
@@ -935,9 +928,9 @@ type Test11_2_UseEndpoint = <
     CreateApiEndpoint<
       Methods,
       readonly UserRoleValue[],
-      TranslationKey,
+      string,
       any,
-      EventSchemas
+      never
     >
   >,
 >(
@@ -955,27 +948,27 @@ const test11_2: Test11_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 12.1: Verify that removing constraints allows any field structure
-const test12_1_field = objectField({
+const test12_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    customProp1: requestField({
+    customProp1: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "Custom Prop 1",
       schema: z.string(),
     }),
-    customProp2: requestField({
+    customProp2: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.NUMBER,
       label: "Custom Prop 2",
       schema: z.number(),
     }),
-    nested: objectField({
+    nested: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        deep: requestField({
+        deep: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "Deep",
@@ -989,18 +982,18 @@ const test12_1_field = objectField({
 type Test12_1_CustomEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
-  TranslationKey,
+  string,
   typeof test12_1_field,
-  EventSchemas
+  never
 >;
 
 type Test12_1_Result =
   Test12_1_CustomEndpoint extends CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     any,
-    EventSchemas
+    never
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -1022,17 +1015,17 @@ const test12_2: Test12_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 13.1: Optional fields in ObjectField
-const test13_1_field = objectField({
+const test13_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    required: requestField({
+    required: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "Required",
       schema: z.string(),
     }),
-    optional: requestField({
+    optional: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "Optional",
@@ -1056,9 +1049,9 @@ const test13_1: Test13_1_Result = "✓ PASS";
 type Test13_2_OptionalEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
-  TranslationKey,
+  string,
   typeof test13_1_field,
-  EventSchemas
+  never
 >;
 type Test13_2_Request = Test13_2_OptionalEndpoint["types"]["RequestOutput"];
 type Test13_2_Result = Test13_2_Request extends {
@@ -1074,11 +1067,11 @@ const test13_2: Test13_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 14.1: GET endpoint with response-only fields
-const test14_1_field = objectField({
+const test14_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { response: true },
   children: {
-    data: responseField({
+    data: responseField(genericST, {
       type: WidgetType.TEXT,
       content: "Response Data",
       schema: z.string(),
@@ -1089,29 +1082,29 @@ const test14_1_field = objectField({
 type Test14_1_GetEndpoint = CreateApiEndpoint<
   Methods.GET,
   readonly UserRoleValue[],
-  TranslationKey,
+  string,
   typeof test14_1_field,
-  EventSchemas
+  never
 >;
 
 type Test14_1_Result =
   Test14_1_GetEndpoint extends CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     any,
-    EventSchemas
+    never
   >
     ? "✓ PASS"
     : "✗ FAIL";
 const test14_1: Test14_1_Result = "✗ FAIL";
 
 // Test 14.2: DELETE endpoint
-const test14_2_field = objectField({
+const test14_2_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "urlPathParams" },
   children: {
-    id: requestUrlPathParamsField({
+    id: requestUrlPathParamsField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       // oxlint-disable-next-line no-explicit-any -- Test file: plain string label for readability
@@ -1124,18 +1117,18 @@ const test14_2_field = objectField({
 type Test14_2_DeleteEndpoint = CreateApiEndpoint<
   Methods.DELETE,
   readonly [typeof UserRole.ADMIN],
-  TranslationKey,
+  string,
   typeof test14_2_field,
-  EventSchemas
+  never
 >;
 
 type Test14_2_Result =
   Test14_2_DeleteEndpoint extends CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     any,
-    EventSchemas
+    never
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -1146,33 +1139,33 @@ const test14_2: Test14_2_Result = "✗ FAIL";
 // ============================================================================
 
 // Test 15.1: Pagination with filters
-const test15_1_field = objectField({
+const test15_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
-    page: requestField({
+    page: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.NUMBER,
       label: "Page",
       schema: z.number(),
     }),
-    pageSize: requestField({
+    pageSize: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.NUMBER,
       label: "Page Size",
       schema: z.number(),
     }),
-    filters: objectField({
+    filters: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        search: requestField({
+        search: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "Search",
           schema: z.string(),
         }),
-        status: requestField({
+        status: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "Status",
@@ -1181,23 +1174,23 @@ const test15_1_field = objectField({
       },
     }),
     results: responseArrayField(
-      { type: WidgetType.CONTAINER },
-      objectField({
+      genericST,
+      { type: WidgetType.CONTAINER, child: objectField(genericST, {
         type: WidgetType.CONTAINER,
         usage: { response: true },
         children: {
-          id: responseField({
+          id: responseField(genericST, {
             type: WidgetType.TEXT,
             content: "ID",
             schema: z.string(),
           }),
-          name: responseField({
+          name: responseField(genericST, {
             type: WidgetType.TEXT,
             content: "Name",
             schema: z.string(),
           }),
         },
-      }),
+      }) },
     ),
   },
 });
@@ -1214,33 +1207,33 @@ type Test15_1_Result =
 const test15_1: Test15_1_Result = "✓ PASS";
 
 // Test 15.2: File upload with metadata
-const test15_2_field = objectField({
+const test15_2_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
-    file: requestField({
+    file: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.FILE,
       label: "File",
       schema: z.any(),
     }),
-    metadata: objectField({
+    metadata: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        filename: requestField({
+        filename: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "Filename",
           schema: z.string(),
         }),
-        size: requestField({
+        size: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "Size",
           schema: z.number(),
         }),
-        mimeType: requestField({
+        mimeType: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "MIME Type",
@@ -1248,16 +1241,16 @@ const test15_2_field = objectField({
         }),
       },
     }),
-    uploadResult: objectField({
+    uploadResult: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { response: true },
       children: {
-        url: responseField({
+        url: responseField(genericST, {
           type: WidgetType.TEXT,
           content: "URL",
           schema: z.string(),
         }),
-        id: responseField({
+        id: responseField(genericST, {
           type: WidgetType.TEXT,
           content: "ID",
           schema: z.string(),
@@ -1287,9 +1280,9 @@ type Test16_1_UseApiFormSignature = <
   TEndpoint extends CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     any,
-    EventSchemas
+    never
   >,
 >(
   endpoint: TEndpoint,
@@ -1303,12 +1296,12 @@ type Test16_1_CanCall = Parameters<Test16_1_UseApiFormSignature>[0];
 type Test16_1_Result = Test6_3_LoginEndpoint extends Test16_1_CanCall
   ? "✓ PASS"
   : "✗ FAIL";
-const test16_1: Test16_1_Result = "✗ FAIL";
+const test16_1: Test16_1_Result = "✓ PASS";
 
 // Test 16.2: useEndpoint with Record of endpoints
 
 // Create a test record
-const test16_2_logoutField = objectField({
+const test16_2_logoutField = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { response: true },
   children: {},
@@ -1319,9 +1312,9 @@ interface Test16_2_TestRecord {
   logout: CreateApiEndpoint<
     Methods.POST,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     typeof test16_2_logoutField,
-    EventSchemas
+    never
   >;
 }
 
@@ -1385,7 +1378,7 @@ const test18_2: Test18_2_HasChildren = "✗ FAIL";
 // ============================================================================
 
 // Test 19.1: Empty object field
-const test19_1_field = objectField({
+const test19_1_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { response: true },
   children: {},
@@ -1404,22 +1397,22 @@ const test19_1: Test19_1_Result = "✓ PASS";
 
 // Test 19.2: Deeply nested arrays (3 levels)
 const test19_2_level3 = responseArrayField(
-  { type: WidgetType.CONTAINER },
-  responseField({
+  genericST,
+  { type: WidgetType.CONTAINER, child: responseField(genericST, {
     type: WidgetType.TEXT,
     content: "String",
     schema: z.string(),
-  }),
+  }) },
 );
 
 const test19_2_level2 = responseArrayField(
-  { type: WidgetType.CONTAINER },
-  test19_2_level3,
+  genericST,
+  { type: WidgetType.CONTAINER, child: test19_2_level3 },
 );
 
 const test19_2_field = responseArrayField(
-  { type: WidgetType.CONTAINER },
-  test19_2_level2,
+  genericST,
+  { type: WidgetType.CONTAINER, child: test19_2_level2 },
 );
 
 type Test19_2_Result =
@@ -1434,17 +1427,17 @@ type Test19_2_Result =
 const test19_2: Test19_2_Result = "✓ PASS";
 
 // Test 19.3: Mixed usage configs
-const test19_3_field = objectField({
+const test19_3_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true },
   children: {
-    input: requestField({
+    input: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "Input",
       schema: z.string(),
     }),
-    output: responseField({
+    output: responseField(genericST, {
       type: WidgetType.TEXT,
       content: "Output",
       schema: z.string(),
@@ -1468,11 +1461,11 @@ const test19_3: Test19_3_Result = "✓ PASS";
 // ============================================================================
 
 // Test 20.1: Multiple endpoints in a record (like actual definition files)
-const test20_1_defaultField = objectField({
+const test20_1_defaultField = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    email: requestField({
+    email: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.EMAIL,
       label: "Email",
@@ -1481,11 +1474,11 @@ const test20_1_defaultField = objectField({
   },
 });
 
-const test20_1_verifyField = objectField({
+const test20_1_verifyField = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    code: requestField({
+    code: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "Code",
@@ -1494,7 +1487,7 @@ const test20_1_verifyField = objectField({
   },
 });
 
-const test20_1_resendField = objectField({
+const test20_1_resendField = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { response: true },
   children: {},
@@ -1504,23 +1497,23 @@ interface Test20_1_MultiEndpoint {
   default: CreateApiEndpoint<
     Methods.POST,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     typeof test20_1_defaultField,
-    EventSchemas
+    never
   >;
   verify: CreateApiEndpoint<
     Methods.POST,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     typeof test20_1_verifyField,
-    EventSchemas
+    never
   >;
   resend: CreateApiEndpoint<
     Methods.POST,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     typeof test20_1_resendField,
-    EventSchemas
+    never
   >;
 }
 
@@ -1529,9 +1522,9 @@ type Test20_1_DefaultValid =
   Test20_1_MultiEndpoint["default"] extends CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
-    TranslationKey,
+    string,
     any,
-    EventSchemas
+    never
   >
     ? "✓ PASS"
     : "✗ FAIL";

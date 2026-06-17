@@ -12,7 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 export interface PromptContextData {
   // Core context (from params - no DB)
   appName: string;
-  locale: string;
+  locale: CountryLanguage;
   languageName: string;
   countryName: string;
   flag: string;
@@ -141,9 +141,9 @@ export const platformOverviewFragment: SystemPromptFragment<PromptContextData> =
 - **Free tier:** ${freeTierCredits} credits/month via browser ID - no account needed.
 - **Subscription:** ${subLabel}. **Credit packs:** ${packLabel}.`;
 
-      return `## About ${appName}
+      return `## ${appName}
 
-- **Platform:** Free speech AI - ${totalModelCount} models from Claude and GPT to ${uncensoredNames}. Users set their own filtering level.
+- **Models:** ${totalModelCount} — Claude, GPT, Gemini, Llama, and uncencored ones ${uncensoredNames}.
 ${creditLines}
 - **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).`;
     },
@@ -176,13 +176,12 @@ ${folderNote}
 
       return `## Automated Execution Context
 
-You are running as a headless background agent - no user is watching in real time. Your final response is stored and reviewed programmatically or by an admin later.
+**⚠ Only your LAST message (no tool call) is returned to the caller. Any text you emit alongside a tool call is silently discarded.**
+
+No user watching. Complete the task. No follow-up questions. No pleasantries.
 ${folderNote}
-**Rules:**
-- Complete the task with the information provided. Do not ask follow-up questions.
-- Do not add pleasantries, sign-offs, or AI commentary.
-- If the task fails or cannot be completed, state clearly why.
-- Your **last message** (with no tool call) is the result. Everything before it is ignored by the requester.${extra}`;
+- If the task fails, state clearly why.
+- State your result once, at the end, without preamble.${extra}`;
     },
   };
 
@@ -263,20 +262,20 @@ export const toolExecutionControlFragment: SystemPromptFragment<PromptContextDat
     id: "tool-execution-control",
     placement: "leading",
     priority: 70,
-    build: () => `## Tool Execution Control
+    build: () => `## Tool Execution
 
-Every tool accepts an optional \`callbackMode\` parameter. **Default: omit it entirely.** Omitting means synchronous execution - result returned immediately, loop continues, you call more tools normally.
+**Schema first:** Call \`tool-help(toolName="<name>")\` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.
 
-**Only use callbackMode when you have a specific reason - most tool calls should omit it:**
-- **\`"detach"\`** - Fire and forget for long-running tasks you don't need to wait for. Returns \`{taskId}\`. Use \`wait-for-task\` if you need the result later.
-- **\`"wakeUp"\`** - Fire and forget for long-running tasks. Result auto-injected when ready, revives the thread. Do NOT call \`wait-for-task\`.
-- **\`"wait"\`** - Block until a remote task completes.
-- **\`"endLoop"\`** - End the ENTIRE turn after this batch. Use ONLY when completely done - no more tools will run after this.
-- **\`"approve"\`** - Pause for user confirmation before executing.
+**callbackMode** (optional on every tool, default: omit = synchronous):
 
-**Rule: if a tool returns its result in under 10 seconds (discovery, search, lookup, schema fetch), omit callbackMode. Async modes are for genuinely long-running operations (minutes, not seconds).**
+- **omit** (default) — synchronous, result inline, loop continues
+- **\`"detach"\`** — fire-and-forget, returns \`{taskId}\`, use \`wait-for-task\` later if needed
+- **\`"wakeUp"\`** — fire-and-forget, result auto-injected when ready, do NOT call \`wait-for-task\`
+- **\`"wait"\`** — block for a remote task
+- **\`"endLoop"\`** — end the entire turn after this batch (use ONLY when fully done)
+- **\`"approve"\`** — pause for user confirmation
 
-**\`wait-for-task\`** - Blocks until a detach/wakeUp task completes. Never pass callbackMode on it.`,
+Fast tools (search, lookup, schema) → always omit. Async only for operations taking minutes which arent needed for the next step.`,
   };
 
 export const formattingFragment: SystemPromptFragment<PromptContextData> = {

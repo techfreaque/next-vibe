@@ -84,7 +84,7 @@ export function TanstackPage({ locale }: CareersPageData): JSX.Element {
     "enterpriseDevs",
   ] as const;
 
-  const useCaseKeys = [
+  const caseKeys = [
     "erpIntegration",
     "desktopAutomation",
     "productionLine",
@@ -189,7 +189,7 @@ export function TanstackPage({ locale }: CareersPageData): JSX.Element {
             {t("useCases.title")}
           </H2>
           <Div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {useCaseKeys.map((key, i) => (
+            {caseKeys.map((key, i) => (
               <Card
                 key={key}
                 className="border hover:shadow-md transition-shadow"

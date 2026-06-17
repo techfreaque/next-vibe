@@ -27,6 +27,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { resolveFavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/repository";
 import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
@@ -68,6 +69,7 @@ export class DescribeVideoRepository {
     const visionModel = ModalityResolver.resolveVideoVisionModel(
       bridgeContext,
       user,
+      agentEnvAvailability,
     );
     if (!visionModel) {
       return fail({

@@ -117,10 +117,14 @@ export class CortexSearchRepository {
         maxResults,
       );
 
+      // Resolve excerpts from source for virtual-mount hits whose index row has
+      // no content (only the final top-N, so source reads stay bounded).
+      const results = await resolveExcerpts(userId, merged, locale);
+
       return success({
         responseQuery: query,
-        results: merged,
-        total: merged.length,
+        results,
+        total: results.length,
         searchMode,
       });
     } catch (error) {
@@ -173,6 +177,7 @@ async function runFtsSearch(
   const conditions = [
     eq(cortexNodes.userId, userId),
     eq(cortexNodes.nodeType, CortexNodeType.FILE),
+    eq(cortexNodes.isDeleted, false),
     sql`${tsVector} @@ ${tsQuery}`,
   ];
 
@@ -253,6 +258,7 @@ async function runVectorSearch(
   const conditions = [
     eq(cortexNodes.userId, userId),
     eq(cortexNodes.nodeType, CortexNodeType.FILE),
+    eq(cortexNodes.isDeleted, false),
     isNotNull(cortexNodes.embedding),
   ];
 
@@ -274,13 +280,54 @@ async function runVectorSearch(
     )
     .limit(limit);
 
+  // cortex_nodes is an index: content is NULL for virtual mounts. The excerpt
+  // is resolved from the source AFTER merge, only for the final top-N (see
+  // resolveExcerpts). Native paths still carry content in the column, so use it
+  // directly when present to avoid an extra read.
   return rows.map((row) => ({
     path: row.path,
-    excerpt: truncateContent(row.content ?? "", 150),
+    excerpt: row.content !== null ? truncateContent(row.content, 150) : "",
     score: row.similarity, // Already 0-1 (cosine similarity)
     updatedAt: row.updatedAt,
     source: "vector" as const,
   }));
+}
+
+/**
+ * Fill in missing excerpts for the final result set by resolving content from
+ * its source. Virtual-mount hits have no excerpt (content is NULL in the index)
+ * — resolve them live via the mount resolver. Native hits already have an
+ * excerpt from the column. Resolves only the final top-N to bound source reads.
+ */
+async function resolveExcerpts(
+  userId: string,
+  results: SearchResult[],
+  locale: CountryLanguage,
+): Promise<SearchResult[]> {
+  const { getMountPrefix, isNativePath } = await import("../repository");
+  const { resolveVirtualRead } = await import("../mounts/resolver");
+
+  return Promise.all(
+    results.map(async (r): Promise<SearchResult> => {
+      if (r.excerpt.trim().length > 0 || isNativePath(r.resultPath, locale)) {
+        return r;
+      }
+      const mountPrefix = getMountPrefix(r.resultPath, locale);
+      if (mountPrefix === null) {
+        return r;
+      }
+      const resolved = await resolveVirtualRead(
+        userId,
+        r.resultPath,
+        mountPrefix,
+        false,
+        locale,
+      ).catch(() => null);
+      return resolved
+        ? { ...r, excerpt: truncateContent(resolved.content, 150) }
+        : r;
+    }),
+  );
 }
 
 /** Whether tasks virtual mount should be searched (tasks not synced to cortexNodes) */

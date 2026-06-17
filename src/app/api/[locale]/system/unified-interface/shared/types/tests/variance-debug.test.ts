@@ -16,22 +16,24 @@ import type { CreateApiEndpointAny } from "../endpoint-base";
 import type { Methods } from "../enums";
 import { FieldDataType, WidgetType } from "../enums";
 
+const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+
 // Simulate the exact structure from retry/stop endpoints
-const testEndpoint_field = objectField({
+const testEndpoint_field = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" },
   children: {
-    jobId: requestField({
+    jobId: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.UUID,
       label: "Job ID",
       schema: z.string().uuid(),
     }),
-    result: objectField({
+    result: objectField(genericST, {
       type: WidgetType.CONTAINER,
       usage: { request: "data" },
       children: {
-        success: requestField({
+        success: requestField(genericST, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "Success",

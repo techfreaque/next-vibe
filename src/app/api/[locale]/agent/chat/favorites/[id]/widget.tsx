@@ -64,6 +64,7 @@ import { scopedTranslation as skillIdTranslation } from "@/app/api/[locale]/agen
 import { ModelGroup } from "@/app/api/[locale]/agent/chat/skills/[id]/widget";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
 import {
@@ -76,6 +77,7 @@ import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-
 import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
@@ -301,6 +303,7 @@ export function FavoriteEditContainer({
     const m = getBestImageVisionModel(
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
+      availability,
     );
     if (!m) {
       return undefined;
@@ -318,6 +321,7 @@ export function FavoriteEditContainer({
     const m = getBestVideoVisionModel(
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
+      availability,
     );
     if (!m) {
       return undefined;
@@ -335,6 +339,7 @@ export function FavoriteEditContainer({
     const m = getBestAudioVisionModel(
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
+      availability,
     );
     if (!m) {
       return undefined;
@@ -1453,6 +1458,7 @@ function SaveAndUseButton({
   logger,
   locale,
   user,
+  availability,
   isSubmitting,
   t,
 }: {
@@ -1502,6 +1508,7 @@ function SaveAndUseButton({
             favoriteData.modelSelection,
             undefined,
             user,
+            availability,
           );
           const parsed = chatManualModelSelectionSchema.safeParse({
             selectionType: ModelSelectionType.MANUAL,

@@ -174,6 +174,11 @@ export const translations = {
       favorites: "Favorites",
       threads: "Threads",
     },
+    reconnectNow: {
+      label: "Reconnect Now",
+      description:
+        "Close and reopen the connection, triggering pull-on-connect sync.",
+    },
     errors: {
       validation: { title: "Validation Error", description: "Invalid request" },
       network: { title: "Network Error", description: "Failed to connect" },

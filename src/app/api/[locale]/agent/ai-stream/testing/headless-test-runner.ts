@@ -19,7 +19,6 @@ import type {
 import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
@@ -240,11 +239,6 @@ export interface TestStreamParams {
   };
   /** Favorite config override for the headless stream */
   favoriteConfig?: FavoriteConfig | null;
-  /**
-   * Force all model resolution (chat + image/music/video gen) to a specific API provider.
-   * Used by UNBOTTLED self-relay tests to route all inference through the UNBOTTLED provider.
-   */
-  providerOverride?: ApiProvider;
   /** Abort signal to cancel the stream. Defaults to a never-aborting signal. */
   abortSignal?: AbortSignal;
   /**
@@ -255,12 +249,6 @@ export interface TestStreamParams {
     toolId: string;
     requiresConfirmation: boolean;
   }> | null;
-  /**
-   * Override the effective compact trigger token threshold.
-   * Pass Number.MAX_SAFE_INTEGER to disable compacting entirely.
-   * Used in integration tests to prevent compacting from consuming fixture slots.
-   */
-  compactTriggerOverride?: number;
 }
 
 /** Slim message shape - only fields we assert on */
@@ -536,7 +524,6 @@ export async function runTestStream(
     preCalls,
     wakeUpRevival,
     mediaModelOverrides,
-    providerOverride,
     favoriteConfig: paramFavoriteConfig,
     operationOverride: callerOperationOverride,
     abortSignal = new AbortController().signal,
@@ -577,7 +564,6 @@ export async function runTestStream(
     preCalls,
     wakeUpRevival,
     mediaModelOverrides,
-    providerOverride,
     favoriteConfig: paramFavoriteConfig ?? null,
     abortSignal,
     availableTools: availableTools ?? null,

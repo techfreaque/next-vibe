@@ -2539,6 +2539,10 @@ export const translations: typeof enTranslations = {
         failedToInitialize:
           "Fehler beim Initialisieren des Chrome DevTools MCP Servers",
       },
+      closePage: {
+        noSession: "Keine aktive Sitzung — nichts zu schließen",
+        switchedToPage: "Seite geschlossen, zu Seite {{pageId}} gewechselt",
+      },
       tool: {
         call: {
           start: "MCP Tool aufrufen",

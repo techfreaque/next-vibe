@@ -43,7 +43,8 @@ import {
   formatSkillId,
   parseSkillId,
 } from "@/app/api/[locale]/agent/chat/slugify";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
@@ -385,6 +386,7 @@ export function UsecasesStep({
         selected,
         addFavorite,
         userRoles,
+        availability,
       );
       applyOptimisticFavorites(entries, firstCompanionId);
       onDone(firstCompanionId);
@@ -429,6 +431,7 @@ export function UsecasesStep({
     userRoles,
     logger,
     user,
+    availability,
   ]);
 
   return (

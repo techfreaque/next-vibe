@@ -7,6 +7,7 @@ import {
   IntelligenceLevel,
   ModelSelectionType,
 } from "../chat/skills/enum";
+import type { AgentEnvAvailability } from "../env-availability";
 import { type Modality, ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -1101,7 +1102,21 @@ function buildVideoGenModelOptionsPool(): VideoGenModelOption[] {
 const videoGenModelOptionsPool: VideoGenModelOption[] =
   buildVideoGenModelOptionsPool();
 
-const videoGenModelOptionsIndex: Partial<
+/**
+ * Cheapest non-UNBOTTLED provider entry for a model — used by UNBOTTLED
+ * self-relay to dispatch in-process via the real provider (pool is sorted
+ * cheapest-first). Exported index is mutable for test runtime-patching,
+ * mirroring chatModelOptionsIndex.
+ */
+export function getVideoGenModelUnderlyingProvider(
+  modelId: string,
+): VideoGenModelOption | undefined {
+  return videoGenModelOptionsPool.find(
+    (m) => m.id === modelId && m.apiProvider !== ApiProvider.UNBOTTLED,
+  );
+}
+
+export const videoGenModelOptionsIndex: Partial<
   Record<VideoGenModelId, VideoGenModelOption>
 > = buildModelOptionsIndex(videoGenModelOptionsPool) as Partial<
   Record<VideoGenModelId, VideoGenModelOption>

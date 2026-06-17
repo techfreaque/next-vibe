@@ -97,9 +97,43 @@ export function WelcomeTour({
   // Get tour steps with translations
   const tourSteps = getTourSteps(t, isAuthenticated, locale, totalModelCount);
 
-  // Initialize tour on mount - uses empty deps intentionally as this should only run once
-  /* eslint-disable react-hooks/exhaustive-deps */
+  // Helper to check if a target is a sidebar element
+  const isSidebarTarget = useCallback((target: string): boolean => {
+    return (
+      target === getTourSelector(TOUR_DATA_ATTRS.ROOT_FOLDERS) ||
+      target === getTourSelector(TOUR_DATA_ATTRS.INCOGNITO_FOLDER) ||
+      target === getTourSelector(TOUR_DATA_ATTRS.PUBLIC_FOLDER) ||
+      target === getTourSelector(TOUR_DATA_ATTRS.PRIVATE_FOLDER) ||
+      target === getTourSelector(TOUR_DATA_ATTRS.SHARED_FOLDER) ||
+      target === getTourSelector(TOUR_DATA_ATTRS.NEW_CHAT_BUTTON) ||
+      target === getTourSelector(TOUR_DATA_ATTRS.SIDEBAR_LOGIN) ||
+      target === getTourSelector(TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON)
+    );
+  }, []);
+
+  // Helper to check if a target needs the bottom sheet expanded
+  const needsBottomSheetExpanded = useCallback((target: string): boolean => {
+    return (
+      target === getTourSelector(TOUR_DATA_ATTRS.SIDEBAR_LOGIN) ||
+      target === getTourSelector(TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON)
+    );
+  }, []);
+
+  // Helper to ensure sidebar is open
+  const ensureSidebarOpen = useCallback((): void => {
+    if (sidebarCollapsed) {
+      setSidebarCollapsed(false);
+    }
+  }, [sidebarCollapsed, setSidebarCollapsed]);
+
+  const didInitTourRef = useRef(false);
+
+  // Initialize tour on mount - runs once guarded by didInitTourRef
   useEffect(() => {
+    if (didInitTourRef.current) {
+      return;
+    }
+    didInitTourRef.current = true;
     void (async (): Promise<void> => {
       // Check if tour was already completed or skipped
       const [tourCompleted, tourSkipped, tourInProgress, lastStep] =
@@ -170,37 +204,21 @@ export function WelcomeTour({
         setTimeout(() => setRun(true), 500);
       }
     })();
-  }, []);
-  /* eslint-enable react-hooks/exhaustive-deps */
-
-  // Helper to check if a target is a sidebar element
-  const isSidebarTarget = useCallback((target: string): boolean => {
-    return (
-      target === getTourSelector(TOUR_DATA_ATTRS.ROOT_FOLDERS) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.INCOGNITO_FOLDER) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.PUBLIC_FOLDER) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.PRIVATE_FOLDER) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.SHARED_FOLDER) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.NEW_CHAT_BUTTON) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.SIDEBAR_LOGIN) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON)
-    );
-  }, []);
-
-  // Helper to check if a target needs the bottom sheet expanded
-  const needsBottomSheetExpanded = useCallback((target: string): boolean => {
-    return (
-      target === getTourSelector(TOUR_DATA_ATTRS.SIDEBAR_LOGIN) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON)
-    );
-  }, []);
-
-  // Helper to ensure sidebar is open
-  const ensureSidebarOpen = useCallback((): void => {
-    if (sidebarCollapsed) {
-      setSidebarCollapsed(false);
-    }
-  }, [sidebarCollapsed, setSidebarCollapsed]);
+  }, [
+    tourSteps,
+    setModelSelectorOpen,
+    ensureSidebarOpen,
+    setSidebarCollapsed,
+    setBottomSheetExpanded,
+    setSteps,
+    setStepIndex,
+    setTourActive,
+    setRun,
+    autoStart,
+    isMobile,
+    isSidebarTarget,
+    needsBottomSheetExpanded,
+  ]);
 
   // Advance to next step
   const goToNextStep = useCallback((): void => {

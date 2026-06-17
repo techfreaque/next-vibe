@@ -113,8 +113,7 @@ export function GetAccessibilityTreeWidget({
     if (!data && onSubmit) {
       onSubmit();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [data, onSubmit]);
 
   const appName = form?.getValues("appName") as string | undefined;
   const isLoading = !data;

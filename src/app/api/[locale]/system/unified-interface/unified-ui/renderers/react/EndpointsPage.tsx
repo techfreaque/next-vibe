@@ -558,16 +558,14 @@ function EndpointsPageInternal<
     deleteMutationOptionsWithNav,
   ]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- intentional: endpointInstance is always
-  // the same reference type at a given call site (static composition), never switches at runtime.
+  const ownEndpointState = useEndpoint(
+    endpoint,
+    finalEndpointOptions as UseEndpointOptions<T>,
+    logger,
+    user,
+  );
   const endpointState = (providedEndpointInstance ??
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEndpoint(
-      endpoint,
-      finalEndpointOptions as UseEndpointOptions<T>,
-      logger,
-      user,
-    )) as ReturnType<typeof useEndpoint>;
+    ownEndpointState) as ReturnType<typeof useEndpoint>;
 
   // Extract response and data based on endpoint type
   let response;

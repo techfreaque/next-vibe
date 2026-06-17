@@ -75,8 +75,13 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
         setOnboardingComplete(true);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [favoritesLoading, needsOnboarding]);
+  }, [
+    favoritesLoading,
+    needsOnboarding,
+    tourActive,
+    setOnboardingComplete,
+    view,
+  ]);
 
   if (view === "loading") {
     return <LoadingSpinner t={t} />;

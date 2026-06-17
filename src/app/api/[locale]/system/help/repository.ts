@@ -64,8 +64,9 @@ interface EndpointMeta {
   allowedRoles: string[];
   aliases: string[];
   title: string;
+  titleShort: string;
   description: string;
-  icon: string;
+  icon: IconKey;
   category: string;
   subCategory: string;
   tags: string[];
@@ -80,21 +81,12 @@ interface EndpointMeta {
 export class HelpRepository {
   // ─── Platform/role filtering on static meta ────────────────────────────────
 
-  private static readonly COMPACT_DEFAULT_PAGE_SIZE = 25;
-  private static readonly HUMAN_DEFAULT_PAGE_SIZE = 500;
+  private static readonly COMPACT_DEFAULT_PAGE_SIZE = 100;
+  private static readonly HUMAN_DEFAULT_PAGE_SIZE = 800;
   /** If a filtered result set is ≤ this many tools, auto-upgrade to full detail (params + examples) */
   private static readonly COMPACT_FULL_DETAIL_THRESHOLD = 5;
-
-  private static mapFilterToPlatform(
-    filter: Platform | "all",
-  ): Platform | "all" {
-    switch (filter) {
-      case "all":
-        return "all";
-      default:
-        return filter;
-    }
-  }
+  /** For AI/MCP: if matchedCount exceeds this, return only categories (no tool names) to save tokens */
+  private static readonly COMPACT_CATEGORY_ONLY_THRESHOLD = 100;
 
   private static checkPlatformAccess(
     roles: string[],
@@ -148,10 +140,14 @@ export class HelpRepository {
     roles: string[],
     userRoles: string[],
     isPublic: boolean,
+    platform?: Platform,
   ): boolean {
     // CLI_AUTH_BYPASS means the endpoint opted into CLI access without auth —
-    // it should be visible to any CLI user regardless of their roles.
-    if (roles.includes(PlatformMarker.CLI_AUTH_BYPASS)) {
+    // only bypass role check when actually on the CLI_PACKAGE platform.
+    if (
+      platform === Platform.CLI_PACKAGE &&
+      roles.includes(PlatformMarker.CLI_AUTH_BYPASS)
+    ) {
       return true;
     }
     const permRoles = roles.filter(
@@ -200,6 +196,39 @@ export class HelpRepository {
     return (Object.values(Platform) as Platform[]).filter((p) =>
       HelpRepository.checkPlatformAccess(roles, p),
     );
+  }
+
+  /** Check if a tool matches any id in a set (by toolName or alias). */
+  private static inSet(m: EndpointMeta, ids: Set<string>): boolean {
+    return ids.has(m.toolName) || m.aliases.some((a) => ids.has(a));
+  }
+
+  private static buildCategories(meta: EndpointMeta[]): Array<{
+    name: string;
+    count: number;
+    subCategories?: Array<{ name: string; count: number }>;
+  }> {
+    const categoryMap = new Map<string, Map<string, number>>();
+    for (const tool of meta) {
+      const cat = tool.category;
+      const sub = tool.subCategory ?? cat;
+      const subMap = categoryMap.get(cat) ?? new Map<string, number>();
+      subMap.set(sub, (subMap.get(sub) ?? 0) + 1);
+      categoryMap.set(cat, subMap);
+    }
+    return [...categoryMap.entries()]
+      .toSorted((a, b) => a[0].localeCompare(b[0]))
+      .map(([name, subMap]) => {
+        const subCategories = [...subMap.entries()]
+          .toSorted((a, b) => a[0].localeCompare(b[0]))
+          .map(([subName, count]) => ({ name: subName, count }));
+        const count = subCategories.reduce((n, s) => n + s.count, 0);
+        return {
+          name,
+          count,
+          ...(subCategories.length > 1 && { subCategories }),
+        };
+      });
   }
 
   private static isCompactPlatform(platform: Platform): boolean {
@@ -310,6 +339,7 @@ export class HelpRepository {
     return {
       name: tool.toolName,
       title: tool.title,
+      titleShort: tool.titleShort,
       // id is redundant with name - omit for compact platforms (AI/MCP) to save tokens
       ...(!compact && { id: tool.toolName }),
       // tags are low-signal for AI tool selection - omit for compact platforms
@@ -319,6 +349,7 @@ export class HelpRepository {
       description: tool.description,
       category: tool.category,
       ...(tool.subCategory && { subCategory: tool.subCategory }),
+      ...(tool.icon && { icon: tool.icon }),
       // compact: only include first alias to avoid token bloat
       aliases:
         tool.aliases.length > 0
@@ -342,6 +373,7 @@ export class HelpRepository {
     return {
       name: tool.toolName,
       title: tool.title,
+      titleShort: tool.titleShort,
       // id is redundant with name - omit for compact platforms
       ...(!compact && { id: tool.toolName }),
       // tags are low-signal for AI tool selection - omit for compact platforms
@@ -349,6 +381,7 @@ export class HelpRepository {
       description: tool.description,
       category: tool.category,
       ...(tool.subCategory && { subCategory: tool.subCategory }),
+      ...(tool.icon && { icon: tool.icon }),
       // compact: only include first alias
       aliases:
         tool.aliases.length > 0
@@ -551,7 +584,7 @@ export class HelpRepository {
     const currentPage = data.page ?? 1;
     const { t } = scopedTranslation.scopedT(locale);
     const { RemoteConnectionRepository } =
-      await import("@/app/api/[locale]/user/remote-connection/repository");
+      await import("@/app/api/[locale]/remote-connection/repository");
 
     // Try user-scoped lookup first, fall back to any-user lookup for CLI/system users
     // whose userId doesn't own the connection.
@@ -570,7 +603,7 @@ export class HelpRepository {
         tools: [],
         totalCount: 0,
         matchedCount: 0,
-        hint: `No capability snapshot for instance "${instanceId}". Connect the instance and wait for a sync pulse.`,
+        hint: t("get.hints.noCapabilitySnapshot", { instanceId }),
       });
     }
 
@@ -584,6 +617,7 @@ export class HelpRepository {
       return {
         name: prefixedId,
         title: cap.title,
+        titleShort: cap.titleShort ?? cap.title,
         id: prefixedId,
         description: cap.description,
         category: cap.category ?? t("category"),
@@ -671,21 +705,32 @@ export class HelpRepository {
         tools,
         totalCount,
         matchedCount,
-        hint: isCompact
-          ? `Full schema for ${matchedCount} tool${matchedCount === 1 ? "" : "s"} from "${instanceId}". Call via: execute-tool toolName="${instanceId}__<name>" input={...}.`
-          : `Showing full detail for ${matchedCount} tool${matchedCount === 1 ? "" : "s"} from "${instanceId}". CLI: vibe ${instanceId}__<name> [--field=value].`,
+        hint: t("get.hints.remoteFullSchema", {
+          count: matchedCount,
+          instanceId,
+        }),
       });
     }
 
     const paginationHint =
       totalPages > 1
-        ? ` Page ${safePage}/${totalPages} - pass page= to continue.`
+        ? t("get.hints.pagination", {
+            page: safePage,
+            total: totalPages,
+            next: safePage + 1,
+          })
         : "";
     return success({
       tools: pageSlice,
       totalCount,
       matchedCount,
-      hint: `${matchedCount} of ${totalCount} tools from remote instance "${instanceId}". Narrow search to ≤${HelpRepository.COMPACT_FULL_DETAIL_THRESHOLD} results for full schemas, or pass toolName= for a specific tool.${paginationHint}`,
+      hint: t("get.hints.remoteList", {
+        matched: matchedCount,
+        total: totalCount,
+        instanceId,
+        detailThreshold: HelpRepository.COMPACT_FULL_DETAIL_THRESHOLD,
+        pagination: paginationHint,
+      }),
     });
   }
 
@@ -697,25 +742,36 @@ export class HelpRepository {
   ): Promise<ResponseType<HelpGetResponseOutput>> {
     // Remote instance tool discovery - bypass local registry
     if (data.instanceId) {
-      return HelpRepository.getToolsFromRemoteInstance(
-        data.instanceId,
-        data,
-        user,
-        locale,
-        platform,
-      );
+      // The local instance's own name resolves to the local listing — callers
+      // (and models) may address the instance explicitly.
+      const { RemoteConnectionRepository: SelfRepo } =
+        await import("@/app/api/[locale]/remote-connection/repository");
+      const selfInstanceId = SelfRepo.deriveDefaultSelfInstanceId();
+      if (data.instanceId !== selfInstanceId) {
+        return HelpRepository.getToolsFromRemoteInstance(
+          data.instanceId,
+          data,
+          user,
+          locale,
+          platform,
+        );
+      }
     }
 
-    const isCompact = HelpRepository.isCompactPlatform(platform);
+    const { t } = scopedTranslation.scopedT(locale);
+
+    const isAdmin =
+      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+
+    // Admin users always get full web-mode stats regardless of platform filter.
+    // Compact mode is for AI/MCP/CLI consumers, not admin UI.
+    const isCompact = !isAdmin && HelpRepository.isCompactPlatform(platform);
     const effectivePageSize =
       data.pageSize ??
       (isCompact
         ? HelpRepository.COMPACT_DEFAULT_PAGE_SIZE
         : HelpRepository.HUMAN_DEFAULT_PAGE_SIZE);
     const currentPage = data.page ?? 1;
-
-    const isAdmin =
-      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
     const isDev = envClient.NODE_ENV !== "production";
     const currentEnv: "development" | "production" = isDev
@@ -733,40 +789,39 @@ export class HelpRepository {
       : localeFile === "pl"
         ? import("@/app/api/[locale]/system/generated/endpoints-meta/pl")
         : import("@/app/api/[locale]/system/generated/endpoints-meta/en"));
-    const allMeta: EndpointMeta[] = metaModule.endpointsMeta;
+    const allMeta = metaModule.endpointsMeta as EndpointMeta[];
 
     // Discovery platform - what platform context are we listing tools for?
-    // Admin can override with data.platform filter.
-    // Non-admin users (customer, public) always see the AI tool set regardless of calling platform.
+    // Admin web UI: use CLI (broadest platform) so all tools are accessible for inspection.
+    // Non-admin users always see the AI tool set regardless of calling platform.
     // Compact platforms (AI/MCP/CRON) keep their own platform semantics.
-    const platformFilter = isAdmin ? data.platform : undefined;
     let discoveryPlatform: Platform;
 
-    if (platformFilter) {
-      const mapped = HelpRepository.mapFilterToPlatform(platformFilter);
-      discoveryPlatform = mapped === "all" ? Platform.CLI : mapped;
-    } else if (
-      !isCompact &&
-      platform !== Platform.CLI &&
-      platform !== Platform.CLI_PACKAGE
-    ) {
-      // Web (all roles): default to AI tool set - admin can override with platformFilter
-      discoveryPlatform = Platform.AI;
+    if (isAdmin) {
+      // Admins on the web UI see the full tool set by default (CLI = broadest platform).
+      // The web platform would silently exclude WEB_OFF tools, making "All" misleadingly small.
+      discoveryPlatform = Platform.CLI;
     } else {
-      // Compact platforms (AI/MCP/CRON), CLI, and CLI_PACKAGE: use actual calling platform
+      // Non-admins always see their actual calling platform.
       discoveryPlatform = platform;
     }
 
-    const userRoles = user.isPublic
-      ? [UserPermissionRole.PUBLIC]
-      : [...user.roles];
+    // View-as-role: admin can impersonate a lower role to see what that role sees
+    const viewAsRole = isAdmin ? data.viewAsRole : undefined;
+    const isPublicView =
+      viewAsRole === UserPermissionRole.PUBLIC || user.isPublic;
+    const userRoles = viewAsRole
+      ? [viewAsRole]
+      : user.isPublic
+        ? [UserPermissionRole.PUBLIC]
+        : [...user.roles];
 
     // Filter meta by platform + user roles
     const filteredByPlatform = HelpRepository.filterMetaForUser(
       allMeta,
       discoveryPlatform,
       userRoles,
-      user.isPublic,
+      isPublicView,
     );
 
     // Admin platform badges - derived directly from allowedRoles in meta
@@ -777,18 +832,10 @@ export class HelpRepository {
       return HelpRepository.getMetaPlatforms(tool.allowedRoles);
     };
 
-    // When admin filters by a specific platform, additionally filter
     let platformFilteredMeta = filteredByPlatform;
     // Keep an unfiltered copy for detail-mode lookups (detail should search all accessible tools,
     // not just the active pinned/allowed subset chosen for list display).
     const allAccessibleMeta = filteredByPlatform;
-    if (platformFilter) {
-      platformFilteredMeta = filteredByPlatform.filter((m) =>
-        HelpRepository.getMetaPlatforms(m.allowedRoles).includes(
-          platformFilter,
-        ),
-      );
-    }
 
     // includeProdOnly: exclude PRODUCTION_OFF tools
     if (isAdmin && data.includeProdOnly) {
@@ -799,44 +846,45 @@ export class HelpRepository {
 
     const totalCount = platformFilteredMeta.length;
 
-    // Build two-level category counts from the FULL set (before statsFilter narrows the list)
-    const categoryMap = new Map<string, Map<string, number>>();
-    for (const tool of platformFilteredMeta) {
-      const cat = tool.category;
-      const sub = tool.subCategory ?? cat;
-      const subMap = categoryMap.get(cat) ?? new Map<string, number>();
-      subMap.set(sub, (subMap.get(sub) ?? 0) + 1);
-      categoryMap.set(cat, subMap);
-    }
-    const categories = [...categoryMap.entries()]
-      .toSorted((a, b) => a[0].localeCompare(b[0]))
-      .map(([name, subMap]) => {
-        const subCategories = [...subMap.entries()]
-          .toSorted((a, b) => a[0].localeCompare(b[0]))
-          .map(([subName, count]) => ({ name: subName, count }));
-        const count = subCategories.reduce((n, s) => n + s.count, 0);
-        // Only include subCategories in response if there's more than one
-        return {
-          name,
-          count,
-          ...(subCategories.length > 1 && { subCategories }),
-        };
-      });
-
     // statsFilter: web platforms (NEXT_PAGE, NEXT_API, TRPC, FRAME, ELECTRON) default to "pinned"
     // to avoid loading all tools unnecessarily in the web UI.
     // Compact platforms (AI/MCP/CRON) and CLI default to "all" - no pinned filtering needed.
+    // Use isCompactPlatform() directly (not isCompact) so admin users on AI/MCP/CRON
+    // still get the "all" default — isCompact strips admin from compact detection.
     const isWebPlatform =
-      !isCompact &&
+      !HelpRepository.isCompactPlatform(platform) &&
       platform !== Platform.CLI &&
       platform !== Platform.CLI_PACKAGE;
-    const statsFilter = data.statsFilter ?? (isWebPlatform ? "pinned" : "all");
+    const statsFilter =
+      data.statsFilter ??
+      (isWebPlatform ? (isAdmin ? "webPinned" : "pinned") : "all");
     // Server-side counts for the stats filter buttons (web only)
     let pinnedCount: number | undefined;
     let allowedCount: number | undefined;
+    let webPinnedCount: number | undefined;
+    let cliAllowedCount: number | undefined;
+    let mcpPinnedCount: number | undefined;
+    let mcpAllowedCount: number | undefined;
+    // aiMeta: always AI-platform tools for the current user's role — independent of any
+    // admin platformFilter. Used for AI pin/allowed counts and stats.
+    let aiMetaForStats: EndpointMeta[] = HelpRepository.filterMetaForUser(
+      allMeta,
+      Platform.AI,
+      userRoles,
+      isPublicView,
+    );
+    // Hoisted so statsMeta (outside the try block) can reference them.
+    let cascadeBase: Array<{
+      toolId: string;
+      requiresConfirmation: boolean;
+    }> | null = null;
+    let pinnedBase: Array<{
+      toolId: string;
+      requiresConfirmation: boolean;
+    }> | null = null;
     if (!isCompact && !user.isPublic) {
       try {
-        const { getDefaultToolIdsForUser } =
+        const { getDefaultToolIdsForUser, getDefaultWebPinnedIdsForUser } =
           await import("@/app/api/[locale]/agent/chat/constants");
 
         const { db } = await import("@/app/api/[locale]/system/db");
@@ -846,23 +894,35 @@ export class HelpRepository {
           await import("@/app/api/[locale]/agent/chat/favorites/db");
         const { eq } = await import("drizzle-orm");
 
-        // Tool configs now live on the active favorite, not on settings
+        // webPinnedTools: per-user sidebar bookmarks (independent of AI pinnedTools)
+        // availableTools: AI-allowed tools from the active favorite
+        // pinnedTools: AI-pinned tools (always in context) from the active favorite
+        let dbWebPinned: string[] | null = null;
         let dbPinned: Array<{ toolId: string }> | null = null;
-        let dbAllowed: Array<{ toolId: string }> | null = null;
 
         const [settingsRow] = await db
-          .select({ activeFavoriteId: chatSettings.activeFavoriteId })
+          .select({
+            activeFavoriteId: chatSettings.activeFavoriteId,
+            webPinnedTools: chatSettings.webPinnedTools,
+          })
           .from(chatSettings)
           .where(eq(chatSettings.userId, user.id))
           .limit(1);
 
+        if (settingsRow) {
+          dbWebPinned = settingsRow.webPinnedTools ?? null;
+        }
+
         if (settingsRow?.activeFavoriteId) {
           const { isUuid } =
             await import("@/app/api/[locale]/agent/chat/slugify");
+          const { resolveToolCascade } =
+            await import("@/app/api/[locale]/agent/chat/skills/tools-cascade");
           const [fav] = await db
             .select({
               availableTools: chatFavorites.availableTools,
               pinnedTools: chatFavorites.pinnedTools,
+              skillId: chatFavorites.skillId,
             })
             .from(chatFavorites)
             .where(
@@ -872,51 +932,137 @@ export class HelpRepository {
             )
             .limit(1);
           if (fav) {
-            dbPinned = fav.pinnedTools;
-            dbAllowed = fav.availableTools;
+            const resolved = await resolveToolCascade({
+              favoriteAvailableTools: fav.availableTools,
+              favoritePinnedTools: fav.pinnedTools,
+              skillId: fav.skillId,
+            });
+            // Use resolved effective lists for both (cascade: fav → skill → null/defaults)
+            dbPinned = resolved.pinnedTools;
+            cascadeBase = resolved.cascadeBase;
+            pinnedBase = resolved.pinnedBase;
           }
         }
 
-        // Always build both ID sets for accurate counts on all filter tabs
-        const pinnedIds: Set<string> =
-          dbPinned !== null
-            ? new Set(dbPinned.map((t: { toolId: string }) => t.toolId))
-            : new Set(getDefaultToolIdsForUser(user));
+        // When viewing as a different role, use that role's defaults for pins
+        const effectiveUser: JwtPayloadType = viewAsRole
+          ? isPublicView
+            ? {
+                leadId: user.leadId,
+                roles: [UserPermissionRole.PUBLIC] as const,
+                isPublic: true as const,
+              }
+            : {
+                id: user.isPublic ? "" : user.id,
+                leadId: user.leadId,
+                roles: [viewAsRole] as [typeof viewAsRole],
+                isPublic: false as const,
+              }
+          : user;
 
-        pinnedCount = platformFilteredMeta.filter(
-          (m) =>
-            pinnedIds.has(m.toolName) ||
-            m.aliases.some((a) => pinnedIds.has(a)),
-        ).length;
+        // aiMetaForStats already computed above (hoisted for statsMeta access).
+        const aiMeta = aiMetaForStats;
 
-        // null allowed = all tools allowed (totalCount)
-        const dbAllowedIds =
-          dbAllowed !== null
-            ? new Set(dbAllowed.map((t: { toolId: string }) => t.toolId))
+        // Web sidebar pinned: from webPinnedTools on settings (null = use defaults)
+        const webPinnedIds: Set<string> =
+          dbWebPinned !== null && !viewAsRole
+            ? new Set(dbWebPinned)
+            : new Set(getDefaultWebPinnedIdsForUser(effectiveUser));
+
+        // AI pinned: from favorite's pinnedTools (null = use system defaults)
+        const aiPinnedIds: Set<string> =
+          dbPinned !== null && !viewAsRole
+            ? new Set(dbPinned.map((entry) => entry.toolId))
+            : new Set(getDefaultToolIdsForUser(effectiveUser));
+
+        // cascadeBaseIds: the set the client should materialize from when toggling a tool off.
+        // = skill's allowed list, or null = full AI platform.
+        const cascadeBaseIds: Set<string> | null =
+          cascadeBase !== null && !viewAsRole
+            ? new Set(
+                cascadeBase
+                  .map((entry) => entry.toolId)
+                  .filter((id) =>
+                    aiMeta.some(
+                      (m) =>
+                        m.toolName === id || m.aliases.some((a) => a === id),
+                    ),
+                  ),
+              )
             : null;
 
-        allowedCount =
-          dbAllowedIds !== null
-            ? platformFilteredMeta.filter(
-                (m) =>
-                  dbAllowedIds.has(m.toolName) ||
-                  m.aliases.some((a) => dbAllowedIds.has(a)),
-              ).length
-            : totalCount;
+        const { inSet } = HelpRepository;
 
-        // Apply the active filter to narrow platformFilteredMeta
+        // AI counts
+        pinnedCount = aiMeta.filter((m) => inSet(m, aiPinnedIds)).length;
+        webPinnedCount = aiMeta.filter((m) => inSet(m, webPinnedIds)).length;
+        // allowed = all AI-platform tools (platform capability, not user/skill restriction)
+        allowedCount = aiMeta.length;
+
+        // CLI/MCP meta — computed once, reused for both counts and filter application.
+        // Admin-only: non-admins never see CLI/MCP-specific breakdowns.
+        let cliMetaCached: EndpointMeta[] | null = null;
+        let mcpMetaCached: EndpointMeta[] | null = null;
+        const getCliMeta = (): EndpointMeta[] => {
+          cliMetaCached ??= HelpRepository.filterMetaForUser(
+            allMeta,
+            Platform.CLI,
+            userRoles,
+            isPublicView,
+          );
+          return cliMetaCached;
+        };
+        const getMcpMeta = (): EndpointMeta[] => {
+          mcpMetaCached ??= HelpRepository.filterMetaForUser(
+            allMeta,
+            Platform.MCP,
+            userRoles,
+            isPublicView,
+          );
+          return mcpMetaCached;
+        };
+
+        if (isAdmin) {
+          const cliMeta = getCliMeta();
+          const mcpMeta = getMcpMeta();
+          cliAllowedCount = cliMeta.length;
+          // MCP: pinned = tools with MCP_VISIBLE (discovery list); allowed = all MCP-callable tools
+          mcpPinnedCount = mcpMeta.filter((m) =>
+            m.allowedRoles.includes(PlatformMarker.MCP_VISIBLE),
+          ).length;
+          mcpAllowedCount = mcpMeta.length;
+        }
+
+        // allAiToolIds: the cascade base the client uses when materializing from null.
+        aiMetaForStats =
+          cascadeBaseIds !== null
+            ? aiMeta.filter((m) => inSet(m, cascadeBaseIds))
+            : aiMeta;
+
+        // Apply the active statsFilter to narrow the tool list returned to the client.
+        // Web admin: "all" = AI platform tools; "webPinned" = web-platform tools filtered to pinned.
         if (statsFilter === "pinned") {
-          platformFilteredMeta = platformFilteredMeta.filter(
-            (m) =>
-              pinnedIds.has(m.toolName) ||
-              m.aliases.some((a) => pinnedIds.has(a)),
+          platformFilteredMeta = aiMeta.filter((m) => inSet(m, aiPinnedIds));
+        } else if (statsFilter === "webPinned") {
+          // Web sidebar pins: base set = web-platform tools (not AI), filtered to pinned IDs.
+          const webMeta = HelpRepository.filterMetaForUser(
+            allMeta,
+            Platform.NEXT_PAGE,
+            userRoles,
+            isPublicView,
           );
-        } else if (statsFilter === "allowed" && dbAllowedIds !== null) {
-          platformFilteredMeta = platformFilteredMeta.filter(
-            (m) =>
-              dbAllowedIds.has(m.toolName) ||
-              m.aliases.some((a) => dbAllowedIds.has(a)),
+          platformFilteredMeta = webMeta.filter((m) => inSet(m, webPinnedIds));
+        } else if (statsFilter === "allowed" || statsFilter === "all") {
+          // "allowed" and "all" both show the full AI-platform tool set.
+          platformFilteredMeta = aiMeta;
+        } else if (statsFilter === "cliAllowed" && isAdmin) {
+          platformFilteredMeta = getCliMeta();
+        } else if (statsFilter === "mcpPinned" && isAdmin) {
+          platformFilteredMeta = getMcpMeta().filter((m) =>
+            m.allowedRoles.includes(PlatformMarker.MCP_VISIBLE),
           );
+        } else if (statsFilter === "mcpAllowed" && isAdmin) {
+          platformFilteredMeta = getMcpMeta();
         }
       } catch {
         // Favorite fetch failed - fall through with unfiltered list
@@ -925,16 +1071,29 @@ export class HelpRepository {
 
     const adminMeta = isAdmin
       ? {
-          currentPlatform: platformFilter ?? platform,
+          currentPlatform: platform,
           currentEnv,
         }
       : {};
 
-    // Web-only: server-computed counts for the pinned/allowed/all filter tabs
+    // Web-only: server-computed counts for the pinned/allowed/all filter tabs.
+    // allAiToolIds: flat list of all AI-platform tool names — used by the widget when
+    // materializing from null (favorite has no explicit allowlist yet).
+    // skillPinnedDefault: skill's pinnedTools (null = no skill restriction → use role defaults).
+    // skillAllowedDefault: skill's availableTools (null = all tools allowed).
     const statsMeta = !isCompact
       ? {
           pinnedCount,
           allowedCount,
+          webPinnedCount,
+          ...(isAdmin && {
+            cliAllowedCount,
+            mcpPinnedCount,
+            mcpAllowedCount,
+          }),
+          allAiToolIds: aiMetaForStats.map((m) => m.toolName),
+          skillPinnedDefault: pinnedBase?.map((e) => e.toolId) ?? null,
+          skillAllowedDefault: cascadeBase?.map((e) => e.toolId) ?? null,
         }
       : {};
 
@@ -954,8 +1113,7 @@ export class HelpRepository {
           tools: [] satisfies HelpToolMetadataSerialized[],
           totalCount,
           matchedCount: 0,
-          categories,
-          hint: `Tool "${data.toolName}" not found. Use query to search by keyword.`,
+          hint: t("get.hints.toolNotFound", { name: data.toolName }),
           ...adminMeta,
           ...statsMeta,
         });
@@ -977,7 +1135,15 @@ export class HelpRepository {
         ],
         totalCount,
         matchedCount: 1,
-        hint: `Call as: execute-tool toolName="${callAs}"${matchedTool.aliases.length > 0 ? ` (aliases: ${matchedTool.aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
+        hint: t("get.hints.detailMode", {
+          name: callAs,
+          aliases:
+            matchedTool.aliases.length > 0
+              ? t("get.hints.detailModeAliases", {
+                  aliases: matchedTool.aliases.join(", "),
+                })
+              : "",
+        }),
         ...adminMeta,
         ...statsMeta,
       });
@@ -985,10 +1151,9 @@ export class HelpRepository {
 
     const query = data.query?.toLowerCase().trim();
     const category = data.category?.toLowerCase().trim();
-    const subCategory = data.subCategory?.toLowerCase().trim();
 
     // Auto-upgrade to detail mode on exact name/alias match
-    if (query && !category && !subCategory) {
+    if (query && !category) {
       const exactMatch = platformFilteredMeta.find(
         (m) =>
           m.toolName.toLowerCase() === query ||
@@ -1012,7 +1177,15 @@ export class HelpRepository {
           ],
           totalCount,
           matchedCount: 1,
-          hint: `Call as: execute-tool toolName="${callAs}"${exactMatch.aliases.length > 0 ? ` (aliases: ${exactMatch.aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
+          hint: t("get.hints.detailMode", {
+            name: callAs,
+            aliases:
+              exactMatch.aliases.length > 0
+                ? t("get.hints.detailModeAliases", {
+                    aliases: exactMatch.aliases.join(", "),
+                  })
+                : "",
+          }),
           ...adminMeta,
           ...statsMeta,
         });
@@ -1035,15 +1208,47 @@ export class HelpRepository {
     }
 
     if (category) {
-      filtered = filtered.filter((m) =>
+      // category field accepts both parent category key (e.g. "ai") and subCategory name (e.g. "Search").
+      // Match against category first; if no tools match, try subCategory fallback.
+      const byCat = filtered.filter((m) =>
         m.category?.toLowerCase().includes(category),
       );
+      filtered =
+        byCat.length > 0
+          ? byCat
+          : filtered.filter((m) =>
+              (m.subCategory ?? m.category)?.toLowerCase().includes(category),
+            );
     }
 
-    if (subCategory) {
-      filtered = filtered.filter((m) =>
-        (m.subCategory ?? m.category)?.toLowerCase().includes(subCategory),
-      );
+    // Web: if no filters at all (no query, no category, no toolName), return categories only.
+    // This lets the sidebar start page show folders without loading every tool.
+    // CLI/compact platforms skip this to preserve existing "return everything" behaviour.
+    const isCli =
+      platform === Platform.CLI || platform === Platform.CLI_PACKAGE;
+    const hasFilters =
+      !!(query ?? category ?? data.toolName) ||
+      statsFilter === "pinned" ||
+      statsFilter === "webPinned" ||
+      statsFilter === "allowed" ||
+      statsFilter === "all" ||
+      statsFilter === "cliAllowed" ||
+      statsFilter === "mcpPinned" ||
+      statsFilter === "mcpAllowed";
+
+    // Categories always reflect the active filtered set (statsFilter + query + category).
+    // Computed from `filtered` so counts stay aligned regardless of which view is active.
+    const categories = HelpRepository.buildCategories(filtered);
+
+    if (!hasFilters && !HelpRepository.isCompactPlatform(platform) && !isCli) {
+      return success({
+        tools: [] satisfies HelpToolMetadataSerialized[],
+        totalCount,
+        matchedCount: 0,
+        categories,
+        ...adminMeta,
+        ...statsMeta,
+      });
     }
 
     // Sort by category (A-Z), then by tool name (A-Z) within each category
@@ -1062,6 +1267,16 @@ export class HelpRepository {
     const pageSlice = filtered.slice(offset, offset + effectivePageSize);
 
     if (isCompact) {
+      if (matchedCount === 0) {
+        return success({
+          tools: [] satisfies HelpToolMetadataSerialized[],
+          totalCount,
+          matchedCount,
+          categories,
+          hint: t("get.hints.noToolsMatched"),
+          ...adminMeta,
+        });
+      }
       if (matchedCount <= HelpRepository.COMPACT_FULL_DETAIL_THRESHOLD) {
         const tools: HelpToolMetadataSerialized[] = await Promise.all(
           pageSlice.map(async (m) => {
@@ -1083,16 +1298,34 @@ export class HelpRepository {
           tools,
           totalCount,
           matchedCount,
-          hint:
-            matchedCount === 0
-              ? `No tools matched. Try a broader query or call without params to see all categories.`
-              : `Full schema for ${matchedCount} tool${matchedCount === 1 ? "" : "s"}. Call via: execute-tool toolName="<name>" input={...}. Narrow query further for fewer results.`,
+          hint: t("get.hints.compactFullSchema", { count: matchedCount }),
           ...adminMeta,
         });
       }
+      // Above COMPACT_CATEGORY_ONLY_THRESHOLD: return only categories, no tool names (saves tokens)
+      if (matchedCount > HelpRepository.COMPACT_CATEGORY_ONLY_THRESHOLD) {
+        return success({
+          tools: [] satisfies HelpToolMetadataSerialized[],
+          totalCount,
+          matchedCount,
+          categories,
+          hint: t("get.hints.compactCategoryOnly", {
+            matched: matchedCount,
+            categories: categories.length,
+            listThreshold: HelpRepository.COMPACT_CATEGORY_ONLY_THRESHOLD,
+            detailThreshold: HelpRepository.COMPACT_FULL_DETAIL_THRESHOLD,
+          }),
+          ...adminMeta,
+        });
+      }
+      // Between COMPACT_FULL_DETAIL_THRESHOLD and COMPACT_CATEGORY_ONLY_THRESHOLD: show tool names
       const paginationHint =
         totalPages > 1
-          ? ` Page ${safePage}/${totalPages} - pass page=${safePage + 1} to continue.`
+          ? t("get.hints.pagination", {
+              page: safePage,
+              total: totalPages,
+              next: safePage + 1,
+            })
           : "";
       return success({
         tools: pageSlice.map(
@@ -1102,7 +1335,11 @@ export class HelpRepository {
         totalCount,
         matchedCount,
         categories,
-        hint: `${matchedCount} tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName="<name>" for detail on one tool. To call any tool: execute-tool toolName="<name>".${paginationHint}`,
+        hint: t("get.hints.compactList", {
+          matched: matchedCount,
+          detailThreshold: HelpRepository.COMPACT_FULL_DETAIL_THRESHOLD,
+          pagination: paginationHint,
+        }),
         currentPage: safePage,
         effectivePageSize,
         totalPages,
@@ -1110,8 +1347,9 @@ export class HelpRepository {
       });
     }
 
-    // CLI/web: auto-upgrade to full detail when result set is small enough
-    if (matchedCount <= HelpRepository.COMPACT_FULL_DETAIL_THRESHOLD) {
+    // CLI only: auto-upgrade to full detail when result set is small enough.
+    // Web skips this — parameter schemas are only needed for CLI/AI/MCP consumers.
+    if (isCli && matchedCount <= HelpRepository.COMPACT_FULL_DETAIL_THRESHOLD) {
       const tools: HelpToolMetadataSerialized[] = await Promise.all(
         pageSlice.map(async (m) => {
           const endpoint = await HelpRepository.loadEndpointForMeta(m);
@@ -1132,8 +1370,8 @@ export class HelpRepository {
         matchedCount,
         hint:
           matchedCount === 0
-            ? `No tools matched. Try a broader query or call without params to see all categories.`
-            : `Showing full detail for ${matchedCount} tool${matchedCount === 1 ? "" : "s"}. CLI: vibe <name> [--field=value].`,
+            ? t("get.hints.noToolsMatched")
+            : t("get.hints.cliFullDetail", { count: matchedCount }),
         ...adminMeta,
         ...statsMeta,
       });
@@ -1154,8 +1392,12 @@ export class HelpRepository {
       categories,
       hint:
         totalPages > 1
-          ? `Page ${safePage}/${totalPages} - ${matchedCount} tools match. Use vibe help <name> for full details.`
-          : `${matchedCount} tools matched. Use vibe help <name> for full details.`,
+          ? t("get.hints.cliList", {
+              page: safePage,
+              total: totalPages,
+              matched: matchedCount,
+            })
+          : t("get.hints.cliListSingle", { matched: matchedCount }),
       currentPage: safePage,
       effectivePageSize,
       totalPages,

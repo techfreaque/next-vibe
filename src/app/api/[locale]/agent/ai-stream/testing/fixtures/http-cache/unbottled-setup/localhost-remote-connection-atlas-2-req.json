@@ -1,0 +1,11 @@
+{
+  "url": "http://localhost:3002/api/en-US/remote-connection/atlas",
+  "method": "PATCH",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "[redacted]"
+  },
+  "body": {
+    "reconnectNow": true
+  }
+}

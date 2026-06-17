@@ -7,6 +7,7 @@ import {
   IntelligenceLevel,
   ModelSelectionType,
 } from "../chat/skills/enum";
+import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -60,7 +61,6 @@ export enum ChatModelId {
   CLAUDE_OPUS_4_5 = "claude-opus-4.5",
   CLAUDE_OPUS_4_6 = "claude-opus-4.6",
   CLAUDE_OPUS_4_7 = "claude-opus-4.7",
-  CLAUDE_OPUS_4_8 = "claude-opus-4.8",
   GLM_4_5V = "glm-4.5v",
   KIMI_K2 = "kimi-k2",
   KIMI_K2_5 = "kimi_k2_5",
@@ -503,60 +503,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         id: ChatModelId.CLAUDE_OPUS_4_7,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-opus-4.7",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 6.5,
-        outputTokenCost: 32.5,
-      },
-    ],
-
-    utilities: [
-      ModelUtility.LEGACY,
-      ModelUtility.SMART,
-      ModelUtility.CODING,
-      ModelUtility.ANALYSIS,
-      ModelUtility.CREATIVE,
-      ModelUtility.REASONING,
-    ],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
-    content: ContentLevel.MAINSTREAM,
-    features: {
-      ...defaultFeatures,
-      toolCalling: true,
-    },
-    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
-  },
-  [ChatModelId.CLAUDE_OPUS_4_8]: {
-    name: "Claude Opus 4.8",
-    by: "anthropic",
-    description: "chat.models.descriptions.claudeOpus48",
-    parameterCount: undefined,
-    contextWindow: 1000000,
-    icon: "si-anthropic",
-    inputs: ["text", "image"],
-    outputs: ["text"],
-    providers: [
-      {
-        id: ChatModelId.CLAUDE_OPUS_4_8,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "anthropic/claude-opus-4.8",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 5,
-        outputTokenCost: 25,
-      },
-      {
-        id: ChatModelId.CLAUDE_CODE_OPUS,
-        apiProvider: ApiProvider.CLAUDE_CODE,
-        providerModel: "claude-opus-4-8",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 5,
-        outputTokenCost: 25,
-        adminOnly: true,
-      },
-      {
-        id: ChatModelId.CLAUDE_OPUS_4_8,
-        apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "claude-opus-4.8",
         creditCost: calculateCreditCost,
         inputTokenCost: 6.5,
         outputTokenCost: 32.5,
@@ -3325,19 +3271,23 @@ export type ChatModelSelection = z.infer<typeof chatModelSelectionSchema>;
 export function filterChatModels(
   selection: ChatModelSelection,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
   providerOverride?: ApiProvider,
 ): ChatModelOption[] {
   const pool = providerOverride
     ? chatModelOptionsPool.filter((m) => m.apiProvider === providerOverride)
     : chatModelOptionsPool;
-  return filterRoleModels(pool, selection, user);
+  return filterRoleModels(pool, selection, user, availability);
 }
 
 /** Get best chat model from a selection. */
 export function getBestChatModel(
   selection: ChatModelSelection,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
   providerOverride?: ApiProvider,
 ): ChatModelOption | null {
-  return filterChatModels(selection, user, providerOverride)[0] ?? null;
+  return (
+    filterChatModels(selection, user, availability, providerOverride)[0] ?? null
+  );
 }

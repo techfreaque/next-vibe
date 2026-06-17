@@ -70,17 +70,21 @@ function ModelCard({
   locale,
   t,
   nameClassName,
-}: {
   onClick,
+}: {
   model: ModelListItem;
   locale: Parameters<typeof ModelCreditDisplay>[0]["locale"];
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
   nameClassName?: string;
+  onClick?: () => void;
 }): JSX.Element {
   const typeIcon = TYPE_ICONS[model.type] ?? "•";
 
   return (
-    <Div className="group flex flex-col gap-2 rounded-xl border bg-card p-3 transition-colors hover:bg-accent/40">
+    <Div
+      className={`group flex flex-col gap-2 rounded-xl border bg-card p-3 transition-colors hover:bg-accent/40${onClick ? " cursor-pointer" : ""}`}
+      onClick={onClick}
+    >
       {/* Header row */}
       <Div className="flex items-start gap-2">
         <Span className="text-base leading-none mt-0.5" aria-hidden="true">
@@ -173,30 +177,7 @@ function ModelGrid({
   models: ModelListItem[];
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
   locale: Parameters<typeof ModelCreditDisplay>[0]["locale"];
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
-  onPick,
+  onPick?: (model: ModelListItem) => void;
 }): JSX.Element {
   if (models.length === 0) {
     return (
@@ -208,7 +189,13 @@ function ModelGrid({
   return (
     <Div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
       {models.map((model) => (
-        <ModelCard key={model.id} model={model} locale={locale} t={t} />
+        <ModelCard
+          key={model.id}
+          model={model}
+          locale={locale}
+          t={t}
+          onClick={onPick ? (): void => onPick(model) : undefined}
+        />
       ))}
     </Div>
   );
@@ -220,6 +207,8 @@ export function ModelsListWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const value = useWidgetValue<typeof definition.GET>();
+  const onPick = usePickerCallback<ModelListItem>();
+  const isPickerMode = !!onPick;
 
   const [localQuery, setLocalQuery] = useState("");
   const [activeContent, setActiveContent] = useState<string | null>(null);
@@ -272,7 +261,7 @@ export function ModelsListWidget(): JSX.Element {
             }}
           />
         </Div>
-        {contentLevels.length > 1 && (
+        {!isPickerMode && contentLevels.length > 1 && (
           <Div className="flex gap-1 flex-wrap">
             <Button
               variant={activeContent === null ? "default" : "outline"}
@@ -302,45 +291,51 @@ export function ModelsListWidget(): JSX.Element {
       </Div>
 
       {/* Stats */}
-      <Div className="text-xs text-muted-foreground">
-        <Span>
-          {t("get.browser.statsLabel", {
-            matched: filtered.length,
-            total: value.totalCount,
-          })}
-        </Span>
-      </Div>
+      {!isPickerMode && (
+        <Div className="text-xs text-muted-foreground">
+          <Span>
+            {t("get.browser.statsLabel", {
+              matched: filtered.length,
+              total: value.totalCount,
+            })}
+          </Span>
+        </Div>
+      )}
 
-      {/* Tabs by model type */}
-      <Tabs defaultValue={defaultTab}>
-        <TabsList>
-          {types.map((type) => {
-            const count = filtered.filter((m) => m.type === type).length;
-            return (
-              <TabsTrigger key={type} value={type}>
-                {TYPE_ICONS[type]} {type}
-                {count > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="ml-1 text-[10px] h-4 px-1"
-                  >
-                    {String(count)}
-                  </Badge>
-                )}
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
-        {types.map((type) => (
-          <TabsContent key={type} value={type} className="mt-3">
-            <ModelGrid
-              models={filtered.filter((m) => m.type === type)}
-              t={t}
-              locale={locale}
-            />
-          </TabsContent>
-        ))}
-      </Tabs>
+      {/* Tabs by model type — full mode; flat grid in picker mode */}
+      {isPickerMode ? (
+        <ModelGrid models={filtered} t={t} locale={locale} onPick={onPick} />
+      ) : (
+        <Tabs defaultValue={defaultTab}>
+          <TabsList>
+            {types.map((type) => {
+              const count = filtered.filter((m) => m.type === type).length;
+              return (
+                <TabsTrigger key={type} value={type}>
+                  {TYPE_ICONS[type]} {type}
+                  {count > 0 && (
+                    <Badge
+                      variant="secondary"
+                      className="ml-1 text-[10px] h-4 px-1"
+                    >
+                      {String(count)}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+          {types.map((type) => (
+            <TabsContent key={type} value={type} className="mt-3">
+              <ModelGrid
+                models={filtered.filter((m) => m.type === type)}
+                t={t}
+                locale={locale}
+              />
+            </TabsContent>
+          ))}
+        </Tabs>
+      )}
     </Div>
   );
 }

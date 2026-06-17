@@ -60,18 +60,41 @@ export const HTTP_CACHE_DIR = join(
 
 // ── Context ────────────────────────────────────────────────────────────────────
 
-let currentTestCase = "unknown";
-let strictMode = false;
+/**
+ * Shared across ALL module instances of this file. The dev server loads two
+ * copies (the CLI graph installs the global fetch patch, the Vite SSR graph
+ * serves route handlers that set the context) - module-local state would
+ * split context/counters between instances and recordings would land in the
+ * wrong context directory.
+ */
+interface FetchCacheSharedState {
+  currentTestCase: string;
+  strictMode: boolean;
+  callCounters: Map<string, number>;
+  inflightCount: number;
+  installed: boolean;
+}
+const sharedState: FetchCacheSharedState = ((): FetchCacheSharedState => {
+  const g = globalThis as { __vibeFetchCacheState?: FetchCacheSharedState };
+  g.__vibeFetchCacheState ??= {
+    currentTestCase: "unknown",
+    strictMode: false,
+    callCounters: new Map<string, number>(),
+    inflightCount: 0,
+    installed: false,
+  };
+  return g.__vibeFetchCacheState;
+})();
 
 /** Current fixture context — relay calls forward it to fixture-mode servers. */
 export function getFetchCacheContext(): string {
-  return currentTestCase;
+  return sharedState.currentTestCase;
 }
 
 /** Call this at the top of each test to scope cache files to that test. */
 export function setFetchCacheContext(testCase: string): void {
-  currentTestCase = slugify(testCase);
-  callCounters.clear();
+  sharedState.currentTestCase = slugify(testCase);
+  sharedState.callCounters.clear();
   // Keep Claude Code fixture store in sync - it doesn't use fetch so needs its own context
   setClaudeCodeFixtureContext(testCase);
   // Keep WS fixture store in sync (registered by ws-fixture.ts when installed)
@@ -91,7 +114,7 @@ export function registerWsStrictHook(hook: (strict: boolean) => void): void {
 }
 
 export function setFetchCacheStrictMode(strict: boolean): void {
-  strictMode = strict;
+  sharedState.strictMode = strict;
   wsStrictHook?.(strict);
 }
 
@@ -529,16 +552,13 @@ export function clearLocalhostPorts(): void {
   localhostPorts.clear();
 }
 
-const callCounters = new Map<string, number>();
-
 function nextCallIndex(modelName: string): number {
-  const n = (callCounters.get(modelName) ?? 0) + 1;
-  callCounters.set(modelName, n);
+  const n = (sharedState.callCounters.get(modelName) ?? 0) + 1;
+  sharedState.callCounters.set(modelName, n);
   return n;
 }
 
 /** Count of external fetch calls currently in-flight (started but not resolved). */
-let inflightCount = 0;
 
 /**
  * Wait until all in-flight external fetch calls have resolved.
@@ -553,7 +573,7 @@ export async function waitForInflightFetches(
   // Poll until no more in-flight calls. inflightCount is mutated by the
   // global fetch interceptor (not inside the loop body), so we read it via
   // a getter to satisfy the loop-condition linter rule.
-  const getInflight = (): number => inflightCount;
+  const getInflight = (): number => sharedState.inflightCount;
   while (getInflight() > 0 && Date.now() < deadline) {
     // eslint-disable-next-line no-await-in-loop
     await new Promise<void>((resolve) => {
@@ -746,8 +766,6 @@ function buildResFile(
 
 // ── Main ───────────────────────────────────────────────────────────────────────
 
-let installed = false;
-
 export function installFetchCache(
   logger: EndpointLogger = createEndpointLogger(
     false,
@@ -755,10 +773,10 @@ export function installFetchCache(
     defaultLocale,
   ),
 ): void {
-  if (installed) {
+  if (sharedState.installed) {
     return;
   }
-  installed = true;
+  sharedState.installed = true;
   mkdirSync(HTTP_CACHE_DIR, { recursive: true });
 
   const originalFetch = global.fetch;
@@ -779,7 +797,20 @@ export function installFetchCache(
       return originalFetch(input, init);
     }
 
-    inflightCount++;
+    // Pass through relay control-plane calls — these are side-effectful and must
+    // always reach the live server:
+    //   ws-provider/stream  — starts a new AI loop, returns a fresh responseThreadId
+    //   ws/broadcast        — delivers tool results to the remote AI loop
+    // Caching either would break the relay: stale responseThreadId → dead WS channel;
+    // cached broadcast → tool result never delivered → tool timeout on remote.
+    if (
+      url.includes("/agent/ai-stream/ws-provider/stream") ||
+      url.includes("/ws/broadcast")
+    ) {
+      return originalFetch(input, init);
+    }
+
+    sharedState.inflightCount++;
     try {
       let bodyStr = "";
       if (init?.body) {
@@ -792,7 +823,7 @@ export function installFetchCache(
       }
 
       const modelName = deriveModelName(url, bodyStr);
-      const testCaseDir = cacheDir(currentTestCase);
+      const testCaseDir = cacheDir(sharedState.currentTestCase);
       const callIndex = nextCallIndex(modelName);
       const stem = fileStem(modelName, callIndex);
       const rp = join(testCaseDir, `${stem}-res.json`);
@@ -822,11 +853,11 @@ export function installFetchCache(
       });
 
       // ── Cache miss ────────────────────────────────────────────────────────────
-      if (strictMode) {
+      if (sharedState.strictMode) {
         // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached fetch
         throw new Error(
           // eslint-disable-next-line i18next/no-literal-string
-          `[FetchCache STRICT] No fixture for external URL: ${url} (context: ${currentTestCase})`,
+          `[FetchCache STRICT] No fixture for external URL: ${url} (context: ${sharedState.currentTestCase})`,
         );
       }
 
@@ -920,7 +951,7 @@ export function installFetchCache(
         headers: responseHeaders,
       });
     } finally {
-      inflightCount--;
+      sharedState.inflightCount--;
     }
   }) as typeof globalThis.fetch;
 }

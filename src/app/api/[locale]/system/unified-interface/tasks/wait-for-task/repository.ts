@@ -21,6 +21,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
@@ -48,6 +49,114 @@ export class WaitForTaskRepository {
     try {
       // tools-loader injects currentToolMessageId from pendingToolMessages before execute() is called.
       // No polling needed - by the time execute() runs, tool-call has already been processed.
+
+      // ── In-flight remote call (no task row — remote-call/spec.md → No Remote Tasks) ──
+      // Remote dispatches live in the in-memory pending-calls registry, not in
+      // cronTasks. Check it first: completed → deliver inline; unresolved →
+      // attach this stream as the revival target and pause.
+      const {
+        getPendingCallReconciled,
+        setPendingCallRevival,
+        discardPendingCall,
+      } = await import("@/app/api/[locale]/remote-connection/pending-calls");
+      const pendingCall = await getPendingCallReconciled(taskId);
+      if (pendingCall) {
+        // Suppress any wakeUp signal for the original dispatch tool message —
+        // wait-for-task is taking over delivery either way.
+        if (streamContext && pendingCall.toolMessageId) {
+          if (!streamContext.suppressedWakeUpToolMessageIds) {
+            streamContext.suppressedWakeUpToolMessageIds = new Set();
+          }
+          streamContext.suppressedWakeUpToolMessageIds.add(
+            pendingCall.toolMessageId,
+          );
+        }
+
+        if (pendingCall.result) {
+          discardPendingCall(taskId);
+          logger.debug(
+            "[WaitForTask] Pending remote call already completed - returning inline",
+            { taskId, status: pendingCall.result.status },
+          );
+          return success<WaitForTaskResponseOutput>({
+            status:
+              pendingCall.result.status === "completed"
+                ? CronTaskStatus.COMPLETED
+                : CronTaskStatus.FAILED,
+            result: pendingCall.result.output ?? undefined,
+            waiting: false,
+            originalToolName: pendingCall.toolName,
+            originalArgs: undefined,
+          });
+        }
+
+        const pendThreadId = streamContext.threadId;
+        const pendToolMessageId =
+          streamContext.currentToolMessageId ?? streamContext.aiMessageId;
+        if (pendThreadId && pendToolMessageId) {
+          // Resolve the active chat model from the favorite/skill cascade so
+          // the revival stream uses the caller's model.
+          const pendUserId = !user.isPublic ? user.id : undefined;
+          const { resolveFavoriteConfig } =
+            await import("@/app/api/[locale]/agent/chat/favorites/repository");
+          const { resolveSkillVariant } =
+            await import("@/app/api/[locale]/agent/chat/skills/resolver");
+          const { resolveChatModelId } =
+            await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
+          const { parseSkillId } =
+            await import("@/app/api/[locale]/agent/chat/slugify");
+          const pendFav = await resolveFavoriteConfig(
+            streamContext.favoriteId,
+            pendUserId,
+          );
+          const pendSkill = await resolveSkillVariant(
+            streamContext.skillId,
+            pendFav ? parseSkillId(pendFav.skillId).variantId : null,
+          );
+          const pendModelId = resolveChatModelId(
+            pendFav?.modelSelection ?? undefined,
+            pendSkill?.modelSelection ?? undefined,
+            user,
+            agentEnvAvailability,
+          );
+
+          // WAIT (not WAKE_UP): backfill in-place + resume directly.
+          setPendingCallRevival(taskId, {
+            threadId: pendThreadId,
+            toolMessageId: pendToolMessageId,
+            callbackMode: CallbackMode.WAIT,
+            leafMessageId: streamContext.leafMessageId ?? null,
+            modelId: pendModelId,
+            skillId: streamContext.skillId ?? null,
+            favoriteId: streamContext.favoriteId ?? null,
+            subAgentDepth: streamContext.subAgentDepth ?? 0,
+            userId: user.id ?? "",
+          });
+
+          streamContext.waitingForRemoteResult = true;
+          streamContext.pendingTimeoutMs = 90_000;
+          logger.info(
+            "[WaitForTask] Registered thread as waiter on pending remote call",
+            {
+              taskId,
+              threadId: pendThreadId,
+              toolMessageId: pendToolMessageId,
+            },
+          );
+        } else {
+          logger.warn(
+            "[WaitForTask] No streamContext target - returning pending status",
+            { taskId },
+          );
+        }
+
+        return success<WaitForTaskResponseOutput>({
+          status: CronTaskStatus.PENDING,
+          waiting: true,
+          originalToolName: pendingCall.toolName,
+          originalArgs: undefined,
+        });
+      }
 
       // Short retry to handle the parallel-batch race: if execute-tool(wakeUp) and
       // wait-for-task run in the same parallel tool batch, execute-tool may not have
@@ -84,13 +193,13 @@ export class WaitForTaskRepository {
       // Helper: extract original tool info from task row for widget rendering
       const originalToolName = task.routeId ?? undefined;
       const rawTaskInput = task.taskInput as Record<string, WidgetData> | null;
-      // Strip internal __result sentinel if present
-      const { __result: taskInputResult, ...cleanTaskInput } =
-        rawTaskInput ?? {};
+      const cleanTaskInput = rawTaskInput ?? {};
       const originalArgs =
         Object.keys(cleanTaskInput).length > 0 ? cleanTaskInput : undefined;
 
-      // If already completed (goroutine stored result in taskInput.__result), return inline.
+      // If already completed, return inline. The result lives on the original
+      // tool message (canonical result store, backfilled by handleTaskCompletion
+      // for every callback mode and execution location).
       if (
         task.lastExecutionStatus === CronTaskStatus.COMPLETED ||
         task.lastExecutionStatus === CronTaskStatus.FAILED ||
@@ -104,21 +213,30 @@ export class WaitForTaskRepository {
           },
         );
 
-        // Resolve result: prefer __result from taskInput (set by execute-tool goroutine),
-        // fall back to cron_task_executions.result (set by hermes cron runner).
-        let storedResult: WidgetData | undefined = taskInputResult;
-        if (storedResult === undefined) {
-          const [latestExecution] = await db
-            .select({ result: cronTaskExecutions.result })
-            .from(cronTaskExecutions)
-            .where(eq(cronTaskExecutions.taskId, taskId))
-            .orderBy(desc(cronTaskExecutions.completedAt))
-            .limit(1);
-          if (
-            latestExecution?.result !== null &&
-            latestExecution?.result !== undefined
-          ) {
-            storedResult = latestExecution.result;
+        let storedResult: WidgetData | undefined = undefined;
+        if (task.wakeUpToolMessageId) {
+          // The row flips terminal before the backfill lands on the tool
+          // message — poll briefly until the toolCall reaches a terminal
+          // status, then read the result.
+          for (let attempt = 0; attempt < 15; attempt++) {
+            const [toolMessage] = await db
+              .select({ metadata: chatMessages.metadata })
+              .from(chatMessages)
+              .where(eq(chatMessages.id, task.wakeUpToolMessageId))
+              .limit(1);
+            const toolCall = toolMessage?.metadata?.toolCall;
+            const terminal =
+              toolCall?.status === "completed" || toolCall?.status === "failed";
+            if (terminal) {
+              const backfilled = toolCall.result;
+              if (backfilled !== null && backfilled !== undefined) {
+                storedResult = backfilled;
+              }
+              break;
+            }
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, 200);
+            });
           }
         }
 
@@ -200,7 +318,6 @@ export class WaitForTaskRepository {
           waitFav?.modelSelection ?? undefined,
           waitSkill?.modelSelection ?? undefined,
           user,
-          streamContext.providerOverride,
         );
 
         // Write revival context to typed wakeUp* columns - not into taskInput JSON blob.

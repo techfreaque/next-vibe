@@ -21,6 +21,7 @@ import type {
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { ModelSelectionType } from "../chat/skills/enum";
+import type { AgentEnvAvailability } from "../env-availability";
 import { filterRoleModels, isModelOptionTokenBased } from "../models/models";
 import {
   filtersSelectionSchema,
@@ -388,41 +389,62 @@ export type AudioVisionModelSelection = z.infer<
 export function filterImageVisionModels(
   selection: ImageVisionModelSelection | null | undefined,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): ImageVisionModelOption[] {
-  return filterRoleModels(imageVisionModelOptions, selection, user);
+  return filterRoleModels(
+    imageVisionModelOptions,
+    selection,
+    user,
+    availability,
+  );
 }
 
 export function getBestImageVisionModel(
   selection: ImageVisionModelSelection,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): ImageVisionModelOption | null {
-  return filterImageVisionModels(selection, user)[0] ?? null;
+  return filterImageVisionModels(selection, user, availability)[0] ?? null;
 }
 
 export function filterVideoVisionModels(
   selection: VideoVisionModelSelection | null | undefined,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): VideoVisionModelOption[] {
-  return filterRoleModels(videoVisionModelOptions, selection, user);
+  return filterRoleModels(
+    videoVisionModelOptions,
+    selection,
+    user,
+    availability,
+  );
 }
 
 export function getBestVideoVisionModel(
   selection: VideoVisionModelSelection,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): VideoVisionModelOption | null {
-  return filterVideoVisionModels(selection, user)[0] ?? null;
+  return filterVideoVisionModels(selection, user, availability)[0] ?? null;
 }
 
 export function filterAudioVisionModels(
   selection: AudioVisionModelSelection | null | undefined,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): AudioVisionModelOption[] {
-  return filterRoleModels(audioVisionModelOptions, selection, user);
+  return filterRoleModels(
+    audioVisionModelOptions,
+    selection,
+    user,
+    availability,
+  );
 }
 
 export function getBestAudioVisionModel(
   selection: AudioVisionModelSelection,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): AudioVisionModelOption | null {
-  return filterAudioVisionModels(selection, user)[0] ?? null;
+  return filterAudioVisionModels(selection, user, availability)[0] ?? null;
 }

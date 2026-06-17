@@ -6,6 +6,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { chatModelOptions } from "@/app/api/[locale]/agent/ai-stream/models";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { imageGenModelOptions } from "@/app/api/[locale]/agent/image-generation/models";
 import { getModelPrice } from "@/app/api/[locale]/agent/models/all-models";
 import {

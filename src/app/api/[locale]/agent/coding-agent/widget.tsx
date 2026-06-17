@@ -281,8 +281,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
       durationMs: typeof durationMs === "number" ? durationMs : 0,
       taskId: typeof taskId === "string" ? taskId : undefined,
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result, rawResponse, isDisabled]);
+  }, [result, rawResponse, isDisabled, form]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -348,29 +347,26 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
 
   const userMessage = useMemo(
     () => makeUserMessage(promptValue, userMsgIdRef.current),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [promptValue, userMsgIdRef.current],
+    [promptValue],
   );
-
-  const isEscalated = !!effectiveResult?.taskId && !effectiveResult.output;
-  const isInteractiveLaunched =
-    !!effectiveResult?.taskId &&
-    effectiveResult.durationMs === 0 &&
-    !!effectiveResult.output;
 
   const assistantContent = useMemo(() => {
     if (!effectiveResult) {
       return "";
     }
-    if (isEscalated) {
+    const escalated = !!effectiveResult.taskId && !effectiveResult.output;
+    const interactiveLaunched =
+      !!effectiveResult.taskId &&
+      effectiveResult.durationMs === 0 &&
+      !!effectiveResult.output;
+    if (escalated) {
       return `⟳ Running in background…\n\nTask ID: \`${effectiveResult.taskId}\`${effectiveResult.hint ? `\n\n${effectiveResult.hint}` : ""}`;
     }
-    if (isInteractiveLaunched) {
+    if (interactiveLaunched) {
       return `◆ Interactive session launched in terminal\n\nTask ID: \`${effectiveResult.taskId}\`${effectiveResult.output ? `\n\n${effectiveResult.output}` : ""}`;
     }
     return effectiveResult.output ?? "";
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectiveResult, isEscalated, isInteractiveLaunched]);
+  }, [effectiveResult]);
 
   const isAssistantLoading = (isSubmitting || isDisabled) && !effectiveResult;
 
@@ -382,8 +378,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
         isAssistantLoading,
         PROVIDER_TO_MODEL[providerValue] ?? ChatModelId.CLAUDE_CODE_SONNET,
       ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [assistantContent, isAssistantLoading],
+    [assistantContent, isAssistantLoading, providerValue],
   );
 
   const assistantGroup = useMemo(

@@ -22,7 +22,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
-export type { EmailRenderProps, EmailResolvedData };
+export type { EmailRenderProps, EmailRenderSkip, EmailResolvedData };
 
 /**
  * Email Function Type - resolver that maps request context to email data.
@@ -42,8 +42,11 @@ export type EmailFunctionType<
     TUserRoles
   >,
 ) =>
-  | Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType>
-  | SuccessResponseType<EmailResolvedData>
+  | Promise<
+      | SuccessResponseType<EmailResolvedData | EmailRenderSkip>
+      | ErrorResponseType
+    >
+  | SuccessResponseType<EmailResolvedData | EmailRenderSkip>
   | ErrorResponseType;
 
 /**
@@ -71,8 +74,11 @@ export interface EmailHandler<
         TUserRoles
       >,
     ) =>
-      | Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType>
-      | SuccessResponseType<EmailResolvedData>
+      | Promise<
+          | SuccessResponseType<EmailResolvedData | EmailRenderSkip>
+          | ErrorResponseType
+        >
+      | SuccessResponseType<EmailResolvedData | EmailRenderSkip>
       | ErrorResponseType;
   };
 }

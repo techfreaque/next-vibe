@@ -1,5 +1,5 @@
 /**
- * AI Stream Integration - Vibe-Coder Skill (Direct, hermes 3001)
+ * AI Stream Integration - Vibe-Coder Skill (Direct, hermes-dev 3002)
  *
  * Tests that when `codingAgent = "next-vibe-coder"` is set in chat settings,
  * Thea correctly delegates coding tasks using `ai-run` with the `vibe-coder` skill.
@@ -11,11 +11,10 @@
  *
  * Setup mirrors route.direct.test.ts:
  *   1. connectToHermes → registers atlas on hermes, syncs capabilities
- *   2. triggerPull → populates capabilities before tests run
- *   3. Override admin user's codingAgent setting to "next-vibe-coder"
- *   4. Create a stable vibe-coder favorite for the test user
- *   5. Run test steps
- *   6. Restore original codingAgent setting in afterAll
+ *   2. Override admin user's codingAgent setting to "next-vibe-coder"
+ *   3. Create a stable vibe-coder favorite for the test user
+ *   4. Run test steps
+ *   5. Restore original codingAgent setting in afterAll
  */
 
 import "server-only";
@@ -65,7 +64,6 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       ensureRemoteUserCredits,
       resolveProdAdminToken,
       resolveProdUserId,
-      triggerPull,
     } = await import("../../testing/remote-setup");
 
     const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
@@ -129,7 +127,6 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
     // ── Connect to hermes (direct mode) ──
     await disconnectFromHermes(testUser.id);
     await connectToHermes(testUser);
-    await triggerPull();
 
     _prodUserId = await resolveProdUserId();
     const remoteAdminToken = await resolveProdAdminToken();

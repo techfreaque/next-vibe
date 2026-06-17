@@ -28,6 +28,10 @@ import {
 import type { ChatFavorite } from "@/app/api/[locale]/agent/chat/favorites/db";
 import type { SkillVariant } from "@/app/api/[locale]/agent/chat/skills/config";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import {
+  type AgentEnvAvailability,
+  agentEnvAvailability,
+} from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
   getBestImageGenModel,
@@ -146,6 +150,7 @@ export function resolveChatModelId(
   favoriteModelSelection: ChatFavorite["modelSelection"] | undefined,
   skillVariantModelSelection: SkillVariant["modelSelection"] | undefined,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
   providerOverride?: ApiProvider,
 ): ChatModelId | null {
   // Try favorite's modelSelection first
@@ -153,6 +158,7 @@ export function resolveChatModelId(
     const best = getBestChatModel(
       favoriteModelSelection,
       user,
+      availability,
       providerOverride,
     );
     if (best) {
@@ -165,6 +171,7 @@ export function resolveChatModelId(
     const best = getBestChatModel(
       skillVariantModelSelection,
       user,
+      availability,
       providerOverride,
     );
     if (best) {
@@ -184,22 +191,29 @@ export class ModalityResolver {
     favoriteSelection: TSelection | null | undefined,
     skillSelection: TSelection | null | undefined,
     defaultSelection: TSelection,
-    getBest: (sel: TSelection, user: JwtPayloadType) => TOption | null,
+    getBest: (
+      sel: TSelection,
+      user: JwtPayloadType,
+      availability: AgentEnvAvailability,
+    ) => TOption | null,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): TOption | null {
     const fromFavorite = favoriteSelection
-      ? getBest(favoriteSelection, user)
+      ? getBest(favoriteSelection, user, availability)
       : null;
     if (fromFavorite) {
       return fromFavorite;
     }
 
-    const fromSkill = skillSelection ? getBest(skillSelection, user) : null;
+    const fromSkill = skillSelection
+      ? getBest(skillSelection, user, availability)
+      : null;
     if (fromSkill) {
       return fromSkill;
     }
 
-    return getBest(defaultSelection, user);
+    return getBest(defaultSelection, user, availability);
   }
 
   /**
@@ -210,35 +224,44 @@ export class ModalityResolver {
     skillSelection: TSelection | null | undefined,
     favoriteSelection: TSelection | null | undefined,
     defaultSelection: TSelection,
-    getBest: (sel: TSelection, user: JwtPayloadType) => TOption | null,
+    getBest: (
+      sel: TSelection,
+      user: JwtPayloadType,
+      availability: AgentEnvAvailability,
+    ) => TOption | null,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): TOption | null {
-    const fromSkill = skillSelection ? getBest(skillSelection, user) : null;
+    const fromSkill = skillSelection
+      ? getBest(skillSelection, user, availability)
+      : null;
     if (fromSkill) {
       return fromSkill;
     }
 
     const fromFavorite = favoriteSelection
-      ? getBest(favoriteSelection, user)
+      ? getBest(favoriteSelection, user, availability)
       : null;
     if (fromFavorite) {
       return fromFavorite;
     }
 
-    return getBest(defaultSelection, user);
+    return getBest(defaultSelection, user, availability);
   }
 
   /** Resolve STT model: favorite → skill variant → system default */
   static resolveSttModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): SttModelOption | null {
     return this.cascadeBridgeModel(
       ctx.favorite?.sttModelSelection,
       ctx.skill?.sttModelSelection,
       DEFAULT_STT_MODEL_SELECTION,
-      (sel, u) => getBestSttModel(sel, u),
+      (sel, u, avail) => getBestSttModel(sel, u, avail),
       user,
+      availability,
     );
   }
 
@@ -246,13 +269,15 @@ export class ModalityResolver {
   static resolveTtsModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): TtsModelOption | null {
     return this.cascadeBridgeModel(
       ctx.favorite?.voiceModelSelection,
       ctx.skill?.voiceModelSelection,
       DEFAULT_TTS_MODEL_SELECTION,
-      (sel, u) => getBestTtsModel(sel, u),
+      (sel, u, avail) => getBestTtsModel(sel, u, avail),
       user,
+      availability,
     );
   }
 
@@ -260,21 +285,24 @@ export class ModalityResolver {
   static resolveTtsVoiceId(
     ctx: BridgeContext,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): TtsModelId | null {
-    return this.resolveTtsModel(ctx, user)?.id ?? null;
+    return this.resolveTtsModel(ctx, user, availability)?.id ?? null;
   }
 
   /** Resolve image vision model: favorite → skill variant → system default */
   static resolveImageVisionModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): ImageVisionModelOption | null {
     return this.cascadeBridgeModel(
       ctx.favorite?.imageVisionModelSelection,
       ctx.skill?.imageVisionModelSelection,
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
-      (sel, u) => getBestImageVisionModel(sel, u),
+      (sel, u, avail) => getBestImageVisionModel(sel, u, avail),
       user,
+      availability,
     );
   }
 
@@ -282,13 +310,15 @@ export class ModalityResolver {
   static resolveVideoVisionModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): VideoVisionModelOption | null {
     return this.cascadeBridgeModel(
       ctx.favorite?.videoVisionModelSelection,
       ctx.skill?.videoVisionModelSelection,
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-      (sel, u) => getBestVideoVisionModel(sel, u),
+      (sel, u, avail) => getBestVideoVisionModel(sel, u, avail),
       user,
+      availability,
     );
   }
 
@@ -296,13 +326,15 @@ export class ModalityResolver {
   static resolveAudioVisionModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): AudioVisionModelOption | null {
     return this.cascadeBridgeModel(
       ctx.favorite?.audioVisionModelSelection,
       ctx.skill?.audioVisionModelSelection,
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
-      (sel, u) => getBestAudioVisionModel(sel, u),
+      (sel, u, avail) => getBestAudioVisionModel(sel, u, avail),
       user,
+      availability,
     );
   }
 
@@ -361,13 +393,15 @@ export class ModalityResolver {
   static resolveImageGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): ImageGenModelOption | null {
     return this.cascadeMediaGenModel(
       ctx.skill?.imageGenModelSelection,
       ctx.favorite?.imageGenModelSelection,
       DEFAULT_IMAGE_GEN_MODEL_SELECTION,
-      (sel, u) => getBestImageGenModel(sel, u),
+      (sel, u, avail) => getBestImageGenModel(sel, u, avail),
       user,
+      availability,
     );
   }
 
@@ -375,13 +409,15 @@ export class ModalityResolver {
   static resolveMusicGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): MusicGenModelOption | null {
     return this.cascadeMediaGenModel(
       ctx.skill?.musicGenModelSelection,
       ctx.favorite?.musicGenModelSelection,
       DEFAULT_MUSIC_GEN_MODEL_SELECTION,
-      (sel, u) => getBestMusicGenModel(sel, u),
+      (sel, u, avail) => getBestMusicGenModel(sel, u, avail),
       user,
+      availability,
     );
   }
 
@@ -389,13 +425,15 @@ export class ModalityResolver {
   static resolveVideoGenModel(
     ctx: BridgeContext,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): VideoGenModelOption | null {
     return this.cascadeMediaGenModel(
       ctx.skill?.videoGenModelSelection,
       ctx.favorite?.videoGenModelSelection,
       DEFAULT_VIDEO_GEN_MODEL_SELECTION,
-      (sel, u) => getBestVideoGenModel(sel, u),
+      (sel, u, avail) => getBestVideoGenModel(sel, u, avail),
       user,
+      availability,
     );
   }
 
@@ -442,6 +480,7 @@ export class ModalityResolver {
     activeModel: ChatModelOption,
     ctx: BridgeContext,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability = agentEnvAvailability,
   ): { modality: Modality; reason: string }[] {
     const unsupported: { modality: Modality; reason: string }[] = [];
     const checked = new Set<Modality>();
@@ -459,7 +498,11 @@ export class ModalityResolver {
 
       // Check if bridge is available
       if (modality === "image") {
-        const visionModel = ModalityResolver.resolveImageVisionModel(ctx, user);
+        const visionModel = ModalityResolver.resolveImageVisionModel(
+          ctx,
+          user,
+          availability,
+        );
         if (!visionModel) {
           unsupported.push({
             modality,
@@ -468,7 +511,11 @@ export class ModalityResolver {
           });
         }
       } else if (modality === "video") {
-        const visionModel = ModalityResolver.resolveVideoVisionModel(ctx, user);
+        const visionModel = ModalityResolver.resolveVideoVisionModel(
+          ctx,
+          user,
+          availability,
+        );
         if (!visionModel) {
           unsupported.push({
             modality,
@@ -477,7 +524,11 @@ export class ModalityResolver {
           });
         }
       } else if (modality === "audio") {
-        const sttModel = ModalityResolver.resolveSttModel(ctx, user);
+        const sttModel = ModalityResolver.resolveSttModel(
+          ctx,
+          user,
+          availability,
+        );
         if (!sttModel) {
           unsupported.push({
             modality,

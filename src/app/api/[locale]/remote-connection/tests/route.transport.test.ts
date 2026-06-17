@@ -15,7 +15,6 @@
  *
  * All suites use transportMode='direct-http'.
  * Setup is E2E: connectToHermes logs into hermes, registers atlas there, syncs caps.
- * triggerPull() ensures capabilities are populated before any test runs.
  *
  * Requires: vibe --hermes dev --fixture-mode  → http://localhost:3002
  */
@@ -52,7 +51,6 @@ import {
   resolveProdAdminToken,
   resolveProdUserId,
   resolveRemoteUrl,
-  triggerPull,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
 
@@ -160,7 +158,6 @@ if (_remoteUrl && _isFixtureMode) {
       // remote/atlas subfolder on hermes. REMOTE-folder routing is deterministic.
       // register() on hermes side: creates remote/atlas subfolder on hermes.
       await connectToHermes(testUser, _remoteUrl!);
-      await triggerPull();
 
       prodUserId = await resolveProdUserId();
 
@@ -393,6 +390,10 @@ if (_remoteUrl && _isFixtureMode) {
           // instanceId identifies the calling instance as known by the provider (atlas).
           // Hermes is known as HERMES_INSTANCE_ID ("hermes") by atlas.
           instanceId: HERMES_INSTANCE_ID,
+          // threadMirrorMode='both' enables provider-side persistence on atlas
+          // so the thread is written to atlas's REMOTE/hermes folder and can be
+          // queried in the assertions below.
+          threadMirrorMode: "both",
         }),
         signal: AbortSignal.timeout(60_000),
       });

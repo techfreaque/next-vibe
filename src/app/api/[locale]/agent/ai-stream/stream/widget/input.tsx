@@ -75,7 +75,7 @@ import {
   useMessageOperations,
 } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-operations";
 import { CortexButton } from "@/app/api/[locale]/agent/cortex/widget/cortex-button";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
@@ -353,6 +353,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       favoriteConfig?.imageVisionModelSelection ??
         DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
+      availability,
     );
   const canAcceptVideo =
     currentModel?.inputs?.includes("video") === true ||
@@ -360,6 +361,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       favoriteConfig?.videoVisionModelSelection ??
         DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
+      availability,
     );
   const canAcceptAudio =
     currentModel?.inputs?.includes("audio") === true ||
@@ -367,6 +369,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       favoriteConfig?.audioVisionModelSelection ??
         DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
+      availability,
     );
 
   // Build dynamic accept string: always include documents, conditionally include media

@@ -3,7 +3,6 @@
 import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import { useMemo } from "react";
 
 import type {
   HelpGetRequestInput,
@@ -93,28 +92,20 @@ export function ToolsPageClient({
   const searchParams = useSearchParams();
   const logger = useLogger();
 
-  const endpointOptions = useMemo(
-    () => {
-      const initialState = parseInitialState(searchParams);
-      const useInitialData =
-        !initialState.category &&
-        (!initialState.statsFilter || initialState.statsFilter === "webPinned");
-      return {
-        read: {
-          initialState,
-          initialData: useInitialData
-            ? (initialHelpData ?? undefined)
-            : undefined,
-          queryOptions: {
-            staleTime: 60 * 1000,
-            refetchOnWindowFocus: false,
-          },
-        },
-      };
+  const initialState = parseInitialState(searchParams);
+  const useInitialData =
+    !initialState.category &&
+    (!initialState.statsFilter || initialState.statsFilter === "webPinned");
+  const endpointOptions = {
+    read: {
+      initialState,
+      initialData: useInitialData ? (initialHelpData ?? undefined) : undefined,
+      queryOptions: {
+        staleTime: 60 * 1000,
+        refetchOnWindowFocus: false,
+      },
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+  };
 
   const endpointInstance = useEndpoint(
     helpDefinitions,

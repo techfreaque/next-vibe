@@ -27,6 +27,7 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,

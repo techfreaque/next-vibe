@@ -30,7 +30,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;
@@ -52,15 +51,17 @@ const mockScopedTranslation = {
   }),
 };
 
+const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+
 /**
  * UNIT TESTS: Test individual field inference
  */
 
 // Test Field 1: requestField with z.literal - field creation
-const field1_requestLiteral = requestField({
+const field1_requestLiteral = requestField(genericST, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
-  label: "test" as TranslationKey,
+  label: "test" as string,
   schema: z.literal("test-plan"),
 });
 
@@ -77,10 +78,10 @@ const _field1_reverse: AssertAssignable<"test-plan", Field1_Output> =
   "test-plan";
 
 // Test Field 2: requestField with z.enum - field creation
-const field2_requestEnum = requestField({
+const field2_requestEnum = requestField(genericST, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.SELECT,
-  label: "test" as TranslationKey,
+  label: "test" as string,
   schema: z.enum(["monthly", "yearly"]),
 });
 
@@ -97,9 +98,9 @@ const _field2_reverse: AssertAssignable<"monthly" | "yearly", Field2_Output> =
   "yearly";
 
 // Test Field 3: responseField with z.string - field creation
-const field3_responseString = responseField({
+const field3_responseString = responseField(genericST, {
   type: WidgetType.TEXT,
-  content: "test" as TranslationKey,
+  content: "test" as string,
   schema: z.string(),
 });
 
@@ -114,7 +115,7 @@ const _field3_output: AssertAssignable<Field3_Output, string> = "hello";
 const _field3_reverse: AssertAssignable<string, Field3_Output> = "world";
 
 // INCREMENTAL TEST: Test objectField with usage preservation
-const testNewUsageOnly = objectField({
+const testNewUsageOnly = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" } as const,
   children: {},
@@ -149,7 +150,7 @@ const _testNewAssign2: TestNewUsageOnly_Assignable2 = "YES";
 // >;
 
 // INCREMENTAL TEST: Test usage parameter preservation alone (OLD API)
-const testUsageOnly = objectField({
+const testUsageOnly = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data" } as const,
   children: {},
@@ -199,7 +200,7 @@ const _debugAssignable2: TestUsageOnly_Assignable2 = "YES";
 // >;
 
 // INCREMENTAL TEST: Test request+response usage
-const testDualUsage = objectField({
+const testDualUsage = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { request: "data", response: true } as const,
   children: {},
@@ -226,7 +227,7 @@ const _testDualAssign2: TestDualUsage_IsAssignable2 = "YES";
 // >;
 
 // INCREMENTAL TEST: Test response-only usage
-const testResponseOnly = objectField({
+const testResponseOnly = objectField(genericST, {
   type: WidgetType.CONTAINER,
   usage: { response: true } as const,
   children: {},
@@ -250,7 +251,7 @@ const _testResponseAssign2: TestResponseOnly_IsAssignable2 = "YES";
 // >;
 
 // Test Field 4: objectField with single request child
-const field4_objectWithRequestChild = objectField({
+const field4_objectWithRequestChild = objectField(genericST, {
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.STACKED,
   usage: { request: "data" } as const,
@@ -446,7 +447,7 @@ const _field4_reverse: AssertAssignable<
 };
 
 // Test Field 5: objectField with multiple request children
-const field5_objectWithMultipleRequestChildren = objectField({
+const field5_objectWithMultipleRequestChildren = objectField(genericST, {
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.STACKED,
   usage: { request: "data" },
@@ -473,7 +474,7 @@ const _field5_reverse: AssertAssignable<
 > = { planId: "test-plan", interval: "yearly" };
 
 // Test Field 6: objectField with response child
-const field6_objectWithResponseChild = objectField({
+const field6_objectWithResponseChild = objectField(genericST, {
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.STACKED,
   usage: { response: true },
@@ -497,34 +498,32 @@ const _field6_reverse: AssertAssignable<{ message: string }, Field6_Output> = {
 };
 
 // Test Field 7: nested objectField like brave-search (request + response)
-const field7_nestedObjectLikeBraveSearch = objectField({
+const field7_nestedObjectLikeBraveSearch = objectField(genericST, {
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.STACKED,
   usage: { request: "data", response: true },
   children: {
-    query: requestField({
+    query: requestField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
-      label: "Query" as TranslationKey,
+      label: "Query" as string,
       schema: z.string(),
     }),
-    results: responseArrayField(
-      {
-        type: WidgetType.CONTAINER,
-      },
-      objectField({
+    results: responseArrayField(genericST, {
+      type: WidgetType.CONTAINER,
+      child: objectField(genericST, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
-          title: responseField({
+          title: responseField(genericST, {
             type: WidgetType.TEXT,
-            content: "Title" as TranslationKey,
+            content: "Title" as string,
             schema: z.string(),
           }),
         },
       }),
-    ),
+    }),
   },
 });
 
@@ -569,21 +568,22 @@ const testSingleRequestLiteral = createEndpoint({
   method: Methods.POST,
   path: ["test", "single-request-literal"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data" },
     children: {
-      planId: requestField({
+      planId: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "test" as TranslationKey,
+        label: "test" as string,
         schema: z.literal("test-plan"),
       }),
     },
@@ -655,21 +655,22 @@ const testSingleRequestEnum = createEndpoint({
   method: Methods.POST,
   path: ["test", "single-request-enum"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data" },
     children: {
-      interval: requestField({
+      interval: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "test" as TranslationKey,
+        label: "test" as string,
         schema: z.enum(["monthly", "yearly"]),
       }),
     },
@@ -741,20 +742,21 @@ const testSingleResponseString = createEndpoint({
   method: Methods.GET,
   path: ["test", "single-response-string"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { response: true },
     children: {
-      message: responseField({
+      message: responseField(genericST, {
         type: WidgetType.TEXT,
-        content: "test" as TranslationKey,
+        content: "test" as string,
         schema: z.string(),
       }),
     },
@@ -826,33 +828,34 @@ const testMultipleRequestFields = createEndpoint({
   method: Methods.POST,
   path: ["test", "multiple-request"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data" },
     children: {
-      planId: requestField({
+      planId: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "test" as TranslationKey,
+        label: "test" as string,
         schema: z.literal("subscription"),
       }),
-      interval: requestField({
+      interval: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "test" as TranslationKey,
+        label: "test" as string,
         schema: z.enum(["monthly", "yearly"]),
       }),
-      provider: requestField({
+      provider: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "test" as TranslationKey,
+        label: "test" as string,
         schema: z.string(),
       }),
     },
@@ -928,18 +931,19 @@ const testPublicEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["test"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { response: true },
     children: {
-      message: responseField({
+      message: responseField(genericST, {
         type: WidgetType.TEXT,
         content: "test" as const,
         schema: z.string(),
@@ -998,18 +1002,19 @@ const testAdminEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["test"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { response: true },
     children: {
-      status: responseField({
+      status: responseField(genericST, {
         type: WidgetType.TEXT,
         content: "test" as const,
         schema: z.string(),
@@ -1088,25 +1093,26 @@ const testResponseEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["test", "response"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { response: true },
     children: {
-      userId: responseField({
+      userId: responseField(genericST, {
         type: WidgetType.TEXT,
-        content: "test" as TranslationKey,
+        content: "test" as string,
         schema: z.string(),
       }),
-      count: responseField({
+      count: responseField(genericST, {
         type: WidgetType.TEXT,
-        content: "test" as TranslationKey,
+        content: "test" as string,
         schema: z.number(),
       }),
     },
@@ -1185,32 +1191,33 @@ const testRequestEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["test", "request"],
   title: "test" as any,
+  titleShort: "test" as any,
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data", response: true },
     children: {
-      planId: requestField({
+      planId: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "test" as TranslationKey,
+        label: "test" as string,
         schema: z.literal("test-plan"),
       }),
-      billingInterval: requestField({
+      billingInterval: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "test" as TranslationKey,
+        label: "test" as string,
         schema: z.enum(["monthly", "yearly"]),
       }),
-      success: responseField({
+      success: responseField(genericST, {
         type: WidgetType.TEXT,
-        content: "test" as TranslationKey,
+        content: "test" as string,
         schema: z.boolean(),
       }),
     },

@@ -133,7 +133,10 @@ export async function loadCortexData(
       tasks,
       favs,
     ] = await Promise.all([
-      getVirtualMountCounts(userId),
+      getVirtualMountCounts(
+        userId,
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN),
+      ),
       loadMemoryContext(userId, localeRoots.memories, locale),
       buildTrimmedDocTree(userId, localeRoots.documents, locale),
       loadPinnedThreads(userId),
@@ -1160,11 +1163,8 @@ function buildSkillsDir(
     shownIds.add(s.id);
   }
 
-  // Relevant from vector search (user skills in cortexNodes - skip default/ system skills)
+  // Relevant from vector search (custom skills in cortexNodes)
   for (const n of relevant) {
-    if (n.path.startsWith("/skills/default/")) {
-      continue;
-    }
     // Extract skill ID from path (e.g. /skills/<uuid>.md or /skills/<uuid>/...)
     const pathParts = n.path.replace(/^\/skills\//, "").split("/");
     const maybeId = pathParts[0]?.replace(/\.md$/, "") ?? "";

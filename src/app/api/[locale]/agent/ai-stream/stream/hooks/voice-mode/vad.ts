@@ -62,7 +62,6 @@ export class VoiceActivityDetector {
 
     // ScriptProcessorNode: 4096 samples, 1 input channel, 1 output channel
     // Deprecated but widely supported; AudioWorklet is the modern alternative
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
 
     this.processor.onaudioprocess = (event): void => {

@@ -4,17 +4,17 @@
   "status": 200,
   "headers": {
     "content-type": "application/json",
-    "date": "Wed, 17 Jun 2026 12:11:07 GMT, Wed, 17 Jun 2026 12:11:07 GMT",
+    "date": "Wed, 17 Jun 2026 18:53:04 GMT, Wed, 17 Jun 2026 18:53:04 GMT",
     "transfer-encoding": "chunked",
     "vary": "sec-fetch-dest",
-    "set-cookie": "lead_id_3002=ca6fcbd4-d565-488c-bba8-3aa52602df53; Max-Age=315360000; Path=/; HttpOnly; SameSite=Lax"
+    "set-cookie": "lead_id_3002=b9febc6d-720a-4c28-b721-3e4049ba5403; Max-Age=315360000; Path=/; HttpOnly; SameSite=Lax"
   },
   "body": {
     "success": true,
     "data": {
       "message": "Welcome back! You have successfully logged in.",
-      "token": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImY0MzFiY2U0LTgwZTUtNDkxOC1iZDU2LWEyNzI2ODY3ODk4YSIsImxlYWRJZCI6ImNhNmZjYmQ0LWQ1NjUtNDg4Yy1iYmE4LTNhYTUyNjAyZGY1MyIsImlzUHVibGljIjpmYWxzZSwicm9sZXMiOlsiZW51bXMudXNlclJvbGUuYWRtaW4iXSwiaWF0IjoxNzgxNjk4MjY3LCJleHAiOjQ5MzUyOTgyNjd9.RRdY8er-wQ_YOxGnhksv6m7ycUZIguESafSxRMu3iTE",
-      "leadId": "ca6fcbd4-d565-488c-bba8-3aa52602df53"
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImY0MzFiY2U0LTgwZTUtNDkxOC1iZDU2LWEyNzI2ODY3ODk4YSIsImxlYWRJZCI6ImI5ZmViYzZkLTcyMGEtNGMyOC1iNzIxLTNlNDA0OWJhNTQwMyIsImlzUHVibGljIjpmYWxzZSwicm9sZXMiOlsiZW51bXMudXNlclJvbGUuYWRtaW4iXSwiaWF0IjoxNzgxNzIyMzg0LCJleHAiOjQ5MzUzMjIzODR9.K6aopm9tY9DY4CFKjRAApH_EKjq4qQDZHOBZncZPbTQ",
+      "leadId": "b9febc6d-720a-4c28-b721-3e4049ba5403"
     }
   }
 }

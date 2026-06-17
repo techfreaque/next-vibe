@@ -3,7 +3,7 @@
 import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import { useMemo } from "react";
+import { useRef } from "react";
 
 import type {
   HelpGetRequestInput,
@@ -19,9 +19,16 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 function parseInitialState(
   searchParams: ReturnType<typeof useSearchParams>,
-  toolAlias: string,
 ): Partial<HelpGetRequestInput> {
-  const state: Partial<HelpGetRequestInput> = { toolName: toolAlias };
+  const cat = searchParams.get("cat");
+
+  // Admin two-pane layout: sidebar loads tools by category (when cat= is in URL)
+  // or shows the full webPinned list (no category filter). The selected tool is
+  // resolved from the URL path by the widget's mount effect — never sent as toolName,
+  // because that would cause a single-tool response and an empty sidebar on refresh.
+  const state: Partial<HelpGetRequestInput> = cat
+    ? { category: cat }
+    : { statsFilter: "webPinned" };
 
   const q = searchParams.get("q");
   if (q) {
@@ -58,7 +65,6 @@ function parseInitialState(
     state.instanceId = inst;
   }
 
-  const cat = searchParams.get("cat");
   if (cat) {
     state.category = cat;
   }
@@ -85,8 +91,6 @@ function parseInitialState(
 export function ToolDetailPageClient({
   locale,
   user,
-  toolAlias,
-  initialHelpData,
 }: {
   locale: CountryLanguage;
   user: JwtPayloadType;
@@ -96,23 +100,31 @@ export function ToolDetailPageClient({
   const searchParams = useSearchParams();
   const logger = useLogger();
 
-  const endpointOptions = useMemo(
-    () => {
-      const initialState = parseInitialState(searchParams, toolAlias);
-      return {
-        read: {
-          initialState,
-          initialData: initialHelpData ?? undefined,
-          queryOptions: {
-            staleTime: 60 * 1000,
-            refetchOnWindowFocus: false,
-          },
+  interface EndpointOptions {
+    read: {
+      initialState: Partial<HelpGetRequestInput>;
+      initialData: HelpGetResponseOutput | undefined;
+      queryOptions: { staleTime: number; refetchOnWindowFocus: boolean };
+    };
+  }
+  const endpointOptionsRef = useRef<EndpointOptions | null>(null);
+  if (endpointOptionsRef.current === null) {
+    const initialState = parseInitialState(searchParams);
+    // SSR initialData was always fetched by toolName (single-tool response) —
+    // wrong shape for the sidebar which needs all tools in the category or webPinned
+    // set. Never seed it; let the client fetch the correct list.
+    endpointOptionsRef.current = {
+      read: {
+        initialState,
+        initialData: undefined,
+        queryOptions: {
+          staleTime: 60 * 1000,
+          refetchOnWindowFocus: false,
         },
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+      },
+    };
+  }
+  const endpointOptions = endpointOptionsRef.current;
 
   const endpointInstance = useEndpoint(
     helpDefinitions,

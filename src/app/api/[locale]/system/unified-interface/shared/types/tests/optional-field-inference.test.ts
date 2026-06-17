@@ -30,7 +30,6 @@ import {
   LayoutType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;
@@ -39,58 +38,58 @@ type Equal<X, Y> =
     ? true
     : false;
 
+const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+
 /**
  * TEST: Optional array field type inference
  * Tests that array fields with `optional: true` in UI config are properly typed as `T | null | undefined`
  */
-const optionalArrayField = requestDataArrayField(
-  {
+const optionalArrayField = requestDataArrayField(genericST, {
+  type: WidgetType.CONTAINER,
+  title: "app.admin.common.actions.back",
+  description: "app.admin.common.actions.back",
+  optional: true,
+  child: objectField(genericST, {
     type: WidgetType.CONTAINER,
-    title: "app.admin.common.actions.back",
-    description: "app.admin.common.actions.back",
-    optional: true,
-  } as const,
-  objectField({
-    type: WidgetType.CONTAINER,
-    title: "test" as TranslationKey,
-    description: "test" as TranslationKey,
+    title: "test" as string,
+    description: "test" as string,
     usage: { request: "data" },
     children: {
-      role: requestField({
+      role: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "test" as TranslationKey,
+        label: "test" as string,
         schema: z.string(),
       }),
-      content: requestField({
+      content: requestField(genericST, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "test" as TranslationKey,
+        label: "test" as string,
         schema: z.string(),
       }),
     },
   }),
-);
+});
 
 // Test 1: responseArrayOptionalField should create array-optional type
-const testResponseArrayOptional = responseArrayOptionalField({
+const testResponseArrayOptional = responseArrayOptionalField(genericST, {
   type: WidgetType.CONTAINER,
-  title: "app.test.optional.array.title" as TranslationKey,
-  child: objectField({
+  title: "app.test.optional.array.title" as string,
+  child: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 2,
     usage: { response: true },
     children: {
-      id: responseField({
+      id: responseField(genericST, {
         type: WidgetType.TEXT,
-        content: "app.test.id" as TranslationKey,
+        content: "app.test.id" as string,
         fieldType: FieldDataType.TEXT,
         schema: z.string(),
       }),
-      name: responseField({
+      name: responseField(genericST, {
         type: WidgetType.TEXT,
-        content: "app.test.name" as TranslationKey,
+        content: "app.test.name" as string,
         fieldType: FieldDataType.TEXT,
         schema: z.string(),
       }),
@@ -106,29 +105,27 @@ type TestResponseArrayOptionalCheck = Expect<
 >;
 
 // Test 2: objectOptionalField should create object-optional type
-const testObjectOptional = objectOptionalField(
-  {
-    type: WidgetType.CONTAINER,
-    title: "app.test.optional.object.title" as TranslationKey,
-    layoutType: LayoutType.GRID,
-    columns: 2,
-  },
-  { response: true },
-  {
-    firstName: responseField({
+const testObjectOptional = objectOptionalField(genericST, {
+  type: WidgetType.CONTAINER,
+  title: "app.test.optional.object.title" as string,
+  layoutType: LayoutType.GRID,
+  columns: 2,
+  usage: { response: true },
+  children: {
+    firstName: responseField(genericST, {
       type: WidgetType.TEXT,
-      content: "app.test.firstName" as TranslationKey,
+      content: "app.test.firstName" as string,
       fieldType: FieldDataType.TEXT,
       schema: z.string(),
     }),
-    lastName: responseField({
+    lastName: responseField(genericST, {
       type: WidgetType.TEXT,
-      content: "app.test.lastName" as TranslationKey,
+      content: "app.test.lastName" as string,
       fieldType: FieldDataType.TEXT,
       schema: z.string(),
     }),
   },
-);
+});
 
 // Verify schemaType is object-optional
 type TestObjectOptionalType = typeof testObjectOptional.schemaType;

@@ -7,7 +7,6 @@
  * Thread mirrored locally under BACKGROUND root (threadMirrorMode='both').
  *
  * Setup is E2E: connectToHermes logs into remote (3002), registers atlas, syncs caps.
- * triggerPull() ensures capabilities are populated before any test runs.
  */
 
 import "server-only";
@@ -35,7 +34,6 @@ async function setupDirectConnection(
     ensureRemoteUserCredits,
     resolveProdAdminToken,
     resolveProdUserId,
-    triggerPull,
   } = await import("../../testing/remote-setup");
 
   // Idempotent: clean up any leftover connection from a previous failed run
@@ -47,9 +45,6 @@ async function setupDirectConnection(
     testUser,
     _resolvedRemoteUrl ?? "http://localhost:3002",
   );
-
-  // Ensure capabilities are populated before tests run
-  await triggerPull();
 
   _prodUserId = await resolveProdUserId();
 

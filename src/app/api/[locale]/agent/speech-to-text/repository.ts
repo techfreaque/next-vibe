@@ -13,17 +13,20 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import {
   agentEnvAvailability,
   buildMissingKeyMessage,
+  getInstanceAvailability,
   PROVIDER_SETUP_INSTRUCTIONS,
 } from "@/app/api/[locale]/agent/env-availability";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { DEFAULT_STT_MODEL_ID } from "@/app/api/[locale]/agent/speech-to-text/constants";
+import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
 import type { SttModelId } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
+import {
+  getBestSttModel,
+  type SttModelSelection,
+} from "@/app/api/[locale]/agent/speech-to-text/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -37,6 +40,7 @@ import {
   STT_MINIMUM_BALANCE,
 } from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
+import { ModelSelectionType } from "../chat/skills/enum";
 import type { SpeechToTextPostResponseOutput } from "./definition";
 import {
   scopedTranslation as sttScopedTranslation,

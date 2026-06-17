@@ -5,6 +5,10 @@
  * Reads from NEXT_PUBLIC_AGENT_* client env vars - set automatically by the
  * vibe runtime (environment.ts) from the server-side API keys before build.
  * Safe to import in both server and client code (no server-only dependency).
+ *
+ * unbottled is NOT an env flag — it comes from the remote_connections table.
+ * Use getInstanceAvailability() on the server or hasInferenceProvider from
+ * the connection list endpoint on the client.
  */
 
 import { envClient } from "@/config/env-client";
@@ -42,8 +46,6 @@ export interface AgentEnvAvailability {
   falAi: boolean;
   /** ModelsLab (music generation, text-to-video) */
   modelsLab: boolean;
-  /** Unbottled AI provider (remote cloud instance) */
-  unbottled: boolean;
   /** Eden AI STT */
   edenAiStt: boolean;
   /** Deepgram STT */
@@ -57,8 +59,8 @@ export interface AgentEnvAvailability {
 }
 
 /**
- * Singleton for env availability - reads from NEXT_PUBLIC_AGENT_* client vars.
- * Evaluated once at module load time. Safe to import anywhere.
+ * Static env-derived availability singleton.
+ * `unbottled` is always false here — use getInstanceAvailability() for the live value.
  */
 export const agentEnvAvailability: AgentEnvAvailability = (() => {
   const braveSearch = envClient.NEXT_PUBLIC_AGENT_BRAVE_SEARCH;
@@ -81,7 +83,6 @@ export const agentEnvAvailability: AgentEnvAvailability = (() => {
     replicate: envClient.NEXT_PUBLIC_AGENT_REPLICATE,
     falAi: envClient.NEXT_PUBLIC_AGENT_FAL_AI,
     modelsLab: envClient.NEXT_PUBLIC_AGENT_MODELS_LAB,
-    unbottled: envClient.NEXT_PUBLIC_AGENT_UNBOTTLED,
     edenAiStt: envClient.NEXT_PUBLIC_AGENT_EDEN_AI_STT,
     deepgram: envClient.NEXT_PUBLIC_AGENT_DEEPGRAM,
     openAiTts: envClient.NEXT_PUBLIC_AGENT_OPEN_AI_TTS,
@@ -89,6 +90,34 @@ export const agentEnvAvailability: AgentEnvAvailability = (() => {
     elevenlabs: envClient.NEXT_PUBLIC_AGENT_ELEVENLABS,
   };
 })();
+
+/**
+ * Build client-side availability from the connection list response.
+ * Called by useProviderAvailability with hasInferenceProvider from the list endpoint.
+ */
+export function buildAvailabilityFromConnections(
+  hasInferenceProvider: boolean,
+): AgentEnvAvailability {
+  return {
+    ...agentEnvAvailability,
+    unbottled: hasInferenceProvider,
+  };
+}
+
+/**
+ * Server-side: returns availability with live unbottled state from DB cache.
+ * The cache is invalidated on any connection mutation (create/update/delete).
+ * Server-only — dynamically imports transport to avoid client bundle inclusion.
+ */
+export async function getInstanceAvailability(): Promise<AgentEnvAvailability> {
+  const { RemoteTransport } =
+    await import("@/app/api/[locale]/remote-connection/transport");
+  const unbottled = await RemoteTransport.hasInstanceInferenceProvider();
+  if (!unbottled) {
+    return agentEnvAvailability;
+  }
+  return { ...agentEnvAvailability, unbottled: true };
+}
 
 /**
  * Setup instructions per provider.

@@ -110,3 +110,14 @@ export interface SystemPromptFragment<TData> {
   condition?: (data: TData) => boolean;
   build: (data: TData) => string | null;
 }
+
+/**
+ * Opaque shape of a fragment as seen from a dynamic module import.
+ * `build` and `condition` use the contravariant-safe `never` input so that
+ * any `SystemPromptFragment<T>` is structurally assignable to this type.
+ */
+// oxlint-disable-next-line typescript/no-explicit-any
+export type PromptFragmentModuleEntry = SystemPromptFragment<any>;
+
+/** Shape of a dynamically-imported prompt module (each named export is a fragment). */
+export type PromptFragmentModule = Record<string, PromptFragmentModuleEntry>;

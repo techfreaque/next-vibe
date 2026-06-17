@@ -52,12 +52,11 @@ export const { POST, tools } = endpointsHandler({
         if (!sel) {
           return undefined;
         }
+        const { getInstanceAvailability } =
+          await import("@/app/api/[locale]/agent/env-availability");
+        const _routeAvailability = await getInstanceAvailability();
         const { getBestImageGenModel } = await import("./models");
-        return getBestImageGenModel(
-          sel,
-          ctx.user,
-          ctx.streamContext.providerOverride,
-        )?.id;
+        return getBestImageGenModel(sel, ctx.user, _routeAvailability)?.id;
       },
     },
   },

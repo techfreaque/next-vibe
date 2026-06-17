@@ -26,7 +26,7 @@ import { LOGIN_ALIAS } from "./constants";
 import { lazyWidget } from "next-vibe-ui/unified/_shared/lazy-widget";
 
 const LoginFormContainer = lazyWidget(() =>
-  import("./widget").then((m) => ({ default: m.LoginFormContainer }))
+  import("./widget").then((m) => ({ default: m.LoginFormContainer })),
 );
 
 const { POST } = createEndpoint({

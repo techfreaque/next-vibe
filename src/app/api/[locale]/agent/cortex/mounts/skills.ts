@@ -2,7 +2,14 @@ import "server-only";
 
 /**
  * Skills Virtual Mount
- * Renders custom skills as markdown files at /skills/<skillId>.md
+ *
+ * Structure:
+ *   /skills/                           → all own + favorited skills
+ *   /skills/<slug>-<variantId>.md      → specific variant of a skill
+ *   /skills/<slug>.md                  → skill with single/default variant
+ *
+ * Each skill variant is its own file. Filename = <skill-slug>-<variant-id>.md
+ * Skills with no variants or a single default variant use <skill-slug>.md
  */
 import { and, count as drizzleCount, eq, inArray, or } from "drizzle-orm";
 
@@ -17,90 +24,190 @@ import type {
   VirtualReadResult,
   VirtualWriteResult,
 } from "./resolver";
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Build the canonical filename for a skill variant */
+function variantFileName(slug: string, variantId: string | null): string {
+  if (!variantId || variantId === "default") {
+    return `${slug}.md`;
+  }
+  return `${slug}-${variantId}.md`;
+}
+
 /**
- * Read a skill as markdown
- * Path: /skills/<skillId>
+ * Parse a cortex path segment back to { slug, variantId }
+ * "/skills/vibe-coder-max.md" → { slug: "vibe-coder", variantId: "max" }  — resolved by DB lookup
+ * We just return the raw segment and let the DB query resolve it.
  */
-export async function readSkillPath(
-  userId: string,
-  path: string,
-): Promise<VirtualReadResult | null> {
-  const segments = path.split("/").filter(Boolean);
-  if (segments.length < 2) {
-    return null;
-  }
+function parseSegment(segment: string): string {
+  return segment.replace(/\.md$/, "");
+}
 
-  const skillIdSegment = segments[1];
-  // Strip .md extension if present
-  const skillId = skillIdSegment.replace(/\.md$/, "");
+/**
+ * Render a skill variant as markdown
+ */
+async function renderSkillVariant(
+  skill: {
+    id: string;
+    slug: string | null;
+    name: string | null;
+    systemPrompt: string | null;
+    ownershipType: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    variants: Array<{
+      id: string;
+      displayName?: string;
+      isDefault?: boolean;
+      modelSelection?: { manualModelId?: string; selectionType?: string };
+    }> | null;
+  },
+  variant: {
+    id: string;
+    displayName?: string;
+    isDefault?: boolean;
+    modelSelection?: { manualModelId?: string; selectionType?: string };
+  } | null,
+  locale?: CountryLanguage,
+): Promise<VirtualReadResult> {
+  const slug = skill.slug ?? skill.id;
+  const variantId = variant?.id ?? null;
 
-  // Dynamic import to avoid pulling in skills DB at module level
-  const { customSkills } =
-    await import("@/app/api/[locale]/agent/chat/skills/db");
+  const fm = ["---", `skillId: "${skill.id}"`, `slug: "${slug}"`];
 
-  const UUID_RE =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  const whereClause = UUID_RE.test(skillId)
-    ? or(eq(customSkills.id, skillId), eq(customSkills.slug, skillId))
-    : eq(customSkills.slug, skillId);
+  const { scopedTranslation: skillsT } =
+    await import("@/app/api/[locale]/agent/chat/skills/i18n");
+  const { t } = skillsT.scopedT(locale ?? "en-US");
 
-  const rows = await db.select().from(customSkills).where(whereClause).limit(1);
-
-  const skill = rows[0];
-  if (!skill) {
-    return null;
-  }
-
-  // Allow reading own skills or skills referenced by user's favorites
-  if (skill.userId !== userId) {
-    const { chatFavorites } =
-      await import("@/app/api/[locale]/agent/chat/favorites/db");
-    const [fav] = await db
-      .select({ id: chatFavorites.id })
-      .from(chatFavorites)
-      .where(
-        and(
-          eq(chatFavorites.userId, userId),
-          eq(chatFavorites.skillId, skill.id),
-        ),
-      )
-      .limit(1);
-    if (!fav) {
-      return null;
+  if (variant) {
+    fm.push(`variantId: "${variant.id}"`);
+    if (variant.displayName) {
+      fm.push(`variantName: "${variant.displayName.replace(/"/g, '\\"')}"`);
+    }
+    if (variant.isDefault) {
+      fm.push(`isDefault: true`);
+    }
+    if (variant.modelSelection) {
+      const m = variant.modelSelection;
+      if (m.manualModelId) {
+        fm.push(`model: "${m.manualModelId}"`);
+      } else if (m.selectionType) {
+        fm.push(`model: "${t(m.selectionType as Parameters<typeof t>[0])}"`);
+      } else {
+        fm.push(`model: "filters"`);
+      }
     }
   }
 
-  const frontmatterLines = [
-    "---",
-    `skillId: "${skill.id}"`,
-    `name: "${(skill.name ?? "Unnamed").replace(/"/g, '\\"')}"`,
-  ];
-
-  if (skill.modelSelection) {
-    const modelId =
-      "modelId" in skill.modelSelection
-        ? String(skill.modelSelection.modelId)
-        : "custom";
-    frontmatterLines.push(`model: "${modelId}"`);
+  if (skill.name) {
+    fm.push(`name: "${skill.name.replace(/"/g, '\\"')}"`);
   }
   if (skill.ownershipType) {
-    frontmatterLines.push(`ownership: "${skill.ownershipType}"`);
+    fm.push(
+      `ownership: "${t(skill.ownershipType as Parameters<typeof t>[0])}"`,
+    );
   }
 
-  frontmatterLines.push(`created: "${skill.createdAt.toISOString()}"`, "---");
+  const allVariants = skill.variants ?? [];
+  if (allVariants.length > 1) {
+    const others = allVariants
+      .filter((v) => v.id !== variantId)
+      .map((v) => variantFileName(slug, v.id));
+    if (others.length > 0) {
+      fm.push(`otherVariants: [${others.map((o) => `"${o}"`).join(", ")}]`);
+    }
+  }
+
+  fm.push(`created: "${skill.createdAt.toISOString()}"`, "---");
 
   const body = skill.systemPrompt ?? "";
-  const content = `${frontmatterLines.join("\n")}\n\n${body}`;
-
   return {
-    content,
+    content: `${fm.join("\n")}\n\n${body}`,
     nodeType: "file",
     updatedAt: skill.updatedAt.toISOString(),
   };
 }
 
 /**
- * List skills - own skills + skills referenced by user's favorites (deduped)
+ * Read a skill variant as markdown.
+ * Path: /skills/<slug>-<variantId>.md  or  /skills/<slug>.md  or  /skills/<uuid>.md
+ */
+export async function readSkillPath(
+  userId: string,
+  path: string,
+  locale?: CountryLanguage,
+): Promise<VirtualReadResult | null> {
+  const segments = path.split("/").filter(Boolean);
+  if (segments.length < 2) {
+    return null;
+  }
+
+  const raw = parseSegment(segments[1]!);
+  const { customSkills } =
+    await import("@/app/api/[locale]/agent/chat/skills/db");
+
+  // Load all accessible skills (own + favorited)
+  const { chatFavorites } =
+    await import("@/app/api/[locale]/agent/chat/favorites/db");
+
+  const favRows = await db
+    .select({ skillId: chatFavorites.skillId })
+    .from(chatFavorites)
+    .where(eq(chatFavorites.userId, userId));
+
+  const favSkillIds = [
+    ...new Set(favRows.map((r) => r.skillId).filter((id) => UUID_RE.test(id))),
+  ];
+
+  const whereClause =
+    favSkillIds.length > 0
+      ? or(
+          eq(customSkills.userId, userId),
+          inArray(customSkills.id, favSkillIds),
+        )
+      : eq(customSkills.userId, userId);
+
+  const rows = await db.select().from(customSkills).where(whereClause);
+
+  // Find matching skill + variant from the filename segment
+  // Filename format: <slug>-<variantId>.md or <slug>.md or <uuid>.md
+  for (const skill of rows) {
+    const slug = skill.slug ?? skill.id;
+    const variants = skill.variants ?? [];
+
+    // Exact UUID match → return default variant
+    if (UUID_RE.test(raw) && skill.id === raw) {
+      const defaultVariant =
+        variants.find((v) => v.isDefault) ?? variants[0] ?? null;
+      return renderSkillVariant(skill, defaultVariant, locale);
+    }
+
+    // Exact slug match → return default variant
+    if (raw === slug) {
+      const defaultVariant =
+        variants.find((v) => v.isDefault) ?? variants[0] ?? null;
+      return renderSkillVariant(skill, defaultVariant, locale);
+    }
+
+    // Try <slug>-<variantId> match
+    if (raw.startsWith(`${slug}-`)) {
+      const variantId = raw.slice(slug.length + 1);
+      const variant = variants.find((v) => v.id === variantId);
+      if (variant) {
+        return renderSkillVariant(skill, variant, locale);
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * List skills - own + favorited, one entry per variant.
+ * Single-variant skills → <slug>.md
+ * Multi-variant skills → <slug>-<variantId>.md per variant
  */
 export async function listSkillPath(
   userId: string,
@@ -115,21 +222,15 @@ export async function listSkillPath(
     import("@/app/api/[locale]/agent/chat/favorites/db"),
   ]);
 
-  // Get skillIds referenced by user's favorites
   const favRows = await db
     .select({ skillId: chatFavorites.skillId })
     .from(chatFavorites)
     .where(eq(chatFavorites.userId, userId));
 
-  const UUID_RE_LIST =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const favSkillIds = [
-    ...new Set(
-      favRows.map((r) => r.skillId).filter((id) => UUID_RE_LIST.test(id)),
-    ),
+    ...new Set(favRows.map((r) => r.skillId).filter((id) => UUID_RE.test(id))),
   ];
 
-  // Fetch own skills + favorited skills in one query
   const whereClause =
     favSkillIds.length > 0
       ? or(
@@ -144,20 +245,46 @@ export async function listSkillPath(
     .where(whereClause)
     .orderBy(customSkills.name);
 
-  return rows.map((s) => {
-    const fileKey = s.slug || s.id;
-    return {
-      name: `${fileKey}.md`,
-      path: `/skills/${fileKey}`,
-      nodeType: "file" as const,
-      size: s.systemPrompt ? Buffer.byteLength(s.systemPrompt, "utf8") : 0,
-      updatedAt: s.updatedAt.toISOString(),
-    };
-  });
+  const entries: VirtualListEntry[] = [];
+
+  for (const s of rows) {
+    const slug = s.slug ?? s.id;
+    const variants = s.variants ?? [];
+    const promptSize = s.systemPrompt
+      ? Buffer.byteLength(s.systemPrompt, "utf8")
+      : 0;
+
+    if (variants.length <= 1) {
+      // Single variant or no variants → one file
+      const variantId = variants[0]?.id ?? null;
+      const fileName = variantFileName(slug, variantId);
+      entries.push({
+        name: fileName,
+        path: `/skills/${fileName.replace(/\.md$/, "")}`,
+        nodeType: "file" as const,
+        size: promptSize,
+        updatedAt: s.updatedAt.toISOString(),
+      });
+    } else {
+      // Multiple variants → one file per variant
+      for (const v of variants) {
+        const fileName = variantFileName(slug, v.id);
+        entries.push({
+          name: fileName,
+          path: `/skills/${fileName.replace(/\.md$/, "")}`,
+          nodeType: "file" as const,
+          size: promptSize,
+          updatedAt: s.updatedAt.toISOString(),
+        });
+      }
+    }
+  }
+
+  return entries;
 }
 
 /**
- * Get skill count - own + favorited (deduped)
+ * Get skill count - own + favorited (total variants)
  */
 export async function getSkillCount(userId: string): Promise<number> {
   const [{ customSkills }, { chatFavorites }] = await Promise.all([
@@ -170,10 +297,12 @@ export async function getSkillCount(userId: string): Promise<number> {
     .from(chatFavorites)
     .where(eq(chatFavorites.userId, userId));
 
-  const UUID_RE =
+  const UUID_RE_LOCAL =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const favSkillIds = [
-    ...new Set(favRows.map((r) => r.skillId).filter((id) => UUID_RE.test(id))),
+    ...new Set(
+      favRows.map((r) => r.skillId).filter((id) => UUID_RE_LOCAL.test(id)),
+    ),
   ];
 
   const whereClause =
@@ -196,9 +325,6 @@ export async function getSkillCount(userId: string): Promise<number> {
 // Write handlers
 // ---------------------------------------------------------------------------
 
-/**
- * Parse skill markdown: extract frontmatter fields + body text (systemPrompt).
- */
 function parseSkillMarkdown(content: string): {
   body: string;
   name?: string;
@@ -241,10 +367,6 @@ function parseSkillMarkdown(content: string): {
   return result;
 }
 
-/**
- * Write a skill via Cortex path.
- * - /skills/<uuid>.md → update existing skill
- */
 export async function writeSkillPath(
   ctx: MountWriteContext,
   path: string,
@@ -255,30 +377,39 @@ export async function writeSkillPath(
     return null;
   }
 
-  const skillIdSegment = segments[1];
-  const skillId = skillIdSegment.replace(/\.md$/, "");
+  const raw = parseSegment(segments[1]!);
   const parsed = parseSkillMarkdown(content);
 
   const { customSkills } =
     await import("@/app/api/[locale]/agent/chat/skills/db");
 
-  // Check if skill exists and belongs to user (by id or slug)
-  const [existing] = await db
-    .select({ id: customSkills.id })
+  // Find the skill: try UUID first, then slug, then slug-variantId prefix
+  const rows = await db
+    .select({
+      id: customSkills.id,
+      slug: customSkills.slug,
+      userId: customSkills.userId,
+    })
     .from(customSkills)
-    .where(
-      and(
-        or(eq(customSkills.id, skillId), eq(customSkills.slug, skillId)),
-        eq(customSkills.userId, ctx.user.id),
-      ),
-    )
-    .limit(1);
+    .where(eq(customSkills.userId, ctx.user.id));
 
-  if (!existing) {
+  let targetId: string | null = null;
+  for (const s of rows) {
+    const slug = s.slug ?? s.id;
+    if (UUID_RE.test(raw) && s.id === raw) {
+      targetId = s.id;
+      break;
+    }
+    if (raw === slug || raw.startsWith(`${slug}-`)) {
+      targetId = s.id;
+      break;
+    }
+  }
+
+  if (!targetId) {
     return null;
   }
 
-  // Update systemPrompt + optional name/description/tagline
   await db
     .update(customSkills)
     .set({
@@ -290,25 +421,12 @@ export async function writeSkillPath(
         : {}),
       ...(parsed.tagline !== undefined ? { tagline: parsed.tagline } : {}),
     })
-    .where(eq(customSkills.id, existing.id));
+    .where(eq(customSkills.id, targetId));
 
-  // Disk write-through
-  try {
-    const { syncToDisk } = await import("../fs-provider/fs-sync");
-    await syncToDisk(`/skills/${skillId}.md`, content);
-  } catch {
-    // Best-effort
-  }
-
-  // Fire-and-forget: sync embedding for vector search
   void (async (): Promise<void> => {
     const { syncVirtualNodeToEmbedding } =
       await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
-    await syncVirtualNodeToEmbedding(
-      ctx.userId,
-      `/skills/${skillId}.md`,
-      content,
-    );
+    await syncVirtualNodeToEmbedding(ctx.userId, path, content);
   })().catch(() => {
     // Best-effort embedding sync
   });
@@ -316,10 +434,6 @@ export async function writeSkillPath(
   return { path, created: false };
 }
 
-/**
- * Delete a skill via Cortex path.
- * Path: /skills/<uuid>.md
- */
 export async function deleteSkillPath(
   ctx: MountWriteContext,
   path: string,
@@ -329,49 +443,49 @@ export async function deleteSkillPath(
     return null;
   }
 
-  const skillIdSegment = segments[1];
-  const skillId = skillIdSegment.replace(/\.md$/, "");
-
+  const raw = parseSegment(segments[1]!);
   const { customSkills } =
     await import("@/app/api/[locale]/agent/chat/skills/db");
 
-  const [existing] = await db
-    .select({ id: customSkills.id, userId: customSkills.userId })
+  const rows = await db
+    .select({
+      id: customSkills.id,
+      slug: customSkills.slug,
+      userId: customSkills.userId,
+    })
     .from(customSkills)
-    .where(or(eq(customSkills.id, skillId), eq(customSkills.slug, skillId)))
-    .limit(1);
+    .where(eq(customSkills.userId, ctx.userId));
 
-  if (!existing || existing.userId !== ctx.userId) {
+  let targetId: string | null = null;
+  for (const s of rows) {
+    const slug = s.slug ?? s.id;
+    if (UUID_RE.test(raw) && s.id === raw) {
+      targetId = s.id;
+      break;
+    }
+    if (raw === slug || raw.startsWith(`${slug}-`)) {
+      targetId = s.id;
+      break;
+    }
+  }
+
+  if (!targetId) {
     return null;
   }
 
-  await db.delete(customSkills).where(eq(customSkills.id, existing.id));
+  await db.delete(customSkills).where(eq(customSkills.id, targetId));
 
-  // Disk write-through - delete from disk
-  try {
-    const { deleteFromDisk } = await import("../fs-provider/fs-sync");
-    await deleteFromDisk(`/skills/${skillId}.md`);
-  } catch {
-    // Best-effort
-  }
-
-  // Fire-and-forget: remove embedding for vector search
   void (async (): Promise<void> => {
     const { removeVirtualNode } =
       await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
-    await removeVirtualNode(ctx.userId, `/skills/${skillId}.md`);
+    await removeVirtualNode(ctx.userId, path);
   })().catch(() => {
-    // Best-effort embedding removal
+    // Best-effort embedding sync
   });
 
   return { path, deleted: true };
 }
 
-/**
- * Move/rename a skill via Cortex path.
- * Only supports same-mount moves: /skills/<oldId>.md → /skills/<newSlug>.md
- * Updates the skill's slug to the new filename.
- */
 export async function moveSkillPath(
   ctx: MountWriteContext,
   fromPath: string,
@@ -383,69 +497,72 @@ export async function moveSkillPath(
     return null;
   }
 
-  const sourceId = fromSegments[1].replace(/\.md$/, "");
-  const newSlug = toSegments[1].replace(/\.md$/, "");
+  const sourceRaw = parseSegment(fromSegments[1]!);
+  const newSlug = parseSegment(toSegments[1]!);
 
-  if (!sourceId || !newSlug) {
+  if (!sourceRaw || !newSlug) {
     return null;
   }
 
   const { customSkills } =
     await import("@/app/api/[locale]/agent/chat/skills/db");
 
-  // Verify source exists and belongs to user (by id or slug)
-  const [existing] = await db
+  const rows = await db
     .select({
       id: customSkills.id,
-      userId: customSkills.userId,
       slug: customSkills.slug,
+      userId: customSkills.userId,
     })
     .from(customSkills)
-    .where(or(eq(customSkills.id, sourceId), eq(customSkills.slug, sourceId)))
-    .limit(1);
+    .where(eq(customSkills.userId, ctx.userId));
 
-  if (!existing || existing.userId !== ctx.userId) {
+  let targetId: string | null = null;
+  for (const s of rows) {
+    const slug = s.slug ?? s.id;
+    if (UUID_RE.test(sourceRaw) && s.id === sourceRaw) {
+      targetId = s.id;
+      break;
+    }
+    if (sourceRaw === slug || sourceRaw.startsWith(`${slug}-`)) {
+      targetId = s.id;
+      break;
+    }
+  }
+
+  if (!targetId) {
     return null;
   }
 
-  // Check slug isn't already taken by another skill
+  // Use base slug (strip variant suffix) as new slug
+  const baseNewSlug = newSlug.includes("-")
+    ? newSlug.split("-").slice(0, -1).join("-") || newSlug
+    : newSlug;
+
   const [conflict] = await db
     .select({ id: customSkills.id })
     .from(customSkills)
     .where(
-      and(eq(customSkills.slug, newSlug), eq(customSkills.userId, ctx.userId)),
+      and(
+        eq(customSkills.slug, baseNewSlug),
+        eq(customSkills.userId, ctx.userId),
+      ),
     )
     .limit(1);
 
-  if (conflict && conflict.id !== existing.id) {
+  if (conflict && conflict.id !== targetId) {
     return null;
   }
 
   await db
     .update(customSkills)
-    .set({ slug: newSlug, updatedAt: new Date() })
-    .where(eq(customSkills.id, sourceId));
+    .set({ slug: baseNewSlug, updatedAt: new Date() })
+    .where(eq(customSkills.id, targetId));
 
-  // Disk write-through: rename on disk
-  try {
-    const { deleteFromDisk } = await import("../fs-provider/fs-sync");
-    await deleteFromDisk(`/skills/${sourceId}.md`);
-    // Re-read and sync to new path
-    const readResult = await readSkillPath(ctx.userId, `/skills/${sourceId}`);
-    if (readResult) {
-      const { syncToDisk } = await import("../fs-provider/fs-sync");
-      await syncToDisk(`/skills/${sourceId}.md`, readResult.content);
-    }
-  } catch {
-    // Best-effort
-  }
-
-  // Fire-and-forget: update embedding
   void (async (): Promise<void> => {
     const { removeVirtualNode, syncVirtualNodeToEmbedding } =
       await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
     await removeVirtualNode(ctx.userId, fromPath);
-    const readResult = await readSkillPath(ctx.userId, `/skills/${sourceId}`);
+    const readResult = await readSkillPath(ctx.userId, toPath);
     if (readResult) {
       await syncVirtualNodeToEmbedding(ctx.userId, toPath, readResult.content);
     }

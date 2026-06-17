@@ -24,13 +24,6 @@ import { Strong } from "next-vibe-ui/ui/strong";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getCountryFromLocale } from "@/i18n/core/language-utils";
-  chatModelOptions,
-  chatModelOptions,
-  chatModelOptions,
-  chatModelOptions,
-
 import {
   type ChatModelOption,
   chatModelOptions,
@@ -625,7 +618,7 @@ export function ModelCreditDisplay({
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
-    openTimeoutRef.current = window.setTimeout(() => {
+    openTimeoutRef.current = setTimeout(() => {
       setIsOpen(true);
     }, 500);
   };
@@ -635,7 +628,7 @@ export function ModelCreditDisplay({
       clearTimeout(openTimeoutRef.current);
       openTimeoutRef.current = null;
     }
-    closeTimeoutRef.current = window.setTimeout(() => {
+    closeTimeoutRef.current = setTimeout(() => {
       setIsOpen(false);
     }, 150);
   };

@@ -1,16 +1,14 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 // AUTO-GENERATED from src/app/[locale]/subscription/page.tsx. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-
-import { TanstackPage as Page } from "@/app/[locale]/subscription/page";
 import { toNextParams } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
+import { TanstackPage as Page } from "@/app/[locale]/subscription/page";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
   .handler(async ({ data }) => {
     const { tanstackLoader } = await import("@/app/[locale]/subscription/page");
-    return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
+        return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
   });
 
 export const Route = createFileRoute("/$locale/subscription/")({

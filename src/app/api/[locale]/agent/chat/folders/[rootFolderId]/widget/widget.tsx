@@ -367,8 +367,7 @@ export function FoldersListContainer(): React.JSX.Element {
     form.setValue("path", `/threads/${activeRootFolderId}`);
     form.setValue("maxResults", 20);
     searchEndpoint.read.submitForm();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuery, activeRootFolderId, searchEndpoint?.read]);
+  }, [debouncedQuery, activeRootFolderId, searchEndpoint]);
 
   // Extract thread IDs from cortex search results
   const searchThreadIds = useMemo(() => {

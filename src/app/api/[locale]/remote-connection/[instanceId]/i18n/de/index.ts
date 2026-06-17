@@ -168,6 +168,11 @@ export const translations: typeof enTranslations = {
       favorites: "Favoriten",
       threads: "Threads",
     },
+    reconnectNow: {
+      label: "Jetzt neu verbinden",
+      description:
+        "Verbindung trennen und neu aufbauen — löst die Pull-on-Connect-Synchronisation aus.",
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",

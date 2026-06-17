@@ -19,7 +19,8 @@ export async function loadRemoteInstancesData(
   const userId = user.isPublic ? undefined : user.id;
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-  const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE || envClient.NODE_ENV !== "production";
+  const isLocalMode =
+    envClient.NEXT_PUBLIC_LOCAL_MODE || envClient.NODE_ENV !== "production";
   const isDev = envClient.NODE_ENV !== "production";
   const appUrl = envClient.NEXT_PUBLIC_APP_URL;
   const { t: configT } = configScopedTranslation.scopedT(locale);

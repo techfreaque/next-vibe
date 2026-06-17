@@ -14,6 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import { customSkills } from "@/app/api/[locale]/agent/chat/skills/db";
@@ -76,6 +77,7 @@ export class CreatorProfileRepository {
       }
 
       const userId = resolvedId;
+      const viewerAvailability = await getInstanceAvailability();
       logger.debug("Getting creator profile", { userId });
 
       const [userResults, skillRows, referralResult, configRows] =
@@ -164,7 +166,11 @@ export class CreatorProfileRepository {
             isDefault,
           }) => {
             const selection = modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
-            const bestModel = getBestChatModel(selection, viewer);
+            const bestModel = getBestChatModel(
+              selection,
+              viewer,
+              viewerAvailability,
+            );
             const modelId = bestModel?.id ?? null;
             const modelRow = bestModel
               ? {

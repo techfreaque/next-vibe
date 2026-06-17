@@ -17,12 +17,12 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { formatCurrency } from "@/i18n/core/localization-utils";
 
 import { getTourSelector, TOUR_DATA_ATTRS } from "./tour-attrs";
+export type { TourDataAttr } from "./tour-attrs";
 export {
   getFolderTourAttr,
   getTourSelector,
   TOUR_DATA_ATTRS,
 } from "./tour-attrs";
-export type { TourDataAttr } from "./tour-attrs";
 
 export interface TourStepConfig extends Step {
   requiresAuth?: boolean;

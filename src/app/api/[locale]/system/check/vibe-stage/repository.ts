@@ -114,6 +114,12 @@ const IMPORT_CLOSE_PATTERN = /^}\s*from\s+["'`]/;
  *    of `} from "..."` appearing as a changed line in non-import code.
  */
 function isImportLine(line: string, state: { inside: boolean }): boolean {
+  // Blank lines between imports are always acceptable — formatters insert them
+  // between import groups and they appear as changed lines in reorder diffs.
+  if (line.trim() === "") {
+    return true;
+  }
+
   if (state.inside) {
     if (IMPORT_CLOSE_PATTERN.test(line.trimStart())) {
       state.inside = false;
@@ -326,6 +332,36 @@ function hunkNewStart(hunkHeader: string): number {
 }
 
 /**
+ * Net line delta a hunk introduces to the target file.
+ * +N lines added, -M lines removed → delta = N - M.
+ * Used to adjust subsequent hunk headers when building a partial patch.
+ */
+function hunkDelta(hunk: string[]): number {
+  let added = 0;
+  let removed = 0;
+  for (const line of hunk.slice(1)) {
+    if (line.startsWith("+") && !line.startsWith("+++")) {
+      added++;
+    } else if (line.startsWith("-") && !line.startsWith("---")) {
+      removed++;
+    }
+  }
+  return added - removed;
+}
+
+/**
+ * Rewrite the @@ header of a hunk to use a new target start line.
+ * Preserves the old-file side (-a,b) and the trailing context label unchanged.
+ */
+function rewriteHunkNewStart(hunkHeader: string, newStart: number): string {
+  // @@ -a,b +c,d @@ label  →  @@ -a,b +newStart,d @@ label
+  return hunkHeader.replace(
+    /^(@@ -\d+(?:,\d+)? \+)\d+/,
+    `$1${String(newStart)}`,
+  );
+}
+
+/**
  * Parse unified diff output for a single file and classify unstaged changes.
  *
  * Strategy:
@@ -354,6 +390,11 @@ async function analyzeFileDiff(
   );
 
   if (!u0Unstaged.trim()) {
+    return null;
+  }
+
+  // Reject diffs that add or remove suppression comment lines — those must be reviewed.
+  if (diffHasSuppression(u0Unstaged)) {
     return null;
   }
 
@@ -391,12 +432,27 @@ async function analyzeFileDiff(
   // Build patch from import-only unstaged hunks.
   // Applied with --unidiff-zero (zero-context hunks ok) and without --3way
   // since the patch base IS the index — no drift to resolve.
-  const importOnlyHunks = u0Parsed.hunks.filter((hunk) => {
-    const start = hunkNewStart(hunk[0] ?? "");
-    return importOnlyStarts.has(start);
-  });
+  //
+  // Line-number adjustment: skipped (non-import) hunks shift subsequent hunk
+  // positions. For each excluded hunk that precedes an included hunk, subtract
+  // its net delta from the included hunk's target start so the patch applies
+  // cleanly against the unmodified index.
+  const adjustedHunks: string[][] = [];
+  let skippedDelta = 0;
 
-  const patchLines = [...u0Parsed.headerLines, ...importOnlyHunks.flat(), ""];
+  for (const hunk of u0Parsed.hunks) {
+    const start = hunkNewStart(hunk[0] ?? "");
+    if (importOnlyStarts.has(start)) {
+      const adjustedStart = start - skippedDelta;
+      const header = rewriteHunkNewStart(hunk[0] ?? "", adjustedStart);
+      adjustedHunks.push([header, ...hunk.slice(1)]);
+    } else {
+      // Accumulate delta from excluded hunks so subsequent import hunks are adjusted.
+      skippedDelta += hunkDelta(hunk);
+    }
+  }
+
+  const patchLines = [...u0Parsed.headerLines, ...adjustedHunks.flat(), ""];
   return { importOnly: false, importHunksPatch: patchLines.join("\n") };
 }
 
@@ -430,16 +486,22 @@ async function applyPatchToIndex(
 }
 
 /**
- * Returns true if the file contains any suppression comments.
- * Files with suppressions are banned from auto-staging.
+ * Returns true if the diff itself adds or removes suppression comment lines.
+ * Suppressions in unchanged file context don't affect staging safety.
  */
-async function hasSuppression(filePath: string, cwd: string): Promise<boolean> {
-  try {
-    const content = await fsp.readFile(resolvePath(cwd, filePath), "utf8");
-    return SUPPRESSION_PATTERN.test(content);
-  } catch {
-    return false;
+function diffHasSuppression(diff: string): boolean {
+  for (const line of diff.split("\n")) {
+    if (
+      (line.startsWith("+") || line.startsWith("-")) &&
+      !line.startsWith("+++") &&
+      !line.startsWith("---")
+    ) {
+      if (SUPPRESSION_PATTERN.test(line.slice(1))) {
+        return true;
+      }
+    }
   }
+  return false;
 }
 
 /**
@@ -601,22 +663,6 @@ export class VibeStageRepository {
         );
       }
 
-      // Filter out files with suppression comments — banned from auto-staging
-      const suppressionChecks = await Promise.all(
-        allFiles.map(async (f) => ({
-          file: f,
-          suppressed: await hasSuppression(f, cwd),
-        })),
-      );
-      const suppressedFiles = new Set<string>(
-        suppressionChecks.filter((r) => r.suppressed).map((r) => r.file),
-      );
-      allFiles = allFiles.filter((f) => !suppressedFiles.has(f));
-
-      logger.debug(
-        `[VIBE-STAGE] ${String(suppressedFiles.size)} candidates skipped (suppression comments)`,
-      );
-
       if (allFiles.length === 0) {
         return success({
           staged: [],
@@ -671,8 +717,7 @@ export class VibeStageRepository {
 
       const staged: string[] = [];
       const partiallyStaged: string[] = [];
-      // Suppressed files go straight to skipped
-      const skipped: string[] = [...suppressedFiles];
+      const skipped: string[] = [];
 
       // Full-file staging: clean boilerplate + import-only files
       for (const candidate of boilerplateCandidates) {

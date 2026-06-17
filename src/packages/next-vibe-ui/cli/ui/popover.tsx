@@ -50,13 +50,14 @@ interface PopoverContextType {
   open: boolean;
   setOpen: (open: boolean) => void;
   triggerId: string;
-  /** Actual focus ID of the trigger element (may differ from triggerId for asChild) */
-  triggerFocusId: React.MutableRefObject<string>;
+  /** Read the actual focus ID of the trigger element */
+  getTriggerFocusId: () => string;
+  /** Set the actual focus ID of the trigger element */
+  setTriggerFocusId: (id: string) => void;
 }
 
-const EMPTY_TRIGGER_FOCUS_ID: React.MutableRefObject<string> = {
-  current: "popover",
-};
+const EMPTY_GET_TRIGGER_FOCUS_ID = (): string => "popover";
+const EMPTY_SET_TRIGGER_FOCUS_ID: (id: string) => void = () => undefined;
 
 const PopoverContext = createContext<PopoverContextType | null>(null);
 
@@ -67,7 +68,8 @@ function usePopoverContext(): PopoverContextType {
       open: false,
       setOpen: () => undefined,
       triggerId: "popover",
-      triggerFocusId: EMPTY_TRIGGER_FOCUS_ID,
+      getTriggerFocusId: EMPTY_GET_TRIGGER_FOCUS_ID,
+      setTriggerFocusId: EMPTY_SET_TRIGGER_FOCUS_ID,
     };
   }
   return ctx;
@@ -131,7 +133,10 @@ export function Popover({
         open,
         setOpen,
         triggerId: idRef.current,
-        triggerFocusId: triggerFocusIdRef,
+        getTriggerFocusId: (): string => triggerFocusIdRef.current,
+        setTriggerFocusId: (id: string): void => {
+          triggerFocusIdRef.current = id;
+        },
       }}
     >
       {children}
@@ -152,7 +157,7 @@ function PopoverTriggerAsChild({
 }: {
   children: React.ReactNode;
 }): React.JSX.Element | null {
-  const { open, setOpen, triggerFocusId } = usePopoverContext();
+  const { open, setOpen, setTriggerFocusId } = usePopoverContext();
   const isMcp = useIsMcp();
 
   const toggleFn = useCallback((): void => {
@@ -161,9 +166,9 @@ function PopoverTriggerAsChild({
 
   const registerFocusIdFn = useCallback(
     (id: string): void => {
-      triggerFocusId.current = id;
+      setTriggerFocusId(id);
     },
-    [triggerFocusId],
+    [setTriggerFocusId],
   );
 
   const toggleRef = useRef({
@@ -306,7 +311,7 @@ function PopoverCloseButton({
 export function PopoverContent({
   children,
 }: PopoverContentProps): React.JSX.Element | null {
-  const { open, setOpen, triggerFocusId } = usePopoverContext();
+  const { open, setOpen, getTriggerFocusId } = usePopoverContext();
   const isMcp = useIsMcp();
   const { isRawModeSupported } = useStdin();
   const { focus } = useFocusManager();
@@ -318,11 +323,11 @@ export function PopoverContent({
       prevOpenRef.current = true;
     }
     if (!open && prevOpenRef.current) {
-      focus(triggerFocusId.current);
+      focus(getTriggerFocusId());
       prevOpenRef.current = false;
     }
     return undefined;
-  }, [open, focus, triggerFocusId]);
+  }, [open, focus, getTriggerFocusId]);
 
   const handleFirstItem = React.useCallback(
     (id: string): void => {

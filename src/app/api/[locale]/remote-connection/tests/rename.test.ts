@@ -57,7 +57,6 @@ import {
   resolveProdUserId,
   resolveRemoteUrl,
   restoreHermesIdentity,
-  triggerPull,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
 
@@ -136,7 +135,6 @@ if (_remoteUrl) {
       await unregisterDevFromHermes(prodUserId);
 
       await connectToHermes(testUser, _remoteUrl!);
-      await triggerPull();
 
       const remoteAdminToken = await resolveProdAdminToken(_remoteUrl!);
       await ensureRemoteUserCredits(

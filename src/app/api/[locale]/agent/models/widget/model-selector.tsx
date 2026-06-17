@@ -34,6 +34,7 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
+import { useWidgetLogger } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -64,7 +65,7 @@ import {
   ModelSortFieldOptions,
   PRICE_DISPLAY,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   filterImageGenModels,
   getBestImageGenModel,
@@ -104,6 +105,7 @@ import {
   TtsModelId,
   ttsModelOptions,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import {
   filterVideoGenModels,
   getBestVideoGenModel,
@@ -252,6 +254,7 @@ function getFilteredModelsByRoleDispatch(
           ...filterChatModels(
             filters ?? { selectionType: ModelSelectionType.FILTERS },
             user,
+            availability,
           ),
         );
         break;
@@ -1352,6 +1355,7 @@ export function ModelSelector({
         selectionForRole,
         allowedRoles,
         user,
+        availability,
       );
       const withInputFilter = requiredInputs
         ? base.filter((m) =>
@@ -1386,6 +1390,7 @@ export function ModelSelector({
     sortBy2,
     sortDirection2,
     user,
+    availability,
     modelTypeTab,
   ]);
 
@@ -1402,6 +1407,7 @@ export function ModelSelector({
           characterModelSelection,
           allowedRoles ?? ["llm"],
           user,
+          availability,
         );
       }
       return null;
@@ -1415,6 +1421,7 @@ export function ModelSelector({
     characterModelSelection,
     user,
     allowedRoles,
+    availability,
   ]);
 
   // For non-admins: hide models whose provider is unavailable (admins see them with setup-required styling)
@@ -2063,6 +2070,7 @@ export function ModelSelector({
                           const setupRequired = getSetupRequiredMessage(
                             model,
                             locale,
+                            availability,
                           );
                           return (
                             <ModelCard
@@ -2223,6 +2231,7 @@ export function ModelSelectorTrigger({
     defaultModelSelection,
     allowedRoles,
     user,
+    availability,
   ]);
 
   const isClickable = !!onClick;

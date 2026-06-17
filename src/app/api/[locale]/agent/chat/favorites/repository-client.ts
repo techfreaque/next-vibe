@@ -20,6 +20,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils";
 import type { ChatModelSelection } from "../../ai-stream/models";
+import type { AgentEnvAvailability } from "../../env-availability";
+import { agentEnvAvailability } from "../../env-availability";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
 import type { VoiceModelSelection } from "../../text-to-speech/models";
@@ -200,6 +202,7 @@ export class ChatFavoritesRepositoryClient {
           variant?.voiceModelSelection ?? null,
           locale,
           user,
+          availability,
         );
       });
 
@@ -443,6 +446,7 @@ export class ChatFavoritesRepositoryClient {
       stored.modelSelection,
       characterModelSelection ?? undefined,
       user,
+      availability,
     );
     const hasSkill = stored.skillId !== "default";
 

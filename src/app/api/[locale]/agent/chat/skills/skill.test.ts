@@ -30,9 +30,11 @@ import { resolveFavorite } from "@/app/api/[locale]/agent/ai-stream/repository/h
 import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import {
   fetchThreadMessages,
+  getOrCreateFolder,
   runTestStream,
   toolResultRecord,
 } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { scopedTranslation as favoritesScopedTranslation } from "@/app/api/[locale]/agent/chat/favorites/i18n";
 import { ChatFavoritesRepository } from "@/app/api/[locale]/agent/chat/favorites/repository";
@@ -45,15 +47,11 @@ import {
 import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -69,46 +67,6 @@ const TEST_SKILL_NAME_LIKE = "Test Chef%"; // prefix used for cleanup query
 const TEST_SKILL_CATEGORY_EXPECTED = SkillCategory.ASSISTANT;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-async function resolveUser(
-  email: string,
-): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await UserRepository.getUserByEmail(
-    email,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  const user = result.data;
-
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-    }),
-    db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-  ]);
-
-  if (!link) {
-    return null;
-  }
-
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-
-  return {
-    isPublic: false,
-    id: user.id,
-    leadId: link.leadId,
-    roles,
-  };
-}
 
 /**
  * Delete any test skills (and cascade-delete their favorites) created by this
@@ -214,6 +172,7 @@ function unwrapExecuteToolResult(
 describe("Skill Creator E2E", () => {
   let testUser: JwtPrivatePayloadType;
   let mainFavoriteId: string;
+  let testSubFolderId: string;
 
   /** Populated by SC1, used in SC2-SC3 */
   let createdSkillId: string | null = null;
@@ -222,15 +181,7 @@ describe("Skill Creator E2E", () => {
   // ── Setup ────────────────────────────────────────────────────────────────
 
   beforeAll(async () => {
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    expect(
-      resolved,
-      `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
-    ).toBeTruthy();
-    if (!resolved) {
-      return;
-    }
-    testUser = resolved;
+    testUser = await resolveTestAdminUser();
 
     // Safety floor: 500cr before any test
     const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -283,6 +234,18 @@ describe("Skill Creator E2E", () => {
 
     // Clean up any stale test data from previous runs BEFORE starting
     await cleanupPreviousTestRuns(testUser.id);
+
+    const testsParentId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "tests",
+    );
+    testSubFolderId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "skill-creator",
+      testsParentId,
+    );
   }, TEST_TIMEOUT);
 
   // ── SC1: Delegation flow ──────────────────────────────────────────────────
@@ -325,6 +288,7 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
         prompt,
         user: testUser,
         favoriteId: mainFavoriteId,
+        subFolderId: testSubFolderId,
       });
 
       // eslint-disable-next-line no-console

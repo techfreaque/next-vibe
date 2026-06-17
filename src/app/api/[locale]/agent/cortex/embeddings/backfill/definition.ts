@@ -34,9 +34,9 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "post.title" as const,
+  titleShort: "post.titleShort" as const,
   description: "post.description" as const,
   icon: "cpu",
-  dynamicIcon: () => "cpu" as const,
   statusBadge: {
     loading: {
       label: "post.status.loading" as const,
@@ -47,8 +47,7 @@ const { POST } = createEndpoint({
       color: "bg-green-500/10 text-green-500",
     },
   },
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "cortex",
   tags: ["post.tags.cortex" as const],
   defaultExpanded: false,
 

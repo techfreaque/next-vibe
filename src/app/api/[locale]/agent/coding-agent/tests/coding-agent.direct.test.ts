@@ -46,7 +46,6 @@ async function setupDirectConnection(
     disconnectFromHermes,
     resolveProdUserId,
     resolveProdAdminToken,
-    triggerPull,
   } = await import("../../ai-stream/testing/remote-setup");
 
   await disconnectFromHermes(testUser.id);

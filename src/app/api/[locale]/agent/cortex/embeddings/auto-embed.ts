@@ -55,6 +55,28 @@ export function queueEmbedding(
 }
 
 /**
+ * Generate + store an embedding for a node and AWAIT completion.
+ * Same logic as queueEmbedding, but synchronous — callers that must observe the
+ * embedding (e.g. tests asserting relevance, or a backfill that needs to block)
+ * use this instead of the fire-and-forget queue. Resolves true if an embedding
+ * is present afterward (newly written or already current), false otherwise.
+ */
+export async function embedNodeNow(
+  nodeId: string,
+  path: string,
+  content: string,
+  options?: EmbedOptions,
+): Promise<boolean> {
+  await embedNode(nodeId, path, content, options);
+  const [row] = await db
+    .select({ embedding: cortexNodes.embedding })
+    .from(cortexNodes)
+    .where(eq(cortexNodes.id, nodeId))
+    .limit(1);
+  return row?.embedding !== null && row?.embedding !== undefined;
+}
+
+/**
  * Generate and store embedding for a cortex node.
  * Skips if content hash matches and embedding already exists.
  */

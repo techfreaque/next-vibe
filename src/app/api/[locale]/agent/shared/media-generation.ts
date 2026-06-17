@@ -72,7 +72,6 @@ export async function deductMediaCredits(
   const deductResult = await CreditRepository.deductCreditsForFeature(
     user,
     creditCost,
-    // eslint-disable-next-line i18next/no-literal-string
     feature,
     logger,
     tCredits,

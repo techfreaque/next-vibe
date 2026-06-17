@@ -37,6 +37,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
 import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import {
+  getOrCreateFolder,
   runTestStream,
   type SlimMessage,
   toolResultRecord,
@@ -50,15 +51,11 @@ import {
 } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
 import { cortexNodes } from "./db";
@@ -135,46 +132,6 @@ function assertVerdictPass(
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-
-async function resolveUser(
-  email: string,
-): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await UserRepository.getUserByEmail(
-    email,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  const user = result.data;
-
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-    }),
-    db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-  ]);
-
-  if (!link) {
-    return null;
-  }
-
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-
-  return {
-    isPublic: false,
-    id: user.id,
-    leadId: link.leadId,
-    roles,
-  };
-}
 
 /** Ensure test user has at least 500 credits (safety floor) */
 async function ensureCredits(user: JwtPrivatePayloadType): Promise<void> {
@@ -343,17 +300,10 @@ const ORIGINAL_WORD = "testing";
 describe("Cortex AI Integration", () => {
   let testUser: JwtPrivatePayloadType;
   let mainFavoriteId: string;
+  let testSubFolderId: string;
 
   beforeAll(async () => {
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    expect(
-      resolved,
-      `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
-    ).toBeTruthy();
-    if (!resolved) {
-      return;
-    }
-    testUser = resolved;
+    testUser = await resolveTestAdminUser();
     await ensureCredits(testUser);
 
     // Resolve or create quality-tester favorite
@@ -395,6 +345,18 @@ describe("Cortex AI Integration", () => {
           like(cortexNodes.path, "/documents/ai-test%"),
         ),
       );
+
+    const testsParentId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "tests",
+    );
+    testSubFolderId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "cortex-ai",
+      testsParentId,
+    );
   }, TEST_TIMEOUT);
 
   afterAll(async () => {
@@ -419,7 +381,7 @@ describe("Cortex AI Integration", () => {
       name,
       async () => {
         if (suiteFailed) {
-          return;
+          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
         }
         try {
           await fn();
@@ -441,6 +403,7 @@ describe("Cortex AI Integration", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       prompt: `Use the cortex-write tool to create a file at /documents/ai-test/notes.md with this exact content:\n\n${INITIAL_CONTENT}\n\nAfter writing, confirm what you did.${VERDICT_INSTRUCTION}`,
     });
 
@@ -511,6 +474,7 @@ describe("Cortex AI Integration", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-read to read the file at /documents/ai-test/notes.md. Tell me what's in it - quote the exact content you receive.${VERDICT_INSTRUCTION}`,
     });
@@ -567,6 +531,7 @@ describe("Cortex AI Integration", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-edit to replace the word "${ORIGINAL_WORD}" with "${EDITED_CONTENT_FRAGMENT}" in /documents/ai-test/notes.md. Report exactly how many replacements were made.${VERDICT_INSTRUCTION}`,
     });
@@ -620,6 +585,7 @@ describe("Cortex AI Integration", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-read to read /documents/ai-test/notes.md again. Confirm that the word "${EDITED_CONTENT_FRAGMENT}" appears in the content and that "${ORIGINAL_WORD}" no longer appears. Quote the relevant line.${VERDICT_INSTRUCTION}`,
     });
@@ -669,6 +635,7 @@ describe("Cortex AI Integration", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use the cortex-tree tool (not cortex-list) to display the directory tree starting at /documents/ai-test/. I need the tree view specifically. Tell me exactly what files and directories you see.${VERDICT_INSTRUCTION}`,
     });
@@ -719,6 +686,7 @@ describe("Cortex AI Integration", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Without using any tools, answer from memory:
 1. What is the exact path of the file you created?
@@ -783,6 +751,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-move to rename /documents/ai-test/notes.md to /documents/ai-test/renamed-notes.md. Confirm the move succeeded and both the source and destination paths.${VERDICT_INSTRUCTION}`,
     });
@@ -838,6 +807,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-delete to delete /documents/ai-test/ recursively. Confirm what was deleted and how many nodes were removed.${VERDICT_INSTRUCTION}`,
     });
@@ -894,6 +864,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Try to read /documents/ai-test/renamed-notes.md using cortex-read. It should not exist anymore. Report what error or status you receive.${VERDICT_INSTRUCTION}`,
     });
@@ -970,34 +941,10 @@ describe("Cortex Mount: /threads", () => {
   let testUser: JwtPrivatePayloadType;
   let mainFavoriteId: string;
   let threadId: string;
+  let testSubFolderId: string;
 
   beforeAll(async () => {
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-    const result = await UserRepository.getUserByEmail(
-      env.VIBE_ADMIN_USER_EMAIL,
-      UserDetailLevel.STANDARD,
-      defaultLocale,
-      logger,
-    );
-    if (!result.success || !result.data) {
-      return;
-    }
-    const user = result.data;
-    const [link, roleRows] = await Promise.all([
-      db.query.userLeadLinks.findFirst({
-        where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-      }),
-      db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-    ]);
-    if (!link) {
-      return;
-    }
-    const roles = roleRows
-      .map((r) => r.role)
-      .filter((r): r is (typeof UserRoleDB)[number] =>
-        UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-      );
-    testUser = { isPublic: false, id: user.id, leadId: link.leadId, roles };
+    testUser = await resolveTestAdminUser();
     await ensureCredits(testUser);
 
     const MOUNT_FAV_ID = "00000000-0000-4001-c000-000000000002";
@@ -1042,6 +989,18 @@ describe("Cortex Mount: /threads", () => {
         createdAt: new Date(),
       })
       .onConflictDoNothing();
+
+    const testsParentId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "tests",
+    );
+    testSubFolderId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "cortex-mount-threads",
+      testsParentId,
+    );
   }, TEST_TIMEOUT);
 
   let suiteFailed = false;
@@ -1050,7 +1009,7 @@ describe("Cortex Mount: /threads", () => {
       name,
       async () => {
         if (suiteFailed) {
-          return;
+          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
         }
         try {
           await fn();
@@ -1070,6 +1029,7 @@ describe("Cortex Mount: /threads", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       prompt: `Use cortex-list to list the directory at /threads. Tell me what root folders you see (private, cron, shared, public, or similar). List every entry name you receive.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1120,6 +1080,7 @@ describe("Cortex Mount: /threads", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-list on /threads/cron to find a thread file (it will end in .md). Then use cortex-read to read it. Confirm the file has frontmatter with threadId and a conversation body. Quote the threadId from the frontmatter.${VERDICT_INSTRUCTION}`,
     });
@@ -1166,6 +1127,7 @@ describe("Cortex Mount: /threads", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Try to use cortex-write to create a file at /threads/test-file.md with content "test". Report exactly what error you get. Do not retry.${VERDICT_INSTRUCTION}`,
     });
@@ -1231,34 +1193,10 @@ describe("Cortex Mount: /skills", () => {
   let threadId: string;
   let testSkillSlug: string;
   let testSkillId: string;
+  let testSubFolderId: string;
 
   beforeAll(async () => {
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-    const result = await UserRepository.getUserByEmail(
-      env.VIBE_ADMIN_USER_EMAIL,
-      UserDetailLevel.STANDARD,
-      defaultLocale,
-      logger,
-    );
-    if (!result.success || !result.data) {
-      return;
-    }
-    const user = result.data;
-    const [link, roleRows] = await Promise.all([
-      db.query.userLeadLinks.findFirst({
-        where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-      }),
-      db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-    ]);
-    if (!link) {
-      return;
-    }
-    const roles = roleRows
-      .map((r) => r.role)
-      .filter((r): r is (typeof UserRoleDB)[number] =>
-        UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-      );
-    testUser = { isPublic: false, id: user.id, leadId: link.leadId, roles };
+    testUser = await resolveTestAdminUser();
     await ensureCredits(testUser);
     const [existingFav] = await db
       .select({ id: chatFavorites.id })
@@ -1297,7 +1235,7 @@ describe("Cortex Mount: /skills", () => {
       .insert(customSkillsTable)
       .values({
         slug: testSkillSlug,
-        userId: user.id,
+        userId: testUser.id,
         name: "Cortex Test Skill",
         description: "Temporary skill created by cortex AI test suite.",
         tagline: "Test skill",
@@ -1320,6 +1258,18 @@ describe("Cortex Mount: /skills", () => {
       })
       .returning({ id: customSkillsTable.id });
     testSkillId = inserted?.id ?? "";
+
+    const testsParentId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "tests",
+    );
+    testSubFolderId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "cortex-mount-skills",
+      testsParentId,
+    );
   }, TEST_TIMEOUT);
 
   afterAll(async () => {
@@ -1339,7 +1289,7 @@ describe("Cortex Mount: /skills", () => {
       name,
       async () => {
         if (suiteFailed) {
-          return;
+          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
         }
         try {
           await fn();
@@ -1361,6 +1311,7 @@ describe("Cortex Mount: /skills", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       prompt: `Use cortex-list to list /skills. Tell me how many skills you see and confirm one is named "${testSkillSlug}.md".${VERDICT_INSTRUCTION}`,
     });
 
@@ -1416,6 +1367,7 @@ describe("Cortex Mount: /skills", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-read to read /skills/${testSkillSlug}.md. Confirm the file has a YAML frontmatter header with skillId and a system prompt body. Quote the first sentence of the system prompt.${VERDICT_INSTRUCTION}`,
     });
@@ -1461,6 +1413,7 @@ describe("Cortex Mount: /skills", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       prompt: `Call cortex-tree with path=/skills and depth=2. You MUST call the tool - do not rely on any prior context. Report the exact tree output and count how many .md files are listed.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1491,34 +1444,10 @@ describe("Cortex Mount: /skills", () => {
 describe("Cortex Mount: /tasks", () => {
   let testUser: JwtPrivatePayloadType;
   let mainFavoriteId: string;
+  let testSubFolderId: string;
 
   beforeAll(async () => {
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-    const result = await UserRepository.getUserByEmail(
-      env.VIBE_ADMIN_USER_EMAIL,
-      UserDetailLevel.STANDARD,
-      defaultLocale,
-      logger,
-    );
-    if (!result.success || !result.data) {
-      return;
-    }
-    const user = result.data;
-    const [link, roleRows] = await Promise.all([
-      db.query.userLeadLinks.findFirst({
-        where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-      }),
-      db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-    ]);
-    if (!link) {
-      return;
-    }
-    const roles = roleRows
-      .map((r) => r.role)
-      .filter((r): r is (typeof UserRoleDB)[number] =>
-        UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-      );
-    testUser = { isPublic: false, id: user.id, leadId: link.leadId, roles };
+    testUser = await resolveTestAdminUser();
     await ensureCredits(testUser);
     const [existingFav] = await db
       .select({ id: chatFavorites.id })
@@ -1547,6 +1476,18 @@ describe("Cortex Mount: /tasks", () => {
         .onConflictDoNothing();
       mainFavoriteId = favId;
     }
+
+    const testsParentId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "tests",
+    );
+    testSubFolderId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "cortex-mount-tasks",
+      testsParentId,
+    );
   }, TEST_TIMEOUT);
 
   // ── T1: List /tasks ──────────────────────────────────────────────────────
@@ -1557,6 +1498,7 @@ describe("Cortex Mount: /tasks", () => {
       const { result, messages } = await runTestStream({
         user: testUser,
         favoriteId: mainFavoriteId,
+        subFolderId: testSubFolderId,
         prompt: `Use cortex-list to list /tasks. If there are any task files, use cortex-read on the first one and confirm it has frontmatter with taskId and a status field. If /tasks is empty, just confirm it's an empty directory.${VERDICT_INSTRUCTION}`,
       });
 
@@ -1605,34 +1547,10 @@ describe("Cortex Mount: /searches and cortex-search", () => {
   let testUser: JwtPrivatePayloadType;
   let mainFavoriteId: string;
   let threadId: string;
+  let testSubFolderId: string;
 
   beforeAll(async () => {
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-    const result = await UserRepository.getUserByEmail(
-      env.VIBE_ADMIN_USER_EMAIL,
-      UserDetailLevel.STANDARD,
-      defaultLocale,
-      logger,
-    );
-    if (!result.success || !result.data) {
-      return;
-    }
-    const user = result.data;
-    const [link, roleRows] = await Promise.all([
-      db.query.userLeadLinks.findFirst({
-        where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-      }),
-      db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-    ]);
-    if (!link) {
-      return;
-    }
-    const roles = roleRows
-      .map((r) => r.role)
-      .filter((r): r is (typeof UserRoleDB)[number] =>
-        UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-      );
-    testUser = { isPublic: false, id: user.id, leadId: link.leadId, roles };
+    testUser = await resolveTestAdminUser();
     await ensureCredits(testUser);
     const [existingFav] = await db
       .select({ id: chatFavorites.id })
@@ -1671,6 +1589,18 @@ describe("Cortex Mount: /searches and cortex-search", () => {
           like(cortexNodes.path, "/documents/search-test%"),
         ),
       );
+
+    const testsParentId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "tests",
+    );
+    testSubFolderId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "cortex-mount-searches",
+      testsParentId,
+    );
   }, TEST_TIMEOUT);
 
   afterAll(async () => {
@@ -1693,7 +1623,7 @@ describe("Cortex Mount: /searches and cortex-search", () => {
       name,
       async () => {
         if (suiteFailed) {
-          return;
+          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
         }
         try {
           await fn();
@@ -1715,6 +1645,7 @@ describe("Cortex Mount: /searches and cortex-search", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       prompt: `Use cortex-write to create /documents/search-test/quantum-flux.md with this content:\n\n# Quantum Flux Resonance\n\nThis document discusses quantum flux resonance in subatomic particle decay chains.\nKey concepts: quark entanglement, decoherence boundaries, Planck-scale interference.\n\nConfirm the file was created.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1758,6 +1689,7 @@ describe("Cortex Mount: /searches and cortex-search", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-search to search for "quantum flux resonance". Report how many results you find, the path of the first result, and its relevance score. The file should be in /documents/search-test/.${VERDICT_INSTRUCTION}`,
     });
@@ -1843,6 +1775,7 @@ describe("Cortex Mount: /searches and cortex-search", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-search to search for "quantum" but limit the search to the path /documents/search-test/. Report how many results are found and confirm they are all within that path.${VERDICT_INSTRUCTION}`,
     });
@@ -1894,6 +1827,7 @@ describe("Cortex Mount: /searches and cortex-search", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-list on /searches to see the search history. If there are month folders, list one. Report how the searches are organized and how many entries you see at the top level.${VERDICT_INSTRUCTION}`,
     });
@@ -1926,34 +1860,10 @@ describe("Cortex: /documents path operations and edge cases", () => {
   let testUser: JwtPrivatePayloadType;
   let mainFavoriteId: string;
   let threadId: string;
+  let testSubFolderId: string;
 
   beforeAll(async () => {
-    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-    const result = await UserRepository.getUserByEmail(
-      env.VIBE_ADMIN_USER_EMAIL,
-      UserDetailLevel.STANDARD,
-      defaultLocale,
-      logger,
-    );
-    if (!result.success || !result.data) {
-      return;
-    }
-    const user = result.data;
-    const [link, roleRows] = await Promise.all([
-      db.query.userLeadLinks.findFirst({
-        where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-      }),
-      db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-    ]);
-    if (!link) {
-      return;
-    }
-    const roles = roleRows
-      .map((r) => r.role)
-      .filter((r): r is (typeof UserRoleDB)[number] =>
-        UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-      );
-    testUser = { isPublic: false, id: user.id, leadId: link.leadId, roles };
+    testUser = await resolveTestAdminUser();
     await ensureCredits(testUser);
     const [existingFav] = await db
       .select({ id: chatFavorites.id })
@@ -1991,6 +1901,18 @@ describe("Cortex: /documents path operations and edge cases", () => {
           like(cortexNodes.path, "/documents/edge-test%"),
         ),
       );
+
+    const testsParentId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "tests",
+    );
+    testSubFolderId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "cortex-documents",
+      testsParentId,
+    );
   }, TEST_TIMEOUT);
 
   afterAll(async () => {
@@ -2013,7 +1935,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
       name,
       async () => {
         if (suiteFailed) {
-          return;
+          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
         }
         try {
           await fn();
@@ -2035,6 +1957,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       prompt: `Use cortex-list on the root path "/" to see all available mounts and directories. List every entry you see and identify which are virtual mounts vs native storage.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2080,6 +2003,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-mkdir to create /documents/edge-test/deep/nested/. Then use cortex-write to create /documents/edge-test/deep/nested/leaf.md with content "# Leaf Node\n\nDeep file." Confirm both operations succeeded.${VERDICT_INSTRUCTION}`,
     });
@@ -2121,6 +2045,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-write to create /documents/edge-test/overwrite-me.md with content "Version 1". Then immediately use cortex-write again on the same path with content "Version 2". Report what 'created' was for each write - first should be true, second should be false.${VERDICT_INSTRUCTION}`,
     });
@@ -2166,6 +2091,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Try to use cortex-read on the path "/documents/../etc/passwd". Report what error you receive. Do not retry.${VERDICT_INSTRUCTION}`,
     });
@@ -2213,6 +2139,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
+      subFolderId: testSubFolderId,
       threadId,
       prompt: `Use cortex-delete to recursively delete /documents/edge-test/. Confirm how many nodes were deleted.${VERDICT_INSTRUCTION}`,
     });
@@ -2260,6 +2187,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
 describe("Cortex System Prompt Injection", () => {
   let testUser: JwtPrivatePayloadType;
+  let testSubFolderId: string;
   const SP_TIMEOUT = 30_000;
 
   const TEST_MEMORY_CONTENT = `---\npriority: 100\ntags: [identity]\n---\n\nTest User - integration test identity.\nPrefers concise responses. Works with TypeScript.`;
@@ -2269,7 +2197,7 @@ describe("Cortex System Prompt Injection", () => {
   const TEST_BACKGROUND_CONTENT = `---\npriority: 70\ntags: [expertise]\n---\n\nBuilt production systems at scale.\nDeep understanding of SaaS architecture and AI pipelines.`;
 
   beforeAll(async () => {
-    const user = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+    const user = await resolveTestAdminUser();
     expect(
       user,
       "SP setup: admin user must resolve (run vibe seed)",
@@ -2317,6 +2245,18 @@ describe("Cortex System Prompt Injection", () => {
         ).toBe(true);
       }
     }
+
+    const testsParentId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "tests",
+    );
+    testSubFolderId = await getOrCreateFolder(
+      testUser,
+      DefaultFolderId.BACKGROUND,
+      "cortex-system-prompt",
+      testsParentId,
+    );
   }, SP_TIMEOUT);
 
   // ── SP1: loadCortexData returns test-created memories ─────────────────────

@@ -172,10 +172,13 @@ export function validateHandlerRequestData<
       return urlValidation;
     }
 
-    // Normalize: AI models sometimes send object fields as JSON strings - parse them
-    const normalizedRequestData = deepParseJsonStrings(
-      context.requestData as WidgetData,
-    );
+    // Normalize: AI/CLI models sometimes send object fields as JSON strings — parse them.
+    // Only for agent/CLI platforms: machine-to-machine HTTP calls send properly typed
+    // data and must not have their string values auto-parsed.
+    const normalizedRequestData =
+      isAgentPlatform(platform) || isCliPlatform(platform)
+        ? deepParseJsonStrings(context.requestData as WidgetData)
+        : (context.requestData as WidgetData);
 
     // Now validate the final merged data
     const requestValidation = validateData(

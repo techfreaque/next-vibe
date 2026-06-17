@@ -12,9 +12,9 @@
  *      Verifies: execute-tool dispatches to hermes, cortex-list returns a result.
  *
  *   B. Remote folder (DefaultFolderId.REMOTE, instance subfolder):
- *      Thread lives in the hermes instance subfolder (routingRules.folderIds match).
+ *      Thread lives in the hermes instance subfolder (REMOTE-folder routing, deterministic).
  *      AI loop runs on hermes (loopLocation='server'); cortex tools are hermes-local.
- *      Verifies: routing via folder ID, AI on hermes can read/write its own cortex.
+ *      Verifies: routing via REMOTE folder ancestry, AI on hermes can read/write its own cortex.
  *
  * Folder hierarchy per run:
  *   - BACKGROUND root → "e2e-cortex-remote" folder → thread per run (shared across same file)
@@ -25,10 +25,9 @@
  *
  * Setup mirrors route.direct.test.ts:
  *   1. connectToHermes → registers atlas on hermes, syncs capabilities
- *   2. triggerPull    → ensures capabilities are populated before tests run
- *   3. transportMode='direct-http', loopLocation='server', toolSource='local', threadMirrorMode='both'
+ *   2. transportMode='direct-http', loopLocation='server', toolSource='local', threadMirrorMode='both'
  *      (set by connectToHermes for E2E tests)
- *   4. For scenario B: create REMOTE subfolder for hermes, add folderId to routingRules
+ *   4. For scenario B: create REMOTE subfolder for hermes (routing is deterministic — no DB rule needed)
  *
  * Requirements:
  *   - vibe --hermes dev --fixture-mode running on port 3002 (hermes)
@@ -66,7 +65,6 @@ import {
   resolveDevUser,
   resolveProdUserId,
   resolveRemoteUrl,
-  triggerPull,
   unregisterDevFromHermes,
 } from "../../testing/remote-setup";
 
@@ -126,7 +124,6 @@ if (!_resolvedRemoteUrl) {
       // ── Connect to hermes ──
       await disconnectFromHermes(testUser.id);
       await connectToHermes(testUser, _resolvedRemoteUrl);
-      await triggerPull();
       _prodUserId = await resolveProdUserId();
 
       // ── Create test folders ──
@@ -331,7 +328,7 @@ if (!_resolvedRemoteUrl) {
           setFetchCacheContext(`${CACHE_PREFIX}b1`);
 
           // Stream into REMOTE/hermes/tests/cortex-remote.
-          // routingRules.folderIds contains remoteHermesFolderId → resolves to hermes connection.
+          // REMOTE-folder routing: folder ancestry resolves to hermes connection deterministically.
           // loopLocation='server' → hermes runs the AI loop.
           // toolSource='local' → atlas sends tool schemas to hermes.
           // On hermes, cortex tools are native (no execute-tool wrapper needed).

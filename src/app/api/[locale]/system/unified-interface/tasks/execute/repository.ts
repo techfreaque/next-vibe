@@ -270,8 +270,6 @@ export class TaskExecuteRepository {
               onEscalatedTaskCancel: undefined,
               escalateToTask: undefined,
               isRevival: undefined,
-
-              providerOverride: undefined,
             },
           }),
           new Promise<never>((...[, reject]) => {

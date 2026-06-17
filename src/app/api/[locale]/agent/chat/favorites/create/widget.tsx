@@ -87,6 +87,7 @@ import {
   type VoiceModelSelection,
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import {
   getBestVideoGenModel,
@@ -141,7 +142,11 @@ export function FavoriteCreateContainer({
 
   // Platform-level default model selections (env-aware)
   const platformChatDefault = useMemo((): ChatModelSelection | undefined => {
-    const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
+    const m = getBestChatModel(
+      DEFAULT_CHAT_MODEL_SELECTION,
+      user,
+      availability,
+    );
     if (!m) {
       return undefined;
     }
@@ -153,7 +158,11 @@ export function FavoriteCreateContainer({
   }, [user]);
 
   const platformTtsDefault = useMemo((): VoiceModelSelection | undefined => {
-    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
+    const m = getBestTtsModel(
+      DEFAULT_TTS_MODEL_SELECTION,
+      user,
+      agentEnvAvailability,
+    );
     if (!m) {
       return undefined;
     }
@@ -167,7 +176,11 @@ export function FavoriteCreateContainer({
   const platformImageGenDefault = useMemo(():
     | ImageGenModelSelection
     | undefined => {
-    const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
+    const m = getBestImageGenModel(
+      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
+      user,
+      availability,
+    );
     if (!m) {
       return undefined;
     }
@@ -181,7 +194,11 @@ export function FavoriteCreateContainer({
   const platformMusicGenDefault = useMemo(():
     | MusicGenModelSelection
     | undefined => {
-    const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
+    const m = getBestMusicGenModel(
+      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+      user,
+      availability,
+    );
     if (!m) {
       return undefined;
     }
@@ -195,7 +212,11 @@ export function FavoriteCreateContainer({
   const platformVideoGenDefault = useMemo(():
     | VideoGenModelSelection
     | undefined => {
-    const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
+    const m = getBestVideoGenModel(
+      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+      user,
+      availability,
+    );
     if (!m) {
       return undefined;
     }
@@ -207,7 +228,11 @@ export function FavoriteCreateContainer({
   }, [user]);
 
   const platformSttDefault = useMemo((): SttModelSelection | undefined => {
-    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
+    const m = getBestSttModel(
+      DEFAULT_STT_MODEL_SELECTION,
+      user,
+      agentEnvAvailability,
+    );
     if (!m) {
       return undefined;
     }
@@ -224,6 +249,7 @@ export function FavoriteCreateContainer({
     const m = getBestImageVisionModel(
       DEFAULT_IMAGE_VISION_MODEL_SELECTION,
       user,
+      availability,
     );
     if (!m) {
       return undefined;
@@ -241,6 +267,7 @@ export function FavoriteCreateContainer({
     const m = getBestVideoVisionModel(
       DEFAULT_VIDEO_VISION_MODEL_SELECTION,
       user,
+      availability,
     );
     if (!m) {
       return undefined;
@@ -258,6 +285,7 @@ export function FavoriteCreateContainer({
     const m = getBestAudioVisionModel(
       DEFAULT_AUDIO_VISION_MODEL_SELECTION,
       user,
+      availability,
     );
     if (!m) {
       return undefined;
@@ -309,7 +337,11 @@ export function FavoriteCreateContainer({
 
       if (modelSelection) {
         // Resolve model selection to actual ModelId
-        const bestModel = getBestChatModel(modelSelection, user);
+        const bestModel = getBestChatModel(
+          modelSelection,
+          user,
+          agentEnvAvailability,
+        );
         const parsed = chatManualModelSelectionSchema.safeParse({
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: bestModel?.id,

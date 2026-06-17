@@ -1,9 +1,9 @@
 /**
  * AI Stream Widget
  *
- * Full-page chat area layout - toolbar, messages via EndpointsPage, real ChatInputContainer.
- * The ChatInputContainer/ChatInput already reads from useChatInputStore and calls useAIStream
- * directly, so input state is already controlled by the ai-stream layer.
+ * Owns the entire chat UI: sidebar, topbar, dialogs, welcome tour, and the
+ * chat area itself. The threads page provides a full-screen container; this
+ * widget adapts to whatever size it receives.
  */
 
 "use client";
@@ -66,30 +66,11 @@ import { ChatToolbar } from "./toolbar";
 function useInputHeight(
   inputContainerRef: React.RefObject<DivRefObject | null>,
 ): number {
-  const [inputHeight, setInputHeight] = useState<number>(120);
-
-  useEffect(() => {
-    if (platform.isReactNative) {
-      return;
-    }
-    if (!inputContainerRef.current) {
-      return;
-    }
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setInputHeight(entry.contentRect.height);
-      }
-    });
-
-    resizeObserver.observe(inputContainerRef.current as Element);
-
-    return (): void => {
-      resizeObserver.disconnect();
-    };
-  }, [inputContainerRef]);
-
-  return inputHeight;
+  const { height } = useResizeObserver(inputContainerRef, {
+    width: 0,
+    height: 120,
+  });
+  return height || 120;
 }
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -100,7 +81,7 @@ interface CustomWidgetProps {
   } & (typeof definition.POST)["fields"];
 }
 
-// ─── Main Widget ─────────────────────────────────────────────────────────────
+// ─── Chat area (messages + input + modals) ────────────────────────────────────
 
 function AiStreamChatArea(): JSX.Element {
   const { initialMessagesData, initialPathData, initialThreadId } =
@@ -115,15 +96,10 @@ function AiStreamChatArea(): JSX.Element {
   const threadIdToRender =
     activeThreadId && activeThreadId !== NEW_MESSAGE_ID ? activeThreadId : null;
 
-  // Prefer initialMessagesData (full messages list); fall back to initialPathData messages.
-  // For optimistically created threads, read the pre-seeded cache so useQuery receives
-  // initialData and doesn't fire a network fetch (which would 404 since the thread
-  // doesn't exist in the DB yet).
   const messagesInitialData = useMemo(() => {
     if (!threadIdToRender) {
       return null;
     }
-    // Boot thread: use SSR data
     if (threadIdToRender === initialThreadId) {
       if (initialMessagesData) {
         return initialMessagesData;
@@ -135,13 +111,7 @@ function AiStreamChatArea(): JSX.Element {
           messages: initialPathData.messages,
         };
       }
-      // Fall through to cache lookup below — optimistic threads trigger a route
-      // change (TanStack loader) which updates initialThreadId to match the new
-      // UUID, but there's no SSR data since the thread doesn't exist in the DB yet.
-      // The pre-seeded React Query cache has the optimistic messages.
     }
-    // Navigated-to thread or optimistic thread without SSR data:
-    // check if cache was pre-seeded (optimistic creation)
     const cached = apiClient.getEndpointData(messagesDefinition.GET, logger, {
       urlPathParams: { threadId: threadIdToRender },
       requestData: { rootFolderId },
@@ -163,14 +133,15 @@ function AiStreamChatArea(): JSX.Element {
   const inputHeight = useInputHeight(inputContainerRef);
   const insets = useSafeAreaInsets();
 
-  // Single endpoint instance - used both for pre-seeding (initialData) and as the
-  // widget form owner passed into EndpointsPage via endpointInstance.
   const messagesReadOptions = useMemo(
     () => ({
       read: {
         urlPathParams: { threadId: threadIdToRender ?? "" },
         initialState: { rootFolderId },
-        queryOptions: { enabled: !!threadIdToRender, staleTime: Infinity },
+        queryOptions: {
+          enabled: !!threadIdToRender,
+          staleTime: Infinity,
+        },
         ...(messagesInitialData ? { initialData: messagesInitialData } : {}),
       },
       create: {
@@ -189,7 +160,6 @@ function AiStreamChatArea(): JSX.Element {
   interface MessagesGetEndpoint {
     GET: typeof messagesDefinition.GET;
   }
-  // endpointOptions for EndpointsPage type constraint - only read needed since we pass GET only
   const messagesEndpointOptions = useMemo(
     (): UseEndpointOptions<MessagesGetEndpoint> => ({
       read: {
@@ -203,68 +173,221 @@ function AiStreamChatArea(): JSX.Element {
   );
 
   return (
-    <KeyboardAvoidingView className="h-dvh flex-1" keyboardVerticalOffset={0}>
-      <Div
-        style={
-          platform.isReactNative ? { paddingTop: insets.top + 60 } : undefined
-        }
-      >
-        <InputHeightProvider height={inputHeight}>
-          <Div
-            className={
-              platform.isReactNative
-                ? "flex-1 flex flex-col min-w-0 relative w-full"
-                : "w-full h-dvh"
-            }
-          >
-            {/* Toolbar */}
-            {activeThreadId && activeThreadId !== NEW_MESSAGE_ID && (
-              <ErrorBoundary locale={locale}>
-                <ChatToolbar locale={locale} />
-              </ErrorBoundary>
-            )}
-
-            {/* Messages area */}
+    <KeyboardAvoidingView
+      className={
+        platform.isReactNative ? "flex-1" : "flex flex-col flex-1 min-h-0"
+      }
+      keyboardVerticalOffset={0}
+    >
+      <InputHeightProvider height={inputHeight}>
+        {platform.isReactNative && (
+          <Div style={{ paddingTop: insets.top + 60 }} />
+        )}
+        <Div
+          className={
+            platform.isReactNative
+              ? "flex-1 flex flex-col min-w-0 relative w-full"
+              : "flex flex-col flex-1 min-w-0 min-h-0 relative"
+          }
+        >
+          {/* Toolbar */}
+          {activeThreadId && activeThreadId !== NEW_MESSAGE_ID && (
             <ErrorBoundary locale={locale}>
-              <Div className="max-w-screen overflow-hidden h-dvh">
-                {threadIdToRender ? (
-                  <EndpointsPage<MessagesGetEndpoint>
-                    key={threadIdToRender}
-                    endpoint={{ GET: messagesDefinition.GET }}
-                    endpointOptions={messagesEndpointOptions}
-                    endpointInstance={messagesEndpointInstance}
-                    className="h-full"
-                    locale={locale}
-                    user={user}
-                  />
-                ) : (
-                  <ChatEmptyState locale={locale} inputHeight={inputHeight} />
-                )}
-              </Div>
+              <ChatToolbar locale={locale} />
             </ErrorBoundary>
+          )}
 
-            {/* Input */}
-            <ErrorBoundary locale={locale}>
-              <ChatInputContainer inputContainerRef={inputContainerRef} />
-            </ErrorBoundary>
+          {/* Messages area */}
+          <ErrorBoundary locale={locale}>
+            <Div className="flex flex-col flex-1 min-w-0 min-h-0">
+              {threadIdToRender ? (
+                <EndpointsPage<MessagesGetEndpoint>
+                  key={threadIdToRender}
+                  endpoint={{ GET: messagesDefinition.GET }}
+                  endpointOptions={messagesEndpointOptions}
+                  endpointInstance={messagesEndpointInstance}
+                  className="flex flex-col flex-1 min-h-0"
+                  locale={locale}
+                  user={user}
+                />
+              ) : (
+                <ChatEmptyState locale={locale} inputHeight={inputHeight} />
+              )}
+            </Div>
+          </ErrorBoundary>
 
-            {/* AI Tools Modal */}
-            <ErrorBoundary locale={locale}>
-              <AIToolsModal locale={locale} user={user} />
-            </ErrorBoundary>
+          {/* Input */}
+          <ErrorBoundary locale={locale}>
+            <ChatInputContainer inputContainerRef={inputContainerRef} />
+          </ErrorBoundary>
 
-            {/* Cortex Modal */}
-            <ErrorBoundary locale={locale}>
-              <CortexModal locale={locale} user={user} />
-            </ErrorBoundary>
-          </Div>
-        </InputHeightProvider>
-      </Div>
+          {/* AI Tools Modal */}
+          <ErrorBoundary locale={locale}>
+            <AIToolsModal locale={locale} user={user} />
+          </ErrorBoundary>
+
+          {/* Cortex Modal */}
+          <ErrorBoundary locale={locale}>
+            <CortexModal locale={locale} user={user} />
+          </ErrorBoundary>
+        </Div>
+      </InputHeightProvider>
     </KeyboardAvoidingView>
   );
 }
 
+// ─── Main Widget ─────────────────────────────────────────────────────────────
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
-  return <AiStreamChatArea />;
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const locale = useWidgetLocale();
+  const { currentCountry } = useTranslation();
+  const { initialPublicFeedData } = useChatBootContext();
+
+  const currentRootFolderId = useChatNavigationStore(
+    (s) => s.currentRootFolderId,
+  );
+  const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
+
+  const isPublicFeed =
+    currentRootFolderId === DefaultFolderId.PUBLIC && !activeThreadId;
+
+  // Delete dialog
+  const deleteDialogOpen = useDeleteDialogStore((s) => s.deleteDialogOpen);
+  const handleConfirmDelete = useDeleteDialogStore((s) => s.confirmDelete);
+  const handleCancelDelete = useDeleteDialogStore((s) => s.closeDeleteDialog);
+
+  const { t } = scopedTranslation.scopedT(locale);
+
+  const isAuthenticated = !user.isPublic;
+  const isAdmin = isAuthenticated && user.roles.includes(UserRole.ADMIN);
+  const totalModelCount = getAvailableModelCount(isAdmin);
+
+  // Auth dialog for welcome tour
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+
+  // Navigation hooks
+  const router = useRouter();
+  const pathname = usePathname();
+  useEffect(() => {
+    if (
+      !isAuthenticated &&
+      currentRootFolderId !== DefaultFolderId.INCOGNITO &&
+      currentRootFolderId !== DefaultFolderId.PUBLIC
+    ) {
+      logger.info(
+        "Non-authenticated user attempted to access restricted folder, redirecting to incognito",
+        { attemptedFolder: currentRootFolderId },
+      );
+      router.push(`/${locale}/threads/${DefaultFolderId.INCOGNITO}/new`);
+    }
+  }, [isAuthenticated, currentRootFolderId, locale, logger, router]);
+
+  return (
+    <>
+      <Div
+        className={
+          platform.isReactNative
+            ? "flex flex-1 overflow-hidden bg-background"
+            : "flex flex-1 min-h-0 overflow-hidden bg-background"
+        }
+      >
+        {/* Top Bar */}
+        <ErrorBoundary locale={locale}>
+          <TopBar currentCountry={currentCountry} locale={locale} />
+        </ErrorBoundary>
+
+        {/* Sidebar + main content */}
+        <ErrorBoundary locale={locale}>
+          <SidebarWrapper locale={locale} user={user} logger={logger}>
+            <ErrorBoundary locale={locale}>
+              {isPublicFeed ? (
+                <EndpointsPage
+                  key="public-feed"
+                  endpoint={publicFeedDefinition}
+                  locale={locale}
+                  user={user}
+                  className="h-full flex-1"
+                  endpointOptions={{
+                    read: {
+                      initialData: initialPublicFeedData ?? undefined,
+                    },
+                  }}
+                />
+              ) : (
+                <AiStreamChatArea />
+              )}
+            </ErrorBoundary>
+          </SidebarWrapper>
+        </ErrorBoundary>
+      </Div>
+
+      {/* Delete Message Confirmation Dialog */}
+      <ErrorBoundary locale={locale}>
+        <AlertDialog open={deleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t("common.delete")}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("components.confirmations.deleteMessage")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={handleCancelDelete}>
+                {t("common.cancel")}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmDelete}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {t("common.delete")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </ErrorBoundary>
+
+      {/* Auth Dialog for Tour */}
+      <ErrorBoundary locale={locale}>
+        <AlertDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t("components.welcomeTour.authDialog.title")}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("components.welcomeTour.authDialog.description")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setAuthDialogOpen(false)}>
+                {t("components.welcomeTour.authDialog.continueTour")}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  router.push(
+                    `/${locale}/login?returnUrl=${encodeURIComponent(pathname)}`,
+                  );
+                }}
+              >
+                {t("components.welcomeTour.authDialog.signUp")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </ErrorBoundary>
+
+      {/* Welcome Tour */}
+      <ErrorBoundary locale={locale}>
+        <WelcomeTour
+          isAuthenticated={isAuthenticated}
+          locale={locale}
+          autoStart={true}
+          totalModelCount={totalModelCount}
+        />
+      </ErrorBoundary>
+    </>
+  );
 }

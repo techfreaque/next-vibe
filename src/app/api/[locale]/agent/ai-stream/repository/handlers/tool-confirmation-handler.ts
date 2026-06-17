@@ -153,6 +153,9 @@ export class ToolConfirmationHandler {
       // Set currentToolMessageId so RouteExecuteRepository (wakeUp path) can call
       // handleTaskCompletion with the correct toolMessageId for revival backfill.
       params.streamContext.currentToolMessageId = toolConfirmation.messageId;
+      // Signal that this is a confirmed re-execution so execute-tool's requiresConfirmation
+      // gate is bypassed — the user already confirmed, we must not halt again.
+      params.streamContext.isConfirmedReExecution = true;
 
       // Load and execute tool
       // Note: Tool confirmation already happened - this is executing the confirmed tool

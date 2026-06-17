@@ -214,15 +214,6 @@ export const {
     value: process.env.NEXT_PUBLIC_AGENT_MODELS_LAB,
     example: false,
   },
-  NEXT_PUBLIC_AGENT_UNBOTTLED: {
-    schema: z
-      .string()
-      .optional()
-
-      .transform((v) => v === "true"),
-    value: process.env.NEXT_PUBLIC_AGENT_UNBOTTLED,
-    example: false,
-  },
   NEXT_PUBLIC_AGENT_EDEN_AI_STT: {
     schema: z
       .string()

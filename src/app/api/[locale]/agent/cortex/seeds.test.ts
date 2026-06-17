@@ -71,13 +71,14 @@ for (const locale of LOCALES) {
       }
     });
 
-    it("all paths start with the locale root", () => {
-      const roots = getLocaleRoots(locale);
+    it("all paths use CANONICAL roots (paths match DB storage; only content is localized)", () => {
+      // Template paths are stored canonically (/memories, /documents) to match
+      // the DB; getLocaleRoots() is only for display. Content is translated.
       for (const item of memoryTemplates) {
-        expect(item.path.startsWith(roots.memories + "/")).toBe(true);
+        expect(item.path.startsWith("/memories/")).toBe(true);
       }
       for (const item of docTemplates) {
-        expect(item.path.startsWith(roots.documents + "/")).toBe(true);
+        expect(item.path.startsWith("/documents/")).toBe(true);
       }
     });
 
@@ -109,19 +110,33 @@ describe("Locale roots", () => {
   });
 });
 
-describe("Locale path isolation", () => {
-  it("EN and DE memory templates have different paths", () => {
-    const en = getMemoryTemplates("en-US").map((t) => t.path);
-    const de = getMemoryTemplates("de-DE").map((t) => t.path);
-    const overlap = en.filter((p) => de.includes(p));
-    expect(overlap.length).toBe(0);
+describe("Locale content isolation (paths canonical, content translated)", () => {
+  it("EN and DE memory templates SHARE canonical paths but DIFFER in content", () => {
+    const en = getMemoryTemplates("en-US");
+    const de = getMemoryTemplates("de-DE");
+    const enPaths = en.map((item) => item.path).toSorted();
+    const dePaths = de.map((item) => item.path).toSorted();
+    // Same canonical paths across locales (DB storage is canonical).
+    expect(dePaths).toEqual(enPaths);
+    // But the translated content differs for at least one template.
+    const enById = new Map(en.map((item) => [item.id, item.content]));
+    const anyContentDiffers = de.some(
+      (item) => enById.get(item.id) !== item.content,
+    );
+    expect(anyContentDiffers).toBe(true);
   });
 
-  it("EN and PL memory templates have different paths", () => {
-    const en = getMemoryTemplates("en-US").map((t) => t.path);
-    const pl = getMemoryTemplates("pl-PL").map((t) => t.path);
-    const overlap = en.filter((p) => pl.includes(p));
-    expect(overlap.length).toBe(0);
+  it("EN and PL memory templates SHARE canonical paths but DIFFER in content", () => {
+    const en = getMemoryTemplates("en-US");
+    const pl = getMemoryTemplates("pl-PL");
+    expect(pl.map((item) => item.path).toSorted()).toEqual(
+      en.map((item) => item.path).toSorted(),
+    );
+    const enById = new Map(en.map((item) => [item.id, item.content]));
+    const anyContentDiffers = pl.some(
+      (item) => enById.get(item.id) !== item.content,
+    );
+    expect(anyContentDiffers).toBe(true);
   });
 });
 

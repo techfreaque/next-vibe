@@ -393,8 +393,12 @@ export class StreamPartHandler {
           streamContext,
         });
         if (result) {
-          ctx.currentParentId = result.currentParentId;
-          ctx.lastParentId = result.currentParentId;
+          // Same tip-rewind guard as tool-result below: a matched pending
+          // entry means the chain already advanced at tool-call time.
+          if (!pending) {
+            ctx.currentParentId = result.currentParentId;
+            ctx.lastParentId = result.currentParentId;
+          }
           ctx.pendingToolMessages.delete(part.toolCallId);
         }
       }
@@ -409,6 +413,13 @@ export class StreamPartHandler {
       typeof part.toolCallId === "string" &&
       typeof part.toolName === "string"
     ) {
+      // Wrapped confirmation gate: execute-tool sets the flag on the tool
+      // execution context (it has no LoopContext access). Mirror it onto the
+      // loop context so stopWhen/finish-step abort before the AI-response turn,
+      // exactly like a direct call to a requiresConfirmation tool.
+      if (streamContext.stepHasToolsAwaitingConfirmation) {
+        ctx.stepHasToolsAwaitingConfirmation = true;
+      }
       const pending = ctx.pendingToolMessages.get(part.toolCallId);
       const result = await ToolResultHandler.processToolResult({
         part: {
@@ -434,8 +445,16 @@ export class StreamPartHandler {
         t,
       });
       if (result) {
-        ctx.currentParentId = result.currentParentId;
-        ctx.lastParentId = result.currentParentId;
+        // The chain tip already advanced when the tool-call created its
+        // message. Re-assigning from the result would REWIND the tip when a
+        // later tool-call has advanced it meanwhile (rapid sequential calls:
+        // result N can process after call N+1 created its message, forking
+        // the chain). Only advance when the handler created a NEW message
+        // (no pending entry - provider-executed tools).
+        if (!pending) {
+          ctx.currentParentId = result.currentParentId;
+          ctx.lastParentId = result.currentParentId;
+        }
         ctx.pendingToolMessages.delete(part.toolCallId);
 
         // Finalize and reset assistant message state so the next turn creates
@@ -460,6 +479,26 @@ export class StreamPartHandler {
         ctx.currentAssistantMessageId = null;
         ctx.currentAssistantContent = "";
         ctx.isInReasoningBlock = false;
+
+        // APPROVE: once every tool of this step has resolved and one of them
+        // awaits confirmation, abort NOW - the provider stream may still be
+        // open, and everything it sends past this point is discarded anyway.
+        // Waiting for finish-step would hold the thread (and keep billing)
+        // until the provider closes the stream on its own.
+        if (
+          ctx.stepHasToolsAwaitingConfirmation &&
+          ctx.pendingToolMessages.size === 0 &&
+          !streamContext.waitingForRemoteResult
+        ) {
+          logger.debug(
+            "[AI Stream] APPROVE - all tool results in, aborting provider stream before AI response turn",
+            { toolName: part.toolName, toolCallId: part.toolCallId },
+          );
+          streamAbortController.abort(
+            new StreamAbortError(AbortReason.TOOL_CONFIRMATION),
+          );
+          return { shouldAbort: true };
+        }
 
         // Remote tool with callbackMode=wait: defer abort to finish-step (same as endLoop/approve).
         // finish-step fires after all tool results, before the AI SDK makes the next API call.

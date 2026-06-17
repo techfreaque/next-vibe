@@ -16,6 +16,7 @@ import {
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";

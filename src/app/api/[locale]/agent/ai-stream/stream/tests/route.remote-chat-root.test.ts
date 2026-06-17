@@ -7,8 +7,8 @@
  * prompts, same assertions; only the folder (and therefore the loop
  * location) differs.
  *
- * Transport: transportMode='reverse-ws', routingRules.isDefault=false
- * (only the REMOTE folder routes to hermes).
+ * Transport: transportMode='reverse-ws', isDefault=false
+ * (only the REMOTE folder routes to hermes — deterministic by folder ancestry).
  *
  * Full T-suite via describeStreamSuite with remoteInstanceId='hermes'.
  *
@@ -37,7 +37,6 @@ import {
   resolveProdAdminToken,
   resolveProdUserId,
   resolveRemoteUrl,
-  triggerPull,
   unregisterDevFromHermes,
 } from "../../testing/remote-setup";
 import { describeStreamSuite } from "./route-base.test";
@@ -50,7 +49,6 @@ let _localFolderId: string | null = null;
 
 async function setup(testUser: JwtPrivatePayloadType): Promise<void> {
   await connectToHermesLocalAi(testUser, _remoteUrl ?? "http://localhost:3002");
-  await triggerPull();
 
   // Threads live in REMOTE → <instanceId>; route-base nests tests/<case> inside.
   _localFolderId = await getOrCreateFolder(

@@ -47,6 +47,7 @@ export class DatabaseMigrationRepository {
           encoding: "utf8",
           cwd: process.cwd(),
           env: { ...process.env, DATABASE_URL: env.DATABASE_URL },
+          timeout: 60_000,
         },
       );
 

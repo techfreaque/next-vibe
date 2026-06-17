@@ -8,5 +8,4 @@ import { describeStreamSuite } from "./route-base.test";
 describeStreamSuite({
   label: "AI Stream Integration - Regular",
   cachePrefix: "",
-  disableCompacting: true,
 });

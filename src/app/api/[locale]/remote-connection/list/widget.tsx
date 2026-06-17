@@ -378,59 +378,61 @@ function CloudView({
 }): JSX.Element {
   return (
     <Div className="flex flex-col gap-6 p-4">
-      {/* Hero */}
-      <Div className="flex flex-col gap-2">
-        <H3 className="text-xl font-bold tracking-tight">
-          {t("widget.cloud.heroTitle")}
-        </H3>
-        <P className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-          {t("widget.cloud.heroSubtitle")}
-        </P>
-      </Div>
+      {/* Hero + features + CTA — full mode only */}
+      {!isPickerMode && (
+        <>
+          <Div className="flex flex-col gap-2">
+            <H3 className="text-xl font-bold tracking-tight">
+              {t("widget.cloud.heroTitle")}
+            </H3>
+            <P className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
+              {t("widget.cloud.heroSubtitle")}
+            </P>
+          </Div>
 
-      {/* Feature grid */}
-      <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <FeatureCard
-          title={t("widget.cloud.feature1Title")}
-          body={t("widget.cloud.feature1Body")}
-        />
-        <FeatureCard
-          title={t("widget.cloud.feature2Title")}
-          body={t("widget.cloud.feature2Body")}
-        />
-        <FeatureCard
-          title={t("widget.cloud.feature3Title")}
-          body={t("widget.cloud.feature3Body")}
-        />
-        <FeatureCard
-          title={t("widget.cloud.feature4Title")}
-          body={t("widget.cloud.feature4Body")}
-        />
-      </Div>
+          <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <FeatureCard
+              title={t("widget.cloud.feature1Title")}
+              body={t("widget.cloud.feature1Body")}
+            />
+            <FeatureCard
+              title={t("widget.cloud.feature2Title")}
+              body={t("widget.cloud.feature2Body")}
+            />
+            <FeatureCard
+              title={t("widget.cloud.feature3Title")}
+              body={t("widget.cloud.feature3Body")}
+            />
+            <FeatureCard
+              title={t("widget.cloud.feature4Title")}
+              body={t("widget.cloud.feature4Body")}
+            />
+          </Div>
 
-      {/* CTA buttons */}
-      <Div className="flex flex-wrap gap-3">
-        <Link
-          href={GITHUB_REPO_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
-        >
-          <SiGithub className="h-4 w-4" />
-          {t("widget.cloud.githubCta")}
-        </Link>
-        <Link
-          href={`${GITHUB_REPO_URL}#quick-start`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors"
-        >
-          {t("widget.cloud.quickstartCta")}
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      </Div>
+          <Div className="flex flex-wrap gap-3">
+            <Link
+              href={GITHUB_REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              <SiGithub className="h-4 w-4" />
+              {t("widget.cloud.githubCta")}
+            </Link>
+            <Link
+              href={`${GITHUB_REPO_URL}#quick-start`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors"
+            >
+              {t("widget.cloud.quickstartCta")}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Div>
 
-      <Separator />
+          <Separator />
+        </>
+      )}
 
       {/* Connected instances (read-only on cloud) */}
       <Div className="flex flex-col gap-4">
@@ -469,112 +471,6 @@ function CloudView({
   );
 }
 
-// ─── Sync settings card (admin only, local only) ──────────────────────────────
-
-function SyncSettingsCard({
-  t,
-}: {
-  syncEnabled: boolean;
-  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
-}): JSX.Element {
-  const [isToggling, setIsToggling] = useState(false);
-  const locale = useWidgetLocale();
-  const user = useWidgetUser();
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  const logger = useWidgetLogger();
-  isAdmin,
-  isAdmin,
-
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  isAdmin,
-  const handleToggle = async (): Promise<void> => {
-    setIsToggling(true);
-    try {
-      const defs =
-        await import("@/app/api/[locale]/system/unified-interface/tasks/task-sync/settings/definition");
-      const listDef = await import("./definition");
-      const newValue = !syncEnabled;
-      await apiClient.mutate(
-        defs.default.PATCH,
-        logger,
-        user,
-        { syncEnabled: newValue },
-        undefined,
-        locale,
-      );
-      apiClient.updateEndpointData(listDef.GET, logger, (prev) => {
-        if (!prev?.success) {
-          return prev;
-        }
-        return { success: true, data: { ...prev.data, syncEnabled: newValue } };
-      });
-    } finally {
-      setIsToggling(false);
-    }
-  };
-
-  return (
-    <Card className="rounded-none border-0 border-b shadow-none">
-      <CardHeader className="pb-3">
-        <Div className="flex items-center justify-between gap-3">
-          <Div className="flex flex-col gap-1">
-            <Div className="flex items-center gap-2">
-              {isToggling ? (
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              ) : (
-                <RefreshCw
-                  className={`h-4 w-4 ${syncEnabled ? "text-primary" : "text-muted-foreground"}`}
-                />
-              )}
-              <CardTitle className="text-sm">
-                {t("widget.syncSettings.title")}
-              </CardTitle>
-              <Badge
-                variant={syncEnabled ? "default" : "outline"}
-                className="text-[10px]"
-              >
-                {syncEnabled
-                  ? t("widget.syncSettings.enabledBadge")
-                  : t("widget.syncSettings.disabledBadge")}
-              </Badge>
-            </Div>
-            <CardDescription className="text-xs">
-              {t("widget.syncSettings.description")}
-            </CardDescription>
-          </Div>
-          <Switch
-            checked={syncEnabled}
-            onCheckedChange={() => void handleToggle()}
-            disabled={isToggling}
-            aria-label={t("widget.syncSettings.toggleLabel")}
-          />
-        </Div>
-      </CardHeader>
-    </Card>
-  );
-}
-
 // ─── Local view: pitch + connection list ──────────────────────────────────────
 
 function LocalView({
@@ -588,53 +484,55 @@ function LocalView({
 }: {
   connections: RemoteConnection[];
   selfInstanceId: string | null;
-  syncEnabled: boolean | null;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
   onPick: ((conn: RemoteConnection) => void) | undefined;
   isPickerMode: boolean;
+  isAdmin: boolean;
 }): JSX.Element {
   return (
     <Div className="flex flex-col gap-0">
-      {/* Connect to cloud pitch */}
-      <Card className="rounded-none border-0 border-b shadow-none">
-        <CardHeader className="pb-3">
-          <Div className="flex items-center gap-2">
-            <Link2 className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base">
-              {t("widget.local.cloudTitle")}
-            </CardTitle>
-          </Div>
-          <CardDescription className="text-sm leading-relaxed">
-            {t("widget.local.cloudSubtitle")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0 pb-4">
-          <Div className="flex flex-col gap-1.5 mb-4">
-            {(
-              [
-                "widget.local.benefit1",
-                "widget.local.benefit2",
-                "widget.local.benefit3",
-              ] as const
-            ).map((key) => (
-              <Div key={key} className="flex items-start gap-2">
-                <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                <P className="text-xs text-muted-foreground">{t(key)}</P>
-              </Div>
-            ))}
-          </Div>
-          {!isPickerMode && (
-            <AddConnectionButton
-              navigate={navigate}
-              label={t("widget.connectButtonLocal")}
-            />
-          )}
-        </CardContent>
-      </Card>
+      {/* Connect to cloud pitch — admins only */}
+      {isAdmin && (
+        <Card className="rounded-none border-0 border-b shadow-none">
+          <CardHeader className="pb-3">
+            <Div className="flex items-center gap-2">
+              <Link2 className="h-5 w-5 text-primary" />
+              <CardTitle className="text-base">
+                {t("widget.local.cloudTitle")}
+              </CardTitle>
+            </Div>
+            <CardDescription className="text-sm leading-relaxed">
+              {t("widget.local.cloudSubtitle")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0 pb-4">
+            <Div className="flex flex-col gap-1.5 mb-4">
+              {(
+                [
+                  "widget.local.benefit1",
+                  "widget.local.benefit2",
+                  "widget.local.benefit3",
+                ] as const
+              ).map((key) => (
+                <Div key={key} className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <P className="text-xs text-muted-foreground">{t(key)}</P>
+                </Div>
+              ))}
+            </Div>
+            {!isPickerMode && (
+              <AddConnectionButton
+                navigate={navigate}
+                label={t("widget.connectButtonLocal")}
+              />
+            )}
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Self-identity */}
-      {selfInstanceId && (
+      {/* Self-identity — admins only */}
+      {isAdmin && selfInstanceId && (
         <Card className="rounded-none border-0 border-b shadow-none">
           <CardHeader className="pb-3">
             <Div className="flex items-center justify-between gap-3">
@@ -652,15 +550,10 @@ function LocalView({
                   {t("widget.selfIdentity.description")}
                 </CardDescription>
               </Div>
-              <RenameSelfButton navigate={navigate} />
+              {!isPickerMode && <RenameSelfButton navigate={navigate} />}
             </Div>
           </CardHeader>
         </Card>
-      )}
-
-      {/* Sync settings (admin only) */}
-      {syncEnabled !== null && (
-        <SyncSettingsCard syncEnabled={syncEnabled} t={t} />
       )}
 
       {/* Connection list */}
@@ -671,12 +564,6 @@ function LocalView({
             ? t("widget.local.connectionsTitle")
             : t("widget.local.noConnectionsYet")}
         </Span>
-        {!isPickerMode && connections.length > 0 && (
-          <AddConnectionButton
-            navigate={navigate}
-            label={t("widget.addButton")}
-          />
-        )}
       </Div>
 
       {connections.length > 0 ? (
@@ -709,12 +596,14 @@ export function RemoteConnectionsListContainer(): JSX.Element {
   const { push: navigate } = useWidgetNavigation();
   const data = useWidgetValue<typeof endpoints.GET>();
   const onPick = usePickerCallback<RemoteConnection>();
+  const user = useWidgetUser();
   const isPickerMode = !!onPick;
 
   const connections = data?.connections ?? [];
   const selfInstanceId = data?.selfInstanceId ?? null;
-  const syncEnabled = data?.syncEnabled ?? null;
   const isCloud = envClient.NEXT_PUBLIC_VIBE_IS_CLOUD;
+  const isAdmin =
+    !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN) === true;
 
   if (isCloud) {
     return (
@@ -732,11 +621,11 @@ export function RemoteConnectionsListContainer(): JSX.Element {
     <LocalView
       connections={connections}
       selfInstanceId={selfInstanceId}
-      syncEnabled={syncEnabled}
       navigate={navigate}
       t={t}
       onPick={onPick}
       isPickerMode={isPickerMode}
+      isAdmin={isAdmin}
     />
   );
 }

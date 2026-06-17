@@ -29,7 +29,6 @@ import type {
   ApiFormOptions,
   ApiFormReturn,
   ApiMutationOptions,
-  SubmitFormFunction,
   SubmitFormFunctionOptions,
 } from "./types";
 import { useApiMutation } from "./use-api-mutation";
@@ -304,14 +303,12 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
 
   // Create a submit handler that validates and submits the form
   const submitForm = useCallback(
-    ((
-      submitOptions: TEndpoint["types"]["UrlVariablesOutput"] extends undefined
-        ? undefined
-        : SubmitFormFunctionOptions<
-            TEndpoint["types"]["RequestOutput"],
-            TEndpoint["types"]["ResponseOutput"],
-            TEndpoint["types"]["UrlVariablesOutput"]
-          >,
+    (
+      submitOptions?: SubmitFormFunctionOptions<
+        TEndpoint["types"]["RequestOutput"],
+        TEndpoint["types"]["ResponseOutput"],
+        TEndpoint["types"]["UrlVariablesOutput"]
+      >,
     ): void => {
       const _submitForm = async (
         validatedData: TEndpoint["types"]["RequestOutput"],
@@ -412,11 +409,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           pathParams: submitOptions?.urlParamVariables,
         });
       })();
-    }) as SubmitFormFunction<
-      TEndpoint["types"]["RequestOutput"],
-      TEndpoint["types"]["ResponseOutput"],
-      TEndpoint["types"]["UrlVariablesOutput"]
-    >,
+    },
     [
       clearFormError,
       endpoint.path,

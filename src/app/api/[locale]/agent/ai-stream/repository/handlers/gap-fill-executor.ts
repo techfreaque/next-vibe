@@ -25,6 +25,10 @@ import type {
 import { generateText as aiGenerateText } from "ai";
 
 import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
+import {
+  type AgentEnvAvailability,
+  getInstanceAvailability,
+} from "@/app/api/[locale]/agent/env-availability";
 import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
@@ -161,6 +165,7 @@ export class GapFillExecutor {
                 logger,
                 user,
                 locale,
+                availability,
               });
               return variantText
                 ? { type: "text" as const, text: variantText }
@@ -190,6 +195,7 @@ export class GapFillExecutor {
                 logger,
                 user,
                 locale,
+                availability,
               });
               return variantText
                 ? { type: "text" as const, text: variantText }
@@ -325,6 +331,7 @@ export class GapFillExecutor {
               logger,
               user,
               locale,
+              availability,
             });
 
             if (!description) {
@@ -366,6 +373,7 @@ export class GapFillExecutor {
       logger,
       user,
       locale,
+      availability,
     } = params;
 
     const isImage = part.type === "image";
@@ -403,6 +411,7 @@ export class GapFillExecutor {
         locale,
         modality,
         bridgeType,
+        availability,
       });
     }
 
@@ -419,6 +428,7 @@ export class GapFillExecutor {
         locale,
         modality,
         bridgeType,
+        availability,
       });
     }
 
@@ -433,6 +443,7 @@ export class GapFillExecutor {
       user,
       modality,
       bridgeType,
+      availability,
     });
   }
 
@@ -457,11 +468,13 @@ export class GapFillExecutor {
       user,
       modality,
       bridgeType,
+      availability,
     } = params;
 
     const visionModel = ModalityResolver.resolveImageVisionModel(
       bridgeContext,
       user,
+      availability,
     );
 
     if (!visionModel) {
@@ -593,6 +606,7 @@ Write in flowing prose. Do not summarize. Do not omit. The receiving AI must be 
       user,
       modality,
       bridgeType,
+      availability,
     } = params;
 
     // Audio attachment bridging uses audio-vision LLM only (e.g. Gemini).
@@ -601,6 +615,7 @@ Write in flowing prose. Do not summarize. Do not omit. The receiving AI must be 
     const audioVisionModel = ModalityResolver.resolveAudioVisionModel(
       bridgeContext,
       user,
+      availability,
     );
     if (!audioVisionModel) {
       logger.warn(
@@ -755,11 +770,13 @@ Write in structured prose. Do not summarize. Do not omit. The receiving AI must 
       user,
       modality,
       bridgeType,
+      availability,
     } = params;
 
     const videoVisionModel = ModalityResolver.resolveVideoVisionModel(
       bridgeContext,
       user,
+      availability,
     );
 
     if (!videoVisionModel) {
@@ -918,15 +935,28 @@ Write in structured prose. Do not summarize. Do not omit. The receiving AI must 
       abortSignal,
       logger,
       user,
+      availability,
     } = params;
 
     // Pick the correct vision model resolver per modality
     const visionModel =
       modality === "video"
-        ? ModalityResolver.resolveVideoVisionModel(bridgeContext, user)
+        ? ModalityResolver.resolveVideoVisionModel(
+            bridgeContext,
+            user,
+            availability,
+          )
         : modality === "audio"
-          ? ModalityResolver.resolveAudioVisionModel(bridgeContext, user)
-          : ModalityResolver.resolveImageVisionModel(bridgeContext, user);
+          ? ModalityResolver.resolveAudioVisionModel(
+              bridgeContext,
+              user,
+              availability,
+            )
+          : ModalityResolver.resolveImageVisionModel(
+              bridgeContext,
+              user,
+              availability,
+            );
 
     if (!visionModel) {
       logger.warn("[GapFill] No vision model configured for media URL bridge", {

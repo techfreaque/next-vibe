@@ -1,10 +1,8 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 // AUTO-GENERATED from src/app/[locale]/story/layout.tsx. Add "use custom" to this file to preserve customizations.
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-
-import { TanstackPage as Layout } from "@/app/[locale]/story/layout";
 import { toNextParams } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
+import { TanstackPage as Layout } from "@/app/[locale]/story/layout";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
@@ -16,9 +14,5 @@ const loadData = createServerFn({ method: "GET" })
 export const Route = createFileRoute("/$locale/story")({
   staleTime: 0,
   loader: ({ params }) => loadData({ data: params as Record<string, string> }),
-  component: () => (
-    <Layout {...Route.useLoaderData()}>
-      <Outlet />
-    </Layout>
-  ),
+  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,
 });

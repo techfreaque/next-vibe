@@ -18,6 +18,7 @@ import {
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
@@ -33,6 +34,7 @@ import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import {
@@ -172,13 +174,11 @@ export function VideoGenerationContainer({
   // Aspect ratio options from model capabilities - memoized to avoid stale deps in useEffect
   const aspectRatioOptions = useMemo(
     () => resolvedVideoBased?.supportedAspectRatios || [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resolvedModelId],
+    [resolvedVideoBased],
   );
   const resolutionOptions = useMemo(
     () => resolvedVideoBased?.supportedResolutions ?? [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resolvedModelId],
+    [resolvedVideoBased],
   );
 
   // When model changes, reset duration/aspectRatio/resolution to valid defaults

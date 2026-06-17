@@ -82,7 +82,6 @@ export function HmrWrapper({
           (): Promise<{ default: AnyComponent }> =>
             Promise.resolve({ default: Component }),
         );
-        state.lazy = freshLazy;
         lazyRef.current = freshLazy;
         // Clear resolved so HMR update switches to the fresh lazy component
         resolvedRef.current = null;

@@ -254,6 +254,9 @@ function useSimpleChart(
   // Keep latest points in a ref so the async chart init can apply them immediately
   const pointsRef = useRef(points);
   pointsRef.current = points;
+  // Keep latest onLastValue in a ref so effects don't need it in deps
+  const onLastValueRef = useRef(onLastValue);
+  onLastValueRef.current = onLastValue;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -331,7 +334,7 @@ function useSimpleChart(
           .toSorted((a, b) => (a.time as number) - (b.time as number));
         series.setData(deduped);
         chart.timeScale().fitContent();
-        onLastValue(deduped[deduped.length - 1]?.value ?? null);
+        onLastValueRef.current(deduped[deduped.length - 1]?.value ?? null);
       }
 
       const ro = new ResizeObserver(() => {
@@ -365,8 +368,7 @@ function useSimpleChart(
     return (): void => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- rebuild on resolution change only
-  }, [resolution]);
+  }, [resolution, containerRef]);
 
   useEffect(() => {
     const s = chartRef.current?.series;
@@ -375,7 +377,7 @@ function useSimpleChart(
     }
     if (points.length === 0) {
       s.setData([]);
-      onLastValue(null);
+      onLastValueRef.current(null);
       return;
     }
     const map = new Map<UTCTimestamp, number>();
@@ -388,9 +390,8 @@ function useSimpleChart(
     s.setData(deduped);
     chartRef.current?.chart.timeScale().fitContent();
     const last = deduped[deduped.length - 1];
-    onLastValue(last?.value ?? null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- stable ref
-  }, [points]);
+    onLastValueRef.current(last?.value ?? null);
+  }, [points, chartRef]);
 }
 
 // ─── Main Widget ──────────────────────────────────────────────────────────────
@@ -415,6 +416,7 @@ export function DataSourceChartWidget({
   const [lastValue, setLastValue] = useState<number | null>(null);
 
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const didMountSubmitRef = useRef(false);
 
   const submit = useWidgetOnSubmit();
   const isLoading = mutations?.create?.isSubmitting ?? false;
@@ -439,9 +441,10 @@ export function DataSourceChartWidget({
 
   // Auto-submit on mount to load initial data
   useEffect((): void => {
-    if (!form || !submit) {
+    if (didMountSubmitRef.current || !form || !submit) {
       return;
     }
+    didMountSubmitRef.current = true;
     const range = buildRange(30);
     const opts = {
       shouldValidate: true,
@@ -451,8 +454,7 @@ export function DataSourceChartWidget({
     form.setValue("resolution", GraphResolution.ONE_DAY, opts);
     form.setValue("range", range, opts);
     void submit();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
-  }, []);
+  }, [form, submit]);
 
   const patchForm = useCallback(
     (patch: {

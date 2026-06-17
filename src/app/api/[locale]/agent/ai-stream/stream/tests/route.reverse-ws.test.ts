@@ -43,15 +43,8 @@ import {
 } from "../../testing/remote-setup";
 import { describeStreamSuite } from "./route-base.test";
 
-const HERMES_INSTANCE_ID = "hermes";
-/** instanceId used by hermes to refer to atlas */
-const ATLAS_INSTANCE_ID = "atlas";
-
-/**
- * Resolved remote URL — set once before the suite runs.
- * Requires port 3002 (vibe --hermes dev --fixture-mode).
- */
-let PROD_URL = "http://localhost:3002";
+/** Resolved remote URL — set once before the suite runs (always port 3002, hermes-dev). */
+let _remoteUrl = "http://localhost:3002";
 
 let _prodAdminToken: string | null = null;
 let _prodUserId: string | null = null;
@@ -63,19 +56,15 @@ async function setupReverseWsConnection(
     connectToHermesLocalAi,
     resolveProdUserId,
     resolveProdAdminToken,
-    triggerPull,
   } = await import("../../testing/remote-setup");
 
   // Local AI loop + remote tool execution: isDefault=false so nothing relays;
   // the AI dispatches tools explicitly via execute-tool(instanceId='hermes').
   // Includes idempotent disconnect of leftover connections.
-  await connectToHermesLocalAi(testUser, PROD_URL);
-
-  // Ensure capabilities are populated before tests run
-  await triggerPull();
+  await connectToHermesLocalAi(testUser, _remoteUrl);
 
   _prodUserId = await resolveProdUserId();
-  _prodAdminToken = await resolveProdAdminToken(PROD_URL);
+  _prodAdminToken = await resolveProdAdminToken(_remoteUrl);
 
   // NAT simulation: close hermes's connector again and mark the local
   // transport cloud-only so the first execute-tool broadcast has no open WS
@@ -83,7 +72,7 @@ async function setupReverseWsConnection(
   // 'reverse-ws' which opens the connector and delivers the missed event.
   // cloud-only is an internal transport state (no public API) — set directly.
   await fetch(
-    `${PROD_URL}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
+    `${_remoteUrl}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
     {
       method: "PATCH",
       headers: {
@@ -118,7 +107,7 @@ async function teardownReverseWsConnection(
   if (_prodAdminToken) {
     try {
       await fetch(
-        `${PROD_URL}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
+        `${_remoteUrl}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
         {
           method: "PATCH",
           headers: {
@@ -170,7 +159,7 @@ async function runReverseWsPulse(threadId: string): Promise<void> {
   //   - Opens WS to atlas, subscribes to system/tool-dispatch/{userId}
   //   - On open: any pending (missed) tool-execute-request is re-broadcast and executed
   const patchResp = await fetch(
-    `${PROD_URL}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
+    `${_remoteUrl}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
     {
       method: "PATCH",
       headers: {
@@ -231,7 +220,7 @@ const _resolvedRemoteUrl = await resolveRemoteUrl();
 const _isFixtureMode = isHermesInFixtureMode();
 
 if (_resolvedRemoteUrl && _isFixtureMode) {
-  PROD_URL = _resolvedRemoteUrl;
+  _remoteUrl = _resolvedRemoteUrl;
   describeStreamSuite({
     label: `AI Stream Integration - Reverse WS (${_resolvedRemoteUrl}, NAT: WS reverse connector → hermes → /report)`,
     cachePrefix: "reverse-ws-",

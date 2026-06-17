@@ -165,6 +165,11 @@ export const translations: typeof enTranslations = {
       favorites: "Ulubione",
       threads: "Wątki",
     },
+    reconnectNow: {
+      label: "Połącz ponownie",
+      description:
+        "Zamknij i wznów połączenie — uruchamia synchronizację pull-on-connect.",
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",

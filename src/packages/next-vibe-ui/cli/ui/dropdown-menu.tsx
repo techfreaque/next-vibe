@@ -84,8 +84,10 @@ interface DropdownMenuContextType {
   asChild: boolean;
   /** Item IDs registered in render order for focus management */
   itemIds: React.MutableRefObject<string[]>;
-  /** Actual focus ID of the trigger element (may differ from triggerId for asChild) */
-  triggerFocusId: React.MutableRefObject<string>;
+  /** Read the actual focus ID of the trigger element */
+  getTriggerFocusId: () => string;
+  /** Set the actual focus ID of the trigger element (may differ from triggerId for asChild) */
+  setTriggerFocusId: (id: string) => void;
 }
 
 const DropdownMenuContext = createContext<DropdownMenuContextType | null>(null);
@@ -93,9 +95,8 @@ const DropdownMenuContext = createContext<DropdownMenuContextType | null>(null);
 const EMPTY_ITEM_IDS: React.MutableRefObject<string[]> = {
   current: [],
 };
-const EMPTY_TRIGGER_FOCUS_ID: React.MutableRefObject<string> = {
-  current: "dropdown",
-};
+const EMPTY_GET_TRIGGER_FOCUS_ID = (): string => "dropdown";
+const EMPTY_SET_TRIGGER_FOCUS_ID: (id: string) => void = () => undefined;
 
 function useDropdownMenuContext(): DropdownMenuContextType {
   const ctx = useContext(DropdownMenuContext);
@@ -106,7 +107,8 @@ function useDropdownMenuContext(): DropdownMenuContextType {
       triggerId: "dropdown",
       asChild: false,
       itemIds: EMPTY_ITEM_IDS,
-      triggerFocusId: EMPTY_TRIGGER_FOCUS_ID,
+      getTriggerFocusId: EMPTY_GET_TRIGGER_FOCUS_ID,
+      setTriggerFocusId: EMPTY_SET_TRIGGER_FOCUS_ID,
     };
   }
   return ctx;
@@ -152,6 +154,14 @@ export function DropdownMenu({
     setInternalOpen(next);
   }, []);
 
+  const getTriggerFocusId = useCallback(
+    (): string => triggerFocusIdRef.current,
+    [],
+  );
+  const setTriggerFocusId = useCallback((id: string): void => {
+    triggerFocusIdRef.current = id;
+  }, []);
+
   return (
     <DropdownMenuContext.Provider
       value={{
@@ -160,7 +170,8 @@ export function DropdownMenu({
         triggerId: idRef.current,
         asChild: false,
         itemIds: itemIdsRef,
-        triggerFocusId: triggerFocusIdRef,
+        getTriggerFocusId,
+        setTriggerFocusId,
       }}
     >
       {children}
@@ -181,7 +192,7 @@ function DropdownMenuTriggerAsChild({
 }: {
   children: React.ReactNode;
 }): React.JSX.Element | null {
-  const { open, setOpen, triggerFocusId } = useDropdownMenuContext();
+  const { open, setOpen, setTriggerFocusId } = useDropdownMenuContext();
   const isMcp = useIsMcp();
 
   const toggleFn = useCallback((): void => {
@@ -190,9 +201,9 @@ function DropdownMenuTriggerAsChild({
 
   const registerFocusIdFn = useCallback(
     (id: string): void => {
-      triggerFocusId.current = id;
+      setTriggerFocusId(id);
     },
-    [triggerFocusId],
+    [setTriggerFocusId],
   );
 
   const toggleRef = useRef({
@@ -273,7 +284,8 @@ export function DropdownMenuTrigger({
 export function DropdownMenuContent({
   children,
 }: DropdownMenuContentProps): React.JSX.Element | null {
-  const { open, setOpen, itemIds, triggerFocusId } = useDropdownMenuContext();
+  const { open, setOpen, itemIds, getTriggerFocusId } =
+    useDropdownMenuContext();
   const isMcp = useIsMcp();
   const { isRawModeSupported } = useStdin();
   const { focus } = useFocusManager();
@@ -292,11 +304,11 @@ export function DropdownMenuContent({
       return (): void => clearTimeout(timer);
     }
     if (!open && prevOpenRef.current) {
-      focus(triggerFocusId.current);
+      focus(getTriggerFocusId());
       prevOpenRef.current = false;
     }
     return undefined;
-  }, [open, focus, triggerFocusId, itemIds]);
+  }, [open, focus, getTriggerFocusId, itemIds]);
 
   useInput(
     (input, key) => {
@@ -332,7 +344,7 @@ export function DropdownMenuItem({
   onSelect,
   onClick,
 }: DropdownMenuItemProps): React.JSX.Element | null {
-  const { setOpen, itemIds, triggerFocusId } = useDropdownMenuContext();
+  const { setOpen, itemIds, getTriggerFocusId } = useDropdownMenuContext();
   const isMcp = useIsMcp();
   const { isRawModeSupported } = useStdin();
   const idRef = useRef(`dd-item-${(dropdownItemIdCounter++).toString()}`);
@@ -370,7 +382,7 @@ export function DropdownMenuItem({
           onClick();
         }
         setOpen(false);
-        focusById(triggerFocusId.current);
+        focusById(getTriggerFocusId());
       }
     },
     { isActive: isRawModeSupported && !isMcp && isFocused },

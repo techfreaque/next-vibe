@@ -5,7 +5,6 @@
 "use client";
 
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
-import { useWindowSize } from "next-vibe-ui/hooks/use-window-size";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import {
   Collapsible,
@@ -71,7 +70,6 @@ import {
 import { AlertWidget } from "next-vibe-ui/unified/display-only/alert/widget";
 import { MarkdownWidget } from "next-vibe-ui/unified/display-only/markdown/widget";
 import { BooleanFieldWidget } from "next-vibe-ui/unified/form-fields/boolean-field/widget";
-import EntityPickerFieldWidget from "next-vibe-ui/unified/form-fields/entity-picker-field/widget";
 import {
   Icon,
   type IconKey,
@@ -83,7 +81,6 @@ import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-f
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
-import { getCurrentUrl, openUrl } from "next-vibe-ui/utils/browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -109,6 +106,7 @@ import {
   type VideoVisionModelSelection,
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
   getBestImageGenModel,
@@ -141,6 +139,7 @@ import {
   type VoiceModelSelection,
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import {
   getBestVideoGenModel,
@@ -286,6 +285,16 @@ export function SkillEditContainer({
       popNavigationOnSuccess: 2,
     });
   };
+
+  // When no skill ID is in context (standalone open), show a picker.
+  // EntityPickerFieldWidget reads config from the definition's id field.
+  if (!skillId) {
+    return (
+      <Div className="flex flex-col gap-4 p-4">
+        <EntityPickerFieldWidget fieldName="id" field={children.id} />
+      </Div>
+    );
+  }
 
   return (
     <Div className="flex flex-col gap-0">
@@ -519,6 +528,7 @@ function useViewDefaults(): {
       const m = getBestImageVisionModel(
         DEFAULT_IMAGE_VISION_MODEL_SELECTION,
         user,
+        availability,
       );
       if (!m) {
         return undefined;
@@ -533,6 +543,7 @@ function useViewDefaults(): {
       const m = getBestVideoVisionModel(
         DEFAULT_VIDEO_VISION_MODEL_SELECTION,
         user,
+        availability,
       );
       if (!m) {
         return undefined;
@@ -547,6 +558,7 @@ function useViewDefaults(): {
       const m = getBestAudioVisionModel(
         DEFAULT_AUDIO_VISION_MODEL_SELECTION,
         user,
+        availability,
       );
       if (!m) {
         return undefined;
@@ -584,7 +596,7 @@ function ModelCard({
   nameClassName?: string;
 }): React.JSX.Element {
   const provider = modelProviders[model.provider];
-  const providerIcon = provider?.icon as IconKey | undefined;
+  const providerIcon = provider?.icon;
 
   return (
     <Div
@@ -1074,7 +1086,7 @@ export function SkillViewContainer({
             >
               {skillData?.icon ? (
                 <Span style={{ color: `${accent}cc` }}>
-                  <Icon icon={skillData.icon as IconKey} className="w-9 h-9" />
+                  <Icon icon={skillData.icon} className="w-9 h-9" />
                 </Span>
               ) : (
                 <Skeleton className="w-9 h-9 rounded-full" />
@@ -1660,7 +1672,7 @@ export function SkillViewContainer({
             >
               {skillData?.icon ? (
                 <Span style={{ color: `${accent}cc` }}>
-                  <Icon icon={skillData.icon as IconKey} className="w-9 h-9" />
+                  <Icon icon={skillData.icon} className="w-9 h-9" />
                 </Span>
               ) : (
                 <Skeleton className="w-9 h-9 rounded-full" />
@@ -1877,6 +1889,7 @@ function VariantCard({
   isOwner,
   onEdit,
   defaultExpanded,
+  availability,
 }: {
   variant: SkillVariantData;
   skillId: string;
@@ -1988,7 +2001,7 @@ function VariantCard({
   }, [matchingFav, user, resolved.chat, skillId, logger, locale]);
 
   const handleGoToChat = useCallback((): void => {
-    window.location.href = `/${locale}/threads`;
+    openUrl(`/${locale}/threads`);
   }, [locale]);
 
   // displayName is pre-resolved server-side (system skills) or set by the user (custom skills)
@@ -2971,6 +2984,7 @@ function ShareEarnButton({
   const [loading, setLoading] = useState(false);
   const [popoverRect, setPopoverRect] = useState<DOMRect | null>(null);
   const wrapperRef = useRef<DivRefObject>(null);
+  const { width: windowWidth } = useWindowSize();
 
   useEffect(() => {
     if (open && wrapperRef.current) {
@@ -3075,9 +3089,11 @@ function ShareEarnButton({
     }
   };
 
+  const currentUrl = getCurrentUrl();
+  const origin = currentUrl ? new URL(currentUrl).origin : "";
   const shareUrl =
-    selectedCode && typeof window !== "undefined"
-      ? `${window.location.origin}/track?ref=${encodeURIComponent(selectedCode)}&url=${encodeURIComponent(`/${locale}/skill/${skillId}`)}`
+    selectedCode && origin
+      ? `${origin}/track?ref=${encodeURIComponent(selectedCode)}&url=${encodeURIComponent(`/${locale}/skill/${skillId}`)}`
       : null;
 
   const handleCopy = async (): Promise<void> => {
@@ -3097,7 +3113,7 @@ function ShareEarnButton({
               zIndex: 9999,
               width: 320,
               top: popoverRect.bottom + 8,
-              right: window.innerWidth - popoverRect.right,
+              right: windowWidth - popoverRect.right,
               borderRadius: 12,
               border: "1px solid hsl(var(--border))",
               backgroundColor: "hsl(var(--popover))",
@@ -3561,6 +3577,7 @@ export function useVariantPlatformDefaults(
       const m = getBestImageVisionModel(
         DEFAULT_IMAGE_VISION_MODEL_SELECTION,
         user,
+        availability,
       );
       if (!m) {
         return undefined;
@@ -3575,6 +3592,7 @@ export function useVariantPlatformDefaults(
       const m = getBestVideoVisionModel(
         DEFAULT_VIDEO_VISION_MODEL_SELECTION,
         user,
+        availability,
       );
       if (!m) {
         return undefined;
@@ -3589,6 +3607,7 @@ export function useVariantPlatformDefaults(
       const m = getBestAudioVisionModel(
         DEFAULT_AUDIO_VISION_MODEL_SELECTION,
         user,
+        availability,
       );
       if (!m) {
         return undefined;
@@ -4233,6 +4252,7 @@ export function VariantList({
   platformDefaults,
   locale,
   user,
+  availability,
   t,
 }: {
   variants: SkillVariantData[];

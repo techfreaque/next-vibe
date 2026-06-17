@@ -612,7 +612,7 @@ function mapStreamEvent(
         parts.push({
           type: "text-delta",
           id: textId,
-          delta: delta.text,
+          delta: delta.text ?? "",
         });
       } else if (delta.type === "thinking_delta") {
         const thinkingContent = (

@@ -10,6 +10,7 @@ import "server-only";
 import { and, desc, eq } from "drizzle-orm";
 
 import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
@@ -40,7 +41,6 @@ import {
 import { isUuid, parseSkillId } from "../../chat/slugify";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import type { ImageGenModelSelection } from "../../image-generation/models";
-import type { ApiProvider } from "../../models/models";
 import type { MusicGenModelSelection } from "../../music-generation/models";
 import type { VideoGenModelSelection } from "../../video-generation/models";
 import type { ChatModelId } from "../models";
@@ -143,12 +143,6 @@ export interface HeadlessAiStreamParams {
     videoGenModelSelection?: VideoGenModelSelection;
     imageGenModelSelection?: ImageGenModelSelection;
   };
-  /**
-   * Force all model resolution (chat + image/music/video gen) to use a specific API provider.
-   * When set, picks the cheapest variant of each resolved model from that provider.
-   * Used by UNBOTTLED self-relay to route all inference through the UNBOTTLED provider.
-   */
-  providerOverride?: ApiProvider;
   /** Sub-agent nesting depth (0 = top-level, incremented by ai-run) */
   subAgentDepth: number;
   /** File attachments to include with the user message (images, audio, PDFs, video) */
@@ -234,7 +228,6 @@ export async function resolveFavorite(
   user: JwtPayloadType,
   logger: EndpointLogger,
   locale: CountryLanguage,
-  providerOverride?: ApiProvider,
 ): Promise<{
   model: ChatModelId;
   skill: string;
@@ -255,6 +248,7 @@ export async function resolveFavorite(
   }
 
   const skill = favorite.skillId || NO_SKILL_ID;
+  const availability = await getInstanceAvailability();
 
   // Resolve model from modelSelection
   const sel = favorite.modelSelection;
@@ -267,7 +261,7 @@ export async function resolveFavorite(
     };
   }
   if (sel && isFiltersSelection(sel)) {
-    const best = getBestChatModel(sel, user, providerOverride);
+    const best = getBestChatModel(sel, user, availability);
     if (best) {
       return { model: best.id, skill, favoriteConfig: favorite };
     }
@@ -292,7 +286,7 @@ export async function resolveFavorite(
         : null;
       const varSel = variant?.modelSelection;
       if (varSel && (isManualSelection(varSel) || isFiltersSelection(varSel))) {
-        const best = getBestChatModel(varSel, user, providerOverride);
+        const best = getBestChatModel(varSel, user, availability);
         if (best) {
           return { model: best.id, skill, favoriteConfig: favorite };
         }
@@ -330,7 +324,6 @@ export async function runHeadlessAiStream(
     explicitParentMessageId,
     sequenceIdOverride,
     mediaModelOverrides,
-    providerOverride,
     attachments: headlessAttachments,
     audioInput,
     toolConfirmations: headlessToolConfirmations,
@@ -340,6 +333,8 @@ export async function runHeadlessAiStream(
     t: aiStreamT,
     abortSignal: parentAbortSignal,
   } = params;
+
+  const headlessAvailability = await getInstanceAvailability();
 
   try {
     // ── Resolve model + skill + favorite config ───────────────────────────────
@@ -357,7 +352,6 @@ export async function runHeadlessAiStream(
           user,
           logger,
           locale,
-          providerOverride,
         );
         if (!resolved) {
           return fail({
@@ -389,32 +383,20 @@ export async function runHeadlessAiStream(
       };
     }
 
-    // ── Resolve model from skill if only skill is provided ────────────
-    if (!model && skill && skill !== NO_SKILL_ID) {
-      const { SkillsRepository } = await import("../../chat/skills/repository");
-      const skillResult = await SkillsRepository.getSkillById(
-        { id: skill },
-        user,
-        logger,
-        locale,
-      );
-      if (skillResult.success) {
-        const variants = skillResult.data.variants;
-        // No variantId known here - use the default variant
-        const defaultVariant = variants
-          ? (variants.find((v) => v.isDefault) ?? variants[0])
-          : null;
-        const varSel = defaultVariant?.modelSelection;
-        if (varSel) {
-          if (isManualSelection(varSel) && "manualModelId" in varSel) {
-            model = varSel.manualModelId;
-          } else if (isFiltersSelection(varSel)) {
-            const best = getBestChatModel(varSel, user, providerOverride);
-            if (best) {
-              model = best.id;
-            }
-          }
+    // When favoriteConfig is passed directly (no favoriteId), resolve model+skill from it.
+    if (resolvedFavoriteConfig && (!model || !skill)) {
+      if (!model && resolvedFavoriteConfig.modelSelection) {
+        const best = getBestChatModel(
+          resolvedFavoriteConfig.modelSelection,
+          user,
+          headlessAvailability,
+        );
+        if (best) {
+          model = best.id;
         }
+      }
+      if (!skill && resolvedFavoriteConfig.skillId) {
+        skill = resolvedFavoriteConfig.skillId;
       }
     }
 
@@ -621,7 +603,6 @@ export async function runHeadlessAiStream(
       sequenceIdOverride,
       subAgentDepth: params.subAgentDepth,
       mediaModelOverrides,
-      providerOverride,
       parentAbortSignal,
     });
 

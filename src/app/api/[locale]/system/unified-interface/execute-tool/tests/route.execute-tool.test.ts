@@ -16,7 +16,6 @@ import "server-only";
 import { installFetchCache } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 installFetchCache();
 
-import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
@@ -26,16 +25,11 @@ import {
   DefaultFolderId,
   makeHeadlessContext,
 } from "@/app/api/[locale]/agent/chat/config";
-import { db } from "@/app/api/[locale]/system/db";
+import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import helpEndpoints from "@/app/api/[locale]/system/help/definition";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
 import { CallbackMode } from "../constants";
@@ -47,46 +41,6 @@ const _resolvedRemoteUrl = await resolveRemoteUrl();
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-async function resolveUser(
-  email: string,
-): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await UserRepository.getUserByEmail(
-    email,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  const user = result.data;
-
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-    }),
-    db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-  ]);
-
-  if (!link) {
-    return null;
-  }
-
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-
-  return {
-    isPublic: false,
-    id: user.id,
-    leadId: link.leadId,
-    roles,
-  };
-}
-
 function makeLogger(): ReturnType<typeof createEndpointLogger> {
   return createEndpointLogger(false, Date.now(), defaultLocale);
 }
@@ -97,12 +51,7 @@ describe("Execute-Tool E2E", () => {
   let testUser: JwtPrivatePayloadType;
 
   beforeAll(async () => {
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    if (!resolved) {
-      // oxlint-disable-next-line restricted-syntax
-      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
-    }
-    testUser = resolved;
+    testUser = await resolveTestAdminUser();
   });
 
   // ── ET1: Local — tool-help, WAIT, AI ────────────────────────────────────────
@@ -275,12 +224,11 @@ describe("Execute-Tool E2E", () => {
       let _remoteConnectError: string | null = null;
 
       beforeAll(async () => {
-        const { connectToHermes, disconnectFromHermes, triggerPull } =
+        const { connectToHermes, disconnectFromHermes } =
           await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
         try {
           await disconnectFromHermes(testUser.id);
           await connectToHermes(testUser, _resolvedRemoteUrl);
-          await triggerPull();
         } catch (err) {
           _remoteConnectError = String(err);
         }
@@ -305,8 +253,7 @@ describe("Execute-Tool E2E", () => {
 
       it("ET6: remote tool-help WAIT returns result from hermes", async () => {
         if (_remoteConnectError) {
-          makeLogger().info("[ET6] skipped: remote not connected");
-          return;
+          throw new Error(`Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`);
         }
         setFetchCacheContext("execute-tool-et6");
 
@@ -333,8 +280,7 @@ describe("Execute-Tool E2E", () => {
 
       it("ET7: remote tool-help DETACH returns taskId", async () => {
         if (_remoteConnectError) {
-          makeLogger().info("[ET7] skipped: remote not connected");
-          return;
+          throw new Error(`Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`);
         }
         setFetchCacheContext("execute-tool-et7");
 
@@ -363,8 +309,7 @@ describe("Execute-Tool E2E", () => {
 
       it("ET9: remote tool-help END_LOOP returns result inline", async () => {
         if (_remoteConnectError) {
-          makeLogger().info("[ET9] skipped: remote not connected");
-          return;
+          throw new Error(`Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`);
         }
         setFetchCacheContext("execute-tool-et9");
 
@@ -391,8 +336,7 @@ describe("Execute-Tool E2E", () => {
 
       it("ET11: prefixed hermes__tool-help_POST routes to hermes", async () => {
         if (_remoteConnectError) {
-          makeLogger().info("[ET11] skipped: remote not connected");
-          return;
+          throw new Error(`Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`);
         }
         setFetchCacheContext("execute-tool-et11");
 
@@ -419,8 +363,7 @@ describe("Execute-Tool E2E", () => {
 
       it("ET12: CLI platform remote tool-help routes to hermes", async () => {
         if (_remoteConnectError) {
-          makeLogger().info("[ET12] skipped: remote not connected");
-          return;
+          throw new Error(`Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`);
         }
         setFetchCacheContext("execute-tool-et12");
 
@@ -444,8 +387,8 @@ describe("Execute-Tool E2E", () => {
       });
     });
   } else {
-    it.skip("Remote tests skipped — no Hermes dev server running (vibe --hermes dev)", () => {
-      // noop
+    it("Remote tests: no Hermes dev server running", () => {
+      throw new Error("Remote tests require Hermes dev server — run: vibe --hermes dev");
     });
   }
 });

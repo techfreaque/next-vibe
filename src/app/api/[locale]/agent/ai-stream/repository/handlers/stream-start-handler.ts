@@ -6,6 +6,7 @@ import "server-only";
 
 import type { ModelMessage, ToolResultPart } from "ai";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -93,6 +94,7 @@ export class StreamStartHandler {
       wsEmit,
       emitTitle,
       sequenceIdOverride,
+      availability,
     } = params;
 
     // Initialize stream context (creates MessageDbWriter with controller + encoder)
@@ -163,6 +165,7 @@ export class StreamStartHandler {
         voiceModelSelection: voiceMode.voiceModelSelection,
         user,
         enabled: true,
+        availability,
       });
       logger.debug("[AI Stream] Voice mode enabled - streaming TTS active", {
         voiceSelectionType: voiceMode.voiceModelSelection.selectionType,

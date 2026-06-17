@@ -22,7 +22,7 @@ import {
   PriceLevelDB,
 } from "../chat/skills/enum";
 import type { SkillsT } from "../chat/skills/i18n";
-import { agentEnvAvailability } from "../env-availability";
+import type { AgentEnvAvailability } from "../env-availability";
 import type { AgentTranslationKey } from "../i18n";
 import type {
   ImageGenModelId,
@@ -678,8 +678,11 @@ export const modelProviders: Record<string, ModelProvider> = {
  * Returns true when the given API provider is configured in the environment.
  * Works on both server and client without pulling in server-only env modules.
  */
-export function isApiProviderAvailable(provider: ApiProvider): boolean {
-  const env = agentEnvAvailability;
+export function isApiProviderAvailable(
+  provider: ApiProvider,
+  availability: AgentEnvAvailability,
+): boolean {
+  const env = availability;
   switch (provider) {
     case ApiProvider.OPENROUTER:
       return env.openRouter;
@@ -725,8 +728,11 @@ export function isApiProviderAvailable(provider: ApiProvider): boolean {
  * Extracted here so it works on both server and client
  * without pulling in server-only env modules.
  */
-export function isModelProviderAvailable(model: ModelOptionBase): boolean {
-  return isApiProviderAvailable(model.apiProvider);
+export function isModelProviderAvailable(
+  model: ModelOptionBase,
+  availability: AgentEnvAvailability,
+): boolean {
+  return isApiProviderAvailable(model.apiProvider, availability);
 }
 
 function roundMediaCost(v: number): number {
@@ -977,12 +983,14 @@ export function filterRoleModels<
   pool: TOption[],
   selection: TSelection | null | undefined,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): TOption[] {
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
   if (!selection) {
     const available = pool.filter(
-      (m) => (!m.adminOnly || isAdmin) && isModelProviderAvailable(m),
+      (m) =>
+        (!m.adminOnly || isAdmin) && isModelProviderAvailable(m, availability),
     );
     return deduplicateCheapestPerModel(available, isAdmin);
   }
@@ -996,19 +1004,26 @@ export function filterRoleModels<
       }
       if (isAdmin) {
         // Admins can see all available providers for this model.
-        return candidates.filter((m) => isModelProviderAvailable(m));
+        return candidates.filter((m) =>
+          isModelProviderAvailable(m, availability),
+        );
       }
       // Non-admins: pick the cheapest available provider for this model ID.
-      const available = candidates.find((m) => isModelProviderAvailable(m));
-      // Return available provider or empty — never fall through to a random model.
-      return available ? [available] : [];
+      const available = candidates.find((m) =>
+        isModelProviderAvailable(m, availability),
+      );
+      if (available) {
+        return [available];
+      }
+      // No provider available for this specific model - fall through to filter fallback.
     }
+    // Fall through to filter fallback
   }
   const filtered = pool.filter((m) => {
     if (m.adminOnly && !isAdmin) {
       return false;
     }
-    if (!isModelProviderAvailable(m)) {
+    if (!isModelProviderAvailable(m, availability)) {
       return false;
     }
     const modelPrice = getModelPriceLevel(getModelPrice(m));

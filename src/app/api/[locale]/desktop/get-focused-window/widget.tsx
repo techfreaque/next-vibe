@@ -38,8 +38,7 @@ export function GetFocusedWindowWidget(_props: CustomWidgetProps): JSX.Element {
     if (!data && onSubmit) {
       onSubmit();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [data, onSubmit]);
 
   const isLoading = !data;
 

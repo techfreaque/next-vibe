@@ -10,6 +10,7 @@ import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
@@ -25,6 +26,7 @@ import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-butt
 import { type JSX, useCallback, useMemo, useState } from "react";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 
 import { scopedTranslation as skillIdTranslation } from "../[id]/i18n";
 import { useVariantPlatformDefaults, VariantList } from "../[id]/widget";

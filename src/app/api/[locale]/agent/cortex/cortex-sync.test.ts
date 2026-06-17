@@ -44,7 +44,6 @@ import {
   resolveProdAdminToken,
   resolveProdUserId,
   triggerHermesPull,
-  triggerPull,
 } from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
 import { skillsSyncProvider } from "@/app/api/[locale]/agent/chat/skills/sync-provider";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
@@ -54,14 +53,11 @@ import {
   ensureProvidersRegistered,
   type SyncProvider,
 } from "@/app/api/[locale]/remote-connection/sync-provider";
+import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import * as userSchema from "@/app/api/[locale]/user/db";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -96,37 +92,6 @@ async function pollUntil<T>(
   // vitest helper, where throwing fails the test as intended.)
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
   throw new Error(`[pollUntil] ${label}: timed out after ${timeoutMs}ms`);
-}
-
-async function resolveUser(
-  email: string,
-): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await UserRepository.getUserByEmail(
-    email,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  const user = result.data;
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-    }),
-    db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-  ]);
-  if (!link) {
-    return null;
-  }
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-  return { isPublic: false, id: user.id, leadId: link.leadId, roles };
 }
 
 /** Check if hermes is reachable - used to conditionally skip live sync tests */
@@ -195,13 +160,13 @@ describe("Sync hash short-circuit (unit)", () => {
     async () => {
       await ensureProvidersRegistered();
 
-      const adminUser = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+      const adminUser = await resolveTestAdminUser();
       expect(
         adminUser,
         "admin user must exist for the sync short-circuit test (run vibe seed)",
       ).toBeTruthy();
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -237,13 +202,13 @@ describe("Sync hash short-circuit (unit)", () => {
     async () => {
       await ensureProvidersRegistered();
 
-      const adminUser = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+      const adminUser = await resolveTestAdminUser();
       expect(
         adminUser,
         "admin user must exist (run vibe seed) — sync tests require it",
       ).toBeTruthy();
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -280,13 +245,13 @@ describe("Sync hash short-circuit (unit)", () => {
     async () => {
       await ensureProvidersRegistered();
 
-      const adminUser = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+      const adminUser = await resolveTestAdminUser();
       expect(
         adminUser,
         "admin user must exist (run vibe seed) — sync tests require it",
       ).toBeTruthy();
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const cursors = await collectCursors(adminUser.id);
@@ -310,26 +275,21 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
   beforeAll(async () => {
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    expect(
-      resolved,
-      "admin user must exist (run vibe seed) — sync tests require it",
-    ).toBeTruthy();
-    if (resolved) {
-      adminUser = resolved;
+    const resolved = await resolveTestAdminUser();
+    if (!resolved) {
+      throw new Error("Admin user not found — run: vibe seed");
     }
+    adminUser = resolved;
 
     // Ensure clean slate
-    if (adminUser) {
-      await db
-        .delete(cortexNodes)
-        .where(
-          and(
-            eq(cortexNodes.userId, adminUser.id),
-            like(cortexNodes.path, "/documents/sync-unit-test/%"),
-          ),
-        );
-    }
+    await db
+      .delete(cortexNodes)
+      .where(
+        and(
+          eq(cortexNodes.userId, adminUser.id),
+          like(cortexNodes.path, "/documents/sync-unit-test/%"),
+        ),
+      );
   }, SYNC_TIMEOUT);
 
   afterAll(async () => {
@@ -349,7 +309,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU1: inserting a node changes the provider hash",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const cursorBefore = await providerCursorKey(
@@ -387,7 +347,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU2: serializeFromCursor includes the inserted node",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const { json } = await documentsSyncProvider.serializeFromCursor(
@@ -414,7 +374,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU3: upsertFromJson with explicit payload creates node for target userId",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       // Build a minimal payload for a new syncId (simulating what hermes would receive)
@@ -471,7 +431,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU4: cursor of fakeProdUserId is the epoch (no nodes) - per-user isolation",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const fakeProdUserId = "00000000-0000-4001-ffff-000000000088";
@@ -495,7 +455,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU5: updating a node's content advances its cursor (updatedAt)",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const cursorBefore = await providerCursorKey(
@@ -534,7 +494,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU6: deleting a node advances the cursor",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       // Before: the node is part of the serialized payload.
@@ -579,7 +539,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU7: tombstone payload - upsertFromJson with isDeleted:true removes the node",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       // Use admin user - tombstone test uses a unique syncId to avoid collision with other tests
@@ -656,7 +616,7 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU8: last-writer-wins - older remote payload does NOT overwrite newer local",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       // Insert node for admin with a fresh timestamp
@@ -731,21 +691,18 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
   beforeAll(async () => {
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    expect(
-      resolved,
-      "admin user must exist (run vibe seed) — sync tests require it",
-    ).toBeTruthy();
-    if (resolved) {
-      adminUser = resolved;
+    const resolved = await resolveTestAdminUser();
+    if (!resolved) {
+      throw new Error("Admin user not found — run: vibe seed");
     }
+    adminUser = resolved;
   }, SYNC_TIMEOUT);
 
   it(
     "SK1: skillsSyncProvider.getCursor returns a stable cursor",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const c1 = await providerCursorKey(skillsSyncProvider, adminUser.id);
@@ -764,7 +721,7 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK3: skillsSyncProvider.serializeFromCursor returns valid JSON array",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const { json } = await skillsSyncProvider.serializeFromCursor(
@@ -786,7 +743,7 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK4: each serialized skill has required fields",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const { json } = await skillsSyncProvider.serializeFromCursor(
@@ -818,7 +775,7 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK5: per-provider isolation - documents change does NOT affect skills cursor",
     async () => {
       if (!adminUser) {
-        return;
+        throw new Error("adminUser not set — beforeAll must have failed");
       }
 
       const skillCursorBefore = await providerCursorKey(
@@ -884,18 +841,12 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   beforeAll(async () => {
     hermesReachable = await isHermesReachable();
     if (!hermesReachable) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `[sync-test] ${HERMES_SKIP_REASON} - skipping live sync tests`,
+      throw new Error(
+        `[sync-test] ${HERMES_SKIP_REASON} — run: vibe --hermes dev`,
       );
-      return;
     }
 
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    if (!resolved) {
-      return;
-    }
-    devUser = resolved;
+    devUser = await resolveTestAdminUser();
 
     try {
       prodAdminToken = await resolveProdAdminToken();
@@ -904,9 +855,7 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
       // Establish atlas → hermes connection
       await connectToHermes(devUser);
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn("[sync-test] Setup failed:", String(err));
-      hermesReachable = false;
+      throw new Error(`[sync-test] Setup failed: ${String(err)}`, { cause: err });
     }
   }, SYNC_TIMEOUT);
 
@@ -946,17 +895,8 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL1: write document on dev, trigger pull, verify on hermes DB",
     async () => {
-      if (
-        !hermesReachable ||
-        !devUser ||
-        !prodUserId ||
-        !process.env.SYNC_CROSS_INSTANCE_TEST
-      ) {
-        // eslint-disable-next-line no-console
-        console.info(
-          "[SL1] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
-        );
-        return;
+      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
+        throw new Error("[SL1] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
       }
 
       // Step 1: Write test node on dev with a syncId
@@ -1026,17 +966,8 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL2: hash short-circuit - no data sent when nothing changed",
     async () => {
-      if (
-        !hermesReachable ||
-        !devUser ||
-        !prodUserId ||
-        !process.env.SYNC_CROSS_INSTANCE_TEST
-      ) {
-        // eslint-disable-next-line no-console
-        console.info(
-          "[SL2] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
-        );
-        return;
+      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
+        throw new Error("[SL2] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
       }
 
       // Trigger pull again (nothing changed since SL1)
@@ -1063,17 +994,8 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL3: update content on dev, resync, hermes gets the new version",
     async () => {
-      if (
-        !hermesReachable ||
-        !devUser ||
-        !prodUserId ||
-        !process.env.SYNC_CROSS_INSTANCE_TEST
-      ) {
-        // eslint-disable-next-line no-console
-        console.info(
-          "[SL3] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
-        );
-        return;
+      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
+        throw new Error("[SL3] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
       }
 
       const updatedContent = `${TEST_CONTENT}\n\n## Update\n\nThis line was added in SL3.`;
@@ -1121,17 +1043,8 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL4: delete on dev, resync, hermes removes the node (tombstone)",
     async () => {
-      if (
-        !hermesReachable ||
-        !devUser ||
-        !prodUserId ||
-        !process.env.SYNC_CROSS_INSTANCE_TEST
-      ) {
-        // eslint-disable-next-line no-console
-        console.info(
-          "[SL4] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
-        );
-        return;
+      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
+        throw new Error("[SL4] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
       }
 
       // Soft-delete on dev: set isDeleted=true + bump updatedAt (tombstone protocol)
@@ -1195,21 +1108,19 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
   beforeAll(async () => {
     hermesReachable = await isHermesReachable();
     if (!hermesReachable) {
-      return;
+      throw new Error(
+        `[sync-test/BN] ${HERMES_SKIP_REASON} — run: vibe --hermes dev`,
+      );
     }
 
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    if (!resolved) {
-      return;
-    }
-    devUser = resolved;
+    devUser = await resolveTestAdminUser();
 
     try {
       prodUserId = await resolveProdUserId();
       await connectToHermes(devUser);
       connectedToHermes = true;
-    } catch {
-      // Already connected or other error - skip live BN tests
+    } catch (err) {
+      throw new Error(`[sync-test/BN] Connection setup failed: ${String(err)}`, { cause: err });
     }
   }, SYNC_TIMEOUT);
 
@@ -1245,19 +1156,8 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
     "BN1: write doc on hermes, dev pulls, doc appears on dev DB",
     async () => {
       // BN tests require two separate instances with different user DBs.
-      // Skip unless SYNC_CROSS_INSTANCE_TEST=1 is set (requires hermes on a different DB).
-      if (
-        !hermesReachable ||
-        !devUser ||
-        !prodUserId ||
-        !connectedToHermes ||
-        !process.env.SYNC_CROSS_INSTANCE_TEST
-      ) {
-        // eslint-disable-next-line no-console
-        console.info(
-          "[BN1] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
-        );
-        return;
+      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
+        throw new Error("[BN1] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
       }
 
       // Step 1: Write a node directly into hermes's DB (simulates hermes AI writing a memory)
@@ -1323,18 +1223,8 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
   it(
     "BN2: consecutive pull with same content → no duplicate, content stable",
     async () => {
-      if (
-        !hermesReachable ||
-        !devUser ||
-        !prodUserId ||
-        !connectedToHermes ||
-        !process.env.SYNC_CROSS_INSTANCE_TEST
-      ) {
-        // eslint-disable-next-line no-console
-        console.info(
-          "[BN2] cross-instance test skipped (set SYNC_CROSS_INSTANCE_TEST=1 to enable)",
-        );
-        return;
+      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
+        throw new Error("[BN2] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
       }
 
       // Second pull - same content, hermes hash unchanged
@@ -1369,22 +1259,16 @@ describe("Sync: scalability and efficiency", () => {
   let adminUser: JwtPrivatePayloadType;
 
   beforeAll(async () => {
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-    expect(
-      resolved,
-      "admin user must exist (run vibe seed) — sync tests require it",
-    ).toBeTruthy();
-    if (resolved) {
-      adminUser = resolved;
+    const resolved = await resolveTestAdminUser();
+    if (!resolved) {
+      throw new Error("Admin user not found — run: vibe seed");
     }
+    adminUser = resolved;
   }, SYNC_TIMEOUT);
 
   it(
     "SC1: getCursor for 1000+ nodes completes in < 2s",
     async () => {
-      if (!adminUser) {
-        return;
-      }
 
       // Insert 20 test nodes (small batch - enough to measure the pattern)
       const batchNodes = [...Array(20).keys()].map((i) => ({
@@ -1426,10 +1310,6 @@ describe("Sync: scalability and efficiency", () => {
   it(
     "SC2: collectCursors runs both providers in parallel (no sequential bottleneck)",
     async () => {
-      if (!adminUser) {
-        return;
-      }
-
       const start = Date.now();
       const cursors = await collectCursors(adminUser.id);
       const elapsed = Date.now() - start;
@@ -1450,10 +1330,6 @@ describe("Sync: scalability and efficiency", () => {
   it(
     "SC3: per-provider cursor changes are independent (only changed provider transfers data)",
     async () => {
-      if (!adminUser) {
-        return;
-      }
-
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
       const initial = await collectCursors(adminUser.id);
 

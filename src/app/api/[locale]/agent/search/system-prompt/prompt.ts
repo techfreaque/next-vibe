@@ -27,8 +27,8 @@ You can search the web and read URLs:
 
     if (data.hasBrowser) {
       lines.push(`
-You have full browser automation: navigate pages, click, fill forms, take screenshots, extract data from JS-heavy sites.
-Use \`tool-help --query browser\` to discover all browser tools.`);
+
+You have full browser automation. \`tool-help query=browser\` lists all tools; \`tool-help query=browser-<toolname>\` gives full schema.`);
     } else if (data.isCloud) {
       lines.push(`
 For JS-heavy sites or interactive pages, the local version of unbottled includes full browser automation.`);

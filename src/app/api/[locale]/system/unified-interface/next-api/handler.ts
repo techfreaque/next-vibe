@@ -180,8 +180,6 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
           isRevival: undefined,
-
-          providerOverride: undefined,
         },
       });
 

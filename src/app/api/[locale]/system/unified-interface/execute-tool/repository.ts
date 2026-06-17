@@ -27,6 +27,7 @@ import {
   makeHeadlessContext,
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
+import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   broadcastToolResult,
   callToolDirect,
@@ -42,8 +43,10 @@ import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-int
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { formatValidationErrorCompact } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
-import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import { getPreferredName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import {
+  getPreferredName,
+  getPreferredToolName,
+} from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import {
   cronTaskExecutions,
   cronTasks,
@@ -125,7 +128,7 @@ export class RouteExecuteRepository {
         execFav?.modelSelection ?? undefined,
         execSkill?.modelSelection ?? undefined,
         user,
-        streamContext.providerOverride,
+        agentEnvAvailability,
       );
 
       // Remote execution path - create a one-shot task for the target instance
@@ -225,8 +228,7 @@ export class RouteExecuteRepository {
               execSkill?.imageGenModelSelection ??
               execFav?.imageGenModelSelection;
             resolvedModel = sel
-              ? getBestImageGenModel(sel, user, streamContext.providerOverride)
-                  ?.id
+              ? getBestImageGenModel(sel, user)?.id
               : undefined;
           } else if (mediaToolName === "generate_music") {
             const { getBestMusicGenModel } =
@@ -235,8 +237,7 @@ export class RouteExecuteRepository {
               execSkill?.musicGenModelSelection ??
               execFav?.musicGenModelSelection;
             resolvedModel = sel
-              ? getBestMusicGenModel(sel, user, streamContext.providerOverride)
-                  ?.id
+              ? getBestMusicGenModel(sel, user)?.id
               : undefined;
           } else if (mediaToolName === "generate_video") {
             const { videoGenModelSelectionSchema, filterVideoGenModels } =
@@ -258,11 +259,7 @@ export class RouteExecuteRepository {
                 resolvedModel = parsed.data.manualModelId;
               } else {
                 // FILTERS selection: run normal filtering (may return empty if no providers)
-                resolvedModel = filterVideoGenModels(
-                  sel,
-                  user,
-                  streamContext.providerOverride,
-                )[0]?.id;
+                resolvedModel = filterVideoGenModels(sel, user)[0]?.id;
               }
             }
           }
@@ -971,22 +968,6 @@ export class RouteExecuteRepository {
               );
             }
 
-            // The row flips terminal FIRST: completion handling (backfill,
-            // revival, thread reconcile) re-reads the row and must see the
-            // final status. Readers that find the row completed before the
-            // backfill lands poll the tool message briefly (wait-for-task).
-            await db
-              .update(cronTasks)
-              .set({
-                lastExecutionStatus: finalStatus,
-                lastExecutedAt: completedAt,
-                lastExecutionDuration:
-                  completedAt.getTime() - startedAt.getTime(),
-                enabled: false,
-                updatedAt: completedAt,
-              })
-              .where(eq(cronTasks.id, taskId));
-
             if (effectiveToolMessageId && effectiveThreadId && !user.isPublic) {
               // Re-read the task row to pick up any callbackMode upgrade written by wait-for-task.
               // If the AI called wait-for-task(taskId) while the task was running, it upgrades
@@ -1022,6 +1003,10 @@ export class RouteExecuteRepository {
                   ? upgradedCallbackMode
                   : CallbackMode.DETACH;
 
+              // Backfill BEFORE flipping the cron task to terminal so hasPendingWork()
+              // (which checks lastExecutionStatus=RUNNING) stays true until the DB write
+              // is complete. This prevents the test / stream from reading the tool message
+              // before the imageUrl (or other final result) has been persisted.
               await handleTaskCompletion({
                 toolMessageId: upgradedToolMessageId,
                 threadId: upgradedThreadId,
@@ -1042,11 +1027,26 @@ export class RouteExecuteRepository {
                 abortSignal: streamContext.abortSignal,
               });
             }
+
+            // Flip to terminal AFTER backfill so hasPendingWork() correctly gates
+            // until the tool message result is written (imageUrl etc. visible to readers).
+            await db
+              .update(cronTasks)
+              .set({
+                lastExecutionStatus: finalStatus,
+                lastExecutedAt: completedAt,
+                lastExecutionDuration:
+                  completedAt.getTime() - startedAt.getTime(),
+                enabled: false,
+                updatedAt: completedAt,
+              })
+              .where(eq(cronTasks.id, taskId));
           } catch (err) {
+            const errMsg = err instanceof Error ? err.message : String(err);
             logger.error("[RouteExecute] Detach goroutine failed", {
               toolName,
               taskId,
-              error: err instanceof Error ? err.message : String(err),
+              error: errMsg,
             });
           }
         })();
@@ -1088,6 +1088,9 @@ export class RouteExecuteRepository {
 
         // DB fallback: if in-memory lookup missed (race between execute() and stream-part-handler),
         // query the tool message row directly using toolCallId stored in metadata JSONB + threadId.
+        // ORDER BY createdAt DESC to prefer the most recent match — the AI SDK reuses sequential
+        // toolCallIds like "functions.execute-tool:1" each turn, so ordering ensures we get the
+        // current turn's message rather than a stale one from a prior turn.
         if (
           !resolvedToolMessageId &&
           streamContext.callerToolCallId &&
@@ -1104,6 +1107,7 @@ export class RouteExecuteRepository {
                 drizzleSql`(${chatMessages.metadata}->'toolCall'->>'toolCallId') = ${streamContext.callerToolCallId}`,
               ),
             )
+            .orderBy(drizzleSql`${chatMessages.createdAt} DESC`)
             .limit(1);
           if (row) {
             resolvedToolMessageId = row.id;
@@ -1616,18 +1620,23 @@ export class RouteExecuteRepository {
    * logger defaults to a throwaway endpoint logger; streamContext defaults to makeHeadlessContext().
    * All other params (locale, platform, user) must be explicit.
    */
-  static async runInProcessTyped<TDef extends CreateApiEndpointAny>(params: {
-    definition: TDef;
-    input?: TDef["types"]["RequestOutput"];
-    urlPathParams?: TDef["types"]["UrlVariablesOutput"];
-    instanceId?: string;
-    callbackMode?: CallbackModeValue;
-    user: JwtPayloadType;
-    locale: CountryLanguage;
-    logger?: EndpointLogger;
-    streamContext?: ToolExecutionContext;
-    platform: Platform;
-  }): Promise<ResponseType<TDef["types"]["ResponseOutput"]>> {
+  static async runInProcessTyped<TDef extends CreateApiEndpointAny>(
+    params: {
+      definition: TDef;
+      instanceId?: string;
+      callbackMode?: CallbackModeValue;
+      user: JwtPayloadType;
+      locale: CountryLanguage;
+      logger?: EndpointLogger;
+      streamContext?: ToolExecutionContext;
+      platform: Platform;
+    } & (TDef["types"]["RequestOutput"] extends never
+      ? { input?: never }
+      : { input: TDef["types"]["RequestOutput"] }) &
+      (TDef["types"]["UrlVariablesOutput"] extends never
+        ? { urlPathParams?: never }
+        : { urlPathParams: TDef["types"]["UrlVariablesOutput"] }),
+  ): Promise<ResponseType<TDef["types"]["ResponseOutput"]>> {
     const { definition, input, urlPathParams, ...rest } = params;
     const logger =
       rest.logger ?? createEndpointLogger(false, Date.now(), rest.locale);

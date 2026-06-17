@@ -120,6 +120,7 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   ".env.production",
   "next-env.d.ts",
   "nativewind-env.d.ts",
+  "**/fixtures/**",
   // Glob patterns
   "**/test-files/**",
 ]);
@@ -674,6 +675,16 @@ const oxlint: CheckConfig["oxlint"] = {
     process: "readonly",
     global: "readonly",
   },
+  overrides: [
+    {
+      // next-vibe-ui platform wrappers legitimately use native HTML elements
+      // (head, audio, video, html) that Next.js/a11y rules disallow in app code.
+      files: ["**/next-vibe-ui/**"],
+      rules: {
+        "nextjs/no-head-element": "off",
+      },
+    },
+  ],
 };
 
 // --------------------------------------------------------

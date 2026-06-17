@@ -1,0 +1,342 @@
+{
+  "url": "ws://localhost:3002/ws?channel=agent%2Fchat%2Fthreads%2Fd6336908-bd70-4dfc-92ac-dc9e051b9626%2Fmessages",
+  "channel": "agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages",
+  "messages": [
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"message-created\",\"data\":{\"streamingState\":\"streaming\",\"messages\":[{\"id\":\"122bc898-2261-4e42-a7eb-49545015d26e\",\"threadId\":\"d6336908-bd70-4dfc-92ac-dc9e051b9626\",\"role\":\"user\",\"isAI\":false,\"content\":\"[T2 cortex-write] Use the cortex-write tool to create a memory node at path \\\"/memories/t2-cheap-test\\\" with content \\\"T2_CHEAP_OK\\\". Then use the cortex-read tool to read it back and verify the content is exactly \\\"T2_CHEAP_OK\\\". End your reply with STEP_OK if write succeeded and read confirmed the content, or FAILED: <reason> if anything was wrong.\",\"parentId\":\"059ead18-3782-4bbb-8591-ce9a46d9f327\",\"sequenceId\":null,\"model\":\"kimi-k2.6\",\"skill\":\"quality-tester\",\"metadata\":{},\"createdAt\":\"2026-06-17T14:23:12.396Z\",\"updatedAt\":\"2026-06-17T14:23:12.396Z\",\"authorId\":null,\"authorName\":null,\"errorType\":null,\"errorCode\":null,\"errorMessage\":null,\"upvotes\":0,\"downvotes\":0,\"searchVector\":null}]},\"seq\":5901},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"streaming-state-changed\",\"data\":{\"streamingState\":\"streaming\"},\"seq\":5902}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"message-created\",\"data\":{\"streamingState\":\"streaming\",\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"threadId\":\"d6336908-bd70-4dfc-92ac-dc9e051b9626\",\"role\":\"assistant\",\"isAI\":true,\"content\":\"\",\"parentId\":\"122bc898-2261-4e42-a7eb-49545015d26e\",\"sequenceId\":\"7d8fbe9b-b873-49bb-b15f-80c97c171b52\",\"model\":\"kimi-k2.6\",\"skill\":\"quality-tester\",\"metadata\":{},\"createdAt\":\"2026-06-17T14:23:13.604Z\",\"updatedAt\":\"2026-06-17T14:23:13.604Z\",\"authorId\":null,\"authorName\":null,\"errorType\":null,\"errorCode\":null,\"errorMessage\":null,\"upvotes\":0,\"downvotes\":0,\"searchVector\":null}]},\"seq\":5903},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"<think>\"}]},\"seq\":5904},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"The\"}]},\"seq\":5905}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" user\"}]},\"seq\":5906}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" wants\"}]},\"seq\":5907}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" me\"}]},\"seq\":5908}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" to\"}]},\"seq\":5909}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\":\\n\"}]},\"seq\":5910}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"1\"}]},\"seq\":5911}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\".\"}]},\"seq\":5912}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" Use\"}]},\"seq\":5913}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" cortex\"}]},\"seq\":5914}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"-write\"}]},\"seq\":5915}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" to\"}]},\"seq\":5916}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" create\"}]},\"seq\":5917}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" a\"}]},\"seq\":5918}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" memory\"}]},\"seq\":5919},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" node\"}]},\"seq\":5920},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" at\"}]},\"seq\":5921}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" \\\"/\"}]},\"seq\":5922},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"mem\"}]},\"seq\":5923},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"ories\"}]},\"seq\":5924}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"/t\"}]},\"seq\":5925},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"2\"}]},\"seq\":5926}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"-c\"}]},\"seq\":5927},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"heap\"}]},\"seq\":5928},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"-test\"}]},\"seq\":5929}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"\\\"\"}]},\"seq\":5930},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" with\"}]},\"seq\":5931},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" content\"}]},\"seq\":5932}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" \\\"\"}]},\"seq\":5933},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"T\"}]},\"seq\":5934},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"2\"}]},\"seq\":5935}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"_C\"}]},\"seq\":5936},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"HE\"}]},\"seq\":5937},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"AP\"}]},\"seq\":5938}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"_OK\"}]},\"seq\":5939},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"\\\"\\n\"}]},\"seq\":5940},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"2\"}]},\"seq\":5941}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\".\"}]},\"seq\":5942},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" Use\"}]},\"seq\":5943}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" cortex\"}]},\"seq\":5944},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"-read\"}]},\"seq\":5945}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" to\"}]},\"seq\":5946}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" read\"}]},\"seq\":5947},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" it\"}]},\"seq\":5948},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" back\"}]},\"seq\":5949},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" and\"}]},\"seq\":5950},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" verify\"}]},\"seq\":5951}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" the\"}]},\"seq\":5952},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" content\"}]},\"seq\":5953},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" is\"}]},\"seq\":5954},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" exactly\"}]},\"seq\":5955},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" \\\"\"}]},\"seq\":5956},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"T\"}]},\"seq\":5957},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"2\"}]},\"seq\":5958}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"_C\"}]},\"seq\":5959},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"HE\"}]},\"seq\":5960},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"AP\"}]},\"seq\":5961},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"_OK\"}]},\"seq\":5962},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"\\\"\\n\"}]},\"seq\":5963},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"3\"}]},\"seq\":5964},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\".\"}]},\"seq\":5965},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" End\"}]},\"seq\":5966},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" reply\"}]},\"seq\":5967},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" with\"}]},\"seq\":5968},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" STEP\"}]},\"seq\":5969},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"_OK\"}]},\"seq\":5970},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" if\"}]},\"seq\":5971}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" both\"}]},\"seq\":5972},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" succeeded\"}]},\"seq\":5973},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\",\"}]},\"seq\":5974},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" or\"}]},\"seq\":5975},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" FAILED\"}]},\"seq\":5976},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\":\"}]},\"seq\":5977}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" <\"}]},\"seq\":5978},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"reason\"}]},\"seq\":5979},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\">\"}]},\"seq\":5980},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" if\"}]},\"seq\":5981},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" anything\"}]},\"seq\":5982},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" was\"}]},\"seq\":5983},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" wrong\"}]},\"seq\":5984},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"\\n\\n\"}]},\"seq\":5985},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"Note\"}]},\"seq\":5986},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" the\"}]},\"seq\":5987},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" state\"}]},\"seq\":5988},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" boundary\"}]},\"seq\":5989}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" message\"}]},\"seq\":5990}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" says\"}]},\"seq\":5991}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" \\\"\"}]},\"seq\":5992}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"C\"}]},\"seq\":5993}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"ortex\"}]},\"seq\":5994}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" Not\"}]},\"seq\":5995}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" available\"}]},\"seq\":5996}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" in\"}]},\"seq\":5997}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" inc\"}]},\"seq\":5998}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"ognito\"}]},\"seq\":5999}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" -\"}]},\"seq\":6000},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" nothing\"}]},\"seq\":6001}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" leaves\"}]},\"seq\":6002}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" the\"}]},\"seq\":6003}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" browser\"}]},\"seq\":6004}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" by\"}]},\"seq\":6005}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" design\"}]},\"seq\":6006}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\".\"}]},\"seq\":6007}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" Switch\"}]},\"seq\":6008}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" to\"}]},\"seq\":6009}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" your\"}]},\"seq\":6010}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" private\"}]},\"seq\":6011}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" folder\"}]},\"seq\":6012},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" to\"}]},\"seq\":6013}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" access\"}]},\"seq\":6014},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" memories\"}]},\"seq\":6015},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" and\"}]},\"seq\":6016}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" tasks\"}]},\"seq\":6017},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\".\\\"\\n\\n\"}]},\"seq\":6018},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"However\"}]},\"seq\":6019}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\",\"}]},\"seq\":6020},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" I\"}]},\"seq\":6021},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" should\"}]},\"seq\":6022}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" try\"}]},\"seq\":6023},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" the\"}]},\"seq\":6024},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" tools\"}]},\"seq\":6025}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" anyway\"}]},\"seq\":6026},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" since\"}]},\"seq\":6027}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" the\"}]},\"seq\":6028},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" user\"}]},\"seq\":6029},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" explicitly\"}]},\"seq\":6030},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" asked\"}]},\"seq\":6031}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" me\"}]},\"seq\":6032},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" to\"}]},\"seq\":6033},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" test\"}]},\"seq\":6034}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" them\"}]},\"seq\":6035},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\".\"}]},\"seq\":6036}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" The\"}]},\"seq\":6037},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" task\"}]},\"seq\":6038}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" says\"}]},\"seq\":6039},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" to\"}]},\"seq\":6040},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" use\"}]},\"seq\":6041}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" cortex\"}]},\"seq\":6042},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"-write\"}]},\"seq\":6043},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" and\"}]},\"seq\":6044},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" cortex\"}]},\"seq\":6045}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"-read\"}]},\"seq\":6046},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\".\"}]},\"seq\":6047}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" Let\"}]},\"seq\":6048},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" me\"}]},\"seq\":6049},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" proceed\"}]},\"seq\":6050}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\".\\n\\n\"}]},\"seq\":6051},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"I'll\"}]},\"seq\":6052},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" call\"}]},\"seq\":6053}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" both\"}]},\"seq\":6054},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" in\"}]},\"seq\":6055},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" sequence\"}]},\"seq\":6056}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" -\"}]},\"seq\":6057}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" first\"}]},\"seq\":6058},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" write\"}]},\"seq\":6059}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\",\"}]},\"seq\":6060},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" then\"}]},\"seq\":6061},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\" read\"}]},\"seq\":6062}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\".\"}]},\"seq\":6063}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"tool-execute-request\",\"data\":{\"callId\":\"20c995d5-8e2c-403e-ae4e-a61e1439df47\",\"toolName\":\"cortex-write\",\"args\":{\"path\":\"/memories/t2-cheap-test\",\"content\":\"T2_CHEAP_OK\"},\"toolCallId\":\"functions.cortex-write:0\"},\"seq\":6064}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"</think>\"}]},\"seq\":6065},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"message-created\",\"data\":{\"streamingState\":\"streaming\",\"messages\":[{\"id\":\"42ad41aa-be7d-4697-98d1-7dfe7046a70d\",\"threadId\":\"d6336908-bd70-4dfc-92ac-dc9e051b9626\",\"role\":\"tool\",\"isAI\":true,\"content\":null,\"parentId\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"sequenceId\":\"7d8fbe9b-b873-49bb-b15f-80c97c171b52\",\"model\":\"kimi-k2.6\",\"skill\":\"quality-tester\",\"metadata\":{\"toolCall\":{\"toolCallId\":\"functions.cortex-write:0\",\"toolName\":\"cortex-write\",\"args\":{\"path\":\"/memories/t2-cheap-test\",\"content\":\"T2_CHEAP_OK\"},\"creditsUsed\":0,\"requiresConfirmation\":false,\"isConfirmed\":false,\"waitingForConfirmation\":false}},\"createdAt\":\"2026-06-17T14:23:19.064Z\",\"updatedAt\":\"2026-06-17T14:23:19.064Z\",\"authorId\":null,\"authorName\":null,\"errorType\":null,\"errorCode\":null,\"errorMessage\":null,\"upvotes\":0,\"downvotes\":0,\"searchVector\":null}]},\"seq\":6066}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"tool-execute-result\",\"data\":{\"callId\":\"20c995d5-8e2c-403e-ae4e-a61e1439df47\",\"result\":{\"responsePath\":\"/memories/t2-cheap-test\",\"size\":11,\"created\":true,\"updatedAt\":\"2026-06-17T14:23:19.274Z\",\"responseContent\":\"T2_CHEAP_OK\"}},\"seq\":6067}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"message-created\",\"data\":{\"streamingState\":\"streaming\",\"messages\":[{\"id\":\"42ad41aa-be7d-4697-98d1-7dfe7046a70d\",\"threadId\":\"d6336908-bd70-4dfc-92ac-dc9e051b9626\",\"role\":\"tool\",\"isAI\":true,\"content\":null,\"parentId\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"sequenceId\":\"7d8fbe9b-b873-49bb-b15f-80c97c171b52\",\"model\":\"kimi-k2.6\",\"skill\":\"quality-tester\",\"metadata\":{\"toolCall\":{\"toolCallId\":\"functions.cortex-write:0\",\"toolName\":\"cortex-write\",\"args\":{\"path\":\"/memories/t2-cheap-test\",\"content\":\"T2_CHEAP_OK\"},\"creditsUsed\":0,\"requiresConfirmation\":false,\"isConfirmed\":false,\"waitingForConfirmation\":false,\"result\":{\"created\":true,\"responseContent\":\"T2_CHEAP_OK\",\"responsePath\":\"/memories/t2-cheap-test\",\"size\":11,\"updatedAt\":\"2026-06-17T14:23:19.274Z\"},\"isPartial\":false,\"status\":\"completed\"}},\"createdAt\":\"2026-06-17T14:23:19.282Z\",\"updatedAt\":\"2026-06-17T14:23:19.282Z\",\"authorId\":null,\"authorName\":null,\"errorType\":null,\"errorCode\":null,\"errorMessage\":null,\"upvotes\":0,\"downvotes\":0,\"searchVector\":null}]},\"seq\":6068},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"tool-result\",\"data\":{\"messages\":[{\"id\":\"42ad41aa-be7d-4697-98d1-7dfe7046a70d\",\"metadata\":{\"toolCall\":{\"toolCallId\":\"functions.cortex-write:0\",\"toolName\":\"cortex-write\",\"args\":{\"path\":\"/memories/t2-cheap-test\",\"content\":\"T2_CHEAP_OK\"},\"creditsUsed\":0,\"requiresConfirmation\":false,\"isConfirmed\":false,\"waitingForConfirmation\":false,\"result\":{\"created\":true,\"responseContent\":\"T2_CHEAP_OK\",\"responsePath\":\"/memories/t2-cheap-test\",\"size\":11,\"updatedAt\":\"2026-06-17T14:23:19.274Z\"},\"isPartial\":false,\"status\":\"completed\"}}}]},\"seq\":6069},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"tokens-updated\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"metadata\":{\"promptTokens\":7153,\"completionTokens\":195,\"totalTokens\":7348,\"cachedInputTokens\":4291,\"creditCost\":0.4,\"finishReason\":\"tool-calls\"}}]},\"seq\":6070},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-done\",\"data\":{\"messages\":[{\"id\":\"279e7914-dd07-40d5-900b-bee0b0bedd2c\",\"content\":\"<think>The user wants me to:\\n1. Use cortex-write to create a memory node at \\\"/memories/t2-cheap-test\\\" with content \\\"T2_CHEAP_OK\\\"\\n2. Use cortex-read to read it back and verify the content is exactly \\\"T2_CHEAP_OK\\\"\\n3. End reply with STEP_OK if both succeeded, or FAILED: <reason> if anything was wrong\\n\\nNote the state boundary message says \\\"Cortex Not available in incognito - nothing leaves the browser by design. Switch to your private folder to access memories and tasks.\\\"\\n\\nHowever, I should try the tools anyway since the user explicitly asked me to test them. The task says to use cortex-write and cortex-read. Let me proceed.\\n\\nI'll call both in sequence - first write, then read.</think>\",\"metadata\":{\"isStreaming\":false}}]},\"seq\":6071}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"message-created\",\"data\":{\"streamingState\":\"streaming\",\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"threadId\":\"d6336908-bd70-4dfc-92ac-dc9e051b9626\",\"role\":\"assistant\",\"isAI\":true,\"content\":\"\",\"parentId\":\"42ad41aa-be7d-4697-98d1-7dfe7046a70d\",\"sequenceId\":\"7d8fbe9b-b873-49bb-b15f-80c97c171b52\",\"model\":\"kimi-k2.6\",\"skill\":\"quality-tester\",\"metadata\":{},\"createdAt\":\"2026-06-17T14:23:21.410Z\",\"updatedAt\":\"2026-06-17T14:23:21.410Z\",\"authorId\":null,\"authorName\":null,\"errorType\":null,\"errorCode\":null,\"errorMessage\":null,\"upvotes\":0,\"downvotes\":0,\"searchVector\":null}]},\"seq\":6072},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"<think>\"}]},\"seq\":6073},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"Write\"}]},\"seq\":6074},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" succeeded\"}]},\"seq\":6075}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\".\"}]},\"seq\":6076}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" Now\"}]},\"seq\":6077}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" I\"}]},\"seq\":6078}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" need\"}]},\"seq\":6079}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" to\"}]},\"seq\":6080}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" read\"}]},\"seq\":6081}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" it\"}]},\"seq\":6082}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" back\"}]},\"seq\":6083}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" and\"}]},\"seq\":6084}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" verify\"}]},\"seq\":6085}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" the\"}]},\"seq\":6086},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" content\"}]},\"seq\":6087},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" is\"}]},\"seq\":6088},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" exactly\"}]},\"seq\":6089},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\" \\\"\"}]},\"seq\":6090},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"T\"}]},\"seq\":6091},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"2\"}]},\"seq\":6092},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"_C\"}]},\"seq\":6093}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"HE\"}]},\"seq\":6094},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"AP\"}]},\"seq\":6095},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"_OK\"}]},\"seq\":6096},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"\\\".\"}]},\"seq\":6097}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"tool-execute-request\",\"data\":{\"callId\":\"cba1c1e7-6461-4b7f-a54f-ca7d1ed6009f\",\"toolName\":\"cortex-read\",\"args\":{\"path\":\"/memories/t2-cheap-test\"},\"toolCallId\":\"functions.cortex-read:1\"},\"seq\":6098}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"</think>\"}]},\"seq\":6099},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"message-created\",\"data\":{\"streamingState\":\"streaming\",\"messages\":[{\"id\":\"7075d223-5783-4842-b457-8d2c1fed3582\",\"threadId\":\"d6336908-bd70-4dfc-92ac-dc9e051b9626\",\"role\":\"tool\",\"isAI\":true,\"content\":null,\"parentId\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"sequenceId\":\"7d8fbe9b-b873-49bb-b15f-80c97c171b52\",\"model\":\"kimi-k2.6\",\"skill\":\"quality-tester\",\"metadata\":{\"toolCall\":{\"toolCallId\":\"functions.cortex-read:1\",\"toolName\":\"cortex-read\",\"args\":{\"path\":\"/memories/t2-cheap-test\"},\"creditsUsed\":0,\"requiresConfirmation\":false,\"isConfirmed\":false,\"waitingForConfirmation\":false}},\"createdAt\":\"2026-06-17T14:23:22.992Z\",\"updatedAt\":\"2026-06-17T14:23:22.992Z\",\"authorId\":null,\"authorName\":null,\"errorType\":null,\"errorCode\":null,\"errorMessage\":null,\"upvotes\":0,\"downvotes\":0,\"searchVector\":null}]},\"seq\":6100}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"tool-execute-result\",\"data\":{\"callId\":\"cba1c1e7-6461-4b7f-a54f-ca7d1ed6009f\",\"result\":{\"responsePath\":\"/memories/t2-cheap-test\",\"content\":\"T2_CHEAP_OK\",\"size\":11,\"truncated\":false,\"readonly\":false,\"nodeType\":\"file\",\"updatedAt\":\"2026-06-17T14:23:19.274Z\"}},\"seq\":6101}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"message-created\",\"data\":{\"streamingState\":\"streaming\",\"messages\":[{\"id\":\"7075d223-5783-4842-b457-8d2c1fed3582\",\"threadId\":\"d6336908-bd70-4dfc-92ac-dc9e051b9626\",\"role\":\"tool\",\"isAI\":true,\"content\":null,\"parentId\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"sequenceId\":\"7d8fbe9b-b873-49bb-b15f-80c97c171b52\",\"model\":\"kimi-k2.6\",\"skill\":\"quality-tester\",\"metadata\":{\"toolCall\":{\"toolCallId\":\"functions.cortex-read:1\",\"toolName\":\"cortex-read\",\"args\":{\"path\":\"/memories/t2-cheap-test\"},\"creditsUsed\":0,\"requiresConfirmation\":false,\"isConfirmed\":false,\"waitingForConfirmation\":false,\"result\":{\"content\":\"T2_CHEAP_OK\",\"nodeType\":\"file\",\"readonly\":false,\"responsePath\":\"/memories/t2-cheap-test\",\"size\":11,\"truncated\":false,\"updatedAt\":\"2026-06-17T14:23:19.274Z\"},\"isPartial\":false,\"status\":\"completed\"}},\"createdAt\":\"2026-06-17T14:23:23.206Z\",\"updatedAt\":\"2026-06-17T14:23:23.206Z\",\"authorId\":null,\"authorName\":null,\"errorType\":null,\"errorCode\":null,\"errorMessage\":null,\"upvotes\":0,\"downvotes\":0,\"searchVector\":null}]},\"seq\":6102},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"tool-result\",\"data\":{\"messages\":[{\"id\":\"7075d223-5783-4842-b457-8d2c1fed3582\",\"metadata\":{\"toolCall\":{\"toolCallId\":\"functions.cortex-read:1\",\"toolName\":\"cortex-read\",\"args\":{\"path\":\"/memories/t2-cheap-test\"},\"creditsUsed\":0,\"requiresConfirmation\":false,\"isConfirmed\":false,\"waitingForConfirmation\":false,\"result\":{\"content\":\"T2_CHEAP_OK\",\"nodeType\":\"file\",\"readonly\":false,\"responsePath\":\"/memories/t2-cheap-test\",\"size\":11,\"truncated\":false,\"updatedAt\":\"2026-06-17T14:23:19.274Z\"},\"isPartial\":false,\"status\":\"completed\"}}}]},\"seq\":6103},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"tokens-updated\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"metadata\":{\"promptTokens\":7417,\"completionTokens\":49,\"totalTokens\":7466,\"cachedInputTokens\":4969,\"creditCost\":0.3,\"finishReason\":\"tool-calls\"}}]},\"seq\":6104},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-done\",\"data\":{\"messages\":[{\"id\":\"938b493f-d30b-4ac2-962d-11214b583a52\",\"content\":\"<think>Write succeeded. Now I need to read it back and verify the content is exactly \\\"T2_CHEAP_OK\\\".</think>\",\"metadata\":{\"isStreaming\":false}}]},\"seq\":6105}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"message-created\",\"data\":{\"streamingState\":\"streaming\",\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"threadId\":\"d6336908-bd70-4dfc-92ac-dc9e051b9626\",\"role\":\"assistant\",\"isAI\":true,\"content\":\"\",\"parentId\":\"7075d223-5783-4842-b457-8d2c1fed3582\",\"sequenceId\":\"7d8fbe9b-b873-49bb-b15f-80c97c171b52\",\"model\":\"kimi-k2.6\",\"skill\":\"quality-tester\",\"metadata\":{},\"createdAt\":\"2026-06-17T14:23:24.879Z\",\"updatedAt\":\"2026-06-17T14:23:24.879Z\",\"authorId\":null,\"authorName\":null,\"errorType\":null,\"errorCode\":null,\"errorMessage\":null,\"upvotes\":0,\"downvotes\":0,\"searchVector\":null}]},\"seq\":6106},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"<think>\"}]},\"seq\":6107},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"The\"}]},\"seq\":6108},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" write\"}]},\"seq\":6109},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" succeeded\"}]},\"seq\":6110},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" and\"}]},\"seq\":6111},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" the\"}]},\"seq\":6112},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" read\"}]},\"seq\":6113},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" confirmed\"}]},\"seq\":6114}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" the\"}]},\"seq\":6115}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" content\"}]},\"seq\":6116}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" is\"}]},\"seq\":6117}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" exactly\"}]},\"seq\":6118}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" \\\"\"}]},\"seq\":6119}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"T\"}]},\"seq\":6120}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"2\"}]},\"seq\":6121}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"_C\"}]},\"seq\":6122},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"HE\"}]},\"seq\":6123},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"AP\"}]},\"seq\":6124}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"_OK\"}]},\"seq\":6125},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"\\\".\"}]},\"seq\":6126}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" I\"}]},\"seq\":6127},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" should\"}]},\"seq\":6128},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" end\"}]},\"seq\":6129}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" with\"}]},\"seq\":6130}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\" STEP\"}]},\"seq\":6131}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"_OK\"}]},\"seq\":6132}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\".\"}]},\"seq\":6133}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"</think>\"}]},\"seq\":6134},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"STEP\"}]},\"seq\":6135}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-delta\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"_OK\"}]},\"seq\":6136}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"tokens-updated\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"metadata\":{\"promptTokens\":7544,\"completionTokens\":30,\"totalTokens\":7574,\"cachedInputTokens\":4828,\"creditCost\":0.3,\"finishReason\":\"stop\"}}]},\"seq\":6137},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"content-done\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"content\":\"<think>The write succeeded and the read confirmed the content is exactly \\\"T2_CHEAP_OK\\\". I should end with STEP_OK.</think>STEP_OK\",\"metadata\":{\"isStreaming\":false}}]},\"seq\":6138},{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"tokens-updated\",\"data\":{\"messages\":[{\"id\":\"28b76af0-a715-4d0d-a97a-46612bd34c44\",\"metadata\":{\"promptTokens\":7544,\"completionTokens\":274,\"totalTokens\":22388,\"cachedInputTokens\":14088,\"creditCost\":1,\"finishReason\":\"stop\"}}]},\"seq\":6139}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/d6336908-bd70-4dfc-92ac-dc9e051b9626/messages\",\"event\":\"stream-finished\",\"data\":{\"streamingState\":\"idle\"},\"seq\":6140}"
+    }
+  ]
+}

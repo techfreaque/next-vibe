@@ -150,7 +150,8 @@ const { PATCH } = createEndpoint({
             schema: z
               .union([z.string().url(), z.literal("")])
               .optional()
-              .transform((v) => (v === "" ? undefined : v)),
+              .transform((v) => (v === "" ? undefined : v))
+              .optional(),
           }),
           isActive: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,

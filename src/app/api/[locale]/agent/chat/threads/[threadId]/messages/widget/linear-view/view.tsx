@@ -207,8 +207,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
           preview: content.slice(0, 50) + (content.length > 50 ? "..." : ""),
         };
       }) ?? [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rootBranches?.siblings],
+    [rootBranches],
   );
 
   return (

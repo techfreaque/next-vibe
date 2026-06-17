@@ -17,7 +17,7 @@ import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { isSelfRelayUrl } from "@/app/api/[locale]/agent/shared/unbottled-media-relay";
 import {
   getVideoGenModelById,
-  getVideoGenModelUnderlyingProvider,
+  getVideoGenModelForProvider,
   type VideoGenModelOption,
 } from "@/app/api/[locale]/agent/video-generation/models";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
@@ -173,30 +173,86 @@ export class VideoGenerationRepository {
     }
     const { tCredits } = balanceCheck.data;
 
-    let generationResult: ResponseType<{ videoUrl: string }>;
-
-    switch (videoModel.apiProvider) {
-      case ApiProvider.MODELSLAB:
-        generationResult = await generateVideoWithModelsLab({
-          providerModel: videoModel.providerModel,
-          prompt: data.prompt,
-          durationSeconds,
-          aspectRatio: data.aspectRatio,
-          resolution: data.resolution,
-          inputImageUrl: data.inputMediaUrl,
+    // UNBOTTLED relay resolution (spec: UNBOTTLED Provider). Self-relay
+    // dispatches in-process via the cheapest non-UNBOTTLED entry while the
+    // marked-up UNBOTTLED creditCost (computed above) still applies.
+    let dispatchModel: VideoGenModelOption = videoModel;
+    let inferenceTarget: RemoteTarget | null = null;
+    if (videoModel.apiProvider === ApiProvider.UNBOTTLED) {
+      if (!user.isPublic && "id" in user) {
+        const { RemoteTransport } =
+          await import("@/app/api/[locale]/remote-connection/transport");
+        inferenceTarget = await RemoteTransport.resolveInferenceProvider({
+          userId: user.id,
           logger,
         });
-        break;
-
-      default:
+      }
+      if (!inferenceTarget) {
         return fail({
           message: t("post.errors.notConfigured", {
             label: videoModel.apiProvider,
             envKey: "N/A",
-            url: "N/A",
+            url: "https://unbottled.ai",
           }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
+      }
+      if (isSelfRelayUrl(inferenceTarget.remoteUrl)) {
+        const underlying = getVideoGenModelUnderlyingProvider(data.model);
+        if (!underlying) {
+          return fail({
+            message: t("post.errors.notConfigured", {
+              label: videoModel.apiProvider,
+              envKey: "N/A",
+              url: "https://unbottled.ai",
+            }),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
+        }
+        dispatchModel = underlying;
+        inferenceTarget = null;
+      }
+    }
+
+    let generationResult: ResponseType<{ videoUrl: string }>;
+
+    if (inferenceTarget) {
+      generationResult = await generateVideoWithUnbottled({
+        session: inferenceTarget,
+        providerModel: dispatchModel.providerModel,
+        prompt: data.prompt,
+        duration: data.duration,
+        aspectRatio: data.aspectRatio,
+        resolution: data.resolution,
+        inputMediaUrl: data.inputMediaUrl,
+        logger,
+        locale,
+      });
+    } else {
+      switch (dispatchModel.apiProvider) {
+        case ApiProvider.MODELSLAB:
+          generationResult = await generateVideoWithModelsLab({
+            providerModel: dispatchModel.providerModel,
+            prompt: data.prompt,
+            durationSeconds,
+            aspectRatio: data.aspectRatio,
+            resolution: data.resolution,
+            inputImageUrl: data.inputMediaUrl,
+            logger,
+            locale,
+          });
+          break;
+
+        default:
+          return fail({
+            message: t("post.errors.notConfigured", {
+              label: dispatchModel.apiProvider,
+              envKey: "N/A",
+              url: "N/A",
+            }),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
+      }
     }
 
     if (!generationResult.success) {

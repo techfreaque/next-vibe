@@ -160,6 +160,17 @@ export const MOUNT_WIDGET_REGISTRY: Record<string, MountWidgetConfig> = {
     color: "pink",
     cliEmoji: "✨",
   },
+  "/ssh": {
+    extractLabel: defaultExtractLabel("/ssh"),
+    loadWidget: () =>
+      import("./favorite-detail-widget").then((m) => ({
+        default: m.FavoriteDetailWidget,
+      })),
+    translationKey: "mounts.ssh" as const,
+    icon: "Terminal",
+    color: "slate",
+    cliEmoji: "🖥️",
+  },
 };
 
 /**

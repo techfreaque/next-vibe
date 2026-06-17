@@ -32,16 +32,10 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
+import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { userRoles } from "@/app/api/[locale]/user/db";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import {
   patchFetchCacheFixtures,
@@ -82,40 +76,6 @@ export interface CodingAgentModeConfig {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-async function resolveUser(
-  email: string,
-): Promise<JwtPrivatePayloadType | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const result = await UserRepository.getUserByEmail(
-    email,
-    UserDetailLevel.STANDARD,
-    defaultLocale,
-    logger,
-  );
-  if (!result.success || !result.data) {
-    return null;
-  }
-  const user = result.data;
-
-  const [link, roleRows] = await Promise.all([
-    db.query.userLeadLinks.findFirst({
-      where: (ul, { eq: eql }) => eql(ul.userId, user.id),
-    }),
-    db.select().from(userRoles).where(eq(userRoles.userId, user.id)),
-  ]);
-
-  if (!link) {
-    return null;
-  }
-
-  const roles = roleRows
-    .map((r) => r.role)
-    .filter((r): r is (typeof UserRoleDB)[number] =>
-      UserRoleDB.includes(r as (typeof UserRoleDB)[number]),
-    );
-
-  return { isPublic: false, id: user.id, leadId: link.leadId, roles };
-}
 
 /** Build the prompt text to call coding-agent via execute-tool with a callbackMode */
 function agentInstr(
@@ -442,12 +402,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
     let testSubFolderId: string;
     let suiteRootFolderIdRef: DefaultFolderId;
     beforeAll(async () => {
-      const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
-      if (!resolved) {
-        // oxlint-disable-next-line restricted-syntax
-        throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
-      }
-      testUser = resolved;
+      testUser = await resolveTestAdminUser();
 
       // Resolve or create a stable favorite for model resolution (same pattern as route-base)
       const MAIN_FAVORITE_ID = "00000000-0000-4001-a000-000000000001";
@@ -607,7 +562,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           name,
           async () => {
             if (suiteFailed) {
-              return;
+              throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
             }
             try {
               await fn();
@@ -1024,7 +979,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           name,
           async () => {
             if (suiteFailed) {
-              return;
+              throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
             }
             try {
               await fn();

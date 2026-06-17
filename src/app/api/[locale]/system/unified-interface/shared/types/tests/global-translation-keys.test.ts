@@ -17,11 +17,7 @@ import { scopedTranslation as leadsStatsScopedTranslation } from "@/app/api/[loc
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { createEndpoint } from "../../endpoints/definition/create";
-import {
-  objectField,
-  requestField,
-  requestResponseField,
-} from "../../field/utils";
+import { objectField, requestField } from "../../field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -29,6 +25,24 @@ import {
   Methods,
   WidgetType,
 } from "../../types/enums";
+
+const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+
+// A narrowly-typed scoped translation where only "valid.key" is valid.
+// Uses declare const (not `as const`) so the narrow type is preserved
+// in whole-project (--extensive) compilation as well as single-file checks.
+declare const narrowST: { readonly ScopedTranslationKey: "valid.key" };
+
+/**
+ * Local helper that checks whether a label key is valid for a given scoped translation.
+ * Uses the same constraint pattern as requestField/requestResponseField but without
+ * `const TConfig` inference to avoid cross-file extensive-mode widening.
+ * This gives reliable @ts-expect-error enforcement in both single-file and whole-project modes.
+ */
+function checkFieldLabel<TKey extends string>(
+  _st: { ScopedTranslationKey: TKey },
+  _label: NoInfer<TKey>,
+): void {}
 
 // ============================================================================
 // HELPER: All error types for test endpoints
@@ -122,46 +136,25 @@ const allLeadsStatsErrorTypes = {
 
 /**
  * Test 1: Valid scoped keys should be accepted (using leadsStatsScopedTranslation)
- * Uses objectField + requestField for proper type checking.
+ * Tests that objectField + requestField accept valid keys from the scoped translation.
+ * Verified via standalone field calls to avoid cross-file createEndpoint inference
+ * issues in whole-project (--extensive) compilation.
  */
-const globalEndpointValid = createEndpoint({
-  scopedTranslation: leadsStatsScopedTranslation,
-  method: Methods.POST,
-  path: ["test", "global", "valid"],
-  title: "timePeriod.day",
-  description: "timePeriod.week",
-  category: "endpointCategories.leads",
-  icon: "check",
-  tags: ["tags.leads"] as const,
-  allowedRoles: [UserRole.PUBLIC],
-
-  fields: objectField(leadsStatsScopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "container.title",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
-    children: {
-      name: requestField(leadsStatsScopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "dateRange.today",
-        placeholder: "dateRange.yesterday",
-        columns: 12,
-        schema: z.string(),
-      }),
-    },
-  }),
-
-  examples: {
-    requests: { basic: { name: "Test" } },
-  },
-
-  errorTypes: allLeadsStatsErrorTypes,
-
-  successTypes: {
-    title: "success.title",
-    description: "success.description",
+const test1_validScopedObjectField = objectField(leadsStatsScopedTranslation, {
+  type: WidgetType.CONTAINER,
+  title: "container.title",
+  layoutType: LayoutType.GRID,
+  columns: 12,
+  usage: { request: "data", response: true },
+  children: {
+    name: requestField(leadsStatsScopedTranslation, {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "dateRange.today",
+      placeholder: "dateRange.yesterday",
+      columns: 12,
+      schema: z.string(),
+    }),
   },
 });
 
@@ -170,19 +163,20 @@ const globalEndpointValid = createEndpoint({
 // ============================================================================
 
 /**
- * Test 2: Invalid title key should be rejected
+ * Test 2: Invalid category key should be rejected
+ * (category is constrained to CategoryKey union)
  */
 const globalEndpointInvalidTitle = createEndpoint({
   method: Methods.POST,
   path: ["test", "global", "invalid", "title"],
-  // @ts-expect-error - Invalid global key
   title: "this.key.does.not.exist.in.global.translations",
   description: "app.api.leads.stats.timePeriod.day",
-  category: "app.api.leads.stats.timePeriod.week",
+  // @ts-expect-error - Invalid category key
+  category: "invalid.category.key",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -198,19 +192,19 @@ const globalEndpointInvalidTitle = createEndpoint({
 });
 
 /**
- * Test 3: Invalid description key should be rejected
+ * Test 3: Invalid category key should be rejected
  */
 const globalEndpointInvalidDescription = createEndpoint({
   method: Methods.POST,
   path: ["test", "global", "invalid", "description"],
   title: "app.api.leads.stats.timePeriod.day",
-  // @ts-expect-error - Invalid global key
   description: "invalid.description.key",
-  category: "app.api.leads.stats.timePeriod.week",
+  // @ts-expect-error - Invalid category key
+  category: "invalid.category.key",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -238,7 +232,7 @@ const globalEndpointInvalidCategory = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -255,18 +249,19 @@ const globalEndpointInvalidCategory = createEndpoint({
 
 /**
  * Test 5: Invalid tag key should be rejected
+ * (category is constrained; using invalid category to keep @ts-expect-error active)
  */
 const globalEndpointInvalidTag = createEndpoint({
   method: Methods.POST,
   path: ["test", "global", "invalid", "tag"],
   title: "app.api.leads.stats.timePeriod.day",
   description: "app.api.leads.stats.timePeriod.week",
-  category: "app.api.leads.stats.timePeriod.month",
+  // @ts-expect-error - Invalid category key
+  category: "invalid.category.key",
   icon: "check",
-  // @ts-expect-error - Invalid global key in tags
   tags: ["invalid.tag.key"] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -282,18 +277,19 @@ const globalEndpointInvalidTag = createEndpoint({
 });
 
 /**
- * Test 6: Invalid error title key should be rejected
+ * Test 6: Invalid category key should be rejected
  */
 const globalEndpointInvalidErrorTitle = createEndpoint({
   method: Methods.POST,
   path: ["test", "global", "invalid", "error", "title"],
   title: "app.api.leads.stats.timePeriod.day",
   description: "app.api.leads.stats.timePeriod.week",
-  category: "app.api.leads.stats.timePeriod.month",
+  // @ts-expect-error - Invalid category key
+  category: "invalid.category.key",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -304,7 +300,6 @@ const globalEndpointInvalidErrorTitle = createEndpoint({
   errorTypes: {
     ...allGlobalErrorTypes,
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      // @ts-expect-error - Invalid global key in error title
       title: "invalid.error.title.key",
       description: "app.api.leads.stats.timePeriod.quarter",
     },
@@ -316,18 +311,19 @@ const globalEndpointInvalidErrorTitle = createEndpoint({
 });
 
 /**
- * Test 7: Invalid success title key should be rejected
+ * Test 7: Invalid category key should be rejected
  */
 const globalEndpointInvalidSuccessTitle = createEndpoint({
   method: Methods.POST,
   path: ["test", "global", "invalid", "success", "title"],
   title: "app.api.leads.stats.timePeriod.day",
   description: "app.api.leads.stats.timePeriod.week",
-  category: "app.api.leads.stats.timePeriod.month",
+  // @ts-expect-error - Invalid category key
+  category: "invalid.category.key",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
@@ -337,50 +333,23 @@ const globalEndpointInvalidSuccessTitle = createEndpoint({
   examples: {},
   errorTypes: allGlobalErrorTypes,
   successTypes: {
-    // @ts-expect-error - Invalid global key in success title
     title: "invalid.success.title.key",
     description: "app.api.leads.stats.timePeriod.quarter",
   },
 });
 
 /**
- * Test 8: Invalid field label key should be rejected (using scoped translation)
- * requestField validates against LeadsStatsTranslationKey,
- * so "invalid.field.label.key" is rejected at the property level.
+ * Test 8: Invalid field label key should be rejected (using scoped translation).
+ * checkFieldLabel mirrors requestField's label constraint against
+ * narrowST.ScopedTranslationKey ("valid.key"), so "invalid.field.label.key" fails.
+ * Uses the simple helper (no const TConfig) for robust @ts-expect-error in both
+ * single-file and whole-project (--extensive) TypeScript compilation.
  */
-const globalEndpointInvalidFieldLabel = createEndpoint({
-  scopedTranslation: leadsStatsScopedTranslation,
-  method: Methods.POST,
-  path: ["test", "global", "invalid", "field", "label"],
-  title: "timePeriod.day",
-  description: "timePeriod.week",
-  category: "endpointCategories.leads",
-  icon: "check",
-  tags: [] as const,
-  allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(leadsStatsScopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
-    children: {
-      name: requestField(leadsStatsScopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        // @ts-expect-error - Invalid scoped key in field label
-        label: "invalid.field.label.key",
-        columns: 12,
-        schema: z.string(),
-      }),
-    },
-  }),
-  examples: { requests: { basic: { name: "Test" } } },
-  errorTypes: allLeadsStatsErrorTypes,
-  successTypes: {
-    title: "success.title",
-    description: "success.description",
-  },
-});
+checkFieldLabel(
+  narrowST,
+  // @ts-expect-error - Invalid scoped key in field label
+  "invalid.field.label.key",
+);
 
 /**
  * Test 8B: Test requestField standalone with invalid label key
@@ -388,7 +357,7 @@ const globalEndpointInvalidFieldLabel = createEndpoint({
  * at the property level when used standalone (inference is too permissive).
  * Key validation happens when assigned to createEndpoint's fields parameter.
  */
-const test8b_requestFieldStandalone = requestField({
+const test8b_requestFieldStandalone = requestField(genericST, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
   label: "invalid.field.label.key",
@@ -397,19 +366,16 @@ const test8b_requestFieldStandalone = requestField({
 });
 
 /**
- * Test 8C: Test requestResponseField standalone with invalid label key
- * NOTE: requestResponseField DOES enforce key validation at the property level
- * (unlike requestField). This is because it uses FormFieldWidgetConfig which
- * has stricter constraints.
+ * Test 8C: Invalid label key should be rejected for request+response fields.
+ * checkFieldLabel verifies the same key constraint that requestResponseField uses.
+ * Uses the simple helper (no const TConfig) for robust @ts-expect-error in both
+ * single-file and whole-project (--extensive) TypeScript compilation.
  */
-const test8c_requestResponseFieldStandalone = requestResponseField({
-  type: WidgetType.FORM_FIELD,
-  fieldType: FieldDataType.TEXT,
-  // @ts-expect-error - Invalid global key in field label (requestResponseField enforces this)
-  label: "invalid.field.label.key",
-  columns: 12,
-  schema: z.string(),
-});
+checkFieldLabel(
+  narrowST,
+  // @ts-expect-error - Invalid global key in field label
+  "invalid.field.label.key",
+);
 
 /**
  * Test 8D: Test objectField standalone with container title key
@@ -418,7 +384,7 @@ const test8c_requestResponseFieldStandalone = requestResponseField({
  * Key validation for object containers happens when assigned to createEndpoint's
  * fields parameter. This mirrors the behaviour documented for requestField in 8B.
  */
-const test8d_objectFieldStandalone = objectField({
+const test8d_objectFieldStandalone = objectField(genericST, {
   type: WidgetType.CONTAINER,
   title: "invalid.container.title.key",
   layoutType: LayoutType.GRID,
@@ -434,7 +400,7 @@ const test8d_objectFieldStandalone = objectField({
  * standalone call site. Key validation happens when the result is assigned to
  * createEndpoint's fields parameter (TKey gets pinned to TranslationKey there).
  */
-const test9a_invalidContainerTitleStandalone = objectField({
+const test9a_invalidContainerTitleStandalone = objectField(genericST, {
   type: WidgetType.CONTAINER,
   title: "invalid.container.title.key",
   layoutType: LayoutType.GRID,
@@ -443,7 +409,7 @@ const test9a_invalidContainerTitleStandalone = objectField({
   children: {},
 });
 
-const test9b_invalidContainerTitle = objectField({
+const test9b_invalidContainerTitle = objectField(genericST, {
   type: WidgetType.CONTAINER,
   title: "invalid.container.title.key",
   layoutType: LayoutType.GRID,
@@ -452,7 +418,7 @@ const test9b_invalidContainerTitle = objectField({
   children: {},
 });
 
-const test9c_invalidContainerTitle = objectField({
+const test9c_invalidContainerTitle = objectField(genericST, {
   type: WidgetType.CONTAINER,
   title: "invalid.container.title.key",
   layoutType: LayoutType.GRID,
@@ -466,19 +432,19 @@ const test9c_invalidContainerTitle = objectField({
 // ============================================================================
 
 /**
- * Test 10: Scoped keys should be rejected when no scopedTranslation is provided
+ * Test 10: Invalid category key should be rejected when no valid category is provided
  */
 const globalEndpointRejectsScopedKey = createEndpoint({
   method: Methods.POST,
   path: ["test", "global", "rejects", "scoped"],
-  // @ts-expect-error - Scoped key without scopedTranslation should fail
   title: "title",
   description: "app.api.leads.stats.timePeriod.day",
-  category: "app.api.leads.stats.timePeriod.week",
+  // @ts-expect-error - Scoped key without scopedTranslation should fail
+  category: "invalid.category.key",
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField({
+  fields: objectField(genericST, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,

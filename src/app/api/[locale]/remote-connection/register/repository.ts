@@ -268,44 +268,8 @@ export class RemoteConnectionRegisterRepository {
           .returning({ id: chatFolders.id });
         folderId = inserted!.id;
       }
-      // Merge folderId into routingRules.folderIds so streams in this folder
-      // auto-route to the connecting instance.
-      const [conn] = await db
-        .select({ routingRules: remoteConnections.routingRules })
-        .from(remoteConnections)
-        .where(
-          and(
-            eq(remoteConnections.userId, user.id),
-            eq(remoteConnections.instanceId, instanceId),
-          ),
-        )
-        .limit(1);
-      if (conn) {
-        const rules = conn.routingRules ?? {
-          folderIds: [],
-          handlesModelProviders: [],
-          isDefault: false,
-        };
-        const folderIds = rules.folderIds ?? [];
-        if (!folderIds.includes(folderId)) {
-          await db
-            .update(remoteConnections)
-            .set({
-              routingRules: {
-                ...rules,
-                folderIds: [...folderIds, folderId],
-              },
-              updatedAt: new Date(),
-            })
-            .where(
-              and(
-                eq(remoteConnections.userId, user.id),
-                eq(remoteConnections.instanceId, instanceId),
-              ),
-            );
-        }
-      }
-      logger.debug("[REGISTER] Created remote subfolder + routing rule", {
+
+      logger.debug("[REGISTER] Created remote subfolder", {
         instanceId,
         folderId,
       });

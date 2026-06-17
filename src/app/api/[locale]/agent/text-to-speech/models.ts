@@ -8,6 +8,7 @@ import {
   IntelligenceLevel,
   ModelSelectionType,
 } from "../chat/skills/enum";
+import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,

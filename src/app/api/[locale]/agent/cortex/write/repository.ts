@@ -1,22 +1,10 @@
-import "server-only";
-
 /**
  * Cortex Write Repository
  * Handles creating and overwriting files in the document workspace
  */
-  success,
-  success,
-  success,
-  success,
-  success,
-  success,
-  success,
-  success,
-  success,
-  success,
-  success,
 
-import { db } from "@/app/api/[locale]/system/db";
+import "server-only";
+
 import {
   ErrorResponseTypes,
   fail,
@@ -25,6 +13,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

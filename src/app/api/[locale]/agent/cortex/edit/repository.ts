@@ -266,7 +266,14 @@ export class CortexEditRepository {
     // Read current content via virtual mount
     const { resolveVirtualRead, resolveVirtualWrite } =
       await import("../mounts/resolver");
-    const current = await resolveVirtualRead(userId, path, mountPrefix);
+    const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
+    const current = await resolveVirtualRead(
+      userId,
+      path,
+      mountPrefix,
+      isAdmin,
+      locale,
+    );
     if (!current) {
       return fail({
         message: t("patch.errors.notFound.title"),

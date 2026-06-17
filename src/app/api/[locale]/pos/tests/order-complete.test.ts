@@ -13,19 +13,20 @@
  * order completion.
  */
 
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
-
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
+import { companies, companyMembers } from "../../companies/db";
+import { CompanyMemberRole } from "../../companies/enum";
 import {
   posOrders,
   posPayments,
@@ -37,8 +38,6 @@ import {
   PosPaymentMethod,
   PosSessionStatus,
 } from "../enum";
-import { companies, companyMembers } from "../../companies/db";
-import { CompanyMemberRole } from "../../companies/enum";
 import { PosOrderCompleteRepository } from "../order/[orderId]/complete/repository";
 
 const TEST_TIMEOUT = 60_000;
@@ -78,12 +77,9 @@ describe("POS Order Complete", () => {
 
   beforeAll(async () => {
     const userId = await resolveUserId(env.VIBE_ADMIN_USER_EMAIL);
-    expect(
-      userId,
-      `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
-    ).toBeTruthy();
     if (!userId) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
     adminUserId = userId;
 
@@ -97,7 +93,10 @@ describe("POS Order Complete", () => {
         currency: "EUR",
       })
       .returning({ id: companies.id });
-    expect(company, "Failed to create test company").toBeTruthy();
+    if (!company) {
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error("Failed to create test company");
+    }
     testCompanyId = company.id;
 
     // Add admin as MEMBER of the company
@@ -122,7 +121,10 @@ describe("POS Order Complete", () => {
         isActive: true,
       })
       .returning({ id: posTerminals.id });
-    expect(terminal, "Failed to create terminal").toBeTruthy();
+    if (!terminal) {
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error("Failed to create terminal");
+    }
     testTerminalId = terminal.id;
 
     // Create an open session
@@ -135,7 +137,10 @@ describe("POS Order Complete", () => {
         openingFloat: 0,
       })
       .returning({ id: posSessions.id });
-    expect(session, "Failed to create session").toBeTruthy();
+    if (!session) {
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error("Failed to create session");
+    }
     testSessionId = session.id;
   }, TEST_TIMEOUT);
 

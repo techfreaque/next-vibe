@@ -1,0 +1,18 @@
+{
+  "url": "ws://localhost:3002/ws?channel=agent%2Fchat%2Fthreads%2F25428783-46ee-4b67-b94b-66c2c0ade6d5%2Fmessages",
+  "channel": "agent/chat/threads/25428783-46ee-4b67-b94b-66c2c0ade6d5/messages",
+  "messages": [
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/25428783-46ee-4b67-b94b-66c2c0ade6d5/messages\",\"event\":\"message-created\",\"data\":{\"streamingState\":\"streaming\",\"messages\":[{\"id\":\"822986da-903d-4d59-af22-c7ed1fc3e834\",\"threadId\":\"25428783-46ee-4b67-b94b-66c2c0ade6d5\",\"role\":\"user\",\"isAI\":false,\"content\":\"Generate an image: wait-inline-test\",\"parentId\":null,\"sequenceId\":null,\"model\":\"gpt-5-image-mini\",\"skill\":\"default\",\"metadata\":{},\"createdAt\":\"2026-06-17T16:02:54.984Z\",\"updatedAt\":\"2026-06-17T16:02:54.984Z\",\"authorId\":null,\"authorName\":null,\"errorType\":null,\"errorCode\":null,\"errorMessage\":null,\"upvotes\":0,\"downvotes\":0,\"searchVector\":null}]},\"seq\":40590},{\"channel\":\"agent/chat/threads/25428783-46ee-4b67-b94b-66c2c0ade6d5/messages\",\"event\":\"streaming-state-changed\",\"data\":{\"streamingState\":\"streaming\"},\"seq\":40591}]}"
+    },
+    {
+      "data": "{\"type\":\"batch\",\"events\":[{\"channel\":\"agent/chat/threads/25428783-46ee-4b67-b94b-66c2c0ade6d5/messages\",\"event\":\"message-created\",\"data\":{\"streamingState\":\"streaming\",\"messages\":[{\"id\":\"edf35b59-ffa9-4cfb-aa01-9fac94418a27\",\"threadId\":\"25428783-46ee-4b67-b94b-66c2c0ade6d5\",\"role\":\"assistant\",\"isAI\":true,\"content\":\"\",\"parentId\":\"822986da-903d-4d59-af22-c7ed1fc3e834\",\"sequenceId\":\"e279f4b5-ae59-4f57-bc07-bdacc12e5ff9\",\"model\":\"gpt-5-image-mini\",\"skill\":\"default\",\"metadata\":{},\"createdAt\":\"2026-06-17T16:03:42.777Z\",\"updatedAt\":\"2026-06-17T16:03:42.777Z\",\"authorId\":null,\"authorName\":null,\"errorType\":null,\"errorCode\":null,\"errorMessage\":null,\"upvotes\":0,\"downvotes\":0,\"searchVector\":null}]},\"seq\":40592},{\"channel\":\"agent/chat/threads/25428783-46ee-4b67-b94b-66c2c0ade6d5/messages\",\"event\":\"content-done\",\"data\":{\"messages\":[{\"id\":\"edf35b59-ffa9-4cfb-aa01-9fac94418a27\",\"content\":\"\",\"metadata\":{\"totalTokens\":0,\"finishReason\":\"stop\",\"isStreaming\":false}}]},\"seq\":40593}]}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/25428783-46ee-4b67-b94b-66c2c0ade6d5/messages\",\"event\":\"tokens-updated\",\"data\":{\"messages\":[{\"id\":\"edf35b59-ffa9-4cfb-aa01-9fac94418a27\",\"metadata\":{\"promptTokens\":6574,\"completionTokens\":5273,\"totalTokens\":11847,\"cachedInputTokens\":3840,\"creditCost\":1.1,\"finishReason\":\"stop\"}}]},\"seq\":40594}"
+    },
+    {
+      "data": "{\"channel\":\"agent/chat/threads/25428783-46ee-4b67-b94b-66c2c0ade6d5/messages\",\"event\":\"stream-finished\",\"data\":{\"streamingState\":\"idle\"},\"seq\":40595}"
+    }
+  ]
+}

@@ -107,6 +107,12 @@ export interface ToolCall {
   isInputStreaming?: boolean;
   /** Raw accumulated argument text during streaming (before JSON parsing completes) */
   argsText?: string;
+  /**
+   * Set when the tool call was executed on a remote instance (e.g. "hermes").
+   * Only present on tool messages that arrived via a remote relay — not on
+   * locally-executed tool calls.
+   */
+  remoteInstanceId?: string;
 }
 
 /**

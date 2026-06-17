@@ -18,7 +18,6 @@ import {
   CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "@/app/api/[locale]/agent/cortex/constants";
-import type { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import {
   type CallbackModeValue,
   EXECUTE_TOOL_ALIAS,
@@ -207,11 +206,7 @@ export interface ToolExecutionContext {
    * This is the post-resolution value (from favorite or explicit override).
    */
   skillId: string | undefined;
-  /**
-   * When set, all media gen tools (image/music/video) must use this provider.
-   * Mirrors the chat model providerOverride so the full stream uses one provider.
-   */
-  providerOverride: ApiProvider | undefined;
+
   /** Whether this is a headless/cron invocation */
   headless: boolean | undefined;
   /**
@@ -366,7 +361,6 @@ export function makeHeadlessContext(
     onEscalatedTaskCancel: undefined,
     escalateToTask: undefined,
     isRevival: undefined,
-    providerOverride: undefined,
   };
 }
 

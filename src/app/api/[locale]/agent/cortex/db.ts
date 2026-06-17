@@ -92,6 +92,11 @@ export const cortexNodes = pgTable(
     syncPolicy: text("sync_policy", { enum: CortexSyncPolicyDB }), // null = inherit from parent
     syncId: uuid("sync_id").defaultRandom(), // stable UUID for cross-instance dedup
 
+    // Soft-delete for tombstone propagation across connected instances.
+    // When true: node is logically deleted but kept in DB until tombstone syncs to all
+    // connected instances. Hard-delete happens on next pull-on-connect after propagation.
+    isDeleted: boolean("is_deleted").default(false).notNull(),
+
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

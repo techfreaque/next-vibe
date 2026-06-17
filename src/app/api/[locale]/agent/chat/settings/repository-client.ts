@@ -7,6 +7,10 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
+import {
+  type AgentEnvAvailability,
+  agentEnvAvailability,
+} from "@/app/api/[locale]/agent/env-availability";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";

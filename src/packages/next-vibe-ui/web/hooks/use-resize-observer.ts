@@ -13,13 +13,20 @@ export interface ElementSize {
  * Returns the element's content rect dimensions.
  */
 export function useResizeObserver(
-  ref: RefObject<Element | null>,
+  ref: RefObject<Element | { getBoundingClientRect: () => DOMRect } | null>,
   defaultSize: ElementSize = { width: 0, height: 0 },
 ): ElementSize {
   const [size, setSize] = useState<ElementSize>(defaultSize);
 
   useEffect(() => {
-    if (!ref.current) {
+    const target = ref.current;
+    if (!target) {
+      return;
+    }
+
+    if (!(target instanceof Element)) {
+      const rect = target.getBoundingClientRect();
+      setSize({ width: rect.width, height: rect.height });
       return;
     }
 
@@ -32,7 +39,7 @@ export function useResizeObserver(
       }
     });
 
-    observer.observe(ref.current);
+    observer.observe(target);
 
     return (): void => {
       observer.disconnect();

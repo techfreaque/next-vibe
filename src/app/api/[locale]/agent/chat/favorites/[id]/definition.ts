@@ -18,6 +18,10 @@ import {
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import {
+  type AgentEnvAvailability,
+  agentEnvAvailability,
+} from "@/app/api/[locale]/agent/env-availability";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
@@ -358,6 +362,7 @@ const { PATCH } = createEndpoint({
               requestData.modelSelection,
               undefined,
               user,
+              availability,
             );
             const parsed = z.enum(ChatModelId).safeParse(bestModel?.id);
             modelId = parsed.success
@@ -1316,6 +1321,7 @@ export function getBestChatModelForFavorite(
       favoriteModelSelection,
       skillModelSelection,
       user,
+      availability,
     )[0] ?? null
   );
 }

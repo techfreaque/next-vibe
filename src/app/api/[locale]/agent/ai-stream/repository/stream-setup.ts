@@ -17,10 +17,12 @@ import type { NextRequest } from "next-vibe-ui/lib/request";
 import {
   type ChatModelOption,
   getChatModelById,
-  getChatModelForProvider,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
+import {
+  buildMissingKeyMessage,
+  getInstanceAvailability,
+} from "@/app/api/[locale]/agent/env-availability";
 import {
   getBestImageGenModel,
   type ImageGenModelSelection,
@@ -369,12 +371,6 @@ export async function setupAiStream(params: {
     videoGenModelSelection?: VideoGenModelSelection;
     imageGenModelSelection?: ImageGenModelSelection;
   };
-  /**
-   * Force all model resolution (chat + image/music/video gen) to use a specific API provider.
-   * When set, picks the cheapest variant of each resolved model from that provider.
-   * Used by UNBOTTLED self-relay tests to route all inference through the UNBOTTLED provider.
-   */
-  providerOverride?: ApiProvider;
   /** Override tools entirely - used by API provider for client-provided tools only */
   toolsOverride?: Record<string, CoreTool>;
   /**
@@ -393,8 +389,8 @@ export async function setupAiStream(params: {
     ipAddress,
     aiStreamT,
     mediaModelOverrides,
-    providerOverride,
   } = params;
+  const availability = await getInstanceAvailability();
   const isIncognito = data.rootFolderId === "incognito";
 
   // File upload promise for server threads (captured for SSE event emission)
@@ -461,7 +457,6 @@ export async function setupAiStream(params: {
       // Pass leafMessageId from request so deferred confirm inserts use the correct branch tip
       leafMessageId: data.leafMessageId ?? undefined,
       skillId: data.skill,
-      providerOverride,
       favoriteId: params.favoriteIdOverride,
       headless: params.headless,
       subAgentDepth: params.subAgentDepth,
@@ -506,9 +501,7 @@ export async function setupAiStream(params: {
       errorType: ErrorResponseTypes.AUTH_ERROR,
     });
   }
-  const modelConfig = providerOverride
-    ? getChatModelForProvider(data.model, providerOverride)
-    : getChatModelById(data.model);
+  const modelConfig = getChatModelById(data.model);
 
   // Guard: TTS/STT models are dispatched via their own handlers, not the LLM stream pipeline
   if (
@@ -1056,31 +1049,34 @@ export async function setupAiStream(params: {
     mediaModelOverrides?.videoGenModelSelection ??
     ModalityResolver.resolveVideoGenSelection(bridgeContext);
 
-  // Resolve models once for system-prompt mediaCapabilities (name display only)
-  // Pass providerOverride so media gen models are constrained to the same provider
-  // as the chat model (e.g. UNBOTTLED routes image/music/video through hermes too).
+  // Resolve models once for system-prompt mediaCapabilities (name display only).
   const effectiveImageGenModel = getBestImageGenModel(
     effectiveImageGenSelection,
     user,
-    providerOverride,
+    availability,
   );
   const effectiveMusicGenModel = getBestMusicGenModel(
     effectiveMusicGenSelection,
     user,
-    providerOverride,
+    availability,
   );
   const effectiveVideoGenModel = getBestVideoGenModel(
     effectiveVideoGenSelection,
     user,
-    providerOverride,
+    availability,
   );
 
   logger.debug("[Setup] Bridge models resolved via cascade", {
     ttsSelectionType: resolvedTtsSelection.selectionType,
     sttModelId:
-      ModalityResolver.resolveSttModel(bridgeContext, user)?.id ?? null,
+      ModalityResolver.resolveSttModel(bridgeContext, user, availability)?.id ??
+      null,
     imageVisionModelId:
-      ModalityResolver.resolveImageVisionModel(bridgeContext, user)?.id ?? null,
+      ModalityResolver.resolveImageVisionModel(
+        bridgeContext,
+        user,
+        availability,
+      )?.id ?? null,
     imageGenModelId: effectiveImageGenModel?.id ?? null,
     musicGenModelId: effectiveMusicGenModel?.id ?? null,
     videoGenModelId: effectiveVideoGenModel?.id ?? null,
@@ -1154,9 +1150,9 @@ export async function setupAiStream(params: {
   const streamContext: ToolExecutionContext = {
     rootFolderId: data.rootFolderId,
     threadId: threadResult.data.threadId,
+    confirmationOverrides: resolvedToolConfig.availableTools ?? null,
     aiMessageId,
     skillId: data.skill,
-    providerOverride,
     headless: params.headless,
     subAgentDepth: params.subAgentDepth,
     isRevival: params.isRevival,
@@ -1369,7 +1365,7 @@ export async function setupAiStream(params: {
     }) => Promise<void>;
   }> => {
     const { CallbackMode } =
-      await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
+      await import("@/app/api/[locale]/system/unified-interface/execute-tool/constants");
 
     const callbackMode = options?.callbackMode ?? CallbackMode.WAKE_UP;
     const escalatedTaskId = `escalated-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -1502,7 +1498,7 @@ export async function setupAiStream(params: {
       const { handleTaskCompletion } =
         await import("@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler");
       const { CallbackMode: CM } =
-        await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
+        await import("@/app/api/[locale]/system/unified-interface/execute-tool/constants");
       const { CronTaskStatus: CronStatus } =
         await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
       const { eq: drizzleEq } = await import("drizzle-orm");

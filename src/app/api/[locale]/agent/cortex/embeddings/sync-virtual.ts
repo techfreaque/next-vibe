@@ -19,18 +19,37 @@ import { queueEmbedding } from "./auto-embed";
 import { computeEmbeddingHash } from "./service";
 
 /**
+ * Whether this path's content should be persisted in cortex_nodes.content.
+ * Only NATIVE paths (/documents, /memories) own their content here; virtual
+ * mounts resolve content live from their source table, so their index row
+ * stores only the embedding + metadata (content stays NULL).
+ */
+function persistsContent(path: string): boolean {
+  return isNativePath(path);
+}
+
+/**
  * Upsert a cortex_nodes FILE row for virtual mount content and queue embedding.
  * Skips embedding if content hash matches and embedding already exists.
  * Uses ON CONFLICT to handle concurrent upserts safely.
+ *
+ * Content is NOT persisted for virtual paths — only the embedding + metadata.
+ * No-op for non-embeddable mounts (/ssh, /favorites).
  */
 export async function syncVirtualNodeToEmbedding(
   userId: string,
   path: string,
   content: string,
 ): Promise<void> {
+  // /ssh and /favorites are never embedded (live/volatile/sensitive).
+  if (!isEmbeddableMount(path) && !isNativePath(path)) {
+    return;
+  }
+
   const size = Buffer.byteLength(content, "utf8");
   const newHash = computeEmbeddingHash(path, content);
   const now = new Date();
+  const storedContent = persistsContent(path) ? content : null;
 
   const [row] = await db
     .insert(cortexNodes)
@@ -38,12 +57,12 @@ export async function syncVirtualNodeToEmbedding(
       userId,
       path,
       nodeType: CortexNodeType.FILE,
-      content,
+      content: storedContent,
       size,
     })
     .onConflictDoUpdate({
       target: [cortexNodes.userId, cortexNodes.path],
-      set: { content, size, updatedAt: now },
+      set: { content: storedContent, size, updatedAt: now },
     })
     .returning({
       id: cortexNodes.id,
@@ -60,6 +79,7 @@ export async function syncVirtualNodeToEmbedding(
     return;
   }
 
+  // queueEmbedding takes content directly — no need for the column.
   queueEmbedding(row.id, path, content);
 }
 
@@ -68,15 +88,24 @@ export async function syncVirtualNodeToEmbedding(
  * Used during bulk seed to avoid stampeding the embedding API with hundreds
  * of simultaneous queueEmbedding() calls. The caller is responsible for
  * scheduling a backfill after materialization is complete.
+ *
+ * Content is NOT persisted for virtual paths (resolved live from source);
+ * only frontmatter/size metadata is kept on the index row.
  */
 export async function upsertVirtualNode(
   userId: string,
   path: string,
   content: string,
 ): Promise<void> {
+  // /ssh and /favorites are never materialized/embedded.
+  if (!isEmbeddableMount(path) && !isNativePath(path)) {
+    return;
+  }
+
   const size = Buffer.byteLength(content, "utf8");
   const now = new Date();
   const { frontmatter } = parseFrontmatter(content);
+  const storedContent = persistsContent(path) ? content : null;
 
   await db
     .insert(cortexNodes)
@@ -84,13 +113,13 @@ export async function upsertVirtualNode(
       userId,
       path,
       nodeType: CortexNodeType.FILE,
-      content,
+      content: storedContent,
       size,
       frontmatter,
     })
     .onConflictDoUpdate({
       target: [cortexNodes.userId, cortexNodes.path],
-      set: { content, size, frontmatter, updatedAt: now },
+      set: { content: storedContent, size, frontmatter, updatedAt: now },
     });
 }
 
@@ -107,6 +136,11 @@ export async function syncVirtualNodeWithCachedEmbedding(
   cachedHash: string,
   cachedEmbedding: number[],
 ): Promise<void> {
+  // /ssh and /favorites are never embedded.
+  if (!isEmbeddableMount(path) && !isNativePath(path)) {
+    return;
+  }
+
   const { eq, and } = await import("drizzle-orm");
 
   // Check if this node already has the correct embedding - skip if so
@@ -125,6 +159,7 @@ export async function syncVirtualNodeWithCachedEmbedding(
 
   const size = Buffer.byteLength(content, "utf8");
   const now = new Date();
+  const storedContent = persistsContent(path) ? content : null;
 
   // Upsert with embedding+hash - on conflict, update to latest cached values
   await db
@@ -133,7 +168,7 @@ export async function syncVirtualNodeWithCachedEmbedding(
       userId,
       path,
       nodeType: CortexNodeType.FILE,
-      content,
+      content: storedContent,
       size,
       embedding: cachedEmbedding,
       contentHash: cachedHash,
@@ -141,7 +176,7 @@ export async function syncVirtualNodeWithCachedEmbedding(
     .onConflictDoUpdate({
       target: [cortexNodes.userId, cortexNodes.path],
       set: {
-        content,
+        content: storedContent,
         size,
         embedding: cachedEmbedding,
         contentHash: cachedHash,
@@ -161,4 +196,34 @@ export async function removeVirtualNode(
   await db
     .delete(cortexNodes)
     .where(and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, path)));
+}
+
+/**
+ * Remove all materialized cortex_nodes index rows for a source entity, matching
+ * by id substring in the path. Used when a source row (thread, upload, search,
+ * gen) is deleted: the materialized path embeds the entity id
+ * (e.g. /threads/<root>/<slug>-<id>.md, /uploads/<type>/<thread>/<id>-<name>),
+ * and slugs derived from titles drift over time — so we match on the stable id,
+ * never reconstruct the slug.
+ *
+ * Returns the number of index rows removed.
+ */
+export async function removeVirtualNodesByEntityId(
+  userId: string,
+  mountPrefix: string,
+  entityId: string,
+): Promise<number> {
+  const { and, eq, like } = await import("drizzle-orm");
+  // Escape LIKE wildcards in the id (uuids contain none, but be safe).
+  const safeId = entityId.replace(/([%_\\])/g, "\\$1");
+  const rows = await db
+    .delete(cortexNodes)
+    .where(
+      and(
+        eq(cortexNodes.userId, userId),
+        like(cortexNodes.path, `${mountPrefix}/%${safeId}%`),
+      ),
+    )
+    .returning({ id: cortexNodes.id });
+  return rows.length;
 }

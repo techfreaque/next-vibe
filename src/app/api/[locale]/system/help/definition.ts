@@ -44,6 +44,7 @@ const aiToolMetadataSchema = z.object({
   // Always present - `name` is the preferred call name (use this in execute-tool toolName param)
   name: z.string(),
   title: z.string(),
+  titleShort: z.string(),
   description: z.string(),
   /** Internal technical ID (e.g. "system_server_rebuild_POST"). Use `name` to call tools, not this. Omitted for compact platforms (AI/MCP). */
   id: z.string().optional(),
@@ -59,13 +60,15 @@ const aiToolMetadataSchema = z.object({
   credits: z.number().optional(),
   /** Platforms this tool is available on (admin only) */
   platforms: z.array(z.enum(Platform)).optional(),
-  parameters: z.record(z.string(), z.unknown()).optional(),
+  parameters: z.record(z.string(), WidgetDataSchema).optional(),
   examples: z
     .object({
       inputs: z.record(z.string(), WidgetDataSchema).optional(),
       responses: z.record(z.string(), WidgetDataSchema).optional(),
     })
     .optional(),
+  /** Icon key for the tool (from the icon registry) */
+  icon: iconSchema.optional(),
   /** Remote instance this tool belongs to (only present for remote tools) */
   instanceId: z.string().optional(),
 });
@@ -84,10 +87,11 @@ const { GET } = createEndpoint({
     "ls",
   ],
   title: "get.title" as const,
+  titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   icon: "help-circle",
-  category: "endpointCategories.ai",
-  subCategory: "endpointCategories.aiTools",
+  category: "ai",
+  subCategory: "Tools",
   tags: ["get.tags.tools" as const],
   allowedRoles: [
     UserRole.PUBLIC,
@@ -96,13 +100,18 @@ const { GET } = createEndpoint({
     UserRole.MCP_VISIBLE,
     UserRole.CLI_AUTH_BYPASS,
   ] as const,
-
+  defaultAiPinned: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+  ] as const,
   cli: {
     firstCliArgKey: "query",
   },
 
   fields: customWidgetObject({
     render: HelpToolsWidget,
+    noFormElement: true,
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
@@ -121,15 +130,6 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "get.fields.category.label" as const,
         description: "get.fields.category.description" as const,
-        columns: 4,
-        schema: z.string().optional(),
-      }),
-
-      subCategory: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "get.fields.subCategory.label" as const,
-        description: "get.fields.subCategory.description" as const,
         columns: 4,
         schema: z.string().optional(),
       }),
@@ -165,18 +165,18 @@ const { GET } = createEndpoint({
         schema: z
           .number()
           .int()
-          .max(500)
+          .max(1000)
           .optional()
           .transform((v) => (v && v >= 1 ? v : undefined)),
       }),
 
-      platform: requestField(scopedTranslation, {
+      includeProdOnly: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "get.fields.platform.label" as const,
-        description: "get.fields.platform.description" as const,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "get.fields.includeProdOnly.label" as const,
+        description: "get.fields.includeProdOnly.description" as const,
         columns: 3,
-        schema: z.enum(Platform).optional(),
+        schema: z.boolean().optional(),
         userRoles: [UserRole.ADMIN],
         visibleFor: [UserPermissionRole.ADMIN],
         hiddenForPlatforms: [
@@ -187,13 +187,15 @@ const { GET } = createEndpoint({
         ],
       }),
 
-      includeProdOnly: requestField(scopedTranslation, {
+      viewAsRole: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "get.fields.includeProdOnly.label" as const,
-        description: "get.fields.includeProdOnly.description" as const,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.viewAsRole.label" as const,
+        description: "get.fields.viewAsRole.description" as const,
         columns: 3,
-        schema: z.boolean().optional(),
+        schema: z
+          .enum([UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER])
+          .optional(),
         userRoles: [UserRole.ADMIN],
         visibleFor: [UserPermissionRole.ADMIN],
         hiddenForPlatforms: [
@@ -220,7 +222,17 @@ const { GET } = createEndpoint({
         label: "get.fields.statsFilter.label" as const,
         description: "get.fields.statsFilter.description" as const,
         columns: 4,
-        schema: z.enum(["all", "pinned", "allowed"]).optional(),
+        schema: z
+          .enum([
+            "all",
+            "pinned",
+            "allowed",
+            "webPinned",
+            "cliAllowed",
+            "mcpPinned",
+            "mcpAllowed",
+          ])
+          .optional(),
         hiddenForPlatforms: [
           Platform.AI,
           Platform.MCP,
@@ -296,6 +308,51 @@ const { GET } = createEndpoint({
         schema: z.number().optional(),
       }),
 
+      allAiToolIds: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.allowedCount.title" as const,
+        schema: z.array(z.string()).optional(),
+      }),
+
+      skillPinnedDefault: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.pinnedCount.title" as const,
+        schema: z.array(z.string()).nullable().optional(),
+      }),
+
+      skillAllowedDefault: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.allowedCount.title" as const,
+        schema: z.array(z.string()).nullable().optional(),
+      }),
+
+      webPinnedCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.webPinnedCount.title" as const,
+        schema: z.number().optional(),
+      }),
+
+      cliAllowedCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.allowedCount.title" as const,
+        schema: z.number().optional(),
+        userRoles: [UserRole.ADMIN],
+      }),
+
+      mcpPinnedCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.pinnedCount.title" as const,
+        schema: z.number().optional(),
+        userRoles: [UserRole.ADMIN],
+      }),
+
+      mcpAllowedCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.allowedCount.title" as const,
+        schema: z.number().optional(),
+        userRoles: [UserRole.ADMIN],
+      }),
+
       currentPage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.currentPage.title" as const,
@@ -364,7 +421,8 @@ const { GET } = createEndpoint({
     requests: {
       default: {},
       searchByName: { query: "search" },
-      filterByCategory: { category: "chat", page: 1, pageSize: 50 },
+      filterByCategory: { category: "ai", page: 1, pageSize: 50 },
+      filterBySubCategory: { category: "Search", page: 1, pageSize: 50 },
       toolDetail: { toolName: "agent_search_brave_GET" },
     },
     responses: {
@@ -386,9 +444,10 @@ const { GET } = createEndpoint({
           {
             name: "Brave Search",
             title: "Brave Search",
+            titleShort: "Brave",
             method: "GET",
             description: "Search the web using Brave Search API",
-            category: "Search",
+            category: "ai",
             tags: ["search", "web"],
             id: "agent_search_brave_GET",
             aliases: ["web-search"],

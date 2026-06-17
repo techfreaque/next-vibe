@@ -94,14 +94,22 @@ describe("POS Order Line Item Calculation", () => {
 
   it("taxAmount is rounded to 4 decimal places", () => {
     // lineNet = 1/3 * 1 = 0.3333..., tax at 0.19 = 0.0633...
-    const result = calcLineItem({ unitPrice: 1 / 3, quantity: 1, taxRate: 0.19 });
+    const result = calcLineItem({
+      unitPrice: 1 / 3,
+      quantity: 1,
+      taxRate: 0.19,
+    });
 
     const decimals = result.taxAmount.toString().split(".")[1] ?? "";
     expect(decimals.length).toBeLessThanOrEqual(4);
   });
 
   it("high quantity with tax: correct scaling", () => {
-    const result = calcLineItem({ unitPrice: 5.99, quantity: 100, taxRate: 0.2 });
+    const result = calcLineItem({
+      unitPrice: 5.99,
+      quantity: 100,
+      taxRate: 0.2,
+    });
 
     // lineNet = 599, tax = 119.8, total = 718.8
     expect(result.lineNet).toBe(599);
@@ -177,22 +185,14 @@ describe("POS Order Totals Aggregation", () => {
   });
 });
 
+/** Mirrors the payment validation in PosOrderCompleteRepository.completeOrder. */
+function isPaymentSufficient(orderTotal: number, totalPaid: number): boolean {
+  const roundedTotal = Math.round(orderTotal * 10000) / 10000;
+  const roundedPaid = Math.round(totalPaid * 10000) / 10000;
+  return roundedPaid >= roundedTotal;
+}
+
 describe("POS Order Complete - Payment Validation", () => {
-  // The complete repository checks: roundedPaid >= roundedTotal (4dp rounding)
-
-  /**
-   * Mirrors the payment validation in PosOrderCompleteRepository.completeOrder.
-   * Returns true if payment is sufficient.
-   */
-  function isPaymentSufficient(
-    orderTotal: number,
-    totalPaid: number,
-  ): boolean {
-    const roundedTotal = Math.round(orderTotal * 10000) / 10000;
-    const roundedPaid = Math.round(totalPaid * 10000) / 10000;
-    return roundedPaid >= roundedTotal;
-  }
-
   it("exact payment: roundedPaid === roundedTotal passes", () => {
     expect(isPaymentSufficient(119, 119)).toBe(true);
   });

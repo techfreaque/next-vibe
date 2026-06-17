@@ -11,17 +11,16 @@
  * Creates and cleans up test fixtures in beforeAll/afterAll.
  */
 
+import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-
 import { db } from "@/app/api/[locale]/system/db";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { defaultLocale } from "@/i18n/core/config";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
 import { companies, companyMembers } from "../db";
 import { CompanyMemberRole } from "../enum";
@@ -59,12 +58,9 @@ describe("CompanyAuthRepository.requireMember", () => {
 
   beforeAll(async () => {
     const userId = await resolveUserId(env.VIBE_ADMIN_USER_EMAIL);
-    expect(
-      userId,
-      `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
-    ).toBeTruthy();
     if (!userId) {
-      return;
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
     }
     adminUserId = userId;
 
@@ -79,7 +75,10 @@ describe("CompanyAuthRepository.requireMember", () => {
       })
       .returning({ id: companies.id });
 
-    expect(company, "Failed to create test company").toBeTruthy();
+    if (!company) {
+      // oxlint-disable-next-line restricted-syntax
+      throw new Error("Failed to create test company");
+    }
     testCompanyId = company.id;
 
     // Upsert admin as MEMBER (not OWNER/ADMIN) for role-check tests

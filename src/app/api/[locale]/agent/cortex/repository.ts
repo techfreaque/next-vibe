@@ -28,10 +28,41 @@ export const VIRTUAL_MOUNTS = [
   "/uploads",
   "/searches",
   "/gens",
+  "/ssh",
 ] as const;
 
 /** Virtual mounts that support write-through (write/edit/delete/move) */
-export const WRITABLE_MOUNTS = ["/skills"] as const;
+export const WRITABLE_MOUNTS = ["/skills", "/ssh"] as const;
+
+/**
+ * Virtual mounts whose content is materialized into cortex_nodes and embedded
+ * for semantic search.
+ *
+ * EXCLUDES:
+ *  - /ssh — browses LIVE filesystems (local node:fs / remote SFTP). Embedding it
+ *    would index volatile, potentially huge, and sensitive content (credentials,
+ *    server configs). SSH read/list/tree/write/exec still work via the resolver,
+ *    served live — they never need a cortex_nodes index row.
+ *  - /favorites — thin pointers; no semantic value, resolved live on demand.
+ */
+export const EMBEDDABLE_MOUNTS = [
+  "/threads",
+  "/skills",
+  "/tasks",
+  "/uploads",
+  "/searches",
+  "/gens",
+] as const;
+
+/**
+ * Whether a virtual-mount path may be materialized + embedded into cortex_nodes.
+ * SSH and favorites are excluded by construction — see EMBEDDABLE_MOUNTS.
+ */
+export function isEmbeddableMount(path: string): boolean {
+  return EMBEDDABLE_MOUNTS.some(
+    (mount) => path === mount || path.startsWith(`${mount}/`),
+  );
+}
 
 /** The document workspace prefix - canonical English, stored in cortex_nodes */
 export const DOCUMENTS_PREFIX = "/documents";
@@ -87,6 +118,16 @@ export function getCanonicalWritablePrefix(
     }
   }
   return null;
+}
+
+/**
+ * Whether a path is native (stored content lives in cortex_nodes.content):
+ * /documents/* or /memories/* (canonical or locale-aware). Virtual mounts are
+ * NOT native — their content is resolved live from source tables and never
+ * persisted in cortex_nodes.
+ */
+export function isNativePath(path: string, locale?: CountryLanguage): boolean {
+  return getCanonicalWritablePrefix(path, locale) !== null;
 }
 
 /**
@@ -360,7 +401,8 @@ export function parseFrontmatter(content: string): {
 }
 
 /**
- * Get a Cortex node by user + path
+ * Get a Cortex node by user + path. Soft-deleted (tombstoned) nodes are
+ * invisible — the tombstone row lingers only for sync propagation.
  */
 export async function getNode(
   userId: string,
@@ -369,13 +411,19 @@ export async function getNode(
   const rows = await db
     .select()
     .from(cortexNodes)
-    .where(and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, path)))
+    .where(
+      and(
+        eq(cortexNodes.userId, userId),
+        eq(cortexNodes.path, path),
+        eq(cortexNodes.isDeleted, false),
+      ),
+    )
     .limit(1);
   return rows[0] ?? null;
 }
 
 /**
- * Check if a path exists for a user
+ * Check if a (non-deleted) path exists for a user.
  */
 export async function pathExists(
   userId: string,
@@ -384,13 +432,19 @@ export async function pathExists(
   const rows = await db
     .select({ id: cortexNodes.id })
     .from(cortexNodes)
-    .where(and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, path)))
+    .where(
+      and(
+        eq(cortexNodes.userId, userId),
+        eq(cortexNodes.path, path),
+        eq(cortexNodes.isDeleted, false),
+      ),
+    )
     .limit(1);
   return rows.length > 0;
 }
 
 /**
- * List direct children of a directory path
+ * List direct (non-deleted) children of a directory path.
  */
 export async function listChildren(
   userId: string,
@@ -405,6 +459,7 @@ export async function listChildren(
     .where(
       and(
         eq(cortexNodes.userId, userId),
+        eq(cortexNodes.isDeleted, false),
         dirPath === "/" ? sql`true` : like(cortexNodes.path, `${prefix}%`),
         // Filter to exact depth in SQL (count slashes = target depth)
         sql`(LENGTH(${cortexNodes.path}) - LENGTH(REPLACE(${cortexNodes.path}, '/', ''))) = ${targetDepth}`,

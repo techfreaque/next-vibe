@@ -436,9 +436,6 @@ export function loadEnvironment(): EnvironmentResult {
     NEXT_PUBLIC_AGENT_MODELS_LAB: Boolean(
       process.env["MODELSLAB_API_KEY"],
     ).toString(),
-    NEXT_PUBLIC_AGENT_UNBOTTLED: Boolean(
-      process.env["UNBOTTLED_CLOUD_CREDENTIALS"],
-    ).toString(),
     NEXT_PUBLIC_AGENT_EDEN_AI_STT: Boolean(
       process.env["EDEN_AI_API_KEY"],
     ).toString(),

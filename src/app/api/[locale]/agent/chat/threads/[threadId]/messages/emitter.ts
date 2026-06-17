@@ -35,7 +35,22 @@ import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { buildMessagesChannel, buildSupportFeedChannel } from "./channel";
-import type { MessagesWsEmit } from "./definition";
+import messagesDefinitions, { type MessagesWsEmit } from "./definition";
+
+/** Per-event payload map for the messages channel (definition-derived). */
+type MessagesEventPayloads = typeof messagesDefinitions.GET.types.EventPayloads;
+
+/**
+ * A messages-channel event as a discriminated {name, payload} pair — keeps the
+ * event name correlated with its typed payload across the union so a replayed
+ * wire event stays type-safe (no `as`).
+ */
+type MessagesEventInput = {
+  [K in keyof MessagesEventPayloads & string]: {
+    name: K;
+    payload: MessagesEventPayloads[K];
+  };
+}[keyof MessagesEventPayloads & string];
 
 export type WsEmitCallback = MessagesWsEmit & {
   flush: () => void;
@@ -144,10 +159,15 @@ export function createMessagesEmitter(
   logger: EndpointLogger,
   user: JwtPayloadType,
   supportSessionId?: string | null,
+  options?: { fanOut?: boolean },
 ): MessagesWsEmit & {
   flush: () => void;
   setStreamPreview: (p: { preview: string | null; updatedAt: Date }) => void;
 } {
+  // fanOut controls cross-instance live broadcast. The local source stream
+  // fans out (default). A connector REPLAYING a peer's stream sets fanOut=false
+  // so the replayed events never bounce back to the origin (echo-loop break).
+  const fanOut = options?.fanOut ?? true;
   const channel = buildMessagesChannel(threadId);
   const emitThreads = createEndpointEmitter(
     threadsDefinitions.GET,
@@ -168,6 +188,12 @@ export function createMessagesEmitter(
 
   const batcher = createBatchingEmitter(logger, user);
 
+  // Self instanceId stamped on every fanned-out live event so a receiving
+  // instance can drop its own echoes (prevents A→B→A loops). Resolved once.
+  const originInstanceId =
+    RemoteConnectionRepository.deriveDefaultSelfInstanceId();
+  const fanoutUserId = user.isPublic ? user.leadId : user.id;
+
   // Set by clearStreamingState before stream-finished is emitted.
   let streamPreview: { preview: string | null; updatedAt: Date } | null = null;
 
@@ -177,6 +203,20 @@ export function createMessagesEmitter(
     // Fan-out to support session channel so local supporters see live updates
     if (supportChannel) {
       batcher.emit(supportChannel, eventName, payload);
+    }
+
+    // Fan-out the typed event to instances mirroring this user's threads, so a
+    // server-streamed thread streams into a client's frontend live. The Bun
+    // proxy no-ops when no instance is subscribed to the sync channel, so this
+    // is free in the single-instance case. Receivers replay it through this
+    // same emitter (fanOut=false), so the originInstanceId stamp + the flag
+    // together prevent echo loops.
+    if (fanOut) {
+      broadcastLiveMessageEvent(
+        fanoutUserId,
+        { threadId, originInstanceId, eventName, data: payload },
+        logger,
+      );
     }
 
     const typedPayload =
@@ -225,4 +265,80 @@ export function createMessagesEmitter(
   };
 
   return emit;
+}
+
+/** Names of the messages-channel events that may be replayed cross-instance. */
+const REPLAYABLE_MESSAGE_EVENTS = new Set<string>(
+  Object.keys(messagesDefinitions.GET.events ?? {}),
+);
+
+/**
+ * Narrow a raw wire event (event name + payload received from a trusted,
+ * authenticated peer) into a typed, correlated MessagesEventInput. Returns null
+ * for unknown event names. This is the single wire→typed boundary — payload
+ * shape is trusted from the peer exactly as the existing live relay does (the
+ * peer produced it through this same typed emitter before fan-out).
+ */
+export function parseMessagesEventInput(
+  eventName: string,
+  payload: WsWireMessage["data"],
+): MessagesEventInput | null {
+  if (!REPLAYABLE_MESSAGE_EVENTS.has(eventName)) {
+    return null;
+  }
+  // eventName is a known event key and payload its matching typed payload —
+  // reassembled as the discriminated input the typed emitter consumes. This is
+  // the one wire→typed boundary, mirroring createEmitter()'s boundary cast.
+  return { name: eventName, payload } as MessagesEventInput;
+}
+
+/**
+ * Replay a single message-stream event received from a peer onto this
+ * instance's LOCAL messages channel, so a mirrored thread streams into this
+ * frontend live. Goes through the SAME typed createMessagesEmitter path the
+ * source uses (sidebar fan-out for stream-finished/streaming-state-changed
+ * included), with fanOut=false so the replay never bounces back to the origin.
+ */
+export function replayMessagesEvent(
+  threadId: string,
+  rootFolderId: DefaultFolderId | null,
+  input: MessagesEventInput,
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): void {
+  const emit = createMessagesEmitter(
+    threadId,
+    rootFolderId,
+    logger,
+    user,
+    null,
+    { fanOut: false },
+  );
+  // input.name/input.payload are correlated by MessagesEventInput, but TS cannot
+  // thread that correlation through emit's generic <K>(name, payload) signature
+  // at the call site. A narrowing callback that fixes a single key K restores it
+  // without a cast: within emitFor, name:K and payload:Payloads[K] line up.
+  const emitFor = <K extends keyof MessagesEventPayloads & string>(
+    name: K,
+    payload: MessagesEventPayloads[K],
+  ): void => {
+    emit(name, payload);
+  };
+  emitForInput(emitFor, input);
+  emit.flush();
+}
+
+/**
+ * Bridge a discriminated {name, payload} input to a per-key emit callback.
+ * Distributing the union here keeps name & payload correlated for each member,
+ * so no cast is needed at the typed emit boundary.
+ */
+function emitForInput(
+  emitFor: <K extends keyof MessagesEventPayloads & string>(
+    name: K,
+    payload: MessagesEventPayloads[K],
+  ) => void,
+  input: MessagesEventInput,
+): void {
+  emitFor(input.name, input.payload);
 }

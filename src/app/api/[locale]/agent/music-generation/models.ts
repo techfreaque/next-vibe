@@ -7,6 +7,7 @@ import {
   IntelligenceLevel,
   ModelSelectionType,
 } from "../chat/skills/enum";
+import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -315,7 +316,21 @@ function buildMusicGenModelOptionsPool(): MusicGenModelOption[] {
 const musicGenModelOptionsPool: MusicGenModelOption[] =
   buildMusicGenModelOptionsPool();
 
-const musicGenModelOptionsIndex: Partial<
+/**
+ * Cheapest non-UNBOTTLED provider entry for a model — used by UNBOTTLED
+ * self-relay to dispatch in-process via the real provider (pool is sorted
+ * cheapest-first). Exported index is mutable for test runtime-patching,
+ * mirroring chatModelOptionsIndex.
+ */
+export function getMusicGenModelUnderlyingProvider(
+  modelId: string,
+): MusicGenModelOption | undefined {
+  return musicGenModelOptionsPool.find(
+    (m) => m.id === modelId && m.apiProvider !== ApiProvider.UNBOTTLED,
+  );
+}
+
+export const musicGenModelOptionsIndex: Partial<
   Record<MusicGenModelId, MusicGenModelOption>
 > = buildModelOptionsIndex(musicGenModelOptionsPool) as Partial<
   Record<MusicGenModelId, MusicGenModelOption>
