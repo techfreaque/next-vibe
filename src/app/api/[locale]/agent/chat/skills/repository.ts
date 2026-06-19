@@ -1043,17 +1043,6 @@ export class SkillsRepository {
         name: data.name,
       });
 
-      const effectiveVariants =
-        data.variants && data.variants.length > 0
-          ? data.variants
-          : [
-              {
-                id: "default",
-                modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
-                isDefault: true,
-              },
-            ];
-
       // Validate variant IDs are unique within the skill
       if (data.variants && data.variants.length > 0) {
         const variantIds = data.variants.map((v) => v.id);
@@ -1098,7 +1087,7 @@ export class SkillsRepository {
             "manualModelId" in data.videoGenModelSelection
               ? (data.videoGenModelSelection.manualModelId ?? null)
               : null,
-          variants: effectiveVariants,
+          variants: data.variants,
           ownershipType: data.isPublic
             ? SkillOwnershipType.PUBLIC
             : SkillOwnershipType.USER,

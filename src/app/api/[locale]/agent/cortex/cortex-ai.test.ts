@@ -2272,6 +2272,7 @@ describe("Cortex System Prompt Injection", () => {
     ];
     for (const { path, content } of memories) {
       const size = Buffer.byteLength(content, "utf8");
+      const { frontmatter } = parseFrontmatter(content);
       const [row] = await db
         .insert(cortexNodes)
         .values({
@@ -2284,7 +2285,7 @@ describe("Cortex System Prompt Injection", () => {
         })
         .onConflictDoUpdate({
           target: [cortexNodes.userId, cortexNodes.path],
-          set: { content, size, isDeleted: false, updatedAt: new Date() },
+          set: { content, size, frontmatter, isDeleted: false, updatedAt: new Date() },
         })
         .returning({ id: cortexNodes.id });
       expect(row?.id, `SP setup: failed to upsert ${path}`).toBeTruthy();
@@ -2525,10 +2526,13 @@ describe("Cortex System Prompt Injection", () => {
           node.score,
           `SP4: score for ${node.path} must be <= 2`,
         ).toBeLessThanOrEqual(2);
-        expect(
-          node.excerpt.length,
-          `SP4: excerpt for ${node.path} must be non-empty`,
-        ).toBeGreaterThan(0);
+        // Skill nodes are virtual-mounts with NULL content — they have no excerpt by design.
+        if (!node.path.startsWith("/skills/")) {
+          expect(
+            node.excerpt.length,
+            `SP4: excerpt for ${node.path} must be non-empty`,
+          ).toBeGreaterThan(0);
+        }
       }
     },
     SP_TIMEOUT,

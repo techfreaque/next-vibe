@@ -49,6 +49,7 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import { useCallback, useMemo, useState } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
@@ -179,17 +180,15 @@ export function UserViewContainer({
     });
   }, [navigate, userId]);
 
-  const handleCopyUserId = useCallback((): void => {
+  const handleCopyUserId = useCallback(async (): Promise<void> => {
     if (!userId) {
       return;
     }
-    void navigator.clipboard.writeText(userId).then(() => {
-      setCopyIdSuccess(true);
-      setTimeout(() => {
-        setCopyIdSuccess(false);
-      }, 2000);
-      return undefined;
-    });
+    await copyToClipboard(userId);
+    setCopyIdSuccess(true);
+    setTimeout(() => {
+      setCopyIdSuccess(false);
+    }, 2000);
   }, [userId]);
 
   // Memoize endpoint options for embedded EndpointsPage components
@@ -447,7 +446,7 @@ export function UserViewContainer({
                   variant="ghost"
                   size="sm"
                   className="h-5 w-5 p-0"
-                  onClick={handleCopyUserId}
+                  onClick={() => void handleCopyUserId()}
                 >
                   {copyIdSuccess ? (
                     <CheckCircle className="h-3 w-3 text-success" />

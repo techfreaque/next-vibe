@@ -3,10 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/user/public/reset-password/validate")({
+export const Route = createFileRoute(
+  "/api/$locale/user/public/reset-password/validate",
+)({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/user/public/reset-password/validate/route"),
+      () =>
+        import("@/app/api/[locale]/user/public/reset-password/validate/route"),
     ),
   },
 });

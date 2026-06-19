@@ -91,7 +91,7 @@ function favoriteKey(skillId: string, variantId: string | null): string {
 
 export const favoritesSyncProvider: SyncProvider = {
   key: "favorites",
-  labelI18nKey: "remoteConnection.sync.favorites",
+  labelKey: "favorites",
 
   async getCursor(userId): Promise<StandardSyncCursor> {
     const [row] = await db

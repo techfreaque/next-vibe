@@ -13,6 +13,11 @@ import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import { Video } from "next-vibe-ui/ui/video";
 import {
+  copyImageToClipboard,
+  copyToClipboard,
+  downloadFromUrl,
+} from "next-vibe-ui/utils/browser";
+import {
   type JSX,
   memo,
   useCallback,

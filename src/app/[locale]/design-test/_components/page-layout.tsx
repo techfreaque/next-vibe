@@ -18,6 +18,7 @@ import { Separator } from "next-vibe-ui/ui/separator";
 import { SidebarLayout } from "next-vibe-ui/ui/sidebar";
 import { Toaster } from "next-vibe-ui/ui/sonner";
 import { H1, H4, Large, P } from "next-vibe-ui/ui/typography";
+import { querySelector } from "next-vibe-ui/utils/browser";
 import { useState } from "react";
 
 import { platform } from "@/config/env-client";
@@ -52,11 +53,7 @@ function SidebarNavButton({
       className="w-full justify-start"
       size="sm"
       onClick={() => {
-        if (!platform.isReactNative) {
-          document
-            .querySelector(`#${targetId}`)
-            ?.scrollIntoView({ behavior: "smooth" });
-        }
+        querySelector(`#${targetId}`)?.scrollIntoView({ behavior: "smooth" });
       }}
     >
       <IconComponent className="h-4 w-4 mr-2" />

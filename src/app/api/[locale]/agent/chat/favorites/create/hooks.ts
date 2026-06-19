@@ -255,15 +255,6 @@ export function useAddToFavorites({
       }
 
       const favoritesListDefinition = await import("../definition");
-      const newFavoriteConfig = {
-        id: createResponse.data.id,
-        skillId, // merged format
-        customIcon: null,
-        voiceModelSelection: null,
-        modelSelection: null,
-        position: 0,
-      };
-
       apiClient.updateEndpointData(
         favoritesListDefinition.default.GET,
         logger,
@@ -273,7 +264,14 @@ export function useAddToFavorites({
           }
           const newFavorite =
             ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
-              newFavoriteConfig,
+              {
+                id: createResponse.data.id,
+                skillId,
+                customIcon: null,
+                voiceModelSelection: null,
+                modelSelection: null,
+                position: 0,
+              },
               charData.modelSelection,
               charData.icon,
               charData.name,
@@ -285,9 +283,6 @@ export function useAddToFavorites({
               user,
               availability,
             );
-
-          // Override model fields with pre-computed values when available
-          // (e.g. from skills list which already has server-computed model info)
           const pre = charData.preComputedModel;
           if (pre) {
             newFavorite.modelId = pre.modelId;

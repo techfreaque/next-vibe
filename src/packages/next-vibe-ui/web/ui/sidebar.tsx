@@ -8,6 +8,7 @@ import React from "react";
 
 import { platform } from "@/config/env-client";
 
+import { useWindowSize } from "../hooks/use-window-size";
 import { ScrollArea } from "./scroll-area";
 
 const SIDEBAR_WIDTH = "w-65";
@@ -51,24 +52,8 @@ export function SidebarLayout({
   minWidth = SIDEBAR_MIN_WIDTH_PX,
   scrollable = true,
 }: SidebarLayoutProps): JSX.Element {
-  const [isMobile, setIsMobile] = React.useState(platform.isReactNative);
-
-  React.useEffect(() => {
-    if (platform.isReactNative) {
-      setIsMobile(true);
-      return;
-    }
-    const checkMobile = (): void => {
-      setIsMobile(window.innerWidth < 930);
-    };
-
-    checkMobile();
-
-    window.addEventListener("resize", checkMobile);
-    return (): void => {
-      window.removeEventListener("resize", checkMobile);
-    };
-  }, []);
+  const { width } = useWindowSize();
+  const isMobile = platform.isReactNative || width < 930;
 
   if (isMobile) {
     return (

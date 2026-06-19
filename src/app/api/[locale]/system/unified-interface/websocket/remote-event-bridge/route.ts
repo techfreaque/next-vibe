@@ -3,8 +3,7 @@
  *
  * Two paths, same code:
  *   HTTP POST  → handler()         (direct-http peers call this directly)
- *   WS event   → onRemoteEvent     (reverse-WS peers send wire messages;
- *                                   connector/server dispatch here)
+ *   WS event   → onRemoteEvent     (reverse-WS peers send wire messages)
  */
 
 import "server-only";
@@ -35,15 +34,6 @@ export const { POST, tools } = endpointsHandler({
           "id" in ctx.user && typeof ctx.user.id === "string"
             ? ctx.user.id
             : null,
-          ctx.logger,
-        ),
-      "sync-event": async (payload, ctx) =>
-        RemoteEventBridgeRepository.handleSyncEvent(
-          payload,
-          "id" in ctx.user && typeof ctx.user.id === "string"
-            ? ctx.user.id
-            : null,
-          null,
           ctx.logger,
         ),
     },

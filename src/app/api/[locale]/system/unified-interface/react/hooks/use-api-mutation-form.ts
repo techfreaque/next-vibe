@@ -255,11 +255,11 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
 
         // Clear any existing timer
         if (debounceTimer !== null) {
-          window.clearTimeout(debounceTimer);
+          clearTimeout(debounceTimer);
         }
 
         // Set a new timer
-        debounceTimer = window.setTimeout(() => {
+        debounceTimer = setTimeout(() => {
           void (async (): Promise<void> => {
             try {
               await storage.setItem(storageKey, JSON.stringify(formValues));
@@ -277,7 +277,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
     return (): void => {
       subscription.unsubscribe();
       if (debounceTimer !== null) {
-        window.clearTimeout(debounceTimer);
+        clearTimeout(debounceTimer);
       }
     };
   }, [formMethods, storageKey, persistForm, logger]);

@@ -162,7 +162,7 @@ const DEFAULT_MESSAGES: BoilerplateMessages = {
   routeHandlerHasBlock:
     "Handler body must be a single expression (no block body `=> { ... }`), no logic allowed.",
   routeHandlerExtraProperty:
-    "Handler object may only contain 'handler', 'email', 'sms', 'fieldDefaults', and 'canSubscribe' properties.",
+    "Handler object may only contain 'handler', 'email', 'sms', 'fieldDefaults', 'canSubscribe', and 'onRemoteEvent' properties.",
   // i18n-pattern
   i18nEnHasImport:
     "i18n/en/index.ts must not have any imports. Split sub-modules into separate scoped i18n files instead.",
@@ -532,6 +532,7 @@ const routePatternRule = {
               "sms",
               "fieldDefaults",
               "canSubscribe",
+              "onRemoteEvent",
             ]);
             if (!ALLOWED_HANDLER_PROPS.has(keyName)) {
               context.report({

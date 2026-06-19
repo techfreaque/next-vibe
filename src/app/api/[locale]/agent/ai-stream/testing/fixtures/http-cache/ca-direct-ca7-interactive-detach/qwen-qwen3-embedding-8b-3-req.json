@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "[T-SYS] What is your instance ID? Look at your system prompt — it contains the identity of the server you are running on. Reply with ONLY the instance ID string, nothing else.",
+    "input": "/threads/cron/-ca5--call-execute-tool-with----2cd7d7f6-aca6-46ff-a4bb-00cfd3970033.md\n\n# [CA5] Call execute-tool with...\nFolder: cron\nPreview: <think>The user wants me to call execute-tool with: toolName='coding-agent' instanceId='hermes' prompt='echo hello-ca6-e…",
     "encoding_format": "float"
   }
 }

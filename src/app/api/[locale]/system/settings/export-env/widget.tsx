@@ -15,6 +15,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { copyToClipboard, downloadFile } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useState } from "react";
 
@@ -30,7 +31,7 @@ export function ExportEnvWidget(): JSX.Element {
   }
 
   const handleCopy = (): void => {
-    void navigator.clipboard.writeText(value.content).then(() => {
+    void copyToClipboard(value.content).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       return undefined;
@@ -38,13 +39,7 @@ export function ExportEnvWidget(): JSX.Element {
   };
 
   const handleDownload = (): void => {
-    const blob = new Blob([value.content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = value.filename ?? ".env.prod";
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadFile(value.filename ?? ".env.prod", value.content, "text/plain");
   };
 
   const tStr = t as (key: string) => string;

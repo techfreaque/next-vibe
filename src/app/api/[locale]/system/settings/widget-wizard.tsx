@@ -6,6 +6,7 @@
 
 "use client";
 
+import { storage } from "next-vibe-ui/lib/storage";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
@@ -660,7 +661,7 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
       setCurrentStep((s) => s + 1);
     } else {
       setDone(true);
-      localStorage.setItem("vibe-wizard-dismissed", "1");
+      await storage.setItem("vibe-wizard-dismissed", "1");
     }
   }, [saveCurrentStep, currentStep, totalSteps]);
 
@@ -668,12 +669,12 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
     setCurrentStep((s) => Math.max(0, s - 1));
   }, []);
 
-  const handleSkip = useCallback((): void => {
+  const handleSkip = useCallback(async (): Promise<void> => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep((s) => s + 1);
     } else {
       setDone(true);
-      localStorage.setItem("vibe-wizard-dismissed", "1");
+      await storage.setItem("vibe-wizard-dismissed", "1");
     }
   }, [currentStep, totalSteps]);
 
@@ -725,8 +726,8 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
             variant="ghost"
             size="sm"
             className="text-xs h-7"
-            onClick={(): void => {
-              localStorage.setItem("vibe-wizard-dismissed", "1");
+            onClick={async (): Promise<void> => {
+              await storage.setItem("vibe-wizard-dismissed", "1");
               onDone();
             }}
           >

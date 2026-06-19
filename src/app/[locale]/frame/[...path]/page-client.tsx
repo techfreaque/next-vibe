@@ -9,6 +9,10 @@
 
 import { useTheme } from "next-themes";
 import { Div } from "next-vibe-ui/ui/div";
+import {
+  getDocumentScrollHeight,
+  setRootCssVar,
+} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -70,7 +74,7 @@ export function VibeFramePageClient({
         case "vf:init":
           setNextTheme(msg.theme);
           Object.entries(msg.cssVars).forEach(([key, value]) => {
-            document.documentElement.style.setProperty(key, value);
+            setRootCssVar(key, value);
           });
           break;
         case "vf:navigate":
@@ -134,7 +138,7 @@ export function VibeFramePageClient({
 
     let lastHeight = 0;
     const observer = new ResizeObserver((): void => {
-      const height = document.documentElement.scrollHeight;
+      const height = getDocumentScrollHeight();
       if (height !== lastHeight) {
         lastHeight = height;
         bridge.send({ type: "vf:resize", frameId, height });

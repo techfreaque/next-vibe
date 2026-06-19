@@ -1019,22 +1019,41 @@ export function FavoritesListContainer({
   );
 
   /**
-   * Handle group-level drag end - reorder entire groups
+   * Handle group-level drag end - reorder within one section only.
+   * Receives the section's groups subset; rebuilds full list preserving other sections.
    */
   const handleGroupDragEnd = useCallback(
-    (event: DragEndEvent): void => {
+    (sectionGroups: SkillGroup[], event: DragEndEvent): void => {
       const { active, over } = event;
       if (!over || active.id === over.id) {
         return;
       }
 
-      const oldIndex = groups.findIndex((g) => g.id === active.id);
-      const newIndex = groups.findIndex((g) => g.id === over.id);
+      const oldIndex = sectionGroups.findIndex((g) => g.id === active.id);
+      const newIndex = sectionGroups.findIndex((g) => g.id === over.id);
       if (oldIndex === -1 || newIndex === -1) {
         return;
       }
 
-      const newGroups = arrayMove(groups, oldIndex, newIndex);
+      const reorderedSection = arrayMove(sectionGroups, oldIndex, newIndex);
+      // Collect the current positions held by this section's items (sorted)
+      const sectionPositions = reorderedSection
+        .flatMap((g) => g.items.map((i) => i.position))
+        .toSorted((a, b) => a - b);
+      // Assign those positions to the reordered items sequentially
+      let posIdx = 0;
+      const updatedSection = reorderedSection.map((g) => ({
+        ...g,
+        items: g.items.map((item) => ({
+          ...item,
+          position: sectionPositions[posIdx++] ?? item.position,
+        })),
+      }));
+      const sectionIds = new Set(sectionGroups.map((g) => g.id));
+      let sectionCursor = 0;
+      const newGroups = groups.map((g) =>
+        sectionIds.has(g.id) ? (updatedSection[sectionCursor++] ?? g) : g,
+      );
       persistPositions(flattenGroups(newGroups));
     },
     [groups, persistPositions],
@@ -1062,9 +1081,17 @@ export function FavoritesListContainer({
         return;
       }
 
-      const newItems = arrayMove(group.items, oldIndex, newIndex);
+      const reorderedItems = arrayMove(group.items, oldIndex, newIndex);
+      // Reuse the same positions the group's items already hold
+      const groupPositions = reorderedItems
+        .map((i) => i.position)
+        .toSorted((a, b) => a - b);
+      const updatedItems = reorderedItems.map((item, i) => ({
+        ...item,
+        position: groupPositions[i] ?? item.position,
+      }));
       const newGroups = groups.map((g, i) =>
-        i === groupIndex ? { ...g, items: newItems } : g,
+        i === groupIndex ? { ...g, items: updatedItems } : g,
       );
       persistPositions(flattenGroups(newGroups));
     },
@@ -1123,43 +1150,45 @@ export function FavoritesListContainer({
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </Div>
         ) : favoritesList.length > 0 ? (
-          <DndContext
-            sensors={groupSensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleGroupDragEnd}
-          >
-            <SortableContext
-              items={groups.map((g) => g.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <Div className="flex flex-col gap-3">
-                {sections.map((section, sectionIdx) => (
+          <Div className="flex flex-col gap-3">
+            {sections.map((section, sectionIdx) => (
+              <Div
+                key={section.type}
+                data-tour={
+                  section.type === "companion"
+                    ? TOUR_DATA_ATTRS.FAVORITES_COMPANION_GROUP
+                    : undefined
+                }
+              >
+                {/* Section header - only shown when multiple sections exist */}
+                {sections.length > 1 && (
                   <Div
-                    key={section.type}
-                    data-tour={
-                      section.type === "companion"
-                        ? TOUR_DATA_ATTRS.FAVORITES_COMPANION_GROUP
-                        : undefined
-                    }
-                  >
-                    {/* Section header - only shown when multiple sections exist */}
-                    {sections.length > 1 && (
-                      <Div
-                        className={cn(
-                          "flex items-center gap-2 mb-2",
-                          sectionIdx > 0 &&
-                            "mt-2 pt-2 border-t border-border/40",
-                        )}
-                      >
-                        <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                          {section.label}
-                        </Span>
-                        <Span className="text-xs text-muted-foreground/60">
-                          {/* Count skills (groups), not variants */}(
-                          {section.groups.length})
-                        </Span>
-                      </Div>
+                    className={cn(
+                      "flex items-center gap-2 mb-2",
+                      sectionIdx > 0 && "mt-2 pt-2 border-t border-border/40",
                     )}
+                  >
+                    <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      {section.label}
+                    </Span>
+                    <Span className="text-xs text-muted-foreground/60">
+                      {/* Count skills (groups), not variants */}(
+                      {section.groups.length})
+                    </Span>
+                  </Div>
+                )}
+                <DndContext
+                  sensors={groupSensors}
+                  collisionDetection={closestCenter}
+                  modifiers={[restrictToParentElement]}
+                  onDragEnd={(event) =>
+                    handleGroupDragEnd(section.groups, event)
+                  }
+                >
+                  <SortableContext
+                    items={section.groups.map((g) => g.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
                     <Div className="flex flex-col gap-3">
                       {section.groups.map((group) => (
                         <SortableGroup
@@ -1178,11 +1207,11 @@ export function FavoritesListContainer({
                         />
                       ))}
                     </Div>
-                  </Div>
-                ))}
+                  </SortableContext>
+                </DndContext>
               </Div>
-            </SortableContext>
-          </DndContext>
+            ))}
+          </Div>
         ) : (
           <Div className="text-center text-muted-foreground py-8">
             {scopedTranslation.scopedT(locale).t("get.emptyState")}

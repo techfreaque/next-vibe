@@ -6,6 +6,7 @@
  */
 
 import { useToast } from "next-vibe-ui/hooks/use-toast";
+import { assignUrl } from "next-vibe-ui/utils/browser";
 import { useCallback } from "react";
 
 import definitions from "@/app/api/[locale]/credits/definition";
@@ -57,9 +58,9 @@ export function useLogout(
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
-      // Use window.location.href for full page refresh
+      // Use assignUrl for full page refresh
       // eslint-disable-next-line react-compiler/react-compiler
-      window.location.href = `/${locale}/user/login`;
+      assignUrl(`/${locale}/user/login`);
     },
     onError: async () => {
       // Even if the API call fails, we still want to log the user out locally
@@ -74,8 +75,8 @@ export function useLogout(
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
-      // Use window.location.href for full page refresh
-      window.location.href = `/${locale}/user/login`;
+      // Use assignUrl for full page refresh
+      assignUrl(`/${locale}/user/login`);
     },
   });
 

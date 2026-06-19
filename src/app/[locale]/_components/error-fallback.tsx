@@ -3,6 +3,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { H2, P } from "next-vibe-ui/ui/typography";
+import { reloadPage } from "next-vibe-ui/utils/browser";
 import type React from "react";
 
 import { configScopedTranslation } from "@/config/i18n";
@@ -16,7 +17,7 @@ export default function ErrorFallback(): React.JSX.Element {
     <Div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
       <H2 className="text-2xl font-bold mb-4">{t("error.title")}</H2>
       <P className="mb-6">{t("error.message")}</P>
-      <Button onClick={() => window.location.reload()} className="px-4 py-2">
+      <Button onClick={() => reloadPage()} className="px-4 py-2">
         {t("error.tryAgain")}
       </Button>
     </Div>

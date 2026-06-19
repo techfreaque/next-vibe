@@ -7,7 +7,6 @@ import { lazy } from "react";
 import { z } from "zod";
 
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
-import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
@@ -294,6 +293,7 @@ const { POST } = createEndpoint({
           descriptionStyle: "inline",
         },
       }),
+
       voiceModelSelection: requestField(scopedTranslation, {
         schema: voiceModelSelectionSchema.nullable().optional(),
         type: WidgetType.FORM_FIELD,

@@ -5,6 +5,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import { getCookie } from "next-vibe-ui/lib/cookies";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -33,14 +34,8 @@ const MUTATING_METHODS = new Set([
   Methods.PATCH,
 ]);
 
-function getCsrfToken(): string | null {
-  if (typeof document === "undefined") {
-    return null;
-  }
-  const match = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith(`${CSRF_TOKEN_COOKIE_NAME}=`));
-  return match ? (match.split("=")[1] ?? null) : null;
+async function getCsrfToken(): Promise<string | null> {
+  return (await getCookie(CSRF_TOKEN_COOKIE_NAME)) ?? null;
 }
 
 function isJsonObject(value: WidgetData): value is Record<string, WidgetData> {
@@ -249,7 +244,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         : { "Content-Type": "application/json" };
 
     if (MUTATING_METHODS.has(endpoint.method)) {
-      const csrfToken = getCsrfToken();
+      const csrfToken = await getCsrfToken();
       if (csrfToken) {
         headers[CSRF_TOKEN_HEADER_NAME] = csrfToken;
       }

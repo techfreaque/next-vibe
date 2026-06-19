@@ -1,9 +1,11 @@
 "use client";
 
+import { getCookie } from "next-vibe-ui/lib/cookies";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
+import { assignUrl } from "next-vibe-ui/utils/browser";
 import { useCallback, useRef, useState } from "react";
 
 const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
@@ -49,10 +51,7 @@ function DevQuickLogin({
     async (email: string) => {
       setLoadingEmail(email);
       try {
-        const csrfCookie = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith(`${CSRF_TOKEN_COOKIE_NAME}=`))
-          ?.split("=")[1];
+        const csrfCookie = await getCookie(CSRF_TOKEN_COOKIE_NAME);
         const response = await fetch(
           `/api/${locale}/${loginEndpoints.POST.path.join("/")}`,
           {
@@ -74,7 +73,7 @@ function DevQuickLogin({
             devSeedPassword === DEFAULT_PASSWORD_SENTINEL
               ? `/${locale}/admin/settings`
               : (callbackUrl ?? `/${locale}`);
-          window.location.assign(target);
+          assignUrl(target);
         } else {
           setLoadingEmail(null);
         }
@@ -138,7 +137,7 @@ export function LoginForm({
                   const target = usedDefaultPassword
                     ? `/${locale}/admin/settings`
                     : (callbackUrl ?? `/${locale}`);
-                  window.location.assign(target);
+                  assignUrl(target);
                 },
               },
             },

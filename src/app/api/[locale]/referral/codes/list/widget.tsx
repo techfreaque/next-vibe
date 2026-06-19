@@ -20,6 +20,7 @@ import {
   useWidgetSelector,
   useWidgetTranslation,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { copyToClipboard, getCurrentOrigin } from "next-vibe-ui/utils/browser";
 import { useCallback, useState } from "react";
 
 import { CountriesArr, LanguagesArr } from "@/i18n/core/config";

@@ -44,6 +44,7 @@ import { MarkdownTextareaFieldWidget } from "next-vibe-ui/unified/form-fields/ma
 import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/widget";
 import { UrlFieldWidget } from "next-vibe-ui/unified/form-fields/url-field/widget";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
+import { assignUrl } from "next-vibe-ui/utils/browser";
 import {
   type JSX,
   useCallback,

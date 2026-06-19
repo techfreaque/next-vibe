@@ -9,6 +9,10 @@ export const translations = {
         "Starts reverse-WS connections and tool executor. No web server.",
     },
     fields: {
+      computerName: {
+        title: "Computer Name",
+        description: "Identifier for this machine (defaults to OS hostname)",
+      },
       remoteUrl: {
         title: "Remote URL",
         description: "Cloud instance URL to connect to",

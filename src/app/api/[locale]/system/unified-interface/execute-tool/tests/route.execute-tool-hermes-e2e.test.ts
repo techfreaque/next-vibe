@@ -13,20 +13,13 @@
 
 import "server-only";
 
-import { installFetchCache } from "../../agent/ai-stream/testing/fetch-cache";
+import { installFetchCache } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 installFetchCache();
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import systemPromptDebugDefinitions from "@/app/api/[locale]/agent/ai-stream/system-prompt/debug/definition";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
-
 import {
   closeProdDb,
   connectToHermes,
@@ -38,7 +31,13 @@ import {
   LOCAL_DEV_URL,
   resolveDevUser,
   resolveRemoteUrlSync,
-} from "../../agent/ai-stream/testing/remote-setup";
+} from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
 // ── Skip guard ────────────────────────────────────────────────────────────────
 
@@ -104,8 +103,13 @@ describe("RC-EXECUTE-DIRECT: direct-http tool execution on hermes", () => {
         input: { rootFolderId: DefaultFolderId.PRIVATE },
       });
 
-      expect(result.success, `Expected success but got: ${!result.success ? result.message : "ok"}`).toBe(true);
-      if (!result.success) { return; }
+      expect(
+        result.success,
+        `Expected success but got: ${!result.success ? result.message : "ok"}`,
+      ).toBe(true);
+      if (!result.success) {
+        return;
+      }
 
       const systemPrompt = extractSystemPrompt(result.data);
       expect(
@@ -113,7 +117,7 @@ describe("RC-EXECUTE-DIRECT: direct-http tool execution on hermes", () => {
         `System prompt must contain "**Instance ID:** hermes" — tool must execute ON hermes, not locally. Got: ${systemPrompt.slice(0, 200)}`,
       ).toContain("**Instance ID:** hermes");
     },
-    { timeout: 60_000 },
+    60_000,
   );
 });
 
@@ -140,8 +144,13 @@ describe("RC-EXECUTE-WS: reverse-WS tool execution on hermes", () => {
         input: { rootFolderId: DefaultFolderId.PRIVATE },
       });
 
-      expect(result.success, `Expected success but got: ${!result.success ? result.message : "ok"}`).toBe(true);
-      if (!result.success) { return; }
+      expect(
+        result.success,
+        `Expected success but got: ${!result.success ? result.message : "ok"}`,
+      ).toBe(true);
+      if (!result.success) {
+        return;
+      }
 
       const systemPrompt = extractSystemPrompt(result.data);
       expect(
@@ -149,6 +158,6 @@ describe("RC-EXECUTE-WS: reverse-WS tool execution on hermes", () => {
         `System prompt must contain "**Instance ID:** hermes" — tool must execute ON hermes via reverse-WS. Got: ${systemPrompt.slice(0, 200)}`,
       ).toContain("**Instance ID:** hermes");
     },
-    { timeout: 60_000 },
+    60_000,
   );
 });

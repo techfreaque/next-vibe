@@ -20,7 +20,11 @@ import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Input } from "next-vibe-ui/ui/input";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
-import { getCurrentUrl, openInNewTab } from "next-vibe-ui/utils/browser";
+import {
+  copyToClipboard,
+  getCurrentUrl,
+  openInNewTab,
+} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 

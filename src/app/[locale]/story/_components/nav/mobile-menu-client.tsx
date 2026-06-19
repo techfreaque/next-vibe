@@ -11,6 +11,7 @@ import { X } from "next-vibe-ui/ui/icons/X";
 import { Link } from "next-vibe-ui/ui/link";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
+import { addDocumentListener } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -88,10 +89,8 @@ export function MobileMenuClient({
       }
     };
 
-    document.addEventListener("keydown", handleEsc);
-    return (): void => {
-      document.removeEventListener("keydown", handleEsc);
-    };
+    const cleanup = addDocumentListener("keydown", handleEsc);
+    return cleanup;
   }, [isMenuOpen, closeMenu]);
 
   const toggleDropdown = (itemTitle: string): void => {

@@ -3,10 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/system/unified-interface/vibe-sense/graphs/$id/data")({
+export const Route = createFileRoute(
+  "/api/$locale/system/unified-interface/vibe-sense/graphs/$id/data",
+)({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/[id]/data/route"),
+      () =>
+        import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/[id]/data/route"),
     ),
   },
 });

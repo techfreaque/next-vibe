@@ -33,6 +33,10 @@ import {
   useWidgetOnSubmit,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import {
+  getRootCssVar,
+  observeRootMutations,
+} from "next-vibe-ui/utils/browser";
 import React, {
   useCallback,
   useEffect,
@@ -161,9 +165,8 @@ function makeTickFormatter(
 }
 
 function getChartColors(): { textColor: string; borderColor: string } {
-  const style = getComputedStyle(document.documentElement);
-  const fg = style.getPropertyValue("--foreground").trim();
-  const border = style.getPropertyValue("--border").trim();
+  const fg = getRootCssVar("--foreground").trim();
+  const border = getRootCssVar("--border").trim();
   return {
     textColor: fg ? `hsl(${fg})` : "#888",
     borderColor: border ? `hsl(${border})` : "#333",
@@ -264,6 +267,7 @@ function useSimpleChart(
       return undefined;
     }
     let cancelled = false;
+    let cleanupMoRef: (() => void) | null = null;
 
     void (async (): Promise<void> => {
       const { createChart, ColorType, LineSeries } =
@@ -347,26 +351,26 @@ function useSimpleChart(
       });
       ro.observe(container);
 
-      const mo = new MutationObserver(() => {
-        if (!cancelled) {
-          const c = getChartColors();
-          chart.applyOptions({
-            layout: { textColor: c.textColor },
-            grid: {
-              vertLines: { color: c.borderColor },
-              horzLines: { color: c.borderColor },
-            },
-          });
-        }
-      });
-      mo.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ["class", "data-theme"],
-      });
+      cleanupMoRef = observeRootMutations(
+        () => {
+          if (!cancelled) {
+            const c = getChartColors();
+            chart.applyOptions({
+              layout: { textColor: c.textColor },
+              grid: {
+                vertLines: { color: c.borderColor },
+                horzLines: { color: c.borderColor },
+              },
+            });
+          }
+        },
+        { attributes: true, attributeFilter: ["class", "data-theme"] },
+      );
     })();
 
     return (): void => {
       cancelled = true;
+      cleanupMoRef?.();
     };
   }, [resolution, containerRef]);
 

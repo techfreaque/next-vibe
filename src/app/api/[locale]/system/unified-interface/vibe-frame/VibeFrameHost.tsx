@@ -8,6 +8,7 @@
 
 "use client";
 
+import { getCurrentOrigin } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -166,7 +167,7 @@ export function VibeFrameHost({
       bridge.send({
         type: "vf:init",
         frameId,
-        origin: window.location.origin,
+        origin: getCurrentOrigin(),
         theme: p.theme,
         locale: p.locale,
         cssVars: p.cssVars ?? {},

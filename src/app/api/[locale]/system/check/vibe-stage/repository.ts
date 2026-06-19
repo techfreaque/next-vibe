@@ -517,13 +517,19 @@ async function getUnstagedFiles(cwd: string): Promise<string[]> {
       continue;
     }
     const unstagedStatus = line[1];
-    const filePath = line.slice(3).trim();
+    const rawPath = line.slice(3).trim();
 
-    // Include modified unstaged (M), untracked (?), or added unstaged (A)
+    // Renames appear as "old -> new" — extract just the destination path
+    const filePath = rawPath.includes(" -> ")
+      ? (rawPath.split(" -> ")[1] ?? rawPath)
+      : rawPath;
+
+    // Include modified unstaged (M), untracked (?), added unstaged (A), or renamed (R)
     if (
       unstagedStatus === "M" ||
       unstagedStatus === "A" ||
-      unstagedStatus === "?"
+      unstagedStatus === "?" ||
+      unstagedStatus === "R"
     ) {
       files.push(filePath);
     }

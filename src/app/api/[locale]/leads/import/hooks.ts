@@ -5,6 +5,7 @@
 
 import type { DivDragEvent } from "next-vibe-ui/ui/div";
 import type { InputChangeEvent } from "next-vibe-ui/ui/input";
+import { downloadFile } from "next-vibe-ui/utils/browser";
 import React from "react";
 
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";

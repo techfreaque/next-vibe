@@ -14,9 +14,12 @@ import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { getCurrentUrl } from "next-vibe-ui/utils/browser";
+import {
+  copyToClipboard,
+  getCurrentUrl,
+  getElementById,
+} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
-import React from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import {

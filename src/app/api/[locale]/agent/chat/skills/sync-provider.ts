@@ -124,7 +124,7 @@ type SyncedSkill = z.infer<typeof syncedSkillSchema>;
 
 export const skillsSyncProvider: SyncProvider = {
   key: "skills",
-  labelI18nKey: "remoteConnection.sync.skills",
+  labelKey: "skills",
 
   async getCursor(userId): Promise<StandardSyncCursor> {
     const [row] = await db

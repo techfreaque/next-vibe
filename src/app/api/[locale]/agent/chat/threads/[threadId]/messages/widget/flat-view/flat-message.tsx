@@ -7,6 +7,7 @@ import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span, type SpanMouseEvent } from "next-vibe-ui/ui/span";
 import { useWidgetNavigation } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { copyToClipboard, getElementById } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React, { memo, useCallback, useMemo } from "react";
 

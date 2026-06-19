@@ -8,6 +8,7 @@
 import { useTouchDevice } from "next-vibe-ui/hooks/use-touch-device";
 import { Div } from "next-vibe-ui/ui/div";
 import { ErrorBoundary } from "next-vibe-ui/ui/error-boundary";
+import { getElementById } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React, { useCallback, useMemo, useState } from "react";
 
@@ -124,7 +125,7 @@ export const FlatMessageView = React.memo(function FlatMessageView({
   );
 
   const handlePostClick = useCallback((postId: string): void => {
-    const element = document.getElementById(`${postId}`);
+    const element = getElementById(`${postId}`);
     element?.scrollIntoView({ behavior: "smooth", block: "center" });
     setHoveredUserId(null);
   }, []);

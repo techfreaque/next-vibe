@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-ca1--call-execute-tool-with----d7488822-11ae-4cc8-8c67-6891cd73d22a.md\n\n# [CA1] Call execute-tool with...\nFolder: cron\nPreview: <think>The execute-tool returned with callbackMode 'wakeUp'. It returned a taskId: \"remote-direct-hermes-functions.execu…",
+    "encoding_format": "float"
+  }
+}

@@ -11,6 +11,10 @@ export const translations: typeof enTranslations = {
         "Uruchamia połączenia reverse-WS i executor narzędzi. Bez serwera web.",
     },
     fields: {
+      computerName: {
+        title: "Nazwa komputera",
+        description: "Identyfikator tej maszyny (domyślnie: hostname systemu)",
+      },
       remoteUrl: {
         title: "Zdalny URL",
         description: "URL instancji chmurowej",

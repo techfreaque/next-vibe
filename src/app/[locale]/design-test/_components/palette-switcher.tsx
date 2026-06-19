@@ -5,6 +5,11 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
+import {
+  removeRootCssVar,
+  rootHasClass,
+  setRootCssVar,
+} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
@@ -721,59 +726,48 @@ function applyPalette(palette: PaletteColors, isDark: boolean): void {
   if (platform.isReactNative) {
     return;
   }
-  const root = document.documentElement;
   const mode = isDark ? palette.dark : palette.light;
   for (const key of CSS_VAR_KEYS) {
-    root.style.setProperty(`--${key}`, mode[key]);
+    setRootCssVar(`--${key}`, mode[key]);
   }
   // Also update sidebar vars to match
-  root.style.setProperty("--sidebar-primary", mode.primary);
-  root.style.setProperty(
-    "--sidebar-primary-foreground",
-    mode["primary-foreground"],
-  );
-  root.style.setProperty("--sidebar-ring", mode.ring);
-  root.style.setProperty("--sidebar-background", mode.background);
-  root.style.setProperty("--sidebar-foreground", mode.foreground);
-  root.style.setProperty(
-    "--sidebar-accent",
-    isDark ? mode.secondary : mode.accent,
-  );
-  root.style.setProperty(
-    "--sidebar-accent-foreground",
-    mode["accent-foreground"],
-  );
-  root.style.setProperty("--sidebar-border", mode.border);
+  setRootCssVar("--sidebar-primary", mode.primary);
+  setRootCssVar("--sidebar-primary-foreground", mode["primary-foreground"]);
+  setRootCssVar("--sidebar-ring", mode.ring);
+  setRootCssVar("--sidebar-background", mode.background);
+  setRootCssVar("--sidebar-foreground", mode.foreground);
+  setRootCssVar("--sidebar-accent", isDark ? mode.secondary : mode.accent);
+  setRootCssVar("--sidebar-accent-foreground", mode["accent-foreground"]);
+  setRootCssVar("--sidebar-border", mode.border);
   // Chart colors
-  root.style.setProperty("--chart-1", mode.primary);
-  root.style.setProperty("--chart-2", mode.success);
-  root.style.setProperty("--chart-3", mode.info);
-  root.style.setProperty("--chart-4", mode.warning);
-  root.style.setProperty("--chart-5", "340 80% 63%");
+  setRootCssVar("--chart-1", mode.primary);
+  setRootCssVar("--chart-2", mode.success);
+  setRootCssVar("--chart-3", mode.info);
+  setRootCssVar("--chart-4", mode.warning);
+  setRootCssVar("--chart-5", "340 80% 63%");
 }
 
 function resetPalette(): void {
   if (platform.isReactNative) {
     return;
   }
-  const root = document.documentElement;
   for (const key of CSS_VAR_KEYS) {
-    root.style.removeProperty(`--${key}`);
+    removeRootCssVar(`--${key}`);
   }
   // Reset sidebar vars
-  root.style.removeProperty("--sidebar-primary");
-  root.style.removeProperty("--sidebar-primary-foreground");
-  root.style.removeProperty("--sidebar-ring");
-  root.style.removeProperty("--sidebar-background");
-  root.style.removeProperty("--sidebar-foreground");
-  root.style.removeProperty("--sidebar-accent");
-  root.style.removeProperty("--sidebar-accent-foreground");
-  root.style.removeProperty("--sidebar-border");
-  root.style.removeProperty("--chart-1");
-  root.style.removeProperty("--chart-2");
-  root.style.removeProperty("--chart-3");
-  root.style.removeProperty("--chart-4");
-  root.style.removeProperty("--chart-5");
+  removeRootCssVar("--sidebar-primary");
+  removeRootCssVar("--sidebar-primary-foreground");
+  removeRootCssVar("--sidebar-ring");
+  removeRootCssVar("--sidebar-background");
+  removeRootCssVar("--sidebar-foreground");
+  removeRootCssVar("--sidebar-accent");
+  removeRootCssVar("--sidebar-accent-foreground");
+  removeRootCssVar("--sidebar-border");
+  removeRootCssVar("--chart-1");
+  removeRootCssVar("--chart-2");
+  removeRootCssVar("--chart-3");
+  removeRootCssVar("--chart-4");
+  removeRootCssVar("--chart-5");
 }
 
 export function PaletteSwitcher(): JSX.Element {
@@ -789,18 +783,14 @@ export function PaletteSwitcher(): JSX.Element {
     if (!palette) {
       return;
     }
-    const isDark =
-      !platform.isReactNative &&
-      document.documentElement.classList.contains("dark");
+    const isDark = !platform.isReactNative && rootHasClass("dark");
     applyPalette(palette.colors, isDark);
   }, []);
 
   // Re-apply when theme toggles (listen for class changes)
   if (!platform.isReactNative) {
     // Using a simple approach: re-apply on every render if active
-    const isDark =
-      typeof document !== "undefined" &&
-      document.documentElement.classList.contains("dark");
+    const isDark = rootHasClass("dark");
     if (activeIndex !== 0) {
       const palette = PALETTES[activeIndex];
       if (palette) {

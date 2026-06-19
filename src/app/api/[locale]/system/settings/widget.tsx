@@ -5,6 +5,7 @@
 
 "use client";
 
+import { storage } from "next-vibe-ui/lib/storage";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
@@ -387,15 +388,15 @@ export function SystemSettingsWidget(): JSX.Element {
     if (!value) {
       return;
     }
-    const dismissed =
-      typeof window !== "undefined" &&
-      !!localStorage.getItem("vibe-wizard-dismissed");
-    const hasDefaultPassword = value.onboardingIssues?.some((issue) =>
-      issue.toLowerCase().includes("default"),
-    );
-    if (value.needsOnboarding && (!dismissed || hasDefaultPassword)) {
-      setShowWizard(true);
-    }
+    void (async (): Promise<void> => {
+      const dismissed = !!(await storage.getItem("vibe-wizard-dismissed"));
+      const hasDefaultPassword = value.onboardingIssues?.some((issue) =>
+        issue.toLowerCase().includes("default"),
+      );
+      if (value.needsOnboarding && (!dismissed || hasDefaultPassword)) {
+        setShowWizard(true);
+      }
+    })();
   }, [value]);
 
   const modules = value?.modules ?? [];
@@ -494,7 +495,7 @@ export function SystemSettingsWidget(): JSX.Element {
             size="sm"
             onClick={(): void => {
               if (showWizard) {
-                localStorage.setItem("vibe-wizard-dismissed", "1");
+                void storage.setItem("vibe-wizard-dismissed", "1");
                 setShowWizard(false);
                 setShowExport(false);
               } else {

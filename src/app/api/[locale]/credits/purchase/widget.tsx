@@ -42,6 +42,7 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { assignUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

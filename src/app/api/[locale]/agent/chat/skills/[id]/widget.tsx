@@ -56,6 +56,12 @@ import { Input } from "next-vibe-ui/ui/input";
 import { Link } from "next-vibe-ui/ui/link";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetContext,
@@ -81,6 +87,13 @@ import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-f
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import {
+  copyToClipboard,
+  getCurrentOrigin,
+  getDocumentBody,
+  getScreenWidth,
+  openUrl,
+} from "next-vibe-ui/utils/browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -1303,34 +1316,51 @@ export function SkillViewContainer({
             <Div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {/* Header row: add-all + delete + edit */}
               {skillId && (
-                <Div className="flex items-center justify-end gap-1">
+                <Div className="@container flex items-center justify-end gap-1">
                   {!allFavorited && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
-                      onClick={handleAddAllToFavorites}
-                      disabled={isAddingAll}
-                    >
-                      {isAddingAll ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Zap className="h-3 w-3" />
-                      )}
-                      {t("get.addAllToFavorites")}
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
+                            onClick={handleAddAllToFavorites}
+                            disabled={isAddingAll}
+                          >
+                            {isAddingAll ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Zap className="h-3 w-3" />
+                            )}
+                            <Span className="hidden @sm:inline">
+                              {t("get.addAllToFavorites")}
+                            </Span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <Span>
+                            {variantsToRender
+                              .map((v) => v.displayName ?? v.id)
+                              .join(", ")}
+                          </Span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                   {isOwner && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="gap-1.5 h-7 text-xs text-destructive hover:bg-destructive/10"
+                      className="h-7 p-0 @sm:px-2 @sm:gap-1 text-xs text-destructive hover:bg-destructive/10"
                       onClick={handleDelete}
                     >
                       <Trash2 className="h-3 w-3" />
-                      {t("get.delete")}
+                      <Span className="hidden @sm:inline">
+                        {t("get.delete")}
+                      </Span>
                     </Button>
                   )}
                   {isOwner ? (
@@ -1338,11 +1368,11 @@ export function SkillViewContainer({
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
+                      className="h-7 p-0 @sm:px-2 @sm:gap-1 text-xs text-muted-foreground hover:text-foreground"
                       onClick={handleOpenEdit}
                     >
                       <Pencil className="h-3 w-3" />
-                      {t("get.edit")}
+                      <Span className="hidden @sm:inline">{t("get.edit")}</Span>
                     </Button>
                   ) : (
                     <EditSkillButton
@@ -1761,7 +1791,7 @@ export function SkillViewContainer({
           {!isLoading && variantsToRender.length > 0 && (
             <Div className="flex flex-col gap-2">
               {/* Header row: variants label + add-all + delete + edit */}
-              <Div className="flex items-center justify-between">
+              <Div className="@container flex items-center justify-between">
                 {variantsToRender.length > 1 && (
                   <Div className="text-sm font-semibold opacity-60">
                     {t("get.variants.title")}
@@ -1770,32 +1800,49 @@ export function SkillViewContainer({
                 <Div className="flex-1" />
                 <Div className="flex items-center gap-1">
                   {!allFavorited && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
-                      onClick={handleAddAllToFavorites}
-                      disabled={isAddingAll}
-                    >
-                      {isAddingAll ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Zap className="h-3 w-3" />
-                      )}
-                      {t("get.addAllToFavorites")}
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
+                            onClick={handleAddAllToFavorites}
+                            disabled={isAddingAll}
+                          >
+                            {isAddingAll ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Zap className="h-3 w-3" />
+                            )}
+                            <Span className="hidden @sm:inline">
+                              {t("get.addAllToFavorites")}
+                            </Span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <Span>
+                            {variantsToRender
+                              .map((v) => v.displayName ?? v.id)
+                              .join(", ")}
+                          </Span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                   {isOwner && skillId && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="gap-1.5 h-7 text-xs text-destructive hover:bg-destructive/10"
+                      className="h-7 p-0 @sm:px-2 @sm:gap-1 text-xs text-destructive hover:bg-destructive/10"
                       onClick={handleDelete}
                     >
                       <Trash2 className="h-3 w-3" />
-                      {t("get.delete")}
+                      <Span className="hidden @sm:inline">
+                        {t("get.delete")}
+                      </Span>
                     </Button>
                   )}
                   {isOwner && skillId ? (
@@ -1803,11 +1850,11 @@ export function SkillViewContainer({
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="gap-1.5 h-7 text-xs text-muted-foreground hover:text-foreground"
+                      className="h-7 p-0 @sm:px-2 @sm:gap-1 text-xs text-muted-foreground hover:text-foreground"
                       onClick={handleOpenEdit}
                     >
                       <Pencil className="h-3 w-3" />
-                      {t("get.edit")}
+                      <Span className="hidden @sm:inline">{t("get.edit")}</Span>
                     </Button>
                   ) : skillId ? (
                     <EditSkillButton
@@ -2068,11 +2115,34 @@ function VariantCard({
 
         {/* Model pill */}
         {resolved.chat && (
-          <Div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+          <Div className="flex items-center gap-1 text-xs text-muted-foreground min-w-0 overflow-hidden shrink">
             {provider?.icon && (
               <Icon icon={provider.icon} className="w-3 h-3" />
             )}
             <Span className="truncate max-w-[100px]">{resolved.chat.name}</Span>
+            {provider && (
+              <Span aria-hidden className="text-muted-foreground/50">
+                {
+                  // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string
+                  "·"
+                }
+              </Span>
+            )}
+            {provider && (
+              <Span className="truncate max-w-[60px]">{provider.name}</Span>
+            )}
+            <Span aria-hidden className="text-muted-foreground/50">
+              {
+                // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string
+                "·"
+              }
+            </Span>
+            <ModelCreditDisplay
+              modelId={resolved.chat.id}
+              variant="text"
+              className="text-xs text-muted-foreground"
+              locale={locale}
+            />
           </Div>
         )}
 

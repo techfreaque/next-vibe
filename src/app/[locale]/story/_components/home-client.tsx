@@ -2,6 +2,11 @@
 
 import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
+import {
+  getCurrentUrl,
+  getElementById,
+  silentReplaceState,
+} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -44,7 +49,7 @@ export function HomeClient({
   );
 
   useEffect(() => {
-    const el = document.getElementById(SITE_FOOTER_ID);
+    const el = getElementById(SITE_FOOTER_ID);
     if (el) {
       el.style.display = activeSide === null ? "none" : "";
     }
@@ -59,7 +64,7 @@ export function HomeClient({
     if (isValidTab(tabParam)) {
       setActiveSide(tabParam);
       setTimeout(() => {
-        const el = document.getElementById("universe-content");
+        const el = getElementById("universe-content");
         el?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 150);
     }
@@ -68,19 +73,19 @@ export function HomeClient({
   function handleSideChange(side: ActiveSide): void {
     setActiveSide(side);
     if (side !== null) {
-      const url = new URL(window.location.href);
+      const url = new URL(getCurrentUrl());
       url.searchParams.set("tab", side);
       url.hash = "universe-content";
-      window.history.replaceState(null, "", url.toString());
+      silentReplaceState(url.toString());
       setTimeout(() => {
-        const el = document.getElementById("universe-content");
+        const el = getElementById("universe-content");
         el?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     } else {
-      const url = new URL(window.location.href);
+      const url = new URL(getCurrentUrl());
       url.searchParams.delete("tab");
       url.hash = "";
-      window.history.replaceState(null, "", url.toString());
+      silentReplaceState(url.toString());
     }
   }
 

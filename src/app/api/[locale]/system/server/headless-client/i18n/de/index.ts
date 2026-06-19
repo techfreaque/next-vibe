@@ -11,6 +11,10 @@ export const translations: typeof enTranslations = {
         "Startet Reverse-WS-Verbindungen und Tool-Executor. Kein Webserver.",
     },
     fields: {
+      computerName: {
+        title: "Computername",
+        description: "Bezeichner für diesen Rechner (Standard: OS-Hostname)",
+      },
       remoteUrl: { title: "Remote-URL", description: "URL der Cloud-Instanz" },
       leadId: {
         title: "Lead-ID",

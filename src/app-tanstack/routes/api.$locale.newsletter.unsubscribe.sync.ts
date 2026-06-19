@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/newsletter/unsubscribe/sync")({
+export const Route = createFileRoute(
+  "/api/$locale/newsletter/unsubscribe/sync",
+)({
   server: {
     handlers: wrapNextApiRoute(
       () => import("@/app/api/[locale]/newsletter/unsubscribe/sync/route"),

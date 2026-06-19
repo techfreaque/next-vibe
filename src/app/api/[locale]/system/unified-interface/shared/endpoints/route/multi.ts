@@ -42,7 +42,8 @@ export type EndpointHandlerConfig<T extends EndpointDefinitionsConstraint> = {
           T[K]["types"]["UrlVariablesOutput"],
           T[K]["allowedRoles"],
           Platform,
-          T[K]["types"]["ScopedTranslationKey"]
+          T[K]["types"]["ScopedTranslationKey"],
+          T[K]["types"]["Events"]
         >
       : never
     : never;
@@ -59,7 +60,8 @@ export type ToolsObject<T extends EndpointDefinitionsConstraint> = {
         T[K]["types"]["RequestOutput"],
         T[K]["types"]["ResponseOutput"],
         T[K]["types"]["UrlVariablesOutput"],
-        T[K]["allowedRoles"]
+        T[K]["allowedRoles"],
+        T[K]["types"]["Events"]
       >
     : never;
 };
@@ -163,6 +165,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       if (methodConfig.canSubscribe) {
         result.tools[Methods.GET].canSubscribe = methodConfig.canSubscribe;
       }
+      if (methodConfig.onRemoteEvent) {
+        result.tools[Methods.GET].onRemoteEvent = methodConfig.onRemoteEvent;
+      }
     }
   }
 
@@ -186,6 +191,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       result.tools[Methods.POST] = handler.tools[Methods.POST];
       if (methodConfig.canSubscribe) {
         result.tools[Methods.POST].canSubscribe = methodConfig.canSubscribe;
+      }
+      if (methodConfig.onRemoteEvent) {
+        result.tools[Methods.POST].onRemoteEvent = methodConfig.onRemoteEvent;
       }
     }
   }
@@ -211,6 +219,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       if (methodConfig.canSubscribe) {
         result.tools[Methods.PUT].canSubscribe = methodConfig.canSubscribe;
       }
+      if (methodConfig.onRemoteEvent) {
+        result.tools[Methods.PUT].onRemoteEvent = methodConfig.onRemoteEvent;
+      }
     }
   }
 
@@ -235,6 +246,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       if (methodConfig.canSubscribe) {
         result.tools[Methods.PATCH].canSubscribe = methodConfig.canSubscribe;
       }
+      if (methodConfig.onRemoteEvent) {
+        result.tools[Methods.PATCH].onRemoteEvent = methodConfig.onRemoteEvent;
+      }
     }
   }
 
@@ -258,6 +272,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       result.tools[Methods.DELETE] = handler.tools[Methods.DELETE];
       if (methodConfig.canSubscribe) {
         result.tools[Methods.DELETE].canSubscribe = methodConfig.canSubscribe;
+      }
+      if (methodConfig.onRemoteEvent) {
+        result.tools[Methods.DELETE].onRemoteEvent = methodConfig.onRemoteEvent;
       }
     }
   }

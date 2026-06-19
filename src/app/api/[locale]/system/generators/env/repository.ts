@@ -663,8 +663,7 @@ ${imports.join("\n")}
 // Platform detection (will be set at runtime)
 const isServer = typeof window === "undefined";
 const isReactNative = false;
-const isBrowser =
-  !isServer && typeof window !== "undefined" && !!window.document;
+const isBrowser = !isServer && typeof window !== "undefined" && !!window.document;
 
 const platform = {
   isServer,

@@ -37,6 +37,7 @@ import {
   Icon,
   type IconKey,
 } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";

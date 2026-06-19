@@ -5,6 +5,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import { reloadPage } from "next-vibe-ui/utils/browser";
 
 import { getEndpoint as globalGetEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";

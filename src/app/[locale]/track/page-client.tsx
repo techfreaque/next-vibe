@@ -3,6 +3,7 @@
 import { useSearchParams } from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
+import { assignUrl } from "next-vibe-ui/utils/browser";
 import type React from "react";
 
 import { scopedTranslation } from "@/app/[locale]/track/i18n";
@@ -49,10 +50,10 @@ export default function TrackPage({
       enabled: true,
       retry: 0,
       onSuccess: ({ responseData }) => {
-        window.location.assign(responseData.redirectUrl ?? `/${locale}`);
+        assignUrl(responseData.redirectUrl ?? `/${locale}`);
       },
       onError: () => {
-        window.location.assign(`/${locale}`);
+        assignUrl(`/${locale}`);
       },
     },
   });

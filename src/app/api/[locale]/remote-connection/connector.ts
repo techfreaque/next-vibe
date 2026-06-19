@@ -35,6 +35,7 @@ import {
   StandardSyncCursorSchema,
   ThreadsSyncCursorSchema,
 } from "@/app/api/[locale]/remote-connection/db";
+import { buildRemoteHeaders } from "@/app/api/[locale]/remote-connection/dispatch";
 import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
 // Wire schema + executor shared with the WS server (both delivery paths
 // execute identically — see tool-executor.ts).
@@ -50,7 +51,6 @@ import type {
   WsWireBatch,
   WsWireMessage,
 } from "@/app/api/[locale]/system/unified-interface/websocket/types";
-import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
 import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 

@@ -13,6 +13,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, P } from "next-vibe-ui/ui/typography";
+import { getElementById } from "next-vibe-ui/utils/browser";
 import type { CSSProperties, JSX } from "react";
 import { useState } from "react";
 
@@ -249,12 +250,10 @@ export function SplitHero({
                   onClick={() => {
                     handleClick(chip.side);
                     setTimeout(() => {
-                      document
-                        .getElementById("universe-content")
-                        ?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
+                      getElementById("universe-content")?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
                     }, 100);
                   }}
                   className={`cursor-pointer px-4 py-1.5 rounded-full border text-xs font-semibold transition-all duration-200 hover:opacity-80 ${chip.color} ${chip.bg} ${chip.border}`}
@@ -451,9 +450,10 @@ function UnbottledContent({
     e.stopPropagation();
     onSideChange?.("unbottled");
     setTimeout(() => {
-      document
-        .getElementById("universe-content")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      getElementById("universe-content")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }, 100);
   }
   return (
@@ -534,9 +534,10 @@ function PersonalContent({
     e.stopPropagation();
     onSideChange?.("personal");
     setTimeout(() => {
-      document
-        .getElementById("universe-content")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      getElementById("universe-content")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }, 100);
   }
   return (
@@ -618,9 +619,10 @@ function NextVibeContent({
     e.stopPropagation();
     onSideChange?.("nextvibe");
     setTimeout(() => {
-      document
-        .getElementById("universe-content")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      getElementById("universe-content")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }, 100);
   }
   return (
@@ -698,9 +700,10 @@ function ReferralContent({
     e.stopPropagation();
     onSideChange?.("referral");
     setTimeout(() => {
-      document
-        .getElementById("universe-content")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      getElementById("universe-content")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }, 100);
   }
   return (

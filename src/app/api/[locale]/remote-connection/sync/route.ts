@@ -16,5 +16,15 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     handler: ({ data, logger, locale, user }) =>
       TaskSyncRepository.syncTasks(data, logger, locale, user),
+    onRemoteEvent: {
+      "sync-event": async (payload, ctx) =>
+        TaskSyncRepository.handleSyncEvent(
+          { syncPayloads: payload.syncPayloads ?? {} },
+          "id" in ctx.user && typeof ctx.user.id === "string"
+            ? ctx.user.id
+            : null,
+          ctx.logger,
+        ),
+    },
   },
 });

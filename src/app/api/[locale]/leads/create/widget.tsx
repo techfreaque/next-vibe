@@ -25,6 +25,7 @@ import { TextareaFieldWidget } from "next-vibe-ui/unified/form-fields/textarea-f
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import React, { useCallback, useEffect } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";

@@ -144,6 +144,7 @@ export const translations: typeof enTranslations = {
         confirm: "Potwierdź",
         cancel: "Anuluj",
         deny: "Odmów",
+        runInBackground: "Uruchom w tle",
       },
       creditsUsed_one: "{{cost}} kredyt",
       creditsUsed_other: "{{cost}} kredytów",

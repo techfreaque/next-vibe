@@ -85,16 +85,41 @@ interface RemoteConnectionByIdWidgetProps {
   field: (typeof definitionsType.PATCH)["fields"];
 }
 
-const SYNC_SCOPE_KEYS = [
-  "memories",
-  "documents",
-  "skills",
-  "favorites",
-  "threads",
-] as const;
-type SyncScopeKey = (typeof SYNC_SCOPE_KEYS)[number];
+// ─── Hook: fetch sync providers from the server ────────────────────────────────
 
-// ─── Sync scope editor (form-context aware) ───────────────────────────────────
+function useSyncProviders(): SyncProviderInfo[] {
+  const [providers, setProviders] = useState<SyncProviderInfo[]>([]);
+  const locale = useWidgetLocale();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
+
+  useEffect(() => {
+    if (user.isPublic) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const { apiClient } =
+        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+      const result = await apiClient.fetch(
+        syncProvidersDefinitions.GET,
+        logger,
+        user,
+        undefined,
+        undefined,
+        locale,
+        availability,
+      );
+      if (result.success) {
+        setProviders(result.data.providers);
+      }
+    })();
+  }, [user, locale, logger, availability]);
+
+  return providers;
+}
+
+// ─── Sync scope editor (form-context aware, provider-driven) ──────────────────
 
 function SyncScopeEditor({
   t,
@@ -103,16 +128,14 @@ function SyncScopeEditor({
 }): JSX.Element {
   const { setValue } = useFormContext();
   const syncScope = useWatch({ name: "syncScope" }) as SyncScope | undefined;
+  const providers = useSyncProviders();
 
-  const current: SyncScope = {
-    memories: syncScope?.memories ?? true,
-    documents: syncScope?.documents ?? true,
-    skills: syncScope?.skills ?? true,
-    favorites: syncScope?.favorites ?? false,
-    threads: syncScope?.threads ?? false,
-  };
+  const current: Record<string, boolean> = {};
+  for (const p of providers) {
+    current[p.key] = syncScope?.[p.key] ?? false;
+  }
 
-  const toggle = (key: SyncScopeKey): void => {
+  const toggle = (key: string): void => {
     setValue(
       "syncScope",
       { ...current, [key]: !current[key] },
@@ -126,20 +149,64 @@ function SyncScopeEditor({
         {t("patch.syncScope.description")}
       </P>
       <Div className="grid grid-cols-1 gap-2">
-        {SYNC_SCOPE_KEYS.map((key: SyncScopeKey) => (
+        {providers.map((p) => (
           <Div
-            key={key}
+            key={p.key}
             className="flex items-center justify-between rounded-md border px-3 py-2 bg-background"
           >
-            <P className="text-sm">{t(`patch.syncScope.${key}` as const)}</P>
+            <Div className="flex flex-col gap-0.5">
+              <P className="text-sm font-medium">{p.label}</P>
+              {p.description && (
+                <P className="text-xs text-muted-foreground">{p.description}</P>
+              )}
+              {p.isLiveOnly && (
+                <P className="text-[10px] text-primary/70 italic">
+                  {t("widget.liveSync.liveOnlyBadge")}
+                </P>
+              )}
+            </Div>
             <Switch
-              checked={current[key]}
-              onCheckedChange={() => toggle(key)}
-              aria-label={t(`patch.syncScope.${key}` as const)}
+              checked={current[p.key] ?? false}
+              onCheckedChange={() => toggle(p.key)}
+              aria-label={p.label}
             />
           </Div>
         ))}
       </Div>
+    </SectionGroup>
+  );
+}
+
+// ─── Sync scope view (read-only, provider-driven) ─────────────────────────────
+
+function SyncScopeViewSection({
+  syncScope,
+}: {
+  syncScope: SyncScope | null;
+}): JSX.Element | null {
+  const { t } = scopedTranslation.scopedT(useWidgetLocale());
+  const providers = useSyncProviders();
+
+  if (!syncScope || providers.length === 0) {
+    return null;
+  }
+
+  return (
+    <SectionGroup title={t("widget.syncSection")}>
+      <DetailGrid columns={2}>
+        {providers.map((p) => (
+          <DetailField
+            key={p.key}
+            label={p.label}
+            value={
+              <StatusPill
+                status={syncScope[p.key] ? "on" : "off"}
+                variant={syncScope[p.key] ? "success" : "default"}
+              />
+            }
+          />
+        ))}
+      </DetailGrid>
     </SectionGroup>
   );
 }
@@ -386,24 +453,7 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
       </SectionGroup>
 
       {/* ── Sync scope — per provider ──────────────────────────────────── */}
-      {status.syncScope && (
-        <SectionGroup title={t("widget.syncSection")}>
-          <DetailGrid columns={3}>
-            {SYNC_SCOPE_KEYS.map((key: SyncScopeKey) => (
-              <DetailField
-                key={key}
-                label={t(`widget.syncScope.${key}` as const)}
-                value={
-                  <StatusPill
-                    status={status.syncScope?.[key] ? "on" : "off"}
-                    variant={status.syncScope?.[key] ? "success" : "default"}
-                  />
-                }
-              />
-            ))}
-          </DetailGrid>
-        </SectionGroup>
-      )}
+      <SyncScopeViewSection syncScope={status.syncScope ?? null} />
 
       {/* ── Behavior — admin only ──────────────────────────────────────── */}
       {isAdmin && (

@@ -3,10 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/system/unified-interface/tasks/pulse/execute")({
+export const Route = createFileRoute(
+  "/api/$locale/system/unified-interface/tasks/pulse/execute",
+)({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/system/unified-interface/tasks/pulse/execute/route"),
+      () =>
+        import("@/app/api/[locale]/system/unified-interface/tasks/pulse/execute/route"),
     ),
   },
 });

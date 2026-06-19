@@ -85,6 +85,48 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  dismissTask: {
+    post: {
+      title: "Aufgabe verwerfen",
+      titleShort: "Verwerfen",
+      description:
+        "Bricht einen ausstehenden wakeUp-Ruf ab. Das Tool läuft im Hintergrund weiter, der Thread wird sofort entsperrt. Das Ergebnis wird beim Abschluss verworfen.",
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "callId ist erforderlich",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Zugriff verweigert",
+        },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Kein ausstehender Aufruf für diese callId gefunden",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Ausstehender Aufruf konnte nicht verworfen werden",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkfehler beim Verwerfen der Aufgabe",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+      },
+      success: {
+        title: "Aufgabe verworfen",
+        description: "Thread entsperrt. Tool läuft im Hintergrund weiter.",
+      },
+    },
+  },
   tools: {
     get: {
       title: "Tool-Hilfe - Verfügbare Tools entdecken",

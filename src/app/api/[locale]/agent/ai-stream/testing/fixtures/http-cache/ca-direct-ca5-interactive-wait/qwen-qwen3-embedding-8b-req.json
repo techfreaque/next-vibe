@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/remote/-t-sys--what-is-your-instance-id--look-at-your----54e5f699-6f80-4c92-ab46-9cd06066227d.md\n\n# [T-SYS] What is your instance ID? Look at your...\nFolder: remote\nPreview: <think> The user is asking for my instance ID. They say to look at my system prompt which contains the identity of the s…",
+    "input": "[CA5] Call execute-tool with toolName='coding-agent', instanceId='hermes', prompt='echo hello-ca5-wait', interactiveMode=true, callbackMode='wait'. The tool escalates to a background task. After revival verify the result output contains \"hello-ca5-wait\". Reply with STEP_OK and quote the exact output.",
     "encoding_format": "float"
   }
 }

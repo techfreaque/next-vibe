@@ -2,6 +2,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { P } from "next-vibe-ui/ui/typography";
+import { assignUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/config/i18n";
@@ -22,7 +23,7 @@ export function SupportButton({
         variant="ghost"
         size="unset"
         onClick={() => {
-          window.location.href = `mailto:${supportEmail}`;
+          assignUrl(`mailto:${supportEmail}`);
         }}
         className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors bg-transparent border-none p-0 cursor-pointer"
       >

@@ -45,6 +45,7 @@ import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
 import {
+  ATLAS_INSTANCE_ID,
   closeProdDb,
   connectToHermes,
   disconnectFromHermes,

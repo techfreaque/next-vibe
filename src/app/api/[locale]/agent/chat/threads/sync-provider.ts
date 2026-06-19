@@ -145,6 +145,7 @@ export async function pushThreadSync(
       .update(chatThreads)
       .set({ updatedAt: new Date() })
       .where(eq(chatThreads.id, threadId));
+
     const { serializeProviders } =
       await import("@/app/api/[locale]/remote-connection/sync-provider");
     const { broadcastSyncNotify } =

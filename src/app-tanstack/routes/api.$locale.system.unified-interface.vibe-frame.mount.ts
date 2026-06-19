@@ -3,10 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/system/unified-interface/vibe-frame/mount")({
+export const Route = createFileRoute(
+  "/api/$locale/system/unified-interface/vibe-frame/mount",
+)({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/system/unified-interface/vibe-frame/mount/route"),
+      () =>
+        import("@/app/api/[locale]/system/unified-interface/vibe-frame/mount/route"),
     ),
   },
 });

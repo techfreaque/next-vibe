@@ -1,4 +1,5 @@
 import { parseError } from "next-vibe/shared/utils";
+import { getGeolocation } from "next-vibe-ui/utils/browser";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -27,26 +28,15 @@ export async function geocodeAddress(
     // This is a placeholder that should be implemented with actual geocoding service
 
     // Example implementation with browser's Geolocation API
-    if (
-      typeof window !== "undefined" &&
-      "navigator" in window &&
-      "geolocation" in navigator
-    ) {
-      return await new Promise<GeocodeResult | null>((resolve) => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            resolve({
-              coordinates: {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              },
-              formattedAddress: address,
-            });
-          },
-          () => resolve(null),
-          { timeout: 10_000 },
-        );
-      });
+    const coords = await getGeolocation();
+    if (coords) {
+      return {
+        coordinates: {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        },
+        formattedAddress: address,
+      };
     }
 
     // Return null when no geocoding is possible

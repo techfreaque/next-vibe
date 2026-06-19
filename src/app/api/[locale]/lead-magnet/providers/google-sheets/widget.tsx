@@ -23,6 +23,11 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import {
+  assignUrl,
+  getCurrentUrl,
+  silentReplaceState,
+} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 

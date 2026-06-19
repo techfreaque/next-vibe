@@ -17,7 +17,12 @@ import {
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { useWidgetSelector } from "next-vibe-ui/unified/_shared/use-widget-context";
-import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
+import {
+  getCurrentUrl,
+  getElementById,
+  querySelector,
+  silentReplaceState,
+} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import {
   useCallback,

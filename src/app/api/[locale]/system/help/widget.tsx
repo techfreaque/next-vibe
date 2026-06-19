@@ -81,6 +81,12 @@ import {
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import {
+  getCurrentOrigin,
+  getCurrentPathname,
+  getCurrentSearch,
+  getScreenWidth,
+} from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import {
   createContext,
@@ -230,7 +236,7 @@ function useSidebarCollapsed(
         const v =
           stored !== null
             ? (JSON.parse(stored) as boolean)
-            : window.innerWidth < 930;
+            : getScreenWidth() < 930;
         entry.collapsed = v;
         for (const l of entry.listeners) {
           l(v);
@@ -522,13 +528,13 @@ export function HelpToolsWidget(): JSX.Element {
   // back() uses window.history directly — popstate handler restores refs from the real URL.
   const navHistory = {
     pushState: (url: string): void => {
-      const u = new URL(url, window.location.origin);
+      const u = new URL(url, getCurrentOrigin());
       effectivePathnameRef.current = u.pathname;
       effectiveSearchRef.current = new URLSearchParams(u.search);
       silentHistory.pushState(url);
     },
     replaceState: (url: string): void => {
-      const u = new URL(url, window.location.origin);
+      const u = new URL(url, getCurrentOrigin());
       effectivePathnameRef.current = u.pathname;
       effectiveSearchRef.current = new URLSearchParams(u.search);
       silentHistory.replaceState(url);
@@ -541,8 +547,8 @@ export function HelpToolsWidget(): JSX.Element {
   const subscribePopState = useCallback((handler: () => void): (() => void) => {
     const wrappedHandler = (): void => {
       // Restore effective refs from the real browser URL on back/forward.
-      effectivePathnameRef.current = window.location.pathname;
-      effectiveSearchRef.current = new URLSearchParams(window.location.search);
+      effectivePathnameRef.current = getCurrentPathname();
+      effectiveSearchRef.current = new URLSearchParams(getCurrentSearch());
       handler();
     };
     window.addEventListener("popstate", wrappedHandler);

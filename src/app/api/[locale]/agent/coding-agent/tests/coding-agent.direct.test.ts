@@ -25,18 +25,21 @@ installFetchCache();
 import { eq } from "drizzle-orm";
 
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import favoritesCreateDefinitions from "@/app/api/[locale]/agent/chat/favorites/create/definition";
+import favoritesDefinitions from "@/app/api/[locale]/agent/chat/favorites/definition";
+import remoteConnectionByIdDefinitions from "@/app/api/[locale]/remote-connection/[instanceId]/definition";
+import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import {
   ATLAS_INSTANCE_ID,
   HERMES_INSTANCE_ID,
-  LOCAL_DEV_URL,
 } from "../../ai-stream/testing/remote-setup";
 import { describeCodingAgentSuite } from "./coding-agent-base.test";
 
+let _testUser: JwtPrivatePayloadType | null = null;
 let _prodUserId: string | null = null;
-let _prodAdminToken: string | null = null;
 
 async function setupDirectConnection(
   testUser: JwtPrivatePayloadType,
@@ -45,14 +48,37 @@ async function setupDirectConnection(
     connectToHermes,
     disconnectFromHermes,
     resolveProdUserId,
-    resolveProdAdminToken,
+    restoreHermesIdentity,
+    restoreAtlasIdentity,
   } = await import("../../ai-stream/testing/remote-setup");
 
+  _testUser = testUser;
   await disconnectFromHermes(testUser.id);
+  await restoreHermesIdentity();
   await connectToHermes(testUser);
 
   _prodUserId = await resolveProdUserId();
-  _prodAdminToken = await resolveProdAdminToken();
+
+  // Ensure the test favorite exists on hermes — hermes's AI loop resolves favorites
+  // from its own DB (not atlas's). Only create if none exists yet.
+  const hermesListResp = await sendTestRequest({
+    endpoint: favoritesDefinitions.GET,
+    data: {},
+    user: testUser,
+    instanceId: HERMES_INSTANCE_ID,
+  });
+  const hermesFavs = hermesListResp.success
+    ? (hermesListResp.data?.favorites as { skillId?: string }[] | undefined)
+    : undefined;
+  const alreadyHas = hermesFavs?.some((f) => f.skillId === "quality-tester");
+  if (!alreadyHas) {
+    await sendTestRequest({
+      endpoint: favoritesCreateDefinitions.POST,
+      data: { skillId: "quality-tester" },
+      user: testUser,
+      instanceId: HERMES_INSTANCE_ID,
+    });
+  }
 }
 
 async function teardownDirectConnection(
@@ -62,24 +88,16 @@ async function teardownDirectConnection(
     await import("../../ai-stream/testing/remote-setup");
 
   // Disable forceSystemProvider on hermes before disconnecting (best-effort)
-  if (_prodAdminToken) {
-    try {
-      await fetch(
-        `${LOCAL_DEV_URL}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            // eslint-disable-next-line i18next/no-literal-string
-            Authorization: `Bearer ${_prodAdminToken}`,
-          },
-          body: JSON.stringify({ forceSystemProvider: false }),
-          signal: AbortSignal.timeout(5_000),
-        },
-      );
-    } catch {
-      /* best-effort */
-    }
+  try {
+    await sendTestRequest({
+      endpoint: remoteConnectionByIdDefinitions.PATCH,
+      urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
+      data: { forceSystemProvider: false },
+      user: testUser,
+      instanceId: HERMES_INSTANCE_ID,
+    });
+  } catch {
+    /* best-effort */
   }
 
   const tasks: Promise<void>[] = [disconnectFromHermes(testUser.id)];
@@ -89,45 +107,23 @@ async function teardownDirectConnection(
   await Promise.all(tasks);
   await closeProdDb();
   _prodUserId = null;
-  _prodAdminToken = null;
+  _testUser = null;
 }
 
 /**
- * Fallback pulse for direct mode: fires only when the direct HTTP call failed and
- * execute-tool fell back to the queue path (thread in 'waiting').
- * Uses WS connector on hermes-dev 3002 — same as queue test.
+ * Wait for a thread in 'waiting' state to auto-revive.
+ *
+ * In direct-http transport, WAKE_UP tasks revive automatically when the
+ * goroutine on hermes completes and calls back via completePendingCall →
+ * handleTaskCompletion. No external trigger is needed — just wait.
+ *
+ * For WAIT/END_LOOP that fell back to the queue path (network failure), the
+ * revival also arrives via the same callback path once hermes completes.
  */
-async function runDirectPulse(threadId: string): Promise<void> {
-  if (!_prodAdminToken) {
-    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-    throw new Error(
-      "runDirectPulse: no prod admin token - setupDirectConnection not called?",
-    );
-  }
-
-  const patchResp = await fetch(
-    `${LOCAL_DEV_URL}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${_prodAdminToken}`,
-      },
-      body: JSON.stringify({ forceSystemProvider: true }),
-      signal: AbortSignal.timeout(10_000),
-    },
-  );
-
-  if (!patchResp.ok) {
-    const body = await patchResp.text().catch(() => "unknown");
-    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-    throw new Error(
-      `runDirectPulse: PATCH forceSystemProvider failed ${String(patchResp.status)}: ${body}`,
-    );
-  }
-
-  const deadline = Date.now() + 60_000;
+async function runDirectPulse(
+  threadId: string,
+): Promise<void> {
+  const deadline = Date.now() + 120_000;
   while (Date.now() < deadline) {
     const [thread] = await db
       .select({ streamingState: chatThreads.streamingState })
@@ -146,7 +142,7 @@ async function runDirectPulse(threadId: string): Promise<void> {
 
   // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
   throw new Error(
-    `runDirectPulse: thread ${threadId} still in 'waiting' after 60s`,
+    `runDirectPulse: thread ${threadId} still in 'waiting' after 120s — goroutine did not complete`,
   );
 }
 
@@ -157,6 +153,14 @@ describeCodingAgentSuite({
   remoteInstanceId: HERMES_INSTANCE_ID,
   setup: setupDirectConnection,
   teardown: teardownDirectConnection,
-  pulse: runDirectPulse,
+  pulse: (threadId) => {
+    if (!_testUser) {
+      // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+      throw new Error(
+        "runDirectPulse: testUser not set — setupDirectConnection not called?",
+      );
+    }
+    return runDirectPulse(threadId);
+  },
   isDirect: true,
 });

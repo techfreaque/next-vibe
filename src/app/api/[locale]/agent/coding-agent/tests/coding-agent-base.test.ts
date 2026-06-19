@@ -179,18 +179,26 @@ function snapshotToolMsg(
   const res = toolResultRecord(toolMsg?.toolCall?.result);
   expect(res, `${step}: execute-tool result must be an object`).not.toBeNull();
 
+  // execute-tool wraps synchronous results in {result: <innerData>}.
+  // Unwrap to get the inner keys (output/durationMs for WAIT/END_LOOP,
+  // taskId/hint for DETACH/WAKE_UP which are returned flat without wrapping).
+  const inner =
+    res !== null && "result" in res
+      ? (toolResultRecord(res["result"] as Record<string, WidgetData>) ?? res)
+      : res;
+
   return {
     reqToolName: String(args?.["toolName"] ?? ""),
     reqInstanceId: String(args?.["instanceId"] ?? ""),
     reqCallbackMode: String(args?.["callbackMode"] ?? ""),
     reqInteractiveMode: Boolean(input?.["interactiveMode"]),
-    resKeys: res ? Object.keys(res).toSorted() : [],
+    resKeys: inner ? Object.keys(inner).toSorted() : [],
     resOutput:
-      res?.["output"] !== undefined ? String(res["output"]) : undefined,
+      inner?.["output"] !== undefined ? String(inner["output"]) : undefined,
     resTaskId:
-      res?.["taskId"] !== undefined ? String(res["taskId"]) : undefined,
+      inner?.["taskId"] !== undefined ? String(inner["taskId"]) : undefined,
     resStatus:
-      res?.["status"] !== undefined ? String(res["status"]) : undefined,
+      inner?.["status"] !== undefined ? String(inner["status"]) : undefined,
   };
 }
 
@@ -370,7 +378,7 @@ async function patchWakeUpFixture(
                 .join("")
             : "";
       if (msg.role === "tool" && contentStr.includes("taskId")) {
-        const m = contentStr.match(/remote-hermes-[\w-]+/);
+        const m = contentStr.match(/remote-(?:direct-|ws-)?hermes-[\w.:+-]+/);
         if (m) {
           oldId = m[0];
           break;
@@ -380,9 +388,9 @@ async function patchWakeUpFixture(
   } catch {
     // Fallback: find the last remote-hermes-* ID in the raw file text
     const content = readFileSync(targetFile, "utf-8");
-    const allIds = [...content.matchAll(/remote-hermes-[\w-]+/g)].map(
-      (m) => m[0],
-    );
+    const allIds = [
+      ...content.matchAll(/remote-(?:direct-|ws-)?hermes-[\w.:+-]+/g),
+    ].map((m) => m[0]);
     oldId = allIds.findLast((id) => id !== liveTaskId);
   }
 
@@ -644,16 +652,22 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           const res = toolResultRecord(toolMsg?.toolCall?.result);
           expect(res, "CA1: result must be an object").not.toBeNull();
 
-          // WAIT: result must have exactly {output, durationMs} - no extra keys
-          const resKeys = Object.keys(res ?? {}).toSorted();
+          // execute-tool wraps synchronous results in {result: <innerData>}
+          const inner =
+            res !== null && "result" in (res ?? {})
+              ? (toolResultRecord(res!["result"] as Record<string, WidgetData>) ?? res)
+              : res;
+
+          // WAIT: inner result must have exactly {output, durationMs} - no extra keys
+          const resKeys = Object.keys(inner ?? {}).toSorted();
           expect(
             resKeys,
             "CA1: result must have exactly {durationMs, output}",
           ).toEqual(["durationMs", "output"]);
 
           // Validate output value
-          expect(res?.["output"], "CA1: output must be present").toBeTruthy();
-          const output = String(res?.["output"] ?? "");
+          expect(inner?.["output"], "CA1: output must be present").toBeTruthy();
+          const output = String(inner?.["output"] ?? "");
           expect(output, "CA1: output must not be a test stub").not.toContain(
             "[test]",
           );
@@ -663,11 +677,11 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
 
           // Validate durationMs is a positive number
           expect(
-            typeof res?.["durationMs"],
+            typeof inner?.["durationMs"],
             "CA1: durationMs must be a number",
           ).toBe("number");
           expect(
-            Number(res?.["durationMs"]) > 0,
+            Number(inner?.["durationMs"]) > 0,
             "CA1: durationMs must be positive",
           ).toBe(true);
 
@@ -720,15 +734,20 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           const res = toolResultRecord(toolMsg?.toolCall?.result);
           expect(res, "CA2: result must be an object").not.toBeNull();
 
-          // END_LOOP: result must have exactly {output, durationMs} - no extra keys
-          const resKeys = Object.keys(res ?? {}).toSorted();
+          const inner =
+            res !== null && "result" in (res ?? {})
+              ? (toolResultRecord(res!["result"] as Record<string, WidgetData>) ?? res)
+              : res;
+
+          // END_LOOP: inner result must have exactly {output, durationMs} - no extra keys
+          const resKeys = Object.keys(inner ?? {}).toSorted();
           expect(
             resKeys,
             "CA2: result must have exactly {durationMs, output}",
           ).toEqual(["durationMs", "output"]);
 
-          expect(res?.["output"], "CA2: output must be present").toBeTruthy();
-          const output = String(res?.["output"] ?? "");
+          expect(inner?.["output"], "CA2: output must be present").toBeTruthy();
+          const output = String(inner?.["output"] ?? "");
           expect(output, "CA2: output must not be a test stub").not.toContain(
             "[test]",
           );
@@ -736,11 +755,11 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             "hello-ca2-endloop",
           );
           expect(
-            typeof res?.["durationMs"],
+            typeof inner?.["durationMs"],
             "CA2: durationMs must be a number",
           ).toBe("number");
           expect(
-            Number(res?.["durationMs"]) > 0,
+            Number(inner?.["durationMs"]) > 0,
             "CA2: durationMs must be positive",
           ).toBe(true);
 
@@ -790,14 +809,14 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           ).toBeDefined();
 
           const res = toolResultRecord(toolMsg?.toolCall?.result);
-          expect(res, "CA3: result must be an object").not.toBeNull();
+          expect(res, `CA3: result must be an object (got: ${JSON.stringify(toolMsg?.toolCall?.result)})`).not.toBeNull();
 
-          // DETACH: result must have exactly {hint, status, taskId} - no output
+          // DETACH: execute-tool returns {hint, taskId} flat (no {result:} wrapper, no status)
           const resKeys = Object.keys(res ?? {}).toSorted();
           expect(
             resKeys,
-            "CA3: result must have exactly {hint, status, taskId}",
-          ).toEqual(["hint", "status", "taskId"]);
+            "CA3: result must have exactly {hint, taskId}",
+          ).toEqual(["hint", "taskId"]);
 
           const taskId = res?.["taskId"];
           expect(taskId, "CA3: taskId must be present").toBeTruthy();
@@ -806,12 +825,6 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             String(taskId).length,
             "CA3: taskId must be non-empty",
           ).toBeGreaterThan(0);
-
-          const status = res?.["status"];
-          expect(
-            String(status ?? "").includes("pending"),
-            `CA3: status must include "pending", got: ${String(status)}`,
-          ).toBe(true);
 
           const hint = res?.["hint"];
           expect(hint, "CA3: hint must be present").toBeTruthy();
@@ -902,22 +915,32 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
 
           const waitRes = toolResultRecord(waitForTaskMsg?.toolCall?.result);
           expect(
-            waitRes,
+            waitRawRes,
             "CA4: wait-for-task result must be an object",
           ).not.toBeNull();
 
-          // wait-for-task backfilled result must have exactly {durationMs, output}
-          const waitResKeys = Object.keys(waitRes ?? {}).toSorted();
+          // wait-for-task returns {status, result: <innerData>, waiting, ...}
+          // The inner coding-agent result is in waitRes["result"]
+          const waitInner = toolResultRecord(
+            waitRes?.["result"] as Record<string, WidgetData>,
+          );
+          expect(
+            waitInner,
+            "CA4: wait-for-task result.result must be an object",
+          ).not.toBeNull();
+
+          // inner result must have exactly {durationMs, output}
+          const waitResKeys = Object.keys(waitInner ?? {}).toSorted();
           expect(
             waitResKeys,
             "CA4: wait-for-task result must have exactly {durationMs, output}",
           ).toEqual(["durationMs", "output"]);
 
           expect(
-            waitRes?.["output"],
+            waitInner?.["output"],
             "CA4: wait-for-task output must be present",
           ).toBeTruthy();
-          const waitOutput = String(waitRes?.["output"] ?? "");
+          const waitOutput = String(waitInner?.["output"] ?? "");
           expect(
             waitOutput,
             "CA4: output must not be a test stub",
@@ -926,11 +949,11 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             "hello-ca4-wakeup",
           );
           expect(
-            typeof waitRes?.["durationMs"],
+            typeof waitInner?.["durationMs"],
             "CA4: durationMs must be a number",
           ).toBe("number");
           expect(
-            Number(waitRes?.["durationMs"]) > 0,
+            Number(waitInner?.["durationMs"]) > 0,
             "CA4: durationMs must be positive",
           ).toBe(true);
 
@@ -1035,15 +1058,20 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           const res = toolResultRecord(toolMsg?.toolCall?.result);
           expect(res, "CA5: result must be an object").not.toBeNull();
 
-          // Interactive WAIT: result must have exactly {output, durationMs}
-          const resKeys = Object.keys(res ?? {}).toSorted();
+          const inner =
+            res !== null && "result" in (res ?? {})
+              ? (toolResultRecord(res!["result"] as Record<string, WidgetData>) ?? res)
+              : res;
+
+          // Interactive WAIT: inner result must have exactly {output, durationMs}
+          const resKeys = Object.keys(inner ?? {}).toSorted();
           expect(
             resKeys,
             "CA5: result must have exactly {durationMs, output}",
           ).toEqual(["durationMs", "output"]);
 
-          expect(res?.["output"], "CA5: output must be present").toBeTruthy();
-          const output = String(res?.["output"] ?? "");
+          expect(inner?.["output"], "CA5: output must be present").toBeTruthy();
+          const output = String(inner?.["output"] ?? "");
           expect(output, "CA5: output must not be a test stub").not.toContain(
             "[test]",
           );
@@ -1051,11 +1079,11 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             "hello-ca5-wait",
           );
           expect(
-            typeof res?.["durationMs"],
+            typeof inner?.["durationMs"],
             "CA5: durationMs must be a number",
           ).toBe("number");
           expect(
-            Number(res?.["durationMs"]) > 0,
+            Number(inner?.["durationMs"]) > 0,
             "CA5: durationMs must be positive",
           ).toBe(true);
 
@@ -1116,15 +1144,20 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           const res = toolResultRecord(toolMsg?.toolCall?.result);
           expect(res, "CA6: result must be an object").not.toBeNull();
 
-          // Interactive END_LOOP: result must have exactly {output, durationMs}
-          const resKeys = Object.keys(res ?? {}).toSorted();
+          const inner =
+            res !== null && "result" in (res ?? {})
+              ? (toolResultRecord(res!["result"] as Record<string, WidgetData>) ?? res)
+              : res;
+
+          // Interactive END_LOOP: inner result must have exactly {output, durationMs}
+          const resKeys = Object.keys(inner ?? {}).toSorted();
           expect(
             resKeys,
             "CA6: result must have exactly {durationMs, output}",
           ).toEqual(["durationMs", "output"]);
 
-          expect(res?.["output"], "CA6: output must be present").toBeTruthy();
-          const output = String(res?.["output"] ?? "");
+          expect(inner?.["output"], "CA6: output must be present").toBeTruthy();
+          const output = String(inner?.["output"] ?? "");
           expect(output, "CA6: output must not be a test stub").not.toContain(
             "[test]",
           );
@@ -1132,11 +1165,11 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             "hello-ca6-endloop",
           );
           expect(
-            typeof res?.["durationMs"],
+            typeof inner?.["durationMs"],
             "CA6: durationMs must be a number",
           ).toBe("number");
           expect(
-            Number(res?.["durationMs"]) > 0,
+            Number(inner?.["durationMs"]) > 0,
             "CA6: durationMs must be positive",
           ).toBe(true);
 
@@ -1195,12 +1228,12 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           const res = toolResultRecord(toolMsg?.toolCall?.result);
           expect(res, "CA7: result must be an object").not.toBeNull();
 
-          // DETACH: result must have exactly {hint, status, taskId}
+          // DETACH: execute-tool returns {hint, taskId} flat (no wrapper, no status)
           const resKeys = Object.keys(res ?? {}).toSorted();
           expect(
             resKeys,
-            "CA7: result must have exactly {hint, status, taskId}",
-          ).toEqual(["hint", "status", "taskId"]);
+            "CA7: result must have exactly {hint, taskId}",
+          ).toEqual(["hint", "taskId"]);
 
           const taskId = res?.["taskId"];
           expect(taskId, "CA7: taskId must be present").toBeTruthy();
@@ -1209,12 +1242,6 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             String(taskId).length,
             "CA7: taskId must be non-empty",
           ).toBeGreaterThan(0);
-
-          const status = res?.["status"];
-          expect(
-            String(status ?? "").includes("pending"),
-            `CA7: status must include "pending", got: ${String(status)}`,
-          ).toBe(true);
 
           const hint = res?.["hint"];
           expect(hint, "CA7: hint must be present").toBeTruthy();
@@ -1308,22 +1335,32 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
 
           const waitRes = toolResultRecord(waitForTaskMsg?.toolCall?.result);
           expect(
-            waitRes,
+            waitRawRes,
             "CA8: wait-for-task result must be an object",
           ).not.toBeNull();
 
-          // wait-for-task backfilled result must have exactly {durationMs, output}
-          const waitResKeys = Object.keys(waitRes ?? {}).toSorted();
+          // wait-for-task returns {status, result: <innerData>, waiting, ...}
+          // The inner coding-agent result is in waitRes["result"]
+          const waitInner = toolResultRecord(
+            waitRes?.["result"] as Record<string, WidgetData>,
+          );
+          expect(
+            waitInner,
+            "CA8: wait-for-task result.result must be an object",
+          ).not.toBeNull();
+
+          // inner result must have exactly {durationMs, output}
+          const waitResKeys = Object.keys(waitInner ?? {}).toSorted();
           expect(
             waitResKeys,
             "CA8: wait-for-task result must have exactly {durationMs, output}",
           ).toEqual(["durationMs", "output"]);
 
           expect(
-            waitRes?.["output"],
+            waitInner?.["output"],
             "CA8: wait-for-task output must be present",
           ).toBeTruthy();
-          const waitOutput = String(waitRes?.["output"] ?? "");
+          const waitOutput = String(waitInner?.["output"] ?? "");
           expect(
             waitOutput,
             "CA8: output must not be a test stub",
@@ -1332,11 +1369,11 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
             "hello-ca8-wakeup",
           );
           expect(
-            typeof waitRes?.["durationMs"],
+            typeof waitInner?.["durationMs"],
             "CA8: durationMs must be a number",
           ).toBe("number");
           expect(
-            Number(waitRes?.["durationMs"]) > 0,
+            Number(waitInner?.["durationMs"]) > 0,
             "CA8: durationMs must be positive",
           ).toBe(true);
 

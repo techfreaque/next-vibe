@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/analytics/indicators/window-max")({
+export const Route = createFileRoute(
+  "/api/$locale/analytics/indicators/window-max",
+)({
   server: {
     handlers: wrapNextApiRoute(
       () => import("@/app/api/[locale]/analytics/indicators/window-max/route"),

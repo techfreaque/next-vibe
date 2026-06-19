@@ -27,6 +27,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { assignUrl, getCurrentOrigin } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 
 import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
@@ -79,22 +80,23 @@ export function SubscriptionOverviewContainer(_props: {
 
   const handleManageSubscription = async (): Promise<void> => {
     if (subscription.provider === PaymentProvider.NOWPAYMENTS) {
-      // eslint-disable-next-line no-alert
+      // TODO should not use alert at all. super shitty ux. needs proper solution with brain activated!
       window.alert(t("manage.nowpayments.info"));
       return;
     }
 
     portal.create.setValue(
       "returnUrl",
-      `${window.location.origin}/${locale}/subscription`,
+      `${getCurrentOrigin()}/${locale}/subscription`,
     );
     await portal.create.submitForm({
       onSuccess: ({ responseData }) => {
         if (responseData.customerPortalUrl) {
-          window.location.href = responseData.customerPortalUrl;
+          assignUrl(responseData.customerPortalUrl);
         }
       },
       onError: ({ error }) => {
+        // oxlint-disable-next-line restricted-syntax -- alert for error notification
         // eslint-disable-next-line no-alert
         window.alert(error.message ?? t("manage.portal.error"));
       },

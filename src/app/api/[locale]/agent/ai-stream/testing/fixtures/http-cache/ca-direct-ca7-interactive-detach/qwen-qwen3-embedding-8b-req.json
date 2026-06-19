@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "Assistant: <think>The user wants me to call `execute-tool` with:\n- toolName='coding-agent'\n- instanceId='hermes'\n- input containing prompt='echo hello-ca5-wait', interactiveMode=true\n- callbackMode='wait'\n\nThen after revival, verify the result contains \"hello-ca5-wait\", reply with STEP_OK and quote the exact output.\n\nI need to use `execute-tool` for this. Let me check if I need `tool-help` first - I haven't used `execute-tool` this session, but I know its schema from the system prompt. Actually, the rules say \"Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session.\" But `execute-tool` is a dispatcher and I use it to call other tools. The target is `coding-agent` on instance `hermes`.\n\nLooking at the remote tools section, there's `hermes__coding-agent [remote]\n\nAssistant: <think>The result came back inline because the task completed quickly. The output is \"hello-ca5-wait\\n\" which contains \"hello-ca5-wait\". I should reply with STEP_OK and quote the exact output.</think>STEP_OK\n\nExact output:\n```\nhello-ca5-wait\n```\n\nUser: [CA6] Call execute-tool with toolName='coding-agent', instanceId='hermes', prompt='echo hello-ca6-endloop', interactiveMode=true, callbackMode='endLoop'. Stream stops after execution. Confirm output contains \"hello-ca6-endloop\". Reply with STEP_OK.\n\nAssistant: <think>The user wants me to call execute-tool with:\n- toolName='coding-agent'\n- instanceId='hermes'\n- prompt='echo hello-ca6-endloop'\n- interactiveMode=true\n- callbackMode='endLoop'\n\nAfter execution, I need to confirm the output contains \"hello-ca6-endloop\" and reply with STEP_OK.\n\nSince callbackMode is 'endLoop', the stream will stop after execution. But I still need to verify the result. Let me make the call.\n\nWait - callbackMode 'endLoop' means the tool call will end the entire turn. But the user wants me to confirm output contains the string. If I use endLoop, the turn ends immediately and I can't verify.\n\nActually, looking at the instructions more carefully: \"callbackMode='endLoop'. Stream stops after execution. Confirm output contains \"hello-ca6-endloop\". Reply with STEP_OK.\"\n\nThe ex\n\nUser: [CA7] Call execute-tool with toolName='coding-agent', instanceId='hermes', prompt='echo hello-ca7-detach', interactiveMode=true, callbackMode='detach'. Must return taskId immediately. Confirm you got a taskId string. Reply with STEP_OK including the taskId.",
+    "encoding_format": "float"
+  }
+}

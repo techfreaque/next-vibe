@@ -6,6 +6,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
+import { storage } from "next-vibe-ui/lib/storage";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CountryLanguage } from "@/i18n/core/config";

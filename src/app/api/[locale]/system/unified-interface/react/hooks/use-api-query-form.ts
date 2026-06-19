@@ -419,11 +419,11 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       if (formValues && Object.keys(formValues).length > 0) {
         // Clear any existing timer
         if (persistDebounceTimer !== null) {
-          window.clearTimeout(persistDebounceTimer);
+          clearTimeout(persistDebounceTimer);
         }
 
         // Set a new timer
-        persistDebounceTimer = window.setTimeout(() => {
+        persistDebounceTimer = setTimeout(() => {
           void (async (): Promise<void> => {
             try {
               await storage.setItem(storageKey, JSON.stringify(formValues));
@@ -439,7 +439,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     return (): void => {
       subscription.unsubscribe();
       if (persistDebounceTimer !== null) {
-        window.clearTimeout(persistDebounceTimer);
+        clearTimeout(persistDebounceTimer);
       }
     };
   }, [storageKey, persistForm]);
@@ -620,7 +620,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           debounceTimerRef.current = null;
         }
 
-        debounceTimerRef.current = window.setTimeout(() => {
+        debounceTimerRef.current = setTimeout(() => {
           if (!isMounted) {
             return;
           }

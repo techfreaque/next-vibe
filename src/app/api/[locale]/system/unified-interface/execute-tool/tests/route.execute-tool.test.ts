@@ -37,6 +37,7 @@ import {
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { db } from "@/app/api/[locale]/system/db";
 import helpEndpoints from "@/app/api/[locale]/system/help/definition";
+import type { AiT } from "@/app/api/[locale]/system/unified-interface/ai/i18n";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
@@ -82,13 +83,13 @@ async function pollTaskCompletion(
     if (s === CronTaskStatus.COMPLETED || s === CronTaskStatus.FAILED) {
       return s;
     }
-    await new Promise((r) => setTimeout(r, 200));
+    await new Promise<void>((resolve) => { setTimeout(resolve, 200); });
   }
   return null;
 }
 
 /** Get AI i18n t() for error message construction in dismiss-task. */
-async function getAiT() {
+async function getAiT(): Promise<AiT> {
   const { scopedTranslation } =
     await import("@/app/api/[locale]/system/unified-interface/ai/i18n");
   return scopedTranslation.scopedT(defaultLocale).t;
@@ -669,7 +670,7 @@ describe("Execute-Tool E2E", () => {
         }
       });
 
-      function requireRemote() {
+      function requireRemote(): void {
         if (_remoteConnectError) {
           // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
           throw new Error(
@@ -901,6 +902,155 @@ describe("Execute-Tool E2E", () => {
     it("ET-REMOTE-*: Hermes not running — remote tests skipped (run: vibe --hermes dev)", () => {
       // Explicit skip marker so the suite still shows something.
       expect(true).toBe(true);
+    });
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // REMOTE TESTS — REVERSE-WS TRANSPORT
+  // Same as direct-http block above but using connectToHermesLocalAi():
+  //   atlas sends tool-execute-request over reverse-WS hub channel,
+  //   hermes executes, publishes tool-execute-result back on hub,
+  //   connector receives via onRemoteEvent["tool-execute-result"] → completePendingCall.
+  // ════════════════════════════════════════════════════════════════════════════
+
+  if (_resolvedRemoteUrl) {
+    describe(`Remote dispatch reverse-WS → ${_resolvedRemoteUrl}`, () => {
+      let _remoteConnectError: string | null = null;
+
+      beforeAll(async () => {
+        const { connectToHermesLocalAi, disconnectFromHermes } =
+          await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
+        try {
+          await disconnectFromHermes(testUser.id);
+          await connectToHermesLocalAi(testUser, _resolvedRemoteUrl);
+        } catch (err) {
+          _remoteConnectError = String(err);
+        }
+      }, 120_000);
+
+      afterAll(async () => {
+        const { disconnectFromHermesLocalAi, closeProdDb } =
+          await import("@/app/api/[locale]/agent/ai-stream/testing/remote-setup");
+        await disconnectFromHermesLocalAi(testUser, _resolvedRemoteUrl);
+        await closeProdDb();
+      }, 60_000);
+
+      it("prerequisites: hermes connected via reverse-WS", () => {
+        if (_remoteConnectError) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(
+            `Reverse-WS connection failed — run: vibe --hermes dev\n${_remoteConnectError}`,
+          );
+        }
+      });
+
+      function requireReverseWs(): void {
+        if (_remoteConnectError) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(
+            `Skipped — fix prerequisites test first: ${_remoteConnectError}`,
+          );
+        }
+      }
+
+      // ── ET-RWS-WAIT ───────────────────────────────────────────────────────
+      // WAIT via reverse-WS: hub dispatches tool-execute-request; hermes executes
+      // and publishes tool-execute-result back on hub; pending call completes inline.
+
+      it("ET-RWS-WAIT: reverse-WS WAIT returns result inline, no taskId", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-wait");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: "tool-help",
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.WAIT,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-WAIT failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(data, "Reverse-WS WAIT must have result field").toHaveProperty("result");
+        expect(data.taskId, "Reverse-WS WAIT must not return taskId").toBeUndefined();
+      }, 60_000);
+
+      // ── ET-RWS-END-LOOP ───────────────────────────────────────────────────
+
+      it("ET-RWS-END-LOOP: reverse-WS END_LOOP returns result inline, no taskId", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-end-loop");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: "tool-help",
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.END_LOOP,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-END-LOOP failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(data, "Reverse-WS END_LOOP must have result field").toHaveProperty("result");
+        expect(data.taskId, "Reverse-WS END_LOOP must not return taskId").toBeUndefined();
+      }, 60_000);
+
+      // ── ET-RWS-DETACH ─────────────────────────────────────────────────────
+
+      it("ET-RWS-DETACH: reverse-WS DETACH returns taskId immediately", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-detach");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: "tool-help",
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.DETACH,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-DETACH failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(data.taskId, "Reverse-WS DETACH must return taskId").toBeTruthy();
+        expect(data.hint, "Reverse-WS DETACH must return hint").toBeTruthy();
+        expect(data.result, "Reverse-WS DETACH must not return inline result").toBeUndefined();
+      }, 60_000);
     });
   }
 });

@@ -10,6 +10,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { downloadFile } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React, { useCallback, useRef } from "react";
 

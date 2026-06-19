@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [Context: ID:568db49f | Posted:Jun 19, 19:51]\n\nUser: [CA8] Call execute-tool with toolName='coding-agent', instanceId='hermes', prompt='echo hello-ca8-wakeup', interactiveMode=true, callbackMode='wakeUp' ONCE. After the tool returns a taskId, call wait-for-task ONCE with that taskId. Do NOT call execute-tool again under any circumstances. When wait-for-task returns with output, verify it contains \"hello-ca8-wakeup\" then reply STEP_OK quoting the exact output value.\n\nSystem: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (17)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the co\n\nSystem: [Context: ID:847861aa | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 19, 19:51]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"coding-agent\",\"input\":{\"interactiveMode\":true,\"prompt\":\"echo hello-ca8-wakeup\"},\"instanceId\":\"hermes\",\"callbackMode\":\"wakeUp\"}\n\nTool: [result:execute-tool] {\"taskId\":\"remote-direct-hermes-functions.execute-tool:3\",\"hint\":\"Result/return will be injected when complete and wakes up the thread. Call wait-for-task only if you need the result before continuing.\"}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"wait-for-task\",\"input\":{\"taskId\":\"remote-direct-hermes-functions.execute-tool:3\"},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"result\":{\"status\":\"status.completed\",\"result\":{\"result\":{\"output\":\"hello-ca8-wakeup\\n\",\"durationMs\":2563}},\"waiting\":false,\"originalToolName\":\"coding-agent\"}}",
+    "encoding_format": "float"
+  }
+}

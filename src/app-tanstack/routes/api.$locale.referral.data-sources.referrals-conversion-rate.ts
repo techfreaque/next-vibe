@@ -3,10 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-export const Route = createFileRoute("/api/$locale/referral/data-sources/referrals-conversion-rate")({
+export const Route = createFileRoute(
+  "/api/$locale/referral/data-sources/referrals-conversion-rate",
+)({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/referral/data-sources/referrals-conversion-rate/route"),
+      () =>
+        import("@/app/api/[locale]/referral/data-sources/referrals-conversion-rate/route"),
     ),
   },
 });

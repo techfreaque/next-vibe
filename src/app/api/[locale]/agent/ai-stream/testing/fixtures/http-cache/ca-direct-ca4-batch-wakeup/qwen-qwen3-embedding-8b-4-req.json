@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "User: [CA4] Call execute-tool with toolName='coding-agent', instanceId='hermes', prompt='echo hello-ca4-wakeup', interactiveMode=false, callbackMode='wakeUp' ONCE. After the tool returns a taskId, call the wait-for-task tool DIRECTLY (do NOT wrap it in execute-tool) with that exact taskId. Do NOT call execute-tool again under any circumstances. When wait-for-task returns with output, verify it contains \"hello-ca4-wakeup\" then reply STEP_OK quoting the exact output value.\n\nAssistant: <think>The user wants me to:\n1. Call execute-tool with toolName='coding-agent', instanceId='hermes', prompt='echo hello-ca4-wakeup', interactiveMode=false, callbackMode='wakeUp' ONCE.\n2. After the tool returns a taskId, call the wait-for-task tool DIRECTLY (do NOT wrap it in execute-tool) with that exact taskId.\n3. Do NOT call execute-tool again under any circumstances.\n4. When wait-for-task returns with output,</think>\n\nAssistant: <think>The execute-tool returned with callbackMode 'wakeUp'. It returned a taskId: \"remote-direct-hermes-functions.execute-tool:5\". Now I need to call wait-for-task DIRECTLY (not wrapped in execute-tool) with that exact taskId.</think>\n\nUser:",
+    "encoding_format": "float"
+  }
+}

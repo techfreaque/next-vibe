@@ -93,6 +93,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { addWindowListener, copyToClipboard } from "next-vibe-ui/utils/browser";
 import React, {
   useCallback,
   useEffect,
@@ -1359,9 +1360,7 @@ const NodeInspector = React.memo(function NodeInspector({
                 size="sm"
                 className="h-6 w-6 p-0 shrink-0"
                 onClick={() => {
-                  void navigator.clipboard.writeText(
-                    nodeConfig.endpointPath ?? "",
-                  );
+                  void copyToClipboard(nodeConfig.endpointPath ?? "");
                 }}
                 title="Copy path"
               >
@@ -2810,8 +2809,8 @@ function EditFormInner({
         setTimeout(() => onSubmit?.(), 0);
       }
     };
-    window.addEventListener("keydown", handler);
-    return (): void => window.removeEventListener("keydown", handler);
+    const cleanup = addWindowListener("keydown", handler);
+    return cleanup;
   }, [syncFormValues, onSubmit]);
 
   if (isLoading) {

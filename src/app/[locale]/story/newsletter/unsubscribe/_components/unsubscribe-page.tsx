@@ -10,6 +10,7 @@ import { X } from "next-vibe-ui/ui/icons/X";
 import { Input } from "next-vibe-ui/ui/input";
 import { Link } from "next-vibe-ui/ui/link";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
+import { assignUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import React, { useEffect, useRef } from "react";
 
@@ -226,7 +227,7 @@ export function UnsubscribePage({
           <Div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               onClick={() => {
-                window.location.href = `/${locale}/story/newsletter`;
+                assignUrl(`/${locale}/story/newsletter`);
               }}
               variant="outline"
               size="lg"
@@ -236,7 +237,7 @@ export function UnsubscribePage({
             </Button>
             <Button
               onClick={() => {
-                window.location.href = `/${locale}/help`;
+                assignUrl(`/${locale}/help`);
               }}
               variant="outline"
               size="lg"

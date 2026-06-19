@@ -10,6 +10,7 @@ import {
 } from "next-vibe-ui/ui/dropdown-menu";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useState } from "react";
 

@@ -6,6 +6,7 @@ import { Strong } from "next-vibe-ui/ui/strong";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import { Ul } from "next-vibe-ui/ui/ul";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
+import { getRootCssVar } from "next-vibe-ui/utils/browser";
 
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
 import type { ThreadsWidgetT } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";

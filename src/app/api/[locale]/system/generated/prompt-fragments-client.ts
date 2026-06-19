@@ -13,11 +13,8 @@
 
 import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 
-// Fragment objects - from each module's system-prompt/prompt.ts
-import { autonomyStatusFragment, bootstrapFragment, extraInstructionsFragment, folderContextFragment, formattingFragment, guestContextFragment, headlessContextFragment, identityFragment, languageFragment, mediaCapabilitiesFragment, messageMetadataFragment, platformOverviewFragment, subAgentGuardFragment, toolExecutionControlFragment, userNameFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/prompt";
-import { codingAgentSettingFragment } from "@/app/api/[locale]/agent/chat/settings/system-prompt/prompt";
+// Fragment objects - only fragments with client.ts hooks (used in buildLines below)
 import { contactFragment } from "@/app/api/[locale]/contact/system-prompt/prompt";
-import { cortexFragment } from "@/app/api/[locale]/agent/cortex/system-prompt/prompt";
 import { desktopFragment } from "@/app/api/[locale]/desktop/system-prompt/prompt";
 import { favoritesFragment } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt";
 import { remoteInstancesFragment, sshConnectionsFragment, systemContextFragment } from "@/app/api/[locale]/remote-connection/system-prompt/prompt";

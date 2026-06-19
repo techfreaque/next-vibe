@@ -13,6 +13,7 @@ import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Input } from "next-vibe-ui/ui/input";
 import { Link } from "next-vibe-ui/ui/link";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
+import { scrollToTop } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 
@@ -286,7 +287,7 @@ export function NewsletterPage({
           <Button
             onClick={() => {
               // Scroll to top form
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              scrollToTop();
             }}
             variant="secondary"
             size="lg"

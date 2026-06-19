@@ -3,7 +3,7 @@
 import type { JSX } from "react";
 
 type VideoProps = React.VideoHTMLAttributes<HTMLVideoElement> & {
-  track: React.TrackHTMLAttributes<HTMLTrackElement>;
+  track?: React.TrackHTMLAttributes<HTMLTrackElement>;
 };
 
 export function Video({ track, children, ...props }: VideoProps): JSX.Element {

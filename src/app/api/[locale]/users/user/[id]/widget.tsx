@@ -35,6 +35,7 @@ import { UuidFieldWidget } from "next-vibe-ui/unified/form-fields/uuid-field/wid
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
+import { copyToClipboard } from "next-vibe-ui/utils/browser";
 import React, { useCallback, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
@@ -172,7 +173,7 @@ export function UserDetailContainer({
       return;
     }
     void (async (): Promise<void> => {
-      await navigator.clipboard.writeText(userId);
+      await copyToClipboard(userId);
       setCopiedId(true);
       setTimeout((): void => {
         setCopiedId(false);
@@ -185,7 +186,7 @@ export function UserDetailContainer({
       return;
     }
     void (async (): Promise<void> => {
-      await navigator.clipboard.writeText(leadId);
+      await copyToClipboard(leadId);
       setCopiedLeadId(true);
       setTimeout((): void => {
         setCopiedLeadId(false);
@@ -469,7 +470,7 @@ export function UserEditContainer({
       return;
     }
     void (async (): Promise<void> => {
-      await navigator.clipboard.writeText(userId);
+      await copyToClipboard(userId);
       setCopiedId(true);
       setTimeout((): void => setCopiedId(false), 2000);
     })();
@@ -480,7 +481,7 @@ export function UserEditContainer({
       return;
     }
     void (async (): Promise<void> => {
-      await navigator.clipboard.writeText(leadId);
+      await copyToClipboard(leadId);
       setCopiedLeadId(true);
       setTimeout((): void => setCopiedLeadId(false), 2000);
     })();

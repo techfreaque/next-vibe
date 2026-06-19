@@ -23,6 +23,7 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
+import { openInNewTab } from "next-vibe-ui/utils/browser";
 import React, { useCallback } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";

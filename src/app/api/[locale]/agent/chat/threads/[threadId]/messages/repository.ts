@@ -18,7 +18,6 @@ import { z } from "zod";
 import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/branch-utils";
 import { db } from "@/app/api/[locale]/system/db";
-import type { OnRemoteEventMap } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
@@ -34,6 +33,7 @@ import {
   type ChatMessage,
   chatMessages,
   chatThreads,
+  type MessageMetadata,
   type ToolCall,
 } from "../../../db";
 import {
@@ -49,7 +49,6 @@ import type {
   MessageCreateRequestOutput,
   MessageCreateResponseOutput,
   MessageListResponseOutput,
-  MessageListUrlParamsTypeOutput,
 } from "./definition";
 import { type MessagesT, scopedTranslation } from "./i18n";
 

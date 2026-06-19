@@ -85,6 +85,48 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  dismissTask: {
+    post: {
+      title: "Odrzuć zadanie",
+      titleShort: "Odrzuć",
+      description:
+        "Anuluje oczekujące wznowienie wakeUp. Narzędzie działa dalej w tle, wątek zostaje natychmiast odblokowany. Wynik jest cicho odrzucany po zakończeniu.",
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "callId jest wymagany",
+        },
+        unauthorized: {
+          title: "Nieautoryzowany",
+          description: "Wymagane uwierzytelnienie",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Odmowa dostępu",
+        },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Brak oczekującego wywołania dla tego callId",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Nie udało się odrzucić oczekującego wywołania",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Błąd sieci podczas odrzucania zadania",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+      },
+      success: {
+        title: "Zadanie odrzucone",
+        description: "Wątek odblokowany. Narzędzie działa dalej w tle.",
+      },
+    },
+  },
   tools: {
     get: {
       title: "Pomoc narzędzi - odkryj dostępne narzędzia AI",

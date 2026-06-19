@@ -1580,9 +1580,6 @@ export class ViteCompiler {
               } as never);
             },
             handleHotUpdate({ modules, server: viteServer }) {
-              const msg = `[widget-hmr-debug] handleHotUpdate: ${modules.map((m) => m.id).join(", ")} | ${JSON.stringify(modules)}`;
-              process.stdout.write(`${msg}\n`);
-              serverFileLog(msg);
               const srcModules = modules.filter((m) => m.id?.includes("/src/"));
               if (srcModules.length === 0) {
                 return;
@@ -1597,6 +1594,13 @@ export class ViteCompiler {
               if (nonCssModules.length === 0) {
                 return;
               }
+
+              const changedFiles = nonCssModules
+                .map((m) => m.id?.replace(/^.*\/src\//, "src/") ?? m.id)
+                .join(", ");
+              const hmrMsg = fmtVite(`HMR update: ${changedFiles}`);
+              process.stdout.write(`${hmrMsg}\n`);
+              serverFileLog(hmrMsg);
 
               // SSR: clear the runner evaluated-module cache so stale
               // __vite_ssr_import_N__ bindings from circular deps are reset,
@@ -1791,6 +1795,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 filePath.includes("/.next-prod/") ||
                 filePath.includes("/.next-rebuild/") ||
                 filePath.includes("/node_modules/") ||
+                filePath.includes("/.claude/") ||
                 filePath.endsWith("/routeTree.gen.ts") ||
                 filePath.includes("/app-tanstack/routes/") ||
                 filePath.includes("/system/generated/") ||
@@ -1798,6 +1803,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 filePath.includes("/app-native/") ||
                 filePath.includes("/test-files/") ||
                 filePath.includes("/testing/") ||
+                filePath.includes("/fixtures/") ||
                 filePath.endsWith(".test.ts") ||
                 filePath.endsWith(".test.tsx") ||
                 filePath.endsWith(".spec.ts") ||
