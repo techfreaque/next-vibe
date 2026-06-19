@@ -70,6 +70,7 @@ export class StreamStartHandler {
     logger: EndpointLogger;
     wsEmit: WsEmitCallback;
     emitTitle: EmitThreadTitleFn;
+    availability: AgentEnvAvailability;
     /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;
   }): {

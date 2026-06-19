@@ -9,6 +9,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -25,6 +26,7 @@ export interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
+    availability: AgentEnvAvailability;
   }) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
 
   onError?: (context: {
@@ -43,6 +45,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   locale,
   options = {},
   user,
+  availability,
 }: {
   endpoint: TEndpoint;
   logger: EndpointLogger;
@@ -54,6 +57,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
     : TEndpoint["types"]["UrlVariablesOutput"];
   locale: CountryLanguage;
   user: JwtPayloadType;
+  availability: AgentEnvAvailability;
   options?: MutationExecutorOptions<
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["ResponseOutput"],
@@ -100,6 +104,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
       locale,
       requestData,
       pathParams,
+      availability,
     );
 
     if (!response.success) {
@@ -122,6 +127,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
         logger,
         user,
         locale,
+        availability,
       });
 
       if (callbackResult) {

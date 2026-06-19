@@ -4,6 +4,7 @@
  * Mirrors server route handler structure but runs in browser
  */
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -25,6 +26,7 @@ export type ClientHandlerFunction<
   locale: CountryLanguage;
   logger: EndpointLogger;
   user: JWTPublicPayloadType;
+  availability: AgentEnvAvailability;
 }) => Promise<ResponseType<TResponseOutput>> | ResponseType<TResponseOutput>;
 
 /**

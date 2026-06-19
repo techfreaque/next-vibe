@@ -6,10 +6,7 @@
 import { lazy } from "react";
 import { z } from "zod";
 
-import {
-  type ChatModelSelection,
-  chatModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
@@ -92,6 +89,7 @@ const { POST } = createEndpoint({
         const skillsDefinition = await import("../definition");
 
         // Optimistically add the new skill to the list
+        const availability = await getInstanceAvailability();
         apiClient.updateEndpointData(
           skillsDefinition.default.GET,
           data.logger,
@@ -110,9 +108,16 @@ const { POST } = createEndpoint({
               return firstChar?.category === data.requestData.category;
             });
 
-            // Get best model for the new skill
-            const bestModel = data.requestData.modelSelection
-              ? getBestChatModel(data.requestData.modelSelection, data.user)
+            // Get best model from the default variant
+            const defaultVariant =
+              data.requestData.variants?.find((v) => v.isDefault) ??
+              data.requestData.variants?.[0];
+            const bestModel = defaultVariant?.modelSelection
+              ? getBestChatModel(
+                  defaultVariant.modelSelection,
+                  data.user,
+                  availability,
+                )
               : null;
 
             // Create the new skill card (only if we have a model)
@@ -398,14 +403,6 @@ const { POST } = createEndpoint({
           descriptionStyle: "inline",
         },
       }),
-      // Model Selection - manual or filter-based (custom widget handles rendering)
-      modelSelection: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.modelSelection.label" as const,
-        description: "post.modelSelection.description" as const,
-        schema: chatModelSelectionSchema.nullable().optional(),
-      }),
       // Named variants with per-variant model selections (optional - single default variant created automatically)
       variants: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -543,10 +540,16 @@ const { POST } = createEndpoint({
           "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
         category: SkillCategory.CODING,
         isPublic: false,
-        modelSelection: {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ChatModelId.GPT_5,
-        },
+        variants: [
+          {
+            id: "default",
+            isDefault: true,
+            modelSelection: {
+              selectionType: ModelSelectionType.MANUAL,
+              manualModelId: ChatModelId.GPT_5,
+            },
+          },
+        ],
         availableTools: [
           { toolId: "execute-tool", requiresConfirmation: false },
         ],
@@ -562,21 +565,27 @@ const { POST } = createEndpoint({
           "You are a creative writing assistant. Help users craft compelling stories and narratives.",
         category: SkillCategory.CREATIVE,
         isPublic: false,
-        modelSelection: {
-          selectionType: ModelSelectionType.FILTERS,
-          intelligenceRange: {
-            min: IntelligenceLevel.SMART,
-            max: IntelligenceLevel.BRILLIANT,
+        variants: [
+          {
+            id: "default",
+            isDefault: true,
+            modelSelection: {
+              selectionType: ModelSelectionType.FILTERS,
+              intelligenceRange: {
+                min: IntelligenceLevel.SMART,
+                max: IntelligenceLevel.BRILLIANT,
+              },
+              priceRange: {
+                min: PriceLevel.CHEAP,
+                max: PriceLevel.STANDARD,
+              },
+              contentRange: {
+                min: ContentLevel.OPEN,
+                max: ContentLevel.UNCENSORED,
+              },
+            },
           },
-          priceRange: {
-            min: PriceLevel.CHEAP,
-            max: PriceLevel.STANDARD,
-          },
-          contentRange: {
-            min: ContentLevel.OPEN,
-            max: ContentLevel.UNCENSORED,
-          },
-        },
+        ],
       },
     },
     responses: {

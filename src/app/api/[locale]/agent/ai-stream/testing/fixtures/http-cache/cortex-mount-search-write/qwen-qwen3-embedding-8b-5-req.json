@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/use-cortex-write-to-create----c6ed0cc5-2aa5-49a7-aecd-96e998882af4.md\n\n# Use cortex-write to create...\nFolder: cron",
+    "input": "/threads/cron/use-cortex-write-to-create----00b43b18-ea47-4850-a8c8-3bfdd3751b94.md\n\n# Use cortex-write to create...\nFolder: cron",
     "encoding_format": "float"
   }
 }

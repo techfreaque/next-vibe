@@ -434,24 +434,30 @@ export class AbortErrorHandler {
     }
 
     // Clear streaming state in DB + registry.
-    // REMOTE_TOOL_WAIT / STREAM_TIMEOUT: stream died but task is still in flight →
-    // set "waiting" so the UI shows the stop button and blocks new messages.
-    // All other abort reasons → set "idle" (stream is fully done).
+    // REMOTE_TOOL_WAIT / STREAM_TIMEOUT: stream died with a task in flight —
+    // but the result may have ALREADY arrived (fast remote executor: the
+    // /report can land and even complete the revival before this abort runs).
+    // Never pin 'waiting' blindly: clearStreamingState re-checks actual
+    // pending work (cron rows + pending-calls registry with cross-process
+    // reconciliation) and decides waiting vs idle. A blind set here would
+    // leave the thread stuck in 'waiting' forever.
     const isWaitingAbort =
       streamAbort?.reason === AbortReason.REMOTE_TOOL_WAIT ||
       streamAbort?.reason === AbortReason.STREAM_TIMEOUT;
     if (isWaitingAbort) {
-      await setStreamingStateWaiting(threadId);
-      // Emit WS event so live clients update the stop button.
-      // REMOTE_TOOL_WAIT: escalateToTask already fires this early - emitting again is harmless (idempotent on client).
-      // STREAM_TIMEOUT: no prior emission, so this is the first signal.
-      try {
-        ctx.wsEmit("streaming-state-changed", { streamingState: "waiting" });
-      } catch (err) {
-        logger.warn("[AI Stream] Failed to emit waiting state WS event", {
-          threadId,
-          error: err instanceof Error ? err.message : String(err),
-        });
+      const cleared = await clearStreamingState(threadId, logger, user);
+      if (cleared.state === "waiting") {
+        // Emit WS event so live clients update the stop button.
+        // REMOTE_TOOL_WAIT: escalateToTask already fires this early - emitting again is harmless (idempotent on client).
+        // STREAM_TIMEOUT: no prior emission, so this is the first signal.
+        try {
+          ctx.wsEmit("streaming-state-changed", { streamingState: "waiting" });
+        } catch (err) {
+          logger.warn("[AI Stream] Failed to emit waiting state WS event", {
+            threadId,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
       }
     } else {
       await clearStreamingState(threadId, logger, user);

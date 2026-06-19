@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----32a8d868-4426-4fe7-b155-54aab89ba1f1.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\nPreview: <think>The move succeeded. 1 node affected. Source: /documents/ai-test/notes.md, Destination: /documents/ai-test/renamed…",
+    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----7d174f61-a1db-4b25-869a-df494146fb32.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\nPreview: <think>The move succeeded. The source was /documents/ai-test/notes.md and the destination was /documents/ai-test/renamed…",
     "encoding_format": "float"
   }
 }

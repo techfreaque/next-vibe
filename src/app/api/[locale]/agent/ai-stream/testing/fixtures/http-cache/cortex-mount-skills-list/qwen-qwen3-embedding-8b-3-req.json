@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/use-cortex-list-to-list--skills--tell-me-how-many--68881972-858c-4c0e-812e-bba0b9505510.md\n\n# Use cortex-list to list /skills. Tell me how many...\nFolder: cron",
+    "input": "/threads/cron/use-cortex-list-to-list--skills--tell-me-how-many--1129dc56-6a56-40d9-bf54-5f0384453db7.md\n\n# Use cortex-list to list /skills. Tell me how many...\nFolder: cron",
     "encoding_format": "float"
   }
 }

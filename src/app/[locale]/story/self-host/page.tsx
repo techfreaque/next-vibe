@@ -11,6 +11,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -34,7 +35,7 @@ export async function tanstackLoader({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<SelfHostPageData> {
   const { locale } = await params;
-  const modelCount = getAvailableModelCount(false);
+  const modelCount = getAvailableModelCount(false, getEnvAvailability());
   return { locale, modelCount };
 }
 

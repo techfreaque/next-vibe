@@ -27,7 +27,7 @@ import {
   makeHeadlessContext,
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   broadcastToolResult,
   callToolDirect,
@@ -128,7 +128,7 @@ export class RouteExecuteRepository {
         execFav?.modelSelection ?? undefined,
         execSkill?.modelSelection ?? undefined,
         user,
-        agentEnvAvailability,
+        getEnvAvailability(),
       );
 
       // Remote execution path - create a one-shot task for the target instance
@@ -228,7 +228,7 @@ export class RouteExecuteRepository {
               execSkill?.imageGenModelSelection ??
               execFav?.imageGenModelSelection;
             resolvedModel = sel
-              ? getBestImageGenModel(sel, user)?.id
+              ? getBestImageGenModel(sel, user, getEnvAvailability())?.id
               : undefined;
           } else if (mediaToolName === "generate_music") {
             const { getBestMusicGenModel } =
@@ -237,7 +237,7 @@ export class RouteExecuteRepository {
               execSkill?.musicGenModelSelection ??
               execFav?.musicGenModelSelection;
             resolvedModel = sel
-              ? getBestMusicGenModel(sel, user)?.id
+              ? getBestMusicGenModel(sel, user, getEnvAvailability())?.id
               : undefined;
           } else if (mediaToolName === "generate_video") {
             const { videoGenModelSelectionSchema, filterVideoGenModels } =
@@ -259,7 +259,11 @@ export class RouteExecuteRepository {
                 resolvedModel = parsed.data.manualModelId;
               } else {
                 // FILTERS selection: run normal filtering (may return empty if no providers)
-                resolvedModel = filterVideoGenModels(sel, user)[0]?.id;
+                resolvedModel = filterVideoGenModels(
+                  sel,
+                  user,
+                  getEnvAvailability(),
+                )[0]?.id;
               }
             }
           }

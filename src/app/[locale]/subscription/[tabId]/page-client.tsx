@@ -13,6 +13,7 @@ import { BuyTab } from "@/app/[locale]/subscription/components/buy-tab";
 import { OverviewTab } from "@/app/[locale]/subscription/components/overview-tab";
 import { SubscriptionHeader } from "@/app/[locale]/subscription/components/subscription-header";
 import { SubscriptionTabsNav } from "@/app/[locale]/subscription/components/subscription-tabs-nav";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import creditsDefinition from "@/app/api/[locale]/credits/definition";
@@ -48,6 +49,7 @@ export function SubscriptionPageClient({
   hasPaymentProvider,
   isAdmin,
 }: SubscriptionPageClientProps): JSX.Element {
+  const availability = useProviderAvailability();
   return (
     <Container className="py-8 flex flex-col gap-8">
       {/* Header - same for all tabs */}
@@ -93,7 +95,7 @@ export function SubscriptionPageClient({
       {activeTab === "overview" && (
         <OverviewTab
           locale={locale}
-          totalModelCount={getAvailableModelCount(isAdmin)}
+          totalModelCount={getAvailableModelCount(isAdmin, availability)}
           isAdmin={isAdmin}
           onSwitchTab={() => {
             // Navigation handled by SubscriptionTabsNav links

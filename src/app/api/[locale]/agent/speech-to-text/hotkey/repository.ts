@@ -203,6 +203,7 @@ export class SttHotkeyRepository {
         user,
         locale,
         logger,
+        null,
       );
 
       if (!result.success) {

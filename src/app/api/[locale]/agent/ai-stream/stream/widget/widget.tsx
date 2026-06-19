@@ -43,6 +43,7 @@ import { useDeleteDialogStore } from "@/app/api/[locale]/agent/chat/threads/[thr
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/widget/new-thread/empty-state";
 import { CortexModal } from "@/app/api/[locale]/agent/cortex/widget/cortex-modal";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { AIToolsModal } from "@/app/api/[locale]/agent/tools/widget/ai-tools-modal";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
@@ -263,7 +264,8 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
 
   const isAuthenticated = !user.isPublic;
   const isAdmin = isAuthenticated && user.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(isAdmin);
+  const availability = useProviderAvailability();
+  const totalModelCount = getAvailableModelCount(isAdmin, availability);
 
   // Auth dialog for welcome tour
   const [authDialogOpen, setAuthDialogOpen] = useState(false);

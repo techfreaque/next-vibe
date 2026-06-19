@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
@@ -148,7 +149,10 @@ export class ChatSettingsRepository {
 
       if (settings.length === 0) {
         logger.debug("No settings found for user, returning defaults");
-        const defaults = ChatSettingsRepositoryClient.getDefaults(user);
+        const defaults = ChatSettingsRepositoryClient.getDefaults(
+          user,
+          await getInstanceAvailability(),
+        );
         return success({
           ...defaults,
           dreamerPrompt:
@@ -166,7 +170,10 @@ export class ChatSettingsRepository {
       }
 
       const setting = settings[0];
-      const defaults = ChatSettingsRepositoryClient.getDefaults(user);
+      const defaults = ChatSettingsRepositoryClient.getDefaults(
+        user,
+        await getInstanceAvailability(),
+      );
       const result: ChatSettingsGetResponseOutput = {
         selectedModel: setting.selectedModel ?? defaults.selectedModel,
         selectedSkill: setting.selectedSkill ?? defaults.selectedSkill,
@@ -232,7 +239,10 @@ export class ChatSettingsRepository {
         .from(chatSettings)
         .where(eq(chatSettings.userId, userId));
 
-      const defaults = ChatSettingsRepositoryClient.getDefaults(user);
+      const defaults = ChatSettingsRepositoryClient.getDefaults(
+        user,
+        await getInstanceAvailability(),
+      );
 
       let result: typeof existing;
 

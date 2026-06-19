@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----32a8d868-4426-4fe7-b155-54aab89ba1f1.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\nPreview: <think>The user wants me to report exactly what files and directories I see in the tree view. The result is: ai-test/ (d…",
+    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----7d174f61-a1db-4b25-869a-df494146fb32.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\nPreview: <think>The cortex-tree tool returned successfully. The directory tree for /documents/ai-test/ shows: 0 directories 1 fil…",
     "encoding_format": "float"
   }
 }

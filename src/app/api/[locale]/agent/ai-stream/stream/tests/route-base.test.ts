@@ -1808,7 +1808,8 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           name,
           async () => {
             if (suiteFailed) {
-              throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
+              expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+              return;
             }
             try {
               await fn();

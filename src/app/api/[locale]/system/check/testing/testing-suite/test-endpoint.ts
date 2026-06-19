@@ -101,18 +101,14 @@ export function testEndpoint<
     > = {
       endpoint,
       executeWith: async ({ data, urlPathParams, user }) => {
-        return await sendTestRequest<
-          CreateApiEndpoint<
-            TMethod,
-            TUserRoleValue,
-            TScopedTranslationKey,
-            TFields,
-            TEvents
-          >
-        >({
-          endpoint,
-          data,
-          urlPathParams,
+        return await sendTestRequest({
+          endpoint: endpoint as Parameters<
+            typeof sendTestRequest
+          >[0]["endpoint"],
+          data: data as Parameters<typeof sendTestRequest>[0]["data"],
+          urlPathParams: urlPathParams as Parameters<
+            typeof sendTestRequest
+          >[0]["urlPathParams"],
           user,
         });
       },

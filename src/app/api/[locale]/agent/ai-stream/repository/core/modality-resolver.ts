@@ -28,10 +28,7 @@ import {
 import type { ChatFavorite } from "@/app/api/[locale]/agent/chat/favorites/db";
 import type { SkillVariant } from "@/app/api/[locale]/agent/chat/skills/config";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import {
-  type AgentEnvAvailability,
-  agentEnvAvailability,
-} from "@/app/api/[locale]/agent/env-availability";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
   getBestImageGenModel,
@@ -39,7 +36,6 @@ import {
   type ImageGenModelSelection,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import { type ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
 import {
   getBestMusicGenModel,
@@ -172,7 +168,6 @@ export function resolveChatModelId(
       skillVariantModelSelection,
       user,
       availability,
-      providerOverride,
     );
     if (best) {
       return best.id;

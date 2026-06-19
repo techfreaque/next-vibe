@@ -1,68 +1,34 @@
-/**
- * Agent Environment Availability
- *
- * Exposes which AI provider keys are configured as boolean flags.
- * Reads from NEXT_PUBLIC_AGENT_* client env vars - set automatically by the
- * vibe runtime (environment.ts) from the server-side API keys before build.
- * Safe to import in both server and client code (no server-only dependency).
- *
- * unbottled is NOT an env flag — it comes from the remote_connections table.
- * Use getInstanceAvailability() on the server or hasInferenceProvider from
- * the connection list endpoint on the client.
- */
-
 import { envClient } from "@/config/env-client";
 
 export interface AgentEnvAvailability {
-  /** Main LLM routing - most models require this */
   openRouter: boolean;
-  /** Claude Code provider - auto-detected from `claude` CLI or set via CLAUDE_CODE_ENABLED */
   claudeCode: boolean;
-  /** Voice / Text-to-Speech via Eden AI */
   voice: boolean;
-  /** Brave web search */
   braveSearch: boolean;
-  /** Kagi FastGPT search */
   kagiSearch: boolean;
-  /** At least one search provider is available */
   anySearch: boolean;
-  /** Uncensored AI provider */
   uncensoredAI: boolean;
-  /** FreedomGPT provider */
   freedomGPT: boolean;
-  /** Gab AI provider */
   gabAI: boolean;
-  /** Venice AI provider */
   veniceAI: boolean;
-  /** Scrappey (web scraping) */
   scrappey: boolean;
-  /** OpenAI Images API (DALL-E, gpt-image-1) */
   openAiImages: boolean;
-  /** OpenAI STT (Whisper direct API) */
   openAiStt: boolean;
-  /** Replicate (Flux Pro, SDXL, video models) */
   replicate: boolean;
-  /** Fal.ai (fast image and video inference) */
   falAi: boolean;
-  /** ModelsLab (music generation, text-to-video) */
   modelsLab: boolean;
-  /** Eden AI STT */
   edenAiStt: boolean;
-  /** Deepgram STT */
   deepgram: boolean;
-  /** OpenAI TTS - requires OPENAI_API_KEY */
   openAiTts: boolean;
-  /** Eden AI TTS - requires EDEN_AI_API_KEY */
   edenAiTts: boolean;
-  /** ElevenLabs TTS - requires ELEVENLABS_API_KEY */
   elevenlabs: boolean;
+  /** True when any active connection has isInferenceProvider or forceSystemProvider */
+  unbottledSystem: boolean;
+  /** True when any active connection has forceSystemProvider — overrides all user model choices */
+  unbottledForce: boolean;
 }
 
-/**
- * Static env-derived availability singleton.
- * `unbottled` is always false here — use getInstanceAvailability() for the live value.
- */
-export const agentEnvAvailability: AgentEnvAvailability = (() => {
+const agentEnvAvailability: AgentEnvAvailability = (() => {
   const braveSearch = envClient.NEXT_PUBLIC_AGENT_BRAVE_SEARCH;
   const kagiSearch = envClient.NEXT_PUBLIC_AGENT_KAGI_SEARCH;
 
@@ -88,41 +54,11 @@ export const agentEnvAvailability: AgentEnvAvailability = (() => {
     openAiTts: envClient.NEXT_PUBLIC_AGENT_OPEN_AI_TTS,
     edenAiTts: envClient.NEXT_PUBLIC_AGENT_EDEN_AI_TTS,
     elevenlabs: envClient.NEXT_PUBLIC_AGENT_ELEVENLABS,
+    unbottledSystem: false,
+    unbottledForce: false,
   };
 })();
 
-/**
- * Build client-side availability from the connection list response.
- * Called by useProviderAvailability with hasInferenceProvider from the list endpoint.
- */
-export function buildAvailabilityFromConnections(
-  hasInferenceProvider: boolean,
-): AgentEnvAvailability {
-  return {
-    ...agentEnvAvailability,
-    unbottled: hasInferenceProvider,
-  };
-}
-
-/**
- * Server-side: returns availability with live unbottled state from DB cache.
- * The cache is invalidated on any connection mutation (create/update/delete).
- * Server-only — dynamically imports transport to avoid client bundle inclusion.
- */
-export async function getInstanceAvailability(): Promise<AgentEnvAvailability> {
-  const { RemoteTransport } =
-    await import("@/app/api/[locale]/remote-connection/transport");
-  const unbottled = await RemoteTransport.hasInstanceInferenceProvider();
-  if (!unbottled) {
-    return agentEnvAvailability;
-  }
-  return { ...agentEnvAvailability, unbottled: true };
-}
-
-/**
- * Setup instructions per provider.
- * Used to show actionable messages when a feature is used without the key configured.
- */
 export const PROVIDER_SETUP_INSTRUCTIONS = {
   openRouter: {
     envKey: "OPENROUTER_API_KEY",
@@ -194,11 +130,6 @@ export const PROVIDER_SETUP_INSTRUCTIONS = {
     url: "https://modelslab.com/account/api",
     label: "ModelsLab",
   },
-  unbottled: {
-    envKey: "UNBOTTLED_CLOUD_CREDENTIALS",
-    url: "https://unbottled.ai",
-    label: "Unbottled AI",
-  },
   openAiStt: {
     envKey: "OPENAI_API_KEY",
     url: "https://platform.openai.com/api-keys",
@@ -229,18 +160,33 @@ export const PROVIDER_SETUP_INSTRUCTIONS = {
     url: "https://elevenlabs.io/app/settings/api-keys",
     label: "ElevenLabs",
   },
-} as const satisfies Record<
-  Exclude<keyof AgentEnvAvailability, "anySearch">,
-  { envKey: string; url: string; label: string }
->;
+} as const;
 
-/**
- * Build a user-friendly error message with setup instructions.
- */
 export function buildMissingKeyMessage(
-  provider: keyof Omit<AgentEnvAvailability, "anySearch">,
+  provider: keyof typeof PROVIDER_SETUP_INSTRUCTIONS,
 ): string {
   const info = PROVIDER_SETUP_INSTRUCTIONS[provider];
   // eslint-disable-next-line i18next/no-literal-string
   return `${info.label} API key not configured. Add ${info.envKey}=<your-key> to your .env file. Get your key at ${info.url}`;
+}
+
+/** Env-flag-only availability (no WS state). Safe to call anywhere including client. */
+export function getEnvAvailability(): AgentEnvAvailability {
+  return agentEnvAvailability;
+}
+
+/**
+ * Full instance availability — env flags + live WS inference state.
+ * Server-side only (async, reads RemoteTransport).
+ */
+export async function getInstanceAvailability(): Promise<AgentEnvAvailability> {
+  const { RemoteTransport } =
+    await import("@/app/api/[locale]/remote-connection/transport");
+  const { hasSystem, forceSystem } =
+    await RemoteTransport.getInstanceInferenceState();
+  return {
+    ...agentEnvAvailability,
+    unbottledSystem: hasSystem,
+    unbottledForce: forceSystem,
+  };
 }

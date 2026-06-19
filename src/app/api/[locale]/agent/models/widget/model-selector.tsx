@@ -34,7 +34,6 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
-import { useWidgetLogger } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -66,6 +65,7 @@ import {
   PRICE_DISPLAY,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import {
   filterImageGenModels,
   getBestImageGenModel,
@@ -105,7 +105,6 @@ import {
   TtsModelId,
   ttsModelOptions,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import {
   filterVideoGenModels,
   getBestVideoGenModel,
@@ -216,6 +215,7 @@ function getFilteredModelsByRoleDispatch(
   selection: AnyRoleModelSelection | null,
   roles: ModelRole[],
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): AnyModelOptionWithVision[] {
   // Extract shared filter props - valid for all role getters regardless of manual ID
   const filters: FiltersModelSelection | null = selection
@@ -235,19 +235,19 @@ function getFilteredModelsByRoleDispatch(
   for (const role of roles) {
     switch (role) {
       case "tts":
-        results.push(...filterTtsModels(filters, user));
+        results.push(...filterTtsModels(filters, user, availability));
         break;
       case "stt":
-        results.push(...filterSttModels(filters, user));
+        results.push(...filterSttModels(filters, user, availability));
         break;
       case "image-gen":
-        results.push(...filterImageGenModels(filters, user));
+        results.push(...filterImageGenModels(filters, user, availability));
         break;
       case "audio-gen":
-        results.push(...filterMusicGenModels(filters, user));
+        results.push(...filterMusicGenModels(filters, user, availability));
         break;
       case "video-gen":
-        results.push(...filterVideoGenModels(filters, user));
+        results.push(...filterVideoGenModels(filters, user, availability));
         break;
       case "llm":
         results.push(
@@ -259,13 +259,13 @@ function getFilteredModelsByRoleDispatch(
         );
         break;
       case "image-vision":
-        results.push(...filterImageVisionModels(filters, user));
+        results.push(...filterImageVisionModels(filters, user, availability));
         break;
       case "video-vision":
-        results.push(...filterVideoVisionModels(filters, user));
+        results.push(...filterVideoVisionModels(filters, user, availability));
         break;
       case "audio-vision":
-        results.push(...filterAudioVisionModels(filters, user));
+        results.push(...filterAudioVisionModels(filters, user, availability));
         break;
       default:
         break;
@@ -279,6 +279,7 @@ function getBestModelByRoleDispatch(
   selection: AnyRoleModelSelection,
   roles: ModelRole[],
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): AnyModelOptionWithVision | null {
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
@@ -294,7 +295,7 @@ function getBestModelByRoleDispatch(
     if (
       model &&
       (!model.adminOnly || isAdmin) &&
-      isModelProviderAvailable(model) &&
+      isModelProviderAvailable(model, availability) &&
       roles.some((role) => modelMatchesRoleLocal(model, role))
     ) {
       return model;
@@ -317,31 +318,31 @@ function getBestModelByRoleDispatch(
     let result: AnyModelOptionWithVision | null = null;
     switch (role) {
       case "tts":
-        result = getBestTtsModel(filtersSelection, user);
+        result = getBestTtsModel(filtersSelection, user, availability);
         break;
       case "stt":
-        result = getBestSttModel(filtersSelection, user);
+        result = getBestSttModel(filtersSelection, user, availability);
         break;
       case "image-gen":
-        result = getBestImageGenModel(filtersSelection, user);
+        result = getBestImageGenModel(filtersSelection, user, availability);
         break;
       case "audio-gen":
-        result = getBestMusicGenModel(filtersSelection, user);
+        result = getBestMusicGenModel(filtersSelection, user, availability);
         break;
       case "video-gen":
-        result = getBestVideoGenModel(filtersSelection, user);
+        result = getBestVideoGenModel(filtersSelection, user, availability);
         break;
       case "llm":
-        result = getBestChatModel(filtersSelection, user);
+        result = getBestChatModel(filtersSelection, user, availability);
         break;
       case "image-vision":
-        result = getBestImageVisionModel(filtersSelection, user);
+        result = getBestImageVisionModel(filtersSelection, user, availability);
         break;
       case "video-vision":
-        result = getBestVideoVisionModel(filtersSelection, user);
+        result = getBestVideoVisionModel(filtersSelection, user, availability);
         break;
       case "audio-vision":
-        result = getBestAudioVisionModel(filtersSelection, user);
+        result = getBestAudioVisionModel(filtersSelection, user, availability);
         break;
       default:
         break;
@@ -751,55 +752,59 @@ export interface ModelSelectorProps {
 }
 
 /** Returns true if the model's provider is available given current env */
-function isProviderAvailable(model: AnyModelOptionWithVision): boolean {
-  return isModelProviderAvailable(model);
+function isProviderAvailable(
+  model: AnyModelOptionWithVision,
+  availability: AgentEnvAvailability,
+): boolean {
+  return isModelProviderAvailable(model, availability);
 }
 
 /** Map ApiProvider to the availability key */
 function getSetupRequiredMessage(
   model: AnyModelOptionWithVision,
   locale: CountryLanguage,
+  availability: AgentEnvAvailability,
 ): string | null {
   const t = scopedTranslation.scopedT(locale).t;
   switch (model.apiProvider) {
     case ApiProvider.OPENROUTER:
-      return agentEnvAvailability.openRouter
+      return availability.openRouter
         ? null
         : `${t("selector.addEnvKey")}: OPENROUTER_API_KEY → openrouter.ai/keys`;
     case ApiProvider.UNCENSORED_AI:
-      return agentEnvAvailability.uncensoredAI
+      return availability.uncensoredAI
         ? null
         : `${t("selector.addEnvKey")}: UNCENSORED_AI_API_KEY`;
     case ApiProvider.FREEDOMGPT:
-      return agentEnvAvailability.freedomGPT
+      return availability.freedomGPT
         ? null
         : `${t("selector.addEnvKey")}: FREEDOMGPT_API_KEY`;
     case ApiProvider.GAB_AI:
-      return agentEnvAvailability.gabAI
+      return availability.gabAI
         ? null
         : `${t("selector.addEnvKey")}: GAB_AI_API_KEY`;
     case ApiProvider.VENICE_AI:
-      return agentEnvAvailability.veniceAI
+      return availability.veniceAI
         ? null
         : `${t("selector.addEnvKey")}: VENICE_AI_API_KEY → venice.ai`;
     case ApiProvider.CLAUDE_CODE:
-      return agentEnvAvailability.claudeCode
+      return availability.claudeCode
         ? null
         : `${t("selector.addEnvKey")}: CLAUDE_CODE_ENABLED=true (install claude CLI)`;
     case ApiProvider.OPENAI_IMAGES:
-      return agentEnvAvailability.openAiImages
+      return availability.openAiImages
         ? null
         : `${t("selector.addEnvKey")}: OPENAI_API_KEY → platform.openai.com/api-keys`;
     case ApiProvider.REPLICATE:
-      return agentEnvAvailability.replicate
+      return availability.replicate
         ? null
         : `${t("selector.addEnvKey")}: REPLICATE_API_TOKEN → replicate.com/account/api-tokens`;
     case ApiProvider.FAL_AI:
-      return agentEnvAvailability.falAi
+      return availability.falAi
         ? null
         : `${t("selector.addEnvKey")}: FAL_AI_API_KEY → fal.ai/dashboard/keys`;
     case ApiProvider.MODELSLAB:
-      return agentEnvAvailability.modelsLab
+      return availability.modelsLab
         ? null
         : `${t("selector.addEnvKey")}: MODELSLAB_API_KEY → modelslab.com`;
     default:
@@ -820,6 +825,7 @@ export function ModelSelector({
   allowedRoles,
   requiredInputs,
 }: ModelSelectorProps): JSX.Element {
+  const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
   // UI state - initialize to CHARACTER_BASED if modelSelection is null or matches the character selection
   const isMatchingCharacterSelection =
@@ -982,7 +988,7 @@ export function ModelSelector({
       if (newMode === ModelSelectionType.MANUAL) {
         // Try to keep current model, otherwise pick first available filtered model
         const firstAvailable = filteredModels.find((m) =>
-          isProviderAvailable(m),
+          isProviderAvailable(m, availability),
         );
         const currentModel =
           manualModelId ??
@@ -1192,7 +1198,8 @@ export function ModelSelector({
       setUseSkillBased(false);
       const first = getAllModelOptions().find(
         (m) =>
-          modelOptionToTypes(m).includes(newType) && isProviderAvailable(m),
+          modelOptionToTypes(m).includes(newType) &&
+          isProviderAvailable(m, availability),
       );
       if (first) {
         updateValue(buildManualSelection(first.id));
@@ -1376,7 +1383,7 @@ export function ModelSelector({
       sortBy2,
       sortDirection2,
     };
-    const base = filterChatModels(filtersModelSelection, user);
+    const base = filterChatModels(filtersModelSelection, user, availability);
     return base.filter((m) => modelOptionToTypes(m).includes(modelTypeTab));
   }, [
     allowedRoles,
@@ -1441,7 +1448,9 @@ export function ModelSelector({
 
     if (showUnfilteredModels) {
       const all = getAllModelOptions().filter(typeFilter);
-      return isAdmin ? all : all.filter((m) => isProviderAvailable(m));
+      return isAdmin
+        ? all
+        : all.filter((m) => isProviderAvailable(m, availability));
     }
 
     if (!isAdmin) {
@@ -1452,10 +1461,19 @@ export function ModelSelector({
     // Admin: filteredModels has env-available models; append env-unavailable ones
     const filteredIds = new Set(filteredModels.map((m) => m.id));
     const adminExtras = getAllModelOptions().filter(
-      (m) => typeFilter(m) && !filteredIds.has(m.id) && !isProviderAvailable(m),
+      (m) =>
+        typeFilter(m) &&
+        !filteredIds.has(m.id) &&
+        !isProviderAvailable(m, availability),
     );
     return [...filteredModels, ...adminExtras];
-  }, [showUnfilteredModels, filteredModels, isAdmin, modelTypeTab]);
+  }, [
+    showUnfilteredModels,
+    filteredModels,
+    isAdmin,
+    modelTypeTab,
+    availability,
+  ]);
 
   // Compute which model names appear with multiple providers (need provider suffix)
   const duplicateModelNames = useMemo(() => {
@@ -1503,19 +1521,19 @@ export function ModelSelector({
       (m) =>
         !shownIds.has(m.id) &&
         typeFilter(m) &&
-        (isAdmin || isProviderAvailable(m)) &&
+        (isAdmin || isProviderAvailable(m, availability)) &&
         (m.name.toLowerCase().includes(q) ||
           modelProviders[m.provider]?.name.toLowerCase().includes(q)),
     );
-  }, [searchQuery, searchFilteredModels, modelTypeTab, isAdmin]);
+  }, [searchQuery, searchFilteredModels, modelTypeTab, isAdmin, availability]);
 
   // Sort and group models
   const sortedAndGroupedModels = useMemo(() => {
     if (!sortBy) {
       // Default: group by provider, available providers first, within each group available-first then price-asc
       const sorted = [...searchFilteredModels].toSorted((a, b) => {
-        const aAvail = isProviderAvailable(a) ? 0 : 1;
-        const bAvail = isProviderAvailable(b) ? 0 : 1;
+        const aAvail = isProviderAvailable(a, availability) ? 0 : 1;
+        const bAvail = isProviderAvailable(b, availability) ? 0 : 1;
         if (aAvail !== bAvail) {
           return aAvail - bAvail;
         }
@@ -1583,7 +1601,7 @@ export function ModelSelector({
     }
 
     return grouped;
-  }, [searchFilteredModels, sortBy, t]);
+  }, [searchFilteredModels, sortBy, t, availability]);
 
   // Get display models (limited or all)
   // Always grouped (by provider in default view, by tier when sort is active)
@@ -1603,7 +1621,7 @@ export function ModelSelector({
         (m) =>
           allowedRoles.some((r) => modelMatchesRoleLocal(m, r)) &&
           modelOptionToTypes(m).includes(defaultModelTypeTab) &&
-          (isAdmin || isProviderAvailable(m)),
+          (isAdmin || isProviderAvailable(m, availability)),
       );
       return hasRoleType ? [defaultModelTypeTab] : [];
     }
@@ -1611,12 +1629,12 @@ export function ModelSelector({
     const hasImage = allModels.some(
       (m) =>
         modelOptionToTypes(m).includes("image") &&
-        (isAdmin || isProviderAvailable(m)),
+        (isAdmin || isProviderAvailable(m, availability)),
     );
     const hasAudio = allModels.some(
       (m) =>
         modelOptionToTypes(m).includes("audio") &&
-        (isAdmin || isProviderAvailable(m)),
+        (isAdmin || isProviderAvailable(m, availability)),
     );
     if (hasImage) {
       types.push("image");
@@ -1625,7 +1643,14 @@ export function ModelSelector({
       types.push("audio");
     }
     return types;
-  }, [chatOnly, allowedRoles, defaultModelTypeTab, allModels, isAdmin]);
+  }, [
+    chatOnly,
+    allowedRoles,
+    defaultModelTypeTab,
+    allModels,
+    isAdmin,
+    availability,
+  ]);
 
   const activeFilterChips = buildFilterChips({
     intelligenceIndices,
@@ -2133,7 +2158,11 @@ export function ModelSelector({
               </Div>
               <Div className="flex flex-col gap-2">
                 {searchExtraModels.map((model) => {
-                  const setupRequired = getSetupRequiredMessage(model, locale);
+                  const setupRequired = getSetupRequiredMessage(
+                    model,
+                    locale,
+                    availability,
+                  );
                   return (
                     <ModelCard
                       key={model.id}
@@ -2211,6 +2240,7 @@ export function ModelSelectorTrigger({
   user,
   nameClassName,
 }: ModelSelectorTriggerProps): JSX.Element {
+  const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
 
   // Resolve the best model to display
@@ -2224,7 +2254,12 @@ export function ModelSelectorTrigger({
       return null;
     }
     const roles: ModelRole[] = allowedRoles ?? ["llm"];
-    return getBestModelByRoleDispatch(effectiveSelection, roles, user);
+    return getBestModelByRoleDispatch(
+      effectiveSelection,
+      roles,
+      user,
+      availability,
+    );
   }, [
     modelSelection,
     characterModelSelection,
@@ -2236,7 +2271,7 @@ export function ModelSelectorTrigger({
 
   const isClickable = !!onClick;
   const isUnavailable =
-    resolvedModel !== null && !isProviderAvailable(resolvedModel);
+    resolvedModel !== null && !isProviderAvailable(resolvedModel, availability);
 
   return (
     <Div

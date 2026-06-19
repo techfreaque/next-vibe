@@ -58,6 +58,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
@@ -1513,6 +1514,7 @@ export function EditFavBeforeAddButton({
   children?: React.ReactNode;
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
+  const availability = useProviderAvailability();
 
   const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
     e.stopPropagation();
@@ -1533,6 +1535,7 @@ export function EditFavBeforeAddButton({
         undefined,
         { id: parseSkillId(char.skillId).skillId },
         locale,
+        availability,
       );
 
       if (!skillResponse.success) {
@@ -1719,6 +1722,7 @@ export function SkillFavoriteActions({
   const setModelSelectorOpen = useTourState(
     (state) => state.setModelSelectorOpen,
   );
+  const availability = useProviderAvailability();
 
   const handleActivateSingleFavorite = async (
     e: ButtonMouseEvent,
@@ -1744,6 +1748,7 @@ export function SkillFavoriteActions({
         undefined,
         { id: favoriteIds[0] },
         locale,
+        availability,
       );
 
       if (!favoriteResponse.success) {
@@ -1758,6 +1763,7 @@ export function SkillFavoriteActions({
         favorite.modelSelection,
         favorite.characterModelSelection ?? undefined,
         user,
+        availability,
       );
       const modelId = bestModel?.id || null;
 
@@ -1769,6 +1775,7 @@ export function SkillFavoriteActions({
         logger,
         locale,
         user,
+        availability,
       });
     } catch (error) {
       logger.error("Failed to activate favorite", {
@@ -1802,6 +1809,7 @@ export function SkillFavoriteActions({
         undefined,
         { id: favoriteId },
         locale,
+        availability,
       );
 
       if (!favoriteResponse.success) {
@@ -1816,6 +1824,7 @@ export function SkillFavoriteActions({
         favorite.modelSelection,
         favorite.characterModelSelection ?? undefined,
         user,
+        availability,
       );
       const modelId = bestModel?.id || null;
 
@@ -1827,6 +1836,7 @@ export function SkillFavoriteActions({
         logger,
         locale,
         user,
+        availability,
       });
     } catch (error) {
       logger.error("Failed to activate favorite", {
@@ -1863,6 +1873,7 @@ export function SkillFavoriteActions({
         undefined,
         { id: baseId },
         locale,
+        availability,
       );
       if (!skillResponse.success) {
         return;

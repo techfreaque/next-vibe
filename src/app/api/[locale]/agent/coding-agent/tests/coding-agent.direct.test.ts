@@ -50,7 +50,6 @@ async function setupDirectConnection(
 
   await disconnectFromHermes(testUser.id);
   await connectToHermes(testUser);
-  await triggerPull();
 
   _prodUserId = await resolveProdUserId();
   _prodAdminToken = await resolveProdAdminToken();

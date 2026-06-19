@@ -31,6 +31,8 @@ import {
 } from "@/app/[locale]/creator/[userId]/_shared/profile-content";
 import { buildScopedPaletteStyle } from "@/app/[locale]/creator/[userId]/_shared/palette-generator";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+
 import { GET, type CreatorGetResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -53,6 +55,7 @@ function CreatorLeadCaptureForm({
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
 
   const handleSubmit = useCallback((): void => {
     if (!firstName.trim() || !email.trim()) {
@@ -72,13 +75,14 @@ function CreatorLeadCaptureForm({
           { skillId, firstName: firstName.trim(), email: email.trim() },
           undefined,
           locale,
+          availability,
         );
         setState(result.success ? "done" : "error");
       } catch {
         setState("error");
       }
     })();
-  }, [skillId, firstName, email, locale, logger]);
+  }, [skillId, firstName, email, locale, logger, availability]);
 
   const displayHeadline = headline ?? t("widget.lead.headline");
   const displayButton = buttonText ?? t("widget.lead.send");

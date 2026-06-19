@@ -1269,7 +1269,9 @@ function buildImageGenModelOptionsPool(): ImageGenModelOption[] {
       !(llmImageGenModelIds as readonly string[]).includes(id),
   )) {
     const def = imageGenModelDefinitions[modelId];
-    const sortedProviders = [...def.providers].toSorted(compareProviderSort);
+    const sortedProviders = [...def.providers].toSorted(
+      (a, b) => getProviderPrice(a) - getProviderPrice(b),
+    );
     for (const provider of sortedProviders) {
       if (
         provider.creditCostPerImage !== undefined ||
@@ -1287,21 +1289,7 @@ function buildImageGenModelOptionsPool(): ImageGenModelOption[] {
 const imageGenModelOptionsPool: ImageGenModelOption[] =
   buildImageGenModelOptionsPool();
 
-/**
- * Cheapest non-UNBOTTLED provider entry for a model — used by UNBOTTLED
- * self-relay to dispatch in-process via the real provider (pool is sorted
- * cheapest-first). Exported index is mutable for test runtime-patching,
- * mirroring chatModelOptionsIndex.
- */
-export function getImageGenModelUnderlyingProvider(
-  modelId: string,
-): ImageGenModelOption | undefined {
-  return imageGenModelOptionsPool.find(
-    (m) => m.id === modelId && m.apiProvider !== ApiProvider.UNBOTTLED,
-  );
-}
-
-export const imageGenModelOptionsIndex: Partial<
+const imageGenModelOptionsIndex: Partial<
   Record<ImageGenModelId, ImageGenModelOption>
 > = buildModelOptionsIndex(imageGenModelOptionsPool) as Partial<
   Record<ImageGenModelId, ImageGenModelOption>
@@ -1364,12 +1352,12 @@ export function filterImageGenModels(
   user: JwtPayloadType,
   availability: AgentEnvAvailability,
 ): ImageGenModelOption[] {
-  return filterRoleModels(
-    imageGenModelOptionsPool,
-    selection,
-    user,
-    availability,
-  );
+  const pool = availability.unbottledForce
+    ? imageGenModelOptionsPool.filter(
+        (m) => m.apiProvider === ApiProvider.UNBOTTLED,
+      )
+    : imageGenModelOptionsPool;
+  return filterRoleModels(pool, selection, user, availability);
 }
 
 export function getBestImageGenModel(

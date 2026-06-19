@@ -357,6 +357,7 @@ export class GenerateTanstackRoutesRepository {
 
       const layoutLines: string[] = [
         `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
+        `import type { JSX } from "react";`,
         `import { createFileRoute, Outlet } from "@tanstack/react-router";`,
       ];
 
@@ -396,6 +397,11 @@ export class GenerateTanstackRoutesRepository {
 
       layoutLines.push(``);
 
+      layoutLines.push(
+        `function LayoutComponent(): JSX.Element { return <Layout {...Route.useLoaderData()}><Outlet /></Layout>; }`,
+      );
+      layoutLines.push(``);
+
       if (hasSearch) {
         layoutLines.push(
           `export const Route = createFileRoute("${routePath}")({`,
@@ -403,7 +409,7 @@ export class GenerateTanstackRoutesRepository {
           `  validateSearch: (search: Record<string, string>) => search,`,
           `  loaderDeps: ({ search }) => ({ search }),`,
           `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
-          `  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,`,
+          `  component: LayoutComponent,`,
           `});`,
           ``,
         );
@@ -412,7 +418,7 @@ export class GenerateTanstackRoutesRepository {
           `export const Route = createFileRoute("${routePath}")({`,
           `  staleTime: ${staleTime},`,
           `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
-          `  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,`,
+          `  component: LayoutComponent,`,
           `});`,
           ``,
         );
@@ -421,7 +427,7 @@ export class GenerateTanstackRoutesRepository {
           `export const Route = createFileRoute("${routePath}")({`,
           `  staleTime: ${staleTime},`,
           `  loader: () => loadData(),`,
-          `  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,`,
+          `  component: LayoutComponent,`,
           `});`,
           ``,
         );
@@ -507,6 +513,7 @@ export class GenerateTanstackRoutesRepository {
 
     const lines = [
       `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
+      `import type { JSX } from "react";`,
       `import { createFileRoute } from "@tanstack/react-router";`,
       `import { createServerFn } from "@tanstack/react-start";`,
       `import { toNextParams } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
@@ -541,7 +548,10 @@ export class GenerateTanstackRoutesRepository {
         ``,
       );
 
-      const componentFn = `() => <Page {...Route.useLoaderData()} />`;
+      lines.push(
+        `function PageComponent(): JSX.Element { return <Page {...Route.useLoaderData()} />; }`,
+      );
+      lines.push(``);
 
       if (hasSearch) {
         lines.push(
@@ -550,7 +560,7 @@ export class GenerateTanstackRoutesRepository {
           `  validateSearch: (search: Record<string, string>) => search,`,
           `  loaderDeps: ({ search }) => ({ search }),`,
           `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
-          `  component: ${componentFn},`,
+          `  component: PageComponent,`,
           `});`,
           ``,
         );
@@ -559,7 +569,7 @@ export class GenerateTanstackRoutesRepository {
           `export const Route = createFileRoute("${routePath}")({`,
           `  staleTime: 0,`,
           `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
-          `  component: ${componentFn},`,
+          `  component: PageComponent,`,
           `});`,
           ``,
         );
@@ -584,7 +594,10 @@ export class GenerateTanstackRoutesRepository {
         ``,
       );
 
-      const componentFn = `() => <Page {...Route.useLoaderData()} />`;
+      lines.push(
+        `function PageComponent(): JSX.Element { return <Page {...Route.useLoaderData()} />; }`,
+      );
+      lines.push(``);
 
       if (hasSearch) {
         lines.push(
@@ -593,7 +606,7 @@ export class GenerateTanstackRoutesRepository {
           `  validateSearch: (search: Record<string, string>) => search,`,
           `  loaderDeps: ({ search }) => ({ search }),`,
           `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
-          `  component: ${componentFn},`,
+          `  component: PageComponent,`,
           `});`,
           ``,
         );
@@ -602,7 +615,7 @@ export class GenerateTanstackRoutesRepository {
           `export const Route = createFileRoute("${routePath}")({`,
           `  staleTime: 0,`,
           `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
-          `  component: ${componentFn},`,
+          `  component: PageComponent,`,
           `});`,
           ``,
         );
@@ -643,10 +656,15 @@ export class GenerateTanstackRoutesRepository {
     const content = [
       `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
       `import { createFileRoute } from "@tanstack/react-router";`,
+      ``,
       `import { wrapNextApiRoute } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
       ``,
       `export const Route = createFileRoute("${routePath}")({`,
-      `  server: { handlers: wrapNextApiRoute(() => import("${importPath}")) },`,
+      `  server: {`,
+      `    handlers: wrapNextApiRoute(`,
+      `      () => import("${importPath}"),`,
+      `    ),`,
+      `  },`,
       `});`,
       ``,
     ].join("\n");

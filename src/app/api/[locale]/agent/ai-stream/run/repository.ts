@@ -45,7 +45,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/skills/create/definition";
 import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { db } from "@/app/api/[locale]/system/db";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -188,7 +188,11 @@ export class AiStreamRunRepository {
             if (isManualSelection(varSel) && "manualModelId" in varSel) {
               resolvedModel = varSel.manualModelId;
             } else if (isFiltersSelection(varSel)) {
-              resolvedModel = getBestChatModel(varSel, user)?.id;
+              resolvedModel = getBestChatModel(
+                varSel,
+                user,
+                getEnvAvailability(),
+              )?.id;
             }
           }
         }

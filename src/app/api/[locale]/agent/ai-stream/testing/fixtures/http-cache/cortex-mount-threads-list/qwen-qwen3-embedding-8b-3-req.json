@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/use-cortex-list-to-list-the-directory-at----12334a01-3686-44c9-845e-839664af9c8a.md\n\n# Use cortex-list to list the directory at...\nFolder: cron",
+    "input": "/threads/cron/use-cortex-list-to-list-the-directory-at----332afa89-39c7-444c-a9fc-bc331437e4a5.md\n\n# Use cortex-list to list the directory at...\nFolder: cron",
     "encoding_format": "float"
   }
 }

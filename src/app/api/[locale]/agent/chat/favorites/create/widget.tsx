@@ -59,6 +59,7 @@ import { scopedTranslation as skillIdTranslation } from "@/app/api/[locale]/agen
 import { ModelGroup } from "@/app/api/[locale]/agent/chat/skills/[id]/widget";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
   getBestImageGenModel,
@@ -87,7 +88,6 @@ import {
   type VoiceModelSelection,
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import {
   getBestVideoGenModel,
@@ -122,6 +122,7 @@ export function FavoriteCreateContainer({
   const { t: tId } = skillIdTranslation.scopedT(locale);
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const navigate = useWidgetNavigation();
   const createResult = useWidgetValue<typeof definition.POST>();
   const [isApplying, setIsApplying] = useState(false);
@@ -155,14 +156,10 @@ export function FavoriteCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformTtsDefault = useMemo((): VoiceModelSelection | undefined => {
-    const m = getBestTtsModel(
-      DEFAULT_TTS_MODEL_SELECTION,
-      user,
-      agentEnvAvailability,
-    );
+    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user, availability);
     if (!m) {
       return undefined;
     }
@@ -171,7 +168,7 @@ export function FavoriteCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformImageGenDefault = useMemo(():
     | ImageGenModelSelection
@@ -189,7 +186,7 @@ export function FavoriteCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformMusicGenDefault = useMemo(():
     | MusicGenModelSelection
@@ -207,7 +204,7 @@ export function FavoriteCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformVideoGenDefault = useMemo(():
     | VideoGenModelSelection
@@ -225,14 +222,10 @@ export function FavoriteCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformSttDefault = useMemo((): SttModelSelection | undefined => {
-    const m = getBestSttModel(
-      DEFAULT_STT_MODEL_SELECTION,
-      user,
-      agentEnvAvailability,
-    );
+    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user, availability);
     if (!m) {
       return undefined;
     }
@@ -241,7 +234,7 @@ export function FavoriteCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformImageVisionDefault = useMemo(():
     | ImageVisionModelSelection
@@ -259,7 +252,7 @@ export function FavoriteCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformVideoVisionDefault = useMemo(():
     | VideoVisionModelSelection
@@ -277,7 +270,7 @@ export function FavoriteCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformAudioVisionDefault = useMemo(():
     | AudioVisionModelSelection
@@ -295,7 +288,7 @@ export function FavoriteCreateContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const skillId = form.watch("skillId");
   const voiceModelSelection = form.watch("voiceModelSelection");
@@ -337,11 +330,7 @@ export function FavoriteCreateContainer({
 
       if (modelSelection) {
         // Resolve model selection to actual ModelId
-        const bestModel = getBestChatModel(
-          modelSelection,
-          user,
-          agentEnvAvailability,
-        );
+        const bestModel = getBestChatModel(modelSelection, user, availability);
         const parsed = chatManualModelSelectionSchema.safeParse({
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: bestModel?.id,

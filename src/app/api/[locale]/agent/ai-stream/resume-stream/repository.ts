@@ -320,6 +320,7 @@ export class ResumeStreamRepository {
                 ? parseSkillId(resolvedFavoriteConfig.skillId).variantId
                 : null,
             );
+            const availability = await getInstanceAvailability();
             const cascadeModel = resolveChatModelId(
               resolvedFavoriteConfig?.modelSelection ?? undefined,
               skillVariant?.modelSelection ?? undefined,

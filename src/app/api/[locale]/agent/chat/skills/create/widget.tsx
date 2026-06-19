@@ -10,7 +10,6 @@ import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetLocale,
-  useWidgetLogger,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
@@ -26,7 +25,7 @@ import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-butt
 import { type JSX, useCallback, useMemo, useState } from "react";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import { scopedTranslation as skillIdTranslation } from "../[id]/i18n";
 import { useVariantPlatformDefaults, VariantList } from "../[id]/widget";
@@ -50,12 +49,13 @@ export function SkillCreateContainer({
   const form = useWidgetForm<typeof defintion.POST>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const availability = useProviderAvailability();
   const { t: tId } = skillIdTranslation.scopedT(locale);
   const fieldValue = useWidgetValue<typeof defintion.POST>();
   const emptyField = useMemo(() => ({}), []);
 
   // Variant management using the reusable VariantList + VariantEditorPanel
-  const platformDefaults = useVariantPlatformDefaults(user);
+  const platformDefaults = useVariantPlatformDefaults(user, availability);
   const [localVariants, setLocalVariants] = useState<SkillVariantData[]>([
     {
       id: "default",
@@ -68,14 +68,6 @@ export function SkillCreateContainer({
     (newVariants: SkillVariantData[]): void => {
       setLocalVariants(newVariants);
       form.setValue("variants", newVariants, { shouldDirty: true });
-      // Sync top-level modelSelection with default variant for backward compat
-      const defaultVariant =
-        newVariants.find((v) => v.isDefault) ?? newVariants[0];
-      if (defaultVariant) {
-        form.setValue("modelSelection", defaultVariant.modelSelection, {
-          shouldDirty: true,
-        });
-      }
     },
     [form],
   );
@@ -130,6 +122,7 @@ export function SkillCreateContainer({
               platformDefaults={platformDefaults}
               locale={locale}
               user={user}
+              availability={availability}
               t={tId}
             />
           </Div>

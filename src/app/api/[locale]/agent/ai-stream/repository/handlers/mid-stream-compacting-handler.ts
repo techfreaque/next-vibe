@@ -154,14 +154,34 @@ export class MidStreamCompactingHandler {
       compactingMessageId,
     });
 
-    // Write compacting record to DB + emit SSE so the UI shows the compacting bubble.
-    // messagesToCompact is empty — we only have SDK-format messages here, not DB records.
-    // Use ctx.currentParentId (last tool result in the chain) as parent so the compacting
-    // message is a child of the last tool step, not a sibling.
+    // Write compacting record to DB + emit SSE so the UI shows the compacting
+    // bubble. The compacting node must sit on the CURRENT turn's tip so the
+    // next assistant chains through it (pendingQueueParentId, set by the
+    // caller). ctx parent fields are unreliable at the step boundary: at step
+    // 0→1 currentParentId still holds the user message's PARENT (not the user
+    // message), which would make the compacting node a sibling of the user
+    // message and orphan it. Resolve the thread's newest committed message
+    // from the DB — the unambiguous current leaf in every step.
+    const pendingTail = [...ctx.pendingToolMessages.values()].at(-1);
+    let compactingParentId = pendingTail?.messageId ?? ctx.currentParentId;
+    if (!pendingTail) {
+      const { db } = await import("@/app/api/[locale]/system/db");
+      const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
+      const { eq, desc } = await import("drizzle-orm");
+      const [dbLeaf] = await db
+        .select({ id: chatMessages.id })
+        .from(chatMessages)
+        .where(eq(chatMessages.threadId, threadId))
+        .orderBy(desc(chatMessages.createdAt))
+        .limit(1);
+      if (dbLeaf) {
+        compactingParentId = dbLeaf.id;
+      }
+    }
     await ctx.dbWriter.emitCompactingMessageCreated({
       messageId: compactingMessageId,
       threadId,
-      parentId: ctx.currentParentId,
+      parentId: compactingParentId,
       sequenceId: compactingSequenceId,
       model,
       skill: skill || null,
@@ -194,7 +214,13 @@ export class MidStreamCompactingHandler {
         model: providerModel,
         messages: compactingMessages,
         ...temperatureParam,
-        abortSignal,
+        // Hard cap: a stalled provider must fail the compacting call quickly
+        // (handleFailure aborts the stream cleanly) instead of holding the
+        // thread until a network-level timeout minutes later.
+        abortSignal: AbortSignal.any([
+          abortSignal,
+          AbortSignal.timeout(COMPACTING_LLM_TIMEOUT_MS),
+        ]),
       });
 
       for await (const part of streamResult.fullStream) {
@@ -214,6 +240,36 @@ export class MidStreamCompactingHandler {
             usageData.inputTokenDetails?.cacheReadTokens ??
             0;
           const uncachedInputTokens = inputTokens - cachedInputTokens;
+
+          // Empty summary is worse than no compacting — it would erase context.
+          if (compactedSummary.trim() === "") {
+            if (outputTokens > 0) {
+              // Model produced tokens but no text (reasoning-only response, e.g. kimi-k2.6).
+              // Skip compacting and continue stream with original messages — safer than aborting.
+              logger.warn(
+                "[MidStreamCompacting] LLM produced reasoning tokens but no text — skipping compacting, stream continues",
+                { inputTokens, outputTokens },
+              );
+              await ctx.dbWriter.emitCompactingFailed({
+                messageId: compactingMessageId,
+                errorMessage: "Reasoning-only response, no text produced",
+              });
+              return null;
+            }
+            logger.error(
+              "[MidStreamCompacting] LLM produced no text output - treating as compacting failure",
+              { inputTokens, outputTokens },
+            );
+            await MidStreamCompactingHandler.handleFailure({
+              compactingMessageId,
+              errorMessage: "Compacting LLM produced no text output",
+              ctx,
+              streamAbortController,
+              t,
+            });
+            return null;
+          }
+
           const creditCost = calculateCreditCost(
             modelConfig,
             uncachedInputTokens,

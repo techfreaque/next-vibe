@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, eq, gt, inArray, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
@@ -92,13 +92,14 @@ function makeCortexNodeSyncProvider(
         // boundary row whose µs tail is non-zero is strictly greater than the
         // returned ms cursor and re-syncs forever. date_trunc keeps the round-trip
         // exact so a current cursor short-circuits to empty.
+        // Pass cursor as a raw SQL string literal to avoid pg driver timezone
+        // conversion. The DB stores TIMESTAMP WITHOUT TIMEZONE in local time;
+        // new Date(cursor) → toISOString() → pg converts to local+offset, making
+        // the comparison 2h ahead in CEST and returning 0 rows.
         const where = typedCursor
           ? and(
               filter(userId),
-              gt(
-                sql`date_trunc('milliseconds', ${cortexNodes.updatedAt})`,
-                new Date(typedCursor.updatedAt),
-              ),
+              sql`date_trunc('milliseconds', ${cortexNodes.updatedAt}) > ${typedCursor.updatedAt}::timestamp`,
             )
           : filter(userId);
 

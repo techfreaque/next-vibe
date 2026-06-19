@@ -26,6 +26,8 @@ import {
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+
 import type endpoints from "./definition";
 
 interface SpreadsheetOption {
@@ -83,6 +85,7 @@ export function GoogleSheetsWidget(): JSX.Element {
           undefined,
           undefined,
           locale,
+          availability,
         );
         if (result.success && result.data) {
           setSheets(result.data.sheets);
@@ -130,6 +133,7 @@ export function GoogleSheetsWidget(): JSX.Element {
           },
           undefined,
           locale,
+          availability,
         );
         endpointMutations?.read?.refetch?.();
       } catch {

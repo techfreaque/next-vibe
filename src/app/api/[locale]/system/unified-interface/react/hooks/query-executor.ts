@@ -9,6 +9,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -43,6 +44,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
   pathParams,
   locale,
   user,
+  availability,
   options = {},
 }: {
   endpoint: TEndpoint;
@@ -55,6 +57,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
     : TEndpoint["types"]["UrlVariablesOutput"];
   locale: CountryLanguage;
   user: JwtPayloadType;
+  availability: AgentEnvAvailability;
   options?: QueryExecutorOptions<
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["ResponseOutput"],
@@ -134,6 +137,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       locale,
       requestData,
       pathParams,
+      availability,
     );
 
     if (!response.success) {

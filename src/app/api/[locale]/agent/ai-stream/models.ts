@@ -3272,10 +3272,11 @@ export function filterChatModels(
   selection: ChatModelSelection,
   user: JwtPayloadType,
   availability: AgentEnvAvailability,
-  providerOverride?: ApiProvider,
 ): ChatModelOption[] {
-  const pool = providerOverride
-    ? chatModelOptionsPool.filter((m) => m.apiProvider === providerOverride)
+  const pool = availability.unbottledForce
+    ? chatModelOptionsPool.filter(
+        (m) => m.apiProvider === ApiProvider.UNBOTTLED,
+      )
     : chatModelOptionsPool;
   return filterRoleModels(pool, selection, user, availability);
 }
@@ -3285,9 +3286,6 @@ export function getBestChatModel(
   selection: ChatModelSelection,
   user: JwtPayloadType,
   availability: AgentEnvAvailability,
-  providerOverride?: ApiProvider,
 ): ChatModelOption | null {
-  return (
-    filterChatModels(selection, user, availability, providerOverride)[0] ?? null
-  );
+  return filterChatModels(selection, user, availability)[0] ?? null;
 }

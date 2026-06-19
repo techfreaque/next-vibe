@@ -21,7 +21,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { parseError } from "../../../shared/utils";
 import type { ChatModelSelection } from "../../ai-stream/models";
 import type { AgentEnvAvailability } from "../../env-availability";
-import { agentEnvAvailability } from "../../env-availability";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
 import type { VoiceModelSelection } from "../../text-to-speech/models";
@@ -101,10 +100,14 @@ export class ChatFavoritesRepositoryClient {
     logger: EndpointLogger,
     locale: CountryLanguage,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const settings = ChatSettingsRepositoryClient.loadLocalSettings(user);
+      const settings = ChatSettingsRepositoryClient.loadLocalSettings(
+        user,
+        availability,
+      );
       const activeFavoriteId = settings.activeFavoriteId;
 
       // Load stored minimal configs
@@ -440,6 +443,7 @@ export class ChatFavoritesRepositoryClient {
     characterVoiceSelection: VoiceModelSelection | null,
     locale: CountryLanguage,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): FavoriteCard {
     const { t } = scopedTranslation.scopedT(locale);
     const bestModel = getBestChatModelForFavorite(
@@ -486,6 +490,7 @@ export class ChatFavoritesRepositoryClient {
             modelInfo: getModelDisplayName(
               bestModel,
               !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN),
+              availability,
             ),
             modelProvider:
               modelProviders[bestModel.provider]?.name ??

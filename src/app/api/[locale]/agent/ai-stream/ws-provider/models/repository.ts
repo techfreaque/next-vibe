@@ -6,7 +6,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { chatModelOptions } from "@/app/api/[locale]/agent/ai-stream/models";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { imageGenModelOptions } from "@/app/api/[locale]/agent/image-generation/models";
 import { getModelPrice } from "@/app/api/[locale]/agent/models/all-models";
 import {
@@ -44,7 +44,14 @@ function mapModel(model: AnyModelOption, category: string): ModelEntry {
 
 function mapModels(models: AnyModelOption[], category: string): ModelEntry[] {
   return models
-    .filter((m) => !m.adminOnly && isModelProviderAvailable(m))
+    .filter(
+      (m) =>
+        !m.adminOnly &&
+        isModelProviderAvailable(m, getEnvAvailability()) &&
+        // Never advertise relay models: a provider serving UNBOTTLED entries
+        // would create recursive relay chains (ws-provider/stream/spec.md).
+        m.apiProvider !== ApiProvider.UNBOTTLED,
+    )
     .map((m) => mapModel(m, category));
 }
 

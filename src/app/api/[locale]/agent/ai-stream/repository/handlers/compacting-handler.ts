@@ -25,6 +25,12 @@ import type { StreamContext } from "../core/stream-context";
 import { MessageConverter } from "./message-converter";
 
 /**
+ * Hard cap for the compacting LLM call. Summarization of a large thread
+ * streams well within this; only a stalled provider connection exceeds it.
+ */
+export const COMPACTING_LLM_TIMEOUT_MS = 600_000;
+
+/**
  * Build compacting instructions (without conversation text)
  */
 function buildCompactingInstructions(): string {
@@ -190,6 +196,16 @@ export class CompactingHandler {
         newParentId: compactingMessageId,
         logger,
       });
+      // Mirror the compacting insert + user re-parent to peers when this is a
+      // REMOTE-folder owned thread. The live relay already delivered the
+      // PRE-reparent user message to the caller; without this push the caller's
+      // mirror keeps the stale parent and the compacting node orphans into a
+      // branch. pushThreadSync no-ops for non-mirrored threads.
+      if (userId) {
+        const { pushThreadSync } =
+          await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+        await pushThreadSync(threadId, userId, logger);
+      }
     }
     if (currentUserMessage) {
       ctx.dbWriter.emitUserMessageCreated({
@@ -219,7 +235,13 @@ export class CompactingHandler {
         // or other system-level instructions that would bloat the context.
         messages: compactingMessages,
         ...compactingTemperatureParam,
-        abortSignal,
+        // Hard cap: a stalled provider must fail the compacting call quickly
+        // (handleFailure aborts the stream cleanly) instead of holding the
+        // thread until a network-level timeout minutes later.
+        abortSignal: AbortSignal.any([
+          abortSignal,
+          AbortSignal.timeout(COMPACTING_LLM_TIMEOUT_MS),
+        ]),
       });
 
       for await (const part of streamResult.fullStream) {
@@ -239,6 +261,28 @@ export class CompactingHandler {
             usageData.inputTokenDetails?.cacheReadTokens ??
             0;
           const uncachedInputTokens = inputTokens - cachedInputTokens;
+
+          // Empty summary is worse than no compacting — it would erase context.
+          // Treat it as a failure so the stream stops rather than continuing with
+          // a blank "summary" that discards the entire conversation history.
+          if (compactedSummary.trim() === "") {
+            logger.error(
+              "[Compacting] LLM produced no text output - treating as compacting failure",
+              { inputTokens, outputTokens },
+            );
+            await ctx.dbWriter.emitCompactingFailed({
+              messageId: compactingMessageId,
+              errorMessage: "Compacting LLM produced no text output",
+            });
+            ctx.dbWriter.emitError(
+              fail({
+                message: t("errors.compactingStreamError"),
+                errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+              }),
+              ctx.lastParentId,
+            );
+            return { success: false, compactingMessageId };
+          }
 
           const modelConfig = getChatModelById(model);
           const creditCost = calculateCreditCost(

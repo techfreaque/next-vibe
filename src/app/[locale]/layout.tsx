@@ -13,6 +13,8 @@ import { Script } from "next-vibe-ui/ui/script";
 import { Scripts } from "next-vibe-ui/ui/scripts";
 import type { JSX, ReactNode } from "react";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { envClient } from "@/config/env-client";
 import { configScopedTranslation } from "@/config/i18n";
@@ -45,7 +47,7 @@ export async function generateMetadata({
     title: t("meta.defaultTitle"),
     category: t("meta.category"),
     description: t("meta.description", {
-      modelCount: getAvailableModelCount(false),
+      modelCount: getAvailableModelCount(false, getEnvAvailability()),
     }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
     imageAlt: t("meta.imageAlt"),
@@ -77,6 +79,7 @@ interface RootLayoutData {
   locale: CountryLanguage;
   structuredData: StructuredDataOrganization;
   theme: "light" | "dark";
+  availability: AgentEnvAvailability;
   children?: ReactNode;
 }
 
@@ -113,14 +116,18 @@ export async function tanstackLoader({
   };
   const themeCookie = (await cookies()).get("theme_v2")?.value;
   const theme: "light" | "dark" = themeCookie === "light" ? "light" : "dark";
+  const { getInstanceAvailability } =
+    await import("@/app/api/[locale]/agent/env-availability");
+  const availability = await getInstanceAvailability();
 
-  return { locale, structuredData, theme };
+  return { locale, structuredData, theme, availability };
 }
 
 export function TanstackPage({
   locale,
   structuredData,
   theme,
+  availability,
   children,
 }: RootLayoutData): JSX.Element {
   return (
@@ -137,7 +144,11 @@ export function TanstackPage({
         />
       </Head>
       <Body className={inter.className}>
-        <RootProviders locale={locale} theme={theme}>
+        <RootProviders
+          locale={locale}
+          theme={theme}
+          availability={availability}
+        >
           <Outlet>{children}</Outlet>
         </RootProviders>
         <Scripts />

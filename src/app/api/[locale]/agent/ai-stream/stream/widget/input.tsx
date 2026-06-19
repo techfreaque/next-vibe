@@ -75,7 +75,7 @@ import {
   useMessageOperations,
 } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-operations";
 import { CortexButton } from "@/app/api/[locale]/agent/cortex/widget/cortex-button";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
@@ -106,6 +106,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
+  const availability = useProviderAvailability();
 
   // Boot context
   const bootContext = useChatBootContext();
@@ -139,7 +140,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     logger,
     initialSettingsData,
   );
-  const defaults = ChatSettingsRepositoryClient.getDefaults(user);
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user, availability);
   const effectiveSettings = settings ?? defaults;
   const ttsAutoplay = effectiveSettings.ttsAutoplay;
   const selectedSkill = effectiveSettings.selectedSkill;
@@ -323,7 +324,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   const { t } = aiStreamScopedTranslation.scopedT(locale);
   const voiceRuntime = useVoiceRuntimeState();
-  const voiceUnconfigured = !agentEnvAvailability.voice;
+  const voiceUnconfigured = !availability.voice;
 
   const currentModel = getChatModelById(selectedModel);
   const modelSupportsTools = currentModel?.supportsTools ?? false;

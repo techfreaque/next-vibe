@@ -86,6 +86,7 @@ import {
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
@@ -189,6 +190,7 @@ function ThreadRow({
   allFolders: FolderFromList[];
 }): React.JSX.Element {
   const { locale, logger, user } = useWidgetContext();
+  const availability = useProviderAvailability();
   const { t: tFolders } = foldersScopedTranslation.scopedT(locale);
   const { t } = threadsScopedTranslation.scopedT(locale);
   const { t: tChat } = chatScopedTranslation.scopedT(locale);
@@ -319,6 +321,7 @@ function ThreadRow({
         { ...updates, rootFolderId: item.rootFolderId },
         { threadId: item.id },
         locale,
+        availability,
       );
     }
   };
@@ -370,6 +373,7 @@ function ThreadRow({
           { rootFolderId: item.rootFolderId },
           { threadId: item.id },
           locale,
+          availability,
         );
       }
     })();
@@ -547,6 +551,7 @@ function ThreadRow({
                               },
                               { threadId: item.id },
                               locale,
+                              availability,
                             );
                           })();
                         }}
@@ -695,6 +700,7 @@ function ThreadRowShared({
   item: FolderContentsItem;
 }): React.JSX.Element {
   const { locale, logger, user } = useWidgetContext();
+  const availability = useProviderAvailability();
   const { t: tFolders } = foldersScopedTranslation.scopedT(locale);
   const { t } = threadsScopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
@@ -786,6 +792,7 @@ function ThreadRowShared({
       { ...updates, rootFolderId: item.rootFolderId },
       { threadId: item.id },
       locale,
+      availability,
     );
   };
 
@@ -831,6 +838,7 @@ function ThreadRowShared({
         { rootFolderId: item.rootFolderId },
         { threadId: item.id },
         locale,
+        availability,
       );
     })();
     setDeleteDialogOpen(false);
@@ -1104,6 +1112,7 @@ function FolderRow({
 }): React.JSX.Element {
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
+  const availability = useProviderAvailability();
   const { t } = foldersScopedTranslation.scopedT(locale);
   const { t: tChat } = chatScopedTranslation.scopedT(locale);
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
@@ -1313,6 +1322,7 @@ function FolderRow({
         updates,
         { subFolderId: item.id },
         locale,
+        availability,
       );
     }
   };
@@ -1385,6 +1395,7 @@ function FolderRow({
           undefined,
           { subFolderId: item.id },
           locale,
+          availability,
         );
       }
     })();

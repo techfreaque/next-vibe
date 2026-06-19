@@ -6,6 +6,7 @@ import {
 import { validateData } from "next-vibe/shared/utils";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
@@ -153,6 +154,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   locale: CountryLanguage,
   requestData: TEndpoint["types"]["RequestOutput"],
   pathParams: TEndpoint["types"]["UrlVariablesOutput"],
+  availability: AgentEnvAvailability,
 ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
   logger.debug("callApi", {
     endpoint: endpoint.path.join("/"),
@@ -209,6 +211,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         locale,
         logger,
         user,
+        availability,
       });
     }
     logger.warn(

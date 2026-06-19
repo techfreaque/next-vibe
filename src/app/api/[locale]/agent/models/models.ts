@@ -705,7 +705,7 @@ export function isApiProviderAvailable(
     case ApiProvider.MODELSLAB:
       return env.modelsLab;
     case ApiProvider.UNBOTTLED:
-      return env.unbottled;
+      return env.unbottledSystem;
     case ApiProvider.OPENAI_STT:
       return env.openAiStt;
     case ApiProvider.EDEN_AI_STT:
@@ -1002,18 +1002,13 @@ export function filterRoleModels<
       if (candidates[0]?.adminOnly && !isAdmin) {
         return [];
       }
-      if (isAdmin) {
-        // Admins can see all available providers for this model.
-        return candidates.filter((m) =>
-          isModelProviderAvailable(m, availability),
-        );
-      }
-      // Non-admins: pick the cheapest available provider for this model ID.
-      const available = candidates.find((m) =>
+      // Admins see all available providers for this model; non-admins pick cheapest.
+      // Both fall through to filter fallback when no provider is available.
+      const availableCandidates = candidates.filter((m) =>
         isModelProviderAvailable(m, availability),
       );
-      if (available) {
-        return [available];
+      if (availableCandidates.length > 0) {
+        return isAdmin ? availableCandidates : [availableCandidates[0]!];
       }
       // No provider available for this specific model - fall through to filter fallback.
     }

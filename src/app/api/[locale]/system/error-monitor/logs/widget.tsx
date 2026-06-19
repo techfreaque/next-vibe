@@ -35,6 +35,7 @@ import { TextFieldWidget } from "next-vibe-ui/unified/form-fields/text-field/wid
 import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/widget";
 import React, { useCallback, useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { cn } from "@/app/api/[locale]/shared/utils";
 
 import type endpoints from "./definition";
@@ -229,6 +230,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
   const user = useWidgetUser();
   const locale = useWidgetLocale();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const platform = useWidgetPlatform();
   const isCli = platform === "cli";
 
@@ -286,6 +288,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
           { fingerprint, resolved },
           undefined,
           locale,
+          availability,
         );
         // Refetch the logs list to reflect updated status
         endpointMutations?.read?.refetch?.();
@@ -293,7 +296,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
         setUpdatingFingerprint(null);
       }
     },
-    [user, logger, locale, endpointMutations],
+    [user, logger, locale, availability, endpointMutations],
   );
 
   return (

@@ -15,7 +15,7 @@ import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
 import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
 import { modelProviders } from "@/app/api/[locale]/agent/models/models";
 import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
@@ -135,15 +135,13 @@ export async function tanstackLoader({
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
 
+  const availability = await getInstanceAvailability();
+
   // Resolve per-variant model info server-side - avoids SSR circular dep in client bundle.
   const resolvedVariants: ResolvedSkillModels["variants"] = [];
   for (const v of initialSkillData?.variants ?? []) {
     const chatSel = v.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
-    const chatModel = getBestChatModel(
-      chatSel,
-      skillUser,
-      agentEnvAvailability,
-    );
+    const chatModel = getBestChatModel(chatSel, skillUser, availability);
     const provider = chatModel
       ? (modelProviders[chatModel.provider] ?? null)
       : null;
@@ -167,13 +165,12 @@ export async function tanstackLoader({
 
     const voiceSel = v.voiceModelSelection ?? null;
     const voiceName = voiceSel
-      ? (getBestTtsModel(voiceSel, skillUser, agentEnvAvailability)?.name ??
-        null)
+      ? (getBestTtsModel(voiceSel, skillUser, availability)?.name ?? null)
       : null;
 
     const imageGenSel = v.imageGenModelSelection ?? null;
     const imageGenModel = imageGenSel
-      ? getBestImageGenModel(imageGenSel, skillUser, agentEnvAvailability)
+      ? getBestImageGenModel(imageGenSel, skillUser, availability)
       : null;
     const imageGenName = imageGenModel?.name ?? null;
     const imageGenCreditCost =
@@ -183,14 +180,14 @@ export async function tanstackLoader({
 
     const musicGenSel = v.musicGenModelSelection ?? null;
     const musicGenName = musicGenSel
-      ? (getBestMusicGenModel(musicGenSel, skillUser, agentEnvAvailability)
-          ?.name ?? null)
+      ? (getBestMusicGenModel(musicGenSel, skillUser, availability)?.name ??
+        null)
       : null;
 
     const videoGenSel = v.videoGenModelSelection ?? null;
     const videoGenName = videoGenSel
-      ? (getBestVideoGenModel(videoGenSel, skillUser, agentEnvAvailability)
-          ?.name ?? null)
+      ? (getBestVideoGenModel(videoGenSel, skillUser, availability)?.name ??
+        null)
       : null;
 
     resolvedVariants.push({
@@ -227,25 +224,22 @@ export async function tanstackLoader({
 
   const voiceSel = defaultVariant?.voiceModelSelection ?? null;
   const voiceName = voiceSel
-    ? (getBestTtsModel(voiceSel, skillUser, agentEnvAvailability)?.name ?? null)
+    ? (getBestTtsModel(voiceSel, skillUser, availability)?.name ?? null)
     : null;
 
   const imageGenSel = defaultVariant?.imageGenModelSelection ?? null;
   const imageGenName = imageGenSel
-    ? (getBestImageGenModel(imageGenSel, skillUser, agentEnvAvailability)
-        ?.name ?? null)
+    ? (getBestImageGenModel(imageGenSel, skillUser, availability)?.name ?? null)
     : null;
 
   const musicGenSel = defaultVariant?.musicGenModelSelection ?? null;
   const musicGenName = musicGenSel
-    ? (getBestMusicGenModel(musicGenSel, skillUser, agentEnvAvailability)
-        ?.name ?? null)
+    ? (getBestMusicGenModel(musicGenSel, skillUser, availability)?.name ?? null)
     : null;
 
   const videoGenSel = defaultVariant?.videoGenModelSelection ?? null;
   const videoGenName = videoGenSel
-    ? (getBestVideoGenModel(videoGenSel, skillUser, agentEnvAvailability)
-        ?.name ?? null)
+    ? (getBestVideoGenModel(videoGenSel, skillUser, availability)?.name ?? null)
     : null;
 
   const hasStt = !!defaultVariant?.sttModelSelection;

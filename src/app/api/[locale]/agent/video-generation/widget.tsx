@@ -18,7 +18,6 @@ import {
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
-  useWidgetLogger,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
@@ -29,12 +28,12 @@ import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "@/app/api/[locale]/agent/models/widget/model-selector";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
 import {
@@ -119,6 +118,7 @@ export function VideoGenerationContainer({
   const prompt = form?.watch("prompt") ?? "";
   const user = useWidgetUser();
   const locale = useWidgetLocale();
+  const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
   const [showModelSelector, setShowModelSelector] = useState(false);
 
@@ -141,7 +141,11 @@ export function VideoGenerationContainer({
   const defaultModelSelection = useMemo(():
     | VideoGenModelSelection
     | undefined => {
-    const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
+    const m = getBestVideoGenModel(
+      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+      user,
+      availability,
+    );
     if (!m) {
       return undefined;
     }
@@ -152,7 +156,7 @@ export function VideoGenerationContainer({
       return undefined;
     }
     return { selectionType: ModelSelectionType.MANUAL, manualModelId: modelId };
-  }, [user]);
+  }, [user, availability]);
 
   const resolvedModelId: VideoGenModelId | undefined =
     currentModelId ??
@@ -173,7 +177,7 @@ export function VideoGenerationContainer({
 
   // Aspect ratio options from model capabilities - memoized to avoid stale deps in useEffect
   const aspectRatioOptions = useMemo(
-    () => resolvedVideoBased?.supportedAspectRatios || [],
+    () => resolvedVideoBased?.supportedAspectRatios ?? [],
     [resolvedVideoBased],
   );
   const resolutionOptions = useMemo(

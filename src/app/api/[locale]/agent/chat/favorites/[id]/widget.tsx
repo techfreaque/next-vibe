@@ -65,6 +65,7 @@ import { ModelGroup } from "@/app/api/[locale]/agent/chat/skills/[id]/widget";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
 import {
@@ -77,7 +78,6 @@ import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-
 import { getBestSttModel } from "@/app/api/[locale]/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
@@ -150,6 +150,7 @@ export function FavoriteEditContainer({
   const editResult = useWidgetValue<typeof definitionPatch.PATCH>();
   const { t: tId } = skillIdTranslation.scopedT(locale);
 
+  const availability = useProviderAvailability();
   const navigation = useWidgetNavigation();
   const isSubmitting = useWidgetIsSubmitting();
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
@@ -220,7 +221,11 @@ export function FavoriteEditContainer({
 
   // Platform-level default model selections (env-aware)
   const platformChatDefault = useMemo((): ChatModelSelection | undefined => {
-    const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
+    const m = getBestChatModel(
+      DEFAULT_CHAT_MODEL_SELECTION,
+      user,
+      availability,
+    );
     if (!m) {
       return undefined;
     }
@@ -229,10 +234,10 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformTtsDefault = useMemo((): VoiceModelSelection | undefined => {
-    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
+    const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user, availability);
     if (!m) {
       return undefined;
     }
@@ -241,12 +246,16 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformImageGenDefault = useMemo(():
     | ImageGenModelSelection
     | undefined => {
-    const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
+    const m = getBestImageGenModel(
+      DEFAULT_IMAGE_GEN_MODEL_SELECTION,
+      user,
+      availability,
+    );
     if (!m) {
       return undefined;
     }
@@ -255,12 +264,16 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformMusicGenDefault = useMemo(():
     | MusicGenModelSelection
     | undefined => {
-    const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
+    const m = getBestMusicGenModel(
+      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+      user,
+      availability,
+    );
     if (!m) {
       return undefined;
     }
@@ -269,12 +282,16 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformVideoGenDefault = useMemo(():
     | VideoGenModelSelection
     | undefined => {
-    const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
+    const m = getBestVideoGenModel(
+      DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+      user,
+      availability,
+    );
     if (!m) {
       return undefined;
     }
@@ -283,10 +300,10 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformSttDefault = useMemo((): SttModelSelection | undefined => {
-    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
+    const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user, availability);
     if (!m) {
       return undefined;
     }
@@ -295,7 +312,7 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformImageVisionDefault = useMemo(():
     | ImageVisionModelSelection
@@ -313,7 +330,7 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformVideoVisionDefault = useMemo(():
     | VideoVisionModelSelection
@@ -331,7 +348,7 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const platformAudioVisionDefault = useMemo(():
     | AudioVisionModelSelection
@@ -349,7 +366,7 @@ export function FavoriteEditContainer({
       manualModelId: m.id,
     });
     return parsed.success ? parsed.data : undefined;
-  }, [user]);
+  }, [user, availability]);
 
   const watchedAllowedTools = form.watch("availableTools") ?? null;
   const watchedPinnedTools = form.watch("pinnedTools") ?? null;
@@ -448,6 +465,7 @@ export function FavoriteEditContainer({
       logger,
       locale,
       user,
+      availability,
     });
   };
 
@@ -542,6 +560,7 @@ export function FavoriteEditContainer({
                 logger={logger}
                 locale={locale}
                 user={user}
+                availability={availability}
                 isSubmitting={isSubmitting}
                 t={t}
               />
@@ -1467,6 +1486,7 @@ function SaveAndUseButton({
   logger: ReturnType<typeof useWidgetLogger>;
   locale: ReturnType<typeof useWidgetLocale>;
   user: ReturnType<typeof useWidgetUser>;
+  availability: AgentEnvAvailability;
   isSubmitting: boolean | undefined;
   t: ReturnType<typeof useWidgetTranslation<typeof definitionPatch.PATCH>>;
 }): JSX.Element {
@@ -1525,6 +1545,7 @@ function SaveAndUseButton({
           logger,
           locale,
           user,
+          availability,
         });
 
         // Pop navigation like the regular save button does

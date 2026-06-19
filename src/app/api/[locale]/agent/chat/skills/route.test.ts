@@ -19,7 +19,7 @@ import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { ChatModelId } from "../../ai-stream/models";
+import { SttModelId } from "../../speech-to-text/models";
 import { isUuid } from "../slugify";
 import skillSingleEndpoint from "./[id]/definition";
 import skillPublishEndpoint from "./[id]/publish/definition";
@@ -106,7 +106,11 @@ describe("Skills CRUD Integration", () => {
       name,
       async () => {
         if (suiteFailed) {
-          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
+          expect(
+            false,
+            `[${name}] Previous test in suite failed — aborting dependent tests`,
+          ).toBe(true);
+          return;
         }
         try {
           await fn();
@@ -134,9 +138,9 @@ describe("Skills CRUD Integration", () => {
           "You are a test assistant. Always respond with 'test-ok'.",
         category: SkillCategory.CODING,
         isPublic: false,
-        modelSelection: {
+        sttModelSelection: {
           selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ChatModelId.GPT_5,
+          manualModelId: SttModelId.OPENAI_WHISPER,
         },
       },
       user: adminUser,
@@ -212,8 +216,8 @@ describe("Skills CRUD Integration", () => {
       urlPathParams: { id: createdSkillSlug },
       data: {
         name: `${TEST_SKILL_NAME} Updated`,
-        tagline: "Updated tagline for test",
-        description: "Updated description for integration test",
+        tagline: "Updated tagline for test" as never,
+        description: "Updated description for integration test" as never,
         icon: "wrench",
         systemPrompt: "You are an updated test assistant.",
         category: SkillCategory.CODING,

@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/use-cortex-list-on-the-root-path-----to-see-all----4979c940-61c6-4751-8f8e-ddec363c4449.md\n\n# Use cortex-list on the root path \"/\" to see all...\nFolder: cron\nPreview: <think> The task is to list every entry from the root path \"/\" and identify which are virtual mounts vs native storage.…",
+    "input": "Use cortex-mkdir to create /documents/edge-test/deep/nested/. Then use cortex-write to create /documents/edge-test/deep/nested/leaf.md with content \"# Leaf Node\n\nDeep file.\" Confirm both operations succeeded.\n\n---\nIMPORTANT: End your entire response with exactly one of these two lines (nothing after it):\n  VERDICT: PASS\n  VERDICT: FAIL – <one-sentence reason>\n\nChoose PASS only if every tool call succeeded, results look correct, and the task is fully done.\nChoose FAIL for ANY of: tool errors, unexpected results, missing output, wrong data, unclear state.",
     "encoding_format": "float"
   }
 }

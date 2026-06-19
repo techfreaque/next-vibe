@@ -264,6 +264,12 @@ export class StreamExecutionHandler {
                 (): StopCondition<typeof tools> => () =>
                   ctx.shouldStopLoop ||
                   ctx.stepHasToolsAwaitingConfirmation ||
+                  // execute-tool's confirmation gate sets the flag on the tool
+                  // execution context synchronously inside execute() - read it
+                  // here too so the SDK never starts the next step before the
+                  // part consumer has bridged it onto the loop context.
+                  params.streamContext.stepHasToolsAwaitingConfirmation ===
+                    true ||
                   ctx.shouldYieldForWakeUp ||
                   params.streamContext.waitingForRemoteResult === true
               )(),
@@ -330,14 +336,24 @@ export class StreamExecutionHandler {
                       logger,
                     });
                   if (compactResult) {
-                    // Reset so we don't re-compact on the very next step
-                    lastStepInputTokens = 0;
+                    // Reset to 1 (not 0) so the fallback estimator is suppressed on
+                    // the next prepareStep. With 0, the estimator would re-evaluate
+                    // from the compacted messages and could immediately re-trigger.
+                    lastStepInputTokens = 1;
                     activeMessages = compactResult.messages;
                     // CRITICAL: update the parent chain so the next assistant message
                     // is a child of the compacting message, not the last tool result.
                     // Any wrong parentId here breaks the linked list and creates a branch.
                     ctx.currentParentId = compactResult.compactingMessageId;
                     ctx.lastParentId = compactResult.compactingMessageId;
+                    // prepareStep can fire BEFORE the consumer has processed the
+                    // previous step's tool-result/finish-step parts - those would
+                    // overwrite the direct sets above with the pre-compacting tool
+                    // tip, and the stream would continue from before the compacting
+                    // message. pendingQueueParentId is the deferred override that
+                    // finish-step consumes LAST, after all tool results.
+                    ctx.pendingQueueParentId =
+                      compactResult.compactingMessageId;
                     // Reset sequenceId so messages after compacting belong to a new
                     // sequence block. Without this, the UI groups pre- and post-compact
                     // messages into one block sorted before the compacting message.
@@ -363,10 +379,15 @@ export class StreamExecutionHandler {
 
                 // The queued message's parentId was continuously advanced by
                 // advanceQueuedMessages(), so it already points to the current
-                // frontier. Use ctx.currentParentId as the authoritative source
-                // since it's updated on every DB write in this stream.
+                // frontier. Prefer pendingQueueParentId (set when compacting
+                // inserted a message this prepareStep - the consumer may have
+                // overwritten currentParentId with the pre-compacting tool tip),
+                // then ctx.currentParentId which is updated on every DB write.
                 const dequeueParentId =
-                  ctx.currentParentId ?? ctx.lastParentId ?? null;
+                  ctx.pendingQueueParentId ??
+                  ctx.currentParentId ??
+                  ctx.lastParentId ??
+                  null;
 
                 // Clear isQueued in DB BEFORE continuing so processNextQueuedMessage
                 // in the finally block doesn't re-process the same message (race safety).
@@ -620,8 +641,41 @@ export class StreamExecutionHandler {
         : {}),
     });
 
+    // Provider first-part watchdog: a dead provider connection (request sent,
+    // then nothing - no parts, no close) would hang the stream forever. Armed
+    // when a model call starts (start-step), cleared by that call's first
+    // response part. Tool execution cannot trip it: the tool-call parts that
+    // precede execution clear the timer, and the next arm happens only when
+    // the following model call starts.
+    const PROVIDER_FIRST_PART_TIMEOUT_MS = 180_000;
+    let firstPartTimer: ReturnType<typeof setTimeout> | null = null;
+    const clearFirstPartTimer = (): void => {
+      if (firstPartTimer) {
+        clearTimeout(firstPartTimer);
+        firstPartTimer = null;
+      }
+    };
+    const armFirstPartTimer = (): void => {
+      clearFirstPartTimer();
+      firstPartTimer = setTimeout(() => {
+        logger.warn(
+          "[AI Stream] Provider sent no output within first-part timeout - aborting stream",
+          { timeoutMs: PROVIDER_FIRST_PART_TIMEOUT_MS, threadId, model },
+        );
+        streamAbortController.abort(
+          new StreamAbortError(AbortReason.STREAM_TIMEOUT),
+        );
+      }, PROVIDER_FIRST_PART_TIMEOUT_MS);
+    };
+    armFirstPartTimer();
+
     try {
       for await (const part of streamResult.fullStream) {
+        if (part.type === "start-step") {
+          armFirstPartTimer();
+        } else {
+          clearFirstPartTimer();
+        }
         const { shouldAbort } = await StreamPartHandler.processPart({
           part,
           ctx,
@@ -758,6 +812,8 @@ export class StreamExecutionHandler {
       // Not an abort error, re-throw to outer StreamErrorCatchHandler
       // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Re-throw is necessary here to propagate to StreamErrorCatchHandler
       throw streamError;
+    } finally {
+      clearFirstPartTimer();
     }
 
     const [usageData, providerMeta] = await Promise.all([
@@ -792,10 +848,32 @@ export class StreamExecutionHandler {
         ? cumulativeTokens.cacheWriteTokens
         : providerCacheWriteTokens;
 
-    const finalInputTokens = cumulativeTokens.lastInputTokens;
-    const finalOutputTokens = cumulativeTokens.outputTokens;
-    const finalCachedInputTokens = cumulativeTokens.cachedInputTokens;
-    const finalUncachedInputTokens = cumulativeTokens.uncachedInputTokens;
+    // For models with supportsTools=false, onStepFinish is never registered so
+    // cumulativeTokens stays at zero. Fall back to the SDK's aggregate usageData
+    // for single-step no-tool models (e.g. GPT-5 Image Mini) — it's accurate
+    // because there's only one step and no re-sent cached history to over-count.
+    const sdkInputTokens = usageData.inputTokens ?? 0;
+    const sdkOutputTokens = usageData.outputTokens ?? 0;
+    const sdkCachedInputTokens =
+      usageData.cachedInputTokens ??
+      usageData.inputTokenDetails?.cacheReadTokens ??
+      0;
+    const noStepData =
+      cumulativeTokens.lastInputTokens === 0 &&
+      cumulativeTokens.outputTokens === 0;
+
+    const finalInputTokens = noStepData
+      ? sdkInputTokens
+      : cumulativeTokens.lastInputTokens;
+    const finalOutputTokens = noStepData
+      ? sdkOutputTokens
+      : cumulativeTokens.outputTokens;
+    const finalCachedInputTokens = noStepData
+      ? sdkCachedInputTokens
+      : cumulativeTokens.cachedInputTokens;
+    const finalUncachedInputTokens = noStepData
+      ? Math.max(0, sdkInputTokens - sdkCachedInputTokens)
+      : cumulativeTokens.uncachedInputTokens;
     const finalTotalTokens =
       finalUncachedInputTokens + finalCachedInputTokens + finalOutputTokens;
 

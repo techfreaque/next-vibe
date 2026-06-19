@@ -67,6 +67,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -844,6 +845,7 @@ export function FavoritesListContainer({
   const { push: navigate } = useWidgetNavigation();
   const context = useWidgetContext();
   const { logger, locale, user } = context;
+  const availability = useProviderAvailability();
   const favoritesData = useWidgetSelector<typeof definition.GET>()(
     (d) => d?.favorites,
   );
@@ -889,10 +891,19 @@ export function FavoritesListContainer({
         logger,
         locale,
         user,
+        availability,
       });
       useTourState.getState().setModelSelectorOpen(false);
     },
-    [onPickRaw, favoriteSelectOverride, hideChrome, logger, locale, user],
+    [
+      onPickRaw,
+      favoriteSelectOverride,
+      hideChrome,
+      logger,
+      locale,
+      user,
+      availability,
+    ],
   );
 
   const rawFavoritesList = useMemo(
@@ -986,6 +997,7 @@ export function FavoritesListContainer({
           },
           undefined,
           locale,
+          availability,
         )
         .then(() => {
           logger.info("Favorites positions updated successfully");
@@ -1002,7 +1014,7 @@ export function FavoritesListContainer({
           setDragOverride(null);
         });
     },
-    [logger, user, locale],
+    [logger, user, locale, availability],
   );
 
   /**
@@ -1207,6 +1219,7 @@ function AddVariantButton({
   size?: "sm";
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
+  const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
 
   const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
@@ -1253,6 +1266,7 @@ function AddVariantButton({
         undefined,
         { id: baseSkillId },
         locale,
+        availability,
       );
       if (!characterResponse.success) {
         return;
@@ -1311,6 +1325,7 @@ function DeleteGroupButton({
   locale: CountryLanguage;
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
+  const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
 
   const handleConfirm = async (e: ButtonMouseEvent): Promise<void> => {
@@ -1330,6 +1345,7 @@ function DeleteGroupButton({
             undefined,
             { id },
             locale,
+            availability,
           ),
         ),
       );

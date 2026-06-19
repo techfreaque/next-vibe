@@ -37,6 +37,7 @@ import {
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -239,6 +240,7 @@ function UnbottledLoginField({
   const [remoteUrl, setRemoteUrl] = useState("https://unbottled.ai");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const availability = useProviderAvailability();
 
   // Parse existing credential to show connected state
   const isConnected = setting.health === "connected";
@@ -266,6 +268,7 @@ function UnbottledLoginField({
         { email, password, remoteUrl: normalizedUrl },
         undefined,
         locale,
+        availability,
       );
 
       if (!result.success || !result.data?.credential) {
@@ -280,7 +283,17 @@ function UnbottledLoginField({
     } finally {
       setLoading(false);
     }
-  }, [email, password, remoteUrl, locale, onEdit, t, user, logger]);
+  }, [
+    email,
+    password,
+    remoteUrl,
+    locale,
+    onEdit,
+    t,
+    user,
+    logger,
+    availability,
+  ]);
 
   const handleDisconnect = useCallback((): void => {
     onEdit("UNBOTTLED_CLOUD_CREDENTIALS", "");
@@ -548,6 +561,7 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const { endpointMutations } = useWidgetContext();
 
   const { wizardSteps, modules } = data;
@@ -584,6 +598,7 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
           undefined,
           undefined,
           locale,
+          availability,
         );
         if (result.success && result.data) {
           handleEdit(key, result.data.key);
@@ -592,7 +607,7 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
         // ignore
       }
     },
-    [user, logger, locale, handleEdit],
+    [user, logger, locale, handleEdit, availability],
   );
 
   const saveCurrentStep = useCallback(async (): Promise<void> => {
@@ -623,12 +638,21 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
         toSave as any,
         undefined,
         locale,
+        availability,
       );
       endpointMutations?.read?.refetch?.();
     } finally {
       setSaving(false);
     }
-  }, [activeWizardStep, edits, user, logger, locale, endpointMutations]);
+  }, [
+    activeWizardStep,
+    edits,
+    user,
+    logger,
+    locale,
+    availability,
+    endpointMutations,
+  ]);
 
   const handleNext = useCallback(async (): Promise<void> => {
     await saveCurrentStep();

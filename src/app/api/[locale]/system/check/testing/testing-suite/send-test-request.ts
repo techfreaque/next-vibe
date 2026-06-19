@@ -88,8 +88,12 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
       });
     }
 
-    // Validate response against endpoint schema if available
-    if (endpoint.responseSchema && result.success) {
+    // Validate response against endpoint schema if available.
+    // Skip for ContentResponse (mixed content blocks) — it bypasses the typed schema.
+    const { isContentResponse } =
+      await import("@/app/api/[locale]/shared/types/response.schema");
+    const isContentData = result.success && isContentResponse(result.data);
+    if (endpoint.responseSchema && result.success && !isContentData) {
       const parseResult = endpoint.responseSchema.safeParse(result.data);
       if (!parseResult.success) {
         return fail({

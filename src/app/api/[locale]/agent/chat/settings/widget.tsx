@@ -77,6 +77,8 @@ import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks/
 import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/chat/skills/config";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   SearchProvider,
@@ -123,6 +125,7 @@ function formatTokens(n: number): string {
  */
 function getModelContextWindow(
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
   modelSelection: ChatModelSelection | ChatModelId | null | undefined,
   characterModelSelection?: ChatModelSelection | null,
 ): number {
@@ -137,6 +140,7 @@ function getModelContextWindow(
     modelSelection ?? null,
     characterModelSelection ?? undefined,
     user,
+    availability,
   );
   return best?.contextWindow ?? MAX_ABSOLUTE;
 }
@@ -279,13 +283,19 @@ export function CompactTriggerEdit({
   locale,
 }: CompactTriggerEditProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const availability = useProviderAvailability();
   const modelCap = useMemo(
     () =>
       Math.min(
-        getModelContextWindow(user, modelSelection, characterModelSelection),
+        getModelContextWindow(
+          user,
+          availability,
+          modelSelection,
+          characterModelSelection,
+        ),
         MAX_ABSOLUTE,
       ),
-    [modelSelection, characterModelSelection, user],
+    [modelSelection, characterModelSelection, user, availability],
   );
 
   const effectiveValue = value ?? COMPACT_TRIGGER;
@@ -800,6 +810,7 @@ function PulseSectionDreaming({
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
 
+  const availability = useProviderAvailability();
   const folderUrl = subFolderId
     ? buildFolderUrl(locale, DefaultFolderId.BACKGROUND, subFolderId)
     : null;
@@ -814,6 +825,7 @@ function PulseSectionDreaming({
         { taskId },
         undefined,
         locale,
+        availability,
       );
       if (folderUrl) {
         router.push(folderUrl);
@@ -821,7 +833,7 @@ function PulseSectionDreaming({
     } finally {
       setIsRunning(false);
     }
-  }, [taskId, logger, user, locale, folderUrl, router]);
+  }, [taskId, logger, user, locale, folderUrl, router, availability]);
 
   return (
     <SettingsSection
@@ -918,6 +930,7 @@ function PulseSectionAutopilot({
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
 
+  const availability = useProviderAvailability();
   const folderUrl = subFolderId
     ? buildFolderUrl(locale, DefaultFolderId.BACKGROUND, subFolderId)
     : null;
@@ -932,6 +945,7 @@ function PulseSectionAutopilot({
         { taskId },
         undefined,
         locale,
+        availability,
       );
       if (folderUrl) {
         router.push(folderUrl);
@@ -939,7 +953,7 @@ function PulseSectionAutopilot({
     } finally {
       setIsRunning(false);
     }
-  }, [taskId, logger, user, locale, folderUrl, router]);
+  }, [taskId, logger, user, locale, folderUrl, router, availability]);
 
   return (
     <SettingsSection
@@ -1041,6 +1055,7 @@ function PulseSectionMama({
   const { t } = scopedTranslation.scopedT(locale);
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const availability = useProviderAvailability();
   const [isRunning, setIsRunning] = useState(false);
 
   const handleRunNow = useCallback(async (): Promise<void> => {
@@ -1053,11 +1068,12 @@ function PulseSectionMama({
         { taskId: MAMA_TASK_ID },
         undefined,
         locale,
+        availability,
       );
     } finally {
       setIsRunning(false);
     }
-  }, [logger, user, locale]);
+  }, [logger, user, locale, availability]);
 
   return (
     <SettingsSection

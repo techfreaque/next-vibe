@@ -22,6 +22,7 @@ import { useState } from "react";
 
 import { scopedTranslation } from "@/app/[locale]/subscription/i18n";
 import { chatModelDefinitions } from "@/app/api/[locale]/agent/ai-stream/models";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { imageGenModelDefinitions } from "@/app/api/[locale]/agent/image-generation/models";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
@@ -80,6 +81,7 @@ export function OverviewTab({
   const { locale: currentLocale } = useTranslation();
   const { t } = scopedTranslation.scopedT(currentLocale);
   const [showLegacyModels, setShowLegacyModels] = useState(false);
+  const availability = useProviderAvailability();
 
   const products = productsRepository.getProducts(locale);
   const subscriptionProduct = products[ProductIds.SUBSCRIPTION];
@@ -236,7 +238,7 @@ export function OverviewTab({
                       ? def.providers
                       : def.providers.filter((p) => !p.adminOnly);
                     return visibleProviders.some((p) =>
-                      isApiProviderAvailable(p.apiProvider),
+                      isApiProviderAvailable(p.apiProvider, availability),
                     );
                   });
                   if (typeModels.length === 0) {

@@ -25,10 +25,8 @@ import type {
 import { generateText as aiGenerateText } from "ai";
 
 import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
-import {
-  type AgentEnvAvailability,
-  getInstanceAvailability,
-} from "@/app/api/[locale]/agent/env-availability";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
@@ -82,6 +80,8 @@ export class GapFillExecutor {
       user,
       locale,
     } = params;
+
+    const availability = await getInstanceAvailability();
 
     // Build a lookup from messageId → ChatMessage for variant access
     const chatHistoryById = new Map<string, ChatMessage>(
@@ -364,6 +364,7 @@ export class GapFillExecutor {
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
+    availability: AgentEnvAvailability;
   }): Promise<string | null> {
     const {
       part,
@@ -458,6 +459,7 @@ export class GapFillExecutor {
     locale: CountryLanguage;
     modality: Modality;
     bridgeType: "stt" | "vision" | "translation" | "tts";
+    availability: AgentEnvAvailability;
   }): Promise<string | null> {
     const {
       part,
@@ -596,6 +598,7 @@ Write in flowing prose. Do not summarize. Do not omit. The receiving AI must be 
     user: JwtPayloadType;
     modality: Modality;
     bridgeType: "stt" | "vision" | "translation" | "tts";
+    availability: AgentEnvAvailability;
   }): Promise<string | null> {
     const {
       part,
@@ -760,6 +763,7 @@ Write in structured prose. Do not summarize. Do not omit. The receiving AI must 
     locale: CountryLanguage;
     modality: Modality;
     bridgeType: "stt" | "vision" | "translation" | "tts";
+    availability: AgentEnvAvailability;
   }): Promise<string | null> {
     const {
       part,
@@ -925,6 +929,7 @@ Write in structured prose. Do not summarize. Do not omit. The receiving AI must 
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
+    availability: AgentEnvAvailability;
   }): Promise<string | null> {
     const {
       mediaUrl,

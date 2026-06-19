@@ -6,6 +6,7 @@ import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
   ProductIds,
@@ -88,7 +89,7 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   const currencySymbol = countryInfo.symbol;
 
   const isAdmin = !jwtUser.isPublic && jwtUser.roles.includes(UserRole.ADMIN);
-  const modelCount = getAvailableModelCount(isAdmin);
+  const modelCount = getAvailableModelCount(isAdmin, getEnvAvailability());
 
   let userEmail: string | undefined;
   if (!jwtUser.isPublic) {

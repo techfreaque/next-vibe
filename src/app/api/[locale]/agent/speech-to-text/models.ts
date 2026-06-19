@@ -187,13 +187,15 @@ export type SttModelSelection = z.infer<typeof sttModelSelectionSchema>;
 export function filterSttModels(
   selection: SttModelSelection | null | undefined,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): SttModelOption[] {
-  return filterRoleModels(sttModelOptions, selection, user);
+  return filterRoleModels(sttModelOptions, selection, user, availability);
 }
 
 export function getBestSttModel(
   selection: SttModelSelection,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): SttModelOption | null {
-  return filterSttModels(selection, user)[0] ?? null;
+  return filterSttModels(selection, user, availability)[0] ?? null;
 }

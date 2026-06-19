@@ -72,6 +72,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/i18n";
 import { ThreadPermissionsDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/widget";
 import { ThreadShareDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/widget";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 
@@ -116,6 +117,7 @@ function ThreadRow({
 }): React.JSX.Element {
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
+  const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
   const { t: tChat } = chatScopedTranslation.scopedT(locale);
   const isThreadStreaming = thread.streamingState !== "idle";
@@ -217,6 +219,7 @@ function ThreadRow({
         { ...updates, rootFolderId: thread.rootFolderId },
         { threadId: thread.id },
         locale,
+        availability,
       );
     }
   };
@@ -309,6 +312,7 @@ function ThreadRow({
           { rootFolderId: thread.rootFolderId },
           { threadId: thread.id },
           locale,
+          availability,
         );
       }
     })();

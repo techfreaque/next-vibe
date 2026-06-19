@@ -272,15 +272,15 @@ describe("extractSchemaDefaults", () => {
     });
 
     it("handles primitive schemas without defaults", () => {
-      expect(extractSchemaDefaults(z.string())).toBeUndefined();
-      expect(extractSchemaDefaults(z.coerce.number())).toBeUndefined();
-      expect(extractSchemaDefaults(z.boolean())).toBeUndefined();
+      expect(extractSchemaDefaults(z.string(), noopLogger)).toBeUndefined();
+      expect(extractSchemaDefaults(z.coerce.number(), noopLogger)).toBeUndefined();
+      expect(extractSchemaDefaults(z.boolean(), noopLogger)).toBeUndefined();
     });
 
     it("returns empty values for primitives when forFormInit is true", () => {
       const stringResult = extractSchemaDefaults<string>(
         z.string(),
-        undefined,
+        noopLogger,
         "",
         true,
       );
@@ -288,7 +288,7 @@ describe("extractSchemaDefaults", () => {
 
       const numberResult = extractSchemaDefaults<number>(
         z.coerce.number(),
-        undefined,
+        noopLogger,
         "",
         true,
       );
@@ -296,7 +296,7 @@ describe("extractSchemaDefaults", () => {
 
       const booleanResult = extractSchemaDefaults<boolean>(
         z.boolean(),
-        undefined,
+        noopLogger,
         "",
         true,
       );
@@ -304,7 +304,7 @@ describe("extractSchemaDefaults", () => {
 
       const arrayResult = extractSchemaDefaults<string[]>(
         z.array(z.string()),
-        undefined,
+        noopLogger,
         "",
         true,
       );
@@ -313,7 +313,7 @@ describe("extractSchemaDefaults", () => {
 
     it("returns empty values for transformed string when forFormInit is true", () => {
       const schema = z.string().transform((x) => x.toLowerCase());
-      const result = extractSchemaDefaults<string>(schema, undefined, "", true);
+      const result = extractSchemaDefaults<string>(schema, noopLogger, "", true);
       expect(result).toBe("");
     });
 
@@ -326,7 +326,7 @@ describe("extractSchemaDefaults", () => {
         password: z.string().min(1),
         rememberMe: z.boolean().optional().default(false),
       });
-      const result = extractSchemaDefaults(schema, undefined, "", true);
+      const result = extractSchemaDefaults(schema, noopLogger, "", true);
       expect(result).toEqual({
         email: "",
         password: "",
@@ -382,7 +382,7 @@ describe("extractSchemaDefaults", () => {
       } as any as z.ZodTypeAny;
 
       // Should return undefined without throwing
-      const result = extractSchemaDefaults(badSchema);
+      const result = extractSchemaDefaults(badSchema, noopLogger);
       expect(result).toBeUndefined();
     });
 

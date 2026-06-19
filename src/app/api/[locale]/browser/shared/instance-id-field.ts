@@ -1,7 +1,7 @@
 /**
  * Shared instanceId request field for browser tools.
  * CLI-only: hidden from all other platforms.
- * Non-CLI platforms get VIBE_PID injected via serverDefault.
+ * Non-CLI platforms resolve the instance ID in the repository.
  */
 
 import { z } from "zod";
@@ -12,7 +12,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { env } from "@/config/env";
 
 import { scopedTranslation } from "../i18n";
 
@@ -40,5 +39,4 @@ export const browserInstanceIdField = requestField(scopedTranslation, {
     Platform.ELECTRON,
     Platform.FRAME,
   ],
-  serverDefault: () => env.VIBE_PID,
 });

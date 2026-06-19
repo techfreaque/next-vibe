@@ -3,8 +3,13 @@
  *
  * One shared chrome-devtools-mcp process per Bun server instance.
  * Session ID = String(process.pid) - stable for the server lifetime, unique per instance.
- * Each session owns one Chrome tab via chrome-devtools-mcp's new_page tool.
- * select_page + tool call are serialized atomically via a mutex so concurrent
+ *
+ * A session owns N Chrome tabs (pages). `new_page` accumulates pages, `close_page`
+ * removes the active page and falls back to a remaining one, `select_page` switches
+ * the active page within the session. CDP target IDs are stable across MCP restarts;
+ * MCP integer page IDs reset on each restart and are re-resolved from CDP targets.
+ *
+ * select_page + tool call are serialized atomically via a global mutex so concurrent
  * requests within a server don't stomp each other's selected page.
  * When Chrome closes, chrome-devtools-mcp exits → MCP process dies cleanly.
  */
@@ -82,11 +87,27 @@ interface MCPProcess {
   mutex: Promise<void>;
 }
 
-/** Per-session state: which Chrome tab this session owns, tracked by stable CDP target ID. */
-interface SessionState {
+/** A single page (tab) owned by a session. */
+interface SessionPage {
   /** Stable Chrome-level target ID (hex string from /json endpoint). Survives chrome-devtools-mcp restarts. */
   cdpTargetId: string;
   /** Current MCP integer page ID - reassigned each time chrome-devtools-mcp restarts. */
+  mcpPageId: number;
+  /** Last known URL of the page (used to re-resolve MCP page IDs after a restart). */
+  url: string;
+}
+
+/** Per-session state: all tabs this session owns and which one is currently active. */
+interface SessionState {
+  /** All open pages for this session. */
+  pages: SessionPage[];
+  /** Index into `pages` of the currently active page. */
+  activeIndex: number;
+}
+
+/** Old single-page persisted shape (pre multi-page). */
+interface LegacySessionState {
+  cdpTargetId: string;
   mcpPageId: number;
 }
 
@@ -437,12 +458,22 @@ async function listCDPTargets(): Promise<CDPTarget[]> {
 // chrome-devtools-mcp page list (MCP integer IDs - reset on each restart)
 // ---------------------------------------------------------------------------
 
+/**
+ * Parse a chrome-devtools-mcp page list. Tolerates an optional "## Pages"
+ * markdown header and indexes that may be prefixed with the line number.
+ * Lines look like: `0: https://example.com [selected]`
+ */
 function parsePageList(
   text: string,
 ): Array<{ id: number; url: string; selected: boolean }> {
   const pages: Array<{ id: number; url: string; selected: boolean }> = [];
   for (const line of text.split("\n")) {
-    const m = /^(\d+):\s+(\S+)/.exec(line.trim());
+    const trimmed = line.trim();
+    // Skip the markdown header if present.
+    if (trimmed.startsWith("##")) {
+      continue;
+    }
+    const m = /^(\d+):\s+(\S+)/.exec(trimmed);
     if (m) {
       pages.push({
         id: parseInt(m[1] ?? "0", 10),
@@ -471,20 +502,62 @@ async function listMCPPages(
 }
 
 // ---------------------------------------------------------------------------
-// Per-session state (keyed by sessionId, tracked by stable CDP target ID)
+// Per-session state (keyed by sessionId; each session owns N pages).
 // Persisted to .tmp/browser-sessions.json so it survives process restarts.
 // ---------------------------------------------------------------------------
 
 const SESSIONS_FILE = join(process.cwd(), ".tmp", "browser-sessions.json");
+
+/**
+ * Normalize one persisted entry into the current SessionState shape.
+ * Accepts both the new multi-page format and the legacy single-page format.
+ */
+function isMultiPageEntry(
+  entry: SessionState | LegacySessionState,
+): entry is SessionState {
+  return "pages" in entry && Array.isArray(entry.pages);
+}
+
+function normalizeSessionEntry(
+  entry: SessionState | LegacySessionState,
+): SessionState {
+  if (isMultiPageEntry(entry)) {
+    const activeIndex =
+      typeof entry.activeIndex === "number" ? entry.activeIndex : 0;
+    return {
+      pages: entry.pages.map((p) => ({
+        cdpTargetId: p.cdpTargetId,
+        mcpPageId: p.mcpPageId,
+        url: typeof p.url === "string" ? p.url : "",
+      })),
+      activeIndex,
+    };
+  }
+  // Legacy single-page format → one-page session.
+  return {
+    pages: [
+      {
+        cdpTargetId: entry.cdpTargetId,
+        mcpPageId: entry.mcpPageId,
+        url: "",
+      },
+    ],
+    activeIndex: 0,
+  };
+}
 
 function loadSessions(): Map<string, SessionState> {
   try {
     const raw = readFileSync(SESSIONS_FILE, "utf-8");
     const obj = JSON.parse(raw) as Record<
       string,
-      { cdpTargetId: string; mcpPageId: number }
+      SessionState | LegacySessionState
     >;
-    return new Map(Object.entries(obj));
+    const map = new Map<string, SessionState>();
+    for (const [k, v] of Object.entries(obj)) {
+      map.set(k, normalizeSessionEntry(v));
+    }
+    return map;
   } catch {
     return new Map();
   }
@@ -510,31 +583,21 @@ if (!globalThis.__browserSessions) {
 const sessions: Map<string, SessionState> = globalThis.__browserSessions;
 
 /**
- * Find the MCP integer page ID that corresponds to a given CDP target ID.
- * Strategy: list MCP pages, list CDP targets, match by URL if target ID isn't
- * directly readable from MCP output. Falls back to URL matching when needed.
+ * Find the MCP integer page ID that corresponds to a given page.
+ * Matches by URL, since each open page has a known URL.
  */
-async function findMCPPageForTarget(
-  mcp: MCPProcess,
-  cdpTargetId: string,
-  cdpTargets: CDPTarget[],
-): Promise<number | null> {
-  const mcpPages = await listMCPPages(mcp);
-  const target = cdpTargets.find((t) => t.id === cdpTargetId);
-  if (!target) {
-    return null;
-  }
-
-  // Match by URL. Sessions are created with a unique data: URL (see
-  // createSessionTab) so this is always an exact 1:1 match.
-  const match = mcpPages.find((p) => p.url === target.url);
+function findMCPPageForUrl(
+  mcpPages: Array<{ id: number; url: string; selected: boolean }>,
+  url: string,
+): number | null {
+  const match = mcpPages.find((p) => p.url === url);
   return match?.id ?? null;
 }
 
 /**
  * Return true if the process that owns the given sessionId is still running.
  * SessionIds are PIDs set by the vibe runtime on startup (VIBE_PID=process.pid).
- * A dead session's tab can be safely reclaimed.
+ * A dead session's tabs can be safely reclaimed.
  */
 function isSessionAlive(sessionId: string): boolean {
   const pid = parseInt(sessionId, 10);
@@ -574,169 +637,195 @@ async function evictDeadSessions(logger: EndpointLogger): Promise<void> {
     if (isSessionAlive(sid)) {
       continue;
     }
-    logger.info("[Browser] Evicting dead session and closing its tab", {
+    logger.info("[Browser] Evicting dead session and closing its tabs", {
       evictedSessionId: sid,
-      cdpTargetId: state.cdpTargetId,
+      pageCount: state.pages.length,
     });
     sessions.delete(sid);
     saveSessions(sessions);
-    // Close via CDP target ID — survives MCP process restarts.
-    await closeCDPTab(state.cdpTargetId);
+    // Close every tab the dead session owned, via CDP target IDs.
+    for (const page of state.pages) {
+      await closeCDPTab(page.cdpTargetId);
+    }
   }
 }
 
 /**
- * Create a new Puppeteer-tracked tab via chrome-devtools-mcp's new_page tool,
- * then immediately identify its CDP target ID via /json HTTP endpoint.
- * Puppeteer-created tabs are the ONLY ones visible to createPagesSnapshot(),
- * so they must be created through MCP, not via /json/new directly.
+ * Re-resolve a session's pages against the live Chrome / MCP state.
+ * Drops pages whose CDP target is gone, and re-resolves MCP integer page IDs
+ * (which reset whenever chrome-devtools-mcp restarts).
+ * Returns the (possibly empty) list of pages that are still alive.
  */
-async function createSessionTab(
+async function reconcilePages(
+  state: SessionState,
+  mcp: MCPProcess,
+  cdpTargets: CDPTarget[],
+): Promise<SessionPage[]> {
+  const aliveCdpIds = new Set(cdpTargets.map((t) => t.id));
+  const surviving = state.pages.filter((p) => aliveCdpIds.has(p.cdpTargetId));
+  if (surviving.length === 0) {
+    return [];
+  }
+
+  // Re-resolve MCP integer IDs if the stored ones are no longer valid.
+  const mcpPages = await listMCPPages(mcp);
+  const validMcpIds = new Set(mcpPages.map((p) => p.id));
+  const result: SessionPage[] = [];
+  for (const page of surviving) {
+    // Keep the latest URL from CDP for accurate re-resolution next time.
+    const cdpTarget = cdpTargets.find((t) => t.id === page.cdpTargetId);
+    const url = cdpTarget?.url ?? page.url;
+    let mcpPageId = page.mcpPageId;
+    if (!validMcpIds.has(mcpPageId)) {
+      const resolved = findMCPPageForUrl(mcpPages, url);
+      if (resolved === null) {
+        // Can't find the page in MCP — treat it as gone.
+        continue;
+      }
+      mcpPageId = resolved;
+    }
+    result.push({ cdpTargetId: page.cdpTargetId, mcpPageId, url });
+  }
+  return result;
+}
+
+/**
+ * Open a new page via chrome-devtools-mcp's new_page tool and register it as
+ * the session's active page (without closing any existing pages).
+ * Must be called inside the global tool mutex.
+ *
+ * @returns the freshly created SessionPage, or null on failure.
+ */
+async function openPage(
   sessionId: string,
+  url: string,
   mcp: MCPProcess,
   logger: EndpointLogger,
-): Promise<SessionState | null> {
+): Promise<SessionPage | null> {
   // Snapshot CDP targets before opening so we can identify the new one.
   const beforeTargets = await listCDPTargets();
   const beforeIds = new Set(beforeTargets.map((t) => t.id));
 
-  // Open via MCP so Puppeteer tracks it.
   const resp = await sendRaw(mcp, {
     jsonrpc: "2.0",
     id: mcp.nextId++,
     method: "tools/call",
-    params: { name: "new_page", arguments: { url: "about:blank" } },
+    params: { name: "new_page", arguments: { url } },
   });
 
   const result = resp.result as
-    | { content?: Array<{ type: string; text?: string }> }
+    | { content?: Array<{ type: string; text?: string }>; isError?: boolean }
     | undefined;
   const text = result?.content?.find((c) => c.type === "text")?.text ?? "";
 
+  if (resp.error || result?.isError) {
+    logger.error("[Browser] new_page failed", {
+      sessionId,
+      url,
+      error: resp.error?.message ?? text,
+    });
+    return null;
+  }
+
   // new_page returns the page list with the new page [selected].
-  const selectedMatch = /^(\d+):.*\[selected\]/m.exec(text);
-  if (!selectedMatch) {
+  const pages = parsePageList(text);
+  const selected = pages.find((p) => p.selected);
+  if (!selected) {
     logger.error("[Browser] new_page did not return selected page", {
       sessionId,
       text,
     });
     return null;
   }
-  const mcpPageId = parseInt(selectedMatch[1] ?? "0", 10);
 
-  // Give Chrome a moment to register the new target.
+  // Give Chrome a moment to register the new target, then diff to find it.
   await new Promise<void>((resolve) => {
-    setTimeout(resolve, 300);
+    setTimeout(resolve, 200);
   });
-
-  // Find the new CDP target ID (the one that wasn't there before).
   const afterTargets = await listCDPTargets();
   const newTarget = afterTargets.find((t) => !beforeIds.has(t.id));
-  if (!newTarget) {
-    // Fallback: find by about:blank that appeared after.
-    logger.warn("[Browser] Could not identify new CDP target by diff", {
-      sessionId,
-      mcpPageId,
-    });
-    // Use mcpPageId as best effort without cdpTargetId resolution.
-    const state: SessionState = {
-      cdpTargetId: `unknown-${mcpPageId}`,
-      mcpPageId,
-    };
-    sessions.set(sessionId, state);
-    saveSessions(sessions);
-    return state;
-  }
 
-  const state: SessionState = {
-    cdpTargetId: newTarget.id,
-    mcpPageId,
+  const page: SessionPage = {
+    cdpTargetId: newTarget?.id ?? `unknown-${selected.id}`,
+    mcpPageId: selected.id,
+    url: newTarget?.url ?? selected.url,
   };
-  sessions.set(sessionId, state);
+
+  const existing = sessions.get(sessionId);
+  if (existing) {
+    existing.pages.push(page);
+    existing.activeIndex = existing.pages.length - 1;
+    sessions.set(sessionId, existing);
+  } else {
+    sessions.set(sessionId, { pages: [page], activeIndex: 0 });
+  }
   saveSessions(sessions);
-  logger.info("[Browser] Opened session tab via MCP new_page", {
+
+  logger.info("[Browser] Opened session page via MCP new_page", {
     sessionId,
-    cdpTargetId: newTarget.id,
-    mcpPageId,
+    cdpTargetId: page.cdpTargetId,
+    mcpPageId: page.mcpPageId,
+    url: page.url,
   });
-  return state;
+  return page;
 }
 
 /**
- * Ensure this session has a live Chrome tab.
+ * Ensure this session has a live, active Chrome page and return it.
  * Must be called inside the global tool mutex.
  *
- * Design: one session = one dedicated tab. No tab sharing.
- * Dead sessions are evicted and their tabs closed.
- * If the session's tab is gone, a fresh one is created.
- * If chrome-devtools-mcp restarted, the MCP integer ID is re-resolved from
- * the stable CDP target ID.
+ * - If the session has live pages, reconcile them and return the active one
+ *   (falling back to the first alive page if the active one died).
+ * - If no live pages remain and createIfMissing is true, open a fresh page.
+ * - Otherwise return null.
  *
- * @param createIfMissing - When false, return null for unknown sessions instead
- *   of creating a placeholder tab. Used by new_page which is its own session
- *   initializer — creating a placeholder first would just produce an orphan tab.
+ * @param createIfMissing - When false, return null for sessions without live
+ *   pages instead of creating one. Used by new_page (its own initializer) and
+ *   close_page (no-op when there's nothing to close).
  */
 async function ensureSession(
   sessionId: string,
   mcp: MCPProcess,
   logger: EndpointLogger,
   createIfMissing = true,
-): Promise<SessionState | null> {
+): Promise<SessionPage | null> {
   // Evict dead sessions and close their orphan tabs first.
   await evictDeadSessions(logger);
 
-  let state: SessionState | undefined | null = sessions.get(sessionId);
-  const cdpTargets = await listCDPTargets();
-
-  if (state) {
-    const knownTargetId = state.cdpTargetId;
-    const targetAlive = cdpTargets.some((t) => t.id === knownTargetId);
-    if (!targetAlive) {
-      logger.warn("[Browser] Session tab closed externally, will reopen", {
-        sessionId,
-        lostTargetId: knownTargetId,
-      });
-      sessions.delete(sessionId);
-      saveSessions(sessions);
-      state = undefined;
-    } else {
-      // Re-resolve MCP integer ID if chrome-devtools-mcp restarted
-      // (it reassigns integer IDs on each startup).
-      const mcpPages = await listMCPPages(mcp);
-      const storedIdStillValid = mcpPages.some(
-        (p) => p.id === state!.mcpPageId,
-      );
-      if (!storedIdStillValid) {
-        const mcpId = await findMCPPageForTarget(
-          mcp,
-          knownTargetId,
-          cdpTargets,
+  const state = sessions.get(sessionId);
+  if (state && state.pages.length > 0) {
+    const cdpTargets = await listCDPTargets();
+    const alivePages = await reconcilePages(state, mcp, cdpTargets);
+    if (alivePages.length > 0) {
+      // Clamp activeIndex into the surviving set; prefer the previously active
+      // page if it survived, else fall back to the first alive page.
+      const prevActive = state.pages[state.activeIndex];
+      let activeIndex = 0;
+      if (prevActive) {
+        const idx = alivePages.findIndex(
+          (p) => p.cdpTargetId === prevActive.cdpTargetId,
         );
-        if (mcpId !== null) {
-          state.mcpPageId = mcpId;
-          sessions.set(sessionId, state);
-          saveSessions(sessions);
-        } else {
-          // Can't find the tab in MCP — treat as gone.
-          sessions.delete(sessionId);
-          saveSessions(sessions);
-          state = undefined;
+        if (idx >= 0) {
+          activeIndex = idx;
         }
       }
+      const next: SessionState = { pages: alivePages, activeIndex };
+      sessions.set(sessionId, next);
+      saveSessions(sessions);
+      return alivePages[activeIndex] ?? alivePages[0] ?? null;
     }
+    // All pages are dead — drop the session.
+    logger.warn("[Browser] Session pages all closed externally", {
+      sessionId,
+    });
+    sessions.delete(sessionId);
+    saveSessions(sessions);
   }
 
-  if (!state) {
-    if (!createIfMissing) {
-      return null;
-    }
-    state = await createSessionTab(sessionId, mcp, logger);
-    if (!state) {
-      return null;
-    }
+  if (!createIfMissing) {
+    return null;
   }
-
-  return state;
+  return openPage(sessionId, "about:blank", mcp, logger);
 }
 
 // ---------------------------------------------------------------------------
@@ -832,47 +921,167 @@ export class BrowserRepository {
       await prev;
 
       try {
-        // new_page is its own session initializer — it opens the real tab directly.
-        // We must NOT create a placeholder about:blank tab first (that would be
-        // an extra tab that we'd have to clean up). Instead, we snapshot CDP targets
-        // before the call and diff after to identify the new tab.
-        //
-        // For all other tools, ensureSession creates a tab if none exists yet.
         const isNewPage = mcpToolName === "new_page";
+        const isClosePage = mcpToolName === "close_page";
 
-        // For new_page with no existing session: don't pre-create a placeholder tab.
-        const s = await ensureSession(sessionId, mcp, logger, !isNewPage);
+        // ── new_page: its own session initializer. Accumulates pages. ──────
+        if (isNewPage) {
+          const url =
+            typeof parsedArgs["url"] === "string"
+              ? parsedArgs["url"]
+              : "about:blank";
+          const page = await openPage(sessionId, url, mcp, logger);
+          if (!page) {
+            return fail({
+              message: t("repository.mcp.tool.call.executionFailed"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              messageParams: { error: "new_page failed" },
+            });
+          }
+          // openPage already selected the new page in MCP. Re-list to return
+          // an accurate, current page list to the caller.
+          const listText = (await listMCPPages(mcp))
+            .map((p) => `${p.id}: ${p.url}${p.selected ? " [selected]" : ""}`)
+            .join("\n");
+          return success({
+            success: true,
+            result: [{ type: "text", text: listText }],
+            status: [BrowserToolStatus.COMPLETED],
+            executionId: `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+          });
+        }
 
-        // Non-new_page tools require an existing session tab.
-        if (!isNewPage && !s) {
+        // ── close_page: remove the active page, fall back to a remaining one ─
+        if (isClosePage) {
+          const s = await ensureSession(sessionId, mcp, logger, false);
+          if (!s) {
+            return success({
+              success: true,
+              result: [
+                { type: "text", text: t("repository.mcp.closePage.noSession") },
+              ],
+              status: [BrowserToolStatus.COMPLETED],
+              executionId: `noop-${Date.now()}`,
+            });
+          }
+
+          // Close the active page in MCP.
+          const closeResp = await sendRaw(mcp, {
+            jsonrpc: "2.0",
+            id: mcp.nextId++,
+            method: "tools/call",
+            params: { name: "close_page", arguments: { pageId: s.mcpPageId } },
+          });
+          const closeResult = closeResp.result as
+            | {
+                content?: Array<{ type: string; text?: string }>;
+                isError?: boolean;
+              }
+            | undefined;
+          const closeOk = !closeResp.error && !closeResult?.isError;
+
+          if (!closeOk) {
+            const errText =
+              closeResp.error?.message ??
+              closeResult?.content?.find((c) => c.type === "text")?.text ??
+              "";
+            return success({
+              success: false,
+              result: [{ type: "text", text: errText }],
+              status: [BrowserToolStatus.FAILED],
+              executionId: `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+            });
+          }
+
+          // Remove the closed page from session state.
+          const state = sessions.get(sessionId);
+          if (state) {
+            state.pages.splice(state.activeIndex, 1);
+            if (state.pages.length === 0) {
+              sessions.delete(sessionId);
+              saveSessions(sessions);
+              logger.info("[Browser] Closed last page, session evicted", {
+                sessionId,
+              });
+              return success({
+                success: true,
+                result: [
+                  {
+                    type: "text",
+                    text: t("repository.mcp.closePage.noSession"),
+                  },
+                ],
+                status: [BrowserToolStatus.COMPLETED],
+                executionId: `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+              });
+            }
+            // Jump to the last remaining page and select it.
+            state.activeIndex = state.pages.length - 1;
+            sessions.set(sessionId, state);
+            saveSessions(sessions);
+            const nextPage = state.pages[state.activeIndex];
+            if (nextPage) {
+              await sendRaw(mcp, {
+                jsonrpc: "2.0",
+                id: mcp.nextId++,
+                method: "tools/call",
+                params: {
+                  name: "select_page",
+                  arguments: { pageId: nextPage.mcpPageId },
+                },
+              });
+              logger.info("[Browser] Closed page, switched to remaining page", {
+                sessionId,
+                mcpPageId: nextPage.mcpPageId,
+              });
+              return success({
+                success: true,
+                result: [
+                  {
+                    type: "text",
+                    text: t("repository.mcp.closePage.switchedToPage", {
+                      pageId: String(nextPage.mcpPageId),
+                    }),
+                  },
+                ],
+                status: [BrowserToolStatus.COMPLETED],
+                executionId: `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+              });
+            }
+          }
+          // Should not happen (we had a session) — succeed defensively.
+          return success({
+            success: true,
+            result: [
+              { type: "text", text: t("repository.mcp.closePage.noSession") },
+            ],
+            status: [BrowserToolStatus.COMPLETED],
+            executionId: `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+          });
+        }
+
+        // ── all other tools: operate on the active page ────────────────────
+        const s = await ensureSession(sessionId, mcp, logger, true);
+        if (!s) {
           return fail({
             message: t("repository.mcp.connect.failedToInitialize"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
           });
         }
 
-        // Snapshot CDP targets before new_page so we can diff after to find the new tab.
-        const beforeIds = isNewPage
-          ? new Set((await listCDPTargets()).map((tgt) => tgt.id))
-          : null;
+        // Select our active page before running the tool (establishes context).
+        await sendRaw(mcp, {
+          jsonrpc: "2.0",
+          id: mcp.nextId++,
+          method: "tools/call",
+          params: { name: "select_page", arguments: { pageId: s.mcpPageId } },
+        });
 
-        // Select our page before running the tool (establishes context in chrome-devtools-mcp).
-        // Skip for new_page when there is no session yet — nothing to select.
-        if (s) {
-          await sendRaw(mcp, {
-            jsonrpc: "2.0",
-            id: mcp.nextId++,
-            method: "tools/call",
-            params: { name: "select_page", arguments: { pageId: s.mcpPageId } },
-          });
-        }
-
-        // For close_page and select_page inject the session's page ID when not
-        // explicitly provided so callers don't need to manage page IDs manually.
+        // For select_page, inject the session's active page ID when the caller
+        // didn't provide one explicitly.
+        const isSelectPage = mcpToolName === "select_page";
         const finalArgs =
-          s &&
-          (mcpToolName === "close_page" || mcpToolName === "select_page") &&
-          parsedArgs["pageId"] === undefined
+          isSelectPage && parsedArgs["pageId"] === undefined
             ? { ...parsedArgs, pageId: s.mcpPageId }
             : parsedArgs;
 
@@ -898,86 +1107,55 @@ export class BrowserRepository {
 
         const toolSuccess = !resp.error && !mcpResult?.isError;
 
-        // After new_page: record the new tab as this session's tab.
-        // Use before/after CDP diff (inside the lock) to identify the exact new target.
-        // If the session already had a tab (s != null), close it — each session owns
-        // exactly one tab; the old one is now an orphan.
-        if (toolSuccess && isNewPage && beforeIds) {
-          const text =
-            mcpResult?.content?.find((c) => c.type === "text")?.text ?? "";
-          const selectedMatch = /^(\d+):.*\[selected\]/m.exec(text);
-          if (selectedMatch) {
-            const newMcpPageId = parseInt(selectedMatch[1] ?? "0", 10);
-            await new Promise<void>((resolve) => {
-              setTimeout(resolve, 200);
-            });
-            const afterTargets = await listCDPTargets();
-            const newTarget = afterTargets.find(
-              (tgt) => !beforeIds.has(tgt.id),
+        // select_page: update which page in our session is active.
+        if (toolSuccess && isSelectPage) {
+          const requestedId =
+            typeof finalArgs["pageId"] === "number"
+              ? finalArgs["pageId"]
+              : s.mcpPageId;
+          const state = sessions.get(sessionId);
+          if (state) {
+            const idx = state.pages.findIndex(
+              (p) => p.mcpPageId === requestedId,
             );
-            // Close the old tab (if any) before updating session state.
-            if (s) {
-              await closeCDPTab(s.cdpTargetId);
+            if (idx >= 0) {
+              state.activeIndex = idx;
+              sessions.set(sessionId, state);
+              saveSessions(sessions);
             }
-            const newState: SessionState = {
-              cdpTargetId: newTarget?.id ?? `unknown-${newMcpPageId}`,
-              mcpPageId: newMcpPageId,
-            };
-            sessions.set(sessionId, newState);
-            saveSessions(sessions);
-            logger.info("[Browser] Session tab replaced via new_page", {
-              sessionId,
-              mcpPageId: newMcpPageId,
-              cdpTargetId: newState.cdpTargetId,
-              closedOldTarget: s?.cdpTargetId ?? null,
-            });
           }
         }
 
-        // After close_page: evict session so next call creates a fresh tab.
-        // The MCP close_page call already closed the tab in Chrome; we just
-        // need to remove it from our session map.
-        if (toolSuccess && mcpToolName === "close_page" && s) {
-          sessions.delete(sessionId);
-          saveSessions(sessions);
-          logger.info("[Browser] Session tab closed, session evicted", {
-            sessionId,
-            cdpTargetId: s.cdpTargetId,
-          });
-        }
-
-        // For other tools: if the selected page changed unexpectedly
-        // (e.g. click opened a new tab), follow it.
-        const isNonFollowTool =
-          mcpToolName === "new_page" ||
-          mcpToolName === "select_page" ||
-          mcpToolName === "close_page";
-
-        if (toolSuccess && !isNonFollowTool && s) {
+        // For tools that may switch the selected page (e.g. click opening a new
+        // tab), follow it: update the active page's MCP id / CDP target / URL.
+        if (toolSuccess && !isSelectPage) {
           const text =
             mcpResult?.content?.find((c) => c.type === "text")?.text ?? "";
-          const selectedMatch = /^(\d+):.*\[selected\]/m.exec(text);
-          if (selectedMatch) {
-            const nowSelectedId = parseInt(selectedMatch[1] ?? "0", 10);
-            if (nowSelectedId !== s.mcpPageId) {
-              const nowTargets = await listCDPTargets();
-              const nowSelectedUrl =
-                parsePageList(text).find((p) => p.id === nowSelectedId)?.url ??
-                "";
-              const nowTarget = nowTargets.find(
-                (tgt) => tgt.url === nowSelectedUrl && tgt.id !== s.cdpTargetId,
-              );
-              s.mcpPageId = nowSelectedId;
-              if (nowTarget) {
-                s.cdpTargetId = nowTarget.id;
+          const pageList = parsePageList(text);
+          const selected = pageList.find((p) => p.selected);
+          if (selected && selected.id !== s.mcpPageId) {
+            const state = sessions.get(sessionId);
+            if (state) {
+              const page = state.pages[state.activeIndex];
+              if (page) {
+                const nowTargets = await listCDPTargets();
+                const nowTarget = nowTargets.find(
+                  (tgt) =>
+                    tgt.url === selected.url && tgt.id !== page.cdpTargetId,
+                );
+                page.mcpPageId = selected.id;
+                page.url = selected.url;
+                if (nowTarget) {
+                  page.cdpTargetId = nowTarget.id;
+                }
+                sessions.set(sessionId, state);
+                saveSessions(sessions);
+                logger.info("[Browser] Active page followed page switch", {
+                  sessionId,
+                  mcpPageId: selected.id,
+                  cdpTargetId: page.cdpTargetId,
+                });
               }
-              sessions.set(sessionId, s);
-              saveSessions(sessions);
-              logger.info("[Browser] Session followed unexpected page switch", {
-                sessionId,
-                mcpPageId: nowSelectedId,
-                cdpTargetId: s.cdpTargetId,
-              });
             }
           }
         }

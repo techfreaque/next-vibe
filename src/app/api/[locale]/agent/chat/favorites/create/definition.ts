@@ -80,6 +80,7 @@ const { POST } = createEndpoint({
         logger,
         locale,
         user,
+        availability,
       }) => {
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
@@ -110,6 +111,7 @@ const { POST } = createEndpoint({
             undefined,
             { id: resolvedSkillId },
             locale,
+            availability,
           );
         }
 
@@ -166,6 +168,7 @@ const { POST } = createEndpoint({
                 null,
                 locale,
                 user,
+                availability,
               );
 
             return {

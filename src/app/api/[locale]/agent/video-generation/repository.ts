@@ -198,7 +198,10 @@ export class VideoGenerationRepository {
         });
       }
       if (isSelfRelayUrl(inferenceTarget.remoteUrl)) {
-        const underlying = getVideoGenModelUnderlyingProvider(data.model);
+        const underlying = getVideoGenModelForProvider(
+          data.model,
+          ApiProvider.MODELSLAB,
+        );
         if (!underlying) {
           return fail({
             message: t("post.errors.notConfigured", {

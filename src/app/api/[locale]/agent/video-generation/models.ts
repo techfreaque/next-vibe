@@ -1102,21 +1102,7 @@ function buildVideoGenModelOptionsPool(): VideoGenModelOption[] {
 const videoGenModelOptionsPool: VideoGenModelOption[] =
   buildVideoGenModelOptionsPool();
 
-/**
- * Cheapest non-UNBOTTLED provider entry for a model — used by UNBOTTLED
- * self-relay to dispatch in-process via the real provider (pool is sorted
- * cheapest-first). Exported index is mutable for test runtime-patching,
- * mirroring chatModelOptionsIndex.
- */
-export function getVideoGenModelUnderlyingProvider(
-  modelId: string,
-): VideoGenModelOption | undefined {
-  return videoGenModelOptionsPool.find(
-    (m) => m.id === modelId && m.apiProvider !== ApiProvider.UNBOTTLED,
-  );
-}
-
-export const videoGenModelOptionsIndex: Partial<
+const videoGenModelOptionsIndex: Partial<
   Record<VideoGenModelId, VideoGenModelOption>
 > = buildModelOptionsIndex(videoGenModelOptionsPool) as Partial<
   Record<VideoGenModelId, VideoGenModelOption>
@@ -1177,20 +1163,22 @@ export type VideoGenModelSelection = z.infer<
 export function filterVideoGenModels(
   selection: VideoGenModelSelection | null | undefined,
   user: JwtPayloadType,
-  providerOverride?: ApiProvider,
+  availability: AgentEnvAvailability,
 ): VideoGenModelOption[] {
-  const pool = providerOverride
-    ? videoGenModelOptionsPool.filter((m) => m.apiProvider === providerOverride)
+  const pool = availability.unbottledForce
+    ? videoGenModelOptionsPool.filter(
+        (m) => m.apiProvider === ApiProvider.UNBOTTLED,
+      )
     : videoGenModelOptionsPool;
-  return filterRoleModels(pool, selection, user);
+  return filterRoleModels(pool, selection, user, availability);
 }
 
 export function getBestVideoGenModel(
   selection: VideoGenModelSelection,
   user: JwtPayloadType,
-  providerOverride?: ApiProvider,
+  availability: AgentEnvAvailability,
 ): VideoGenModelOption | null {
-  return filterVideoGenModels(selection, user, providerOverride)[0] ?? null;
+  return filterVideoGenModels(selection, user, availability)[0] ?? null;
 }
 
 /**

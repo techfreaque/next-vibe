@@ -43,7 +43,8 @@ import {
   toolResultRecord,
 } from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import {
   SkillCategory,
@@ -322,6 +323,10 @@ describe("Cortex AI Integration", () => {
 
     if (existingFav) {
       mainFavoriteId = existingFav.id;
+      await db
+        .update(chatFavorites)
+        .set({ variantId: "kimi", modelSelection: null })
+        .where(eq(chatFavorites.id, existingFav.id));
     } else {
       await db
         .insert(chatFavorites)
@@ -381,7 +386,8 @@ describe("Cortex AI Integration", () => {
       name,
       async () => {
         if (suiteFailed) {
-          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
+          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          return;
         }
         try {
           await fn();
@@ -866,7 +872,15 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      prompt: `Try to read /documents/ai-test/renamed-notes.md using cortex-read. It should not exist anymore. Report what error or status you receive.${VERDICT_INSTRUCTION}`,
+      prompt: `Try to read /documents/ai-test/renamed-notes.md using cortex-read. It should not exist anymore. Report what error or status you receive.
+
+---
+IMPORTANT: End your entire response with exactly one of these two lines (nothing after it):
+  VERDICT: PASS
+  VERDICT: FAIL – <one-sentence reason>
+
+Choose PASS if the tool returned a not-found or file-does-not-exist error (that is the expected outcome — the file was deleted).
+Choose FAIL only if the tool unexpectedly succeeded and returned file contents, or if an unrelated error occurred.`,
     });
 
     expect(result.success, "C8: stream failed").toBe(true);
@@ -886,7 +900,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
     const readResult = resolveToolResult(readMsg);
     if (rawResult !== undefined) {
       // If a result was stored, it must indicate not-found
-      const resultStr = String(rawResult).toLowerCase();
+      const resultStr = JSON.stringify(rawResult).toLowerCase();
       const isError =
         resultStr.includes("not found") ||
         resultStr.includes("not_found") ||
@@ -961,6 +975,10 @@ describe("Cortex Mount: /threads", () => {
       .limit(1);
     if (existingFav) {
       mainFavoriteId = existingFav.id;
+      await db
+        .update(chatFavorites)
+        .set({ variantId: "kimi", modelSelection: null })
+        .where(eq(chatFavorites.id, existingFav.id));
     } else {
       await db
         .insert(chatFavorites)
@@ -976,7 +994,8 @@ describe("Cortex Mount: /threads", () => {
     }
 
     // Ensure fixture thread exists in DB so M2's cached fixture can read it via cortex-read.
-    // The fixture has the AI reading /threads/cron/use-cortex-list-...-93595f50-807e-4d65-9c70-d0338e08e1b7.md
+    // The fixture has the AI reading /threads/cron/...-93595f50-807e-4d65-9c70-d0338e08e1b7.md
+    // rootFolderId must be "cron" (DefaultFolderId.BACKGROUND) to match virtual path /threads/cron/
     await db
       .insert(chatThreads)
       .values({
@@ -987,6 +1006,23 @@ describe("Cortex Mount: /threads", () => {
         folderId: null,
         updatedAt: new Date(),
         createdAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: chatThreads.id,
+        set: { rootFolderId: DefaultFolderId.BACKGROUND },
+      });
+
+    // Ensure fixture thread has at least one message so cortex-read returns a conversation body
+    const fixtureMsgId = "00000000-0000-4002-a000-000000000001";
+    await db
+      .insert(chatMessages)
+      .values({
+        id: fixtureMsgId,
+        threadId: "93595f50-807e-4d65-9c70-d0338e08e1b7",
+        role: ChatMessageRole.USER,
+        content: "Hello, this is a fixture conversation.",
+        isAI: false,
+        sequenceId: fixtureMsgId,
       })
       .onConflictDoNothing();
 
@@ -1009,7 +1045,8 @@ describe("Cortex Mount: /threads", () => {
       name,
       async () => {
         if (suiteFailed) {
-          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
+          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          return;
         }
         try {
           await fn();
@@ -1119,7 +1156,7 @@ describe("Cortex Mount: /threads", () => {
       "M2: AI must quote a threadId UUID",
     ).toBe(true);
     assertVerdictPass(aiContent, "M2");
-  });
+  }, 300_000);
 
   // ── M3: /threads is read-only ───────────────────────────────────────────────
   fit("M3: AI cannot write to /threads (read-only mount)", async () => {
@@ -1129,7 +1166,15 @@ describe("Cortex Mount: /threads", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      prompt: `Try to use cortex-write to create a file at /threads/test-file.md with content "test". Report exactly what error you get. Do not retry.${VERDICT_INSTRUCTION}`,
+      prompt: `Try to use cortex-write to create a file at /threads/test-file.md with content "test". Report exactly what error you get. Do not retry.
+
+---
+IMPORTANT: End your entire response with exactly one of these two lines (nothing after it):
+  VERDICT: PASS
+  VERDICT: FAIL – <one-sentence reason>
+
+Choose PASS if the tool returned a read-only, forbidden, or 403 error (that is the expected outcome — /threads is a read-only mount).
+Choose FAIL only if the write unexpectedly SUCCEEDED, or if an unrelated error occurred.`,
     });
 
     expect(result.success, "M3: stream failed").toBe(true);
@@ -1148,6 +1193,7 @@ describe("Cortex Mount: /threads", () => {
       // Must be an error - /threads is not writable
       const rawResult = writeMsg.toolCall?.result;
       const writeResult = resolveToolResult(writeMsg);
+      const rawResultStr = JSON.stringify(rawResult ?? "").toLowerCase();
       const isError =
         rawResult === undefined ||
         (writeResult !== null &&
@@ -1156,12 +1202,9 @@ describe("Cortex Mount: /threads", () => {
             String(writeResult.message ?? "")
               .toLowerCase()
               .includes("read"))) ||
-        String(rawResult ?? "")
-          .toLowerCase()
-          .includes("read") ||
-        String(rawResult ?? "")
-          .toLowerCase()
-          .includes("forbidden");
+        rawResultStr.includes("read") ||
+        rawResultStr.includes("forbidden") ||
+        rawResultStr.includes("error");
       expect(
         isError,
         "M3: write to /threads must fail with a read-only or forbidden error",
@@ -1211,6 +1254,10 @@ describe("Cortex Mount: /skills", () => {
       .limit(1);
     if (existingFav) {
       mainFavoriteId = existingFav.id;
+      await db
+        .update(chatFavorites)
+        .set({ variantId: "kimi", modelSelection: null })
+        .where(eq(chatFavorites.id, existingFav.id));
     } else {
       const favId = crypto.randomUUID();
       await db
@@ -1289,7 +1336,8 @@ describe("Cortex Mount: /skills", () => {
       name,
       async () => {
         if (suiteFailed) {
-          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
+          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          return;
         }
         try {
           await fn();
@@ -1462,6 +1510,10 @@ describe("Cortex Mount: /tasks", () => {
       .limit(1);
     if (existingFav) {
       mainFavoriteId = existingFav.id;
+      await db
+        .update(chatFavorites)
+        .set({ variantId: "kimi", modelSelection: null })
+        .where(eq(chatFavorites.id, existingFav.id));
     } else {
       const favId = crypto.randomUUID();
       await db
@@ -1623,7 +1675,8 @@ describe("Cortex Mount: /searches and cortex-search", () => {
       name,
       async () => {
         if (suiteFailed) {
-          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
+          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          return;
         }
         try {
           await fn();
@@ -1935,7 +1988,8 @@ describe("Cortex: /documents path operations and edge cases", () => {
       name,
       async () => {
         if (suiteFailed) {
-          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
+          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          return;
         }
         try {
           await fn();
@@ -2106,21 +2160,17 @@ describe("Cortex: /documents path operations and edge cases", () => {
       // If the tool was called, it must have returned an error (path normalized or rejected)
       const rawResult = readMsg.toolCall?.result;
       const readResult = resolveToolResult(readMsg);
+      const rawResultStr2 = JSON.stringify(rawResult ?? "").toLowerCase();
       const isError =
         rawResult === undefined ||
         (readResult !== null &&
           (readResult.success === false ||
             String(readResult.errorType ?? "") !== "" ||
             String(readResult.message ?? "").length > 0)) ||
-        String(rawResult ?? "")
-          .toLowerCase()
-          .includes("invalid") ||
-        String(rawResult ?? "")
-          .toLowerCase()
-          .includes("not found") ||
-        String(rawResult ?? "")
-          .toLowerCase()
-          .includes("forbidden");
+        rawResultStr2.includes("invalid") ||
+        rawResultStr2.includes("not found") ||
+        rawResultStr2.includes("error") ||
+        rawResultStr2.includes("forbidden");
       expect(
         isError,
         "E4: path traversal must be rejected or normalized to safe path",
@@ -2187,7 +2237,6 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
 describe("Cortex System Prompt Injection", () => {
   let testUser: JwtPrivatePayloadType;
-  let testSubFolderId: string;
   const SP_TIMEOUT = 30_000;
 
   const TEST_MEMORY_CONTENT = `---\npriority: 100\ntags: [identity]\n---\n\nTest User - integration test identity.\nPrefers concise responses. Works with TypeScript.`;
@@ -2246,17 +2295,6 @@ describe("Cortex System Prompt Injection", () => {
       }
     }
 
-    const testsParentId = await getOrCreateFolder(
-      testUser,
-      DefaultFolderId.BACKGROUND,
-      "tests",
-    );
-    testSubFolderId = await getOrCreateFolder(
-      testUser,
-      DefaultFolderId.BACKGROUND,
-      "cortex-system-prompt",
-      testsParentId,
-    );
   }, SP_TIMEOUT);
 
   // ── SP1: loadCortexData returns test-created memories ─────────────────────

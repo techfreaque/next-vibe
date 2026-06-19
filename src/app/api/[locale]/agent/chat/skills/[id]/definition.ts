@@ -169,9 +169,7 @@ const { DELETE } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: listDef0.GET,
-        labelField: "name",
+        fieldType: FieldDataType.TEXT,
         label: "delete.id.label" as const,
         description: "delete.id.description" as const,
         hidden: true,
@@ -369,6 +367,7 @@ const { PATCH } = createEndpoint({
         );
 
         // Optimistically update the skill in the list
+        const availability = await getInstanceAvailability();
         apiClient.updateEndpointData(
           skillsDefinition.default.GET,
           data.logger,
@@ -426,6 +425,7 @@ const { PATCH } = createEndpoint({
                                 data.user.roles.includes(
                                   UserPermissionRole.ADMIN,
                                 ),
+                              availability,
                             ),
                             modelProvider: bestModel.provider,
                           }
@@ -480,11 +480,10 @@ const { PATCH } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.ENTITY_PICKER,
+        fieldType: FieldDataType.TEXT,
         label: "patch.id.label" as const,
+        hidden: true,
         schema: z.string(),
-        listEndpoint: listDef0.GET,
-        labelField: "name",
       }),
 
       // === RESPONSE ===
@@ -494,7 +493,6 @@ const { PATCH } = createEndpoint({
       }),
 
       name: requestField(scopedTranslation, {
-        // Free user text, not a translation key — PATCH is partial, so optional.
         schema: z
           .string()
           .min(2, {
@@ -502,8 +500,7 @@ const { PATCH } = createEndpoint({
           })
           .max(100, {
             message: "patch.name.validation.maxLength" as const,
-          })
-          .optional(),
+          }),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.name.label" as const,
@@ -516,7 +513,6 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       tagline: requestField(scopedTranslation, {
-        // Free user text, not a translation key — PATCH is partial, so optional.
         schema: z
           .string()
           .min(2, {
@@ -524,8 +520,7 @@ const { PATCH } = createEndpoint({
           })
           .max(500, {
             message: "patch.tagline.validation.maxLength" as const,
-          })
-          .optional(),
+          }) as z.ZodType<SkillsTranslationKey>,
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.tagline.label" as const,
@@ -538,7 +533,7 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       icon: requestField(scopedTranslation, {
-        schema: iconSchema.optional(),
+        schema: iconSchema,
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
         label: "patch.icon.label" as const,
@@ -550,7 +545,6 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       description: requestField(scopedTranslation, {
-        // Free user text, not a translation key — PATCH is partial, so optional.
         schema: z
           .string()
           .min(10, {
@@ -558,8 +552,7 @@ const { PATCH } = createEndpoint({
           })
           .max(500, {
             message: "patch.description.validation.maxLength" as const,
-          })
-          .optional(),
+          }) as z.ZodType<SkillsTranslationKey>,
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.description.label" as const,
@@ -572,7 +565,7 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       category: requestField(scopedTranslation, {
-        schema: z.enum(SkillCategory).optional(),
+        schema: z.enum(SkillCategory),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "patch.category.label" as const,
@@ -585,7 +578,7 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
       isPublic: requestField(scopedTranslation, {
-        schema: z.boolean().optional(),
+        schema: z.boolean(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.isPublic.label" as const,
@@ -598,7 +591,7 @@ const { PATCH } = createEndpoint({
       }),
 
       systemPrompt: requestField(scopedTranslation, {
-        schema: z.string().nullable().optional(),
+        schema: z.string().nullable(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "patch.systemPrompt.label" as const,
@@ -788,9 +781,7 @@ const { GET } = createEndpoint({
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: listDef0.GET,
-        labelField: "name",
+        fieldType: FieldDataType.TEXT,
         label: "get.id.label" as const,
         hidden: true,
         schema: z.string(),

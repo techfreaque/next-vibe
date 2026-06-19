@@ -25,8 +25,7 @@ import type {
   LanguageModelV2ToolResultOutput,
   LanguageModelV2Usage,
 } from "@ai-sdk/provider";
-// Import from the agent SDK's bundled @anthropic-ai/sdk to match the stream event types it emits
-import type { BetaRawMessageStreamEvent } from "@anthropic-ai/claude-agent-sdk/node_modules/@anthropic-ai/sdk/resources/beta/messages/messages.js";
+import type { SDKPartialAssistantMessage } from "@anthropic-ai/claude-agent-sdk";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -587,7 +586,7 @@ function extractPromptParts(prompt: LanguageModelV2CallOptions["prompt"]): {
  * separately via MCP handler and emitted as tool-call/tool-result.
  */
 function mapStreamEvent(
-  event: BetaRawMessageStreamEvent,
+  event: SDKPartialAssistantMessage["event"],
   /** Stable text block id - shared across all deltas within one content block */
   textId: string,
   /** Stable reasoning block id - shared across all deltas within one reasoning block */

@@ -1,4 +1,5 @@
 // AUTO-GENERATED from src/app/[locale]/user/(auth)/signup/layout.tsx. Add "use custom" to this file to preserve customizations.
+import type { JSX } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { TanstackPage as Layout } from "@/app/[locale]/user/(auth)/signup/layout";
@@ -9,8 +10,10 @@ const loadData = createServerFn({ method: "GET" })
     return tanstackLoader();
   });
 
+function LayoutComponent(): JSX.Element { return <Layout {...Route.useLoaderData()}><Outlet /></Layout>; }
+
 export const Route = createFileRoute("/$locale/user/_auth/signup")({
   staleTime: Infinity,
   loader: () => loadData(),
-  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,
+  component: LayoutComponent,
 });

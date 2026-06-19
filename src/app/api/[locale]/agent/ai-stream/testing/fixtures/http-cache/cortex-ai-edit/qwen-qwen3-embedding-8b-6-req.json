@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----66541853-c1b4-414d-b789-740ce5d94b56.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\nPreview: <think>The file was read successfully. The content is: ` AI Test Notes This document was created by an AI to test cortex…",
+    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----8be1fa82-3b4a-44a5-8487-fae7578800ed.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\nPreview: <think>The tool call succeeded and returned the exact content. I need to quote the content and end with VERDICT: PASS.</…",
     "encoding_format": "float"
   }
 }

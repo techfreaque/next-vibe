@@ -43,13 +43,13 @@ import {
   HERMES_INSTANCE_ID,
   resolveDevUser,
   resolveProdUserId,
-  resolveRemoteUrl,
+  resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
 
 // ── Skip guard ────────────────────────────────────────────────────────────────
 
-const _remoteUrl = await resolveRemoteUrl();
+const _remoteUrl = resolveRemoteUrlSync();
 if (!_remoteUrl) {
   failSuitePrerequisites(
     "Remote Connect folder tests",

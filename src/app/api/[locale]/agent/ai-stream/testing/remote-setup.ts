@@ -24,13 +24,9 @@ import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { describe, expect, it } from "vitest";
-import { z } from "zod";
 
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
-import {
-  remoteConnections,
-  RemoteToolCapabilitySchema,
-} from "@/app/api/[locale]/remote-connection/db";
+import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { db } from "@/app/api/[locale]/system/db";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -111,6 +107,18 @@ export async function isServerRunning(
  */
 export async function resolveRemoteUrl(): Promise<string | null> {
   if (await isServerRunning(LOCAL_DEV_URL, HERMES_DEV_PID_FILE_PATH)) {
+    return LOCAL_DEV_URL;
+  }
+  return null;
+}
+
+/**
+ * Synchronous variant of resolveRemoteUrl for test module top-level guards.
+ * Checks only the PID file (no HTTP health check) — sufficient for deciding
+ * whether to register describe() blocks at collection time.
+ */
+export function resolveRemoteUrlSync(): string | null {
+  if (readServerPort(HERMES_DEV_PID_FILE_PATH) !== null) {
     return LOCAL_DEV_URL;
   }
   return null;
@@ -496,16 +504,16 @@ export async function connectToHermes(
   }
 
   if (!result.success) {
-    // "Already Connected" means hermes still has the registration from a previous run
-    // but our local row was deleted by disconnectFromHermes. Unregister from hermes
-    // (remote side), then retry the connect so both sides are in sync.
+    // "Already Connected" means one or both sides still have a stale registration row.
+    // Clean both sides and retry so they are in sync.
     if (result.message?.includes("Already Connected")) {
-      // Remote already has our registration from a previous run but local row
-      // was deleted by disconnectFromHermes. Clean up remote side and retry.
       // eslint-disable-next-line no-console
       console.log(
-        "[connectToHermes] Already Connected - cleaning up remote and retrying",
+        "[connectToHermes] Already Connected - cleaning both sides and retrying",
       );
+
+      // Delete local hermes row on atlas.
+      await disconnectFromHermes(user.id);
 
       // Delete atlas's registration on hermes (remote side).
       // Use broad delete (no user filter) to catch any leftover registrations.
@@ -583,8 +591,15 @@ export async function connectToHermes(
     await import("@/app/api/[locale]/remote-connection/connector");
   reloadWsProviderConnector();
 
-  // Hermes's reverse entry for atlas defaults to all sync domains enabled
-  // (register sets REVERSE_ENTRY_SYNC_SCOPE) — no test-side patch needed.
+  // Trigger hermes to reconnect its atlas WS — this is the real connect event
+  // that fires hermes's pullOnConnect (bidirectional push-pull). Then assert
+  // sync completed: fail hard if capabilities or lastSyncedAt are not populated.
+  const hermesAdminToken = await resolveProdAdminToken(remoteUrl);
+  // Capture hermes's current atlas-row lastSyncedAt BEFORE triggering — phase 2
+  // must wait for it to ADVANCE past this value, not just be non-null.
+  const hermesBeforeTs = await resolveHermesAtlasLastSyncedAt();
+  await triggerHermesReconnect(hermesAdminToken, remoteUrl);
+  await assertSyncCompleted(user.id, remoteUrl, hermesBeforeTs);
 }
 
 /**
@@ -702,101 +717,132 @@ export async function restoreHermesIdentity(): Promise<void> {
   );
 }
 
-// ── Task-sync pull trigger ────────────────────────────────────────────────────
+// ── Hermes reconnect trigger ──────────────────────────────────────────────────
 
 /**
- * Trigger an immediate task-sync pull on atlas without waiting the full
- * 60s pulse cycle. Calls TaskSyncRepository.pullFromRemote in-process.
- *
- * If the remote pull fails (e.g. TanStack dev server socket error), falls back
- * to seeding capabilities locally from the generated JSON so tests can proceed.
+ * PATCH hermes's atlas connection with reconnectNow=true.
+ * Hermes calls restartConnection("atlas") → WS opens → pullOnConnect fires.
+ * This is a real connect event, not a manual pull shortcut.
  */
-export async function triggerPull(): Promise<void> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const { TaskSyncRepository } =
-    await import("@/app/api/[locale]/remote-connection/sync/repository");
-  await TaskSyncRepository.pullFromRemote(logger, defaultLocale);
-
-  // Always seed capabilities after pull — the pull succeeds even when individual
-  // connection syncs fail (e.g. TanStack dev socket error). seedCapabilities is
-  // a no-op for connections that already have a snapshot.
-  await seedCapabilitiesForAllConnections(logger);
+async function triggerHermesReconnect(
+  adminToken: string,
+  remoteUrl: string,
+): Promise<void> {
+  const resp = await fetch(
+    `${remoteUrl}/api/en-US/remote-connection/${ATLAS_INSTANCE_ID}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({ reconnectNow: true }),
+    },
+  );
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => "unknown");
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+    throw new Error(
+      `[connectToHermes] hermes reconnect failed: status=${String(resp.status)} body=${body.slice(0, 300)}`,
+    );
+  }
 }
 
 /**
- * Directly write local capability JSON into remote_connections.capabilities
- * for every active connection that still has no capabilities snapshot.
- *
- * Used as a fallback when the remote sync endpoint is unreachable (e.g.
- * TanStack dev server socket errors during test runs). The local capability
- * JSON represents what the local instance exposes; since both sides run the
- * same codebase in tests, this is an accurate stand-in for the remote's caps.
+ * Read hermes's current last_synced_at for its atlas row.
+ * Returns 0 if the row does not exist yet (first run).
  */
-async function seedCapabilitiesForAllConnections(
-  logger: ReturnType<typeof createEndpointLogger>,
-): Promise<void> {
-  const { RemoteConnectionRepository } =
-    await import("@/app/api/[locale]/remote-connection/repository");
-
-  // Load admin capabilities (tests run as admin)
-  const capFileImport =
-    await import("@/app/api/[locale]/system/generated/remote-capabilities/en/admin.json").catch(
-      () => null,
-    );
-  if (!capFileImport) {
-    logger.warn("[triggerPull] No capability JSON found — skipping seed");
-    return;
-  }
-
-  const caps = z
-    .array(RemoteToolCapabilitySchema)
-    .safeParse(capFileImport.default);
-  if (!caps.success) {
-    logger.warn("[triggerPull] Capability JSON parse failed — skipping seed");
-    return;
-  }
-
-  // Query connections that have no capabilities snapshot yet
-  const rows = await db
-    .select({
-      userId: remoteConnections.userId,
-      instanceId: remoteConnections.instanceId,
-      capabilities: remoteConnections.capabilities,
-    })
-    .from(remoteConnections)
-    .where(eq(remoteConnections.isActive, true));
-
-  // eslint-disable-next-line no-console
-  console.log(
-    "[seedCaps] active connections found:",
-    rows.length,
-    rows.map((r) => ({
-      instanceId: r.instanceId,
-      hasCaps: r.capabilities !== null && r.capabilities.length > 0,
-    })),
+async function resolveHermesAtlasLastSyncedAt(): Promise<number> {
+  const pdb = getProdDb();
+  const rows = await pdb.execute<{ last_synced_at: string | null }>(
+    sql`SELECT last_synced_at FROM remote_connections
+        WHERE instance_id = ${ATLAS_INSTANCE_ID}
+          AND is_reverse_entry = true
+        LIMIT 1`,
   );
+  const ts = rows.rows[0]?.last_synced_at;
+  return ts ? new Date(ts).getTime() : 0;
+}
 
-  for (const row of rows) {
-    if (row.capabilities && row.capabilities.length > 0) {
-      continue; // already populated
+/**
+ * Poll atlas's remoteConnections row until lastSyncedAt and capabilities are
+ * populated — proof that hermes's pullOnConnect completed against atlas.
+ * hermesBeforeTs: the last_synced_at value on hermes's atlas row BEFORE this reconnect;
+ * phase 2 waits for it to ADVANCE past that value (not just be non-null).
+ * Throws if sync does not complete within 90s.
+ */
+async function assertSyncCompleted(
+  userId: string,
+  remoteUrl: string,
+  hermesBeforeTs = 0,
+): Promise<void> {
+  // 120s: allows up to one 15s 500-retry + a large sync (threads can take ~50s on first run).
+  const deadline = Date.now() + 120_000;
+
+  // Phase 1: wait for atlas's hermes row to have lastSyncedAt + capabilities
+  // (set by atlas when hermes's pullOnConnect POSTs to /sync)
+  while (Date.now() < deadline) {
+    const [row] = await db
+      .select({
+        lastSyncedAt: remoteConnections.lastSyncedAt,
+        capabilities: remoteConnections.capabilities,
+      })
+      .from(remoteConnections)
+      .where(
+        and(
+          eq(remoteConnections.userId, userId),
+          eq(remoteConnections.remoteUrl, remoteUrl),
+          eq(remoteConnections.isReverseEntry, false),
+        ),
+      );
+    if (row?.lastSyncedAt && row.capabilities && row.capabilities.length > 0) {
+      break;
     }
-    await RemoteConnectionRepository.touchLastSynced(
-      row.userId,
-      row.instanceId,
-      { capabilities: caps.data },
-    );
-    // eslint-disable-next-line no-console
-    console.log(
-      "[seedCaps] Seeded capabilities for connection",
-      row.instanceId,
-      "count:",
-      caps.data.length,
-    );
-    logger.debug("[triggerPull] Seeded capabilities for connection", {
-      instanceId: row.instanceId,
-      count: caps.data.length,
-    });
+    await sleep(200);
   }
+
+  if (Date.now() >= deadline) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+    throw new Error(
+      "[connectToHermes] Sync did not complete within 120s — lastSyncedAt or capabilities not populated after hermes reconnect",
+    );
+  }
+
+  // Phase 2: wait for hermes's own atlas-row lastSyncedAt to ADVANCE past hermesBeforeTs.
+  // Hermes updates this row inside pullOnConnect, RIGHT BEFORE releaseSyncSlot().
+  // Waiting for this guarantees the sync slot is free before the next reconnect.
+  const pdb = getProdDb();
+  const phase2Deadline = Date.now() + 30_000;
+  while (Date.now() < phase2Deadline) {
+    const rows = await pdb.execute<{ last_synced_at: string | null }>(
+      sql`SELECT last_synced_at FROM remote_connections
+          WHERE instance_id = ${ATLAS_INSTANCE_ID}
+            AND is_reverse_entry = true
+          LIMIT 1`,
+    );
+    const ts = rows.rows[0]?.last_synced_at
+      ? new Date(rows.rows[0].last_synced_at).getTime()
+      : 0;
+    if (ts > hermesBeforeTs) {
+      // Grace window: releaseSyncSlot() runs immediately after the DB write
+      // (in the finally block of pullOnConnect). 1s covers any executor
+      // scheduling delay or Vite module re-evaluation race.
+      await sleep(1000);
+      return;
+    }
+    await sleep(300);
+  }
+  // Phase 2 timeout: hermes's slot release may have already happened (fast sync).
+  // Non-fatal but log it so we notice if SP2 starts flapping again.
+  // eslint-disable-next-line no-console
+  console.warn(
+    "[assertSyncCompleted] Phase 2 timeout — hermes atlas-row lastSyncedAt did not advance past",
+    hermesBeforeTs,
+    "within 30s. Slot may still be held — SP2 may flap.",
+  );
+  // Longer fallback sleep to reduce race window if phase 2 timed out.
+  await sleep(3000);
 }
 
 // ── Prod admin token ──────────────────────────────────────────────────────────
@@ -839,38 +885,27 @@ export async function resolveProdAdminToken(
 // ── Hermes pull trigger ───────────────────────────────────────────────────────
 
 /**
- * Trigger hermes-dev (port 3002) to pull memory/capability updates from atlas.
- * Used by cortex-sync tests to verify cross-instance memory synchronization.
- *
- * Calls the admin-only sync/trigger-pull endpoint which runs pullFromRemote in-process.
- * Requires an admin-role JWT for hermes (use resolveProdAdminToken).
+ * Trigger hermes to reconnect its atlas WS — fires hermes's pullOnConnect —
+ * and wait until hermes's lastSyncedAt for atlas has advanced.
+ * Gives tests a synchronisation point so polling the hermes DB doesn't race.
  */
 export async function triggerHermesPull(
   adminToken: string,
   remoteUrl: string = LOCAL_DEV_URL,
 ): Promise<void> {
-  const headers = {
-    "Content-Type": "application/json",
-    // eslint-disable-next-line i18next/no-literal-string
-    Authorization: `Bearer ${adminToken}`,
-  };
-
-  const pullResp = await fetch(
-    `${remoteUrl}/api/en-US/remote-connection/sync/trigger-pull`,
-    { method: "POST", headers, body: JSON.stringify({}) },
-  );
-  const pullBody = await pullResp.text().catch(() => "unknown");
-  if (!pullResp.ok) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `[triggerHermesPull] pull failed (non-fatal): status=${String(pullResp.status)} body=${pullBody.slice(0, 200)}`,
-    );
-    return;
+  const beforeTs = await resolveHermesAtlasLastSyncedAt();
+  await triggerHermesReconnect(adminToken, remoteUrl);
+  // Wait for hermes to complete the pull (lastSyncedAt advances past beforeTs).
+  const deadline = Date.now() + 30_000;
+  while (Date.now() < deadline) {
+    const afterTs = await resolveHermesAtlasLastSyncedAt();
+    if (afterTs > beforeTs) {
+      return;
+    }
+    await sleep(200);
   }
-  // eslint-disable-next-line no-console
-  console.log(
-    `[triggerHermesPull] status=${String(pullResp.status)} body=${pullBody}`,
-  );
+  // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
+  throw new Error("triggerHermesPull: hermes did not complete pull within 30s");
 }
 
 // ── Fixture-mode detection ────────────────────────────────────────────────────

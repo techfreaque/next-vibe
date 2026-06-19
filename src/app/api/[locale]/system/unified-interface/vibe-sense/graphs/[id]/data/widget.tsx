@@ -67,6 +67,7 @@ import React, {
   useState,
 } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   type Resolution,
@@ -1788,6 +1789,7 @@ export function GraphChartView(): React.JSX.Element {
   const logger = useWidgetLogger();
   const user = useWidgetUser();
   const locale = useWidgetLocale();
+  const availability = useProviderAvailability();
 
   const [resolution, setResolution] = useState<Resolution>(
     GraphResolution.ONE_DAY,
@@ -1927,6 +1929,7 @@ export function GraphChartView(): React.JSX.Element {
           { config: newConfig },
           { id: graph.id },
           locale,
+          availability,
         );
         setIsSavingLayout(false);
         if (result.success) {
@@ -1949,7 +1952,7 @@ export function GraphChartView(): React.JSX.Element {
         }
       })();
     },
-    [graph, logger, user, locale, navigation, t],
+    [graph, logger, user, locale, availability, navigation, t],
   );
 
   // Node display configs from graph config (uses optimistic config when in-flight)

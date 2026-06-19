@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { executeMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/mutation-executor";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import meEndpoints from "@/app/api/[locale]/user/private/me/definition";
@@ -48,6 +49,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
   const logger = useLogger();
+  const availability = useProviderAvailability();
 
   // Memoize the tab change handler
   const handleTabChange = useCallback((value: string) => {
@@ -67,9 +69,10 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
         pathParams: undefined,
         locale: newLocale,
         user,
+        availability,
       }).catch(() => undefined);
     },
-    [user, logger],
+    [user, logger, availability],
   );
 
   const handleLanguageChange = useCallback(

@@ -19,7 +19,7 @@ installFetchCache();
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { setFetchCacheContext } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
-import { resolveRemoteUrl } from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
+import { resolveRemoteUrlSync } from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
 import { HERMES_INSTANCE_ID } from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
 import {
   DefaultFolderId,
@@ -37,7 +37,7 @@ import { RouteExecuteRepository } from "../repository";
 
 // ── Remote URL guard ──────────────────────────────────────────────────────────
 
-const _resolvedRemoteUrl = await resolveRemoteUrl();
+const _resolvedRemoteUrl = resolveRemoteUrlSync();
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -242,10 +242,8 @@ describe("Execute-Tool E2E", () => {
 
       it("prerequisites: hermes connected", () => {
         if (_remoteConnectError) {
-          // oxlint-disable-next-line restricted-syntax
-          throw new Error(
-            `Remote connection failed — run: vibe rebuild\n${_remoteConnectError}`,
-          );
+          expect(false, `Remote connection failed — run: vibe rebuild\n${_remoteConnectError}`).toBe(true);
+          return;
         }
       });
 
@@ -253,7 +251,8 @@ describe("Execute-Tool E2E", () => {
 
       it("ET6: remote tool-help WAIT returns result from hermes", async () => {
         if (_remoteConnectError) {
-          throw new Error(`Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`);
+          expect(false, `Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`).toBe(true);
+          return;
         }
         setFetchCacheContext("execute-tool-et6");
 
@@ -270,8 +269,8 @@ describe("Execute-Tool E2E", () => {
 
         expect(result.success).toBe(true);
         if (!result.success) {
-          // oxlint-disable-next-line restricted-syntax
-          throw new Error(`ET6 failed: ${JSON.stringify(result)}`);
+          expect(false, `ET6 failed: ${JSON.stringify(result)}`).toBe(true);
+          return;
         }
         expect(result.data).toBeDefined();
       });
@@ -280,7 +279,8 @@ describe("Execute-Tool E2E", () => {
 
       it("ET7: remote tool-help DETACH returns taskId", async () => {
         if (_remoteConnectError) {
-          throw new Error(`Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`);
+          expect(false, `Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`).toBe(true);
+          return;
         }
         setFetchCacheContext("execute-tool-et7");
 
@@ -298,8 +298,8 @@ describe("Execute-Tool E2E", () => {
         // Remote DETACH: task created on remote, returns {taskId, status}
         expect(result.success).toBe(true);
         if (!result.success) {
-          // oxlint-disable-next-line restricted-syntax
-          throw new Error(`ET7 failed: ${JSON.stringify(result)}`);
+          expect(false, `ET7 failed: ${JSON.stringify(result)}`).toBe(true);
+          return;
         }
         // Response is either inline (hermes did it sync) or taskId object
         expect(result.data).toBeDefined();
@@ -309,7 +309,8 @@ describe("Execute-Tool E2E", () => {
 
       it("ET9: remote tool-help END_LOOP returns result inline", async () => {
         if (_remoteConnectError) {
-          throw new Error(`Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`);
+          expect(false, `Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`).toBe(true);
+          return;
         }
         setFetchCacheContext("execute-tool-et9");
 
@@ -326,8 +327,8 @@ describe("Execute-Tool E2E", () => {
 
         expect(result.success).toBe(true);
         if (!result.success) {
-          // oxlint-disable-next-line restricted-syntax
-          throw new Error(`ET9 failed: ${JSON.stringify(result)}`);
+          expect(false, `ET9 failed: ${JSON.stringify(result)}`).toBe(true);
+          return;
         }
         expect(result.data).toBeDefined();
       });
@@ -336,7 +337,8 @@ describe("Execute-Tool E2E", () => {
 
       it("ET11: prefixed hermes__tool-help_POST routes to hermes", async () => {
         if (_remoteConnectError) {
-          throw new Error(`Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`);
+          expect(false, `Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`).toBe(true);
+          return;
         }
         setFetchCacheContext("execute-tool-et11");
 
@@ -353,8 +355,8 @@ describe("Execute-Tool E2E", () => {
 
         expect(result.success).toBe(true);
         if (!result.success) {
-          // oxlint-disable-next-line restricted-syntax
-          throw new Error(`ET11 failed: ${JSON.stringify(result)}`);
+          expect(false, `ET11 failed: ${JSON.stringify(result)}`).toBe(true);
+          return;
         }
         expect(result.data).toBeDefined();
       });
@@ -363,7 +365,8 @@ describe("Execute-Tool E2E", () => {
 
       it("ET12: CLI platform remote tool-help routes to hermes", async () => {
         if (_remoteConnectError) {
-          throw new Error(`Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`);
+          expect(false, `Remote connection failed — fix prerequisites test first: ${_remoteConnectError}`).toBe(true);
+          return;
         }
         setFetchCacheContext("execute-tool-et12");
 
@@ -380,15 +383,15 @@ describe("Execute-Tool E2E", () => {
 
         expect(result.success).toBe(true);
         if (!result.success) {
-          // oxlint-disable-next-line restricted-syntax
-          throw new Error(`ET12 failed: ${JSON.stringify(result)}`);
+          expect(false, `ET12 failed: ${JSON.stringify(result)}`).toBe(true);
+          return;
         }
         expect(result.data).toBeDefined();
       });
     });
   } else {
     it("Remote tests: no Hermes dev server running", () => {
-      throw new Error("Remote tests require Hermes dev server — run: vibe --hermes dev");
+      expect(false, "Remote tests require Hermes dev server — run: vibe --hermes dev").toBe(true);
     });
   }
 });

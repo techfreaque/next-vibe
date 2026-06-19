@@ -12,7 +12,7 @@ import "server-only";
  * Wire format carries the remote's `instanceId` so the receiver can resolve
  * the correct local subfolder UUID at upsert time.
  */
-import { and, asc, eq, gte, inArray, isNull, max } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, max, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 

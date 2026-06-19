@@ -19,7 +19,7 @@ import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   failSuitePrerequisites,
   isHermesInFixtureMode,
-  resolveRemoteUrl,
+  resolveRemoteUrlSync,
 } from "../../testing/remote-setup";
 import { describeStreamSuite } from "./route-base.test";
 
@@ -76,7 +76,7 @@ async function teardownDirectConnection(
   _prodUserId = null;
 }
 
-const _resolvedRemoteUrl = await resolveRemoteUrl();
+const _resolvedRemoteUrl = resolveRemoteUrlSync();
 const _isFixtureMode = isHermesInFixtureMode();
 
 if (_resolvedRemoteUrl && _isFixtureMode) {

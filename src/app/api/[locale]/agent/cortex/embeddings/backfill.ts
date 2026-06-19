@@ -161,12 +161,6 @@ async function materializeVirtualMounts(userId: string): Promise<number> {
     }
   }
 
-  // --- Built-in skills ---
-  {
-    const { ensureUserCortexReady } = await import("../ensure-ready");
-    await ensureUserCortexReady(userId);
-  }
-
   // --- Skills ---
   const skillRoot = await listSkillPath(userId, "/skills").catch(() => []);
   for (const skill of skillRoot) {

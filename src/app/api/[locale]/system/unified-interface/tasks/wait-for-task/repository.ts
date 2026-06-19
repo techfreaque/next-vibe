@@ -21,7 +21,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
@@ -117,7 +117,7 @@ export class WaitForTaskRepository {
             pendFav?.modelSelection ?? undefined,
             pendSkill?.modelSelection ?? undefined,
             user,
-            agentEnvAvailability,
+            getEnvAvailability(),
           );
 
           // WAIT (not WAKE_UP): backfill in-place + resume directly.
@@ -314,10 +314,14 @@ export class WaitForTaskRepository {
           streamSkillId,
           waitFav ? parseSkillId(waitFav.skillId).variantId : null,
         );
+        const { getInstanceAvailability } =
+          await import("@/app/api/[locale]/agent/env-availability");
+        const waitAvailability = await getInstanceAvailability();
         const waitModelId = resolveChatModelId(
           waitFav?.modelSelection ?? undefined,
           waitSkill?.modelSelection ?? undefined,
           user,
+          waitAvailability,
         );
 
         // Write revival context to typed wakeUp* columns - not into taskInput JSON blob.

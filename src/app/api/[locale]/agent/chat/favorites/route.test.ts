@@ -120,7 +120,8 @@ describe("Favorites CRUD Integration", () => {
       name,
       async () => {
         if (suiteFailed) {
-          throw new Error(`[${name}] Previous test in suite failed — aborting dependent tests`);
+          expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+          return;
         }
         try {
           await fn();

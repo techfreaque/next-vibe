@@ -27,7 +27,7 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
-import { agentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   ModelSelector,
@@ -76,6 +76,7 @@ export function MusicGenerationContainer({
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const [showModelSelector, setShowModelSelector] = useState(false);
+  const availability = useProviderAvailability();
 
   const currentModelId = form?.watch("model");
   const currentDuration = form?.watch("duration") ?? MusicDuration.MEDIUM;
@@ -94,12 +95,16 @@ export function MusicGenerationContainer({
   const defaultModelSelection = useMemo(():
     | MusicGenModelSelection
     | undefined => {
-    const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
+    const m = getBestMusicGenModel(
+      DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+      user,
+      availability,
+    );
     if (!m) {
       return undefined;
     }
     return { selectionType: ModelSelectionType.MANUAL, manualModelId: m.id };
-  }, [user]);
+  }, [user, availability]);
 
   const resolvedModelId =
     currentModelId ??

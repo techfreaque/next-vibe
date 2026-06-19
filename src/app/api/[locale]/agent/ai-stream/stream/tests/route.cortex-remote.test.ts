@@ -64,7 +64,7 @@ import {
   isHermesInFixtureMode,
   resolveDevUser,
   resolveProdUserId,
-  resolveRemoteUrl,
+  resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../testing/remote-setup";
 
@@ -95,7 +95,7 @@ let remoteHermesFolderId: string;
 
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
-const _resolvedRemoteUrl = await resolveRemoteUrl();
+const _resolvedRemoteUrl = resolveRemoteUrlSync();
 const _isFixtureMode = isHermesInFixtureMode();
 
 if (!_resolvedRemoteUrl) {

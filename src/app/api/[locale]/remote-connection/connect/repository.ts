@@ -519,6 +519,10 @@ export class RemoteConnectionConnectRepository {
       });
     }
 
+    if (data.isInferenceProvider) {
+      invalidateUnbottledCache();
+    }
+
     // ── Step 5b: Upsert local self-identity record ─────────────────────────────
     // This lets getLocalInstanceId() return our own instanceId even when no remote
     // has registered here yet (e.g. outbound-only setups).
@@ -686,25 +690,6 @@ export class RemoteConnectionConnectRepository {
       } catch (err) {
         logger.warn("[CONNECT] Failed to open WS connection after connect", {
           error: err instanceof Error ? err.message : String(err),
-        });
-      }
-    })();
-
-    // ── Step 7: Immediate bidirectional capability sync ────────────────────────
-    // Fire-and-forget: sends our capabilities to the remote and pulls theirs back.
-    // This populates both sides without waiting for the next cron pulse (~1 min).
-    void (async (): Promise<void> => {
-      try {
-        const { TaskSyncRepository } =
-          await import("@/app/api/[locale]/remote-connection/sync/repository");
-        await TaskSyncRepository.pullFromRemote(logger, locale);
-        logger.debug("[CONNECT] Initial capability sync completed", {
-          instanceId,
-        });
-      } catch (syncError) {
-        // Non-fatal - capabilities will sync on the next cron pulse
-        logger.warn("[CONNECT] Initial capability sync failed (non-fatal)", {
-          error: String(syncError),
         });
       }
     })();

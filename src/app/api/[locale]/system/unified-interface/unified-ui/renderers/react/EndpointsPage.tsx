@@ -292,6 +292,7 @@ function EndpointsPageInternal<
           logger: callLogger,
           user: callUser,
           locale: callLocale,
+          availability: callAvailability,
         }: Parameters<
           NonNullable<
             ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
@@ -305,6 +306,7 @@ function EndpointsPageInternal<
             logger: callLogger,
             user: callUser,
             locale: callLocale,
+            availability: callAvailability,
           });
 
           if (result) {
@@ -370,6 +372,7 @@ function EndpointsPageInternal<
         logger: callLogger,
         user: callUser,
         locale: callLocale,
+        availability: callAvailability,
       }: Parameters<
         NonNullable<
           ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
@@ -384,6 +387,7 @@ function EndpointsPageInternal<
             logger: callLogger,
             user: callUser,
             locale: callLocale,
+            availability: callAvailability,
           });
           if (result) {
             return result;
@@ -444,6 +448,7 @@ function EndpointsPageInternal<
         logger: callLogger,
         user: callUser,
         locale: callLocale,
+        availability: callAvailability,
       }: Parameters<
         NonNullable<
           ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
@@ -458,6 +463,7 @@ function EndpointsPageInternal<
             logger: callLogger,
             user: callUser,
             locale: callLocale,
+            availability: callAvailability,
           });
           if (result) {
             return result;

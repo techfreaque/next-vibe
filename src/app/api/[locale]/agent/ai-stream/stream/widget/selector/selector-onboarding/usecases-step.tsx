@@ -44,7 +44,7 @@ import {
   parseSkillId,
 } from "@/app/api/[locale]/agent/chat/slugify";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
@@ -123,6 +123,7 @@ async function seedFavorites(
   selected: Set<UseCase>,
   addFavorite: ReturnType<typeof useFavoriteCreate>["addFavorite"],
   userRoles: readonly (typeof UserPermissionRoleValue)[],
+  availability: AgentEnvAvailability,
 ): Promise<SeedResult> {
   const companion = COMPANION_SKILLS.find((c) => c.id === companionId);
   if (!companion) {
@@ -167,9 +168,9 @@ async function seedFavorites(
 
   const seededSkillIds = new Set<string>();
 
-  // Always seed vibe-coder for admins on local/claude-code instances
+  // Always seed vibe-coder for admins on local instances
   const isAdmin = userRoles.includes(UserPermissionRole.ADMIN);
-  if (isAdmin && agentEnvAvailability.claudeCode) {
+  if (isAdmin && availability.claudeCode) {
     const vibeCoderSkill = DEFAULT_SKILLS.find((s) => s.id === "vibe-coder");
     if (vibeCoderSkill && !seededSkillIds.has("vibe-coder")) {
       seededSkillIds.add("vibe-coder");
@@ -295,16 +296,17 @@ export function UsecasesStep({
 
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const { setActiveFavorite } = useChatSettings(user, logger);
   const { addFavorite } = useFavoriteCreate(user, logger);
   const noProviderAvailable =
-    !agentEnvAvailability.claudeCode &&
-    !agentEnvAvailability.openRouter &&
-    !agentEnvAvailability.unbottled &&
-    !agentEnvAvailability.uncensoredAI &&
-    !agentEnvAvailability.freedomGPT &&
-    !agentEnvAvailability.gabAI &&
-    !agentEnvAvailability.veniceAI;
+    !availability.claudeCode &&
+    !availability.openRouter &&
+    !availability.unbottledSystem &&
+    !availability.uncensoredAI &&
+    !availability.freedomGPT &&
+    !availability.gabAI &&
+    !availability.veniceAI;
   const userRoles = user.roles;
 
   const toggleUseCase = useCallback((id: UseCase) => {
@@ -355,6 +357,7 @@ export function UsecasesStep({
           skillVoiceSel,
           locale,
           user,
+          availability,
         );
       });
       apiClient.updateEndpointData(
@@ -375,7 +378,7 @@ export function UsecasesStep({
         },
       );
     },
-    [logger, locale, user],
+    [logger, locale, user, availability],
   );
 
   const handleStart = useCallback(async () => {
@@ -398,9 +401,17 @@ export function UsecasesStep({
             sel?.selectionType === ModelSelectionType.MANUAL
               ? sel.manualModelId
               : sel
-                ? (getBestChatModel(sel, user)?.id ??
-                  getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user)?.id)
-                : getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user)?.id;
+                ? (getBestChatModel(sel, user, availability)?.id ??
+                  getBestChatModel(
+                    DEFAULT_CHAT_MODEL_SELECTION,
+                    user,
+                    availability,
+                  )?.id)
+                : getBestChatModel(
+                    DEFAULT_CHAT_MODEL_SELECTION,
+                    user,
+                    availability,
+                  )?.id;
           const activeModelId: ChatModelId =
             (resolvedAnyId !== undefined
               ? Object.values(ChatModelId).find((id) => id === resolvedAnyId)

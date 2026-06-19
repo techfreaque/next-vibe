@@ -9,6 +9,7 @@ import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
 import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
 import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import {
   ProductIds,
@@ -149,7 +150,7 @@ export async function loadPromptContextData(
     subLabel,
     packLabel,
     uncensoredNames: FEATURED_MODELS.uncensored.join(", "),
-    totalModelCount: getAvailableModelCount(isAdmin),
+    totalModelCount: getAvailableModelCount(isAdmin, getEnvAvailability()),
     isExposedFolder,
     privateName,
     publicName,

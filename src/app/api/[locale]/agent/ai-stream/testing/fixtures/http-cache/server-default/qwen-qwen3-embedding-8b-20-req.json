@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/skills/3b006175-0d05-45d8-9153-fddb42248b9d.md\n\n# E2E Sync Skill RWS\n> E2E test tagline\nSkill for E2E sync testing — at least 10 chars\nYou are an E2E test skill (reverse-ws).",
+    "encoding_format": "float"
+  }
+}

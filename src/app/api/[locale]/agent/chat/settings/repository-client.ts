@@ -7,10 +7,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
-import {
-  type AgentEnvAvailability,
-  agentEnvAvailability,
-} from "@/app/api/[locale]/agent/env-availability";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
@@ -44,9 +41,10 @@ export class ChatSettingsRepositoryClient {
   static async getSettings(
     logger: EndpointLogger,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): Promise<ResponseType<ChatSettingsGetResponseOutput>> {
     try {
-      const settings = this.loadLocalSettings(user);
+      const settings = this.loadLocalSettings(user, availability);
       logger.debug("Loaded settings from localStorage");
       return success(settings);
     } catch (error) {
@@ -54,7 +52,7 @@ export class ChatSettingsRepositoryClient {
         "Failed to load settings",
         error instanceof Error ? error : new Error(String(error)),
       );
-      return success(this.getDefaults(user));
+      return success(this.getDefaults(user, availability));
     }
   }
 
@@ -65,9 +63,10 @@ export class ChatSettingsRepositoryClient {
     data: ChatSettingsUpdateRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): Promise<ResponseType<never>> {
     try {
-      this.updateLocalSettings(data, user);
+      this.updateLocalSettings(data, user, availability);
       return success();
     } catch (error) {
       logger.error(
@@ -82,8 +81,15 @@ export class ChatSettingsRepositoryClient {
    * Get default values - shared between client and server
    * Resolves selectedModel through DEFAULT_CHAT_MODEL_SELECTION with env filtering
    */
-  static getDefaults(user: JwtPayloadType): ChatSettingsGetResponseOutput {
-    const bestModel = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
+  static getDefaults(
+    user: JwtPayloadType,
+    availability: AgentEnvAvailability,
+  ): ChatSettingsGetResponseOutput {
+    const bestModel = getBestChatModel(
+      DEFAULT_CHAT_MODEL_SELECTION,
+      user,
+      availability,
+    );
     return {
       selectedModel: bestModel?.id ?? null,
       selectedSkill: "thea",
@@ -118,19 +124,20 @@ export class ChatSettingsRepositoryClient {
    */
   static loadLocalSettings(
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): ChatSettingsGetResponseOutput {
     if (typeof window === "undefined") {
-      return this.getDefaults(user);
+      return this.getDefaults(user, availability);
     }
 
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
-      return this.getDefaults(user);
+      return this.getDefaults(user, availability);
     }
 
     try {
       const overrides = JSON.parse(stored) as ChatSettingsGetResponseOutput;
-      const defaults = this.getDefaults(user);
+      const defaults = this.getDefaults(user, availability);
 
       // Merge overrides with defaults
       // Use 'in' check for nullable fields to distinguish "explicitly set to null" from "not set"
@@ -192,7 +199,7 @@ export class ChatSettingsRepositoryClient {
         autopilotTaskId: null,
       };
     } catch {
-      return this.getDefaults(user);
+      return this.getDefaults(user, availability);
     }
   }
 
@@ -202,12 +209,13 @@ export class ChatSettingsRepositoryClient {
   static saveLocalSettings(
     settings: ChatSettingsGetResponseOutput,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): void {
     if (typeof window === "undefined") {
       return;
     }
 
-    const defaults = this.getDefaults(user);
+    const defaults = this.getDefaults(user, availability);
     const overrides: Partial<ChatSettingsGetResponseOutput> = {};
 
     // Only store values that differ from defaults
@@ -282,8 +290,9 @@ export class ChatSettingsRepositoryClient {
   static updateLocalSettings(
     updates: Partial<ChatSettingsUpdateRequestOutput>,
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): ChatSettingsGetResponseOutput {
-    const current = this.loadLocalSettings(user);
+    const current = this.loadLocalSettings(user, availability);
     const updated: ChatSettingsGetResponseOutput = {
       selectedModel: updates.selectedModel ?? current.selectedModel,
       selectedSkill: updates.selectedSkill ?? current.selectedSkill,
@@ -361,7 +370,7 @@ export class ChatSettingsRepositoryClient {
       autopilotTaskId: current.autopilotTaskId,
     };
 
-    this.saveLocalSettings(updated, user);
+    this.saveLocalSettings(updated, user, availability);
     return updated;
   }
 
@@ -386,8 +395,10 @@ export class ChatSettingsRepositoryClient {
     logger: EndpointLogger;
     locale: CountryLanguage;
     user: JwtPayloadType;
+    availability: AgentEnvAvailability;
   }): Promise<void> {
-    const { favoriteId, modelId, skillId, logger, locale, user } = params;
+    const { favoriteId, modelId, skillId, logger, locale, user, availability } =
+      params;
 
     const { apiClient } =
       await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
@@ -447,6 +458,7 @@ export class ChatSettingsRepositoryClient {
         },
         undefined,
         locale,
+        availability,
       );
     } catch (error) {
       logger.error("Failed to update active favorite", {

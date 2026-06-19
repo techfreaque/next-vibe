@@ -61,6 +61,7 @@ import {
 } from "@/app/[locale]/creator/[userId]/_shared/profile-content";
 import skillsDef from "@/app/api/[locale]/agent/chat/skills/definition";
 import { SkillOwnershipType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import creditsDef from "@/app/api/[locale]/credits/definition";
 import configDef from "@/app/api/[locale]/lead-magnet/config/definition";
 import referralDef from "@/app/api/[locale]/referral/definition";
@@ -108,6 +109,7 @@ export function MeDeleteWidget(): JSX.Element {
       undefined,
       undefined,
       locale,
+      availability,
     );
 
     if (result.success) {
@@ -344,6 +346,7 @@ function AvatarUploadButton({
           { fileUpload: { file } },
           undefined,
           locale,
+          availability,
         );
         setUploading(false);
         if (result.success && result.data.response?.avatarUrl) {

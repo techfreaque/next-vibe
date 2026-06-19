@@ -177,7 +177,15 @@ export class TaskSyncRepository {
       phaseStart = Date.now();
     };
 
-    // ── 1. Process incoming capability snapshot (only if version changed) ──────
+    // ── 1. Process incoming capability snapshot + always touch lastSyncedAt ────
+    // touchLastSynced is called unconditionally so tests can poll lastSyncedAt to
+    // confirm a sync completed. Capabilities opts are merged in only when version changed.
+    let capabilityOpts:
+      | {
+          capabilities: z.infer<typeof RemoteToolCapabilitySchema>[];
+          capabilitiesVersion?: string;
+        }
+      | undefined;
     if (data.capabilitiesJson) {
       try {
         let capabilities: z.infer<typeof RemoteToolCapabilitySchema>[];
@@ -196,11 +204,10 @@ export class TaskSyncRepository {
           data.senderCapabilitiesVersion ?? data.capabilitiesVersion;
         const storedVersion = connRow?.capabilitiesVersion;
         if (storedVersion !== incomingVersion) {
-          await RemoteRepoReport.touchLastSynced(user.id, instanceId, {
+          capabilityOpts = {
             capabilities,
-            // The SENDER's snapshot version — what we now hold of the peer.
             capabilitiesVersion: incomingVersion,
-          });
+          };
           logger.debug("Stored updated capability snapshot", {
             instanceId,
             version: incomingVersion,
@@ -211,6 +218,7 @@ export class TaskSyncRepository {
         logger.warn("Failed to store capabilities snapshot", parseError(error));
       }
     }
+    await RemoteRepoReport.touchLastSynced(user.id, instanceId, capabilityOpts);
     markPhase("capabilities");
 
     // ── 2. Parse incoming cursors ─────────────────────────────────────────────

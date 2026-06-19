@@ -15,6 +15,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { getCurrentUrl, silentReplaceState } from "next-vibe-ui/utils/browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
@@ -60,6 +61,7 @@ export function useLazyBranchLoader(
   /** Update the navigation store's leafMessageId when server resolves to a different leaf */
   setLeafMessageId?: (leafMessageId: string | null) => void,
 ): LazyBranchLoaderReturn {
+  const availability = useProviderAvailability();
   const [isLoadingOlderHistory, setIsLoadingOlderHistory] = useState(false);
   const [isLoadingNewerHistory, setIsLoadingNewerHistory] = useState(false);
 
@@ -207,6 +209,7 @@ export function useLazyBranchLoader(
             pathParams: { threadId },
             locale,
             user,
+            availability,
           });
 
           if (controller.signal.aborted) {
@@ -316,6 +319,7 @@ export function useLazyBranchLoader(
       user,
       thread?.rootFolderId,
       rootFolderId,
+      availability,
     ],
   );
 
@@ -351,6 +355,7 @@ export function useLazyBranchLoader(
             pathParams: { threadId },
             locale,
             user,
+            availability,
           });
 
           if (controller.signal.aborted) {
@@ -439,6 +444,7 @@ export function useLazyBranchLoader(
       thread?.rootFolderId,
       rootFolderId,
       setLeafMessageId,
+      availability,
     ],
   );
 
@@ -479,6 +485,7 @@ export function useFullLoadFallback(
   user: JwtPayloadType,
   currentRootFolderId: DefaultFolderId,
 ): { isUpgrading: boolean } {
+  const availability = useProviderAvailability();
   const [isUpgrading, setIsUpgrading] = useState(false);
   const upgradedRef = useRef<Set<string>>(new Set());
 
@@ -511,6 +518,7 @@ export function useFullLoadFallback(
           pathParams: { threadId: activeThreadId },
           locale,
           user,
+          availability,
         });
 
         if (response.success) {
@@ -550,6 +558,7 @@ export function useFullLoadFallback(
     user,
     currentRootFolderId,
     pendingNewThreadIds,
+    availability,
   ]);
 
   return { isUpgrading };

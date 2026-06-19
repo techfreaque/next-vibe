@@ -187,8 +187,10 @@ export async function clearStreamingState(
   StreamRegistry.unregister(threadId);
   const now = new Date();
 
-  // Check for active tasks tied to this thread - if any are still running,
+  // Check for active work tied to this thread - if any is still running,
   // set "waiting" instead of "idle" so the stop button stays visible.
+  // Two sources: local cron tasks (this instance's own background work) and
+  // in-flight remote calls (no task rows — see remote-call/spec.md).
   const [activeTask] = await db
     .select({ id: cronTasks.id })
     .from(cronTasks)
@@ -200,7 +202,29 @@ export async function clearStreamingState(
     )
     .limit(1);
 
-  const nextState = activeTask ? "waiting" : "idle";
+  // A scheduled-but-not-yet-finished revival (resume-stream row, possibly
+  // direct-firing in ANOTHER process) means the thread is about to stream —
+  // an idle verdict here would let the revival turn leak into whatever the
+  // caller does next.
+  const [resumePending] = await db
+    .select({ id: cronTasks.id })
+    .from(cronTasks)
+    .where(
+      and(
+        eq(cronTasks.enabled, true),
+        like(cronTasks.routeId, "resume-stream%"),
+        sql`${cronTasks.taskInput}->>'threadId' = ${threadId}`,
+      ),
+    )
+    .limit(1);
+
+  const { hasPendingCallForThread } =
+    await import("@/app/api/[locale]/remote-connection/pending-calls");
+
+  const nextState =
+    activeTask || resumePending || (await hasPendingCallForThread(threadId))
+      ? "waiting"
+      : "idle";
   const preview =
     lastContent && lastContent.trim().length > 0
       ? computePreview(lastContent)
@@ -214,10 +238,15 @@ export async function clearStreamingState(
       ...(preview !== null ? { preview } : {}),
     })
     .where(
-      and(
-        eq(chatThreads.id, threadId),
-        ne(chatThreads.streamingState, "waiting"),
-      ),
+      nextState === "idle"
+        ? // Positively idle: rows + registry (cross-process reconciled) show
+          // no pending work — clearing an earlier 'waiting' is correct, and
+          // nothing else would ever transition it back.
+          eq(chatThreads.id, threadId)
+        : and(
+            eq(chatThreads.id, threadId),
+            ne(chatThreads.streamingState, "waiting"),
+          ),
     )
     .returning({ folderId: chatThreads.folderId });
 

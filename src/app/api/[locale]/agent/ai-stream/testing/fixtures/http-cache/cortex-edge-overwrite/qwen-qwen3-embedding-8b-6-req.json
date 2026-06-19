@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/use-cortex-list-on-the-root-path-----to-see-all----4979c940-61c6-4751-8f8e-ddec363c4449.md\n\n# Use cortex-list on the root path \"/\" to see all...\nFolder: cron\nPreview: <think> Both operations succeeded: 1. cortex-mkdir created the deep nested directory /documents/edge-test/deep/nested wi…",
+    "input": "/threads/cron/use-cortex-list-on-the-root-path-----to-see-all----ae944295-bbe2-4833-879d-6e01108f2648.md\n\n# Use cortex-list on the root path \"/\" to see all...\nFolder: cron\nPreview: <think>Both operations succeeded: cortex-mkdir returned created: true, responsePath: /documents/edge-test/deep/nested co…",
     "encoding_format": "float"
   }
 }

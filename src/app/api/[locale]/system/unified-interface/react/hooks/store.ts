@@ -7,6 +7,7 @@ import type {
 import { z } from "zod";
 import { create } from "zustand";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { generateStorageKey } from "@/app/api/[locale]/system/unified-interface/react/utils/storage-storage-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -431,6 +432,7 @@ export const apiClient = {
       ? undefined
       : TEndpoint["types"]["UrlVariablesOutput"],
     locale: CountryLanguage,
+    availability: AgentEnvAvailability,
     options: Omit<
       ApiQueryOptions<
         TEndpoint["types"]["RequestOutput"],
@@ -484,6 +486,7 @@ export const apiClient = {
       pathParams: pathParams as never,
       locale,
       user,
+      availability,
       options: {
         onSuccess: options.onSuccess,
         onError: options.onError,
@@ -507,6 +510,7 @@ export const apiClient = {
       ? undefined
       : TEndpoint["types"]["UrlVariablesOutput"],
     locale: CountryLanguage,
+    availability: AgentEnvAvailability,
     options: ApiMutationOptions<
       TEndpoint["types"]["RequestOutput"],
       TEndpoint["types"]["ResponseOutput"],
@@ -522,6 +526,7 @@ export const apiClient = {
       pathParams: pathParams as never,
       locale,
       user,
+      availability,
       options: {
         onSuccess: options.onSuccess
           ? (context) =>
@@ -532,6 +537,7 @@ export const apiClient = {
                 logger: context.logger,
                 user: context.user,
                 locale: context.locale,
+                availability: context.availability,
               })
           : undefined,
         onError: options.onError

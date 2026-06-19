@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/documents/edge-test/overwrite-me.md\n\nVersion 1",
+    "input": "what TypeScript skills and expertise does the user have?",
     "encoding_format": "float"
   }
 }

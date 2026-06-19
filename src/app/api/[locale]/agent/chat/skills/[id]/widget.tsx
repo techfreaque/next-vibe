@@ -107,6 +107,7 @@ import {
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import {
   getBestImageGenModel,
@@ -139,7 +140,6 @@ import {
   type VoiceModelSelection,
   voiceModelSelectionSchema,
 } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/use-provider-availability";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
 import {
   getBestVideoGenModel,
@@ -226,11 +226,13 @@ export function SkillEditContainer({
   const skillHook = useSkill(skillId, user, logger);
   const skillOwnership = skillHook.read?.data?.skillOwnership;
 
+  const availability = useProviderAvailability();
+
   // Stable props
   const emptyField = useMemo(() => ({}), []);
 
   // Variant management
-  const platformDefaults = useVariantPlatformDefaults(user);
+  const platformDefaults = useVariantPlatformDefaults(user, availability);
   const watchedVariants = form.watch("variants");
   const localVariants: SkillVariantData[] = useMemo(() => {
     if (watchedVariants && watchedVariants.length > 0) {
@@ -285,16 +287,6 @@ export function SkillEditContainer({
       popNavigationOnSuccess: 2,
     });
   };
-
-  // When no skill ID is in context (standalone open), show a picker.
-  // EntityPickerFieldWidget reads config from the definition's id field.
-  if (!skillId) {
-    return (
-      <Div className="flex flex-col gap-4 p-4">
-        <EntityPickerFieldWidget fieldName="id" field={children.id} />
-      </Div>
-    );
-  }
 
   return (
     <Div className="flex flex-col gap-0">
@@ -373,6 +365,7 @@ export function SkillEditContainer({
                     platformDefaults={platformDefaults}
                     locale={locale}
                     user={user}
+                    availability={availability}
                     t={t}
                   />
                 </FormControl>
@@ -445,7 +438,7 @@ export function SkillEditContainer({
   );
 }
 
-function useViewDefaults(): {
+function useViewDefaults(availability: AgentEnvAvailability): {
   chat: ChatModelSelection | undefined;
   tts: VoiceModelSelection | undefined;
   imageGen: ImageGenModelSelection | undefined;
@@ -459,7 +452,11 @@ function useViewDefaults(): {
   const user = useWidgetUser();
   return useMemo(() => {
     const mkChat = (): ChatModelSelection | undefined => {
-      const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
+      const m = getBestChatModel(
+        DEFAULT_CHAT_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -470,7 +467,11 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkVoice = (): VoiceModelSelection | undefined => {
-      const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
+      const m = getBestTtsModel(
+        DEFAULT_TTS_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -481,7 +482,11 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkImageGen = (): ImageGenModelSelection | undefined => {
-      const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
+      const m = getBestImageGenModel(
+        DEFAULT_IMAGE_GEN_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -492,7 +497,11 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkMusicGen = (): MusicGenModelSelection | undefined => {
-      const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
+      const m = getBestMusicGenModel(
+        DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -503,7 +512,11 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkVideoGen = (): VideoGenModelSelection | undefined => {
-      const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
+      const m = getBestVideoGenModel(
+        DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -514,7 +527,11 @@ function useViewDefaults(): {
       return p.success ? p.data : undefined;
     };
     const mkStt = (): SttModelSelection | undefined => {
-      const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
+      const m = getBestSttModel(
+        DEFAULT_STT_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -580,7 +597,7 @@ function useViewDefaults(): {
       videoVision: mkVideoVision(),
       audioVision: mkAudioVision(),
     };
-  }, [user]);
+  }, [user, availability]);
 }
 
 /** Compact read-only model card - slot label + provider icon + model name + credit cost */
@@ -596,7 +613,7 @@ function ModelCard({
   nameClassName?: string;
 }): React.JSX.Element {
   const provider = modelProviders[model.provider];
-  const providerIcon = provider?.icon;
+  const providerIcon = provider?.icon as IconKey | undefined;
 
   return (
     <Div
@@ -733,7 +750,8 @@ export function SkillViewContainer({
   const context = useWidgetContext();
   const { logger, user } = context;
   const locale = useWidgetLocale();
-  const viewDefaults = useViewDefaults();
+  const availability = useProviderAvailability();
+  const viewDefaults = useViewDefaults(availability);
   const t = useWidgetTranslation<typeof definitionGet.GET>();
   const skillData = useWidgetValue<typeof definitionGet.GET>();
   const variants = skillData?.variants;
@@ -1086,7 +1104,7 @@ export function SkillViewContainer({
             >
               {skillData?.icon ? (
                 <Span style={{ color: `${accent}cc` }}>
-                  <Icon icon={skillData.icon} className="w-9 h-9" />
+                  <Icon icon={skillData.icon as IconKey} className="w-9 h-9" />
                 </Span>
               ) : (
                 <Skeleton className="w-9 h-9 rounded-full" />
@@ -1354,6 +1372,7 @@ export function SkillViewContainer({
                   isOwner={isOwner}
                   onEdit={handleOpenEdit}
                   defaultExpanded={false}
+                  availability={availability}
                 />
               ))}
               {/* Owner: Add Variant - styled like a variant card */}
@@ -1672,7 +1691,7 @@ export function SkillViewContainer({
             >
               {skillData?.icon ? (
                 <Span style={{ color: `${accent}cc` }}>
-                  <Icon icon={skillData.icon} className="w-9 h-9" />
+                  <Icon icon={skillData.icon as IconKey} className="w-9 h-9" />
                 </Span>
               ) : (
                 <Skeleton className="w-9 h-9 rounded-full" />
@@ -1819,6 +1838,7 @@ export function SkillViewContainer({
                   isOwner={isOwner}
                   onEdit={handleOpenEdit}
                   defaultExpanded={false}
+                  availability={availability}
                 />
               ))}
 
@@ -1904,6 +1924,7 @@ function VariantCard({
   isOwner: boolean;
   onEdit: () => void;
   defaultExpanded: boolean;
+  availability: AgentEnvAvailability;
 }): React.JSX.Element {
   const [expanded, setExpanded] = useState(defaultExpanded);
 
@@ -1925,23 +1946,29 @@ function VariantCard({
     const videoGenSel =
       variant.videoGenModelSelection ?? viewDefaults.videoGen ?? null;
     return {
-      chat: chatSel ? getBestChatModel(chatSel, user) : null,
-      tts: ttsSel ? getBestTtsModel(ttsSel, user) : null,
-      stt: sttSel ? getBestSttModel(sttSel, user) : null,
+      chat: chatSel ? getBestChatModel(chatSel, user, availability) : null,
+      tts: ttsSel ? getBestTtsModel(ttsSel, user, availability) : null,
+      stt: sttSel ? getBestSttModel(sttSel, user, availability) : null,
       imageVision: imageVisionSel
-        ? getBestImageVisionModel(imageVisionSel, user)
+        ? getBestImageVisionModel(imageVisionSel, user, availability)
         : null,
       videoVision: videoVisionSel
-        ? getBestVideoVisionModel(videoVisionSel, user)
+        ? getBestVideoVisionModel(videoVisionSel, user, availability)
         : null,
       audioVision: audioVisionSel
-        ? getBestAudioVisionModel(audioVisionSel, user)
+        ? getBestAudioVisionModel(audioVisionSel, user, availability)
         : null,
-      imageGen: imageGenSel ? getBestImageGenModel(imageGenSel, user) : null,
-      musicGen: musicGenSel ? getBestMusicGenModel(musicGenSel, user) : null,
-      videoGen: videoGenSel ? getBestVideoGenModel(videoGenSel, user) : null,
+      imageGen: imageGenSel
+        ? getBestImageGenModel(imageGenSel, user, availability)
+        : null,
+      musicGen: musicGenSel
+        ? getBestMusicGenModel(musicGenSel, user, availability)
+        : null,
+      videoGen: videoGenSel
+        ? getBestVideoGenModel(videoGenSel, user, availability)
+        : null,
     };
-  }, [variant, viewDefaults, user]);
+  }, [variant, viewDefaults, user, availability]);
 
   const provider = resolved.chat
     ? modelProviders[resolved.chat.provider]
@@ -1995,13 +2022,14 @@ function VariantCard({
         logger,
         locale,
         user,
+        availability,
       });
       setIsActivating(false);
     })();
-  }, [matchingFav, user, resolved.chat, skillId, logger, locale]);
+  }, [matchingFav, user, resolved.chat, skillId, logger, locale, availability]);
 
   const handleGoToChat = useCallback((): void => {
-    openUrl(`/${locale}/threads`);
+    window.location.href = `/${locale}/threads`;
   }, [locale]);
 
   // displayName is pre-resolved server-side (system skills) or set by the user (custom skills)
@@ -2350,6 +2378,7 @@ function LeadCaptureForm({
   const [state, setState] = useState<CaptureState>("idle");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
+  const availability = useProviderAvailability();
 
   const handleSubmit = useCallback((): void => {
     if (!firstName.trim() || !email.trim()) {
@@ -2364,7 +2393,12 @@ function LeadCaptureForm({
         ]);
         const { createClientLogger } =
           await import("@/app/api/[locale]/system/unified-interface/shared/logger/client-logger");
-        const logger = createClientLogger(false, Date.now(), locale);
+        const logger = createClientLogger(
+          false,
+          Date.now(),
+          locale,
+          availability,
+        );
         const result = await apiClient.mutate(
           captureDef.POST,
           logger,
@@ -2372,13 +2406,14 @@ function LeadCaptureForm({
           { skillId, firstName: firstName.trim(), email: email.trim() },
           undefined,
           locale,
+          availability,
         );
         setState(result.success ? "done" : "error");
       } catch {
         setState("error");
       }
     })();
-  }, [skillId, firstName, email, locale]);
+  }, [skillId, firstName, email, locale, availability]);
 
   const displayHeadline = headline ?? t("get.leadCapture.fallbackHeadline");
   const displayButton = buttonText ?? t("get.leadCapture.fallbackButton");
@@ -2603,6 +2638,7 @@ function CreatorOtherSkills({
     }>
   >([]);
   const [loaded, setLoaded] = useState(false);
+  const availability = useProviderAvailability();
 
   useEffect(() => {
     void (async (): Promise<void> => {
@@ -2613,7 +2649,12 @@ function CreatorOtherSkills({
         ]);
         const { createClientLogger } =
           await import("@/app/api/[locale]/system/unified-interface/shared/logger/client-logger");
-        const logger = createClientLogger(false, Date.now(), locale);
+        const logger = createClientLogger(
+          false,
+          Date.now(),
+          locale,
+          availability,
+        );
         const result = await apiClient.fetch(
           listDef.default.GET,
           logger,
@@ -2621,6 +2662,7 @@ function CreatorOtherSkills({
           { sourceFilter: "enums.source.community" as const },
           undefined,
           locale,
+          availability,
         );
         if (result.success && Array.isArray(result.data)) {
           const filtered = (
@@ -2645,7 +2687,7 @@ function CreatorOtherSkills({
       }
       setLoaded(true);
     })();
-  }, [creatorUserId, currentSkillId, locale]);
+  }, [creatorUserId, currentSkillId, locale, availability]);
 
   if (!loaded || skills.length === 0) {
     return null;
@@ -2983,8 +3025,8 @@ function ShareEarnButton({
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [popoverRect, setPopoverRect] = useState<DOMRect | null>(null);
+  const availability = useProviderAvailability();
   const wrapperRef = useRef<DivRefObject>(null);
-  const { width: windowWidth } = useWindowSize();
 
   useEffect(() => {
     if (open && wrapperRef.current) {
@@ -3039,6 +3081,7 @@ function ShareEarnButton({
         {},
         undefined,
         locale,
+        availability,
       );
       if (result.success) {
         const fetchedCodes = result.data.codes.map((c) => ({
@@ -3074,6 +3117,7 @@ function ShareEarnButton({
         { fieldsGrid: { code: newCode.trim() } },
         undefined,
         locale,
+        availability,
       );
       if (result.success) {
         const createdCode = newCode.trim();
@@ -3089,11 +3133,9 @@ function ShareEarnButton({
     }
   };
 
-  const currentUrl = getCurrentUrl();
-  const origin = currentUrl ? new URL(currentUrl).origin : "";
   const shareUrl =
-    selectedCode && origin
-      ? `${origin}/track?ref=${encodeURIComponent(selectedCode)}&url=${encodeURIComponent(`/${locale}/skill/${skillId}`)}`
+    selectedCode && typeof window !== "undefined"
+      ? `${window.location.origin}/track?ref=${encodeURIComponent(selectedCode)}&url=${encodeURIComponent(`/${locale}/skill/${skillId}`)}`
       : null;
 
   const handleCopy = async (): Promise<void> => {
@@ -3113,7 +3155,7 @@ function ShareEarnButton({
               zIndex: 9999,
               width: 320,
               top: popoverRect.bottom + 8,
-              right: windowWidth - popoverRect.right,
+              right: window.innerWidth - popoverRect.right,
               borderRadius: 12,
               border: "1px solid hsl(var(--border))",
               backgroundColor: "hsl(var(--popover))",
@@ -3318,6 +3360,7 @@ function CustomizeAndAddButton({
   iconOnly?: boolean;
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
+  const availability = useProviderAvailability();
 
   const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
     e.stopPropagation();
@@ -3351,6 +3394,7 @@ function CustomizeAndAddButton({
             undefined,
             { id: skillId },
             locale,
+            availability,
           );
           if (!skillResponse.success) {
             return;
@@ -3505,10 +3549,15 @@ export interface VariantPlatformDefaults {
  */
 export function useVariantPlatformDefaults(
   user: ReturnType<typeof useWidgetUser>,
+  availability: AgentEnvAvailability,
 ): VariantPlatformDefaults {
   return useMemo(() => {
     const mkChat = (): ChatModelSelection | undefined => {
-      const m = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
+      const m = getBestChatModel(
+        DEFAULT_CHAT_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -3519,7 +3568,11 @@ export function useVariantPlatformDefaults(
       return p.success ? p.data : undefined;
     };
     const mkTts = (): VoiceModelSelection | undefined => {
-      const m = getBestTtsModel(DEFAULT_TTS_MODEL_SELECTION, user);
+      const m = getBestTtsModel(
+        DEFAULT_TTS_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -3530,7 +3583,11 @@ export function useVariantPlatformDefaults(
       return p.success ? p.data : undefined;
     };
     const mkImageGen = (): ImageGenModelSelection | undefined => {
-      const m = getBestImageGenModel(DEFAULT_IMAGE_GEN_MODEL_SELECTION, user);
+      const m = getBestImageGenModel(
+        DEFAULT_IMAGE_GEN_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -3541,7 +3598,11 @@ export function useVariantPlatformDefaults(
       return p.success ? p.data : undefined;
     };
     const mkMusicGen = (): MusicGenModelSelection | undefined => {
-      const m = getBestMusicGenModel(DEFAULT_MUSIC_GEN_MODEL_SELECTION, user);
+      const m = getBestMusicGenModel(
+        DEFAULT_MUSIC_GEN_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -3552,7 +3613,11 @@ export function useVariantPlatformDefaults(
       return p.success ? p.data : undefined;
     };
     const mkVideoGen = (): VideoGenModelSelection | undefined => {
-      const m = getBestVideoGenModel(DEFAULT_VIDEO_GEN_MODEL_SELECTION, user);
+      const m = getBestVideoGenModel(
+        DEFAULT_VIDEO_GEN_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -3563,7 +3628,11 @@ export function useVariantPlatformDefaults(
       return p.success ? p.data : undefined;
     };
     const mkStt = (): SttModelSelection | undefined => {
-      const m = getBestSttModel(DEFAULT_STT_MODEL_SELECTION, user);
+      const m = getBestSttModel(
+        DEFAULT_STT_MODEL_SELECTION,
+        user,
+        availability,
+      );
       if (!m) {
         return undefined;
       }
@@ -3629,7 +3698,7 @@ export function useVariantPlatformDefaults(
       videoVision: mkVideoVision(),
       audioVision: mkAudioVision(),
     };
-  }, [user]);
+  }, [user, availability]);
 }
 
 /**
@@ -4260,6 +4329,7 @@ export function VariantList({
   platformDefaults: VariantPlatformDefaults;
   locale: CountryLanguage;
   user: ReturnType<typeof useWidgetUser>;
+  availability: AgentEnvAvailability;
   t: ReturnType<typeof useWidgetTranslation>;
 }): React.JSX.Element {
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -4300,7 +4370,11 @@ export function VariantList({
 
   const handleAddVariant = useCallback((): void => {
     const defaultVariant = variants.find((v) => v.isDefault) ?? variants[0];
-    const fallbackModel = getBestChatModel(DEFAULT_CHAT_MODEL_SELECTION, user);
+    const fallbackModel = getBestChatModel(
+      DEFAULT_CHAT_MODEL_SELECTION,
+      user,
+      availability,
+    );
     const fallbackModelSelection: ChatModelSelection | undefined = fallbackModel
       ? chatModelSelectionSchema.safeParse({
           selectionType: ModelSelectionType.MANUAL,
@@ -4318,7 +4392,7 @@ export function VariantList({
     const next = [...variants, newVariant];
     onChange(next);
     setExpandedId(newVariant.id);
-  }, [variants, onChange, user]);
+  }, [variants, onChange, user, availability]);
 
   return (
     <Div className="flex flex-col gap-2">

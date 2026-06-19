@@ -10,6 +10,7 @@ import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { useCallback, useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -119,6 +120,7 @@ export function useAddToFavorites({
   onSuccess,
 }: UseAddToFavoritesOptions): UseAddToFavoritesReturn {
   const [isLoading, setIsLoading] = useState(false);
+  const availability = useProviderAvailability();
 
   const addToFavorites = async (e?: ButtonMouseEvent): Promise<void> => {
     e?.stopPropagation();
@@ -167,6 +169,7 @@ export function useAddToFavorites({
             undefined,
             { id: plainSkillId },
             locale,
+            availability,
           );
 
           if (!characterResponse.success) {
@@ -216,6 +219,7 @@ export function useAddToFavorites({
         },
         undefined,
         locale,
+        availability,
       );
 
       if (!createResponse.success) {
@@ -245,6 +249,7 @@ export function useAddToFavorites({
             { skillId: plainSkillId },
             undefined,
             locale,
+            availability,
           );
         })();
       }
@@ -279,6 +284,7 @@ export function useAddToFavorites({
               null,
               locale,
               user,
+              availability,
             );
 
           // Override model fields with pre-computed values when available

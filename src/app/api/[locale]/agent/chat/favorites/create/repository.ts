@@ -14,6 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
@@ -341,6 +342,7 @@ export class FavoritesCreateRepository {
         logger,
         user,
       );
+      const availability = await getInstanceAvailability();
       const variantForDisplay = effectiveVariantId
         ? character?.variants?.find((v) => v.id === effectiveVariantId)
         : (character?.variants?.find((v) => v.isDefault) ??
@@ -375,6 +377,7 @@ export class FavoritesCreateRepository {
           characterDefaultVariant?.voiceModelSelection ?? null,
           locale,
           user,
+          availability,
         );
       emitFavorites("favorite-created", { favorites: [newFavoriteCard] });
 

@@ -21,7 +21,7 @@ import {
   type VideoVisionModelOption,
 } from "../ai-stream/vision-models";
 import { ContentLevel } from "../chat/skills/enum";
-import { agentEnvAvailability } from "../env-availability";
+import { getEnvAvailability } from "../env-availability";
 import {
   imageGenModelDefinitions,
   type ImageGenModelOption,
@@ -122,7 +122,7 @@ export function getModelDisplayName(
   }
   const availableProviders = (
     isAdmin ? def.providers : def.providers.filter((p) => !p.adminOnly)
-  ).filter((p) => isApiProviderAvailable(p.apiProvider));
+  ).filter((p) => isApiProviderAvailable(p.apiProvider, getEnvAvailability()));
   if (availableProviders.length <= 1) {
     return model.name;
   }
@@ -180,7 +180,9 @@ export function getAvailableModelCount(isAdmin: boolean): number {
     }
     return visibleProviders.some((p) => {
       const option = allModelOptions.find((m) => m.id === p.id);
-      return option ? isModelProviderAvailable(option) : false;
+      return option
+        ? isModelProviderAvailable(option, getEnvAvailability())
+        : false;
     });
   }).length;
 }
@@ -194,7 +196,7 @@ export function getAvailableProviderCount(isAdmin: boolean): number {
     const publicProviders = def.providers.filter((p) => !p.adminOnly);
     for (const p of publicProviders) {
       const option = allModelOptions.find((m) => m.id === p.id);
-      if (option && isModelProviderAvailable(option)) {
+      if (option && isModelProviderAvailable(option, getEnvAvailability())) {
         availableProviderIds.add(def.by);
         break;
       }
@@ -229,7 +231,9 @@ export function getAvailableModelCountsByContentLevel(
       !isAdmin &&
       !visibleProviders.some((p) => {
         const option = allModelOptions.find((m) => m.id === p.id);
-        return option ? isModelProviderAvailable(option) : false;
+        return option
+          ? isModelProviderAvailable(option, getEnvAvailability())
+          : false;
       })
     ) {
       continue;

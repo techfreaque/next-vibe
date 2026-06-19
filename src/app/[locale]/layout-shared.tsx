@@ -9,22 +9,23 @@ import { ThemeProvider } from "next-vibe-ui/ui/theme-provider";
 import { Toaster } from "next-vibe-ui/ui/toaster";
 import type { JSX, ReactNode } from "react";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { AgentAvailabilityProvider } from "@/app/api/[locale]/agent/env-availability-context";
 import { LoggerProvider } from "@/hooks/logger-provider";
 import { TranslationProvider } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
-/**
- * Shared root providers for both web and native
- * Contains all platform-agnostic provider logic
- */
+
 export function RootProviders({
   locale,
   theme,
+  availability,
   children,
 }: {
   locale: CountryLanguage;
   theme?: "light" | "dark";
+  availability: AgentEnvAvailability;
   children: ReactNode;
 }): JSX.Element {
   return (
@@ -35,10 +36,12 @@ export function RootProviders({
         enableSystem={false}
       >
         <TranslationProvider currentLocale={locale}>
-          <LoggerProvider locale={locale}>
-            <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
-            <LeadTrackingProvider />
-            <Toaster />
+          <LoggerProvider locale={locale} availability={availability}>
+            <AgentAvailabilityProvider availability={availability}>
+              <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
+              <LeadTrackingProvider />
+              <Toaster />
+            </AgentAvailabilityProvider>
           </LoggerProvider>
         </TranslationProvider>
       </ThemeProvider>

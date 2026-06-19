@@ -25,6 +25,7 @@ import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -56,6 +57,7 @@ export function ThreadShareDialog({
   onThreadMoved,
 }: ThreadShareDialogProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const availability = useProviderAvailability();
 
   const isInSharedFolder = currentRootFolderId === DefaultFolderId.SHARED;
   const [overridePublic, setOverridePublic] = useState<boolean | null>(null);
@@ -159,6 +161,7 @@ export function ThreadShareDialog({
         { rootFolderId: targetFolderId, folderId: null },
         { threadId },
         locale,
+        availability,
       );
 
       setOverridePublic(targetPublic);
@@ -173,6 +176,7 @@ export function ThreadShareDialog({
     logger,
     user,
     locale,
+    availability,
     onThreadMoved,
   ]);
 

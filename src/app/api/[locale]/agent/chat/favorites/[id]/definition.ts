@@ -18,10 +18,7 @@ import {
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import {
-  type AgentEnvAvailability,
-  agentEnvAvailability,
-} from "@/app/api/[locale]/agent/env-availability";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
@@ -335,7 +332,8 @@ const { PATCH } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { logger, pathParams, requestData, user, locale } = data;
+        const { logger, pathParams, requestData, user, locale, availability } =
+          data;
 
         // Import dependencies
         const { apiClient } =
@@ -399,6 +397,7 @@ const { PATCH } = createEndpoint({
               },
               undefined,
               locale,
+              availability,
             );
           } catch (error) {
             logger.error("Failed to update settings for active favorite", {
@@ -505,6 +504,7 @@ const { PATCH } = createEndpoint({
                       null,
                       locale,
                       user,
+                      availability,
                     );
 
                   updatedFavorite.activeBadge = fav.activeBadge;
@@ -1302,12 +1302,13 @@ export function filterChatModelsForFavorite(
   favoriteModelSelection: FavoriteGetModelSelection | null,
   skillModelSelection: ChatModelSelection | undefined,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): ReturnType<typeof filterChatModels> {
   const selectionToUse = favoriteModelSelection ?? skillModelSelection;
   if (!selectionToUse) {
     return [];
   }
-  return filterChatModels(selectionToUse, user);
+  return filterChatModels(selectionToUse, user, availability);
 }
 
 /** Get best chat model for a favorite. */
@@ -1315,6 +1316,7 @@ export function getBestChatModelForFavorite(
   favoriteModelSelection: FavoriteGetModelSelection | null,
   skillModelSelection: ChatModelSelection | undefined,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): ReturnType<typeof getBestChatModel> {
   return (
     filterChatModelsForFavorite(

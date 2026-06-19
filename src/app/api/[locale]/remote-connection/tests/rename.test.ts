@@ -55,7 +55,7 @@ import {
   resolveDevUser,
   resolveProdAdminToken,
   resolveProdUserId,
-  resolveRemoteUrl,
+  resolveRemoteUrlSync,
   restoreHermesIdentity,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
@@ -64,7 +64,7 @@ installFetchCache();
 
 // ── Skip guard ─────────────────────────────────────────────────────────────────
 
-const _remoteUrl = await resolveRemoteUrl();
+const _remoteUrl = resolveRemoteUrlSync();
 if (!_remoteUrl) {
   failSuitePrerequisites(
     "Rename propagation tests",

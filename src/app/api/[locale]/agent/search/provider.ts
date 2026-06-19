@@ -14,7 +14,7 @@ import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { agentEnvAvailability } from "../env-availability";
+import { getEnvAvailability } from "../env-availability";
 import { SearchProvider, type SearchProviderValue } from "./enum";
 
 /**
@@ -67,7 +67,7 @@ export interface SearchProviderConfig {
  */
 const braveProvider: SearchProviderConfig = {
   id: SearchProvider.BRAVE,
-  isAvailable: () => agentEnvAvailability.braveSearch,
+  isAvailable: () => getEnvAvailability().braveSearch,
   creditCost: FEATURE_COSTS.BRAVE_SEARCH,
   search: async (query, options, logger, locale) => {
     const { BraveSearchRepository } = await import("./brave/repository");
@@ -101,7 +101,7 @@ const braveProvider: SearchProviderConfig = {
  */
 const kagiProvider: SearchProviderConfig = {
   id: SearchProvider.KAGI,
-  isAvailable: () => agentEnvAvailability.kagiSearch,
+  isAvailable: () => getEnvAvailability().kagiSearch,
   creditCost: FEATURE_COSTS.KAGI_SEARCH,
   search: async (query, options, logger, locale) => {
     void options; // Kagi doesn't support maxResults/freshness/includeNews

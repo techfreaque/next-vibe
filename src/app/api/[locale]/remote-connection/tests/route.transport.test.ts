@@ -50,13 +50,13 @@ import {
   resolveDevUser,
   resolveProdAdminToken,
   resolveProdUserId,
-  resolveRemoteUrl,
+  resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
 
 // ── Remote URL — skip all suites if unreachable ───────────────────────────────
 
-const _remoteUrl = await resolveRemoteUrl();
+const _remoteUrl = resolveRemoteUrlSync();
 const _isFixtureMode = isHermesInFixtureMode();
 
 if (!_remoteUrl) {

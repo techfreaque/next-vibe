@@ -15,8 +15,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import {
-  agentEnvAvailability,
   buildMissingKeyMessage,
+  getEnvAvailability,
   getInstanceAvailability,
   PROVIDER_SETUP_INSTRUCTIONS,
 } from "@/app/api/[locale]/agent/env-availability";
@@ -157,16 +157,21 @@ export class SpeechToTextRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    modelId?: SttModelId | null,
+    sttModelSelection: SttModelSelection | SttModelId | null,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
     const t = sttScopedTranslation.scopedT(locale).t;
     const language = getLanguageFromLocale(locale);
 
-    const selection = {
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: modelId ?? DEFAULT_STT_MODEL_ID,
-    } as const;
-    const modelOption = getBestSttModel(selection, user);
+    // Accept raw SttModelId string or full selection object; fall back to default
+    const selection: SttModelSelection =
+      typeof sttModelSelection === "string"
+        ? {
+            selectionType: ModelSelectionType.MANUAL,
+            manualModelId: sttModelSelection,
+          }
+        : (sttModelSelection ?? DEFAULT_STT_MODEL_SELECTION);
+    const _sttAvailability = await getInstanceAvailability();
+    const modelOption = getBestSttModel(selection, user, _sttAvailability);
 
     if (!modelOption) {
       logger.error("[STT] No STT provider available", {
@@ -524,7 +529,7 @@ export class SpeechToTextRepository {
       edenAiCostUsd: number | undefined;
     }>
   > {
-    if (!agentEnvAvailability.voice) {
+    if (!getEnvAvailability().voice) {
       logger.error(
         "[STT] Eden AI not configured",
         buildMissingKeyMessage("voice"),

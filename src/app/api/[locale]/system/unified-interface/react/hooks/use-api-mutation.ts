@@ -8,6 +8,7 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import { useCallback, useMemo, useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
@@ -123,6 +124,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
   TEndpoint["types"]["UrlVariablesOutput"]
 > {
   const { locale } = useTranslation();
+  const availability = useProviderAvailability();
 
   // Track error state for backward compatibility
   const [localError, setLocalError] = useState<ErrorResponseType | null>(null);
@@ -162,6 +164,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
         pathParams: urlPathParams,
         locale,
         user,
+        availability,
         options: {
           onSuccess: options.onSuccess
             ? (
@@ -177,6 +180,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
                   logger: context.logger,
                   user: context.user,
                   locale: context.locale,
+                  availability: context.availability,
                 });
               }
             : undefined,

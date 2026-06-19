@@ -15,10 +15,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import {
-  getInstanceAvailability,
-  PROVIDER_SETUP_INSTRUCTIONS,
-} from "@/app/api/[locale]/agent/env-availability";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
@@ -323,6 +321,7 @@ export class TextToSpeechRepository {
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
+    const _ttsAvailability = await getInstanceAvailability();
     const modelOption = getBestTtsModel(
       { selectionType: ModelSelectionType.MANUAL, manualModelId: data.voiceId },
       user,

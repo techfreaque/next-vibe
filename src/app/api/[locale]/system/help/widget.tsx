@@ -103,6 +103,7 @@ import favoriteByIdDefinition from "@/app/api/[locale]/agent/chat/favorites/[id]
 import favoritesListDefinition from "@/app/api/[locale]/agent/chat/favorites/definition";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import settingsDefinition from "@/app/api/[locale]/agent/chat/settings/definition";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import remoteConnectionListDefinition from "@/app/api/[locale]/remote-connection/list/definition";
 import {
   ADMIN_GROUPS,
@@ -319,6 +320,7 @@ export function HelpToolsWidget(): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
+  const availability = useProviderAvailability();
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const endpointMutations = useWidgetEndpointMutations();
@@ -677,9 +679,10 @@ export function HelpToolsWidget(): JSX.Element {
         { webPinnedTools: tools },
         undefined,
         locale,
+        availability,
       );
     },
-    [user, logger, locale],
+    [user, logger, locale, availability],
   );
 
   // Load active favorite's tool config
@@ -744,9 +747,17 @@ export function HelpToolsWidget(): JSX.Element {
         { pinnedTools, modelSelection: activeFavoriteData.modelSelection },
         { id: effectiveFavoriteId },
         locale,
+        availability,
       );
     },
-    [effectiveFavoriteId, activeFavoriteData, user, logger, locale],
+    [
+      effectiveFavoriteId,
+      activeFavoriteData,
+      user,
+      logger,
+      locale,
+      availability,
+    ],
   );
 
   const saveAvailableTools = useCallback(
@@ -780,9 +791,17 @@ export function HelpToolsWidget(): JSX.Element {
         { availableTools, modelSelection: activeFavoriteData.modelSelection },
         { id: effectiveFavoriteId },
         locale,
+        availability,
       );
     },
-    [effectiveFavoriteId, activeFavoriteData, user, logger, locale],
+    [
+      effectiveFavoriteId,
+      activeFavoriteData,
+      user,
+      logger,
+      locale,
+      availability,
+    ],
   );
 
   // Reset both tool lists to null (inherit defaults) at once
@@ -815,8 +834,16 @@ export function HelpToolsWidget(): JSX.Element {
       },
       { id: effectiveFavoriteId },
       locale,
+      availability,
     );
-  }, [effectiveFavoriteId, activeFavoriteData, user, logger, locale]);
+  }, [
+    effectiveFavoriteId,
+    activeFavoriteData,
+    user,
+    logger,
+    locale,
+    availability,
+  ]);
   const { t } = scopedTranslation.scopedT(locale);
 
   const searchQuery = form.watch("query") ?? "";
@@ -2217,7 +2244,7 @@ export function HelpToolsWidget(): JSX.Element {
           </Div>
         </Div>
 
-        {/* ── Filter chips ───────────────────────────────────────────── */}
+        {/* ── Filter chips ��──────────────────────────────────────────── */}
         <Div className="flex flex-col gap-1 px-3 pb-2 shrink-0">
           {/* Web + AI row — always visible */}
           <Div className="flex items-center gap-1">

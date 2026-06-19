@@ -13,6 +13,7 @@ import { useState } from "react";
 import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -52,8 +53,9 @@ export function ModelSkillSelectorModal({
   user,
 }: ModelSkillSelectorModalProps): JSX.Element {
   // Get settings directly (no context dependency for model/skill)
+  const availability = useProviderAvailability();
   const { settings } = useChatSettings(user, logger);
-  const defaults = ChatSettingsRepositoryClient.getDefaults(user);
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user, availability);
   const selectedModel = settings?.selectedModel ?? defaults.selectedModel;
   const selectedSkill = settings?.selectedSkill ?? defaults.selectedSkill;
 

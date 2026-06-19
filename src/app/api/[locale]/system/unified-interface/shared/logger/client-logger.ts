@@ -4,6 +4,7 @@
  * Import this in all client code: "use client" components, client hooks, etc.
  */
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -53,6 +54,7 @@ function reportToServer(
   metadata: LoggerMetadata[],
   locale: CountryLanguage,
   tabId: string | undefined,
+  availability: AgentEnvAvailability,
 ): void {
   const allMeta = error !== undefined ? [error, ...metadata] : metadata;
   const metaPayload = allMeta
@@ -99,6 +101,7 @@ function reportToServer(
         pathParams: undefined as never,
         locale,
         user: publicUser,
+        availability,
       });
     } catch {
       // silently swallow - client logger must never cascade
@@ -110,6 +113,7 @@ export function createClientLogger(
   debugEnabled = false,
   startTime: number = Date.now(),
   locale: CountryLanguage,
+  availability: AgentEnvAvailability,
   tabId?: string,
 ): EndpointLogger {
   return createLogger(
@@ -117,7 +121,15 @@ export function createClientLogger(
     startTime,
     locale,
     (level, message, error, metadata) => {
-      reportToServer(level, message, error, metadata, locale, tabId);
+      reportToServer(
+        level,
+        message,
+        error,
+        metadata,
+        locale,
+        tabId,
+        availability,
+      );
     },
   );
 }

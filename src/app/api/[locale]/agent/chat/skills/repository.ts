@@ -11,15 +11,9 @@ import type { IconKey } from "next-vibe-ui/unified/form-fields/icon-field/icons"
 import type { z } from "zod";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import {
-  type ChatModelSelection,
-  chatModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  type AgentEnvAvailability,
-  agentEnvAvailability,
-  getInstanceAvailability,
-} from "@/app/api/[locale]/agent/env-availability";
+import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
 import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
 import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
@@ -235,22 +229,16 @@ export class SkillsRepository {
     return result.success ? result.data : null;
   }
 
-  /**
-   * Safely parse variants from DB JSONB.
-   */
   private static safeParseVariants(
     variants: SkillVariantData[] | null | undefined,
   ): SkillVariantData[] {
-    if (variants && variants.length > 0) {
-      const parsed = variants
-        .map((v) => skillVariantSchema.safeParse(v))
-        .filter((r): r is z.ZodSafeParseSuccess<SkillVariantData> => r.success)
-        .map((r) => r.data);
-      if (parsed.length > 0) {
-        return parsed;
-      }
+    if (!variants || variants.length === 0) {
+      return [];
     }
-    return [];
+    return variants
+      .map((v) => skillVariantSchema.safeParse(v))
+      .filter((r): r is z.ZodSafeParseSuccess<SkillVariantData> => r.success)
+      .map((r) => r.data);
   }
 
   /**
@@ -302,6 +290,7 @@ export class SkillsRepository {
     const effectivePageSize =
       data.pageSize ?? (isCompact ? COMPACT_PAGE_SIZE : undefined);
     const currentPage = data.page ?? 1;
+    const skillsAvailability = await getInstanceAvailability();
 
     try {
       const isAdmin =
@@ -326,7 +315,7 @@ export class SkillsRepository {
 
         if (needCustom) {
           // Build DB where clause based on source filter
-          const sourceCondition =
+          const dbCondition =
             source === SkillSourceFilter.MY
               ? eq(customSkills.userId, userId)
               : source === SkillSourceFilter.COMMUNITY
@@ -341,10 +330,6 @@ export class SkillsRepository {
                       ne(customSkills.userId, userId),
                     ),
                   );
-          const dbCondition = and(
-            eq(customSkills.isDeleted, false),
-            sourceCondition,
-          );
 
           const customSkillsList = await db
             .select({
@@ -408,7 +393,6 @@ export class SkillsRepository {
                 ),
               );
             } else {
-              const defaultVariant = variants?.[0];
               customSkillsCards.push(
                 SkillsRepository.mapSkillToListItem(
                   externalId,
@@ -418,17 +402,17 @@ export class SkillsRepository {
                     tagline: char.tagline,
                     description: char.description,
                     category: char.category,
-                    modelSelection: defaultVariant?.modelSelection,
+                    modelSelection:
+                      (
+                        char.variants?.find((v) => v.isDefault) ??
+                        char.variants?.[0]
+                      )?.modelSelection ?? null,
                     ownershipType: char.ownershipType,
                     voteCount: char.voteCount,
                     trustLevel: char.trustLevel,
                   },
                   t,
                   user,
-                  undefined,
-                  undefined,
-                  undefined,
-                  undefined,
                   skillsAvailability,
                 ),
               );
@@ -558,12 +542,7 @@ export class SkillsRepository {
             trustLevel: customSkills.trustLevel,
           })
           .from(customSkills)
-          .where(
-            and(
-              eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
-              eq(customSkills.isDeleted, false),
-            ),
-          );
+          .where(eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC));
 
         for (const char of publicSkills) {
           const externalId = char.slug || char.id;
@@ -607,7 +586,6 @@ export class SkillsRepository {
               ),
             );
           } else {
-            const defaultVariant = variants?.[0];
             communitySkillsCards.push(
               SkillsRepository.mapSkillToListItem(
                 externalId,
@@ -617,17 +595,17 @@ export class SkillsRepository {
                   tagline: char.tagline,
                   description: char.description,
                   category: char.category,
-                  modelSelection: defaultVariant?.modelSelection,
+                  modelSelection:
+                    (
+                      char.variants?.find((v) => v.isDefault) ??
+                      char.variants?.[0]
+                    )?.modelSelection ?? null,
                   ownershipType: char.ownershipType,
                   voteCount: char.voteCount,
                   trustLevel: char.trustLevel,
                 },
                 t,
                 user,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
                 skillsAvailability,
               ),
             );
@@ -757,10 +735,7 @@ export class SkillsRepository {
         return {
           sectionIcon: config.icon,
           sectionTitle: t(config.category),
-          // Count unique skills - variants of the same skill are separate items
-          sectionCount: new Set(
-            chars.map((c) => parseSkillId(c.skillId).skillId),
-          ).size,
+          sectionCount: chars.length,
           skills: chars,
           order: config.order,
         };
@@ -890,7 +865,6 @@ export class SkillsRepository {
         .where(
           and(
             idCondition,
-            eq(customSkills.isDeleted, false),
             userId
               ? or(
                   eq(customSkills.userId, userId),
@@ -1052,6 +1026,8 @@ export class SkillsRepository {
     logger: EndpointLogger,
     t: SkillsT,
   ): Promise<ResponseType<SkillCreateResponseOutput>> {
+    const createAvailability = await getInstanceAvailability();
+
     try {
       const userId = user.id;
 
@@ -1067,20 +1043,16 @@ export class SkillsRepository {
         name: data.name,
       });
 
-      // Variants are the source of truth for model selection.
-      // If request provides modelSelection without variants, wrap it into a single default variant.
-      const effectiveVariants: SkillVariantData[] | null =
+      const effectiveVariants =
         data.variants && data.variants.length > 0
           ? data.variants
-          : data.modelSelection
-            ? [
-                {
-                  id: "default",
-                  modelSelection: data.modelSelection,
-                  isDefault: true,
-                },
-              ]
-            : null;
+          : [
+              {
+                id: "default",
+                modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
+                isDefault: true,
+              },
+            ];
 
       // Validate variant IDs are unique within the skill
       if (data.variants && data.variants.length > 0) {
@@ -1165,8 +1137,9 @@ export class SkillsRepository {
         user,
       );
       if (skill) {
-        const defaultVariant =
-          effectiveVariants?.find((v) => v.isDefault) ?? effectiveVariants?.[0];
+        const skillVariants = SkillsRepository.safeParseVariants(
+          skill.variants,
+        );
         const listItem = SkillsRepository.mapSkillToListItem(
           skill.slug ?? skill.id,
           {
@@ -1175,17 +1148,15 @@ export class SkillsRepository {
             tagline: skill.tagline,
             description: skill.description,
             category: skill.category,
-            modelSelection: defaultVariant?.modelSelection,
+            modelSelection:
+              (skillVariants.find((v) => v.isDefault) ?? skillVariants[0])
+                ?.modelSelection ?? null,
             ownershipType: skill.ownershipType,
             voteCount: skill.voteCount,
             trustLevel: skill.trustLevel,
           },
           t,
           user,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
           createAvailability,
         );
         emitSkills("skill-created", {
@@ -1198,24 +1169,6 @@ export class SkillsRepository {
       } else {
         emitSkills("skill-created", { wsEvent: null });
       }
-
-      // WS-push sync: broadcast skills change to connected local instances
-      void (async (): Promise<void> => {
-        try {
-          const { serializeProviders } =
-            await import("@/app/api/[locale]/remote-connection/sync-provider");
-          const { broadcastSyncNotify } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-          const syncPayloads = await serializeProviders(
-            ["skills"],
-            userId,
-            logger,
-          );
-          broadcastSyncNotify(userId, syncPayloads, logger);
-        } catch {
-          // Best-effort
-        }
-      })();
 
       return success({
         success: t("post.success.title"),
@@ -1241,6 +1194,7 @@ export class SkillsRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<SkillUpdateResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
+    const updateAvailability = await getInstanceAvailability();
     try {
       const userId = user.id;
       const { id: skillId } = urlPathParams;
@@ -1281,43 +1235,42 @@ export class SkillsRepository {
           defaultSkillId: skillId,
         });
 
-        // Fall back to the default skill's values for any PATCH field omitted
-        // (PATCH is partial — when cloning a default skill, unset fields inherit
-        // from the default).
+        // Fall back to the default skill's icon if not provided
         const defaultSkillForIcon = DEFAULT_SKILLS.find(
           (c) => c.id === skillId,
         );
         const iconToUse = data.icon ?? defaultSkillForIcon?.icon ?? "sparkles";
-        const nameToUse = data.name ?? defaultSkillForIcon?.name ?? skillId;
-        const descriptionToUse =
-          data.description ?? defaultSkillForIcon?.description ?? "";
-        const taglineToUse = data.tagline ?? defaultSkillForIcon?.tagline ?? "";
-        const categoryToUse =
-          data.category ??
-          defaultSkillForIcon?.category ??
-          SkillCategory.ASSISTANT;
 
         // Generate slug for the new custom skill derived from a default skill
-        const derivedSlug =
-          await SkillsRepository.generateUniqueSkillSlug(nameToUse);
+        const derivedSlug = await SkillsRepository.generateUniqueSkillSlug(
+          data.name,
+        );
 
-        // Variants are the source of truth for model selection
-        const derivedVariants: SkillVariantData[] | null =
-          data.variants && data.variants.length > 0 ? data.variants : null;
+        // Derive model selections from the default variant (variants are now the source of truth)
+        const derivedVariants: SkillVariantData[] =
+          data.variants && data.variants.length > 0
+            ? data.variants
+            : [
+                {
+                  id: "default",
+                  modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
+                  isDefault: true,
+                },
+              ];
         const derivedDefaultVariant =
-          derivedVariants?.find((v) => v.isDefault) ?? derivedVariants?.[0];
+          derivedVariants.find((v) => v.isDefault) ?? derivedVariants[0];
 
         const [derivedSkill] = await db
           .insert(customSkills)
           .values({
             userId,
             slug: derivedSlug,
-            name: nameToUse,
-            description: descriptionToUse,
-            tagline: taglineToUse,
+            name: data.name,
+            description: data.description,
+            tagline: data.tagline,
             icon: iconToUse,
             systemPrompt: data.systemPrompt,
-            category: categoryToUse,
+            category: data.category,
             // Sync top-level columns from default variant for backward compat
             voiceModelSelection: SkillsRepository.normalizeTtsSelection(
               derivedDefaultVariant?.voiceModelSelection ?? null,
@@ -1357,6 +1310,9 @@ export class SkillsRepository {
           user,
         );
         if (derivedSkill) {
+          const derivedSkillVariants = SkillsRepository.safeParseVariants(
+            derivedSkill.variants,
+          );
           const derivedListItem = SkillsRepository.mapSkillToListItem(
             derivedSkill.slug ?? derivedSkill.id,
             {
@@ -1365,17 +1321,17 @@ export class SkillsRepository {
               tagline: derivedSkill.tagline,
               description: derivedSkill.description,
               category: derivedSkill.category,
-              modelSelection: derivedDefaultVariant?.modelSelection,
+              modelSelection:
+                (
+                  derivedSkillVariants.find((v) => v.isDefault) ??
+                  derivedSkillVariants[0]
+                )?.modelSelection ?? null,
               ownershipType: derivedSkill.ownershipType,
               voteCount: derivedSkill.voteCount,
               trustLevel: derivedSkill.trustLevel,
             },
             t,
             user,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
             updateAvailability,
           );
           emitSkillsCreate("skill-created", {
@@ -1434,7 +1390,7 @@ export class SkillsRepository {
 
       const variantsToWrite = requestVariants ?? undefined;
 
-      // Derive per-modality selections from the default variant (variants are the source of truth)
+      // Derive per-modality selections from the default variant (variants are now the source of truth)
       const updateDefaultVariant = variantsToWrite
         ? (variantsToWrite.find((v) => v.isDefault) ?? variantsToWrite[0])
         : undefined;
@@ -1454,7 +1410,7 @@ export class SkillsRepository {
           icon: iconToUpdate,
           ownershipType,
           variants: variantsToWrite,
-          // Sync per-modality columns from default variant
+          // Derive per-modality columns from the default variant
           voiceModelSelection: updateDefaultVariant
             ? SkillsRepository.normalizeTtsSelection(
                 updateDefaultVariant.voiceModelSelection ?? null,
@@ -1564,24 +1520,6 @@ export class SkillsRepository {
           })) ?? null,
       });
 
-      // WS-push sync: broadcast skills change to connected local instances
-      void (async (): Promise<void> => {
-        try {
-          const { serializeProviders } =
-            await import("@/app/api/[locale]/remote-connection/sync-provider");
-          const { broadcastSyncNotify } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-          const syncPayloads = await serializeProviders(
-            ["skills"],
-            userId,
-            logger,
-          );
-          broadcastSyncNotify(userId, syncPayloads, logger);
-        } catch {
-          // Best-effort
-        }
-      })();
-
       // Return the full updated skill to match GET response structure
       // Transform ownershipType: PATCH response only accepts "user" | "public", not "system"
       // Custom skills should never be "system", but TypeScript doesn't know this
@@ -1641,7 +1579,6 @@ export class SkillsRepository {
       );
 
       const result = await db.transaction(async (tx) => {
-        // Hard-delete favorites (no need to propagate favorites to remotes)
         await tx
           .delete(chatFavorites)
           .where(
@@ -1653,11 +1590,8 @@ export class SkillsRepository {
             ),
           );
 
-        // Soft-delete the skill: isDeleted=true + bump updatedAt so tombstone propagates
-        // to connected remote instances. Hard-delete deferred until propagated.
         return tx
-          .update(customSkills)
-          .set({ isDeleted: true, updatedAt: new Date() })
+          .delete(customSkills)
           .where(
             and(
               eq(customSkills.id, existingSkill.id),
@@ -1695,24 +1629,6 @@ export class SkillsRepository {
         // Best-effort embedding removal
       });
 
-      // WS-push sync: broadcast tombstone to connected remote instances
-      void (async (): Promise<void> => {
-        try {
-          const { serializeProviders } =
-            await import("@/app/api/[locale]/remote-connection/sync-provider");
-          const { broadcastSyncNotify } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-          const syncPayloads = await serializeProviders(
-            ["skills"],
-            userId,
-            logger,
-          );
-          broadcastSyncNotify(userId, syncPayloads, logger);
-        } catch {
-          // Best-effort
-        }
-      })();
-
       return success({
         name: deleted.name,
         tagline: deleted.tagline,
@@ -1744,13 +1660,14 @@ export class SkillsRepository {
       tagline: string | null;
       description: string | null;
       category: typeof SkillCategoryValue;
-      modelSelection?: ChatModelSelection;
+      modelSelection: ChatModelSelection | null | undefined;
       ownershipType: typeof SkillOwnershipTypeValue;
       voteCount: number | null;
       trustLevel: typeof SkillTrustLevelValue | null;
     },
     t: ReturnType<(typeof scopedTranslation)["scopedT"]>["t"],
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
     variantId?: string | null,
     variantName?: string | null,
     isVariant?: boolean,
@@ -1758,7 +1675,7 @@ export class SkillsRepository {
   ): SkillListItem {
     // Get best model from skill's modelSelection
     const selection = char.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
-    const bestModel = getBestChatModel(selection, user);
+    const bestModel = getBestChatModel(selection, user, availability);
 
     const modelId = bestModel?.id ?? null;
     const isAdmin =
@@ -1766,7 +1683,7 @@ export class SkillsRepository {
     const modelRow = bestModel
       ? {
           modelIcon: bestModel.icon,
-          modelInfo: getModelDisplayName(bestModel, isAdmin),
+          modelInfo: getModelDisplayName(bestModel, isAdmin, availability),
           modelProvider:
             modelProviders[bestModel.provider]?.name ?? bestModel.provider,
         }
@@ -1815,6 +1732,7 @@ export class SkillsRepository {
     id: string,
     t: ReturnType<(typeof scopedTranslation)["scopedT"]>["t"],
     user: JwtPayloadType,
+    availability: AgentEnvAvailability,
   ): SkillListItem[] {
     return char.variants.map((variant) =>
       SkillsRepository.mapSkillToListItem(
@@ -1825,11 +1743,11 @@ export class SkillsRepository {
         },
         t,
         user,
+        availability,
         variant.id,
         variant.variantName ? t(variant.variantName) : "",
         true,
         variant.isDefault ?? false,
-        availability,
       ),
     );
   }

@@ -44,6 +44,7 @@ import {
   resolveProdAdminToken,
   resolveProdUserId,
   triggerHermesPull,
+  unregisterDevFromHermes,
 } from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
 import { skillsSyncProvider } from "@/app/api/[locale]/agent/chat/skills/sync-provider";
 import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
@@ -90,8 +91,8 @@ async function pollUntil<T>(
   }
   // Test helper: surface a clear timeout. (Not a ResponseType path — this is a
   // vitest helper, where throwing fails the test as intended.)
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-  throw new Error(`[pollUntil] ${label}: timed out after ${timeoutMs}ms`);
+  expect(false, `[pollUntil] ${label}: timed out after ${timeoutMs}ms`).toBe(true);
+  return undefined as never;
 }
 
 /** Check if hermes is reachable - used to conditionally skip live sync tests */
@@ -166,7 +167,8 @@ describe("Sync hash short-circuit (unit)", () => {
         "admin user must exist for the sync short-circuit test (run vibe seed)",
       ).toBeTruthy();
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -208,7 +210,8 @@ describe("Sync hash short-circuit (unit)", () => {
         "admin user must exist (run vibe seed) — sync tests require it",
       ).toBeTruthy();
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -251,7 +254,8 @@ describe("Sync hash short-circuit (unit)", () => {
         "admin user must exist (run vibe seed) — sync tests require it",
       ).toBeTruthy();
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const cursors = await collectCursors(adminUser.id);
@@ -277,7 +281,8 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
   beforeAll(async () => {
     const resolved = await resolveTestAdminUser();
     if (!resolved) {
-      throw new Error("Admin user not found — run: vibe seed");
+      expect(false, "Admin user not found — run: vibe seed").toBe(true);
+      return;
     }
     adminUser = resolved;
 
@@ -309,7 +314,8 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU1: inserting a node changes the provider hash",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const cursorBefore = await providerCursorKey(
@@ -347,7 +353,8 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU2: serializeFromCursor includes the inserted node",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const { json } = await documentsSyncProvider.serializeFromCursor(
@@ -374,7 +381,8 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU3: upsertFromJson with explicit payload creates node for target userId",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       // Build a minimal payload for a new syncId (simulating what hermes would receive)
@@ -431,7 +439,8 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU4: cursor of fakeProdUserId is the epoch (no nodes) - per-user isolation",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const fakeProdUserId = "00000000-0000-4001-ffff-000000000088";
@@ -455,7 +464,8 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU5: updating a node's content advances its cursor (updatedAt)",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const cursorBefore = await providerCursorKey(
@@ -494,7 +504,8 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU6: deleting a node advances the cursor",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       // Before: the node is part of the serialized payload.
@@ -539,7 +550,8 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU7: tombstone payload - upsertFromJson with isDeleted:true removes the node",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       // Use admin user - tombstone test uses a unique syncId to avoid collision with other tests
@@ -616,7 +628,8 @@ describe("Sync: documents provider serialize/deserialize (in-process)", () => {
     "SU8: last-writer-wins - older remote payload does NOT overwrite newer local",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       // Insert node for admin with a fresh timestamp
@@ -693,7 +706,8 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
   beforeAll(async () => {
     const resolved = await resolveTestAdminUser();
     if (!resolved) {
-      throw new Error("Admin user not found — run: vibe seed");
+      expect(false, "Admin user not found — run: vibe seed").toBe(true);
+      return;
     }
     adminUser = resolved;
   }, SYNC_TIMEOUT);
@@ -702,7 +716,8 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK1: skillsSyncProvider.getCursor returns a stable cursor",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const c1 = await providerCursorKey(skillsSyncProvider, adminUser.id);
@@ -721,7 +736,8 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK3: skillsSyncProvider.serializeFromCursor returns valid JSON array",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const { json } = await skillsSyncProvider.serializeFromCursor(
@@ -743,7 +759,8 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK4: each serialized skill has required fields",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const { json } = await skillsSyncProvider.serializeFromCursor(
@@ -775,7 +792,8 @@ describe("Sync: skills provider serialize/deserialize (in-process)", () => {
     "SK5: per-provider isolation - documents change does NOT affect skills cursor",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true);
+        return;
       }
 
       const skillCursorBefore = await providerCursorKey(
@@ -841,9 +859,8 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   beforeAll(async () => {
     hermesReachable = await isHermesReachable();
     if (!hermesReachable) {
-      throw new Error(
-        `[sync-test] ${HERMES_SKIP_REASON} — run: vibe --hermes dev`,
-      );
+      expect(false, `[sync-test] ${HERMES_SKIP_REASON} — run: vibe --hermes dev`).toBe(true);
+      return;
     }
 
     devUser = await resolveTestAdminUser();
@@ -855,9 +872,10 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
       // Establish atlas → hermes connection
       await connectToHermes(devUser);
     } catch (err) {
-      throw new Error(`[sync-test] Setup failed: ${String(err)}`, { cause: err });
+      expect(false, `[sync-test] Setup failed: ${String(err)}`).toBe(true);
+      return;
     }
-  }, SYNC_TIMEOUT);
+  }, 180_000);
 
   afterAll(async () => {
     // Clean up test nodes on dev
@@ -883,9 +901,16 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
       }
     }
 
-    // Disconnect
+    // Bilateral disconnect: remove both sides before closing the prod pool.
     if (devUser) {
       await disconnectFromHermes(devUser.id);
+    }
+    if (prodUserId) {
+      try {
+        await unregisterDevFromHermes(prodUserId);
+      } catch {
+        // Best-effort
+      }
     }
 
     await prodPool.end().catch(() => undefined);
@@ -895,10 +920,6 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL1: write document on dev, trigger pull, verify on hermes DB",
     async () => {
-      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
-        throw new Error("[SL1] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-      }
-
       // Step 1: Write test node on dev with a syncId
       await db.insert(cortexNodes).values({
         userId: devUser.id,
@@ -934,27 +955,21 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
       // gets the new syncId in the documents payload.
       await triggerHermesPull(prodAdminToken);
 
-      // Wait for sync to propagate (hermes processes the pull async)
-      // eslint-disable-next-line no-promise-executor-return
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 2000);
-      });
-
-      // Step 3: Verify the node arrived on hermes's DB (port 5433)
-      const hermesRows = await prodDb.execute<{
-        path: string;
-        sync_id: string;
-        content: string;
-      }>(
-        sql`SELECT path, sync_id, content FROM cortex_nodes WHERE user_id = ${prodUserId} AND sync_id = ${TEST_SYNC_ID} LIMIT 1`,
+      // Step 3: Poll hermes DB until the node appears (up to 15s)
+      const hermesNode = await pollUntil(
+        `SL1: node syncId=${TEST_SYNC_ID} must appear on hermes after sync`,
+        async () => {
+          const rows = await prodDb.execute<{
+            path: string;
+            sync_id: string;
+            content: string;
+          }>(
+            sql`SELECT path, sync_id, content FROM cortex_nodes WHERE user_id = ${prodUserId} AND sync_id = ${TEST_SYNC_ID} LIMIT 1`,
+          );
+          return rows.rows[0] ?? null;
+        },
       );
 
-      expect(
-        hermesRows.rows.length,
-        `SL1: node with syncId=${TEST_SYNC_ID} must appear on hermes after sync`,
-      ).toBeGreaterThanOrEqual(1);
-
-      const hermesNode = hermesRows.rows[0]!;
       expect(hermesNode.path, "SL1: path must match on hermes").toBe(TEST_PATH);
       expect(hermesNode.content, "SL1: content must match on hermes").toBe(
         TEST_CONTENT,
@@ -966,10 +981,6 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL2: hash short-circuit - no data sent when nothing changed",
     async () => {
-      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
-        throw new Error("[SL2] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-      }
-
       // Trigger pull again (nothing changed since SL1)
       // The cursors should match → zero payload bytes transferred
       const cursorsBefore = await collectCursors(devUser.id);
@@ -994,9 +1005,6 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL3: update content on dev, resync, hermes gets the new version",
     async () => {
-      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
-        throw new Error("[SL3] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-      }
 
       const updatedContent = `${TEST_CONTENT}\n\n## Update\n\nThis line was added in SL3.`;
 
@@ -1017,25 +1025,29 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
 
       // Trigger hermes pull
       await triggerHermesPull(prodAdminToken);
-      // eslint-disable-next-line no-promise-executor-return
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 2000);
-      });
 
-      // Hermes must have the updated content
-      const hermesRows = await prodDb.execute<{ content: string }>(
-        sql`SELECT content FROM cortex_nodes WHERE user_id = ${prodUserId} AND sync_id = ${TEST_SYNC_ID} LIMIT 1`,
+      // Poll hermes DB until the updated content appears
+      const hermesContent = await pollUntil(
+        "SL3: hermes must receive updated content after resync",
+        async () => {
+          const rows = await prodDb.execute<{ content: string }>(
+            sql`SELECT content FROM cortex_nodes WHERE user_id = ${prodUserId} AND sync_id = ${TEST_SYNC_ID} LIMIT 1`,
+          );
+          const row = rows.rows[0];
+          if (!row) {
+            return null;
+          }
+          // Only resolve once hermes has the updated content
+          return row.content.includes("This line was added in SL3")
+            ? row.content
+            : null;
+        },
       );
 
       expect(
-        hermesRows.rows.length,
-        "SL3: node must still exist on hermes",
-      ).toBeGreaterThanOrEqual(1);
-      const hermesContent = hermesRows.rows[0]!.content;
-      expect(
         hermesContent,
-        "SL3: hermes must have updated content after resync",
-      ).toContain("This line was added in SL3");
+        "SL3: hermes must have the exact updated content after resync",
+      ).toBe(updatedContent);
     },
     SYNC_TIMEOUT,
   );
@@ -1043,9 +1055,6 @@ Unique marker: sync-live-test-${Date.now().toString(36)}`;
   it(
     "SL4: delete on dev, resync, hermes removes the node (tombstone)",
     async () => {
-      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
-        throw new Error("[SL4] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-      }
 
       // Soft-delete on dev: set isDeleted=true + bump updatedAt (tombstone protocol)
       await db
@@ -1099,6 +1108,7 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
   let hermesReachable = false;
   let connectedToHermes = false;
   let prodUserId = "";
+  let prodAdminToken = "";
   const { db: prodDb, pool: prodPool } = getProdDb();
 
   const HERMES_SYNC_ID = randomUUID();
@@ -1108,9 +1118,8 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
   beforeAll(async () => {
     hermesReachable = await isHermesReachable();
     if (!hermesReachable) {
-      throw new Error(
-        `[sync-test/BN] ${HERMES_SKIP_REASON} — run: vibe --hermes dev`,
-      );
+      expect(false, `[sync-test/BN] ${HERMES_SKIP_REASON} — run: vibe --hermes dev`).toBe(true);
+      return;
     }
 
     devUser = await resolveTestAdminUser();
@@ -1119,10 +1128,12 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
       prodUserId = await resolveProdUserId();
       await connectToHermes(devUser);
       connectedToHermes = true;
+      prodAdminToken = await resolveProdAdminToken();
     } catch (err) {
-      throw new Error(`[sync-test/BN] Connection setup failed: ${String(err)}`, { cause: err });
+      expect(false, `[sync-test/BN] Connection setup failed: ${String(err)}`).toBe(true);
+      return;
     }
-  }, SYNC_TIMEOUT);
+  }, 180_000);
 
   afterAll(async () => {
     // Cleanup hermes-dev DB
@@ -1147,6 +1158,13 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
         );
       await disconnectFromHermes(devUser.id);
     }
+    if (prodUserId) {
+      try {
+        await unregisterDevFromHermes(prodUserId);
+      } catch {
+        // Best-effort
+      }
+    }
 
     await prodPool.end().catch(() => undefined);
     await closeProdDb();
@@ -1156,8 +1174,9 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
     "BN1: write doc on hermes, dev pulls, doc appears on dev DB",
     async () => {
       // BN tests require two separate instances with different user DBs.
-      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
-        throw new Error("[BN1] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
+      if (!connectedToHermes) {
+        expect(false, "[BN1] Not connected to hermes — beforeAll must have failed").toBe(true);
+        return;
       }
 
       // Step 1: Write a node directly into hermes's DB (simulates hermes AI writing a memory)
@@ -1188,32 +1207,28 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
         "BN1: node must be on hermes before pull",
       ).toBe(1);
 
-      // Step 2: Trigger atlas to pull from hermes
-      // pullFromRemote sends dev's hashes → hermes diffs → returns changed payload
-      await triggerPull();
+      // Step 2: Trigger hermes to reconnect — fires pullOnConnect which syncs to atlas
+      await triggerHermesPull(prodAdminToken);
 
-      // eslint-disable-next-line no-promise-executor-return
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 2000);
-      });
-
-      // Step 3: Verify the node arrived on dev
-      const [devNode] = await db
-        .select({ path: cortexNodes.path, content: cortexNodes.content })
-        .from(cortexNodes)
-        .where(
-          and(
-            eq(cortexNodes.userId, devUser.id),
-            eq(cortexNodes.path, HERMES_TEST_PATH),
-          ),
-        );
-
-      expect(
-        devNode,
+      // Step 3: Poll dev DB until the node appears (up to 15s)
+      const devNode = await pollUntil(
         `BN1: node written on hermes must appear on dev after pull (syncId=${HERMES_SYNC_ID})`,
-      ).toBeTruthy();
+        async () => {
+          const [row] = await db
+            .select({ path: cortexNodes.path, content: cortexNodes.content })
+            .from(cortexNodes)
+            .where(
+              and(
+                eq(cortexNodes.userId, devUser.id),
+                eq(cortexNodes.path, HERMES_TEST_PATH),
+              ),
+            );
+          return row ?? null;
+        },
+      );
+
       expect(
-        devNode?.content,
+        devNode.content,
         "BN1: content must match what was written on hermes",
       ).toContain(HERMES_SYNC_ID);
     },
@@ -1223,16 +1238,41 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
   it(
     "BN2: consecutive pull with same content → no duplicate, content stable",
     async () => {
-      if (!process.env.SYNC_CROSS_INSTANCE_TEST) {
-        throw new Error("[BN2] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
+      if (!connectedToHermes) {
+        expect(false, "[BN2] Not connected to hermes — beforeAll must have failed").toBe(true);
+        return;
       }
 
-      // Second pull - same content, hermes hash unchanged
-      await triggerPull();
-      // eslint-disable-next-line no-promise-executor-return
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 1000);
-      });
+      // Capture the lastSyncedAt of the hermes connection row before the second pull
+      const [connectionBefore] = await db
+        .select({
+          lastSyncedAt: remoteConnectionSchema.remoteConnections.lastSyncedAt,
+        })
+        .from(remoteConnectionSchema.remoteConnections)
+        .where(eq(remoteConnectionSchema.remoteConnections.userId, devUser.id))
+        .limit(1);
+
+      // Second pull - same content, hermes hash unchanged → no duplicate
+      await triggerHermesPull(prodAdminToken);
+
+      // Poll until lastSyncedAt advances (confirms the pull round-trip completed)
+      await pollUntil(
+        "BN2: lastSyncedAt must advance after second pull",
+        async () => {
+          const [conn] = await db
+            .select({
+              lastSyncedAt: remoteConnectionSchema.remoteConnections.lastSyncedAt,
+            })
+            .from(remoteConnectionSchema.remoteConnections)
+            .where(eq(remoteConnectionSchema.remoteConnections.userId, devUser.id))
+            .limit(1);
+          if (!conn?.lastSyncedAt) {
+            return false;
+          }
+          const beforeTs = connectionBefore?.lastSyncedAt?.getTime() ?? 0;
+          return conn.lastSyncedAt.getTime() > beforeTs;
+        },
+      );
 
       // Node should still exist exactly once on dev
       const devNodes = await db
@@ -1251,6 +1291,66 @@ describe("Sync: behind-NAT pull (dev pulls from hermes)", () => {
     },
     SYNC_TIMEOUT,
   );
+
+  it(
+    "BN3: delete node on hermes, dev pulls, node is gone on atlas",
+    async () => {
+      if (!connectedToHermes) {
+        expect(false, "[BN3] Not connected to hermes — beforeAll must have failed").toBe(true);
+        return;
+      }
+
+      // Soft-delete the HERMES_SYNC_ID node on hermes (tombstone protocol)
+      await prodDb.execute(
+        sql`UPDATE cortex_nodes SET is_deleted = true, updated_at = NOW() WHERE user_id = ${prodUserId} AND sync_id = ${HERMES_SYNC_ID}`,
+      );
+
+      // Verify soft-delete on hermes
+      const hermesCheck = await prodDb.execute<{ is_deleted: boolean }>(
+        sql`SELECT is_deleted FROM cortex_nodes WHERE user_id = ${prodUserId} AND sync_id = ${HERMES_SYNC_ID} LIMIT 1`,
+      );
+      expect(
+        hermesCheck.rows[0]?.is_deleted,
+        "BN3: node must be soft-deleted on hermes before pull",
+      ).toBe(true);
+
+      // Trigger atlas to pull from hermes — tombstone must arrive and be applied
+      await triggerHermesPull(prodAdminToken);
+
+      // Poll dev DB until the node is gone (deleted from atlas)
+      await pollUntil(
+        "BN3: tombstone must propagate — node must be gone from atlas after pull",
+        async () => {
+          const devNodes = await db
+            .select({ path: cortexNodes.path })
+            .from(cortexNodes)
+            .where(
+              and(
+                eq(cortexNodes.userId, devUser.id),
+                eq(cortexNodes.path, HERMES_TEST_PATH),
+              ),
+            );
+          return devNodes.length === 0;
+        },
+      );
+
+      // Final assertion: dev has no matching row
+      const devNodes = await db
+        .select({ path: cortexNodes.path })
+        .from(cortexNodes)
+        .where(
+          and(
+            eq(cortexNodes.userId, devUser.id),
+            eq(cortexNodes.path, HERMES_TEST_PATH),
+          ),
+        );
+      expect(
+        devNodes.length,
+        "BN3: node deleted on hermes must be gone from atlas after pull",
+      ).toBe(0);
+    },
+    SYNC_TIMEOUT,
+  );
 });
 
 // ── 7. Sync scalability assertions ───────────────────────────────────────────
@@ -1261,7 +1361,8 @@ describe("Sync: scalability and efficiency", () => {
   beforeAll(async () => {
     const resolved = await resolveTestAdminUser();
     if (!resolved) {
-      throw new Error("Admin user not found — run: vibe seed");
+      expect(false, "Admin user not found — run: vibe seed").toBe(true);
+      return;
     }
     adminUser = resolved;
   }, SYNC_TIMEOUT);
@@ -1333,8 +1434,16 @@ describe("Sync: scalability and efficiency", () => {
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
       const initial = await collectCursors(adminUser.id);
 
-      // Add a documents node
+      // Add a documents node (clean up stale leftovers from prior failed runs first)
       const tempPath = `/documents/sync-isolation-check/node.md`;
+      await db
+        .delete(cortexNodes)
+        .where(
+          and(
+            eq(cortexNodes.userId, adminUser.id),
+            eq(cortexNodes.path, tempPath),
+          ),
+        );
       await db.insert(cortexNodes).values({
         userId: adminUser.id,
         path: tempPath,

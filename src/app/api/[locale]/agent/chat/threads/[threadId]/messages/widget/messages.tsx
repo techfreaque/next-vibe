@@ -51,6 +51,7 @@ import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
@@ -173,8 +174,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   }, [messagesData, activeThreadId]);
 
   // Settings - pass SSR initialData so no client fetch on hydration
+  const availability = useProviderAvailability();
   const { settings } = useChatSettings(user, logger, initialSettingsData);
-  const defaults = ChatSettingsRepositoryClient.getDefaults(user);
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user, availability);
   const effectiveSettings = settings ?? defaults;
   const viewMode = effectiveSettings.viewMode;
   const selectedSkill = effectiveSettings.selectedSkill;
@@ -339,6 +341,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
           pathParams: { threadId: activeThreadId },
           locale,
           user,
+          availability,
         });
 
         if (controller.signal.aborted) {
@@ -400,6 +403,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     user,
     setLeafMessageId,
     messagesData,
+    availability,
   ]);
 
   // Abort in-flight history requests when thread changes
@@ -436,6 +440,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
             pathParams: { threadId },
             locale,
             user,
+            availability,
           });
 
           if (controller.signal.aborted) {
@@ -544,6 +549,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       locale,
       logger,
       user,
+      availability,
     ],
   );
 
@@ -573,6 +579,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
             pathParams: { threadId },
             locale,
             user,
+            availability,
           });
 
           if (controller.signal.aborted) {
@@ -648,6 +655,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       logger,
       user,
       setLeafMessageId,
+      availability,
     ],
   );
 

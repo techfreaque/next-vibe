@@ -16,8 +16,6 @@
  * Cross-instance tests (sections 1-3, 11-12) require:
  *   Terminal 1: vibe dev                   (atlas, port 3000)
  *   Terminal 2: vibe --hermes dev           (port 3002, prod DB port 5433)
- *   Env: SYNC_CROSS_INSTANCE_TEST=1
- *
  * Read-only mount tests (sections 4-10) run in-process, no extra servers needed.
  */
 
@@ -79,6 +77,7 @@ import { resolveVirtualList, resolveVirtualRead } from "./mounts/resolver";
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const SYNC_TIMEOUT = 60_000;
+const SETUP_TIMEOUT = 180_000;
 const MOUNT_TIMEOUT = 30_000;
 
 /** Wait for async sync processing */
@@ -110,16 +109,6 @@ async function pollUntil<T>(
   ) as Promise<T>;
 }
 
-/** Check if cross-instance testing is enabled */
-function isCrossInstanceEnabled(): boolean {
-  return process.env["SYNC_CROSS_INSTANCE_TEST"] === "1";
-}
-
-function skipCrossInstance(label: string): never {
-  throw new Error(
-    `[${label}] Cross-instance test failed: set SYNC_CROSS_INSTANCE_TEST=1 and run: vibe --hermes dev`,
-  );
-}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // 1. DOCUMENTS — synced via "documents" provider
@@ -129,6 +118,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
   let devUser: JwtPrivatePayloadType;
   let remoteUrl: string | null = null;
   let prodUserId = "";
+  let prodAdminToken = "";
   let connected = false;
   let remoteTarget: RemoteTarget | null = null;
 
@@ -142,16 +132,13 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
   beforeAll(async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      throw new Error(`[E2E-doc] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
+      expect(false, `[E2E-doc] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`).toBe(true); return;
     }
     devUser = resolved;
 
     remoteUrl = await resolveRemoteUrl();
-    if (!isCrossInstanceEnabled()) {
-      throw new Error("[E2E-doc] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-    }
     if (!remoteUrl) {
-      throw new Error("[E2E-doc] No remote URL configured — connect Hermes before running");
+      expect(false, "[E2E-doc] No remote URL configured — connect Hermes before running").toBe(true); return;
     }
 
     try {
@@ -162,19 +149,23 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
       }
       await connectToHermes(devUser, remoteUrl);
       prodUserId = await resolveProdUserId();
+      prodAdminToken = await resolveProdAdminToken(remoteUrl);
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+      // resolveTarget() only returns non-null for explicit instanceId or REMOTE-folder routing.
+      // For tests that need the hermes connection, build the target directly.
       const { RemoteTransport } =
         await import("@/app/api/[locale]/remote-connection/transport");
       remoteTarget = await RemoteTransport.resolveTarget({
         userId: devUser.id,
+        instanceId: HERMES_INSTANCE_ID,
         locale: defaultLocale,
         logger,
       });
       connected = !!remoteTarget;
     } catch (err) {
-      throw new Error(`[E2E-doc] Setup failed: ${String(err)}`, { cause: err });
+      expect(false, `[E2E-doc] Setup failed: ${String(err)}`).toBe(true); return;
     }
-  }, SYNC_TIMEOUT);
+  }, SETUP_TIMEOUT);
 
   afterAll(async () => {
     // Clean dev DB
@@ -212,7 +203,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
     "D1: create document via transport → verify on prod DB",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[D1] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -253,7 +244,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
     "D2: create nested document via transport → verify on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[D2] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -297,7 +288,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
     "D3: update content via transport → verify updated on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[D3] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const updatedContent = `${D_CONTENT}\n\n## Updated\n\nAdded by D3 test.`;
@@ -345,7 +336,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
     "D4: delete via transport → verify gone on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[D4] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const pdb = getProdDb();
@@ -395,7 +386,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
     "D5: create on prod → WS push → verify on dev DB",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[D5] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const reverseSyncId = randomUUID();
@@ -425,7 +416,11 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
         `D5: write to hermes must succeed — ${result.success ? "" : JSON.stringify(result)}`,
       ).toBe(true);
 
-      // WS push from hermes delivers the node to atlas's cortex_nodes
+      // Trigger hermes pull to push the new node from hermes to atlas.
+      // Direct-http mode does not maintain a persistent WS from atlas to hermes,
+      // so pull-on-reconnect is the sync mechanism for hermes→atlas data flow.
+      await triggerHermesPull(prodAdminToken, remoteUrl!);
+
       const d5Node = await pollUntil(
         "D5: reverse-synced document must appear on dev",
         async () => {
@@ -452,7 +447,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
     "D6: bidirectional write → WS push → last-writer-wins",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[D6] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const biSyncId = randomUUID();
@@ -551,16 +546,13 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
   beforeAll(async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      throw new Error(`[E2E-doc-rws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
+      expect(false, `[E2E-doc-rws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`).toBe(true); return;
     }
     devUser = resolved;
 
     remoteUrl = await resolveRemoteUrl();
-    if (!isCrossInstanceEnabled()) {
-      throw new Error("[E2E-doc-rws] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-    }
     if (!remoteUrl) {
-      throw new Error("[E2E-doc-rws] No remote URL configured — connect Hermes before running");
+      expect(false, "[E2E-doc-rws] No remote URL configured — connect Hermes before running").toBe(true); return;
     }
 
     try {
@@ -586,14 +578,15 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
         await import("@/app/api/[locale]/remote-connection/transport");
       remoteTarget = await RemoteTransport.resolveTarget({
         userId: devUser.id,
+        instanceId: HERMES_INSTANCE_ID,
         locale: defaultLocale,
         logger,
       });
       connected = !!remoteTarget;
     } catch (err) {
-      throw new Error(`[E2E-doc-rws] Setup failed: ${String(err)}`, { cause: err });
+      expect(false, `[E2E-doc-rws] Setup failed: ${String(err)}`).toBe(true); return;
     }
-  }, SYNC_TIMEOUT);
+  }, SETUP_TIMEOUT);
 
   afterAll(async () => {
     // Reset transport mode before disconnect
@@ -643,7 +636,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
     "D1: create document via transport → verify on prod DB",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[D1] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -684,7 +677,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
     "D2: create nested document via transport → verify on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[D2] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -728,7 +721,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
     "D3: update content via transport → verify updated on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[D3] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const updatedContent = `${D_CONTENT}\n\n## Updated\n\nAdded by D3-rws test.`;
@@ -776,7 +769,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
     "D4: delete via transport → verify gone on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[D4] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const pdb = getProdDb();
@@ -826,6 +819,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
   let devUser: JwtPrivatePayloadType;
   let remoteUrl: string | null = null;
   let prodUserId = "";
+  let prodAdminToken = "";
   let connected = false;
   let remoteTarget: RemoteTarget | null = null;
 
@@ -838,16 +832,13 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
   beforeAll(async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      throw new Error(`[E2E-mem] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
+      expect(false, `[E2E-mem] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`).toBe(true); return;
     }
     devUser = resolved;
 
     remoteUrl = await resolveRemoteUrl();
-    if (!isCrossInstanceEnabled()) {
-      throw new Error("[E2E-mem] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-    }
     if (!remoteUrl) {
-      throw new Error("[E2E-mem] No remote URL configured — connect Hermes before running");
+      expect(false, "[E2E-mem] No remote URL configured — connect Hermes before running").toBe(true); return;
     }
 
     try {
@@ -858,19 +849,21 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
       }
       await connectToHermes(devUser, remoteUrl);
       prodUserId = await resolveProdUserId();
+      prodAdminToken = await resolveProdAdminToken(remoteUrl);
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
       const { RemoteTransport } =
         await import("@/app/api/[locale]/remote-connection/transport");
       remoteTarget = await RemoteTransport.resolveTarget({
         userId: devUser.id,
+        instanceId: HERMES_INSTANCE_ID,
         locale: defaultLocale,
         logger,
       });
       connected = !!remoteTarget;
     } catch (err) {
-      throw new Error(`[E2E-mem] Setup failed: ${String(err)}`, { cause: err });
+      expect(false, `[E2E-mem] Setup failed: ${String(err)}`).toBe(true); return;
     }
-  }, SYNC_TIMEOUT);
+  }, SETUP_TIMEOUT);
 
   afterAll(async () => {
     if (devUser) {
@@ -906,7 +899,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
     "M1: create memory via transport → verify on prod DB",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[M1] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -946,7 +939,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
     "M2: create nested memory in subfolder via transport → verify on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[M2] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -990,7 +983,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
     "M3: update memory via transport → verify updated on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[M3] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const updatedContent = `${M_CONTENT}\n\n## Updated by M3`;
@@ -1038,7 +1031,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
     "M4: delete memory via transport → verify gone on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[M4] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const pdb = getProdDb();
@@ -1088,7 +1081,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
     "M5: create memory on prod → WS push → verify on dev",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[M5] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const reverseSyncId = randomUUID();
@@ -1118,7 +1111,9 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
         `M5: write to hermes must succeed — ${result.success ? "" : JSON.stringify(result)}`,
       ).toBe(true);
 
-      // WS push from hermes delivers the node to atlas's cortex_nodes
+      // Trigger hermes pull — direct-http mode has no persistent WS from atlas to hermes.
+      await triggerHermesPull(prodAdminToken, remoteUrl!);
+
       const m5Node = await pollUntil(
         "M5: reverse-synced memory must appear on dev",
         async () => {
@@ -1143,7 +1138,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
     "M6: provider isolation — memory change only triggers 'memories' payload",
     async () => {
       if (!devUser) {
-        throw new Error("[M6] devUser not set — beforeAll must have failed");
+        expect(false, "[M6] devUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       await ensureProvidersRegistered();
@@ -1231,16 +1226,13 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
   beforeAll(async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      throw new Error(`[E2E-mem-rws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
+      expect(false, `[E2E-mem-rws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`).toBe(true); return;
     }
     devUser = resolved;
 
     remoteUrl = await resolveRemoteUrl();
-    if (!isCrossInstanceEnabled()) {
-      throw new Error("[E2E-mem-rws] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-    }
     if (!remoteUrl) {
-      throw new Error("[E2E-mem-rws] No remote URL configured — connect Hermes before running");
+      expect(false, "[E2E-mem-rws] No remote URL configured — connect Hermes before running").toBe(true); return;
     }
 
     try {
@@ -1266,14 +1258,15 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
         await import("@/app/api/[locale]/remote-connection/transport");
       remoteTarget = await RemoteTransport.resolveTarget({
         userId: devUser.id,
+        instanceId: HERMES_INSTANCE_ID,
         locale: defaultLocale,
         logger,
       });
       connected = !!remoteTarget;
     } catch (err) {
-      throw new Error(`[E2E-mem-rws] Setup failed: ${String(err)}`, { cause: err });
+      expect(false, `[E2E-mem-rws] Setup failed: ${String(err)}`).toBe(true); return;
     }
-  }, SYNC_TIMEOUT);
+  }, SETUP_TIMEOUT);
 
   afterAll(async () => {
     // Reset transport mode before disconnect
@@ -1321,7 +1314,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
     "M1: create memory via transport → verify on prod DB",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[M1] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -1361,7 +1354,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
     "M2: create nested memory in subfolder via transport → verify on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[M2] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -1405,7 +1398,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
     "M3: update memory via transport → verify updated on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[M3] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const updatedContent = `${M_CONTENT}\n\n## Updated by M3-rws`;
@@ -1453,7 +1446,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
     "M4: delete memory via transport → verify gone on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[M4] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const pdb = getProdDb();
@@ -1503,6 +1496,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
   let devUser: JwtPrivatePayloadType;
   let remoteUrl: string | null = null;
   let prodUserId = "";
+  let prodAdminToken = "";
   let connected = false;
   let remoteTarget: RemoteTarget | null = null;
   let prodSkillId = "";
@@ -1513,16 +1507,13 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
   beforeAll(async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      throw new Error(`[E2E-skill] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
+      expect(false, `[E2E-skill] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`).toBe(true); return;
     }
     devUser = resolved;
 
     remoteUrl = await resolveRemoteUrl();
-    if (!isCrossInstanceEnabled()) {
-      throw new Error("[E2E-skill] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-    }
     if (!remoteUrl) {
-      throw new Error("[E2E-skill] No remote URL configured — connect Hermes before running");
+      expect(false, "[E2E-skill] No remote URL configured — connect Hermes before running").toBe(true); return;
     }
 
     try {
@@ -1533,19 +1524,21 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       }
       await connectToHermes(devUser, remoteUrl);
       prodUserId = await resolveProdUserId();
+      prodAdminToken = await resolveProdAdminToken(remoteUrl);
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
       const { RemoteTransport } =
         await import("@/app/api/[locale]/remote-connection/transport");
       remoteTarget = await RemoteTransport.resolveTarget({
         userId: devUser.id,
+        instanceId: HERMES_INSTANCE_ID,
         locale: defaultLocale,
         logger,
       });
       connected = !!remoteTarget;
     } catch (err) {
-      throw new Error(`[E2E-skill] Setup failed: ${String(err)}`, { cause: err });
+      expect(false, `[E2E-skill] Setup failed: ${String(err)}`).toBe(true); return;
     }
-  }, SYNC_TIMEOUT);
+  }, SETUP_TIMEOUT);
 
   afterAll(async () => {
     // Clean dev custom skills
@@ -1585,7 +1578,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
     "S1: create custom skill via transport → verify on prod DB",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[S1] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -1601,7 +1594,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
           category: SkillCategory.ASSISTANT,
           isPublic: false,
           systemPrompt: "You are an E2E test skill.",
-          modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
+          sttModelSelection: undefined,
         },
         instanceId: remoteTarget.instanceId,
         callbackMode: "wait",
@@ -1646,7 +1639,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
         !prodUserId ||
         !prodSkillId
       ) {
-
+        expect(false, `[S2] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId} prodSkillId=${!!prodSkillId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -1656,8 +1649,13 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
         definition: skillDef.PATCH,
         input: {
           name: "E2E Sync Skill Updated",
+          tagline: "E2E test tagline",
+          icon: "sparkles",
+          description: "Skill for E2E sync testing — at least 10 chars",
+          category: SkillCategory.ASSISTANT,
+          isPublic: false,
           systemPrompt: "You are an updated E2E test skill.",
-        },
+        } as never as (typeof skillDef.PATCH)["types"]["RequestOutput"],
         urlPathParams: { id: prodSkillId },
         instanceId: remoteTarget.instanceId,
         callbackMode: "wait",
@@ -1700,7 +1698,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
         !prodUserId ||
         !prodSkillId
       ) {
-
+        expect(false, `[S3] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId} prodSkillId=${!!prodSkillId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -1754,7 +1752,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
     "S4: create skill on prod → WS push → verify on dev",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[S4] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       // Create skill on hermes via runInProcessTyped — hermes writes and WS-pushes to atlas
@@ -1771,7 +1769,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
           category: SkillCategory.ASSISTANT,
           isPublic: false,
           systemPrompt: "You are reverse.",
-          modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
+          sttModelSelection: undefined,
         },
         instanceId: remoteTarget.instanceId,
         callbackMode: "wait",
@@ -1786,7 +1784,9 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
         `S4: create skill on hermes must succeed — ${result.success ? "" : JSON.stringify(result)}`,
       ).toBe(true);
 
-      // WS push from hermes delivers the skill to atlas's custom_skills
+      // Trigger hermes pull — direct-http mode has no persistent WS from atlas to hermes.
+      await triggerHermesPull(prodAdminToken, remoteUrl!);
+
       const { customSkills } =
         await import("@/app/api/[locale]/agent/chat/skills/db");
       const s4Skill = await pollUntil(
@@ -1814,7 +1814,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
     "S5: provider isolation — skill change only triggers 'skills' payload",
     async () => {
       if (!devUser) {
-        throw new Error("[S5] devUser not set — beforeAll must have failed");
+        expect(false, "[S5] devUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       await ensureProvidersRegistered();
@@ -1889,16 +1889,13 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
   beforeAll(async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      throw new Error(`[E2E-skill-rws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
+      expect(false, `[E2E-skill-rws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`).toBe(true); return;
     }
     devUser = resolved;
 
     remoteUrl = await resolveRemoteUrl();
-    if (!isCrossInstanceEnabled()) {
-      throw new Error("[E2E-skill-rws] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-    }
     if (!remoteUrl) {
-      throw new Error("[E2E-skill-rws] No remote URL configured — connect Hermes before running");
+      expect(false, "[E2E-skill-rws] No remote URL configured — connect Hermes before running").toBe(true); return;
     }
 
     try {
@@ -1924,14 +1921,15 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
         await import("@/app/api/[locale]/remote-connection/transport");
       remoteTarget = await RemoteTransport.resolveTarget({
         userId: devUser.id,
+        instanceId: HERMES_INSTANCE_ID,
         locale: defaultLocale,
         logger,
       });
       connected = !!remoteTarget;
     } catch (err) {
-      throw new Error(`[E2E-skill-rws] Setup failed: ${String(err)}`, { cause: err });
+      expect(false, `[E2E-skill-rws] Setup failed: ${String(err)}`).toBe(true); return;
     }
-  }, SYNC_TIMEOUT);
+  }, SETUP_TIMEOUT);
 
   afterAll(async () => {
     // Reset transport mode before disconnect
@@ -1983,7 +1981,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
     "S1: create custom skill via transport → verify on prod DB",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[S1] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -1999,7 +1997,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
           category: SkillCategory.ASSISTANT,
           isPublic: false,
           systemPrompt: "You are an E2E test skill (reverse-ws).",
-          modelSelection: DEFAULT_CHAT_MODEL_SELECTION,
+          sttModelSelection: undefined,
         },
         instanceId: remoteTarget.instanceId,
         callbackMode: "wait",
@@ -2044,7 +2042,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
         !prodUserId ||
         !prodSkillId
       ) {
-
+        expect(false, `[S2] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId} prodSkillId=${!!prodSkillId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -2053,8 +2051,14 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
       const result = await RouteExecuteRepository.runInProcessTyped({
         definition: skillDef.PATCH,
         input: {
+          name: "E2E Sync Skill RWS Updated",
+          tagline: "E2E test tagline",
+          icon: "sparkles",
+          description: "Skill for E2E sync testing — at least 10 chars",
+          category: SkillCategory.ASSISTANT,
+          isPublic: false,
           systemPrompt: "You are an updated E2E test skill (reverse-ws).",
-        },
+        } as never as (typeof skillDef.PATCH)["types"]["RequestOutput"],
         urlPathParams: { id: prodSkillId },
         instanceId: remoteTarget.instanceId,
         callbackMode: "wait",
@@ -2073,8 +2077,8 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
       const s2Row = await pollUntil(
         "S2-rws: updated skill must appear on prod",
         async () => {
-          const r = await pdb.execute<{ system_prompt: string }>(
-            sql`SELECT system_prompt FROM custom_skills WHERE user_id = ${prodUserId} AND id = ${prodSkillId} LIMIT 1`,
+          const r = await pdb.execute<{ name: string; system_prompt: string }>(
+            sql`SELECT name, system_prompt FROM custom_skills WHERE user_id = ${prodUserId} AND id = ${prodSkillId} LIMIT 1`,
           );
           const row = r.rows[0];
           return row?.system_prompt ===
@@ -2100,7 +2104,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
         !prodUserId ||
         !prodSkillId
       ) {
-
+        expect(false, `[S3] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId} prodSkillId=${!!prodSkillId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -2168,6 +2172,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
   let devUser: JwtPrivatePayloadType;
   let remoteUrl: string | null = null;
   let prodUserId = "";
+  let prodAdminToken = "";
   let connected = false;
   let remoteTarget: RemoteTarget | null = null;
 
@@ -2179,16 +2184,13 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
   beforeAll(async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      throw new Error(`[E2E-thread] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
+      expect(false, `[E2E-thread] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`).toBe(true); return;
     }
     devUser = resolved;
 
     remoteUrl = await resolveRemoteUrl();
-    if (!isCrossInstanceEnabled()) {
-      throw new Error("[E2E-thread] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-    }
     if (!remoteUrl) {
-      throw new Error("[E2E-thread] No remote URL configured — connect Hermes before running");
+      expect(false, "[E2E-thread] No remote URL configured — connect Hermes before running").toBe(true); return;
     }
 
     try {
@@ -2199,19 +2201,21 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       }
       await connectToHermes(devUser, remoteUrl);
       prodUserId = await resolveProdUserId();
+      prodAdminToken = await resolveProdAdminToken(remoteUrl);
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
       const { RemoteTransport } =
         await import("@/app/api/[locale]/remote-connection/transport");
       remoteTarget = await RemoteTransport.resolveTarget({
         userId: devUser.id,
+        instanceId: HERMES_INSTANCE_ID,
         locale: defaultLocale,
         logger,
       });
       connected = !!remoteTarget;
     } catch (err) {
-      throw new Error(`[E2E-thread] Setup failed: ${String(err)}`, { cause: err });
+      expect(false, `[E2E-thread] Setup failed: ${String(err)}`).toBe(true); return;
     }
-  }, SYNC_TIMEOUT);
+  }, SETUP_TIMEOUT);
 
   afterAll(async () => {
     // Clean dev threads + messages
@@ -2255,7 +2259,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
     "TH1: create thread via transport → appears on prod with REMOTE root folder",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[TH1] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -2266,7 +2270,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
         input: {
           id: TH_THREAD_ID,
           title: TH_TITLE,
-          rootFolderId: DefaultFolderId.PRIVATE,
+          rootFolderId: DefaultFolderId.REMOTE,
           model: ChatModelId.GPT_5_4_NANO,
         },
         instanceId: remoteTarget.instanceId,
@@ -2311,7 +2315,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
     "TH2: add message to thread via transport → message appears on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[TH2] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -2360,7 +2364,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
     "TH3: rename thread via transport → updated title on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[TH3] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const updatedTitle = `E2E Thread Sync ${RUN_ID} UPDATED`;
@@ -2408,7 +2412,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
     "TH4: create thread on prod → WS push → appears in dev REMOTE/hermes subfolder",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[TH4] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const reverseTitle = `E2E Thread Sync ${RUN_ID} Reverse`;
@@ -2437,7 +2441,9 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
         `TH4: create thread on hermes must succeed — ${result.success ? "" : JSON.stringify(result)}`,
       ).toBe(true);
 
-      // WS push from hermes delivers the thread to atlas; it lands in REMOTE/hermes subfolder
+      // Trigger hermes pull — threads are pull-on-connect only (no persistent WS atlas→hermes).
+      await triggerHermesPull(prodAdminToken, remoteUrl!);
+
       const { chatThreads: ct } =
         await import("@/app/api/[locale]/agent/chat/db");
       const devThread = await pollUntil(
@@ -2468,7 +2474,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
     "TH5: bidirectional write → pull → last-writer-wins (LWW >=, remote wins on tie)",
     async () => {
       if (!connected || !devUser || !prodUserId) {
-
+        expect(false, `[TH5] Setup failed: connected=${connected} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const biThreadId = randomUUID();
@@ -2500,8 +2506,9 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
           ON CONFLICT DO NOTHING`,
       );
 
-      // Dev pulls from prod — prod has older copy, dev should WIN (LWW).
-      await triggerPull();
+      // Trigger hermes to reconnect — fires pullOnConnect which bidirectionally syncs.
+      // Dev wrote newer; prod has older — after sync, dev should WIN (LWW).
+      await triggerHermesPull(prodAdminToken, remoteUrl!);
 
       const th5Thread = await pollUntil(
         "TH5: dev thread must exist and keep newer version (LWW)",
@@ -2525,6 +2532,86 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       await pdb.execute(
         sql`DELETE FROM chat_threads WHERE id = ${biThreadId} AND user_id = ${prodUserId}`,
       );
+    },
+    SYNC_TIMEOUT,
+  );
+
+  it(
+    "TH6: syncScope.threads=false → thread NOT synced on pull",
+    async () => {
+      if (!connected || !remoteTarget || !devUser || !prodUserId) {
+        expect(false, `[TH6] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
+      }
+
+      const th6ThreadId = randomUUID();
+      const th6Title = `TH6 Scope Test ${RUN_ID}`;
+
+      // 1. Disable threads sync on atlas's hermes connection row
+      const scopeThreadsOff: SyncScope = { ...DEFAULT_SYNC_SCOPE, threads: false };
+      await db
+        .update(remoteConnections)
+        .set({ syncScope: scopeThreadsOff, updatedAt: new Date() })
+        .where(
+          and(
+            eq(remoteConnections.userId, devUser.id),
+            eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
+          ),
+        );
+
+      try {
+        // 2. Write a unique thread directly into hermes prod DB
+        const pdb = getProdDb();
+        await pdb.execute(
+          sql`INSERT INTO chat_threads (id, user_id, title, root_folder_id, status, pinned, archived, tags, created_at, updated_at)
+            VALUES (${th6ThreadId}, ${prodUserId}, ${th6Title}, 'remote', 'active', false, false, '[]', NOW(), NOW())
+            ON CONFLICT DO NOTHING`,
+        );
+
+        // 3. Trigger hermes reconnect — fires pullOnConnect
+        await triggerHermesPull(prodAdminToken, remoteUrl!);
+
+        // 4. Wait for any sync to complete
+        await sleep(4000);
+
+        // 5. Assert the thread does NOT appear on atlas
+        const { chatThreads: ct } =
+          await import("@/app/api/[locale]/agent/chat/db");
+        const rows = await db
+          .select({ id: ct.id })
+          .from(ct)
+          .where(
+            and(
+              eq(ct.userId, devUser.id),
+              like(ct.title, "TH6 Scope Test%"),
+            ),
+          );
+        expect(
+          rows.length,
+          "TH6: thread must NOT appear on atlas when syncScope.threads=false",
+        ).toBe(0);
+      } finally {
+        // 6. Restore syncScope.threads=true
+        const scopeThreadsOn: SyncScope = { ...DEFAULT_SYNC_SCOPE, threads: true };
+        await db
+          .update(remoteConnections)
+          .set({ syncScope: scopeThreadsOn, updatedAt: new Date() })
+          .where(
+            and(
+              eq(remoteConnections.userId, devUser.id),
+              eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
+            ),
+          );
+
+        // 7. Cleanup: delete the thread from hermes DB
+        try {
+          const pdb = getProdDb();
+          await pdb.execute(
+            sql`DELETE FROM chat_threads WHERE id = ${th6ThreadId} AND user_id = ${prodUserId}`,
+          );
+        } catch {
+          // Best-effort
+        }
+      }
     },
     SYNC_TIMEOUT,
   );
@@ -2552,7 +2639,7 @@ describe("Mount hierarchy: /threads", () => {
   beforeAll(async () => {
     adminUser = await resolveTestAdminUser();
     if (!adminUser) {
-      throw new Error("Admin user not found — run: vibe seed");
+      expect(false, "Admin user not found — run: vibe seed").toBe(true); return;
     }
 
     const { chatThreads: ct, chatFolders: cf } =
@@ -2629,7 +2716,7 @@ describe("Mount hierarchy: /threads", () => {
     "T1: list /threads → returns root folder entries",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -2650,7 +2737,7 @@ describe("Mount hierarchy: /threads", () => {
     "T2: list /threads/private → returns threads or subfolders",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -2680,7 +2767,7 @@ describe("Mount hierarchy: /threads", () => {
     "T3: read a thread file → returns content with frontmatter",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       // Find our fixture thread to read (beforeAll inserted it at the private root).
@@ -2728,7 +2815,7 @@ describe("Mount hierarchy: /threads", () => {
     "T4: list thread subfolder (if any exist)",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const rootEntries = await resolveVirtualList(
@@ -2811,7 +2898,7 @@ describe("Mount hierarchy: /favorites", () => {
   beforeAll(async () => {
     adminUser = await resolveTestAdminUser();
     if (!adminUser) {
-      throw new Error("Admin user not found — run: vibe seed");
+      expect(false, "Admin user not found — run: vibe seed").toBe(true); return;
     }
 
     const { chatFavorites } =
@@ -2849,7 +2936,7 @@ describe("Mount hierarchy: /favorites", () => {
     "F1: list /favorites → returns favorite entries",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -2872,7 +2959,7 @@ describe("Mount hierarchy: /favorites", () => {
     "F2: read a favorite file → returns content with frontmatter",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -2920,7 +3007,7 @@ describe("Mount hierarchy: /tasks", () => {
   beforeAll(async () => {
     adminUser = await resolveTestAdminUser();
     if (!adminUser) {
-      throw new Error("Admin user not found — run: vibe seed");
+      expect(false, "Admin user not found — run: vibe seed").toBe(true); return;
     }
 
     const { cronTasks } =
@@ -2957,7 +3044,7 @@ describe("Mount hierarchy: /tasks", () => {
     "TK1: list /tasks → returns task entries",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -2980,7 +3067,7 @@ describe("Mount hierarchy: /tasks", () => {
     "TK2: read a task file → returns content with frontmatter",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -3031,7 +3118,7 @@ describe("Mount hierarchy: /uploads", () => {
   beforeAll(async () => {
     adminUser = await resolveTestAdminUser();
     if (!adminUser) {
-      throw new Error("Admin user not found — run: vibe seed");
+      expect(false, "Admin user not found — run: vibe seed").toBe(true); return;
     }
 
     const { chatThreads: ct, chatMessages: cm } =
@@ -3087,7 +3174,7 @@ describe("Mount hierarchy: /uploads", () => {
     "U1: list /uploads → returns type folders",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -3115,7 +3202,7 @@ describe("Mount hierarchy: /uploads", () => {
     "U2: list /uploads/images → returns thread directories (if any uploads exist)",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -3138,7 +3225,7 @@ describe("Mount hierarchy: /uploads", () => {
     "U3: list /uploads/images/{threadSlug} → returns upload files (if any exist)",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const threadDirs = await resolveVirtualList(
@@ -3180,7 +3267,7 @@ describe("Mount hierarchy: /uploads", () => {
     "U4: read an upload file → returns content with metadata",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       // Traverse: /uploads/images → fixture thread dir → fixture file
@@ -3245,7 +3332,7 @@ describe("Mount hierarchy: /searches", () => {
   beforeAll(async () => {
     adminUser = await resolveTestAdminUser();
     if (!adminUser) {
-      throw new Error("Admin user not found — run: vibe seed");
+      expect(false, "Admin user not found — run: vibe seed").toBe(true); return;
     }
 
     const { chatThreads: ct, chatMessages: cm } =
@@ -3308,7 +3395,7 @@ describe("Mount hierarchy: /searches", () => {
     "SR1: list /searches → returns month folders",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -3334,7 +3421,7 @@ describe("Mount hierarchy: /searches", () => {
     "SR2: list /searches/{YYYY-MM} → returns search result entries",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const months = await resolveVirtualList(
@@ -3379,7 +3466,7 @@ describe("Mount hierarchy: /searches", () => {
     "SR3: read a search result → returns content with query and results",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const months = await resolveVirtualList(
@@ -3446,7 +3533,7 @@ describe("Mount hierarchy: /gens", () => {
   beforeAll(async () => {
     adminUser = await resolveTestAdminUser();
     if (!adminUser) {
-      throw new Error("Admin user not found — run: vibe seed");
+      expect(false, "Admin user not found — run: vibe seed").toBe(true); return;
     }
 
     const { chatThreads: ct, chatMessages: cm } =
@@ -3503,7 +3590,7 @@ describe("Mount hierarchy: /gens", () => {
     "G1: list /gens → returns type folders (images, audio, video)",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -3526,7 +3613,7 @@ describe("Mount hierarchy: /gens", () => {
     "G2: list /gens/images → returns month folders",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -3551,7 +3638,7 @@ describe("Mount hierarchy: /gens", () => {
     "G3: list /gens/images/{YYYY-MM} → returns gen entries",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const months = await resolveVirtualList(
@@ -3594,7 +3681,7 @@ describe("Mount hierarchy: /gens", () => {
     "G4: read a gen file → returns content with prompt and media URL",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const months = await resolveVirtualList(
@@ -3652,7 +3739,7 @@ describe("Mount hierarchy: /ssh", () => {
   beforeAll(async () => {
     adminUser = await resolveTestAdminUser();
     if (!adminUser) {
-      throw new Error("Admin user not found — run: vibe seed");
+      expect(false, "Admin user not found — run: vibe seed").toBe(true); return;
     }
     // Guarantee the built-in "Local Machine" connection exists so SSH2 always
     // has a connection to read. ensureLocalConnection is idempotent.
@@ -3664,7 +3751,7 @@ describe("Mount hierarchy: /ssh", () => {
     "SSH1: list /ssh → returns connection directories",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const entries = await resolveVirtualList(
@@ -3687,7 +3774,7 @@ describe("Mount hierarchy: /ssh", () => {
     "SSH2: read a connection summary → returns frontmatter with connection info",
     async () => {
       if (!adminUser) {
-        throw new Error("adminUser not set — beforeAll must have failed");
+        expect(false, "adminUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const connections = await resolveVirtualList(
@@ -3741,7 +3828,7 @@ describe("E2E Sync: hash engine cross-instance", () => {
     "HE1: identical state → buildSyncPayloads returns empty (zero transfer)",
     async () => {
       if (!devUser) {
-        return;
+        expect(false, "[HE1] devUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -3772,7 +3859,7 @@ describe("E2E Sync: hash engine cross-instance", () => {
     "HE2: only one provider changed → only that provider transfers data",
     async () => {
       if (!devUser) {
-        return;
+        expect(false, "[HE2] devUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -3802,7 +3889,7 @@ describe("E2E Sync: hash engine cross-instance", () => {
     "HE3: all providers stale → all three payloads keyed",
     async () => {
       if (!devUser) {
-        return;
+        expect(false, "[HE3] devUser not set — beforeAll must have failed").toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);
@@ -3844,16 +3931,13 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
   beforeAll(async () => {
     const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
-      throw new Error(`[E2E-ws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`);
+      expect(false, `[E2E-ws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`).toBe(true); return;
     }
     devUser = resolved;
 
     remoteUrl = await resolveRemoteUrl();
-    if (!isCrossInstanceEnabled()) {
-      throw new Error("[E2E-ws] Set SYNC_CROSS_INSTANCE_TEST=1 to run cross-instance tests");
-    }
     if (!remoteUrl) {
-      throw new Error("[E2E-ws] No remote URL configured — connect Hermes before running");
+      expect(false, "[E2E-ws] No remote URL configured — connect Hermes before running").toBe(true); return;
     }
 
     try {
@@ -3869,14 +3953,15 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
         await import("@/app/api/[locale]/remote-connection/transport");
       remoteTarget = await RemoteTransport.resolveTarget({
         userId: devUser.id,
+        instanceId: HERMES_INSTANCE_ID,
         locale: defaultLocale,
         logger,
       });
       connected = !!remoteTarget;
     } catch (err) {
-      throw new Error(`[E2E-ws] Setup failed: ${String(err)}`);
+      expect(false, `[E2E-ws] Setup failed: ${String(err)}`).toBe(true); return;
     }
-  }, SYNC_TIMEOUT);
+  }, SETUP_TIMEOUT);
 
   afterAll(async () => {
     if (devUser) {
@@ -3912,7 +3997,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
     "WS1: write cortex document via transport → auto-appears on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[WS1] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const wsPath = `/documents/ws-push-${RUN_ID}/ws-doc.md`;
@@ -3956,7 +4041,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
     "WS2: write memory via transport → auto-appears on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[WS2] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const wsPath = `/memories/ws-push-${RUN_ID}.md`;
@@ -4000,7 +4085,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
     "WS3: create skill via transport → auto-appears on prod",
     async () => {
       if (!connected || !remoteTarget || !devUser || !prodUserId) {
-
+        expect(false, `[WS3] Setup failed: connected=${connected} remoteTarget=${!!remoteTarget} devUser=${!!devUser} prodUserId=${!!prodUserId}`).toBe(true); return;
       }
 
       const logger = createEndpointLogger(false, Date.now(), defaultLocale);

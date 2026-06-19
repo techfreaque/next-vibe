@@ -14,6 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -142,6 +143,8 @@ export class ChatFavoritesRepository {
     try {
       logger.debug("Fetching favorites", { userId });
 
+      const availability = await getInstanceAvailability();
+
       // Get active favorite ID from settings
       const settingsResult = await ChatSettingsRepository.getSettings(
         user,
@@ -226,6 +229,7 @@ export class ChatFavoritesRepository {
             characterVoice,
             locale,
             user,
+            availability,
           );
         }),
       );

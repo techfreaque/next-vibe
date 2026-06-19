@@ -63,10 +63,11 @@ export async function readThreadPath(
     return null;
   }
 
-  // The threadId is embedded in the filename: could be a UUID or slug-uuid
-  // Try to find the thread by matching the end of the filename as UUID
+  // The threadId is the UUID at the END of the filename: "<slug>-<threadId>.md".
+  // Anchor to the tail (before the optional .md) so a UUID embedded in the slug
+  // (from a title that contained one) cannot shadow the real threadId.
   const uuidMatch = lastSegment.match(
-    /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i,
+    /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:\.md)?$/i,
   );
 
   if (!uuidMatch) {

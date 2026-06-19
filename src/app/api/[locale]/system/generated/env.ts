@@ -17,40 +17,40 @@ import { defaultLocale } from "@/i18n/core/config";
 // Import env modules
 import {
   env as env_env,
-  envSchema as env_envSchema,
   envExamples,
+  envSchema as env_envSchema,
 } from "../../../../../config/env";
-import { agentEnv, agentEnvSchema, agentEnvExamples } from "../../agent/env";
+import { agentEnv, agentEnvExamples,agentEnvSchema } from "../../agent/env";
 import {
   browserEnv,
-  browserEnvSchema,
   browserEnvExamples,
+  browserEnvSchema,
 } from "../../browser/env";
 import {
   leadsCampaignsEnv,
-  leadsCampaignsEnvSchema,
   leadsCampaignsEnvExamples,
+  leadsCampaignsEnvSchema,
 } from "../../leads/campaigns/env";
 import {
   messengerEnv,
-  messengerEnvSchema,
   messengerEnvExamples,
+  messengerEnvSchema,
 } from "../../messenger/env";
 import {
   imapClientEnv,
-  imapClientEnvSchema,
   imapClientEnvExamples,
+  imapClientEnvSchema,
 } from "../../messenger/providers/email/imap-client/env";
 import {
   paymentEnv,
-  paymentEnvSchema,
   paymentEnvExamples,
+  paymentEnvSchema,
 } from "../../payment/env";
-import { smsEnv, smsEnvSchema, smsEnvExamples } from "../../sms/env";
+import { smsEnv, smsEnvExamples,smsEnvSchema } from "../../sms/env";
 import {
   serverSystemEnv,
-  serverSystemEnvSchema,
   serverSystemEnvExamples,
+  serverSystemEnvSchema,
 } from "../server/env";
 
 // Platform detection

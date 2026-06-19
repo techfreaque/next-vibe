@@ -8,7 +8,7 @@
 
 /* eslint-disable prettier/prettier */
 
-import type { AdminGroup,CategoryDefinitionSerialized } from "@/app/api/[locale]/system/help/category-types";
+import type { CategoryDefinitionSerialized, AdminGroup } from "@/app/api/[locale]/system/help/category-types";
 
 export type CategoryKey = "ai" | "cortex" | "analytics" | "payments" | "subscriptions" | "credits" | "leads" | "accounting" | "companies" | "products" | "pos" | "inventory" | "purchasing" | "referral" | "tax" | "messenger" | "newsletter" | "browser" | "ssh" | "desktop" | "account" | "devTools" | "database";
 

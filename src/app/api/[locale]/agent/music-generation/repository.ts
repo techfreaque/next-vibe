@@ -150,7 +150,10 @@ export class MusicGenerationRepository {
         });
       }
       if (isSelfRelayUrl(inferenceTarget.remoteUrl)) {
-        const underlying = getMusicGenModelUnderlyingProvider(data.model);
+        const underlying = getMusicGenModelForProvider(
+          data.model,
+          ApiProvider.MODELSLAB,
+        );
         if (!underlying) {
           return fail({
             message: t("post.errors.notConfigured", {

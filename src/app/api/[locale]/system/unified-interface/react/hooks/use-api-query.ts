@@ -8,6 +8,7 @@ import type {
 import { success } from "next-vibe/shared/types/response.schema";
 import { useCallback, useMemo, useRef } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
@@ -90,6 +91,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     };
   }): ApiQueryReturn<TEndpoint["types"]["ResponseOutput"]> {
   const { locale } = useTranslation();
+  const availability = useProviderAvailability();
 
   const {
     queryKey: customQueryKey,
@@ -215,6 +217,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         pathParams: urlPathParams,
         locale,
         user,
+        availability,
         options: {
           onSuccess: async (context) => {
             // Call endpoint-defined onSuccess first (from endpoint.options.queryOptions.onSuccess)

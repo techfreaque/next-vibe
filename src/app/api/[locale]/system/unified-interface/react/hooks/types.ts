@@ -9,6 +9,7 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -169,6 +170,7 @@ export interface ApiMutationOptions<TRequest, TResponse, TUrlVariables> {
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
+    availability: AgentEnvAvailability;
   }) => ErrorResponseType | void | Promise<ErrorResponseType | void>;
   onError?: (data: {
     error: ErrorResponseType;

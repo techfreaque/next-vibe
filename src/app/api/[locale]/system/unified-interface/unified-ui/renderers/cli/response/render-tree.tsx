@@ -1,6 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import type { JSX } from "react";
 
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { queryClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

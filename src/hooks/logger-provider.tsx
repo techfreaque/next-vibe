@@ -2,6 +2,7 @@
 
 import { createContext, type JSX, type ReactNode, useMemo } from "react";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { createClientLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/client-logger";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { setWsLogger } from "@/app/api/[locale]/system/unified-interface/websocket/client";
@@ -27,6 +28,7 @@ function getOrCreateTabId(): string {
 
 export function LoggerProvider({
   locale,
+  availability,
   children,
 }: {
   locale: CountryLanguage;

@@ -8,7 +8,7 @@ import "server-only";
  * This preserves variants, trustLevel, availableTools, model selections, etc.
  * Community metrics (voteCount, reportCount) are NOT synced — they are instance-local.
  */
-import { and, asc, eq, gt, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
@@ -156,12 +156,11 @@ export const skillsSyncProvider: SyncProvider = {
           typedCursor
             ? and(
                 eq(customSkills.userId, userId),
-                // Millisecond-precision compare so a current cursor short-
-                // circuits to empty (toISOString is ms, Postgres stores µs).
-                gt(
-                  sql`date_trunc('milliseconds', ${customSkills.updatedAt})`,
-                  new Date(typedCursor.updatedAt),
-                ),
+                // Pass cursor as a raw SQL string literal to avoid pg driver timezone
+                // conversion. The DB stores TIMESTAMP WITHOUT TIMEZONE in local time;
+                // new Date(cursor) → toISOString() → pg converts to local+offset, making
+                // the comparison 2h ahead in CEST and returning 0 rows.
+                sql`date_trunc('milliseconds', ${customSkills.updatedAt}) > ${typedCursor.updatedAt}::timestamp`,
               )
             : eq(customSkills.userId, userId),
         )

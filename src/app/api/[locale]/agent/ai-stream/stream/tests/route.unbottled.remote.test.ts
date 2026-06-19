@@ -83,7 +83,6 @@ async function cleanupHermesConnections(testUser: JwtPrivatePayloadType): Promis
   for (const row of rows) {
     await RouteExecuteRepository.runInProcessTyped({
       definition: connByIdDef.default.DELETE,
-      input: {},
       urlPathParams: { instanceId: row.instanceId },
       user: testUser,
       locale: defaultLocale,

@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/threads/cron/use-the-cortex-write-tool-to-create-a-file-at----32a8d868-4426-4fe7-b155-54aab89ba1f1.md\n\n# Use the cortex-write tool to create a file at...\nFolder: cron\nPreview: <think>The tool call succeeded. created: true, size 144 bytes, path matches exactly /documents/ai-test/notes.md. The con…",
+    "input": "/threads/cron/remote-stream-82d8ba59-b7bc-495b-8028-63cf64de7e77.md\n\n# Remote Stream\nFolder: cron",
     "encoding_format": "float"
   }
 }

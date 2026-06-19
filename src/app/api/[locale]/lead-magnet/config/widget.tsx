@@ -26,6 +26,7 @@ import {
 import type { JSX } from "react";
 import React, { useCallback, useMemo, useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
@@ -97,6 +98,7 @@ export function LeadMagnetConfigContainer(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const widgetData = useWidgetValue<typeof endpoints.GET>();
@@ -135,11 +137,12 @@ export function LeadMagnetConfigContainer(): JSX.Element {
         undefined,
         undefined,
         locale,
+        availability,
       );
       endpointMutations?.read?.refetch?.();
       setOverride(null);
     })();
-  }, [user, locale, logger, endpointMutations]);
+  }, [user, locale, logger, availability, endpointMutations]);
 
   return (
     <Div className="flex flex-col gap-6 p-4">

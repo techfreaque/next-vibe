@@ -39,6 +39,7 @@ import { ToolsButton } from "@/app/api/[locale]/agent/ai-stream/stream/widget/to
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -95,6 +96,7 @@ export function BaseMessageInput({
   user,
 }: BaseMessageInputProps): JSX.Element {
   const { initialSettingsData } = useChatBootContext();
+  const availability = useProviderAvailability();
 
   // Get settings directly (no context dependency for model/character)
   const { settings, setTTSAutoplay } = useChatSettings(
@@ -102,7 +104,7 @@ export function BaseMessageInput({
     logger,
     initialSettingsData,
   );
-  const defaults = ChatSettingsRepositoryClient.getDefaults(user);
+  const defaults = ChatSettingsRepositoryClient.getDefaults(user, availability);
   const selectedModel = settings?.selectedModel ?? defaults.selectedModel;
   const selectedSkill = settings?.selectedSkill ?? defaults.selectedSkill;
   const ttsAutoplay = settings?.ttsAutoplay ?? defaults.ttsAutoplay;

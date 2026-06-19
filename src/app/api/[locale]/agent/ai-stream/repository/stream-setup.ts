@@ -19,10 +19,8 @@ import {
   getChatModelById,
 } from "@/app/api/[locale]/agent/ai-stream/models";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import {
-  buildMissingKeyMessage,
-  getInstanceAvailability,
-} from "@/app/api/[locale]/agent/env-availability";
+import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
+import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   getBestImageGenModel,
   type ImageGenModelSelection,

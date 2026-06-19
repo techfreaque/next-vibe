@@ -40,6 +40,7 @@ import {
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
@@ -371,6 +372,7 @@ export function SystemSettingsWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const { endpointMutations } = useWidgetContext();
   const isLoading = endpointMutations?.read?.isLoading ?? value === undefined;
   const [edits, setEdits] = useState<Record<string, string>>({});
@@ -430,6 +432,7 @@ export function SystemSettingsWidget(): JSX.Element {
         filtered,
         undefined,
         locale,
+        availability,
       );
       setEdits({});
       setPendingRestart(true);
@@ -437,7 +440,7 @@ export function SystemSettingsWidget(): JSX.Element {
     } finally {
       setSaving(false);
     }
-  }, [edits, hasEdits, user, logger, locale, endpointMutations]);
+  }, [edits, hasEdits, user, logger, locale, availability, endpointMutations]);
 
   const handleApplyRestart = useCallback(async (): Promise<void> => {
     if (!user) {
@@ -456,12 +459,13 @@ export function SystemSettingsWidget(): JSX.Element {
         { framework: ServerFramework.NEXT, webpack: true },
         undefined,
         locale,
+        availability,
       );
       setPendingRestart(false);
     } finally {
       setApplying(false);
     }
-  }, [user, logger, locale]);
+  }, [user, logger, locale, availability]);
 
   const tStr = t as (key: string) => string;
 

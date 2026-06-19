@@ -32,6 +32,7 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { platform } from "@/config/env-client";
 
 import type definition from "../definition";
@@ -82,6 +83,7 @@ function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
 
@@ -102,6 +104,7 @@ function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
       } as (typeof messagesDefinition.GET)["types"]["UrlVariablesOutput"],
       locale,
       user,
+      availability,
     });
     if (response?.success) {
       setCliMessages(
@@ -118,7 +121,7 @@ function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
         })),
       );
     }
-  }, [activeThreadId, rootFolderId, logger, locale, user]);
+  }, [activeThreadId, rootFolderId, logger, locale, user, availability]);
 
   useEffect(() => {
     if (!isCli || !activeThreadId) {

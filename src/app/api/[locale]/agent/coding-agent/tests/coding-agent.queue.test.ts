@@ -49,9 +49,6 @@ async function setupCloudOnlyConnection(
   // E2E: log into prod, register atlas on hermes, sync capabilities
   await connectToHermes(testUser, LOCAL_DEV_URL);
 
-  // Ensure capabilities are populated before tests run
-  await triggerPull();
-
   _prodUserId = await resolveProdUserId();
   _prodAdminToken = await resolveProdAdminToken(LOCAL_DEV_URL);
 

@@ -477,13 +477,15 @@ export type VoiceModelSelection = z.infer<typeof voiceModelSelectionSchema>;
 export function filterTtsModels(
   selection: VoiceModelSelection | null | undefined,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): TtsModelOption[] {
-  return filterRoleModels(ttsModelOptions, selection, user);
+  return filterRoleModels(ttsModelOptions, selection, user, availability);
 }
 
 export function getBestTtsModel(
   selection: VoiceModelSelection,
   user: JwtPayloadType,
+  availability: AgentEnvAvailability,
 ): TtsModelOption | null {
-  return filterTtsModels(selection, user)[0] ?? null;
+  return filterTtsModels(selection, user, availability)[0] ?? null;
 }

@@ -36,12 +36,12 @@ import {
   isHermesInFixtureMode,
   resolveProdAdminToken,
   resolveProdUserId,
-  resolveRemoteUrl,
+  resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../testing/remote-setup";
 import { describeStreamSuite } from "./route-base.test";
 
-const _remoteUrl = await resolveRemoteUrl();
+const _remoteUrl = resolveRemoteUrlSync();
 const _isFixtureMode = isHermesInFixtureMode();
 
 let _prodUserId: string | null = null;

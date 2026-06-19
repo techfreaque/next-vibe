@@ -4,6 +4,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { getMaxToolCountAllPlatforms } from "@/app/api/[locale]/agent/chat/default-tool-counts";
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   getAvailableModelCount,
   getAvailableModelCountsByContentLevel,
@@ -83,9 +84,15 @@ export async function tanstackLoader({
     return {
       locale,
       totalToolCount,
-      totalModelCount: getAvailableModelCount(false),
-      totalProviderCount: getAvailableProviderCount(false),
-      modelCountsByTier: getAvailableModelCountsByContentLevel(false),
+      totalModelCount: getAvailableModelCount(false, getEnvAvailability()),
+      totalProviderCount: getAvailableProviderCount(
+        false,
+        getEnvAvailability(),
+      ),
+      modelCountsByTier: getAvailableModelCountsByContentLevel(
+        false,
+        getEnvAvailability(),
+      ),
       hasUser: false,
       authError: userResponse.message,
     };
@@ -97,9 +104,15 @@ export async function tanstackLoader({
   return {
     locale,
     totalToolCount,
-    totalModelCount: getAvailableModelCount(isAdmin),
-    totalProviderCount: getAvailableProviderCount(isAdmin),
-    modelCountsByTier: getAvailableModelCountsByContentLevel(isAdmin),
+    totalModelCount: getAvailableModelCount(isAdmin, getEnvAvailability()),
+    totalProviderCount: getAvailableProviderCount(
+      isAdmin,
+      getEnvAvailability(),
+    ),
+    modelCountsByTier: getAvailableModelCountsByContentLevel(
+      isAdmin,
+      getEnvAvailability(),
+    ),
     hasUser: !user.isPublic,
   };
 }
