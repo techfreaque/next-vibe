@@ -4,6 +4,7 @@ import { count } from "drizzle-orm";
 import { eq } from "drizzle-orm";
 
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { db } from "@/app/api/[locale]/system/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -26,7 +27,7 @@ export async function loadRemoteInstancesData(
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
 
-  const totalModelCount = getAvailableModelCount(isAdmin);
+  const totalModelCount = getAvailableModelCount(isAdmin, getEnvAvailability());
 
   const base = {
     isAdmin,

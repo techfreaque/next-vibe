@@ -419,7 +419,7 @@
     --card-foreground: #f1f5f9;
     --popover: #151d2e;
     --popover-foreground: #f1f5f9;
-    --primary: #3b82f6;
+    --primary: #1e40af;
     --primary-foreground: #f1f5f9;
     --secondary: #1a2540;
     --secondary-foreground: #d4dce8;
@@ -437,7 +437,7 @@
     --info-foreground: #f1f5f9;
     --border: #253352;
     --input: #253352;
-    --ring: #3b82f6;
+    --ring: #1e40af;
 
     /* Modern HSL values - Sapphire dark with deep blue surfaces */
     --background: 225 40% 8%;
@@ -446,7 +446,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 225 35% 10%;
     --popover-foreground: 210 40% 98%;
-    --primary: 221 83% 53%;
+    --primary: 224 71% 40%;
     --primary-foreground: 210 40% 98%;
     --secondary: 225 28% 16%;
     --secondary-foreground: 214 32% 91%;
@@ -477,7 +477,7 @@
     --sidebar-accent: 225 28% 16%;
     --sidebar-accent-foreground: 210 40% 96%;
     --sidebar-border: 225 22% 18%;
-    --sidebar-ring: 221 83% 53%;
+    --sidebar-ring: 224 71% 40%;
   }
 }
 

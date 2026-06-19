@@ -72,12 +72,10 @@ import {
   ImageGenModelId,
   imageGenModelOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
-import {
-  type AnyModelOptionWithVision,
-  getModelPrice,
-} from "@/app/api/[locale]/agent/models/all-models";
+import { type AnyModelOptionWithVision } from "@/app/api/[locale]/agent/models/all-models";
 import type { Modality, ModelRole } from "@/app/api/[locale]/agent/models/enum";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
+import { getModelPrice } from "@/app/api/[locale]/agent/models/models";
 import {
   type AnyModelId,
   type AnyModelOption,

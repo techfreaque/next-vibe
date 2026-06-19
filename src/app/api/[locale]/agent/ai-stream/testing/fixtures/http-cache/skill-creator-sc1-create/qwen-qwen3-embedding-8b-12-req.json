@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/skills/9cc11466-bcc6-4dda-8b05-60c308d56a05.md\n\n# Updated Code Reviewer\n> Updated tagline\nUpdated description\nUpdated system prompt",
+    "input": "/skills/3d8fc165-0bc1-495e-b8cb-3a74e2a4f2b3.md\n\n# Updated Code Reviewer\n> Updated tagline\nUpdated description\nUpdated system prompt",
     "encoding_format": "float"
   }
 }

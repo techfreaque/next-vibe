@@ -16,6 +16,11 @@ export const translations = {
         description: "Maximum wait time in milliseconds (0 for default)",
         placeholder: "Enter timeout",
       },
+      replacePage: {
+        label: "Replace existing page",
+        description:
+          "When true (default), closes all existing pages for this session before opening the new one — one tab per session. Set to false to accumulate pages (open an additional tab regardless of existing ones). Each session is isolated; this never affects other sessions.",
+      },
     },
   },
   response: {

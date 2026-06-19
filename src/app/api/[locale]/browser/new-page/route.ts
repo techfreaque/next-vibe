@@ -18,8 +18,8 @@ export const { POST, tools } = endpointsHandler({
           toolName: BrowserTool.NEW_PAGE,
           args: BrowserSharedRepository.filterUndefinedArgs({
             url: data.url,
+            replacePage: data.replacePage ?? true,
             background: data.background,
-            isolatedContext: data.isolatedContext,
             timeout: data.timeout,
           }),
           instanceId: data.instanceId,

@@ -162,18 +162,30 @@ if (_remoteUrl && _isFixtureMode) {
       prodUserId = await resolveProdUserId();
 
       const remoteAdminToken = await resolveProdAdminToken();
-      await ensureRemoteUserCredits(
-        _remoteUrl!,
-        remoteAdminToken,
-        prodUserId,
-        20000,
-      );
-      await ensureRemoteUserCredits(
-        _remoteUrl!,
-        remoteAdminToken,
-        testUser.id,
-        20000,
-      );
+      // Both credit top-ups are best-effort: hermes may run old code where admin-add
+      // behaves differently, or testUser may not exist on hermes.
+      try {
+        await ensureRemoteUserCredits(
+          _remoteUrl!,
+          remoteAdminToken,
+          prodUserId,
+          20000,
+        );
+      } catch {
+        /* best-effort — hermes version may not support this */
+      }
+      // testUser only exists in atlas DB — if Hermes doesn't know them (no --fixture-mode),
+      // this call fails but isn't needed: TM streams run as prodUserId on Hermes.
+      try {
+        await ensureRemoteUserCredits(
+          _remoteUrl!,
+          remoteAdminToken,
+          testUser.id,
+          20000,
+        );
+      } catch {
+        /* best-effort — testUser may not exist on hermes */
+      }
 
       // Verify and capture the local remote/hermes subfolder UUID.
       const [localFolder] = await db

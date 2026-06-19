@@ -17,9 +17,7 @@ import { parseStorageUrl } from "@/app/api/[locale]/agent/chat/storage/url-utils
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   getImageGenModelById,
-  getImageGenModelForProvider,
   type ImageGenModelId,
-  type ImageGenModelOption,
 } from "@/app/api/[locale]/agent/image-generation/models";
 import {
   ApiProvider,
@@ -28,9 +26,7 @@ import {
   type ModelOptionImageBased,
   type ModelOptionTokenBased,
 } from "@/app/api/[locale]/agent/models/models";
-import { isSelfRelayUrl } from "@/app/api/[locale]/agent/shared/unbottled-media-relay";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
-import type { RemoteTarget } from "@/app/api/[locale]/remote-connection/transport";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -45,9 +41,9 @@ import {
   checkMediaBalance,
   deductMediaCredits,
 } from "../shared/media-generation";
-import type {
-  ImageGenerationPostRequestOutput,
-  ImageGenerationPostResponseOutput,
+import {
+  type ImageGenerationPostRequestOutput,
+  type ImageGenerationPostResponseOutput,
 } from "./definition";
 import type { ImageGenerationT } from "./i18n";
 import { generateWithFalAi } from "./providers/fal-ai";
@@ -224,21 +220,78 @@ export class ImageGenerationRepository {
     }
     const { tCredits } = balanceCheck.data;
 
-    // UNBOTTLED relay resolution (spec: UNBOTTLED Provider). Self-relay
-    // dispatches in-process via the cheapest non-UNBOTTLED entry while the
-    // marked-up UNBOTTLED creditCost (computed above) still applies.
-    let dispatchModel: ImageGenModelOption = imageModel;
-    let inferenceTarget: RemoteTarget | null = null;
-    if (imageModel.apiProvider === ApiProvider.UNBOTTLED) {
-      if (!user.isPublic && "id" in user) {
-        const { RemoteTransport } =
-          await import("@/app/api/[locale]/remote-connection/transport");
-        inferenceTarget = await RemoteTransport.resolveInferenceProvider({
-          userId: user.id,
+    let generationResult: ResponseType<{
+      imageUrl: string;
+      creditCost?: number;
+    }>;
+    switch (imageModel.apiProvider) {
+      case ApiProvider.MODELSLAB:
+        generationResult = await generateImageWithModelsLab({
+          providerModel: imageModel.providerModel,
+          prompt: data.prompt,
+          aspectRatio: data.aspectRatio,
+          inputMediaUrl: data.inputMediaUrl,
           logger,
+          locale,
         });
-      }
-      if (!inferenceTarget) {
+        break;
+
+      case ApiProvider.OPENROUTER:
+        // OpenRouter image models don't support aspect ratio or quality - silently drop them
+        generationResult = await generateWithOpenRouter({
+          providerModel: imageModel.providerModel,
+          prompt: data.prompt,
+          inputMediaUrl: data.inputMediaUrl,
+          logger,
+          locale,
+        });
+        break;
+
+      case ApiProvider.FAL_AI:
+        generationResult = await generateWithFalAi({
+          providerModel: imageModel.providerModel,
+          prompt: data.prompt,
+          size: data.size,
+          inputMediaUrl: data.inputMediaUrl,
+          logger,
+          locale,
+        });
+        break;
+
+      case ApiProvider.OPENAI_IMAGES:
+        generationResult = await generateWithOpenAI({
+          providerModel: imageModel.providerModel,
+          prompt: data.prompt,
+          size: data.size,
+          quality: data.quality,
+          inputMediaUrl: data.inputMediaUrl,
+          logger,
+          locale,
+        });
+        break;
+
+      case ApiProvider.REPLICATE:
+        generationResult = await generateWithReplicate({
+          providerModel: imageModel.providerModel,
+          prompt: data.prompt,
+          size: data.size,
+          inputMediaUrl: data.inputMediaUrl,
+          logger,
+          locale,
+        });
+        break;
+
+      case ApiProvider.UNBOTTLED:
+        generationResult = await generateImageWithUnbottled({
+          input: data,
+          user,
+          locale,
+          logger,
+          featureLabel: t("post.title"),
+        });
+        break;
+
+      default:
         return fail({
           message: t("post.errors.notConfigured", {
             label: imageModel.apiProvider,
@@ -247,109 +300,6 @@ export class ImageGenerationRepository {
           }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
-      }
-      if (isSelfRelayUrl(inferenceTarget.remoteUrl)) {
-        const underlying = getImageGenModelForProvider(
-          data.model,
-          ApiProvider.OPENROUTER,
-        );
-        if (!underlying) {
-          return fail({
-            message: t("post.errors.notConfigured", {
-              label: imageModel.apiProvider,
-              envKey: "N/A",
-              url: "https://unbottled.ai",
-            }),
-            errorType: ErrorResponseTypes.BAD_REQUEST,
-          });
-        }
-        dispatchModel = underlying;
-        inferenceTarget = null;
-      }
-    }
-
-    let generationResult: ResponseType<{ imageUrl: string }>;
-
-    if (inferenceTarget) {
-      generationResult = await generateImageWithUnbottled({
-        session: inferenceTarget,
-        providerModel: dispatchModel.providerModel,
-        prompt: data.prompt,
-        size: data.size,
-        quality: data.quality,
-        aspectRatio: data.aspectRatio,
-        inputMediaUrl: data.inputMediaUrl,
-        logger,
-        locale,
-      });
-    } else {
-      switch (dispatchModel.apiProvider) {
-        case ApiProvider.MODELSLAB:
-          generationResult = await generateImageWithModelsLab({
-            providerModel: dispatchModel.providerModel,
-            prompt: data.prompt,
-            aspectRatio: data.aspectRatio,
-            inputMediaUrl: data.inputMediaUrl,
-            logger,
-            locale,
-          });
-          break;
-
-        case ApiProvider.OPENROUTER:
-          // OpenRouter image models don't support aspect ratio or quality - silently drop them
-          generationResult = await generateWithOpenRouter({
-            providerModel: dispatchModel.providerModel,
-            prompt: data.prompt,
-            inputMediaUrl: data.inputMediaUrl,
-            logger,
-            locale,
-          });
-          break;
-
-        case ApiProvider.FAL_AI:
-          generationResult = await generateWithFalAi({
-            providerModel: dispatchModel.providerModel,
-            prompt: data.prompt,
-            size: data.size,
-            inputMediaUrl: data.inputMediaUrl,
-            logger,
-            locale,
-          });
-          break;
-
-        case ApiProvider.OPENAI_IMAGES:
-          generationResult = await generateWithOpenAI({
-            providerModel: dispatchModel.providerModel,
-            prompt: data.prompt,
-            size: data.size,
-            quality: data.quality,
-            inputMediaUrl: data.inputMediaUrl,
-            logger,
-            locale,
-          });
-          break;
-
-        case ApiProvider.REPLICATE:
-          generationResult = await generateWithReplicate({
-            providerModel: dispatchModel.providerModel,
-            prompt: data.prompt,
-            size: data.size,
-            inputMediaUrl: data.inputMediaUrl,
-            logger,
-            locale,
-          });
-          break;
-
-        default:
-          return fail({
-            message: t("post.errors.notConfigured", {
-              label: imageModel.apiProvider,
-              envKey: "N/A",
-              url: "https://unbottled.ai",
-            }),
-            errorType: ErrorResponseTypes.BAD_REQUEST,
-          });
-      }
     }
 
     if (!generationResult.success) {
@@ -404,24 +354,28 @@ export class ImageGenerationRepository {
       }
     }
 
-    const deductResult = await deductMediaCredits(
-      user,
-      creditCost,
-      t("post.title"),
-      locale,
-      logger,
-      tCredits,
-    );
-    if (!deductResult.success) {
-      return deductResult;
+    const finalCreditCost = generationResult.data.creditCost ?? creditCost;
+
+    if (imageModel.apiProvider !== ApiProvider.UNBOTTLED) {
+      const deductResult = await deductMediaCredits(
+        user,
+        finalCreditCost,
+        t("post.title"),
+        locale,
+        logger,
+        tCredits,
+      );
+      if (!deductResult.success) {
+        return deductResult;
+      }
     }
 
     logger.debug("[ImageGen] Image generated successfully", {
       model: data.model,
-      creditCost,
+      creditCost: finalCreditCost,
     });
 
-    return success({ imageUrl, creditCost });
+    return success({ imageUrl, creditCost: finalCreditCost });
   }
 
   /**

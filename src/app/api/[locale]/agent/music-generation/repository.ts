@@ -17,13 +17,7 @@ import {
   ApiProvider,
   calculateCreditCost,
 } from "@/app/api/[locale]/agent/models/models";
-import {
-  getMusicGenModelById,
-  getMusicGenModelForProvider,
-  type MusicGenModelOption,
-} from "@/app/api/[locale]/agent/music-generation/models";
-import { isSelfRelayUrl } from "@/app/api/[locale]/agent/shared/unbottled-media-relay";
-import type { RemoteTarget } from "@/app/api/[locale]/remote-connection/transport";
+import { getMusicGenModelById } from "@/app/api/[locale]/agent/music-generation/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -32,9 +26,9 @@ import {
   checkMediaBalance,
   deductMediaCredits,
 } from "../shared/media-generation";
-import type {
-  MusicGenerationPostRequestOutput,
-  MusicGenerationPostResponseOutput,
+import {
+  type MusicGenerationPostRequestOutput,
+  type MusicGenerationPostResponseOutput,
 } from "./definition";
 import { MUSIC_DURATION_SECONDS } from "./enum";
 import type { MusicGenerationT } from "./i18n";
@@ -125,96 +119,53 @@ export class MusicGenerationRepository {
     }
     const { tCredits } = balanceCheck.data;
 
-    // UNBOTTLED relay resolution (spec: UNBOTTLED Provider). Self-relay
-    // dispatches in-process via the cheapest non-UNBOTTLED entry while the
-    // marked-up UNBOTTLED creditCost (computed above) still applies.
-    let dispatchModel: MusicGenModelOption = audioModel;
-    let inferenceTarget: RemoteTarget | null = null;
-    if (audioModel.apiProvider === ApiProvider.UNBOTTLED) {
-      if (!user.isPublic && "id" in user) {
-        const { RemoteTransport } =
-          await import("@/app/api/[locale]/remote-connection/transport");
-        inferenceTarget = await RemoteTransport.resolveInferenceProvider({
-          userId: user.id,
+    let generationResult: ResponseType<{
+      audioUrl: string;
+      creditCost?: number;
+      durationSeconds?: number;
+    }>;
+    switch (audioModel.apiProvider) {
+      case ApiProvider.REPLICATE:
+        generationResult = await generateMusicWithReplicate({
+          providerModel: audioModel.providerModel,
+          prompt: data.prompt,
+          durationSeconds,
+          inputMediaUrl: data.inputMediaUrl,
           logger,
+          locale,
         });
-      }
-      if (!inferenceTarget) {
+        break;
+
+      case ApiProvider.MODELSLAB:
+        generationResult = await generateMusicWithModelsLab({
+          providerModel: audioModel.providerModel,
+          prompt: data.prompt,
+          durationSeconds,
+          inputMediaUrl: data.inputMediaUrl,
+          logger,
+          locale,
+        });
+        break;
+
+      case ApiProvider.UNBOTTLED:
+        generationResult = await generateMusicWithUnbottled({
+          input: data,
+          user,
+          locale,
+          logger,
+          featureLabel: t("post.title"),
+        });
+        break;
+
+      default:
         return fail({
           message: t("post.errors.notConfigured", {
             label: audioModel.apiProvider,
             envKey: "N/A",
-            url: "https://unbottled.ai",
+            url: "",
           }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
-      }
-      if (isSelfRelayUrl(inferenceTarget.remoteUrl)) {
-        const underlying = getMusicGenModelForProvider(
-          data.model,
-          ApiProvider.MODELSLAB,
-        );
-        if (!underlying) {
-          return fail({
-            message: t("post.errors.notConfigured", {
-              label: audioModel.apiProvider,
-              envKey: "N/A",
-              url: "https://unbottled.ai",
-            }),
-            errorType: ErrorResponseTypes.BAD_REQUEST,
-          });
-        }
-        dispatchModel = underlying;
-        inferenceTarget = null;
-      }
-    }
-
-    let generationResult: ResponseType<{ audioUrl: string }>;
-
-    if (inferenceTarget) {
-      generationResult = await generateMusicWithUnbottled({
-        session: inferenceTarget,
-        providerModel: dispatchModel.providerModel,
-        prompt: data.prompt,
-        duration: data.duration,
-        inputMediaUrl: data.inputMediaUrl,
-        logger,
-        locale,
-      });
-    } else {
-      switch (dispatchModel.apiProvider) {
-        case ApiProvider.REPLICATE:
-          generationResult = await generateMusicWithReplicate({
-            providerModel: dispatchModel.providerModel,
-            prompt: data.prompt,
-            durationSeconds,
-            inputMediaUrl: data.inputMediaUrl,
-            logger,
-            locale,
-          });
-          break;
-
-        case ApiProvider.MODELSLAB:
-          generationResult = await generateMusicWithModelsLab({
-            providerModel: dispatchModel.providerModel,
-            prompt: data.prompt,
-            durationSeconds,
-            inputMediaUrl: data.inputMediaUrl,
-            logger,
-            locale,
-          });
-          break;
-
-        default:
-          return fail({
-            message: t("post.errors.notConfigured", {
-              label: dispatchModel.apiProvider,
-              envKey: "N/A",
-              url: "https://unbottled.ai",
-            }),
-            errorType: ErrorResponseTypes.BAD_REQUEST,
-          });
-      }
     }
 
     if (!generationResult.success) {
@@ -227,6 +178,9 @@ export class MusicGenerationRepository {
     }
 
     let { audioUrl } = generationResult.data;
+    const finalDurationSeconds =
+      generationResult.data.durationSeconds ?? durationSeconds;
+    const finalCreditCost = generationResult.data.creditCost ?? creditCost;
 
     // Upload to our storage so the URL is persistent and access-controlled
     const scThreadId = streamContext?.threadId;
@@ -255,28 +209,30 @@ export class MusicGenerationRepository {
       }
     }
 
-    const deductResult = await deductMediaCredits(
-      user,
-      creditCost,
-      t("post.title"),
-      locale,
-      logger,
-      tCredits,
-    );
-    if (!deductResult.success) {
-      return deductResult;
+    if (audioModel.apiProvider !== ApiProvider.UNBOTTLED) {
+      const deductResult = await deductMediaCredits(
+        user,
+        finalCreditCost,
+        t("post.title"),
+        locale,
+        logger,
+        tCredits,
+      );
+      if (!deductResult.success) {
+        return deductResult;
+      }
     }
 
     logger.debug("[MusicGen] Music generated successfully", {
       model: data.model,
-      creditCost,
-      durationSeconds,
+      creditCost: finalCreditCost,
+      durationSeconds: finalDurationSeconds,
     });
 
     return success({
       audioUrl,
-      creditCost,
-      durationSeconds,
+      creditCost: finalCreditCost,
+      durationSeconds: finalDurationSeconds,
     });
   }
 }

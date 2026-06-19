@@ -12,6 +12,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
 import {
@@ -267,7 +268,7 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
         publicName: user.publicName,
         userId: user.id,
         passwordResetUrl,
-        totalModelCount: getAvailableModelCount(false),
+        totalModelCount: getAvailableModelCount(false, getEnvAvailability()),
       };
 
       return success({

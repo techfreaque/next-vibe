@@ -7,7 +7,6 @@ import type { JSX, ReactNode } from "react";
 import Footer from "@/app/[locale]/story/_components/footer";
 import { Navbar } from "@/app/[locale]/story/_components/nav/navbar";
 import { accountNavItems } from "@/app/[locale]/user/_components/account-nav-items";
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
@@ -68,6 +67,8 @@ export async function tanstackLoader({
   }
 
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+  const { getEnvAvailability } =
+    await import("@/app/api/[locale]/agent/env-availability");
   const totalModelCount = getAvailableModelCount(isAdmin, getEnvAvailability());
 
   return { locale, user, userProfile, hasSubscription, totalModelCount };

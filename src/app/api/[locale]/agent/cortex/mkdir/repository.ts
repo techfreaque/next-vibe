@@ -42,6 +42,7 @@ interface MkdirParams {
 export class CortexMkdirRepository {
   static async createDirectory({
     userId,
+    user,
     locale,
     path: rawPath,
     viewType,

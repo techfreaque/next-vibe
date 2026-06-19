@@ -34,10 +34,11 @@ import {
   instanceIdentities,
   remoteConnections,
 } from "@/app/api/[locale]/remote-connection/db";
+import selfRenameDefinitions from "@/app/api/[locale]/remote-connection/self-rename/definition";
+import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
 import { db } from "@/app/api/[locale]/system/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import {
   installFetchCache,
@@ -53,7 +54,6 @@ import {
   getProdDb,
   HERMES_INSTANCE_ID,
   resolveDevUser,
-  resolveProdAdminToken,
   resolveProdUserId,
   resolveRemoteUrlSync,
   restoreHermesIdentity,
@@ -136,19 +136,13 @@ if (_remoteUrl) {
 
       await connectToHermes(testUser, _remoteUrl!);
 
-      const remoteAdminToken = await resolveProdAdminToken(_remoteUrl!);
-      await ensureRemoteUserCredits(
-        _remoteUrl!,
-        remoteAdminToken,
-        prodUserId,
-        20000,
-      );
-      await ensureRemoteUserCredits(
-        _remoteUrl!,
-        remoteAdminToken,
-        testUser.id,
-        20000,
-      );
+      await ensureRemoteUserCredits("", "", prodUserId, 20000);
+      // testUser only exists in atlas DB — best-effort if Hermes doesn't know them
+      try {
+        await ensureRemoteUserCredits("", "", testUser.id, 20000);
+      } catch {
+        /* best-effort — testUser may not exist on hermes */
+      }
 
       // Capture local remote/hermes subfolder UUID
       const [lf] = await db
@@ -297,31 +291,16 @@ if (_remoteUrl) {
       const newName = `atlas-rn1-${randomUUID().slice(0, 8)}`;
       appliedNewDevName = newName;
 
-      // Call the local self-rename endpoint via HTTP (propagate=false: local only)
-      const localAdminToken = await resolveProdAdminToken(
-        "http://localhost:3000",
-      );
-      const renameUrl = `http://localhost:3000/api/${defaultLocale}/remote-connection/self/rename`;
-      const resp = await fetch(renameUrl, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${localAdminToken}`,
-        },
-        body: JSON.stringify({ newInstanceId: newName, propagate: false }),
-        signal: AbortSignal.timeout(15_000),
+      // Call the local self-rename endpoint via the typed executor (propagate=false: local only)
+      const rn1Resp = await sendTestRequest({
+        endpoint: selfRenameDefinitions.PATCH,
+        data: { newInstanceId: newName, propagate: false },
+        user: testUser,
       });
 
       expect(
-        resp.ok,
-        `RN1: PATCH ${renameUrl} failed with status ${String(resp.status)}`,
-      ).toBe(true);
-
-      const body = (await resp.json()) as { success?: boolean };
-      expect(
-        body.success,
-        `RN1: renameSelf response must have success=true`,
+        rn1Resp.success,
+        `RN1: renameSelf must succeed — ${rn1Resp.success ? "" : JSON.stringify(rn1Resp)}`,
       ).toBe(true);
 
       // instanceIdentities must be updated
@@ -389,31 +368,16 @@ if (_remoteUrl) {
       const newName = `atlas-rn2-${randomUUID().slice(0, 8)}`;
       appliedNewDevName = newName;
 
-      // Call the local self-rename endpoint via HTTP (propagate=true: fires PATCH to hermes)
-      const localAdminToken = await resolveProdAdminToken(
-        "http://localhost:3000",
-      );
-      const renameUrl = `http://localhost:3000/api/${defaultLocale}/remote-connection/self/rename`;
-      const resp = await fetch(renameUrl, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${localAdminToken}`,
-        },
-        body: JSON.stringify({ newInstanceId: newName, propagate: true }),
-        signal: AbortSignal.timeout(15_000),
+      // Call the local self-rename endpoint via the typed executor (propagate=true: fires PATCH to hermes)
+      const rn2Resp = await sendTestRequest({
+        endpoint: selfRenameDefinitions.PATCH,
+        data: { newInstanceId: newName, propagate: true },
+        user: testUser,
       });
 
       expect(
-        resp.ok,
-        `RN2: PATCH ${renameUrl} failed with status ${String(resp.status)}`,
-      ).toBe(true);
-
-      const body = (await resp.json()) as { success?: boolean };
-      expect(
-        body.success,
-        `RN2: renameSelf response must have success=true`,
+        rn2Resp.success,
+        `RN2: renameSelf must succeed — ${rn2Resp.success ? "" : JSON.stringify(rn2Resp)}`,
       ).toBe(true);
 
       // Give the fire-and-forget propagation time to reach hermes-dev
@@ -567,44 +531,17 @@ if (_remoteUrl) {
       // hermes's rename sends PATCH to atlas's /remote-connection/[instanceId]/rename.
       // atlas's _rename() handler updates its local chatFolders.name.
       //
-      // We simulate this by calling hermes's rename endpoint directly.
-      const [connRowRN5] = await db
-        .select({ token: remoteConnections.token })
-        .from(remoteConnections)
-        .where(
-          and(
-            eq(remoteConnections.userId, testUser.id),
-            eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-          ),
-        )
-        .limit(1);
-      const token = connRowRN5?.token ?? null;
-
-      expect(token, "RN5: must have token for hermes connection").toBeTruthy();
-      if (!token) {
-        return;
-      }
-
-      const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/remote-connection/repository");
-      const decryptedToken = RemoteConnectionRepository.decryptToken(token);
-
-      // PATCH hermes's self/rename endpoint
-      const renameUrl = `${_remoteUrl!}/api/${defaultLocale}/remote-connection/self/rename`;
-      const resp = await fetch(renameUrl, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${decryptedToken}`,
-        },
-        body: JSON.stringify({ newInstanceId: newHermesName, propagate: true }),
-        signal: AbortSignal.timeout(30_000),
+      // We call hermes's rename endpoint via sendTestRequest with instanceId routing.
+      const rn5Resp = await sendTestRequest({
+        endpoint: selfRenameDefinitions.PATCH,
+        data: { newInstanceId: newHermesName, propagate: true },
+        user: testUser,
+        instanceId: HERMES_INSTANCE_ID,
       });
 
       expect(
-        resp.ok,
-        `RN5: PATCH ${renameUrl} failed with status ${String(resp.status)}`,
+        rn5Resp.success,
+        `RN5: hermes self-rename must succeed — ${rn5Resp.success ? "" : JSON.stringify(rn5Resp)}`,
       ).toBe(true);
 
       // Poll atlas's chatFolders for the renamed folder

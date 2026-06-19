@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/skills/5517e3eb-73e6-4393-be1c-7c6b1ad3e41f.md\n\n# Code Reviewer\n> Expert code review and suggestions\nReviews code for bugs, performance issues, and best practices\nYou are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
+    "input": "/skills/5f467d85-6776-4729-b0d0-2bc2b2e87932.md\n\n# Code Reviewer\n> Expert code review and suggestions\nReviews code for bugs, performance issues, and best practices\nYou are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
     "encoding_format": "float"
   }
 }

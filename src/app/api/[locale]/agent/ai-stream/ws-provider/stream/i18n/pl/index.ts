@@ -53,7 +53,12 @@ export const translations: typeof enTranslations = {
       threadMirrorMode: {
         label: "Tryb kopiowania wątku",
         description:
-          "Gdzie przechowywany jest wątek: po obu stronach, tylko u wywołującego, tylko u dostawcy lub nigdzie. 'both'/'cloud' zapisują wątek na tej instancji w REMOTE/<instancja wywołująca>.",
+          "Gdzie przechowywany jest wątek: po obu stronach, tylko u wywołującego, tylko u dostawcy lub nigdzie. 'both'/'cloud' zapisują wątek na tej instancji w BACKGROUND/<instancja wywołująca>.",
+      },
+      folderPath: {
+        label: "Ścieżka folderu",
+        description:
+          "Lista nazw podfolderów do utworzenia w BACKGROUND/<instancja wywołująca> (np. ['tests', 'mój-zestaw']). Odzwierciedla hierarchię folderów wywołującego.",
       },
       userMessageId: {
         label: "ID wiadomości użytkownika",

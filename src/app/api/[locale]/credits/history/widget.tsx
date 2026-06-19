@@ -6,6 +6,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import {
   useWidgetContext,
@@ -13,8 +14,8 @@ import {
   useWidgetValue,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
 import { PaginationWidget } from "next-vibe-ui/unified/containers/pagination/widget";
-import NavigateButtonWidget from "next-vibe-ui/unified/interactive/navigate-button/widget";
 
+import { CreditsTabHeader } from "@/app/api/[locale]/credits/credits-tab-header";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";

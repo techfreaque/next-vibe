@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/skills/a3ba9beb-7519-471b-af31-ed9973aece37.md\n\n# Test Skill Route Suite\n> Integration test skill for route suite\nThis skill is created by the automated test suite to verify the full CRUD flow\nYou are a test assistant. Always respond with 'test-ok'.",
+    "input": "/skills/14f2c6be-db27-4d62-a1ed-541a3f0c60f2.md\n\n# Test Skill Route Suite\n> Integration test skill for route suite\nThis skill is created by the automated test suite to verify the full CRUD flow\nYou are a test assistant. Always respond with 'test-ok'.",
     "encoding_format": "float"
   }
 }

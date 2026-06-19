@@ -523,6 +523,17 @@ export class MessageConverter {
         for (const toolMsg of toolMessages) {
           const toolCall = toolMsg.metadata!.toolCall!;
 
+          // Non-revival: a deferred result row supersedes its original pending
+          // message. Emit only the deferred row so each toolCallId appears
+          // exactly once in the converted batch.
+          if (
+            !isRevival &&
+            !toolCall.isDeferred &&
+            supersededToolCallIds.has(toolCall.toolCallId)
+          ) {
+            continue;
+          }
+
           // In revival context: use a fresh synthetic toolCallId for deferred results so the
           // AI SDK doesn't see duplicate IDs (the original pending call already used this ID).
           // This lets revival AI see: [original pending call] → [STEP_OK response] → [deferred final result]
@@ -533,11 +544,13 @@ export class MessageConverter {
               ? `deferred-${toolCall.toolCallId}`
               : toolCall.toolCallId;
 
-          // Skip duplicate toolCallIds - keep the first occurrence
-          // Duplicates can occur when a tool call fails and is retried with the same ID
+          // Duplicate toolCallIds must never reach the provider (API rejects
+          // non-unique IDs). With superseded originals stripped above, a
+          // duplicate here means two non-deferred rows share a toolCallId -
+          // an invariant violation in message creation, not a display concern.
           if (seenToolCallIds.has(effectiveToolCallId)) {
-            logger.warn(
-              "[MessageConverter] Skipping duplicate toolCallId in batch",
+            logger.error(
+              "[MessageConverter] Duplicate toolCallId in batch - dropping later occurrence",
               {
                 toolCallId: effectiveToolCallId,
                 toolName: toolCall.toolName,
@@ -619,6 +632,12 @@ export class MessageConverter {
               ],
             });
           }
+        }
+
+        // Every tool message in the group was a superseded original (its
+        // deferred result lives in a later group) - nothing to emit here.
+        if (toolCallContent.length === 0) {
+          continue;
         }
 
         if (hasTextAssistant) {
@@ -707,58 +726,74 @@ export class MessageConverter {
       }
     }
 
-    // Safety net: deduplicate tool_use IDs across the entire result.
-    // The API rejects messages with non-unique tool_use IDs.
-    // This handles edge cases where the same toolCallId appears in separate
-    // assistant messages (e.g. non-consecutive TOOL messages sharing an ID).
+    // Safety net: the provider requires tool_use IDs to be unique within one
+    // request, but some providers (e.g. kimi) number tool calls per RESPONSE -
+    // two turns that each call the same tool re-use the same ID string
+    // (functions.tool-help:0). Those are distinct real calls, so later
+    // occurrences are REMAPPED to a unique suffix (and their adjacent
+    // tool-results patched to match) - never dropped, the model keeps the
+    // full call/result history.
     const globalSeenToolCallIds = new Set<string>();
+    const pendingRemap = new Map<string, string>();
     for (let k = 0; k < result.length; k++) {
       const msg = result[k];
       if (msg.role === "assistant" && Array.isArray(msg.content)) {
-        const contentArr = msg.content;
-        const indicesToRemove = new Set<number>();
-        for (let p = 0; p < contentArr.length; p++) {
-          const part = contentArr[p];
-          if (part && part.type === "tool-call") {
-            const toolPart = part as ToolCallPart;
-            if (globalSeenToolCallIds.has(toolPart.toolCallId)) {
-              logger.warn(
-                "[MessageConverter] Removing duplicate toolCallId from assistant message",
-                { toolCallId: toolPart.toolCallId },
-              );
-              indicesToRemove.add(p);
-            } else {
-              globalSeenToolCallIds.add(toolPart.toolCallId);
-            }
+        let changed = false;
+        const remapped = msg.content.map((part, p) => {
+          if (!part || part.type !== "tool-call") {
+            return part;
           }
-        }
-        if (indicesToRemove.size > 0) {
-          const kept = contentArr.flatMap((part, idx) =>
-            indicesToRemove.has(idx) ? [] : [part],
-          );
-          result[k] = { ...msg, content: kept };
+          const toolPart = part as ToolCallPart;
+          if (globalSeenToolCallIds.has(toolPart.toolCallId)) {
+            const newId = `${toolPart.toolCallId}#h${String(k)}-${String(p)}`;
+            pendingRemap.set(toolPart.toolCallId, newId);
+            globalSeenToolCallIds.add(newId);
+            changed = true;
+            logger.debug(
+              "[MessageConverter] Remapped provider-reused toolCallId in history",
+              { from: toolPart.toolCallId, to: newId },
+            );
+            return { ...toolPart, toolCallId: newId };
+          }
+          globalSeenToolCallIds.add(toolPart.toolCallId);
+          return part;
+        });
+        if (changed) {
+          result[k] = { ...msg, content: remapped };
         }
       }
       if (msg.role === "tool" && Array.isArray(msg.content)) {
-        const contentArr = msg.content;
         const indicesToRemove = new Set<number>();
-        for (let p = 0; p < contentArr.length; p++) {
-          const part = contentArr[p];
-          if (part && part.type === "tool-result") {
-            const toolPart = part as ToolResultPart;
-            if (!globalSeenToolCallIds.has(toolPart.toolCallId)) {
-              logger.warn("[MessageConverter] Removing orphaned tool-result", {
-                toolCallId: toolPart.toolCallId,
-              });
-              indicesToRemove.add(p);
-            }
+        let changed = false;
+        const newContent = msg.content.map((part, p) => {
+          if (!part || part.type !== "tool-result") {
+            return part;
           }
-        }
-        if (indicesToRemove.size > 0) {
-          const kept = contentArr.flatMap((part, idx) =>
-            indicesToRemove.has(idx) ? [] : [part],
-          );
-          result[k] = { ...msg, content: kept };
+          const toolPart = part as ToolResultPart;
+          const remappedId = pendingRemap.get(toolPart.toolCallId);
+          if (remappedId) {
+            // This result belongs to the most recent remapped call - the
+            // original call's own result already passed through earlier.
+            pendingRemap.delete(toolPart.toolCallId);
+            changed = true;
+            return { ...toolPart, toolCallId: remappedId };
+          }
+          if (!globalSeenToolCallIds.has(toolPart.toolCallId)) {
+            logger.warn("[MessageConverter] Removing orphaned tool-result", {
+              toolCallId: toolPart.toolCallId,
+            });
+            indicesToRemove.add(p);
+            changed = true;
+          }
+          return part;
+        });
+        if (changed) {
+          result[k] = {
+            ...msg,
+            content: newContent.filter(
+              (part, idx) => part !== undefined && !indicesToRemove.has(idx),
+            ),
+          };
         }
       }
     }
@@ -997,6 +1032,14 @@ export class MessageConverter {
               | { type: "text"; text: string }
               | { type: "image-data"; data: string; mediaType: string }
             > = [{ type: "image-data", data: base64Data, mediaType: mimeType }];
+            // Also surface the canonical URL as text. A vision model sees the
+            // pixels but, asked to report the imageUrl, would otherwise have no
+            // URL string to cite and tends to hallucinate one (e.g. a sandbox:
+            // path). The real URL must be in the result it reads.
+            const citeUrl = mediaResult.imageUrl ?? mediaResult.file;
+            if (citeUrl) {
+              contentParts.push({ type: "text", text: `imageUrl: ${citeUrl}` });
+            }
             if (mediaResult.text) {
               contentParts.push({ type: "text", text: mediaResult.text });
             }
@@ -1046,7 +1089,48 @@ export class MessageConverter {
       };
     }
 
-    return { type: "json", value: (result ?? null) as JSONValue };
+    return {
+      type: "json",
+      value: MessageConverter.sanitizeJsonSchemaRefs(
+        (result ?? null) as JSONValue,
+      ),
+    };
+  }
+
+  /**
+   * Deep-strip JSON Schema `$ref` values starting with "#/definitions/" from any JSON value.
+   *
+   * Gemini's function_response parser treats strings matching "#/definitions/<name>" as
+   * function name references and rejects them with:
+   *   "The referenced name `#/definitions/__schema0` in function_response.response does not
+   *   match to a display_name in the function_response.parts."
+   *
+   * Tool results (e.g. tool-help returning execute-tool's parameter schema) can contain
+   * these $ref strings nested inside the JSON. Stripping them prevents Gemini rejections
+   * while keeping all other content intact.
+   */
+  private static sanitizeJsonSchemaRefs(value: JSONValue): JSONValue {
+    if (value === null || typeof value !== "object") {
+      return value;
+    }
+    if (Array.isArray(value)) {
+      return value.map((v) =>
+        MessageConverter.sanitizeJsonSchemaRefs(v as JSONValue),
+      );
+    }
+    const result: Record<string, JSONValue> = {};
+    for (const [k, v] of Object.entries(value as Record<string, JSONValue>)) {
+      // Drop $ref keys whose value points to an internal schema definition
+      if (
+        k === "$ref" &&
+        typeof v === "string" &&
+        v.startsWith("#/definitions/")
+      ) {
+        continue;
+      }
+      result[k] = MessageConverter.sanitizeJsonSchemaRefs(v as JSONValue);
+    }
+    return result;
   }
 
   /**

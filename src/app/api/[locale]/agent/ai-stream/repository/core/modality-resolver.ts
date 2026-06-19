@@ -147,16 +147,10 @@ export function resolveChatModelId(
   skillVariantModelSelection: SkillVariant["modelSelection"] | undefined,
   user: JwtPayloadType,
   availability: AgentEnvAvailability,
-  providerOverride?: ApiProvider,
 ): ChatModelId | null {
   // Try favorite's modelSelection first
   if (favoriteModelSelection) {
-    const best = getBestChatModel(
-      favoriteModelSelection,
-      user,
-      availability,
-      providerOverride,
-    );
+    const best = getBestChatModel(favoriteModelSelection, user, availability);
     if (best) {
       return best.id;
     }
@@ -475,7 +469,7 @@ export class ModalityResolver {
     activeModel: ChatModelOption,
     ctx: BridgeContext,
     user: JwtPayloadType,
-    availability: AgentEnvAvailability = agentEnvAvailability,
+    availability: AgentEnvAvailability,
   ): { modality: Modality; reason: string }[] {
     const unsupported: { modality: Modality; reason: string }[] = [];
     const checked = new Set<Modality>();

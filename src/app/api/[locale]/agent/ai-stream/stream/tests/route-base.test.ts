@@ -201,6 +201,19 @@ export interface ModeConfig {
    * Set after connection setup when the remote/hermes subfolder UUID is known.
    */
   subFolderIdOverride?: string;
+  /**
+   * When true, add T-RELAY: assert the remote (hermes) wallet balance decreased
+   * after T1, proving the stream actually ran on the remote instance via relay
+   * and was NOT served locally. Use for UNBOTTLED inference-provider mode and
+   * any relay mode where the loop cost should land on the remote wallet.
+   */
+  assertRelayRan?: boolean;
+  /**
+   * Remote folder on hermes where relayed threads should land.
+   * When set alongside assertRelayRan, T-RELAY also verifies the thread exists
+   * in this folder on the hermes prod DB. Get this from beforeAll after connecting.
+   */
+  hermesThreadFolderId?: string;
 }
 
 // ── Remote-mode helpers ────────────────────────────────────────────────────────
@@ -1733,6 +1746,63 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
       assertParentTimeOrder(firstResult.messages);
       return firstResult;
+    }
+
+    // ── T-RELAY: Relay ran on remote assertion ────────────────────────────────
+    // Proves the stream actually executed on the remote instance, not locally.
+    // Checks that the remote (hermes) wallet balance decreased after a stream
+    // and, when hermesThreadFolderId is set, that the thread exists in that
+    // folder in the hermes prod DB.
+    if (cfg.assertRelayRan) {
+      it(
+        "T-RELAY: stream must have run on hermes — remote wallet decreased and thread exists in hermes DB",
+        async () => {
+          setFetchCacheContext(`${cfg.cachePrefix}relay-ran`);
+          await pinBalance(testUser, 10);
+
+          const balanceBefore = await readRemoteAdminBalance();
+          expect(
+            balanceBefore,
+            "T-RELAY: hermes wallet must be readable before the stream",
+          ).not.toBeNull();
+
+          const { result } = await runStream({
+            user: testUser,
+            prompt: `[T-RELAY] Reply with exactly: RELAY_OK`,
+            favoriteId: mainFavoriteId,
+          });
+
+          expect(
+            result.success,
+            `T-RELAY stream failed: ${!result.success ? result.message : ""}`,
+          ).toBe(true);
+          if (!result.success) {
+            return;
+          }
+
+          // Remote wallet must decrease — proves inference ran on hermes.
+          const balanceAfter = await readRemoteAdminBalance();
+          expect(
+            balanceAfter,
+            "T-RELAY: hermes wallet must be readable after the stream",
+          ).not.toBeNull();
+          expect(
+            balanceAfter!,
+            `T-RELAY: hermes wallet did not decrease (before=${String(balanceBefore)}, after=${String(balanceAfter)}). ` +
+              `This means the stream ran locally, not on the remote relay.`,
+          ).toBeLessThan(balanceBefore!);
+
+          // When a specific hermes-side folder is expected, verify the thread landed there.
+          const hermesFolder = cfg.hermesThreadFolderId;
+          if (hermesFolder && result.data.threadId) {
+            const { assertProdDbHasThread, assertProdDbHasMessages } =
+              await import("../../testing/remote-setup");
+            await assertProdDbHasThread(result.data.threadId, hermesFolder);
+            await assertProdDbHasMessages(result.data.threadId, 2);
+          }
+        },
+        effectiveTestTimeout,
+      );
     }
 
     // ── T-SYS: System prompt origin assertion ─────────────────────────────────

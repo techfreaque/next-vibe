@@ -18,6 +18,11 @@ export const translations: typeof enTranslations = {
         description: "Maximale Wartezeit in Millisekunden (0 für Standard)",
         placeholder: "Zeitlimit eingeben",
       },
+      replacePage: {
+        label: "Bestehende Seite ersetzen",
+        description:
+          "Bei true (Standard) werden alle bestehenden Seiten dieser Sitzung geschlossen, bevor die neue geöffnet wird – ein Tab pro Sitzung. Bei false wird ein weiterer Tab geöffnet, unabhängig von bestehenden. Andere Sitzungen bleiben unberührt.",
+      },
     },
   },
   response: {

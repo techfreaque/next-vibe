@@ -54,7 +54,12 @@ export const translations: typeof enTranslations = {
       threadMirrorMode: {
         label: "Thread-Spiegelmodus",
         description:
-          "Wo der Thread gespeichert wird: beide Seiten, nur Aufrufer, nur Provider oder nirgends. 'both'/'cloud' speichern den Thread auf dieser Instanz unter REMOTE/<Aufrufer-Instanz>.",
+          "Wo der Thread gespeichert wird: beide Seiten, nur Aufrufer, nur Provider oder nirgends. 'both'/'cloud' speichern den Thread auf dieser Instanz unter BACKGROUND/<Aufrufer-Instanz>.",
+      },
+      folderPath: {
+        label: "Ordnerpfad",
+        description:
+          "Geordnete Liste von Unterordnernamen, die unter BACKGROUND/<Aufrufer-Instanz> erstellt werden (z. B. ['tests', 'meine-suite']). Spiegelt die Ordnerhierarchie des Aufrufers.",
       },
       userMessageId: {
         label: "Benutzernachrichten-ID",

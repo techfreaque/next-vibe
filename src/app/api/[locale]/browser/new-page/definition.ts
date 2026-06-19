@@ -70,6 +70,20 @@ const { POST } = createEndpoint({
         columns: 8,
         schema: z.string().describe("URL to load in a new page."),
       }),
+      replacePage: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "new-page.form.fields.replacePage.label",
+        description: "new-page.form.fields.replacePage.description",
+        columns: 4,
+        schema: z
+          .boolean()
+          .optional()
+          .default(true)
+          .describe(
+            "When true (default), closes all existing pages for this session before opening the new one — one tab per session. Set to false to accumulate pages (open an additional tab regardless of existing ones). This never affects other sessions.",
+          ),
+      }),
       background: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -81,19 +95,6 @@ const { POST } = createEndpoint({
           .optional()
           .describe(
             "Whether to open the page in the background without bringing it to the front. Default is false (foreground).",
-          ),
-      }),
-      isolatedContext: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "new-page.form.fields.url.label",
-        description: "new-page.form.fields.url.description",
-        columns: 8,
-        schema: z
-          .string()
-          .optional()
-          .describe(
-            "If specified, the page is created in an isolated browser context with the given name. Pages in the same browser context share cookies and storage.",
           ),
       }),
       timeout: requestField(scopedTranslation, {
@@ -152,7 +153,7 @@ const { POST } = createEndpoint({
   }),
   examples: {
     requests: {
-      default: { url: "https://example.com" },
+      default: { url: "https://example.com", replacePage: true },
     },
     responses: {
       default: {

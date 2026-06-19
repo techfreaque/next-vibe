@@ -271,7 +271,6 @@ export function useAddToFavorites({
           if (!oldData?.success) {
             return oldData;
           }
-
           const newFavorite =
             ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
               newFavoriteConfig,
@@ -296,7 +295,6 @@ export function useAddToFavorites({
             newFavorite.modelInfo = pre.modelInfo;
             newFavorite.modelProvider = pre.modelProvider;
           }
-
           return {
             success: true,
             data: {

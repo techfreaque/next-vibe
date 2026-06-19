@@ -1,88 +1,70 @@
-/**
- * UNBOTTLED image generation — relays to the UNBOTTLED cloud instance's own
- * image-generation endpoint with Bearer auth. Stateless: the remote charges
- * its own credits on the relay account; the local instance charges its
- * marked-up UNBOTTLED price (computed before dispatch).
- */
-
 import "server-only";
 
-import {
-  ErrorResponseTypes,
-  fail,
-  type ResponseType,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import {
-  absolutizeRemoteMediaUrl,
-  relayUnbottledMediaPost,
-} from "@/app/api/[locale]/agent/shared/unbottled-media-relay";
-import type { RemoteTarget } from "@/app/api/[locale]/remote-connection/transport";
+  checkMediaBalance,
+  deductMediaCredits,
+} from "@/app/api/[locale]/agent/shared/media-generation";
+import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation } from "../i18n";
-
-const RELAY_TIMEOUT_MS = 600_000;
+import definitions, {
+  type ImageGenerationPostRequestOutput,
+} from "../definition";
 
 export async function generateImageWithUnbottled(params: {
-  session: RemoteTarget;
-  providerModel: string;
-  prompt: string;
-  size: string;
-  quality: string;
-  aspectRatio?: string;
-  inputMediaUrl?: string;
+  input: ImageGenerationPostRequestOutput;
+  user: JwtPayloadType;
   logger: EndpointLogger;
   locale: CountryLanguage;
-}): Promise<ResponseType<{ imageUrl: string }>> {
-  const {
-    session,
-    providerModel,
-    prompt,
-    size,
-    quality,
-    aspectRatio,
-    inputMediaUrl,
-    logger,
-    locale,
-  } = params;
-  const { t } = scopedTranslation.scopedT(locale);
+  featureLabel: string;
+}): Promise<ResponseType<{ imageUrl: string; creditCost: number }>> {
+  const { input, user, logger, locale, featureLabel } = params;
 
-  const result = await relayUnbottledMediaPost<{ imageUrl?: string }>({
-    session,
-    endpointPath: "agent/image-generation",
-    body: {
-      prompt,
-      model: providerModel,
-      size,
-      quality,
-      aspectRatio,
-      inputMediaUrl,
-    },
-    timeoutMs: RELAY_TIMEOUT_MS,
-    logger,
+  const remoteResult = await RouteExecuteRepository.runAsSystemProvider({
+    definition: definitions.POST,
+    input,
+    user,
     locale,
+    logger,
   });
 
-  if (!result.success) {
-    return fail({
-      message: t("post.errors.requestFailed", {
-        message: "UNBOTTLED relay rejected the request",
-      }),
-      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-    });
+  if (!remoteResult.success) {
+    return remoteResult;
   }
-  const imageUrl = result.data.imageUrl;
-  if (!imageUrl) {
-    logger.warn("[UnbottledImage] Remote returned no imageUrl");
-    return fail({
-      message: t("post.errors.requestFailed", {
-        message: "UNBOTTLED relay returned no imageUrl",
-      }),
-      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-    });
+
+  const remoteCreditCost = remoteResult.data.creditCost ?? 0;
+  const creditCost =
+    Math.round(remoteCreditCost * (1 + STANDARD_MARKUP_PERCENTAGE) * 10) / 10;
+
+  const balanceCheck = await checkMediaBalance(
+    user,
+    creditCost,
+    locale,
+    logger,
+  );
+  if (!balanceCheck.success) {
+    return balanceCheck;
   }
-  return success({ imageUrl: absolutizeRemoteMediaUrl(session, imageUrl) });
+
+  const deductResult = await deductMediaCredits(
+    user,
+    creditCost,
+    featureLabel,
+    locale,
+    logger,
+    balanceCheck.data.tCredits,
+  );
+  if (!deductResult.success) {
+    return deductResult;
+  }
+
+  return {
+    success: true,
+    data: { imageUrl: remoteResult.data.imageUrl, creditCost },
+  };
 }

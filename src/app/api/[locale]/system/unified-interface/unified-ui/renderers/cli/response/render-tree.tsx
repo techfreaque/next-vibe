@@ -28,7 +28,7 @@ export function CliRenderTree({
 }): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <LoggerProvider locale={locale}>
+      <LoggerProvider locale={locale} availability={getEnvAvailability()}>
         <NavigationStackProvider>
           <EndpointRenderer
             endpoint={endpoint}

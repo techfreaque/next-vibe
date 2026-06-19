@@ -19,6 +19,11 @@ export const translations: typeof enTranslations = {
           "Maksymalny czas oczekiwania w milisekundach (0 dla domyślnego)",
         placeholder: "Wprowadź limit czasu",
       },
+      replacePage: {
+        label: "Zastąp istniejącą stronę",
+        description:
+          "Gdy true (domyślnie), zamyka wszystkie istniejące strony tej sesji przed otwarciem nowej — jeden tab na sesję. Gdy false, dodaje kolejny tab niezależnie od istniejących. Inne sesje pozostają nienaruszone.",
+      },
     },
   },
   response: {

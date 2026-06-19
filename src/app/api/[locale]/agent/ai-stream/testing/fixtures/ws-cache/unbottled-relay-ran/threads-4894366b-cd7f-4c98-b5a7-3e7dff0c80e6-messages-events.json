@@ -1,0 +1,5 @@
+{
+  "url": "ws://localhost:3002/ws?channel=agent%2Fchat%2Fthreads%2F4894366b-cd7f-4c98-b5a7-3e7dff0c80e6%2Fmessages",
+  "channel": "agent/chat/threads/4894366b-cd7f-4c98-b5a7-3e7dff0c80e6/messages",
+  "messages": []
+}

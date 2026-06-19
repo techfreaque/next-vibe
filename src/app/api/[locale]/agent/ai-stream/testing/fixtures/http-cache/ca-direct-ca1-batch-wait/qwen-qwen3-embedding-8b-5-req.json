@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/cron/-ca1--call-execute-tool-with----2bfc1448-a210-40e3-9d1a-b3ba97306e18.md\n\n# [CA1] Call execute-tool with...\nFolder: cron",
+    "encoding_format": "float"
+  }
+}

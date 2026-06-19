@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,
   CardContent,
@@ -14,29 +14,50 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
 import { Coins } from "next-vibe-ui/ui/icons/Coins";
-import { Gift } from "next-vibe-ui/ui/icons/Gift";
+import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
-import { Link } from "next-vibe-ui/ui/link";
-import { MotionDiv } from "next-vibe-ui/ui/motion";
+import { Span } from "next-vibe-ui/ui/span";
+import { H4, P } from "next-vibe-ui/ui/typography";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import {
-  useWidgetSelector,
-  useWidgetTranslation,
+  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetUser,
 } from "next-vibe-ui/unified/_shared/use-widget-context";
+import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import type { JSX } from "react";
+import { useState } from "react";
 
+import { scopedTranslation as subscriptionT } from "@/app/[locale]/subscription/i18n";
+import { chatModelDefinitions } from "@/app/api/[locale]/agent/ai-stream/models";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { imageGenModelDefinitions } from "@/app/api/[locale]/agent/image-generation/models";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
+import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
+  getProviderPrice,
+  isApiProviderAvailable,
+  type ModelDefinition,
+  modelProviders,
+} from "@/app/api/[locale]/agent/models/models";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
+import { musicGenModelDefinitions } from "@/app/api/[locale]/agent/music-generation/models";
+import { sttModelDefinitions } from "@/app/api/[locale]/agent/speech-to-text/models";
+import { ttsModelDefinitions } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { videoGenModelDefinitions } from "@/app/api/[locale]/agent/video-generation/models";
+import {
+  FEATURE_COSTS,
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
-import type definition from "./definition";
+import { CreditsTabHeader } from "./credits-tab-header";
 
 /**
  * Format credit amount for display
@@ -185,7 +206,8 @@ export function CreditsBalanceContainer(): JSX.Element {
   const widgetUser = useWidgetUser();
   const isAdmin =
     !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(isAdmin);
+  const availability = useProviderAvailability();
+  const totalModelCount = getAvailableModelCount(isAdmin, availability);
 
   return (
     <MotionDiv

@@ -34,6 +34,7 @@ import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { db } from "@/app/api/[locale]/system/db";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 

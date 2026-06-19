@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "System: [State boundary: the following was captured before this turn and may reflect an earlier tool-loop state]\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (16)\n│   ├── name.md [77%]\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── background.md [76%]\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── skills.md [76%]\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. --\n\nSystem: [Context: ID:1580da39 | Model:kimi-k2.6 | Skill:quality-tester | Posted:Jun 19, 16:28]\n\nAssistant: [tool:execute-tool] {\"toolName\":\"coding-agent\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Validation failed (1 error):\\n  • prompt: Invalid input: expected string, received undefined\"}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"coding-agent\",\"input\":{},\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Validation failed (1 error):\\n  • prompt: Invalid input: expected string, received undefined\"}\n\nAssistant: [tool:execute-tool] {\"toolName\":\"coding-agent\",\"input\":{\"interactiveMode\":false,\"prompt\":\"echo hello-co2\"},\"instanceId\":\"hermes\",\"callbackMode\":\"wait\"}\n\nTool: [result:execute-tool] {\"success\":false,\"message\":\"Tool Not Found\"}",
+    "encoding_format": "float"
+  }
+}

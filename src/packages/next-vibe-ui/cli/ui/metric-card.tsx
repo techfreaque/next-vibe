@@ -22,6 +22,7 @@ const VARIANT_COLOR: Record<MetricCardVariant, string | undefined> = {
   danger: "red",
   info: "blue",
   muted: undefined,
+  violet: "magenta",
 };
 
 const TREND_SYMBOL: Record<MetricCardTrend, string> = {

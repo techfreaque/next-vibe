@@ -226,7 +226,7 @@ function EndpointsPageInternal<
     };
     return navigationOverride ? { ...base, ...navigationOverride } : base;
   }, [
-    navigationOverride,
+    navigationOverrideRaw,
     navigationStack,
     navigationPush,
     navigationReplace,

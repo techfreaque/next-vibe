@@ -9,7 +9,6 @@
 
 import "server-only";
 
-import { jsonSchema, tool } from "ai";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -26,9 +25,9 @@ import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/co
 import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
+import { EXECUTE_TOOL_ALIAS } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -41,100 +40,130 @@ import type {
 } from "./definition";
 
 // ============================================================================
-// MODULE-LEVEL PENDING TOOL RESOLVERS
+// MODULE-LEVEL PENDING TOOL RESOLVERS + SHARED SUBSCRIBER
 // ============================================================================
 
 /**
  * Pending tool result resolvers.
- * Keyed by callId. When the remote AI loop calls a delegated tool, it registers
- * a resolver here and awaits it. When the local node broadcasts TOOL_EXECUTE_RESULT
- * on the messages channel, our WS subscription resolves the matching promise.
- * Scoped to this Next.js process - no Bun proxy involvement.
+ * Keyed by callId. Registered before TOOL_EXECUTE_REQUEST is emitted to avoid
+ * race conditions. Resolved by the shared subscriber when TOOL_EXECUTE_RESULT
+ * arrives on any thread channel.
  */
 const pendingToolWaiters = new Map<
   string,
   (result: WidgetData, error?: string) => void
 >();
 
-// ============================================================================
-// WS SUBSCRIPTION FOR RECEIVING TOOL RESULTS
-// ============================================================================
-
 /**
- * Open a WebSocket subscription to the messages channel on the local Bun proxy.
- * Returns a Promise that resolves with a cleanup function once the connection is
- * established and subscribed - guaranteeing no TOOL_EXECUTE_RESULT events are missed.
- * Rejects after 5 s if the local proxy isn't reachable.
+ * Shared persistent WS connection to the local Bun proxy.
+ * Subscribes to all channels on-demand as streams start; routes
+ * tool-execute-result events to pendingToolWaiters by callId.
+ * One connection reused across all concurrent WsProvider streams.
  */
-async function openToolResultSubscription(
-  channel: string,
-  logger: EndpointLogger,
-): Promise<() => void> {
-  const appUrl = process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
-  let wsPort: number;
-  try {
-    const parsed = new URL(appUrl);
-    const mainPort = parsed.port ? parseInt(parsed.port, 10) : 3000;
-    const disableProxy = process.env["VIBE_DISABLE_PROXY"] === "true";
-    wsPort = disableProxy ? mainPort + 1000 : mainPort;
-  } catch {
-    wsPort = 3000;
+let sharedSubscriber: SharedToolResultSubscriber | null = null;
+
+class SharedToolResultSubscriber {
+  private ws: WebSocket | null = null;
+  private stopped = false;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private reconnectAttempt = 0;
+  /** Channels we should be subscribed to */
+  private readonly subscribedChannels = new Set<string>();
+
+  private readonly wsUrl: string;
+  private readonly broadcastUrl: string;
+
+  constructor() {
+    const appUrl =
+      process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
+    let wsPort: number;
+    try {
+      const parsed = new URL(appUrl);
+      const mainPort = parsed.port ? parseInt(parsed.port, 10) : 3000;
+      const disableProxy = process.env["VIBE_DISABLE_PROXY"] === "true";
+      wsPort = disableProxy ? mainPort + 1000 : mainPort;
+    } catch {
+      wsPort = 3000;
+    }
+    // Use an unauthenticated URL — no token needed for server-side internal WS
+    // The channel auth is enforced server-side at subscribe time.
+    // We pass a stable leadId so the Bun proxy accepts the connection.
+    this.wsUrl = `ws://127.0.0.1:${wsPort}/ws?leadId=ws-provider-internal`;
+    this.broadcastUrl = `http://127.0.0.1:${wsPort}/ws/broadcast`;
   }
 
-  const wsUrl = `ws://127.0.0.1:${wsPort}/ws?channel=${encodeURIComponent(channel)}`;
+  get broadcastUrlValue(): string {
+    return this.broadcastUrl;
+  }
 
-  return new Promise<() => void>((resolve, reject) => {
-    let ws: WebSocket;
-    let closed = false;
+  /** Ensure the WS is connected and subscribed to a channel. Returns cleanup fn. */
+  subscribeChannel(channel: string): () => void {
+    this.subscribedChannels.add(channel);
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ type: "subscribe", channel }));
+    } else {
+      this.ensureConnected();
+    }
+    return () => {
+      this.subscribedChannels.delete(channel);
+    };
+  }
 
-    const connectionTimeout = setTimeout(() => {
-      closed = true;
+  stop(): void {
+    this.stopped = true;
+    if (this.reconnectTimer !== null) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    if (this.ws) {
       try {
-        ws.close();
+        this.ws.close();
       } catch {
         /* ignore */
       }
-      reject(new Error("[WsProvider] Tool result subscription timed out (5s)"));
-    }, 5_000);
+      this.ws = null;
+    }
+  }
 
-    try {
-      ws = new WebSocket(wsUrl);
-    } catch (err) {
-      clearTimeout(connectionTimeout);
-      reject(err);
+  private ensureConnected(): void {
+    if (this.ws || this.stopped) {
+      return;
+    }
+    this.connect();
+  }
+
+  private connect(): void {
+    if (this.stopped) {
       return;
     }
 
-    ws.addEventListener("open", (): void => {
-      clearTimeout(connectionTimeout);
-      if (closed) {
-        return;
-      }
-      ws.send(JSON.stringify({ type: "subscribe", channel }));
-      logger.debug("[WsProvider] Subscribed to tool-result channel", {
-        channel,
-      });
+    let ws: WebSocket;
+    try {
+      ws = new WebSocket(this.wsUrl);
+    } catch {
+      this.scheduleReconnect();
+      return;
+    }
 
-      // Resolve with cleanup function - AI stream may now start.
-      resolve((): void => {
-        closed = true;
-        try {
-          ws.close();
-        } catch {
-          /* Already closed */
-        }
-      });
+    this.ws = ws;
+
+    ws.addEventListener("open", (): void => {
+      this.reconnectAttempt = 0;
+      // Re-subscribe to all registered channels
+      for (const channel of this.subscribedChannels) {
+        ws.send(JSON.stringify({ type: "subscribe", channel }));
+      }
     });
 
-    ws.addEventListener("message", (event): void => {
+    ws.addEventListener("message", (event: MessageEvent): void => {
       try {
-        const msg = JSON.parse(
+        const raw =
           typeof event.data === "string"
             ? event.data
-            : new TextDecoder().decode(event.data as ArrayBuffer),
-        ) as WsWireMessage;
+            : new TextDecoder().decode(event.data as ArrayBuffer);
+        const msg = JSON.parse(raw) as WsWireMessage;
 
-        if (msg.channel !== channel || msg.event !== "tool-execute-result") {
+        if (msg.event !== "tool-execute-result") {
           return;
         }
 
@@ -147,24 +176,45 @@ async function openToolResultSubscription(
         if (waiter) {
           pendingToolWaiters.delete(eventData.callId);
           waiter(eventData.result, eventData.error);
-          logger.debug("[WsProvider] Tool result received", {
-            callId: eventData.callId,
-          });
         }
       } catch {
-        // Malformed message - ignore
+        // Malformed message — ignore
+      }
+    });
+
+    ws.addEventListener("close", (): void => {
+      this.ws = null;
+      if (!this.stopped && this.subscribedChannels.size > 0) {
+        this.scheduleReconnect();
       }
     });
 
     ws.addEventListener("error", (): void => {
-      clearTimeout(connectionTimeout);
-      if (!closed) {
-        logger.warn("[WsProvider] Tool result subscription WS error");
-        // If we haven't resolved yet, reject so the caller knows setup failed.
-        reject(new Error("[WsProvider] Tool result subscription WS error"));
-      }
+      // close event follows — reconnect handled there
     });
-  });
+  }
+
+  private scheduleReconnect(): void {
+    if (this.stopped || this.reconnectTimer !== null) {
+      return;
+    }
+    const BACKOFF = [500, 1000, 2000, 4000, 8000];
+    const delayMs =
+      BACKOFF[Math.min(this.reconnectAttempt, BACKOFF.length - 1)] ?? 8000;
+    this.reconnectAttempt++;
+    this.reconnectTimer = setTimeout((): void => {
+      this.reconnectTimer = null;
+      this.connect();
+    }, delayMs);
+  }
+}
+
+/** Get or create the module-level shared subscriber. */
+function getSharedSubscriber(): SharedToolResultSubscriber {
+  if (!sharedSubscriber) {
+    sharedSubscriber = new SharedToolResultSubscriber();
+  }
+  return sharedSubscriber;
 }
 
 // ============================================================================
@@ -173,11 +223,15 @@ async function openToolResultSubscription(
 
 /**
  * Build pass-through CoreTool definitions from client-provided tool specs.
- * Each tool's execute() emits TOOL_EXECUTE_REQUEST via publishWsEvent on the
- * messages channel, then awaits a TOOL_EXECUTE_RESULT event with the same callId.
- * The result arrives via the WS subscription opened in openToolResultSubscription().
+ * Each tool's execute() emits TOOL_EXECUTE_REQUEST via the local /ws/broadcast,
+ * then awaits a TOOL_EXECUTE_RESULT event with the same callId.
+ * Results arrive via the shared persistent WS subscriber (pendingToolWaiters).
+ *
+ * When instanceId + userId are provided, tool specs are filtered against the
+ * caller's capability snapshot (fail-closed when snapshot exists). This prevents
+ * a caller from injecting tool names that were never declared in their manifest.
  */
-function buildDelegatedTools(
+async function buildDelegatedTools(
   toolSpecs: Array<{
     name: string;
     description: string;
@@ -185,31 +239,58 @@ function buildDelegatedTools(
   }>,
   channel: string,
   logger: EndpointLogger,
-): Record<string, CoreTool> {
+  instanceId?: string,
+  userId?: string,
+): Promise<Record<string, CoreTool>> {
   const tools: Record<string, CoreTool> = {};
 
-  // Derive the broadcast URL for emitting events to the local WS server.
-  const appUrl = process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
-  let broadcastUrl: string;
-  try {
-    const parsed = new URL(appUrl);
-    const mainPort = parsed.port ? parseInt(parsed.port, 10) : 3000;
-    const disableProxy = process.env["VIBE_DISABLE_PROXY"] === "true";
-    const wsPort = disableProxy ? mainPort + 1000 : mainPort;
-    broadcastUrl = `http://127.0.0.1:${wsPort}/ws/broadcast`;
-  } catch {
-    broadcastUrl = "http://127.0.0.1:3000/ws/broadcast";
+  // Capability gate: filter specs against the caller's declared capability snapshot.
+  // If snapshot is present and non-empty, reject any tool not in the manifest.
+  // If snapshot is absent (not yet synced), allow all — fail-open on first connection.
+  let allowedToolNames: Set<string> | null = null;
+  if (instanceId && userId) {
+    const [connRow] = await db
+      .select({ capabilities: remoteConnections.capabilities })
+      .from(remoteConnections)
+      .where(
+        and(
+          eq(remoteConnections.userId, userId),
+          eq(remoteConnections.instanceId, instanceId),
+        ),
+      )
+      .limit(1);
+    if (connRow?.capabilities && connRow.capabilities.length > 0) {
+      allowedToolNames = new Set(connRow.capabilities.map((c) => c.toolName));
+    }
   }
 
+  // Use the shared subscriber's broadcast URL (already computed once).
+  const broadcastUrl = getSharedSubscriber().broadcastUrlValue;
+
   for (const spec of toolSpecs) {
+    if (allowedToolNames !== null && !allowedToolNames.has(spec.name)) {
+      logger.warn(
+        "[WsProvider] Dropping tool spec not in capability snapshot",
+        {
+          toolName: spec.name,
+          instanceId,
+        },
+      );
+      continue;
+    }
+
     const inputSchema = jsonSchema<Record<string, WidgetData>>(
       spec.parameters as Parameters<typeof jsonSchema>[0],
     );
     tools[spec.name] = tool({
       description: spec.description,
       inputSchema,
-      execute: async (args): Promise<WidgetData> => {
+      execute: async (args, executeOptions): Promise<WidgetData> => {
         const callId = crypto.randomUUID();
+        // The AI SDK toolCallId identifies this call's TOOL message on every
+        // instance that mirrors it - the executor binds background completions
+        // (detach/wakeUp) to that message.
+        const aiToolCallId = executeOptions?.toolCallId;
         logger.debug("[WsProvider] Delegating tool to local", {
           toolName: spec.name,
           callId,
@@ -229,10 +310,10 @@ function buildDelegatedTools(
             settled = true;
             pendingToolWaiters.delete(callId);
             resolveToolResult({
-              error: "Tool result timeout (120s)",
+              error: "Tool result timeout (300s)",
             });
           }
-        }, 120_000);
+        }, 300_000);
 
         pendingToolWaiters.set(callId, (result, error) => {
           if (!settled) {
@@ -251,7 +332,12 @@ function buildDelegatedTools(
             body: JSON.stringify({
               channel,
               event: "tool-execute-request",
-              data: { callId, toolName: spec.name, args },
+              data: {
+                callId,
+                toolName: spec.name,
+                args,
+                toolCallId: aiToolCallId,
+              },
             }),
           });
         } catch (emitErr) {
@@ -308,21 +394,25 @@ export class WsProviderStreamRepository {
       //    events; remote emits them here; local sends TOOL_EXECUTE_RESULT back.
       const channel = `agent/chat/threads/${threadId}/messages`;
 
-      // 3. Open WS subscription for receiving TOOL_EXECUTE_RESULT events from local.
-      //    Awaited so the connection is confirmed ready before the AI stream starts —
-      //    guarantees no tool results arrive before we're listening.
+      // 3. Subscribe to the thread channel via the shared persistent WS subscriber.
+      //    The shared subscriber reuses one WS connection for all concurrent streams.
+      //    Returns a cleanup fn that removes this channel from the subscriber's set.
       const closeSubscription: () => void =
         data.tools && data.tools.length > 0
-          ? await openToolResultSubscription(channel, logger)
+          ? getSharedSubscriber().subscribeChannel(channel)
           : (): void => {
               /* no-op: no delegated tools */
             };
 
-      // 4. Build delegated tools from client-provided specs.
+      // 4. Resolve userId for capability validation.
+      const userId =
+        "id" in user && typeof user.id === "string" ? user.id : undefined;
+
+      // 5. Build delegated tools from client-provided specs.
       //    All tools execute on local - remote emits the request and awaits the result.
       const toolsOverride =
         data.tools && data.tools.length > 0
-          ? buildDelegatedTools(
+          ? await buildDelegatedTools(
               data.tools as Array<{
                 name: string;
                 description: string;
@@ -330,28 +420,206 @@ export class WsProviderStreamRepository {
               }>,
               channel,
               logger,
+              data.instanceId ?? undefined,
+              userId,
             )
           : undefined;
 
-      // 5. Build AiStream-compatible data object
+      // 6. Provider-side persistence policy.
+      //    - Peer connection relay (REMOTE-folder loop): this instance OWNS the
+      //      running thread. When the wire threadMirrorMode includes the
+      //      provider side ('both'/'cloud') AND a peer connection entry exists
+      //      for the caller, persist under REMOTE/<caller instance> so the
+      //      loop's tool messages exist in DB (detach/wakeUp backfill, revival)
+      //      and the caller's mirror has a canonical source.
+      //    - Inference-provider relay (e.g. UNBOTTLED) and mirror modes that
+      //      exclude the provider: INCOGNITO - no DB writes, ephemeral session.
+      let effectiveRootFolderId: DefaultFolderId = DefaultFolderId.INCOGNITO;
+      let resolvedSubFolderId: string | null = null;
+      const providerPersists =
+        (data.threadMirrorMode === "both" ||
+          data.threadMirrorMode === "cloud") &&
+        data.instanceId &&
+        userId;
+      logger.warn("[WsProvider] persistence check", {
+        providerPersists: !!providerPersists,
+        threadMirrorMode: data.threadMirrorMode,
+        instanceId: data.instanceId,
+        userId,
+      });
+      if (providerPersists) {
+        const [peerRow] = await db
+          .select({ id: remoteConnections.id })
+          .from(remoteConnections)
+          .where(
+            and(
+              eq(remoteConnections.userId, userId),
+              eq(remoteConnections.instanceId, data.instanceId!),
+              eq(remoteConnections.isActive, true),
+            ),
+          )
+          .limit(1);
+        logger.warn("[WsProvider] peerRow lookup result", {
+          found: !!peerRow,
+          userId,
+          instanceId: data.instanceId,
+        });
+        if (peerRow) {
+          const { chatFolders } =
+            await import("@/app/api/[locale]/agent/chat/db");
+          const { isNull } = await import("drizzle-orm");
+
+          // Resolve or create BACKGROUND/<caller-instanceId> as the root sub-folder.
+          const [existingFolder] = await db
+            .select({ id: chatFolders.id })
+            .from(chatFolders)
+            .where(
+              and(
+                eq(chatFolders.userId, userId),
+                eq(chatFolders.rootFolderId, DefaultFolderId.BACKGROUND),
+                eq(chatFolders.name, data.instanceId!),
+                isNull(chatFolders.parentId),
+              ),
+            )
+            .limit(1);
+          let currentParentId: string;
+          if (existingFolder) {
+            currentParentId = existingFolder.id;
+          } else {
+            const [insertedFolder] = await db
+              .insert(chatFolders)
+              .values({
+                userId,
+                rootFolderId: DefaultFolderId.BACKGROUND,
+                name: data.instanceId!,
+                parentId: null,
+              })
+              .returning({ id: chatFolders.id });
+            currentParentId = insertedFolder!.id;
+          }
+
+          // Walk folderPath to create or resolve each nested sub-folder in order.
+          // folderPath mirrors the caller's sub-folder hierarchy (e.g. ["tests", "my-suite"]).
+          for (const segment of data.folderPath ?? []) {
+            const [existingSub] = await db
+              .select({ id: chatFolders.id })
+              .from(chatFolders)
+              .where(
+                and(
+                  eq(chatFolders.userId, userId),
+                  eq(chatFolders.rootFolderId, DefaultFolderId.BACKGROUND),
+                  eq(chatFolders.name, segment),
+                  eq(chatFolders.parentId, currentParentId),
+                ),
+              )
+              .limit(1);
+            if (existingSub) {
+              currentParentId = existingSub.id;
+            } else {
+              const [insertedSub] = await db
+                .insert(chatFolders)
+                .values({
+                  userId,
+                  rootFolderId: DefaultFolderId.BACKGROUND,
+                  name: segment,
+                  parentId: currentParentId,
+                })
+                .returning({ id: chatFolders.id });
+              currentParentId = insertedSub!.id;
+            }
+          }
+
+          resolvedSubFolderId = currentParentId;
+          effectiveRootFolderId = DefaultFolderId.BACKGROUND;
+          logger.debug(
+            "[WsProvider] Peer relay - persisting thread under BACKGROUND/<caller>",
+            {
+              instanceId: data.instanceId,
+              folderPath: data.folderPath,
+              subFolderId: resolvedSubFolderId,
+              threadMirrorMode: data.threadMirrorMode,
+            },
+          );
+        } else {
+          logger.warn(
+            "[WsProvider] threadMirrorMode requests provider persistence but no active peer connection entry exists - running INCOGNITO",
+            { instanceId: data.instanceId },
+          );
+        }
+      }
+
+      // 7. Build AiStream-compatible data object
       //    userMessageId is generated here (provider-side) - it becomes the
       //    server-assigned ID that flows to the client via MESSAGE_CREATED.
+      //    Attachments arrive base64-encoded and are rebuilt as File objects
+      //    so the stream pipeline handles them exactly like local uploads.
+      const wireAttachments = (data.attachments ?? []).map(
+        (att) =>
+          new File([Buffer.from(att.data, "base64")], att.filename, {
+            type: att.mimeType,
+          }),
+      );
+      // The OWNER keeps its own chain consistent. When this instance persists
+      // the thread (REMOTE-folder peer relay) and has inserted a COMPACTING
+      // message after the caller's wire parent since the caller last saw the
+      // thread, the new turn must chain through that compacting node — not
+      // off the now-superseded pre-compacting leaf (which would orphan the
+      // compacting message as a dead branch). Only the compacting case
+      // re-parents; intentional UI branches (retry/fork) are left untouched.
+      let resolvedParentMessageId: string | null = data.parentMessageId ?? null;
+      if (
+        effectiveRootFolderId !== DefaultFolderId.INCOGNITO &&
+        data.parentMessageId
+      ) {
+        const { chatMessages: ownMessages } =
+          await import("@/app/api/[locale]/agent/chat/db");
+        const { eq: ownEq } = await import("drizzle-orm");
+        const { db: ownDb } = await import("@/app/api/[locale]/system/db");
+        // Follow the compacting chain forward from the wire parent: while the
+        // current node has a compacting child, descend to it.
+        let cursor = data.parentMessageId;
+        for (let hop = 0; hop < 10; hop++) {
+          const children = await ownDb
+            .select({ id: ownMessages.id, metadata: ownMessages.metadata })
+            .from(ownMessages)
+            .where(ownEq(ownMessages.parentId, cursor));
+          const compactingChild = children.find(
+            (c) => c.metadata?.isCompacting === true,
+          );
+          if (!compactingChild) {
+            break;
+          }
+          cursor = compactingChild.id;
+          resolvedParentMessageId = compactingChild.id;
+        }
+      }
+
       const aiStreamData: AiStreamPostRequestOutput = {
         operation: "send",
-        rootFolderId: data.rootFolderId ?? DefaultFolderId.PRIVATE,
-        subFolderId: null,
+        rootFolderId: effectiveRootFolderId,
+        subFolderId: resolvedSubFolderId,
         threadId,
-        userMessageId: crypto.randomUUID(),
-        parentMessageId: null,
+        // Honour the caller's user-message id so the message persists under the
+        // same id on both sides — the threads sync round-trip is then idempotent
+        // (no duplicate orphan-root user message synced back to the caller).
+        userMessageId: data.userMessageId ?? crypto.randomUUID(),
+        // Owner-resolved leaf (see above) so the persisted thread is a single
+        // linked list on both sides even across this instance's compactions.
+        parentMessageId: resolvedParentMessageId,
         leafMessageId: null,
         content: data.content,
         role: ChatMessageRole.USER,
         model: data.model,
         skill: data.skill,
         favoriteConfig: null,
-        toolConfirmations: null,
-        messageHistory: [],
-        attachments: [],
+        toolConfirmations: data.toolConfirmations ?? null,
+        // Persisted peer threads read history from this instance's own DB -
+        // wire history only feeds stateless (incognito) relay sessions.
+        messageHistory:
+          effectiveRootFolderId === DefaultFolderId.INCOGNITO
+            ? (data.messageHistory ?? [])
+            : [],
+        attachments: wireAttachments,
         resumeToken: null,
         voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE_ID },
         audioInput: { file: null },
@@ -361,7 +629,7 @@ export class WsProviderStreamRepository {
         musicDuration: undefined,
       };
 
-      // 6. Call AiStreamRepository.createAiStream() with delegated tools.
+      // 8. Call AiStreamRepository.createAiStream() with delegated tools.
       //    If no tools provided, AI runs with no tools (pure inference).
       let result: Awaited<ReturnType<typeof AiStreamRepository.createAiStream>>;
       try {
@@ -375,6 +643,20 @@ export class WsProviderStreamRepository {
           subAgentDepth: 0,
           t,
           extraInstructions: data.systemPrompt,
+          // Carry the caller's favorite/skill confirmation gates to this loop —
+          // the provider has no favorite of its own, so without these the
+          // execute-tool gate never pauses a confirmation-required tool.
+          confirmationOverridesOverride:
+            data.confirmationOverrides
+              ?.filter(
+                (o): o is { toolId: string; requiresConfirmation: boolean } =>
+                  typeof o.toolId === "string" &&
+                  typeof o.requiresConfirmation === "boolean",
+              )
+              .map((o) => ({
+                toolId: o.toolId,
+                requiresConfirmation: o.requiresConfirmation,
+              })) ?? null,
           ...(toolsOverride ? { toolsOverride } : {}),
         });
       } finally {
@@ -388,7 +670,7 @@ export class WsProviderStreamRepository {
         });
       }
 
-      // 7. Return threadId and messageId
+      // 9. Return threadId and messageId
       // messageId is always set when headless: false (AiStreamPostResponseOutput)
       const messageId = result.data.messageId ?? "";
       return success({

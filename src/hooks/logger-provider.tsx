@@ -32,14 +32,21 @@ export function LoggerProvider({
   children,
 }: {
   locale: CountryLanguage;
+  availability: AgentEnvAvailability;
   children: ReactNode;
 }): JSX.Element {
   const logger = useMemo(() => {
-    const l = createClientLogger(false, Date.now(), locale, getOrCreateTabId());
+    const l = createClientLogger(
+      false,
+      Date.now(),
+      locale,
+      availability,
+      getOrCreateTabId(),
+    );
     setWsLogger(l);
     return l;
     // locale changes are rare but must re-create so API calls use correct path
-  }, [locale]);
+  }, [locale, availability]);
 
   return (
     <LoggerContext.Provider value={logger}>{children}</LoggerContext.Provider>

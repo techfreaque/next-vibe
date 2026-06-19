@@ -32,6 +32,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
+import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
   useWidgetNavigation,
@@ -42,6 +43,7 @@ import {
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { CreditsTabHeader } from "@/app/api/[locale]/credits/credits-tab-header";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { GITHUB_REPO_URL } from "@/config/constants";
 import { envClient } from "@/config/env-client";
@@ -191,7 +193,7 @@ function RenameSelfButton({
     e.stopPropagation();
     setIsLoading(true);
     try {
-      const defs = await import("../self/rename/definition");
+      const defs = await import("../self-rename/definition");
       navigate(defs.default.PATCH, {
         popNavigationOnSuccess: 1,
         renderInModal: true,

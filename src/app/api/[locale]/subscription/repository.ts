@@ -20,6 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { configScopedTranslation } from "@/config/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { getEnvAvailability } from "../agent/env-availability";
 import { getAvailableModelCount } from "../agent/models/all-models";
 import { createTrackingContext } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { scopedTranslation as checkoutScopedTranslation } from "../payment/checkout/i18n";
@@ -1000,7 +1001,10 @@ export class SubscriptionRepository {
                     userId,
                     leadId,
                     planName: t(subRecord.planId),
-                    totalModelCount: getAvailableModelCount(false),
+                    totalModelCount: getAvailableModelCount(
+                      false,
+                      getEnvAvailability(),
+                    ),
                   },
                   t,
                   locale: userLocale,

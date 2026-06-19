@@ -142,6 +142,7 @@ export const translations = {
         confirm: "Confirm",
         cancel: "Cancel",
         deny: "Deny",
+        runInBackground: "Run in background",
       },
       creditsUsed_one: "{{cost}} credit",
       creditsUsed_other: "{{cost}} credits",

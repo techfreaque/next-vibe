@@ -10,41 +10,26 @@
  * aggregate helpers (getModelCost, getAvailableModelCount, …).
  */
 
-import {
-  chatModelDefinitions,
-  type ChatModelOption,
-  chatModelOptions,
-} from "../ai-stream/models";
+import { chatModelDefinitions, chatModelOptions } from "../ai-stream/models";
 import {
   type AudioVisionModelOption,
   type ImageVisionModelOption,
   type VideoVisionModelOption,
 } from "../ai-stream/vision-models";
 import { ContentLevel } from "../chat/skills/enum";
-import { getEnvAvailability } from "../env-availability";
+import type { AgentEnvAvailability } from "../env-availability";
 import {
   imageGenModelDefinitions,
-  type ImageGenModelOption,
   imageGenModelOptions,
 } from "../image-generation/models";
 import {
   musicGenModelDefinitions,
-  type MusicGenModelOption,
   musicGenModelOptions,
 } from "../music-generation/models";
-import {
-  sttModelDefinitions,
-  type SttModelOption,
-  sttModelOptions,
-} from "../speech-to-text/models";
-import {
-  ttsModelDefinitions,
-  type TtsModelOption,
-  ttsModelOptions,
-} from "../text-to-speech/models";
+import { sttModelDefinitions, sttModelOptions } from "../speech-to-text/models";
+import { ttsModelDefinitions, ttsModelOptions } from "../text-to-speech/models";
 import {
   videoGenModelDefinitions,
-  type VideoGenModelOption,
   videoGenModelOptions,
 } from "../video-generation/models";
 import type { Modality } from "./enum";
@@ -53,15 +38,12 @@ import {
   type AnyModelOption,
   apiProviderDisplayNames,
   calculateCreditCost,
-  getModelPrice,
   isApiProviderAvailable,
   isModelProviderAvailable,
   type ModelDefinition,
   type ModelOptionBase,
   modelProviders,
 } from "./models";
-
-export { getModelPrice };
 
 /**
  * Full union of all model option types, including vision bridge models.
@@ -74,21 +56,6 @@ export type AnyModelOptionWithVision =
   | ImageVisionModelOption
   | VideoVisionModelOption
   | AudioVisionModelOption;
-
-// Re-export aggregate option types for consumers that need them
-export type {
-  AnyModelId,
-  AnyModelOption,
-  AudioVisionModelOption,
-  ChatModelOption,
-  ImageGenModelOption,
-  ImageVisionModelOption,
-  MusicGenModelOption,
-  SttModelOption,
-  TtsModelOption,
-  VideoGenModelOption,
-  VideoVisionModelOption,
-};
 
 // ============================================
 // CROSS-DOMAIN AGGREGATES
@@ -115,6 +82,7 @@ export const allModelDefinitions: ModelDefinition[] = [
 export function getModelDisplayName(
   model: AnyModelOption,
   isAdmin: boolean,
+  availability: AgentEnvAvailability,
 ): string {
   const def = allModelDefinitions.find((d) => d.name === model.name);
   if (!def) {
@@ -122,7 +90,7 @@ export function getModelDisplayName(
   }
   const availableProviders = (
     isAdmin ? def.providers : def.providers.filter((p) => !p.adminOnly)
-  ).filter((p) => isApiProviderAvailable(p.apiProvider, getEnvAvailability()));
+  ).filter((p) => isApiProviderAvailable(p.apiProvider, availability));
   if (availableProviders.length <= 1) {
     return model.name;
   }
@@ -167,7 +135,10 @@ export function getModelCost(
   );
 }
 
-export function getAvailableModelCount(isAdmin: boolean): number {
+export function getAvailableModelCount(
+  isAdmin: boolean,
+  availability: AgentEnvAvailability,
+): number {
   return allModelDefinitions.filter((def) => {
     const visibleProviders = isAdmin
       ? def.providers
@@ -180,14 +151,15 @@ export function getAvailableModelCount(isAdmin: boolean): number {
     }
     return visibleProviders.some((p) => {
       const option = allModelOptions.find((m) => m.id === p.id);
-      return option
-        ? isModelProviderAvailable(option, getEnvAvailability())
-        : false;
+      return option ? isModelProviderAvailable(option, availability) : false;
     });
   }).length;
 }
 
-export function getAvailableProviderCount(isAdmin: boolean): number {
+export function getAvailableProviderCount(
+  isAdmin: boolean,
+  availability: AgentEnvAvailability,
+): number {
   if (isAdmin) {
     return Object.keys(modelProviders).length;
   }
@@ -196,7 +168,7 @@ export function getAvailableProviderCount(isAdmin: boolean): number {
     const publicProviders = def.providers.filter((p) => !p.adminOnly);
     for (const p of publicProviders) {
       const option = allModelOptions.find((m) => m.id === p.id);
-      if (option && isModelProviderAvailable(option, getEnvAvailability())) {
+      if (option && isModelProviderAvailable(option, availability)) {
         availableProviderIds.add(def.by);
         break;
       }
@@ -213,6 +185,7 @@ export interface ModelCountsByContentLevel {
 
 export function getAvailableModelCountsByContentLevel(
   isAdmin: boolean,
+  availability: AgentEnvAvailability,
 ): ModelCountsByContentLevel {
   const counts: ModelCountsByContentLevel = {
     mainstream: 0,
@@ -231,9 +204,7 @@ export function getAvailableModelCountsByContentLevel(
       !isAdmin &&
       !visibleProviders.some((p) => {
         const option = allModelOptions.find((m) => m.id === p.id);
-        return option
-          ? isModelProviderAvailable(option, getEnvAvailability())
-          : false;
+        return option ? isModelProviderAvailable(option, availability) : false;
       })
     ) {
       continue;

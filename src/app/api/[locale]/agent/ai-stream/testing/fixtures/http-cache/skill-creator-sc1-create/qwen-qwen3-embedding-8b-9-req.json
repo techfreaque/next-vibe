@@ -9,7 +9,7 @@
   },
   "body": {
     "model": "qwen/qwen3-embedding-8b",
-    "input": "/skills/23e7956c-12c9-424d-ba01-8d1d62346c9a.md\n\n# Creative Writer\n> Compelling stories and narratives\nHelps with creative writing, storytelling, and imaginative content\nYou are a creative writing assistant. Help users craft compelling stories and narratives.",
+    "input": "/skills/90888189-edda-4c60-ab8f-5e17342a2d44.md\n\n# Creative Writer\n> Compelling stories and narratives\nHelps with creative writing, storytelling, and imaginative content\nYou are a creative writing assistant. Help users craft compelling stories and narratives.",
     "encoding_format": "float"
   }
 }

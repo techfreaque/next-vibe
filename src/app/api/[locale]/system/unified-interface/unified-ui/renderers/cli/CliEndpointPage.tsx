@@ -709,7 +709,7 @@ export async function renderInkEndpointPage<
 
   const instance = render(
     <InkErrorBoundary label={LABEL_INK_ROOT}>
-      <LoggerProvider locale={props.locale}>
+      <LoggerProvider locale={props.locale} availability={getEnvAvailability()}>
         <QueryProvider>
           <InkEndpointPage {...props} />
         </QueryProvider>

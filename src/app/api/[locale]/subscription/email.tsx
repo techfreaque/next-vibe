@@ -19,6 +19,7 @@ import {
 import type { ReactElement } from "react";
 import { z } from "zod";
 
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -468,7 +469,7 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
         userId: requestData.user?.id ?? user.id,
         leadId: requestData.user?.leadId ?? user.leadId,
         planName: requestData.planName ?? "",
-        totalModelCount: getAvailableModelCount(false),
+        totalModelCount: getAvailableModelCount(false, getEnvAvailability()),
       };
       const tracking = createTrackingContext(
         locale,

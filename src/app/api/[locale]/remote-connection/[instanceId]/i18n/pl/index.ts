@@ -39,6 +39,14 @@ export const translations: typeof enTranslations = {
       skills: "Umiejętności",
       favorites: "Ulubione",
       threads: "Wątki",
+      chat: "Chat",
+    },
+    liveSync: {
+      title: "Sync wydarzeń na żywo",
+      description:
+        "Zdarzenia w czasie rzeczywistym przekazywane między połączonymi instancjami.",
+      chatEvents: "Wiadomości czatu",
+      liveOnlyBadge: "Tylko relay na żywo",
     },
     cortexSection: "Cortex",
     cortexDescription: "Przeglądaj wspólny system plików tego połączenia.",
@@ -164,6 +172,7 @@ export const translations: typeof enTranslations = {
       skills: "Umiejętności",
       favorites: "Ulubione",
       threads: "Wątki",
+      chat: "Zdarzenia czatu",
     },
     reconnectNow: {
       label: "Połącz ponownie",

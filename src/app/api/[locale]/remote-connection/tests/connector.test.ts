@@ -398,6 +398,7 @@ if (_remoteUrl) {
               threads: true,
               memories: false,
               favorites: false,
+              chat: false,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -436,6 +437,7 @@ if (_remoteUrl) {
             threads: true,
             memories: false,
             favorites: false,
+            chat: false,
           } satisfies SyncScope,
         };
         openConnection(scopedConfig);
@@ -513,6 +515,7 @@ if (_remoteUrl) {
               threads: true,
               memories: true,
               favorites: true,
+              chat: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -542,6 +545,7 @@ if (_remoteUrl) {
               threads: true,
               memories: true,
               favorites: true,
+              chat: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -569,6 +573,7 @@ if (_remoteUrl) {
             threads: true,
             memories: true,
             favorites: true,
+            chat: true,
           } satisfies SyncScope,
         });
 
@@ -639,6 +644,7 @@ if (_remoteUrl) {
               skills: true,
               threads: true,
               memories: true,
+              chat: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -841,6 +847,7 @@ if (_remoteUrl) {
               skills: true,
               threads: true,
               memories: true,
+              chat: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })

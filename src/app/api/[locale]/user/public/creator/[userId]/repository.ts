@@ -175,7 +175,7 @@ export class CreatorProfileRepository {
             const modelRow = bestModel
               ? {
                   modelIcon: bestModel.icon,
-                  modelInfo: getModelDisplayName(bestModel, false),
+                  modelInfo: getModelDisplayName(bestModel, false, viewerAvailability),
                   modelProvider:
                     modelProviders[bestModel.provider]?.name ??
                     bestModel.provider,

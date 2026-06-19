@@ -6,6 +6,7 @@
 
 import React from "react";
 
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
 import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
@@ -46,7 +47,7 @@ export const signupNurtureInitialEmail: EmailTemplateFunction = ({
 
       <HumanText variant="body">
         {t("initial.modelChoice", {
-          modelCount: getAvailableModelCount(false),
+          modelCount: getAvailableModelCount(false, getEnvAvailability()),
         })}
       </HumanText>
 

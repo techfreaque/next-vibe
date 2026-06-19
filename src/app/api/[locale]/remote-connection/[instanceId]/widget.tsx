@@ -49,6 +49,7 @@ import {
   useWidgetEndpoint,
   useWidgetEndpointMutations,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetUser,
   useWidgetValue,
@@ -62,15 +63,18 @@ import { FormAlertWidget } from "next-vibe-ui/unified/interactive/form-alert/wid
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe-ui/unified/interactive/submit-button/widget";
 import type { JSX } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import connectDefinitions from "../connect/definition";
 import type { SyncScope } from "../db";
+import type { SyncProviderInfo } from "../sync-providers/definition";
+import syncProvidersDefinitions from "../sync-providers/definition";
 import type { default as definitionsType } from "./definition";
 import definitions from "./definition";
 import { scopedTranslation } from "./i18n";

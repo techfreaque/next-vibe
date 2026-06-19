@@ -100,8 +100,10 @@ export function shouldUseColors(): boolean {
     return false;
   }
 
-  // Disable colors if not in a TTY
-  if (!process.stdout?.isTTY) {
+  // Disable colors if not in a TTY.
+  // Access via globalThis with a cast to avoid Next.js Edge static analysis flagging `process.stdout`.
+  const proc = globalThis as { process?: { stdout?: { isTTY?: boolean } } };
+  if (!proc.process?.stdout?.isTTY) {
     return false;
   }
 

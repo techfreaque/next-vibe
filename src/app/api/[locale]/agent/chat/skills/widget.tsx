@@ -12,6 +12,7 @@ import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Maximize } from "next-vibe-ui/ui/icons/Maximize";
@@ -38,6 +39,12 @@ import {
   SelectValue,
 } from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
 import { withValue } from "next-vibe-ui/unified/_shared/field-helpers";
 import { usePickerCallback } from "next-vibe-ui/unified/_shared/picker-context";
 import {
@@ -54,7 +61,7 @@ import { SeparatorWidget } from "next-vibe-ui/unified/display-only/separator/wid
 import TextWidget from "next-vibe-ui/unified/display-only/text/widget";
 import { Icon } from "next-vibe-ui/unified/form-fields/icon-field/icons";
 import { NavigateButtonWidget } from "next-vibe-ui/unified/interactive/navigate-button/widget";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
@@ -64,7 +71,10 @@ import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/share
 
 import { cn } from "../../../shared/utils";
 import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/selector/selector-onboarding/context";
-import { useAddToFavorites } from "../favorites/create/hooks";
+import {
+  useAddToFavorites,
+  useFavoriteCreate,
+} from "../favorites/create/hooks";
 import { useChatFavorites } from "../favorites/hooks/hooks";
 import { useChatSettings } from "../settings/hooks";
 import { parseSkillId } from "../slugify";

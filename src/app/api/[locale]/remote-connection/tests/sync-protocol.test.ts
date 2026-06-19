@@ -507,7 +507,7 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
 
     const testProvider: SyncProvider = {
       key: testKey,
-      labelI18nKey: "test.label",
+      labelKey: "test.label",
       async getCursor() {
         return { updatedAt: new Date(0).toISOString() };
       },
@@ -922,6 +922,7 @@ if (_remoteUrl) {
               threads: true,
               memories: true,
               favorites: true,
+              chat: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })
@@ -1005,6 +1006,7 @@ if (_remoteUrl) {
               threads: true,
               memories: true,
               favorites: true,
+              chat: true,
             } satisfies SyncScope,
             updatedAt: new Date(),
           })

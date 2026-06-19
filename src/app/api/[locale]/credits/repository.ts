@@ -83,7 +83,7 @@ import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
 import { withTransaction } from "../system/db/utils/repository-helpers";
-import { createEndpointEmitter } from "../system/unified-interface/websocket/endpoint-emitter";
+import { createEndpointEmitter } from "../system/unified-interface/websocket/emitter";
 import { FREE_CREDIT_POOL } from "./constants";
 import {
   creditPacks,

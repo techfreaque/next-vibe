@@ -45,6 +45,7 @@ import { useForm } from "react-hook-form";
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
+import { endpoints as dismissTaskEndpoints } from "@/app/api/[locale]/system/unified-interface/execute-tool/dismiss-task/definition";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

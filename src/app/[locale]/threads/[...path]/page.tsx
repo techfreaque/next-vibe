@@ -16,7 +16,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
-import aiStreamDefinition from "@/app/api/[locale]/agent/ai-stream/stream/definition";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import type { FolderContentsResponseOutput } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
@@ -28,8 +27,6 @@ import { ChatFoldersRepository } from "@/app/api/[locale]/agent/chat/folders/[ro
 import { RootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/root-permissions/repository";
 import { FolderRepository } from "@/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/repository";
 import type { RootFolderPermissions } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { ChatBootProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import type { PublicFeedGetResponseOutput } from "@/app/api/[locale]/agent/chat/public-feed/definition";
 import { FeedSortMode } from "@/app/api/[locale]/agent/chat/public-feed/definition";
 import { scopedTranslation as publicFeedScopedTranslation } from "@/app/api/[locale]/agent/chat/public-feed/i18n";
@@ -53,7 +50,6 @@ import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/defini
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { scopedTranslation as userScopedTranslation } from "@/app/api/[locale]/user/i18n";
@@ -61,6 +57,8 @@ import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { ThreadsPageClient } from "./page-client";
 
 interface ThreadsPathPageProps {
   params: Promise<{
@@ -456,64 +454,14 @@ export async function tanstackLoader({
   };
 }
 
-export function TanstackPage({
-  locale,
-  user,
-  creditsToUse,
-  initialRootFolderId,
-  initialSubFolderId,
-  initialThreadId,
-  rootFolderPermissions,
-  leafMessageId,
-  initialFoldersData,
-  initialThreadsData,
-  initialMessagesData,
-  initialPathData,
-  initialSettingsData,
-  initialSkillData,
-  initialPublicFeedData,
-  initialFolderContentsData,
-  initialSubFolderContentsData,
-}: ThreadsPathPageData): JSX.Element {
-  const { t: userT } = userScopedTranslation.scopedT(locale);
+export function TanstackPage(data: ThreadsPathPageData): JSX.Element {
+  const { t: userT } = userScopedTranslation.scopedT(data.locale);
 
-  if (!user) {
+  if (!data.user) {
     return <Div>{userT("auth.errors.unknownError")}</Div>;
   }
 
-  return (
-    <ChatNavigationProvider
-      activeThreadId={initialThreadId}
-      currentRootFolderId={initialRootFolderId}
-      currentSubFolderId={initialSubFolderId}
-      leafMessageId={initialPathData?.resolvedLeafMessageId ?? leafMessageId}
-    >
-      <ChatBootProvider
-        activeThreadId={initialThreadId}
-        currentRootFolderId={initialRootFolderId}
-        currentSubFolderId={initialSubFolderId}
-        initialCredits={creditsToUse}
-        rootFolderPermissions={rootFolderPermissions}
-        initialFoldersData={initialFoldersData}
-        initialThreadsData={initialThreadsData}
-        initialMessagesData={initialMessagesData}
-        initialPathData={initialPathData}
-        initialSettingsData={initialSettingsData}
-        initialSkillData={initialSkillData}
-        initialPublicFeedData={initialPublicFeedData}
-        initialFolderContentsData={initialFolderContentsData}
-        initialSubFolderContentsData={initialSubFolderContentsData}
-        initialSubFolderId={initialSubFolderId}
-      >
-        <EndpointsPage
-          endpoint={aiStreamDefinition}
-          locale={locale}
-          user={user}
-          className="flex flex-col h-dvh w-full"
-        />
-      </ChatBootProvider>
-    </ChatNavigationProvider>
-  );
+  return <ThreadsPageClient {...data} user={data.user} />;
 }
 
 export default async function ThreadsPathPage({

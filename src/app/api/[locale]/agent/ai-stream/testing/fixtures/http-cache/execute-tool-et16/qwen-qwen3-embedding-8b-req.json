@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "---\nthreadId: \"97a7abd7-2a08-48ed-a8ce-55025862d74d\"\ntitle: \"Remote Stream\"\nstatus: \"enums.threadStatus.active\"\nrootFolder: \"remote\"\ncreated: \"2026-06-19T16:06:38.414Z\"\nupdated: \"2026-06-19T16:06:48.301Z\"\n---\n\n**User** (2026-06-19 16:06):\n[T-SYS] What is your instance ID? Look at your system prompt — it contains the identity of the server you are running on. Reply with ONLY the instance ID string, nothing else.\n\n**Assistant** [kimi-k2.6] (2026-06-19 16:06):\n<think>The user is asking for my instance ID. Looking at the system context, under \"System Context\" it clearly states:\n\n**Instance:** Self-hosted / local (unbottled.ai)\n**URL:** http://localhost:3002\n**Instance ID:** hermes\n\nThe user wants ONLY the instance ID string, nothing else. So I should reply with just \"hermes\".</think>hermes",
+    "encoding_format": "float"
+  }
+}

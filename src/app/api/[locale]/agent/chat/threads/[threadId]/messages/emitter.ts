@@ -30,7 +30,7 @@ import {
   broadcastLiveMessageEvent,
   createBatchingEmitter,
 } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
-import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/endpoint-emitter";
+import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 

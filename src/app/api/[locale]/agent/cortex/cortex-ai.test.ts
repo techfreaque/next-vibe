@@ -61,6 +61,7 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";
+import { parseFrontmatter } from "./repository";
 
 // ── Verdict helpers ──────────────────────────────────────────────────────────
 
@@ -2279,6 +2280,7 @@ describe("Cortex System Prompt Injection", () => {
           nodeType: CortexNodeType.FILE,
           content,
           size,
+          frontmatter,
         })
         .onConflictDoUpdate({
           target: [cortexNodes.userId, cortexNodes.path],

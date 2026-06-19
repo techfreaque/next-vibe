@@ -1,13 +1,10 @@
-/**
- * Chat Messages API Route Handler
- * Handles GET and POST requests for messages in a thread
- */
+import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { MessagesRepository } from "./repository";
+import { messagesOnRemoteEvent, MessagesRepository } from "./repository";
 
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
@@ -22,15 +19,15 @@ export const { GET, POST, tools } = endpointsHandler({
       }
 
       const { db } = await import("@/app/api/[locale]/system/db");
-      const { chatFolders, chatThreads } = await import("../../../db");
+      const { chatFolders, chatThreads: threads } = await import("../../../db");
       const { eq } = await import("drizzle-orm");
       const { canViewThread } =
         await import("../../../permissions/permissions");
 
       const [thread] = await db
         .select()
-        .from(chatThreads)
-        .where(eq(chatThreads.id, threadId))
+        .from(threads)
+        .where(eq(threads.id, threadId))
         .limit(1);
       if (!thread) {
         return true;
@@ -45,6 +42,7 @@ export const { GET, POST, tools } = endpointsHandler({
         : null;
       return canViewThread(user, thread, folder, logger, "en-US");
     },
+    onRemoteEvent: messagesOnRemoteEvent,
   },
   [Methods.POST]: {
     email: undefined,

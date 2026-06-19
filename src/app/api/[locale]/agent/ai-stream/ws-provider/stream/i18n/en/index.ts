@@ -51,7 +51,12 @@ export const translations = {
       threadMirrorMode: {
         label: "Thread Mirror Mode",
         description:
-          "Where the thread is stored: both sides, caller only, provider only, or nowhere. 'both'/'cloud' make this instance persist the thread under REMOTE/<caller instance>.",
+          "Where the thread is stored: both sides, caller only, provider only, or nowhere. 'both'/'cloud' make this instance persist the thread under BACKGROUND/<caller instance>.",
+      },
+      folderPath: {
+        label: "Folder Path",
+        description:
+          "Ordered list of sub-folder names to create under BACKGROUND/<caller instance> on this instance (e.g. ['tests', 'my-suite']). Mirrors the caller's folder hierarchy.",
       },
       userMessageId: {
         label: "User Message ID",

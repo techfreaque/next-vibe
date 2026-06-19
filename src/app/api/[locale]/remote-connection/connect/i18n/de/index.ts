@@ -84,6 +84,7 @@ export const translations: typeof enTranslations = {
       skills: "Skills",
       favorites: "Favoriten",
       threads: "Threads",
+      chat: "Chat",
       defaultNote:
         "Standardmäßig alles deaktiviert. Nach dem Verbinden aktivierbar.",
     },

@@ -8,7 +8,7 @@ import {
 import { chatModelOptions } from "@/app/api/[locale]/agent/ai-stream/models";
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { imageGenModelOptions } from "@/app/api/[locale]/agent/image-generation/models";
-import { getModelPrice } from "@/app/api/[locale]/agent/models/all-models";
+import { getModelPrice } from "@/app/api/[locale]/agent/models/models";
 import {
   type AnyModelOption,
   ApiProvider,

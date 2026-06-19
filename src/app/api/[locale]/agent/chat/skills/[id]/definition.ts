@@ -8,7 +8,6 @@ import { z } from "zod";
 
 import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
 import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -367,7 +366,7 @@ const { PATCH } = createEndpoint({
         );
 
         // Optimistically update the skill in the list
-        const availability = await getInstanceAvailability();
+        const { availability } = data;
         apiClient.updateEndpointData(
           skillsDefinition.default.GET,
           data.logger,

@@ -14,14 +14,8 @@ import {
 
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { isSelfRelayUrl } from "@/app/api/[locale]/agent/shared/unbottled-media-relay";
-import {
-  getVideoGenModelById,
-  getVideoGenModelForProvider,
-  type VideoGenModelOption,
-} from "@/app/api/[locale]/agent/video-generation/models";
+import { getVideoGenModelById } from "@/app/api/[locale]/agent/video-generation/models";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
-import type { RemoteTarget } from "@/app/api/[locale]/remote-connection/transport";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -30,9 +24,9 @@ import {
   checkMediaBalance,
   deductMediaCredits,
 } from "../shared/media-generation";
-import type {
-  VideoGenerationPostRequestOutput,
-  VideoGenerationPostResponseOutput,
+import {
+  type VideoGenerationPostRequestOutput,
+  type VideoGenerationPostResponseOutput,
 } from "./definition";
 import type { VideoGenerationT } from "./i18n";
 import { generateVideoWithModelsLab } from "./providers/modelslab";
@@ -173,89 +167,44 @@ export class VideoGenerationRepository {
     }
     const { tCredits } = balanceCheck.data;
 
-    // UNBOTTLED relay resolution (spec: UNBOTTLED Provider). Self-relay
-    // dispatches in-process via the cheapest non-UNBOTTLED entry while the
-    // marked-up UNBOTTLED creditCost (computed above) still applies.
-    let dispatchModel: VideoGenModelOption = videoModel;
-    let inferenceTarget: RemoteTarget | null = null;
-    if (videoModel.apiProvider === ApiProvider.UNBOTTLED) {
-      if (!user.isPublic && "id" in user) {
-        const { RemoteTransport } =
-          await import("@/app/api/[locale]/remote-connection/transport");
-        inferenceTarget = await RemoteTransport.resolveInferenceProvider({
-          userId: user.id,
+    let generationResult: ResponseType<{
+      videoUrl: string;
+      creditCost?: number;
+      durationSeconds?: number;
+    }>;
+    switch (videoModel.apiProvider) {
+      case ApiProvider.MODELSLAB:
+        generationResult = await generateVideoWithModelsLab({
+          providerModel: videoModel.providerModel,
+          prompt: data.prompt,
+          durationSeconds,
+          aspectRatio: data.aspectRatio,
+          resolution: data.resolution,
+          inputImageUrl: data.inputMediaUrl,
           logger,
+          locale,
         });
-      }
-      if (!inferenceTarget) {
+        break;
+
+      case ApiProvider.UNBOTTLED:
+        generationResult = await generateVideoWithUnbottled({
+          input: data,
+          user,
+          locale,
+          logger,
+          featureLabel: t("post.title"),
+        });
+        break;
+
+      default:
         return fail({
           message: t("post.errors.notConfigured", {
             label: videoModel.apiProvider,
             envKey: "N/A",
-            url: "https://unbottled.ai",
+            url: "",
           }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
-      }
-      if (isSelfRelayUrl(inferenceTarget.remoteUrl)) {
-        const underlying = getVideoGenModelForProvider(
-          data.model,
-          ApiProvider.MODELSLAB,
-        );
-        if (!underlying) {
-          return fail({
-            message: t("post.errors.notConfigured", {
-              label: videoModel.apiProvider,
-              envKey: "N/A",
-              url: "https://unbottled.ai",
-            }),
-            errorType: ErrorResponseTypes.BAD_REQUEST,
-          });
-        }
-        dispatchModel = underlying;
-        inferenceTarget = null;
-      }
-    }
-
-    let generationResult: ResponseType<{ videoUrl: string }>;
-
-    if (inferenceTarget) {
-      generationResult = await generateVideoWithUnbottled({
-        session: inferenceTarget,
-        providerModel: dispatchModel.providerModel,
-        prompt: data.prompt,
-        duration: data.duration,
-        aspectRatio: data.aspectRatio,
-        resolution: data.resolution,
-        inputMediaUrl: data.inputMediaUrl,
-        logger,
-        locale,
-      });
-    } else {
-      switch (dispatchModel.apiProvider) {
-        case ApiProvider.MODELSLAB:
-          generationResult = await generateVideoWithModelsLab({
-            providerModel: dispatchModel.providerModel,
-            prompt: data.prompt,
-            durationSeconds,
-            aspectRatio: data.aspectRatio,
-            resolution: data.resolution,
-            inputImageUrl: data.inputMediaUrl,
-            logger,
-            locale,
-          });
-          break;
-
-        default:
-          return fail({
-            message: t("post.errors.notConfigured", {
-              label: dispatchModel.apiProvider,
-              envKey: "N/A",
-              url: "N/A",
-            }),
-            errorType: ErrorResponseTypes.BAD_REQUEST,
-          });
-      }
     }
 
     if (!generationResult.success) {
@@ -268,6 +217,9 @@ export class VideoGenerationRepository {
     }
 
     let { videoUrl } = generationResult.data;
+    const finalDurationSeconds =
+      generationResult.data.durationSeconds ?? durationSeconds;
+    const finalCreditCost = generationResult.data.creditCost ?? creditCost;
 
     // Upload to our storage so the URL is persistent and access-controlled
     if (streamContext.threadId) {
@@ -296,28 +248,30 @@ export class VideoGenerationRepository {
       }
     }
 
-    const deductResult = await deductMediaCredits(
-      user,
-      creditCost,
-      t("post.title"),
-      locale,
-      logger,
-      tCredits,
-    );
-    if (!deductResult.success) {
-      return deductResult;
+    if (videoModel.apiProvider !== ApiProvider.UNBOTTLED) {
+      const deductResult = await deductMediaCredits(
+        user,
+        finalCreditCost,
+        t("post.title"),
+        locale,
+        logger,
+        tCredits,
+      );
+      if (!deductResult.success) {
+        return deductResult;
+      }
     }
 
     logger.debug("[VideoGen] Video generated successfully", {
       model: data.model,
-      creditCost,
-      durationSeconds,
+      creditCost: finalCreditCost,
+      durationSeconds: finalDurationSeconds,
     });
 
     return success({
       videoUrl,
-      creditCost,
-      durationSeconds,
+      creditCost: finalCreditCost,
+      durationSeconds: finalDurationSeconds,
     });
   }
 }

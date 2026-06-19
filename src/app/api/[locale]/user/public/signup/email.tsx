@@ -13,6 +13,7 @@ import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
 
+import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
@@ -461,7 +462,7 @@ async function renderWelcomeEmailByEmail(
     privateName: user.privateName,
     userId: user.id,
     leadId: user.leadId,
-    totalModelCount: getAvailableModelCount(false),
+    totalModelCount: getAvailableModelCount(false, getEnvAvailability()),
   };
   const { t: globalT } = configScopedTranslation.scopedT(locale);
 

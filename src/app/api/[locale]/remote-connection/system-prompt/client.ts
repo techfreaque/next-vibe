@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 
 import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
 import remoteConnectionEndpoints from "@/app/api/[locale]/remote-connection/list/definition";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
@@ -18,7 +19,8 @@ export function useRemoteInstancesData(
   const { enabledPrivate, logger, user, locale } = params;
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(isAdmin);
+  const availability = useProviderAvailability();
+  const totalModelCount = getAvailableModelCount(isAdmin, availability);
   const isLocalMode =
     envClient.NEXT_PUBLIC_LOCAL_MODE || envClient.NODE_ENV !== "production";
   const isDev = envClient.NODE_ENV !== "production";

@@ -22,6 +22,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import { z } from "zod";
 
 import {
   makeHeadlessContext,
@@ -36,11 +37,13 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { AiT } from "@/app/api/[locale]/system/unified-interface/ai/i18n";
+import type { ToolReportTarget } from "@/app/api/[locale]/system/unified-interface/execute-tool/tool-executor";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { formatValidationErrorCompact } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
 import {
@@ -58,6 +61,7 @@ import {
   TaskOutputMode,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler";
+import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -1631,9 +1635,8 @@ export class RouteExecuteRepository {
       callbackMode?: CallbackModeValue;
       user: JwtPayloadType;
       locale: CountryLanguage;
-      logger?: EndpointLogger;
+      logger: EndpointLogger;
       streamContext?: ToolExecutionContext;
-      platform: Platform;
     } & (TDef["types"]["RequestOutput"] extends never
       ? { input?: never }
       : { input: TDef["types"]["RequestOutput"] }) &
@@ -1669,7 +1672,7 @@ export class RouteExecuteRepository {
         locale: rest.locale,
         logger,
         streamContext,
-        platform: rest.platform,
+        platform: Platform.NEXT_API,
       });
       // Type boundary: runInProcess returns ResponseType<WidgetData>; caller gets typed view.
       return routingResult as ResponseType<TDef["types"]["ResponseOutput"]>;
@@ -1700,7 +1703,7 @@ export class RouteExecuteRepository {
       user: rest.user,
       locale: rest.locale,
       logger,
-      platform: rest.platform,
+      platform: rest.platform ?? Platform.NEXT_API,
       streamContext,
     });
   }
@@ -1708,7 +1711,7 @@ export class RouteExecuteRepository {
   /**
    * Execute a tool locally and POST tool-execute-result back to a remote /ws/broadcast.
    *
-   * Used by relay handlers (HeadlessRelayProcessor, unbottled-stream-handler) when the
+   * Used by relay handlers (HeadlessRelayProcessor) when the
    * remote AI loop sends a tool-execute-request and needs the result to continue.
    * Centralises what was previously duplicated in both handlers.
    */
@@ -1779,5 +1782,45 @@ export class RouteExecuteRepository {
       error,
       logger,
     });
+  }
+
+  /**
+   * Run an endpoint in-process as the system (CRON) user with ADMIN role.
+   * Shorthand for runInProcessTyped when there is no real user context — cron
+   * tasks, seeding, background jobs, etc.
+   *
+   * All params are forwarded to runInProcessTyped; `user` is provided internally.
+   * Platform defaults to Platform.CRON.
+   */
+  static async runAsSystemProvider<TDef extends CreateApiEndpointAny>(
+    params: {
+      definition: TDef;
+      locale: CountryLanguage;
+      logger: EndpointLogger;
+      streamContext?: ToolExecutionContext;
+    } & (TDef["types"]["RequestOutput"] extends never
+      ? { input?: never }
+      : { input: TDef["types"]["RequestOutput"] }) &
+      (TDef["types"]["UrlVariablesOutput"] extends never
+        ? { urlPathParams?: never }
+        : { urlPathParams: TDef["types"]["UrlVariablesOutput"] }),
+  ): Promise<ResponseType<TDef["types"]["ResponseOutput"]>> {
+    const systemUser: JwtPayloadType = {
+      id: "system-provider",
+      leadId: "system-provider-lead",
+      isPublic: false,
+      roles: [UserPermissionRole.ADMIN],
+    };
+    const { platform, definition, input, urlPathParams, locale, logger, streamContext } = params;
+    return RouteExecuteRepository.runInProcessTyped({
+      definition,
+      input,
+      urlPathParams,
+      user: systemUser,
+      locale,
+      logger,
+      streamContext,
+      platform: platform ?? Platform.CRON,
+    } as Parameters<typeof RouteExecuteRepository.runInProcessTyped>[0]);
   }
 }

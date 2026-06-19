@@ -27,6 +27,7 @@ const variantClasses: Record<MetricCardVariant, string> = {
   danger: "text-destructive",
   info: "text-info",
   muted: "text-muted-foreground",
+  violet: "text-violet-600",
 };
 
 const trendColors: Record<MetricCardTrend, string> = {

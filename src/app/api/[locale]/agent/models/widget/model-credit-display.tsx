@@ -41,8 +41,9 @@ import {
   COMPACT_TRIGGER,
   COMPACT_TRIGGER_PERCENTAGE,
 } from "../../ai-stream/repository/core/constants";
-import { getCreditCostFromModel, getModelPrice } from "../all-models";
+import { getCreditCostFromModel } from "../all-models";
 import { scopedTranslation } from "../i18n";
+import { getModelPrice } from "../models";
 import {
   type AnyModelId,
   type AnyModelOption,

@@ -9,7 +9,8 @@ export type MetricCardVariant =
   | "warning"
   | "danger"
   | "info"
-  | "muted";
+  | "muted"
+  | "violet";
 
 export type MetricCardTrend = "up" | "down" | "neutral";
 
@@ -24,6 +25,7 @@ export type MetricCardProps = {
   trend?: MetricCardTrend;
   trendValue?: string;
   format?: MetricCardFormat;
+  colored?: boolean;
 } & StyleType;
 
 const variantClasses: Record<MetricCardVariant, string> = {
@@ -33,6 +35,38 @@ const variantClasses: Record<MetricCardVariant, string> = {
   danger: "text-destructive",
   info: "text-info",
   muted: "text-muted-foreground",
+  violet: "text-violet-600 dark:text-violet-300",
+};
+
+const coloredBgClasses: Record<MetricCardVariant, string> = {
+  default: "bg-card border-border",
+  success: "bg-success/10 border-success/30",
+  warning: "bg-warning/10 border-warning/30",
+  danger: "bg-destructive/10 border-destructive/30",
+  info: "bg-info/10 border-info/30",
+  muted: "bg-muted/30 border-border",
+  violet:
+    "bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800",
+};
+
+const coloredIconClasses: Record<MetricCardVariant, string> = {
+  default: "text-muted-foreground",
+  success: "text-success",
+  warning: "text-warning",
+  danger: "text-destructive",
+  info: "text-info",
+  muted: "text-muted-foreground",
+  violet: "text-violet-600 dark:text-violet-300",
+};
+
+const coloredDescClasses: Record<MetricCardVariant, string> = {
+  default: "text-muted-foreground",
+  success: "text-success/70",
+  warning: "text-warning/70",
+  danger: "text-destructive/70",
+  info: "text-info/70",
+  muted: "text-muted-foreground/70",
+  violet: "text-violet-500 dark:text-violet-400",
 };
 
 const trendIcons: Record<MetricCardTrend, string> = {
@@ -84,6 +118,7 @@ export function MetricCard({
   trend,
   trendValue,
   format,
+  colored = false,
   className,
   style,
 }: MetricCardProps): React.JSX.Element {
@@ -92,15 +127,32 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        "flex flex-col gap-1 rounded-lg border bg-card px-4 py-3 min-w-0",
+        "flex flex-col gap-1 rounded-lg border px-4 py-3 min-w-0",
+        colored ? coloredBgClasses[variant] : "bg-card",
         className,
       )}
       style={style}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs text-muted-foreground truncate">{label}</span>
+        <span
+          className={cn(
+            "text-xs font-medium truncate",
+            colored ? coloredIconClasses[variant] : "text-muted-foreground",
+          )}
+        >
+          {label}
+        </span>
         {icon ? (
-          <div className="flex-shrink-0 text-muted-foreground/50">{icon}</div>
+          <div
+            className={cn(
+              "flex-shrink-0",
+              colored
+                ? coloredIconClasses[variant]
+                : "text-muted-foreground/50",
+            )}
+          >
+            {icon}
+          </div>
         ) : null}
       </div>
       <div className="flex items-baseline gap-2">
@@ -125,7 +177,14 @@ export function MetricCard({
         ) : null}
       </div>
       {description ? (
-        <span className="text-xs text-muted-foreground">{description}</span>
+        <span
+          className={cn(
+            "text-xs",
+            colored ? coloredDescClasses[variant] : "text-muted-foreground",
+          )}
+        >
+          {description}
+        </span>
       ) : null}
     </div>
   );

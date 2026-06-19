@@ -393,6 +393,7 @@ export function installWsFixture(): void {
       const urlStr = typeof url === "string" ? url : url.toString();
       this.url = urlStr;
       const channel = extractChannel(urlStr);
+
       const contextSlug = slugify(channel.split("/").slice(-3).join("-"));
       const callIndex = nextWsCallIndex(contextSlug);
       const stem = fixtureStem(contextSlug, callIndex);
@@ -472,7 +473,7 @@ export function installWsFixture(): void {
   }
 
   // Object.defineProperty bypasses TS type checking on globalThis assignments.
-  // WsInterceptor matches the runtime contract used by unbottled-stream-handler.
+  // WsInterceptor matches the runtime contract used by HeadlessRelayProcessor.
   Object.defineProperty(globalThis, "WebSocket", {
     value: WsInterceptor,
     writable: true,

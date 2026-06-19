@@ -66,7 +66,9 @@ const { POST } = createEndpoint({
         description: "post.fields.content.description",
         placeholder: "post.fields.content.placeholder",
         columns: 12,
-        schema: z.string().min(1),
+        // Empty content is valid for confirmation-resume turns - the AI
+        // continues from the confirmed tool result without a new user message.
+        schema: z.string(),
       }),
 
       model: requestField(scopedTranslation, {
@@ -129,6 +131,42 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
+      threadMirrorMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.threadMirrorMode.label",
+        description: "post.fields.threadMirrorMode.description",
+        columns: 6,
+        schema: z.enum(["both", "local", "cloud", "none"]).optional(),
+      }),
+
+      folderPath: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "post.fields.folderPath.label",
+        description: "post.fields.folderPath.description",
+        columns: 6,
+        schema: z.array(z.string()).optional(),
+      }),
+
+      userMessageId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.userMessageId.label",
+        description: "post.fields.userMessageId.description",
+        columns: 6,
+        schema: z.string().uuid().optional(),
+      }),
+
+      parentMessageId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.parentMessageId.label",
+        description: "post.fields.parentMessageId.description",
+        columns: 6,
+        schema: z.string().uuid().optional(),
+      }),
+
       tools: requestDataArrayOptionalField(
         scopedTranslation,
         {
@@ -179,6 +217,168 @@ const { POST } = createEndpoint({
         description: "post.fields.timezone.description",
         columns: 6,
         schema: z.string().default("UTC"),
+      }),
+
+      toolConfirmations: requestDataArrayOptionalField(
+        scopedTranslation,
+        {
+          type: WidgetType.CONTAINER,
+          title: "post.fields.toolConfirmations.title",
+          description: "post.fields.toolConfirmations.description",
+        },
+        objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { request: "data" },
+          children: {
+            messageId: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.fields.toolConfirmations.messageId.label",
+              description:
+                "post.fields.toolConfirmations.messageId.description",
+              schema: z.string().uuid(),
+            }),
+            confirmed: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label: "post.fields.toolConfirmations.confirmed.label",
+              description:
+                "post.fields.toolConfirmations.confirmed.description",
+              schema: z.boolean(),
+            }),
+            updatedArgs: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.JSON,
+              label: "post.fields.toolConfirmations.updatedArgs.label",
+              description:
+                "post.fields.toolConfirmations.updatedArgs.description",
+              schema: z
+                .record(
+                  z.string(),
+                  z.union([
+                    z.string(),
+                    z.coerce.number(),
+                    z.boolean(),
+                    z.null(),
+                  ]),
+                )
+                .optional(),
+            }),
+          },
+        }),
+      ),
+
+      confirmationOverrides: requestDataArrayOptionalField(
+        scopedTranslation,
+        {
+          type: WidgetType.CONTAINER,
+          title: "post.fields.confirmationOverrides.title",
+          description: "post.fields.confirmationOverrides.description",
+        },
+        objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { request: "data" },
+          children: {
+            toolId: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.fields.confirmationOverrides.toolId.label",
+              description:
+                "post.fields.confirmationOverrides.toolId.description",
+              schema: z.string(),
+            }),
+            requiresConfirmation: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "post.fields.confirmationOverrides.requiresConfirmation.label",
+              description:
+                "post.fields.confirmationOverrides.requiresConfirmation.description",
+              schema: z.boolean(),
+            }),
+          },
+        }),
+      ),
+
+      attachments: requestDataArrayOptionalField(
+        scopedTranslation,
+        {
+          type: WidgetType.CONTAINER,
+          title: "post.fields.attachments.title",
+          description: "post.fields.attachments.description",
+        },
+        objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { request: "data" },
+          children: {
+            filename: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.fields.attachments.filename.label",
+              description: "post.fields.attachments.filename.description",
+              schema: z.string().min(1),
+            }),
+            mimeType: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.fields.attachments.mimeType.label",
+              description: "post.fields.attachments.mimeType.description",
+              schema: z.string().min(1),
+            }),
+            data: requestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXTAREA,
+              label: "post.fields.attachments.data.label",
+              description: "post.fields.attachments.data.description",
+              schema: z.string().min(1),
+            }),
+          },
+        }),
+      ),
+
+      messageHistory: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "post.fields.messageHistory.label",
+        description: "post.fields.messageHistory.description",
+        schema: z
+          .array(
+            selectChatMessageSchema.extend({
+              createdAt: dateSchema.nullable(),
+              updatedAt: dateSchema.nullable(),
+              // Tool messages may send content as an array (AI SDK multi-part
+              // content format). Accept and coerce to JSON string.
+              content: z
+                .union([
+                  z.string(),
+                  z.array(z.unknown()),
+                  z.record(z.string(), z.unknown()),
+                  z.null(),
+                ])
+                .transform((v) =>
+                  typeof v === "string" || v === null ? v : JSON.stringify(v),
+                )
+                .optional(),
+              errorMessage: z
+                .union([z.string(), z.unknown()])
+                .transform((v) =>
+                  typeof v === "string" || v === null || v === undefined
+                    ? v
+                    : JSON.stringify(v),
+                )
+                .optional(),
+              // DB-populated fields absent in client-side messages
+              authorId: z.string().nullish(),
+              authorName: z.string().nullish(),
+              errorType: z.string().nullish(),
+              errorCode: z.string().nullish(),
+              upvotes: z.number().nullish(),
+              downvotes: z.number().nullish(),
+              searchVector: z.string().nullish(),
+            }),
+          )
+          .optional()
+          .nullable() as z.ZodType<ChatMessage[]>,
       }),
 
       // === RESPONSE FIELDS ===
@@ -250,6 +450,7 @@ const { POST } = createEndpoint({
         model: ChatModelId.GPT_5_MINI,
         skill: "default",
         timezone: "UTC",
+        messageHistory: [],
       },
       withTools: {
         content: "Search for the latest TypeScript release notes",
@@ -270,6 +471,7 @@ const { POST } = createEndpoint({
           },
         ],
         timezone: "America/New_York",
+        messageHistory: [],
       },
       continueThread: {
         content: "Can you elaborate on your previous answer?",
@@ -277,6 +479,7 @@ const { POST } = createEndpoint({
         threadId: "550e8400-e29b-41d4-a716-446655440000",
         skill: "default",
         timezone: "UTC",
+        messageHistory: [],
       },
     },
     responses: {

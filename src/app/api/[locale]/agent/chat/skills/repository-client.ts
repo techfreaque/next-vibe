@@ -36,11 +36,11 @@ import {
   type ImageGenModelOption,
   imageGenModelOptions,
 } from "@/app/api/[locale]/agent/image-generation/models";
-import { getModelPrice } from "@/app/api/[locale]/agent/models/all-models";
 import type {
   ModelOptionBase,
   ModelOptionTokenBased,
 } from "@/app/api/[locale]/agent/models/models";
+import { getModelPrice } from "@/app/api/[locale]/agent/models/models";
 import { isModelProviderAvailable } from "@/app/api/[locale]/agent/models/models";
 import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
 import {

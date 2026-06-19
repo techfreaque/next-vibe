@@ -668,7 +668,10 @@ export class MessageContextBuilder {
     messageHistory?: ChatMessage[]; // For incognito mode
     systemPrompt: string;
     tools: Parameters<typeof streamText>[0]["tools"];
-    model: ChatModelId;
+    modelConfig: ChatModelOption;
+    timezone: string;
+    rootFolderId: DefaultFolderId;
+    locale: CountryLanguage;
     logger: EndpointLogger;
     /** Per-user compact trigger override (cascade resolved in stream-setup). Falls back to COMPACT_TRIGGER. */
     compactTrigger?: number;
@@ -797,7 +800,9 @@ export class MessageContextBuilder {
       messagesForTokenCount.push(currentUserMessage);
     }
 
-    const totalTokens = this.calculateTotalTokens(
+    // Convert DB ChatMessage[] → ModelMessage[] (same transformation MessageConverter
+    // performs before sending to the AI) so token estimation matches actual API usage.
+    const aiSdkMessages = await MessageConverter.toAiSdkMessages(
       messagesForTokenCount,
       logger,
       timezone,
@@ -805,20 +810,33 @@ export class MessageContextBuilder {
       locale,
       modelConfig,
     );
+    const systemTokens = Math.ceil(systemPrompt.length / 3.5);
+    const toolsTokens = tools
+      ? Math.ceil(JSON.stringify(tools).length / 2.5)
+      : 0;
+    const totalTokens =
+      systemTokens +
+      toolsTokens +
+      MessageContextBuilder.estimateModelMessageTokens(aiSdkMessages);
 
     // Calculate dynamic trigger based on model's context window
-    const modelConfig = getChatModelById(model);
     const modelContextLimit = Math.floor(
       modelConfig.contextWindow * COMPACT_TRIGGER_PERCENTAGE,
     );
     const absoluteTrigger = compactTrigger ?? COMPACT_TRIGGER;
-    const effectiveTrigger = Math.min(absoluteTrigger, modelContextLimit);
+    // MAX_SAFE_INTEGER is the sentinel for "compacting disabled" (revival streams,
+    // disableCompacting flag). Skip both the regular trigger and the emergency threshold.
+    const compactingDisabled = absoluteTrigger === Number.MAX_SAFE_INTEGER;
+    const effectiveTrigger = compactingDisabled
+      ? Number.MAX_SAFE_INTEGER
+      : Math.min(absoluteTrigger, modelContextLimit);
 
     // Emergency threshold: if we're already at/above 85% of the hard context window,
     // force compacting regardless of the user's effectiveTrigger setting.
     // This prevents the "238K tokens to a 131K model" class of API errors.
     const emergencyThreshold = Math.floor(modelConfig.contextWindow * 0.85);
-    const isEmergencyCompact = totalTokens >= emergencyThreshold;
+    const isEmergencyCompact =
+      !compactingDisabled && totalTokens >= emergencyThreshold;
 
     const shouldCompact = isEmergencyCompact || totalTokens >= effectiveTrigger;
 
@@ -1003,7 +1021,7 @@ export class MessageContextBuilder {
                       part as {
                         output?: {
                           type?: string;
-                          value?: Array<{ type?: string }>;
+                          value?: JSONValue;
                         };
                       }
                     ).output;
@@ -1012,21 +1030,26 @@ export class MessageContextBuilder {
                       Array.isArray(output.value)
                     ) {
                       let tokens = 0;
-                      for (const entry of output.value) {
+                      for (const entry of output.value as Array<{
+                        type?: string;
+                        text?: string;
+                      }>) {
                         if (
                           entry.type === "file-data" ||
                           entry.type === "media" ||
                           entry.type === "image-data"
                         ) {
                           tokens += 400 * 4; // same as image overhead
-                        } else if ("text" in entry) {
-                          tokens += (entry as { text: string }).text.length;
+                        } else if (entry.text) {
+                          tokens += entry.text.length;
                         } else {
                           tokens += 50; // small overhead for other parts
                         }
                       }
                       return " ".repeat(tokens);
                     }
+                    // json output: count the serialized value, not the full part wrapper
+                    return JSON.stringify(output?.value ?? null);
                   }
                 }
                 return JSON.stringify(part);

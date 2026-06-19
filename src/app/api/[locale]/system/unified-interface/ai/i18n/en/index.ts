@@ -83,6 +83,48 @@ export const translations = {
       },
     },
   },
+  dismissTask: {
+    post: {
+      title: "Dismiss Task",
+      titleShort: "Dismiss",
+      description:
+        "Cancel a pending wakeUp revival. The tool keeps running in the background but the thread unblocks immediately. The result is silently discarded when the tool completes.",
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "callId is required",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access denied",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "No pending call found for this callId",
+        },
+        server: {
+          title: "Server Error",
+          description: "Failed to dismiss the pending call",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error while dismissing task",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+      },
+      success: {
+        title: "Task Dismissed",
+        description: "Thread unblocked. Tool continues in the background.",
+      },
+    },
+  },
   tools: {
     // Translations moved to system/help/get - see system/help/i18n/en/index.ts
     get: {

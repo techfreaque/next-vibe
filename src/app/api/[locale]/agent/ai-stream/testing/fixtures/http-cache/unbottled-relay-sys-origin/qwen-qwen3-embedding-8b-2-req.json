@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "qwen/qwen3-embedding-8b",
+    "input": "/threads/remote/-t-sys--what-is-your-instance-id--look-at-your----54e5f699-6f80-4c92-ab46-9cd06066227d.md\n\n# [T-SYS] What is your instance ID? Look at your...\nFolder: remote\nPreview: <think> The user is asking for my instance ID. They say to look at my system prompt which contains the identity of the s…",
+    "encoding_format": "float"
+  }
+}

@@ -82,6 +82,7 @@ export const translations: typeof enTranslations = {
       skills: "Umiejętności",
       favorites: "Ulubione",
       threads: "Wątki",
+      chat: "Chat",
       defaultNote: "Domyślnie wszystko wyłączone. Włącz po połączeniu.",
     },
     advancedSettings: "Ustawienia zaawansowane",

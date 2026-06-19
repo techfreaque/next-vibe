@@ -13,9 +13,20 @@ import "server-only";
 
 import type { z } from "zod";
 
+import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "@/app/api/[locale]/user/auth/types";
 
+import { buildUserChannel, buildWsChannel } from "./channel";
+import type {
+  ComputeEventPayloads,
+  EmitEventNamed,
+  EndpointEventEnvelope,
+  EndpointEventsMap,
+} from "./structured-events";
 import type {
   EventSchemas,
   TypedEmit,

@@ -7,13 +7,13 @@ import { lazy } from "react";
 import { z } from "zod";
 
 import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
+import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
 } from "@/app/api/[locale]/agent/ai-stream/vision-models";
 import { skillVariantSchema } from "@/app/api/[locale]/agent/chat/skills/db";
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
 import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
 import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
@@ -89,7 +89,7 @@ const { POST } = createEndpoint({
         const skillsDefinition = await import("../definition");
 
         // Optimistically add the new skill to the list
-        const availability = await getInstanceAvailability();
+        const { availability } = data;
         apiClient.updateEndpointData(
           skillsDefinition.default.GET,
           data.logger,

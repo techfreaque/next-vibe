@@ -40,6 +40,14 @@ export const translations = {
       skills: "Skills",
       favorites: "Favorites",
       threads: "Threads",
+      chat: "Chat",
+    },
+    // ── Live sync section ──────────────────────────────────────────────────
+    liveSync: {
+      title: "Live Event Sync",
+      description: "Real-time events relayed across connected instances.",
+      chatEvents: "Chat messages",
+      liveOnlyBadge: "Live relay only",
     },
     // ── Cross-references ───────────────────────────────────────────────────
     cortexSection: "Cortex",
@@ -173,6 +181,7 @@ export const translations = {
       skills: "Skills",
       favorites: "Favorites",
       threads: "Threads",
+      chat: "Chat events",
     },
     reconnectNow: {
       label: "Reconnect Now",

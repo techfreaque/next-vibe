@@ -66,7 +66,7 @@ function makeCortexNodeSyncProvider(
 
   return {
     key,
-    labelI18nKey,
+    labelKey,
 
     async getCursor(userId): Promise<StandardSyncCursor> {
       const [row] = await db

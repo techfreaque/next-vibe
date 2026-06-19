@@ -24,6 +24,7 @@ import {
   isStreamingResponse,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
+import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,

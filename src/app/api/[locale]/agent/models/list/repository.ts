@@ -17,9 +17,10 @@ import { musicGenModelOptions } from "../../music-generation/models";
 import { sttModelOptions } from "../../speech-to-text/models";
 import { ttsModelOptions } from "../../text-to-speech/models";
 import { videoGenModelOptions } from "../../video-generation/models";
-import { allModelDefinitions, getModelPrice } from "../all-models";
+import { allModelDefinitions } from "../all-models";
 import { ModelUtility } from "../enum";
 import type { AnyModelOption, ModelDefinition } from "../models";
+import { getModelPrice } from "../models";
 import { modelProviders } from "../models";
 import type { ModelListGetResponseOutput, ModelListItem } from "./definition";
 

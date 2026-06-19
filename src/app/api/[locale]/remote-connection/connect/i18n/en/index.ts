@@ -84,6 +84,7 @@ export const translations = {
       skills: "Skills",
       favorites: "Favorites",
       threads: "Threads",
+      chat: "Chat",
       defaultNote: "All disabled by default. Enable after connecting.",
     },
     advancedSettings: "Advanced Settings",

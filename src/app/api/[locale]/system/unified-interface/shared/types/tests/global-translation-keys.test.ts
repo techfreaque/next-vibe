@@ -29,9 +29,9 @@ import {
 const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
 
 // A narrowly-typed scoped translation where only "valid.key" is valid.
-// Uses declare const (not `as const`) so the narrow type is preserved
-// in whole-project (--extensive) compilation as well as single-file checks.
-declare const narrowST: { readonly ScopedTranslationKey: "valid.key" };
+// Typed as a const assertion to preserve the narrow literal type in both
+// single-file and whole-project (--extensive) TypeScript compilation.
+const narrowST = { ScopedTranslationKey: "valid.key" } as const;
 
 /**
  * Local helper that checks whether a label key is valid for a given scoped translation.

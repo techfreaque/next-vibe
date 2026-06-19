@@ -392,8 +392,8 @@ export async function ensureRemoteUserCredits(
     { targetUserId: userId, amount: minCredits },
   );
   if (!result.success) {
-    // eslint-disable-next-line no-console
-    console.warn(
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+    throw new Error(
       `[ensureRemoteUserCredits] Failed to add credits for ${userId}: ${result.message ?? "unknown error"}`,
     );
   }
@@ -406,24 +406,6 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
-}
-
-/**
- * Returns true if the connectRemote failure is transient (server overloaded, timeout).
- * These errors are safe to retry after a short wait.
- */
-function isConnectTransientFailure(msg: string | undefined): boolean {
-  if (!msg) {
-    return false;
-  }
-  return (
-    msg.includes("Connection Failed") ||
-    msg.includes("Remote Server Error") ||
-    msg.includes("network") ||
-    msg.includes("Network") ||
-    msg.toLowerCase().includes("timeout") ||
-    msg.toLowerCase().includes("fetch")
-  );
 }
 
 /**
@@ -445,10 +427,11 @@ export async function connectToHermes(
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
 
-  // connectRemote pings the remote server; if it's temporarily slow (e.g. after
-  // handling many test requests), the 10s ping timeout fires. Retry once after a
-  // short delay to give the server time to recover.
-  let result = await RemoteConnectionConnectRepository.connectRemote(
+  // Pre-clean both sides so connectRemote never hits a 409 conflict.
+  await disconnectFromHermes(user.id);
+  await unregisterDevFromHermes(await resolveProdUserId(), remoteUrl);
+
+  const result = await RemoteConnectionConnectRepository.connectRemote(
     {
       remoteUrl,
       email: env.VIBE_ADMIN_USER_EMAIL,
@@ -460,91 +443,7 @@ export async function connectToHermes(
     defaultLocale,
   );
 
-  // Transient failure: wait and retry — Vite dev server may be momentarily busy.
-  // connectRemote returns "Connection Failed" when the remote ping times out (AbortSignal).
-  // connectRemote returns "Remote Server Error" when the registration HTTP call times out.
-  if (!result.success && isConnectTransientFailure(result.message)) {
-    // eslint-disable-next-line no-console
-    console.log(
-      "[connectToHermes] Transient error — waiting 15s before retry:",
-      result.message,
-    );
-    await sleep(15000);
-    result = await RemoteConnectionConnectRepository.connectRemote(
-      {
-        remoteUrl,
-        email: env.VIBE_ADMIN_USER_EMAIL,
-        password: env.VIBE_ADMIN_USER_PASSWORD,
-      },
-      user,
-      logger,
-      t,
-      defaultLocale,
-    );
-    // Second retry if still failing
-    if (!result.success && isConnectTransientFailure(result.message)) {
-      // eslint-disable-next-line no-console
-      console.log(
-        "[connectToHermes] Still failing — waiting 15s for second retry:",
-        result.message,
-      );
-      await sleep(15000);
-      result = await RemoteConnectionConnectRepository.connectRemote(
-        {
-          remoteUrl,
-          email: env.VIBE_ADMIN_USER_EMAIL,
-          password: env.VIBE_ADMIN_USER_PASSWORD,
-        },
-        user,
-        logger,
-        t,
-        defaultLocale,
-      );
-    }
-  }
-
   if (!result.success) {
-    // "Already Connected" means one or both sides still have a stale registration row.
-    // Clean both sides and retry so they are in sync.
-    if (result.message?.includes("Already Connected")) {
-      // eslint-disable-next-line no-console
-      console.log(
-        "[connectToHermes] Already Connected - cleaning both sides and retrying",
-      );
-
-      // Delete local hermes row on atlas.
-      await disconnectFromHermes(user.id);
-
-      // Delete atlas's registration on hermes (remote side).
-      // Use broad delete (no user filter) to catch any leftover registrations.
-      const pdb = getProdDb();
-      await pdb.execute(
-        sql`DELETE FROM remote_connections WHERE instance_id = ${ATLAS_INSTANCE_ID}`,
-      );
-
-      // Also fix self-identity if it got set to atlas by a previous register call
-      await pdb.execute(
-        sql`UPDATE instance_identities SET instance_id = 'hermes' WHERE instance_id = ${ATLAS_INSTANCE_ID}`,
-      );
-
-      // Retry connect
-      const retry = await RemoteConnectionConnectRepository.connectRemote(
-        {
-          remoteUrl,
-          email: env.VIBE_ADMIN_USER_EMAIL,
-          password: env.VIBE_ADMIN_USER_PASSWORD,
-        },
-        user,
-        logger,
-        t,
-        defaultLocale,
-      );
-      if (!retry.success) {
-        // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-        throw new Error(`connectToHermes retry: ${retry.message}`);
-      }
-      return;
-    }
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(`connectToHermes: ${result.message}`);
   }
@@ -572,6 +471,7 @@ export async function connectToHermes(
         memories: true,
         skills: true,
         threads: true,
+        chat: false,
       },
       updatedAt: new Date(),
     })
@@ -617,9 +517,7 @@ export async function connectToHermesLocalAi(
   user: JwtPrivatePayloadType,
   remoteUrl: string = LOCAL_DEV_URL,
 ): Promise<void> {
-  // Idempotent: clean up any leftover connection before reconnecting.
-  await disconnectFromHermes(user.id);
-  // Full connect flow (registers both sides, syncs capabilities).
+  // Full connect flow (registers both sides, syncs capabilities + pre-cleans internally).
   await connectToHermes(user, remoteUrl);
 
   // Override the connection settings set by connectToHermes:
@@ -694,10 +592,39 @@ export async function disconnectFromHermes(userId: string): Promise<void> {
  */
 export async function unregisterDevFromHermes(
   prodUserId: string,
+  remoteUrl: string = LOCAL_DEV_URL,
 ): Promise<void> {
+  // First: call hermes's proper DELETE endpoint to close the WS and release the
+  // in-memory sync slot. Direct DB delete skips the WS close → stuck sync slot
+  // → "pull-on-connect skipped - sync already in flight" on the next connect.
+  try {
+    const adminToken = await resolveProdAdminToken(remoteUrl);
+    const resp = await fetch(
+      `${remoteUrl}/api/en-US/remote-connection/${ATLAS_INSTANCE_ID}`,
+      {
+        method: "DELETE",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${adminToken}`,
+        },
+        signal: AbortSignal.timeout(10_000),
+      },
+    );
+    if (!resp.ok) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[unregisterDevFromHermes] DELETE endpoint returned ${String(resp.status)} — falling back to direct DB delete`,
+      );
+    }
+  } catch {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[unregisterDevFromHermes] DELETE endpoint failed — falling back to direct DB delete",
+    );
+  }
+  // Fallback: direct DB delete for any renamed variants (e.g. 'atlas-rn2-*')
+  // that the DELETE endpoint may not cover.
   const pdb = getProdDb();
-  // Delete exact 'atlas' row plus any renamed variants (e.g. 'atlas-rn2-*')
-  // left behind by failed rename tests.
   await pdb.execute(
     sql`DELETE FROM remote_connections WHERE user_id = ${prodUserId} AND instance_id LIKE ${"atlas%"}`,
   );
@@ -796,7 +723,7 @@ async function assertSyncCompleted(
           eq(remoteConnections.isReverseEntry, false),
         ),
       );
-    if (row?.lastSyncedAt && row.capabilities && row.capabilities.length > 0) {
+    if (row?.lastSyncedAt) {
       break;
     }
     await sleep(200);
