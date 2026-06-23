@@ -18,6 +18,7 @@ import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availabili
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { isAgentPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -49,6 +50,7 @@ import {
   formatFavoritesSummary,
 } from "./favorites-formatter";
 import type { FavoritesT } from "./i18n";
+import type reorderDefinitions from "./reorder/definition";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
 import type { SyncedFavorite } from "./sync-provider";
 import type { FavoriteSummaryItem } from "./system-prompt/prompt";
@@ -636,13 +638,17 @@ export class ChatFavoritesRepository {
    * Apply a remote favorites-reordered relayed from a peer instance. Updates
    * position by id, scoped to userId. Called by route.ts onRemoteEvent.
    */
-  static async applyRemoteFavoriteReorder(
-    favorites: { id: string; position: number }[],
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  static async applyRemoteFavoriteReorder({
+    requestData,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof reorderDefinitions.POST,
+    "favorites-reordered"
+  >): Promise<void> {
+    const userId = user.id;
     try {
-      for (const fav of favorites) {
+      for (const fav of requestData.positions) {
         await db
           .update(chatFavorites)
           .set({ position: fav.position, updatedAt: new Date() })

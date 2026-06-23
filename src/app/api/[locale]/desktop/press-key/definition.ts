@@ -136,14 +136,14 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "press-key.response.success",
+        label: "press-key.response.success",
         schema: z
           .boolean()
           .describe("Whether the key press operation succeeded"),
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "press-key.response.error",
+        label: "press-key.response.error",
         schema: z
           .string()
           .optional()
@@ -151,7 +151,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "press-key.response.executionId",
+        label: "press-key.response.executionId",
         schema: z
           .string()
           .optional()

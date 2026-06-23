@@ -47,20 +47,14 @@ installFetchCache();
 import { installWsFixture } from "../../testing/ws-fixture";
 installWsFixture();
 
-import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { reloadWsProviderConnector } from "@/app/api/[locale]/remote-connection/connector";
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { db } from "@/app/api/[locale]/system/db";
-import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
+import { reloadWsProviderConnector } from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 
 import {
   addLocalhostPort,
@@ -74,7 +68,6 @@ import {
   runTestStream,
 } from "../../testing/headless-test-runner";
 import {
-  ATLAS_INSTANCE_ID,
   connectToHermes,
   disconnectFromHermes,
   failSuitePrerequisites,
@@ -110,14 +103,11 @@ async function setupWsProvider(testUser: JwtPrivatePayloadType): Promise<void> {
 
   const connByIdDef =
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
-  await RouteExecuteRepository.runInProcessTyped({
-    definition: connByIdDef.default.PATCH,
-    input: { isInferenceProvider: true, forceSystemProvider: true },
+  await sendTestRequest({
+    endpoint: connByIdDef.default.PATCH,
+    data: { isInferenceProvider: true, forceSystemProvider: true },
     urlPathParams: { instanceId: HERMES_INSTANCE_ID },
     user: testUser,
-    locale: defaultLocale,
-    platform: Platform.AI,
-    logger: createEndpointLogger(false, Date.now(), defaultLocale),
   });
 
   _wpProdUserId = await _resolveId();
@@ -148,15 +138,21 @@ async function teardownWsProvider(
 async function cleanupHermesConnections(
   testUser: JwtPrivatePayloadType,
 ): Promise<void> {
-  const rows = await db
-    .select({ instanceId: remoteConnections.instanceId })
-    .from(remoteConnections)
-    .where(
-      and(
-        eq(remoteConnections.userId, testUser.id),
-        eq(remoteConnections.remoteUrl, LOCAL_DEV_URL),
-      ),
-    );
+  const connListDef =
+    await import("@/app/api/[locale]/remote-connection/list/definition");
+  const listResult = await sendTestRequest({
+    endpoint: connListDef.default.GET,
+    data: {},
+    user: testUser,
+  });
+
+  if (!listResult.success) {
+    return;
+  }
+
+  const rows = listResult.data.connections.filter(
+    (c) => c.remoteUrl === LOCAL_DEV_URL,
+  );
 
   if (rows.length === 0) {
     return;
@@ -166,13 +162,10 @@ async function cleanupHermesConnections(
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
 
   for (const row of rows) {
-    await RouteExecuteRepository.runInProcessTyped({
-      definition: connByIdDef.default.DELETE,
+    await sendTestRequest({
+      endpoint: connByIdDef.default.DELETE,
       urlPathParams: { instanceId: row.instanceId },
       user: testUser,
-      locale: defaultLocale,
-      platform: Platform.AI,
-      logger: createEndpointLogger(false, Date.now(), defaultLocale),
     });
   }
 }
@@ -185,17 +178,17 @@ async function setupUnbottled(testUser: JwtPrivatePayloadType): Promise<void> {
   reloadWsProviderConnector();
   await connectToHermes(testUser, LOCAL_DEV_URL);
 
-  const [connRow] = await db
-    .select({ instanceId: remoteConnections.instanceId })
-    .from(remoteConnections)
-    .where(
-      and(
-        eq(remoteConnections.userId, testUser.id),
-        eq(remoteConnections.remoteUrl, LOCAL_DEV_URL),
-        eq(remoteConnections.isReverseEntry, false),
-      ),
-    )
-    .limit(1);
+  const connListDefSetup =
+    await import("@/app/api/[locale]/remote-connection/list/definition");
+  const connListResult = await sendTestRequest({
+    endpoint: connListDefSetup.default.GET,
+    data: {},
+    user: testUser,
+  });
+
+  const connRow = connListResult.success
+    ? connListResult.data.connections.find((c) => c.remoteUrl === LOCAL_DEV_URL)
+    : undefined;
 
   if (!connRow) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
@@ -206,18 +199,13 @@ async function setupUnbottled(testUser: JwtPrivatePayloadType): Promise<void> {
 
   const connByIdDef =
     await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
-  await RouteExecuteRepository.runInProcessTyped({
-    definition: connByIdDef.default.PATCH,
-    input: {
+  await sendTestRequest({
+    endpoint: connByIdDef.default.PATCH,
+    data: {
       isInferenceProvider: true,
-      toolSource: "remote",
-      threadMirrorMode: "both",
     },
     urlPathParams: { instanceId: connRow.instanceId },
     user: testUser,
-    locale: defaultLocale,
-    platform: Platform.AI,
-    logger: createEndpointLogger(false, Date.now(), defaultLocale),
   });
 }
 
@@ -231,49 +219,33 @@ async function teardownUnbottled(
 
 // ── Suite C: Reverse-WS (NAT simulation) ─────────────────────────────────────
 
-let _rwsProdAdminToken: string | null = null;
 let _rwsProdUserId: string | null = null;
+let _rwsTestUser: JwtPrivatePayloadType | null = null;
 
 async function setupReverseWs(testUser: JwtPrivatePayloadType): Promise<void> {
   const {
     connectToHermesLocalAi: _connectLocalAi,
     resolveProdUserId: _resolveId,
-    resolveProdAdminToken: _resolveToken,
   } = await import("../../testing/remote-setup");
 
   // Local AI loop + remote tool execution via execute-tool(instanceId='hermes').
   await _connectLocalAi(testUser, _remoteUrl ?? "http://localhost:3002");
 
+  _rwsTestUser = testUser;
   _rwsProdUserId = await _resolveId();
-  _rwsProdAdminToken = await _resolveToken(
-    _remoteUrl ?? "http://localhost:3002",
-  );
 
   // NAT simulation: force cloud-only so the first tool broadcast has no WS channel.
   // Thread enters 'waiting'. runReverseWsPulse then switches to 'reverse-ws' which
   // opens the connector and delivers the missed request.
-  await fetch(
-    `${_remoteUrl}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${_rwsProdAdminToken}`,
-      },
-      body: JSON.stringify({ transportMode: "cloud-only" }),
-      signal: AbortSignal.timeout(10_000),
-    },
-  );
-  await db
-    .update(remoteConnections)
-    .set({ transportMode: "cloud-only" as "reverse-ws" })
-    .where(
-      and(
-        eq(remoteConnections.userId, testUser.id),
-        eq(remoteConnections.instanceId, HERMES_INSTANCE_ID),
-      ),
-    );
+  const connByIdDefSetup =
+    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+  await sendTestRequest({
+    endpoint: connByIdDefSetup.default.PATCH,
+    data: { transportMode: "cloud-only" as const },
+    urlPathParams: { instanceId: HERMES_INSTANCE_ID },
+    user: testUser,
+    instanceId: HERMES_INSTANCE_ID,
+  });
 }
 
 async function teardownReverseWs(
@@ -284,24 +256,18 @@ async function teardownReverseWs(
     unregisterDevFromHermes: _unregister,
   } = await import("../../testing/remote-setup");
 
-  if (_rwsProdAdminToken) {
-    try {
-      await fetch(
-        `${_remoteUrl}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            // eslint-disable-next-line i18next/no-literal-string
-            Authorization: `Bearer ${_rwsProdAdminToken}`,
-          },
-          body: JSON.stringify({ transportMode: "cloud-only" }),
-          signal: AbortSignal.timeout(5_000),
-        },
-      );
-    } catch {
-      /* best-effort */
-    }
+  try {
+    const connByIdDefTeardown =
+      await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+    await sendTestRequest({
+      endpoint: connByIdDefTeardown.default.PATCH,
+      data: { transportMode: "cloud-only" as const },
+      urlPathParams: { instanceId: HERMES_INSTANCE_ID },
+      user: testUser,
+      instanceId: HERMES_INSTANCE_ID,
+    });
+  } catch {
+    /* best-effort */
   }
 
   const tasks: Promise<void>[] = [_disconnect(testUser.id)];
@@ -310,7 +276,7 @@ async function teardownReverseWs(
   }
   await Promise.all(tasks);
   _rwsProdUserId = null;
-  _rwsProdAdminToken = null;
+  _rwsTestUser = null;
 }
 
 /**
@@ -320,53 +286,54 @@ async function teardownReverseWs(
  * tool-execute-request. Polls chatThreads.streamingState until thread exits 'waiting'.
  */
 async function runReverseWsPulse(threadId: string): Promise<void> {
-  if (!_rwsProdAdminToken) {
+  if (!_rwsTestUser) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
     throw new Error(
-      "runReverseWsPulse: no prod admin token — setupReverseWs not called?",
+      "runReverseWsPulse: no test user — setupReverseWs not called?",
     );
   }
 
-  const patchResp = await fetch(
-    `${_remoteUrl}/api/en-US/user/remote-connection/${ATLAS_INSTANCE_ID}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${_rwsProdAdminToken}`,
-      },
-      body: JSON.stringify({ transportMode: "reverse-ws" }),
-      signal: AbortSignal.timeout(10_000),
-    },
-  );
+  const connByIdDefPulse =
+    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+  const patchResult = await sendTestRequest({
+    endpoint: connByIdDefPulse.default.PATCH,
+    data: { transportMode: "reverse-ws" as const },
+    urlPathParams: { instanceId: HERMES_INSTANCE_ID },
+    user: _rwsTestUser,
+    instanceId: HERMES_INSTANCE_ID,
+  });
 
-  if (!patchResp.ok) {
-    const body = await patchResp.text().catch(() => "unknown");
+  if (!patchResult.success) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
     throw new Error(
-      `runReverseWsPulse: PATCH transportMode failed ${String(patchResp.status)}: ${body}`,
+      `runReverseWsPulse: PATCH transportMode failed: ${patchResult.message ?? "unknown"}`,
     );
   }
 
   // eslint-disable-next-line no-console
   console.log("[runReverseWsPulse] transportMode=reverse-ws PATCH succeeded");
 
-  const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+  const threadByIdDef =
+    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
   const deadline = Date.now() + 60_000;
 
   while (Date.now() < deadline) {
-    const [thread] = await db
-      .select({ streamingState: chatThreads.streamingState })
-      .from(chatThreads)
-      .where(eq(chatThreads.id, threadId))
-      .limit(1);
+    const threadResult = await sendTestRequest({
+      endpoint: threadByIdDef.default.GET,
+      data: { rootFolderId: DefaultFolderId.REMOTE },
+      urlPathParams: { threadId },
+      user: _rwsTestUser,
+      instanceId: HERMES_INSTANCE_ID,
+    });
 
-    if (thread && thread.streamingState !== "waiting") {
+    if (
+      threadResult.success &&
+      threadResult.data.streamingState !== "waiting"
+    ) {
       // eslint-disable-next-line no-console
       console.log(
         "[runReverseWsPulse] Thread exited waiting:",
-        thread.streamingState,
+        threadResult.data.streamingState,
       );
       return;
     }
@@ -463,14 +430,11 @@ if (_remoteUrl && _isFixtureMode) {
     it("WP3: threadMirrorMode=both → thread + messages exist in atlas DB", async () => {
       const threadDef =
         await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
-      const threadResult = await RouteExecuteRepository.runInProcessTyped({
-        definition: threadDef.default.GET,
-        input: { rootFolderId: DefaultFolderId.REMOTE },
+      const threadResult = await sendTestRequest({
+        endpoint: threadDef.default.GET,
+        data: { rootFolderId: DefaultFolderId.REMOTE },
         urlPathParams: { threadId },
         user: testUser,
-        locale: defaultLocale,
-        platform: Platform.AI,
-        logger: createEndpointLogger(false, Date.now(), defaultLocale),
       });
       expect(threadResult.success, "WP3: thread must exist in atlas DB").toBe(
         true,

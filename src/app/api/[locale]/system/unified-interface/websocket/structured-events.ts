@@ -178,12 +178,14 @@ export type EndpointEventDeclaration<
   | EndpointEventDeclarationWithFlatFields<
       TResponseOutput,
       readonly [keyof TResponseOutput, ...(keyof TResponseOutput)[]],
-      TRequestOutput
+      TRequestOutput,
+      TUrlVariablesOutput
     >
   | EndpointEventDeclarationWithNestedFields<
       TResponseOutput,
       NestedFieldSpec<TResponseOutput>,
-      TRequestOutput
+      TRequestOutput,
+      TUrlVariablesOutput
     >
   | EndpointEventDeclarationSideEffect<TResponseOutput, TRequestOutput>;
 

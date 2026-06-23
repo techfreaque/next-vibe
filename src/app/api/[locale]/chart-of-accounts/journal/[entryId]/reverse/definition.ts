@@ -69,12 +69,12 @@ const { POST } = createEndpoint({
       }),
       reversalEntryId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "journalReverse.response.reversalEntryId" as const,
+        label: "journalReverse.response.reversalEntryId" as const,
         schema: z.string(),
       }),
       reversalEntryNumber: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "journalReverse.response.reversalEntryNumber" as const,
+        label: "journalReverse.response.reversalEntryNumber" as const,
         schema: z.string(),
       }),
     },

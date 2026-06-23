@@ -116,7 +116,7 @@ export const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       logs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.logs.title",
+        label: "get.response.logs.title",
         schema: z.array(
           z.object({
             id: z.string(),
@@ -135,17 +135,17 @@ export const { GET } = createEndpoint({
       }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalCount.title",
+        label: "get.response.totalCount.title",
         schema: z.coerce.number(),
       }),
       hasMore: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.hasMore.title",
+        label: "get.response.hasMore.title",
         schema: z.boolean(),
       }),
       unresolvedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.unresolvedCount.title",
+        label: "get.response.unresolvedCount.title",
         schema: z.coerce.number(),
       }),
     },
@@ -253,17 +253,17 @@ export const { PATCH } = createEndpoint({
       // === RESPONSE FIELDS ===
       responseFingerprint: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.fingerprint.title",
+        label: "patch.response.fingerprint.title",
         schema: z.string(),
       }),
       responseResolved: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.resolved.title",
+        label: "patch.response.resolved.title",
         schema: z.boolean(),
       }),
       affectedRows: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.affectedRows.title",
+        label: "patch.response.affectedRows.title",
         schema: z.number(),
       }),
     },

@@ -13,6 +13,10 @@ export const translations = {
     de: "German",
     pl: "Polish",
   },
+  title: "Create Messenger Account",
+  titleShort: "New Account",
+  description: "Create a new messenger account",
+
   enums: {
     campaignType: {
       leadCampaign: "Lead Campaign",
@@ -42,12 +46,6 @@ export const translations = {
       nurture: "Nurture",
       reactivation: "Reactivation",
     },
-  },
-  title: "Create Messenger Account",
-  titleShort: "New Account",
-  description: "Create a new messenger account",
-
-  enums: {
     channel: {
       email: "Email",
       sms: "SMS",

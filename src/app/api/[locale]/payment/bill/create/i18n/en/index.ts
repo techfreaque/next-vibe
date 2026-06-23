@@ -70,6 +70,15 @@ export const translations = {
       updatedAt: "Updated",
     },
   },
+  enums: {
+    billStatus: {
+      DRAFT: "Draft",
+      RECEIVED: "Received",
+      APPROVED: "Approved",
+      PAID: "Paid",
+      DISPUTED: "Disputed",
+    },
+  },
   companyId: {
     label: "Company",
     description: "The company receiving this bill",

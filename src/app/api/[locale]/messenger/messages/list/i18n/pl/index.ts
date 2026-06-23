@@ -91,6 +91,7 @@ export const translations: typeof enTranslations = {
         senderName: "Nazwa nadawcy",
         type: "Typ",
         status: "Status",
+        channel: "Kanał",
         templateName: "Nazwa szablonu",
         emailProvider: "Dostawca e-maila",
         externalId: "ID zewnętrzne",
@@ -189,6 +190,19 @@ export const translations: typeof enTranslations = {
     description: "E-maile pobrane pomyślnie",
   },
   enums: {
+    status: {
+      pending: "Oczekujący",
+      sent: "Wysłany",
+      delivered: "Dostarczony",
+      opened: "Otwarty",
+      clicked: "Kliknięty",
+      bounced: "Odrzucony",
+      failed: "Nieudany",
+      unsubscribed: "Wypisany",
+    },
+    statusFilter: {
+      any: "Wszystkie statusy",
+    },
     type: {
       transactional: "Transakcyjny",
       marketing: "Marketingowy",

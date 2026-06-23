@@ -448,6 +448,8 @@ export const translations: typeof enTranslations = {
 
   // Response fields
   response: {
+    checkoutUrl: "Checkout-URL",
+    sessionId: "Session-ID",
     id: "Abonnement-ID",
     userId: "Benutzer-ID",
     status: "Abonnement-Status",

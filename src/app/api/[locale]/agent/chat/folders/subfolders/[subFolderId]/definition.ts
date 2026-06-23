@@ -71,47 +71,47 @@ const { GET } = createEndpoint({
 
       name: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.folder.name.content" as const,
+        label: "get.response.folder.name.content" as const,
         schema: z.string(),
       }),
       icon: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.folder.icon.content" as const,
+        label: "get.response.folder.icon.content" as const,
         schema: iconSchema.nullable(),
       }),
       color: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.folder.color.content" as const,
+        label: "get.response.folder.color.content" as const,
         schema: z.string().nullable(),
       }),
       parentId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.folder.parentId.content" as const,
+        label: "get.response.folder.parentId.content" as const,
         schema: z.uuid().nullable(),
       }),
       rootFolderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.folder.rootFolderId.content" as const,
+        label: "get.response.folder.rootFolderId.content" as const,
         schema: z.enum(DefaultFolderId),
       }),
       expanded: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.folder.expanded.content" as const,
+        label: "get.response.folder.expanded.content" as const,
         schema: z.boolean(),
       }),
       sortOrder: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.folder.sortOrder.content" as const,
+        label: "get.response.folder.sortOrder.content" as const,
         schema: z.coerce.number(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.folder.createdAt.content" as const,
+        label: "get.response.folder.createdAt.content" as const,
         schema: dateSchema,
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.folder.updatedAt.content" as const,
+        label: "get.response.folder.updatedAt.content" as const,
         schema: dateSchema,
       }),
     },
@@ -214,12 +214,12 @@ const { DELETE } = createEndpoint({
 
       name: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.name.content" as const,
+        label: "delete.response.name.content" as const,
         schema: z.string(),
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.updatedAt.content" as const,
+        label: "delete.response.updatedAt.content" as const,
         schema: dateSchema,
       }),
 

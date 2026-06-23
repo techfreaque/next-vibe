@@ -26,6 +26,7 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { InferUrlVariablesOutput } from "../../../unified-interface/react-native/native-endpoint";
 import { resolveTestAdminUser } from "./resolve-test-user";
 import { sendTestRequest } from "./send-test-request";
 import type { TestEndpointOptions, TestRunner } from "./types";
@@ -66,7 +67,10 @@ export function testEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
-  TEvents extends EndpointEventsMap<InferResponseOutput<TFields>>,
+  TEvents extends EndpointEventsMap<
+    InferResponseOutput<TFields>,
+    InferRequestOutput<TFields>
+  >,
 >(
   endpoint: CreateApiEndpoint<
     TMethod,

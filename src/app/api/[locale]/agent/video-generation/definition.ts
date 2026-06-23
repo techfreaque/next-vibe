@@ -148,23 +148,23 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       videoUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.videoUrl",
+        label: "post.response.videoUrl",
         schema: z.string(),
       }),
       creditCost: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.creditCost",
+        label: "post.response.creditCost",
         schema: z.number(),
       }),
       durationSeconds: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.durationSeconds",
+        label: "post.response.durationSeconds",
         schema: z.number().optional(),
       }),
       /** Async job ID for polling */
       jobId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.jobId",
+        label: "post.response.jobId",
         schema: z.string().optional(),
       }),
     },

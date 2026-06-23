@@ -120,7 +120,7 @@ export async function loadCortexData(
 
     // Pre-warm skills/db so it's in the module cache before getVirtualMountCounts
     // calls getSkillCount - otherwise we hit a TDZ circular-dep crash.
-    await import("@/app/api/[locale]/agent/chat/skills/db").catch(() => null);
+    await import("@/app/api/[locale]/agent/skills/db").catch(() => null);
 
     // 2. Parallel loads - all mounts independent
     const [
@@ -557,7 +557,12 @@ async function buildTrimmedDocTree(
   const escapedDocsPath = documentsPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   // Single query: get top-level dirs + their file counts + recent files via window function
-  const rows = await db.execute(sql`
+  const rows = await db.execute<{
+    dir_path: string;
+    file_count: number;
+    file_path: string | null;
+    rn: number;
+  }>(sql`
     WITH top_dirs AS (
       SELECT path
       FROM ${cortexNodes}
@@ -692,7 +697,7 @@ interface SkillRecord {
 async function loadFavedSkills(userId: string): Promise<SkillRecord[]> {
   try {
     const { db } = await import("@/app/api/[locale]/system/db");
-    const { chatFavorites } = await import("../../chat/favorites/db");
+    const { chatFavorites } = await import("../../skills/favorites/db");
     const { eq } = await import("drizzle-orm");
 
     // Step 1: get skillIds from favorites - filter to UUID-format only (custom skills)
@@ -714,7 +719,7 @@ async function loadFavedSkills(userId: string): Promise<SkillRecord[]> {
       .filter((id) => UUID_RE.test(id));
 
     // Step 2: fetch skill details separately (avoids TDZ circular init with join)
-    const { customSkills } = await import("../../chat/skills/db");
+    const { customSkills } = await import("../../skills/db");
     const { inArray } = await import("drizzle-orm");
 
     const skillRows = await db
@@ -737,8 +742,8 @@ async function loadFavedSkills(userId: string): Promise<SkillRecord[]> {
 async function loadCreatedSkills(userId: string): Promise<SkillRecord[]> {
   try {
     const { db } = await import("@/app/api/[locale]/system/db");
-    const { customSkills } = await import("../../chat/skills/db");
-    const { SkillOwnershipType } = await import("../../chat/skills/enum");
+    const { customSkills } = await import("../../skills/db");
+    const { SkillOwnershipType } = await import("../../skills/enum");
     const { eq, and, ne, sql } = await import("drizzle-orm");
 
     const rows = await db
@@ -795,7 +800,7 @@ async function loadFavoritesForCortex(
       { db: favDb },
       { asc: favAsc, eq: favEq, inArray: favInArray },
     ] = await Promise.all([
-      import("@/app/api/[locale]/agent/chat/favorites/db"),
+      import("@/app/api/[locale]/agent/skills/favorites/db"),
       import("@/app/api/[locale]/agent/chat/settings/db"),
       import("@/app/api/[locale]/system/db"),
       import("drizzle-orm"),
@@ -830,7 +835,7 @@ async function loadFavoritesForCortex(
 
     if (customSkillUuids.length > 0) {
       const { customSkills: customSkillsTable } =
-        await import("@/app/api/[locale]/agent/chat/skills/db");
+        await import("@/app/api/[locale]/agent/skills/db");
       const customSkillsList = await favDb
         .select({
           id: customSkillsTable.id,

@@ -20,7 +20,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "../../i18n";
+import { scopedTranslation } from "../i18n";
 import { HotkeyAction, HotkeyActionOptions } from "./enum";
 
 /**
@@ -30,16 +30,16 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "speech-to-text", "hotkey"],
-  title: "speechToText.hotkey.post.title" as const,
-  titleShort: "speechToText.hotkey.post.titleShort" as const,
-  description: "speechToText.hotkey.post.description" as const,
+  title: "hotkey.post.title" as const,
+  titleShort: "hotkey.post.titleShort" as const,
+  description: "hotkey.post.description" as const,
   icon: "mic",
   category: "ai",
   subCategory: "Generation",
   tags: [
-    "chat.tags.speech" as const,
-    "chat.tags.hotkey" as const,
-    "chat.tags.cli" as const,
+    "hotkey.tags.speech" as const,
+    "hotkey.tags.hotkey" as const,
+    "hotkey.tags.cli" as const,
   ],
   allowedRoles: [
     UserRole.ADMIN,
@@ -59,8 +59,8 @@ const { POST } = createEndpoint({
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
-    title: "speechToText.hotkey.post.form.title" as const,
-    description: "speechToText.hotkey.post.form.description" as const,
+    title: "hotkey.post.form.title" as const,
+    description: "hotkey.post.form.description" as const,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
@@ -69,86 +69,69 @@ const { POST } = createEndpoint({
       action: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "speechToText.hotkey.post.action.label" as const,
-        description: "speechToText.hotkey.post.action.description" as const,
+        label: "hotkey.post.action.label" as const,
+        description: "hotkey.post.action.description" as const,
         columns: 12,
         options: HotkeyActionOptions,
         schema: z.enum(HotkeyAction).optional(),
       }),
 
-      // provider: requestField(scopedTranslation, {
-      //   type: WidgetType.FORM_FIELD,
-      //   fieldType: FieldDataType.SELECT,
-      //   label:
-      //     "speechToText.hotkey.post.provider.label" as const,
-      //   description:
-      //     "speechToText.hotkey.post.provider.description" as const,
-      //   columns: 6,
-      //   options: SttProviderOptions,
-      //   schema: z.enum(SttProvider).default(SttProvider.OPENAI),
-      // }),
-
       insertPrefix: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "speechToText.hotkey.post.insertPrefix.label" as const,
-        description:
-          "speechToText.hotkey.post.insertPrefix.description" as const,
+        label: "hotkey.post.insertPrefix.label" as const,
+        description: "hotkey.post.insertPrefix.description" as const,
         columns: 6,
-        placeholder:
-          "speechToText.hotkey.post.insertPrefix.placeholder" as const,
+        placeholder: "hotkey.post.insertPrefix.placeholder" as const,
         schema: z.string().default(""),
       }),
 
       insertSuffix: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "speechToText.hotkey.post.insertSuffix.label" as const,
-        description:
-          "speechToText.hotkey.post.insertSuffix.description" as const,
+        label: "hotkey.post.insertSuffix.label" as const,
+        description: "hotkey.post.insertSuffix.description" as const,
         columns: 6,
-        placeholder:
-          "speechToText.hotkey.post.insertSuffix.placeholder" as const,
+        placeholder: "hotkey.post.insertSuffix.placeholder" as const,
         schema: z.string().default(" "),
       }),
 
       // === RESPONSE FIELDS ===
       response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        title: "speechToText.hotkey.post.response.title" as const,
-        description: "speechToText.hotkey.post.response.description" as const,
+        title: "hotkey.post.response.title" as const,
+        description: "hotkey.post.response.description" as const,
         layoutType: LayoutType.GRID,
         columns: 12,
         usage: { response: true },
         children: {
           success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "speechToText.hotkey.post.response.success" as const,
+            label: "hotkey.post.response.success" as const,
             schema: z.boolean(),
           }),
 
           status: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "speechToText.hotkey.post.response.status" as const,
+            text: "hotkey.post.response.status" as const,
             schema: z.string(),
           }),
 
           message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "speechToText.hotkey.post.response.message" as const,
+            label: "hotkey.post.response.message" as const,
             schema: z.string(),
           }),
 
           text: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "speechToText.hotkey.post.response.text" as const,
+            label: "hotkey.post.response.text" as const,
             schema: z.string().optional(),
           }),
 
           recordingDuration: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "speechToText.hotkey.post.response.recordingDuration" as const,
+            content: "hotkey.post.response.recordingDuration" as const,
             schema: z.coerce.number().optional(),
           }),
         },
@@ -158,55 +141,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "speechToText.hotkey.post.errors.unauthorized.title" as const,
-      description:
-        "speechToText.hotkey.post.errors.unauthorized.description" as const,
+      title: "hotkey.post.errors.unauthorized.title" as const,
+      description: "hotkey.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "speechToText.hotkey.post.errors.validation.title" as const,
-      description:
-        "speechToText.hotkey.post.errors.validation.description" as const,
+      title: "hotkey.post.errors.validation.title" as const,
+      description: "hotkey.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "speechToText.hotkey.post.errors.server.title" as const,
-      description:
-        "speechToText.hotkey.post.errors.server.description" as const,
+      title: "hotkey.post.errors.server.title" as const,
+      description: "hotkey.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "speechToText.hotkey.post.errors.conflict.title" as const,
-      description:
-        "speechToText.hotkey.post.errors.conflict.description" as const,
+      title: "hotkey.post.errors.conflict.title" as const,
+      description: "hotkey.post.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "speechToText.hotkey.post.errors.forbidden.title" as const,
-      description:
-        "speechToText.hotkey.post.errors.forbidden.description" as const,
+      title: "hotkey.post.errors.forbidden.title" as const,
+      description: "hotkey.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "speechToText.hotkey.post.errors.network.title" as const,
-      description:
-        "speechToText.hotkey.post.errors.network.description" as const,
+      title: "hotkey.post.errors.network.title" as const,
+      description: "hotkey.post.errors.network.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "speechToText.hotkey.post.errors.notFound.title" as const,
-      description:
-        "speechToText.hotkey.post.errors.notFound.description" as const,
+      title: "hotkey.post.errors.notFound.title" as const,
+      description: "hotkey.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "speechToText.hotkey.post.errors.unsaved.title" as const,
-      description:
-        "speechToText.hotkey.post.errors.unsaved.description" as const,
+      title: "hotkey.post.errors.unsaved.title" as const,
+      description: "hotkey.post.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "speechToText.hotkey.post.errors.unknown.title" as const,
-      description:
-        "speechToText.hotkey.post.errors.unknown.description" as const,
+      title: "hotkey.post.errors.unknown.title" as const,
+      description: "hotkey.post.errors.unknown.description" as const,
     },
   },
 
   successTypes: {
-    title: "speechToText.hotkey.post.success.title" as const,
-    description: "speechToText.hotkey.post.success.description" as const,
+    title: "hotkey.post.success.title" as const,
+    description: "hotkey.post.success.description" as const,
   },
 
   examples: {

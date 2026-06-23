@@ -10,6 +10,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -24,18 +25,8 @@ import {
   normalizeToCanonicalPath,
   pathExists,
 } from "../repository";
-import type { CortexMkdirT } from "./i18n";
-
-interface MkdirParams {
-  userId: string;
-  user: JwtPrivatePayloadType;
-  locale: CountryLanguage;
-  path: string;
-  viewType?: CortexViewTypeValue;
-  createParents?: boolean;
-  logger: EndpointLogger;
-  t: CortexMkdirT;
-}
+import mkdirDefinitions from "./definition";
+import { type CortexMkdirT, scopedTranslation } from "./i18n";
 
 export class CortexMkdirRepository {
   static async createDirectory({
@@ -47,8 +38,27 @@ export class CortexMkdirRepository {
     createParents = true,
     logger,
     t,
-  }: MkdirParams): Promise<
-    ResponseType<{ responsePath: string; created: boolean }>
+    relayed = false,
+  }: {
+    userId: string;
+    user: JwtPrivatePayloadType;
+    locale: CountryLanguage;
+    path: string;
+    viewType?: CortexViewTypeValue;
+    createParents?: boolean;
+    logger: EndpointLogger;
+    t: CortexMkdirT;
+    /**
+     * True when invoked from a cross-instance applier (the mkdir was already
+     * performed on the origin and relayed here). Suppresses the `node-written`
+     * emit so the event is not relayed back, preventing an infinite ping-pong.
+     */
+    relayed?: boolean;
+  }): Promise<
+    ResponseType<{
+      responsePath: string;
+      created: boolean;
+    }>
   > {
     const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
 
@@ -56,34 +66,6 @@ export class CortexMkdirRepository {
       return fail({
         message: t("post.errors.validation.title"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
-      });
-    }
-
-    // SSH virtual mount — create real directory on machine
-    if (isVirtualWritable(path)) {
-      const mountPrefix = getMountPrefix(path, locale);
-      if (mountPrefix === "/ssh") {
-        try {
-          const { mkdirSshPath } = await import("../mounts/ssh");
-          const ok = await mkdirSshPath(userId, path);
-          if (!ok) {
-            return fail({
-              message: t("post.errors.notFound.title"),
-              errorType: ErrorResponseTypes.NOT_FOUND,
-            });
-          }
-          return success({ responsePath: path, created: true });
-        } catch (error) {
-          logger.error("Cortex ssh mkdir failed", parseError(error), { path });
-          return fail({
-            message: t("post.errors.server.title"),
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          });
-        }
-      }
-      return fail({
-        message: t("post.errors.forbidden.title"),
-        errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 
@@ -104,17 +86,6 @@ export class CortexMkdirRepository {
     try {
       const exists = await pathExists(userId, path);
       if (exists) {
-        // Dir already exists. If an explicit viewType was requested, apply it
-        // (so `mkdir --view kanban` on an existing dir sets the view); otherwise
-        // leave it untouched. Either way this is not a fresh creation.
-        if (viewType) {
-          await db
-            .update(cortexNodes)
-            .set({ viewType, updatedAt: new Date() })
-            .where(
-              and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, path)),
-            );
-        }
         return success({ responsePath: path, created: false });
       }
 
@@ -122,10 +93,7 @@ export class CortexMkdirRepository {
         await ensureParentDirs(userId, `${path}/placeholder`);
       }
 
-      // ensureParentDirs above may have already materialized this dir row
-      // (without a viewType). Upsert so an explicit viewType is applied to the
-      // target dir whether the row pre-existed or not. When no viewType was
-      // requested, leave any existing viewType untouched (no-op on conflict).
+      // onConflictDoNothing: ensureParentDirs may have already created this dir
       await db
         .insert(cortexNodes)
         .values({
@@ -136,37 +104,27 @@ export class CortexMkdirRepository {
           size: 0,
           viewType: viewType ?? null,
         })
-        .onConflictDoUpdate({
-          target: [cortexNodes.userId, cortexNodes.path],
-          set: viewType
-            ? { viewType, updatedAt: new Date() }
-            : { updatedAt: new Date() },
-        });
+        .onConflictDoNothing();
 
       logger.info(
         `Cortex mkdir: ${path}${viewType ? ` (viewType: ${viewType})` : ""}`,
       );
 
-      // WS-push sync: broadcast changed provider to connected remote instances
-      void (async (): Promise<void> => {
-        try {
-          const { serializeProviders } =
-            await import("@/app/api/[locale]/remote-connection/sync-provider");
-          const { broadcastSyncNotify } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-          const providerKey = path.startsWith("/memories")
-            ? "memories"
-            : "documents";
-          const syncPayloads = await serializeProviders(
-            [providerKey],
-            userId,
-            logger,
-          );
-          broadcastSyncNotify(userId, syncPayloads, logger);
-        } catch {
-          // Best-effort: cron fallback handles missed syncs
-        }
-      })();
+      // This op owns its `node-written` event: the mkdir the user submitted
+      // (requestFields). The peer's onRemoteEvent re-runs createDirectory.
+      // Server-only. Suppressed when applying a relayed mkdir (avoids re-relay
+      // ping-pong).
+      if (!relayed) {
+        createEndpointEmitter(
+          mkdirDefinitions.POST,
+          logger,
+          user,
+        )("node-written", {
+          path,
+          viewType,
+          createParents,
+        });
+      }
 
       return success({ responsePath: path, created: true });
     } catch (error) {
@@ -174,6 +132,37 @@ export class CortexMkdirRepository {
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Cross-instance applier for `node-written`: re-run the mkdir on this instance
+   * with the relayed inputs. Reuses createDirectory so there is one code path.
+   */
+  static async applyRemoteMkdir({
+    requestData,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof mkdirDefinitions.POST,
+    "node-written"
+  >): Promise<void> {
+    const { t } = scopedTranslation.scopedT(defaultLocale);
+    const result = await this.createDirectory({
+      userId: user.id,
+      user,
+      locale: defaultLocale,
+      path: requestData.path,
+      viewType: requestData.viewType,
+      createParents: requestData.createParents,
+      logger,
+      t,
+      relayed: true,
+    });
+    if (!result.success) {
+      logger.error("Failed to apply remote cortex mkdir", {
+        message: result.message,
       });
     }
   }

@@ -43,72 +43,72 @@ const variantItemSchema = objectField(scopedTranslation, {
   children: {
     id: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.id",
+      label: "get.response.id",
       schema: z.string(),
     }),
     variantKey: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.variantKey",
+      label: "get.response.variantKey",
       schema: z.string(),
     }),
     displayName: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.displayName",
+      label: "get.response.displayName",
       schema: z.string(),
     }),
     description: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.description",
+      label: "get.response.description",
       schema: z.string().nullable(),
     }),
     weight: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.weight",
+      label: "get.response.weight",
       schema: z.number(),
     }),
     active: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.active",
+      label: "get.response.active",
       schema: z.boolean(),
     }),
     campaignType: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.campaignType",
+      label: "get.response.campaignType",
       schema: z.string().nullable(),
     }),
     sourceFilePath: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.sourceFilePath",
+      label: "get.response.sourceFilePath",
       schema: z.string().nullable(),
     }),
     senderName: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.senderName",
+      label: "get.response.senderName",
       schema: z.string().nullable(),
     }),
     companyName: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.companyName",
+      label: "get.response.companyName",
       schema: z.string().nullable(),
     }),
     companyEmail: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.companyEmail",
+      label: "get.response.companyEmail",
       schema: z.string().nullable(),
     }),
     checkErrors: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.checkErrors",
+      label: "get.response.checkErrors",
       schema: z.array(z.string()),
     }),
     createdAt: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.createdAt",
+      label: "get.response.createdAt",
       schema: z.string(),
     }),
     updatedAt: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
-      content: "get.response.updatedAt",
+      label: "get.response.updatedAt",
       schema: z.string(),
     }),
   },
@@ -137,7 +137,7 @@ const { GET } = createEndpoint({
     children: {
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.total",
+        label: "get.response.total",
         schema: z.number(),
       }),
       items: responseArrayField(scopedTranslation, {
@@ -309,22 +309,22 @@ const { POST } = createEndpoint({
       // Response - the created record
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.id",
+        label: "get.response.id",
         schema: z.string(),
       }),
       active: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.active",
+        label: "get.response.active",
         schema: z.boolean(),
       }),
       checkErrors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.checkErrors",
+        label: "get.response.checkErrors",
         schema: z.array(z.string()),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.createdAt",
+        label: "get.response.createdAt",
         schema: z.string(),
       }),
     },
@@ -482,12 +482,12 @@ const { PATCH } = createEndpoint({
       // Response
       variantKey: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.variantKey",
+        label: "get.response.variantKey",
         schema: z.string(),
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.updatedAt",
+        label: "get.response.updatedAt",
         schema: z.string(),
       }),
     },

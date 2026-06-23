@@ -77,19 +77,19 @@ const { POST } = createEndpoint({
         children: {
           subtotal: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderLineRemove.post.response.subtotal" as const,
+            label: "orderLineRemove.post.response.subtotal" as const,
             fieldType: FieldDataType.NUMBER,
             schema: z.number(),
           }),
           taxAmount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderLineRemove.post.response.taxAmount" as const,
+            label: "orderLineRemove.post.response.taxAmount" as const,
             fieldType: FieldDataType.NUMBER,
             schema: z.number(),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderLineRemove.post.response.total" as const,
+            label: "orderLineRemove.post.response.total" as const,
             fieldType: FieldDataType.NUMBER,
             schema: z.number(),
           }),

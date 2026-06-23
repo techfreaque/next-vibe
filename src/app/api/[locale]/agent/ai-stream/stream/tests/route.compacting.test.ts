@@ -69,9 +69,9 @@ async function withFavCompactTrigger(
 ): Promise<() => Promise<void>> {
   const userId = "id" in user ? String(user.id) : "";
   const { resolveFavoriteConfig } =
-    await import("@/app/api/[locale]/agent/chat/favorites/repository");
+    await import("@/app/api/[locale]/agent/skills/favorites/repository");
   const patchDef =
-    await import("@/app/api/[locale]/agent/chat/favorites/[id]/definition").then(
+    await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition").then(
       (m) => m.default.PATCH,
     );
 
@@ -248,10 +248,10 @@ describe("Compacting - context management", () => {
     // ── Resolve quality-tester__kimi favorite ──
     // Use existing fav if present (respects user overrides). Create only if absent.
     const [favsDef, favoriteCreateDef] = await Promise.all([
-      import("@/app/api/[locale]/agent/chat/favorites/definition").then(
+      import("@/app/api/[locale]/agent/skills/favorites/definition").then(
         (m) => m.default.GET,
       ),
-      import("@/app/api/[locale]/agent/chat/favorites/create/definition").then(
+      import("@/app/api/[locale]/agent/skills/favorites/create/definition").then(
         (m) => m.default.POST,
       ),
     ]);

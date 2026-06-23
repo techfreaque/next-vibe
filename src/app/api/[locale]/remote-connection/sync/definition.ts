@@ -201,7 +201,7 @@ const { POST } = createEndpoint({
   },
 });
 
-export const endpoints = { POST };
+export const endpoints = { POST } as const;
 
 export type SyncRequestOutput = typeof POST.types.RequestOutput;
 export type SyncResponseOutput = typeof POST.types.ResponseOutput;

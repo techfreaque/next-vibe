@@ -191,7 +191,7 @@ const { GET } = createEndpoint({
 
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "search.get.response.totalCount.content" as const,
+        label: "search.get.response.totalCount.content" as const,
         schema: z.coerce.number(),
       }),
     },

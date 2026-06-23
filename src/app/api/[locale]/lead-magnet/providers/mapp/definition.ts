@@ -100,7 +100,7 @@ export const { POST } = createEndpoint({
       }),
       provider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "providers.shared.response.provider" as const,
+        label: "providers.shared.response.provider" as const,
         schema: z.string(),
       }),
       isActiveResponse: responseField(scopedTranslation, {

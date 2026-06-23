@@ -86,33 +86,33 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "history.get.id" as const,
+              label: "history.get.id" as const,
               schema: z.string(),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "history.get.amount" as const,
+              label: "history.get.amount" as const,
               schema: z.coerce.number(),
             }),
             balanceAfter: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "history.get.transaction.balanceAfter.content" as const,
+              label: "history.get.transaction.balanceAfter.content" as const,
               schema: z.coerce.number(),
             }),
             type: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "history.get.type" as const,
+              label: "history.get.type" as const,
               schema: z.string().optional(),
             }),
             messageId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "history.get.messageId" as const,
+              label: "history.get.messageId" as const,
               schema: z.string().nullable(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.DATE,
-              content: "history.get.createdAt" as const,
+              label: "history.get.createdAt" as const,
               schema: dateSchema,
             }),
           },

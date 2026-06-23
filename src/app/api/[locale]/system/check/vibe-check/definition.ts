@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
       // === REQUEST FIELDS ===
       title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "title",
+        label: "title",
         level: 1,
         columns: 12,
         usage: { request: "data" },

@@ -89,19 +89,19 @@ const { POST } = createEndpoint({
         children: {
           totalStarted: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "fields.totalStarted.title",
+            label: "fields.totalStarted.title",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "fields.status.title",
+            label: "fields.status.title",
             fieldType: FieldDataType.TEXT,
             schema: z.string(),
           }),
           hasIssues: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "fields.hasIssues.title",
+            label: "fields.hasIssues.title",
             fieldType: FieldDataType.BOOLEAN,
             schema: z.boolean(),
           }),
@@ -110,31 +110,31 @@ const { POST } = createEndpoint({
 
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.output.title",
+        label: "fields.output.title",
         schema: z.string(),
       }),
 
       guardId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.guardId.title",
+        label: "fields.guardId.title",
         schema: z.string(),
       }),
 
       username: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.startedGuards.columns.username",
+        label: "fields.startedGuards.columns.username",
         schema: z.string(),
       }),
 
       guardProjectPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.startedGuards.columns.projectPath",
+        label: "fields.startedGuards.columns.projectPath",
         schema: z.string(),
       }),
 
       scriptPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.output.title",
+        label: "fields.output.title",
         schema: z.string(),
       }),
     },

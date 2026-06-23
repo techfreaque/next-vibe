@@ -1,8 +1,3 @@
-/**
- * Credits Balance Widget
- * Displays user credit balance breakdown
- */
-
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
@@ -59,190 +54,358 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { CreditsTabHeader } from "./credits-tab-header";
 
-/**
- * Format credit amount for display
- * Rounds to 2 decimal places to avoid floating point artifacts
- */
-function formatCredits(amount: number): string {
-  const rounded = Math.round(amount * 100) / 100;
-  if (rounded === Math.floor(rounded)) {
-    return rounded.toString();
+function formatPrice(amount: number, locale: string): string {
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `€${amount}`;
   }
-  return rounded.toFixed(2);
 }
 
-/**
- * Credits total badge - subscribes only to `total`
- */
-function CreditsBadge(): JSX.Element {
-  const t = useWidgetTranslation<typeof definition.GET>();
-  const total = useWidgetSelector<typeof definition.GET>()(
-    (data) => data?.total ?? 0,
-  );
-  return (
-    <Badge className="text-lg font-bold px-4 py-2">
-      {total === 1
-        ? t("get.balance.credit", { count: formatCredits(total) })
-        : t("get.balance.credits", { count: formatCredits(total) })}
-    </Badge>
-  );
+const MODEL_TYPE_ORDER = [
+  "text",
+  "tts",
+  "stt",
+  "image",
+  "audio",
+  "video",
+] as const;
+type ModelTypeKey = (typeof MODEL_TYPE_ORDER)[number];
+
+function getModelSortPrice(def: ModelDefinition): number {
+  const p = def.providers[0];
+  if (!p) {
+    return 0;
+  }
+  return getProviderPrice(p);
 }
 
-/**
- * Expiring credits cell - re-renders only when `expiring` changes
- */
-function ExpiringCell(): JSX.Element {
-  const t = useWidgetTranslation<typeof definition.GET>();
-  const { locale } = useTranslation();
-  const expiring = useWidgetSelector<typeof definition.GET>()(
-    (data) => data?.expiring ?? 0,
-  );
-  const subscriptionProduct = productsRepository.getProduct(
-    ProductIds.SUBSCRIPTION,
-    locale,
-  );
-  return (
-    <Div className="p-4 rounded-lg bg-warning/10 border border-warning/30">
-      <Div className="flex items-center gap-2 text-sm text-warning mb-2">
-        <Calendar className="h-4 w-4" />
-        {t("get.balance.expiring.title")}
-      </Div>
-      <Div className="text-2xl font-bold text-warning">
-        {formatCredits(expiring)}
-      </Div>
-      <Div className="text-xs text-warning/70 mt-1">
-        {t("get.balance.expiring.description", {
-          subCredits: subscriptionProduct.credits,
-        })}
-      </Div>
-    </Div>
-  );
-}
+export function CreditsBalanceContainer(): JSX.Element {
+  const locale = useWidgetLocale();
+  const widgetUser = useWidgetUser();
+  const navigation = useWidgetNavigation();
+  const availability = useProviderAvailability();
+  const { locale: currentLocale } = useTranslation();
+  const { t: tSub } = subscriptionT.scopedT(currentLocale);
 
-/**
- * Permanent credits cell - re-renders only when `permanent` changes
- */
-function PermanentCell(): JSX.Element {
-  const t = useWidgetTranslation<typeof definition.GET>();
-  const permanent = useWidgetSelector<typeof definition.GET>()(
-    (data) => data?.permanent ?? 0,
-  );
-  return (
-    <Div className="p-4 rounded-lg bg-success/10 border border-success/30">
-      <Div className="flex items-center gap-2 text-sm text-success mb-2">
-        <Sparkles className="h-4 w-4" />
-        {t("get.balance.permanent.title")}
-      </Div>
-      <Div className="text-2xl font-bold text-success">
-        {formatCredits(permanent)}
-      </Div>
-      <Div className="text-xs text-success/70 mt-1">
-        {t("get.balance.permanent.description")}
-      </Div>
-    </Div>
-  );
-}
+  const isAdmin =
+    !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
+  const totalModelCount = getAvailableModelCount(isAdmin, availability);
 
-/**
- * Free credits cell - re-renders only when `free` changes
- */
-function FreeCell(): JSX.Element {
-  const t = useWidgetTranslation<typeof definition.GET>();
-  const { locale } = useTranslation();
-  const free = useWidgetSelector<typeof definition.GET>()(
-    (data) => data?.free ?? 0,
-  );
+  const products = productsRepository.getProducts(locale);
+  const subscriptionProduct = products[ProductIds.SUBSCRIPTION];
   const freeProduct = productsRepository.getProduct(
     ProductIds.FREE_TIER,
     locale,
   );
-  return (
-    <Div className="p-4 rounded-lg bg-info/10 border border-info/30">
-      <Div className="flex items-center gap-2 text-sm text-info mb-2">
-        <Zap className="h-4 w-4" />
-        {t("get.balance.free.title")}
-      </Div>
-      <Div className="text-2xl font-bold text-info">{formatCredits(free)}</Div>
-      <Div className="text-xs text-info/70 mt-1">
-        {t("get.balance.free.description", { count: freeProduct.credits })}
-      </Div>
-    </Div>
-  );
-}
+  const packProduct = products[ProductIds.CREDIT_PACK];
 
-/**
- * Earned credits cell - re-renders only when `earned` changes
- */
-function EarnedCell(): JSX.Element {
-  const t = useWidgetTranslation<typeof definition.GET>();
-  const { locale } = useTranslation();
-  const earned = useWidgetSelector<typeof definition.GET>()(
-    (data) => data?.earned ?? 0,
-  );
-  return (
-    <Link href={`/${locale}/user/referral`} className="block">
-      <Div className="p-4 rounded-lg bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors cursor-pointer h-full">
-        <Div className="flex items-center gap-2 text-sm text-violet-700 dark:text-violet-300 mb-2">
-          <Gift className="h-4 w-4" />
-          {t("get.balance.earned.title")}
-        </Div>
-        <Div className="text-2xl font-bold text-violet-900 dark:text-violet-100">
-          {formatCredits(earned)}
-        </Div>
-        <Div className="text-xs text-violet-600 dark:text-violet-400 mt-1">
-          {t("get.balance.earned.description")}
-        </Div>
-      </Div>
-    </Link>
-  );
-}
+  const [showLegacyModels, setShowLegacyModels] = useState(false);
 
-/**
- * Credits Balance Container Widget
- * The container itself subscribes to nothing - only sub-components re-render on data changes
- */
-export function CreditsBalanceContainer(): JSX.Element {
-  const t = useWidgetTranslation<typeof definition.GET>();
-  const widgetUser = useWidgetUser();
-  const isAdmin =
-    !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
-  const availability = useProviderAvailability();
-  const totalModelCount = getAvailableModelCount(isAdmin, availability);
+  const handleBuyClick = (): void => {
+    void (async (): Promise<void> => {
+      const def =
+        await import("@/app/api/[locale]/subscription/create/definition");
+      navigation.push(def.default.POST, {});
+    })();
+  };
 
   return (
-    <MotionDiv
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
-    >
-      <Card className="relative overflow-hidden">
-        <CardHeader>
-          <Div className="flex items-start justify-between">
-            <Div className="flex flex-col gap-1">
-              <CardTitle className="flex items-center gap-3">
-                <Div className="p-2 rounded-lg bg-primary/10">
-                  <Coins className="h-6 w-6 text-primary" />
-                </Div>
-                {t("get.balance.title")}
-              </CardTitle>
-              <CardDescription>
-                {t("get.balance.description", {
-                  modelCount: totalModelCount,
-                })}
-              </CardDescription>
+    <WidgetShell>
+      <CreditsTabHeader activeTab="overview" />
+
+      {/* Overview content */}
+      <Div className="flex flex-col gap-6">
+        {/* How credits work */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5" />
+              {tSub("subscription.overview.howItWorks.title")}
+            </CardTitle>
+            <CardDescription>
+              {tSub("subscription.overview.howItWorks.description", {
+                subCredits: subscriptionProduct.credits,
+              })}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <Div className="flex items-start gap-3 p-3 rounded-lg bg-warning/10">
+              <Calendar className="h-5 w-5 text-warning mt-0.5 shrink-0" />
+              <Div>
+                <P className="font-medium text-warning">
+                  {tSub("subscription.overview.howItWorks.expiring.title")}
+                </P>
+                <P className="text-sm text-warning/80">
+                  {tSub(
+                    "subscription.overview.howItWorks.expiring.description",
+                    {
+                      subPrice: formatPrice(subscriptionProduct.price, locale),
+                      subCredits: subscriptionProduct.credits,
+                      modelCount: totalModelCount,
+                    },
+                  )}
+                </P>
+              </Div>
             </Div>
-            <CreditsBadge />
-          </Div>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-6">
-          <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <ExpiringCell />
-            <PermanentCell />
-            <FreeCell />
-            <EarnedCell />
-          </Div>
-        </CardContent>
-      </Card>
-    </MotionDiv>
+            <Div className="flex items-start gap-3 p-3 rounded-lg bg-success/10">
+              <Sparkles className="h-5 w-5 text-success mt-0.5 shrink-0" />
+              <Div>
+                <P className="font-medium text-success">
+                  {tSub("subscription.overview.howItWorks.permanent.title")}
+                </P>
+                <P className="text-sm text-success/80">
+                  {tSub(
+                    "subscription.overview.howItWorks.permanent.description",
+                    {
+                      packPrice: formatPrice(packProduct.price, locale),
+                      packCredits: packProduct.credits,
+                      subCredits: subscriptionProduct.credits,
+                    },
+                  )}
+                </P>
+              </Div>
+            </Div>
+            <Div className="flex items-start gap-3 p-3 rounded-lg bg-info/10">
+              <Zap className="h-5 w-5 text-info mt-0.5 shrink-0" />
+              <Div>
+                <P className="font-medium text-info">
+                  {tSub("subscription.overview.howItWorks.free.title")}
+                </P>
+                <P className="text-sm text-info/80">
+                  {tSub("subscription.overview.howItWorks.free.description", {
+                    count: freeProduct.credits,
+                  })}
+                </P>
+              </Div>
+            </Div>
+          </CardContent>
+        </Card>
+
+        {/* CTA */}
+        <Card className="overflow-hidden border-0 bg-linear-to-br from-primary/10 via-primary/5 to-background">
+          <CardContent className="p-8">
+            <Div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <Div className="flex-1 text-center md:text-left">
+                <H4 className="text-2xl font-bold mb-2">
+                  {tSub("subscription.overview.cta.title")}
+                </H4>
+                <P className="text-muted-foreground">
+                  {tSub("subscription.overview.cta.description", {
+                    modelCount: totalModelCount,
+                  })}
+                </P>
+              </Div>
+              <Button
+                size="lg"
+                onClick={handleBuyClick}
+                className="group flex items-center gap-2 shadow-lg hover:shadow-xl transition-all"
+              >
+                {tSub("subscription.overview.cta.button")}
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Div>
+          </CardContent>
+        </Card>
+
+        {/* Model pricing */}
+        <Card id="model-costs">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Coins className="h-5 w-5" />
+              {tSub("subscription.overview.costs.title")}
+            </CardTitle>
+            <CardDescription>
+              {tSub("subscription.overview.costs.description")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Div className="flex flex-col gap-6">
+              <Div>
+                <Div className="flex items-center justify-between mb-3">
+                  <H4 className="font-semibold">
+                    {tSub("subscription.overview.costs.models.title")}
+                  </H4>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowLegacyModels(!showLegacyModels)}
+                  >
+                    {showLegacyModels
+                      ? tSub("subscription.overview.costs.models.hideLegacy")
+                      : tSub("subscription.overview.costs.models.showLegacy")}
+                  </Button>
+                </Div>
+                <Div className="flex flex-col gap-6">
+                  {MODEL_TYPE_ORDER.map((modelType: ModelTypeKey) => {
+                    const modelsByType: Record<
+                      ModelTypeKey,
+                      ModelDefinition[]
+                    > = {
+                      text: Object.values(chatModelDefinitions),
+                      tts: Object.values(ttsModelDefinitions),
+                      stt: Object.values(sttModelDefinitions),
+                      image: Object.values(imageGenModelDefinitions),
+                      audio: Object.values(musicGenModelDefinitions),
+                      video: Object.values(videoGenModelDefinitions),
+                    };
+                    const typeModels = modelsByType[modelType].filter((def) => {
+                      if (
+                        !showLegacyModels &&
+                        def.utilities.includes(ModelUtility.LEGACY)
+                      ) {
+                        return false;
+                      }
+                      const visibleProviders = isAdmin
+                        ? def.providers
+                        : def.providers.filter((p) => !p.adminOnly);
+                      return visibleProviders.some((p) =>
+                        isApiProviderAvailable(p.apiProvider, availability),
+                      );
+                    });
+                    if (typeModels.length === 0) {
+                      return null;
+                    }
+
+                    const byProvider = Object.entries(modelProviders)
+                      .map(([providerId, provider]) => ({
+                        providerId,
+                        provider,
+                        models: typeModels
+                          .filter((def) => def.by === providerId)
+                          .toSorted(
+                            (a, b) =>
+                              getModelSortPrice(a) - getModelSortPrice(b),
+                          ),
+                      }))
+                      .filter(({ models }) => models.length > 0)
+                      .toSorted((a, b) =>
+                        a.provider.name.localeCompare(b.provider.name),
+                      );
+
+                    return (
+                      <Div key={modelType}>
+                        <H4 className="font-semibold mb-3 text-base">
+                          {tSub(
+                            `subscription.overview.costs.models.types.${modelType}`,
+                          )}
+                        </H4>
+                        <Div className="flex flex-col gap-4">
+                          {byProvider.map(
+                            ({ providerId, provider, models }) => (
+                              <Div key={providerId}>
+                                <Div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground font-medium">
+                                  <Icon
+                                    icon={provider.icon}
+                                    className="h-4 w-4"
+                                  />
+                                  {provider.name}
+                                </Div>
+                                <Div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                                  {models.map((def) => {
+                                    const isLegacy = def.utilities.includes(
+                                      ModelUtility.LEGACY,
+                                    );
+                                    const primaryId = def.providers[0].id;
+                                    return (
+                                      <Div
+                                        key={primaryId}
+                                        className="flex items-center gap-3 p-2 rounded bg-accent"
+                                      >
+                                        <Span className="flex items-center gap-1 flex-1 min-w-0">
+                                          {def.name}
+                                          {isLegacy && (
+                                            <Span className="text-xs text-muted-foreground">
+                                              (
+                                              {tSub(
+                                                "subscription.overview.costs.models.legacyBadge",
+                                              )}
+                                              )
+                                            </Span>
+                                          )}
+                                        </Span>
+                                        <ModelCreditDisplay
+                                          modelId={primaryId}
+                                          variant="text"
+                                          className="font-mono text-xs shrink-0"
+                                          locale={locale}
+                                        />
+                                      </Div>
+                                    );
+                                  })}
+                                </Div>
+                              </Div>
+                            ),
+                          )}
+                        </Div>
+                      </Div>
+                    );
+                  })}
+                </Div>
+              </Div>
+
+              {/* Feature costs */}
+              <Div>
+                <H4 className="font-semibold mb-2">
+                  {tSub("subscription.overview.costs.features.title")}
+                </H4>
+                <Div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                  <Div className="flex items-center gap-3 p-2 rounded bg-accent">
+                    <Span>
+                      {tSub(
+                        "subscription.overview.costs.features.braveSearchLabel",
+                      )}
+                    </Span>
+                    <Span className="font-mono">
+                      {tSub("subscription.overview.costs.features.costFormat", {
+                        value: FEATURE_COSTS.BRAVE_SEARCH,
+                        unit: tSub(
+                          "subscription.overview.costs.features.creditsUnit",
+                        ),
+                      })}
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center gap-3 p-2 rounded bg-accent">
+                    <Span>
+                      {tSub(
+                        "subscription.overview.costs.features.kagiSearchLabel",
+                      )}
+                    </Span>
+                    <Span className="font-mono">
+                      {tSub("subscription.overview.costs.features.costFormat", {
+                        value: FEATURE_COSTS.KAGI_SEARCH,
+                        unit: tSub(
+                          "subscription.overview.costs.features.creditsUnit",
+                        ),
+                      })}
+                    </Span>
+                  </Div>
+                  <Div className="flex items-center gap-3 p-2 rounded bg-accent">
+                    <Span>
+                      {tSub(
+                        "subscription.overview.costs.features.fetchUrlLabel",
+                      )}
+                    </Span>
+                    <Span className="font-mono">
+                      {tSub("subscription.overview.costs.features.costFormat", {
+                        value: FEATURE_COSTS.FETCH_URL_CONTENT,
+                        unit: tSub(
+                          "subscription.overview.costs.features.creditsUnit",
+                        ),
+                      })}
+                    </Span>
+                  </Div>
+                </Div>
+              </Div>
+            </Div>
+          </CardContent>
+        </Card>
+      </Div>
+    </WidgetShell>
   );
 }

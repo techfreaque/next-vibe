@@ -331,6 +331,9 @@ export const translations = {
         consecutiveFailures: "Consecutive Failures",
         targetInstance: "Target Instance",
         tags: "Tags",
+        owner: "Owner",
+        createdAt: "Created At",
+        updatedAt: "Updated At",
       },
     },
     errors: {

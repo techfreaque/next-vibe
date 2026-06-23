@@ -57,6 +57,9 @@ export const translations: typeof enTranslations = {
       network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
       timeout: { title: "Timeout", description: "Przekroczono limit czasu" },
     },
+    response: {
+      ok: { title: "OK" },
+    },
     success: {
       title: "Użytkownik usunięty",
       description: "Konto użytkownika OS usunięte pomyślnie",

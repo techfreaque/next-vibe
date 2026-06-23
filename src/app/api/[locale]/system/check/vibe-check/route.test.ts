@@ -40,8 +40,8 @@ const TEST_FILES = [
 // ============================================================
 const EXPECTED_COUNTS = {
   // Total summary (counts may vary slightly based on test environment)
-  totalIssues: 312,
-  totalErrors: 306,
+  totalIssues: 325,
+  totalErrors: 319,
   totalWarnings: 6,
   totalFiles: 11,
 
@@ -70,7 +70,7 @@ const EXPECTED_COUNTS = {
     // ESLint rules
     "eslint(no-debugger)": 1,
     "eslint(no-console)": 8,
-    "eslint(curly)": 2,
+    "eslint(curly)": 1,
     "eslint(eqeqeq)": 3,
     "eslint(no-unused-vars)": 5,
     "eslint(no-template-curly-in-string)": 1,

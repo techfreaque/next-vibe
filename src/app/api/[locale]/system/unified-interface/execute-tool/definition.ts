@@ -28,6 +28,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { taskInputSchema } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -54,6 +55,7 @@ const { POST } = createEndpoint({
     }
     return undefined;
   },
+  timeoutMs: 0,
   icon: "zap",
   category: "ai",
   subCategory: "Tools",
@@ -196,6 +198,19 @@ const { POST } = createEndpoint({
   successTypes: {
     title: "executeTool.post.success.title",
     description: "executeTool.post.success.description",
+  },
+
+  // === EVENTS (server-side wire protocol) ===
+  // Tool dispatch wire events — server-only, never delivered to client.
+  events: {
+    "tool-execute-request": {
+      remoteEvent: true as const,
+      clientDelivery: false as const,
+    },
+    "tool-execute-result": {
+      remoteEvent: true as const,
+      clientDelivery: false as const,
+    },
   },
 
   // === EXAMPLES ===

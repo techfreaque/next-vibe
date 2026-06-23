@@ -87,7 +87,7 @@ const { DELETE } = createEndpoint({
       // === RESPONSE ===
       responsePath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.path.content" as const,
+        label: "delete.response.path.content" as const,
         schema: z.string(),
         fieldName: "path",
       }),

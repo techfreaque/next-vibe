@@ -215,23 +215,23 @@ const { PATCH } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "vendorUpdate.patch.response.id" as const,
+            label: "vendorUpdate.patch.response.id" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           nameResponse: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "vendorUpdate.patch.response.name" as const,
+            label: "vendorUpdate.patch.response.name" as const,
             schema: z.string(),
           }),
           isActive: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "vendorUpdate.patch.response.isActive" as const,
+            label: "vendorUpdate.patch.response.isActive" as const,
             schema: z.boolean(),
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "vendorUpdate.patch.response.updatedAt" as const,
+            label: "vendorUpdate.patch.response.updatedAt" as const,
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date(),
           }),

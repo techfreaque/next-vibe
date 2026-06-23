@@ -100,19 +100,19 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       html: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "preview.render.post.fields.html.title" as const,
+        label: "preview.render.post.fields.html.title" as const,
         schema: z.string(),
       }),
 
       subject: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "preview.render.post.fields.subject.title" as const,
+        label: "preview.render.post.fields.subject.title" as const,
         schema: z.string(),
       }),
 
       templateVersion: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "preview.render.post.fields.templateVersion.title" as const,
+        label: "preview.render.post.fields.templateVersion.title" as const,
         schema: z.string(),
       }),
     },

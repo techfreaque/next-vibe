@@ -47,22 +47,12 @@ interface ConnectWidgetProps {
   field: (typeof definitions.POST)["fields"];
 }
 
-const SYNC_SCOPE_KEYS = [
-  "memories",
-  "documents",
-  "skills",
-  "favorites",
-  "threads",
-] as const;
-type SyncScopeKey = (typeof SYNC_SCOPE_KEYS)[number];
-
 export function RemoteConnectWidget({
   field,
 }: ConnectWidgetProps): JSX.Element {
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const user = useWidgetUser();
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const backButton = <NavigateButtonWidget field={field.children.backButton} />;
 
@@ -165,54 +155,11 @@ export function RemoteConnectWidget({
             </Div>
           </Div>
 
-          {/* Advanced settings toggle */}
-          <Div
-            className="flex items-center gap-2 cursor-pointer select-none py-1 border-t pt-3"
-            onClick={() => setShowAdvanced((v) => !v)}
-          >
-            {showAdvanced ? (
-              <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-            )}
-            <P className="text-xs font-medium text-muted-foreground">
-              {t("post.advancedSettings")}
-            </P>
-          </Div>
-
-          {showAdvanced && (
-            <Div className="flex flex-col gap-4 border rounded-md px-4 py-4 bg-muted/20">
-              {/* Inference provider */}
-              <BooleanFieldWidget
-                fieldName="isInferenceProvider"
-                field={field.children.isInferenceProvider}
-              />
-
-              {/* Sync scope */}
-              <Div>
-                <P className="text-xs font-medium mb-1">
-                  {t("post.syncScope.label")}
-                </P>
-                <P className="text-xs text-muted-foreground mb-2">
-                  {t("post.syncScope.description")}
-                </P>
-                <Div className="grid grid-cols-2 gap-1.5">
-                  {SYNC_SCOPE_KEYS.map((key: SyncScopeKey) => (
-                    <Div
-                      key={key}
-                      className="flex items-center gap-1.5 text-xs text-muted-foreground"
-                    >
-                      <CheckCircle2 className="h-3 w-3 text-primary" />
-                      {t(`post.syncScope.${key}` as const)}
-                    </Div>
-                  ))}
-                </Div>
-                <P className="text-[10px] text-muted-foreground mt-1.5 italic">
-                  {t("post.syncScope.defaultNote")}
-                </P>
-              </Div>
-            </Div>
-          )}
+          {/* Inference provider — always visible for admins */}
+          <BooleanFieldWidget
+            fieldName="isInferenceProvider"
+            field={field.children.isInferenceProvider}
+          />
 
           <FormAlertWidget field={field.children.formAlert} />
 

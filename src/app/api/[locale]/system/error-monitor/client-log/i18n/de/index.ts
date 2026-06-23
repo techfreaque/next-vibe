@@ -2,6 +2,13 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "System",
 
+  enums: {
+    level: {
+      error: "Fehler",
+      warn: "Warnung",
+    },
+  },
+
   post: {
     title: "Client-Fehler melden",
     titleShort: "Fehler protokollieren",

@@ -43,7 +43,7 @@ const { POST } = createEndpoint({
     children: {
       expiredCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "expire.post.response.expiredCount" as const,
+        label: "expire.post.response.expiredCount" as const,
         schema: z.number(),
       }),
     },

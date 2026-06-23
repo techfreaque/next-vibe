@@ -187,49 +187,49 @@ const { GET } = createEndpoint({
               children: {
                 id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.purchases.id" as const,
+                  label: "get.response.purchases.id" as const,
                   schema: z.string(),
                 }),
                 userEmail: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.purchases.userEmail" as const,
+                  label: "get.response.purchases.userEmail" as const,
                   schema: z.string(),
                 }),
                 userName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.purchases.userName" as const,
+                  label: "get.response.purchases.userName" as const,
                   schema: z.string(),
                 }),
                 packType: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.purchases.packType" as const,
+                  label: "get.response.purchases.packType" as const,
                   schema: z.string(),
                 }),
                 source: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.purchases.source" as const,
+                  label: "get.response.purchases.source" as const,
                   schema: z.string(),
                 }),
                 originalAmount: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.purchases.originalAmount" as const,
+                  label: "get.response.purchases.originalAmount" as const,
                   schema: z.coerce.number(),
                 }),
                 remaining: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.purchases.remaining" as const,
+                  label: "get.response.purchases.remaining" as const,
                   schema: z.coerce.number(),
                 }),
                 expiresAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content: "get.response.purchases.expiresAt" as const,
+                  label: "get.response.purchases.expiresAt" as const,
                   schema: z.coerce.date().nullable(),
                 }),
                 createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content: "get.response.purchases.createdAt" as const,
+                  label: "get.response.purchases.createdAt" as const,
                   schema: z.coerce.date(),
                 }),
               },
@@ -264,14 +264,12 @@ const { GET } = createEndpoint({
           totalCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.totalCount" as const,
-            content: "get.response.totalCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),
           pageCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.pageCount" as const,
-            content: "get.response.pageCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),

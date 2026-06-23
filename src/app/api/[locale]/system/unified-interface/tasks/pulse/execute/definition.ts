@@ -83,22 +83,22 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.success.title",
+        label: "post.fields.success.title",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.message.title",
+        label: "post.fields.message.title",
         schema: z.string(),
       }),
       executedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.executedAt",
+        label: "post.response.executedAt",
         schema: z.string(),
       }),
       tasksExecuted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.tasksExecuted",
+        label: "post.response.tasksExecuted",
         schema: z.coerce.number(),
       }),
       results: responseArrayField(scopedTranslation, {
@@ -114,22 +114,22 @@ const { POST } = createEndpoint({
           children: {
             taskName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.taskName",
+              label: "post.response.taskName",
               schema: z.string(),
             }),
             success: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.success",
+              label: "post.response.success",
               schema: z.boolean(),
             }),
             duration: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.duration",
+              label: "post.response.duration",
               schema: z.coerce.number(),
             }),
             message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.message",
+              label: "post.response.message",
               schema: z.string().optional(),
             }),
           },

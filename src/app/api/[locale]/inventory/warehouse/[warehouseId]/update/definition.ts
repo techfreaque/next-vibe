@@ -102,28 +102,28 @@ const { PATCH } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseUpdate.patch.response.id" as const,
+            label: "warehouseUpdate.patch.response.id" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           name: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseUpdate.patch.response.name" as const,
+            label: "warehouseUpdate.patch.response.name" as const,
             schema: z.string(),
           }),
           code: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseUpdate.patch.response.code" as const,
+            label: "warehouseUpdate.patch.response.code" as const,
             schema: z.string(),
           }),
           isActive: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseUpdate.patch.response.isActive" as const,
+            label: "warehouseUpdate.patch.response.isActive" as const,
             schema: z.boolean(),
           }),
           isDefault: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseUpdate.patch.response.isDefault" as const,
+            label: "warehouseUpdate.patch.response.isDefault" as const,
             schema: z.boolean(),
           }),
         },

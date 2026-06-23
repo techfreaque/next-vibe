@@ -53,9 +53,9 @@ import { generateWithOpenRouter } from "./providers/openrouter";
 import { generateWithReplicate } from "./providers/replicate";
 import { generateImageWithUnbottled } from "./providers/unbottled";
 
-interface MediaGenStreamContext {
-  threadId?: string | undefined;
-  aiMessageId?: string | undefined;
+export interface ImageGenerationMediaGenStreamContext {
+  threadId?: string;
+  aiMessageId?: string;
   abortSignal: AbortSignal;
   subAgentDepth: number;
 }
@@ -101,7 +101,7 @@ export class ImageGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ImageGenerationT,
-    streamContext: MediaGenStreamContext,
+    streamContext: ImageGenerationMediaGenStreamContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -390,7 +390,7 @@ export class ImageGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ImageGenerationT,
-    streamContext: MediaGenStreamContext,
+    streamContext: ImageGenerationMediaGenStreamContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
     logger.debug("[ImageGen] Using headless AI runner for token-based model", {
       model: data.model,

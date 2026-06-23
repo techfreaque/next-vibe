@@ -70,12 +70,12 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.success",
+        label: "response.success",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.message",
+        label: "response.message",
         schema: z.string(),
       }),
     },

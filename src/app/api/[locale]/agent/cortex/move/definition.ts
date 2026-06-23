@@ -87,13 +87,13 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       responseFrom: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.from.content" as const,
+        label: "post.response.from.content" as const,
         schema: z.string(),
         fieldName: "from",
       }),
       responseTo: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.to.content" as const,
+        label: "post.response.to.content" as const,
         schema: z.string(),
         fieldName: "to",
       }),

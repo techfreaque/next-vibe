@@ -87,14 +87,14 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "move-mouse.response.success",
+        label: "move-mouse.response.success",
         schema: z
           .boolean()
           .describe("Whether the mouse move operation succeeded"),
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "move-mouse.response.error",
+        label: "move-mouse.response.error",
         schema: z
           .string()
           .optional()
@@ -102,7 +102,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "move-mouse.response.executionId",
+        label: "move-mouse.response.executionId",
         schema: z
           .string()
           .optional()

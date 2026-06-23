@@ -69,24 +69,24 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.id",
+              label: "get.response.id",
               hidden: true,
               schema: z.uuid(),
             }),
             userId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.userId",
+              label: "get.response.userId",
               hidden: true,
               schema: z.uuid(),
             }),
             email: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.email",
+              label: "get.response.email",
               schema: z.string().nullable(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.name",
+              label: "get.response.name",
               schema: z.string().nullable(),
             }),
             role: responseField(scopedTranslation, {
@@ -97,12 +97,12 @@ const { GET } = createEndpoint({
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.isActive",
+              label: "get.response.isActive",
               schema: z.boolean(),
             }),
             joinedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.joinedAt",
+              label: "get.response.joinedAt",
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date(),
             }),

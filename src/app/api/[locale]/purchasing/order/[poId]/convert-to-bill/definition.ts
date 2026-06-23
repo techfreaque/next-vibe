@@ -68,17 +68,17 @@ const { POST } = createEndpoint({
         children: {
           billId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderConvertToBill.post.response.billId" as const,
+            label: "orderConvertToBill.post.response.billId" as const,
             schema: z.uuid(),
           }),
           billNumber: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderConvertToBill.post.response.billNumber" as const,
+            label: "orderConvertToBill.post.response.billNumber" as const,
             schema: z.string(),
           }),
           poId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderConvertToBill.post.response.poId" as const,
+            label: "orderConvertToBill.post.response.poId" as const,
             hidden: true,
             schema: z.uuid(),
           }),

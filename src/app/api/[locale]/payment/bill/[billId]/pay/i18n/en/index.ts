@@ -49,6 +49,15 @@ export const translations = {
       paymentRecorded: "Payment recorded",
     },
   },
+  enums: {
+    billStatus: {
+      DRAFT: "Draft",
+      RECEIVED: "Received",
+      APPROVED: "Approved",
+      PAID: "Paid",
+      DISPUTED: "Disputed",
+    },
+  },
   accountNodeId: {
     label: "Bank / Cash Account",
     description: "Account node used to pay (Bank or Cash)",

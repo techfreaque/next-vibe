@@ -142,19 +142,19 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.success.label",
+        label: "response.success.label",
         schema: z
           .boolean()
           .describe("Whether the command executed successfully"),
       }),
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.output.label",
+        label: "response.output.label",
         schema: z.string().describe("Command output"),
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.error.label",
+        label: "response.error.label",
         schema: z
           .string()
           .optional()

@@ -40,27 +40,27 @@ const { POST } = createEndpoint({
     children: {
       nodesProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.nodesProcessed",
+        label: "post.response.nodesProcessed",
         schema: z.number(),
       }),
       totalDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.totalDeleted",
+        label: "post.response.totalDeleted",
         schema: z.number(),
       }),
       snapshotsDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.snapshotsDeleted",
+        label: "post.response.snapshotsDeleted",
         schema: z.number(),
       }),
       graphsChecked: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.graphsChecked",
+        label: "post.response.graphsChecked",
         schema: z.number(),
       }),
       graphsExecuted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.graphsExecuted",
+        label: "post.response.graphsExecuted",
         schema: z.number(),
       }),
     },

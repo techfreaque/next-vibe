@@ -314,12 +314,12 @@ describe("Browser Tools", () => {
       const [resA, resB] = await Promise.all([
         run(
           newPageEndpoints.POST,
-          { url: URL_A, instanceId: SESSION_A },
+          { url: URL_A, replacePage: true, instanceId: SESSION_A },
           testUser,
         ),
         run(
           newPageEndpoints.POST,
-          { url: URL_B, instanceId: SESSION_B },
+          { url: URL_B, replacePage: true, instanceId: SESSION_B },
           testUser,
         ),
       ]);
@@ -787,7 +787,7 @@ describe("Browser Tools", () => {
       // Open: 2 (A+B) + 1 = 3 tabs
       const openRes = await run(
         newPageEndpoints.POST,
-        { url: URL_A, instanceId: SID },
+        { url: URL_A, replacePage: true, instanceId: SID },
         testUser,
       );
       expect(openRes.success, `B13 open: ${openRes.error ?? ""}`).toBe(true);
@@ -805,7 +805,7 @@ describe("Browser Tools", () => {
       // Re-use same sessionId — must reopen cleanly → 3 again
       const recoverRes = await run(
         newPageEndpoints.POST,
-        { url: URL_A, instanceId: SID },
+        { url: URL_A, replacePage: true, instanceId: SID },
         testUser,
       );
       expect(
@@ -872,7 +872,7 @@ describe("Browser Tools", () => {
       // No instanceId in input — field is hidden for MCP, serverDefault injects VIBE_PID
       const result = await RouteExecuteRepository.runInProcessTyped({
         definition: newPageEndpoints.POST,
-        input: { url: "https://example.com" },
+        input: { url: "https://example.com", replacePage: true },
         user: testUser,
         locale: defaultLocale,
         logger,
@@ -911,7 +911,7 @@ describe("Browser Tools", () => {
       const SID = "browser-test-close-only";
       const openRes = await run(
         newPageEndpoints.POST,
-        { url: URL_A, instanceId: SID },
+        { url: URL_A, replacePage: true, instanceId: SID },
         testUser,
       );
       expect(openRes.success, `B16 open: ${openRes.error ?? ""}`).toBe(true);
@@ -1017,17 +1017,17 @@ describe("Browser Tools", () => {
         // A opens PAGE_A1 → +1 tab (A:1, B:0)
         const a1 = await run(
           newPageEndpoints.POST,
-          { url: URL_A1, instanceId: MA },
+          { url: URL_A1, replacePage: true, instanceId: MA },
           testUser,
         );
         expect(a1.success, `B_MULTI a1: ${a1.error ?? ""}`).toBe(true);
         expect(extractText(a1.data)).toMatch(/example\.com.*\[selected\]/i);
         await assertTabCount(localBase, 1, "B_MULTI: after A1");
 
-        // A opens PAGE_A2 → +2 tabs (A:2, B:0)
+        // A opens PAGE_A2 → +2 tabs (A:2, B:0) — replacePage=false to accumulate
         const a2 = await run(
           newPageEndpoints.POST,
-          { url: URL_A2, instanceId: MA },
+          { url: URL_A2, instanceId: MA, replacePage: false },
           testUser,
         );
         expect(a2.success, `B_MULTI a2: ${a2.error ?? ""}`).toBe(true);
@@ -1037,7 +1037,7 @@ describe("Browser Tools", () => {
         // B opens PAGE_B1 → +3 tabs (A:2, B:1)
         const b1 = await run(
           newPageEndpoints.POST,
-          { url: URL_B1, instanceId: MB },
+          { url: URL_B1, replacePage: true, instanceId: MB },
           testUser,
         );
         expect(b1.success, `B_MULTI b1: ${b1.error ?? ""}`).toBe(true);
@@ -1138,6 +1138,166 @@ describe("Browser Tools", () => {
     },
   );
 
+  // ── B_REPLACE: replacePage=true replaces; replacePage=false accumulates ──────
+
+  it(
+    "B_REPLACE: replacePage=true replaces existing page; replacePage=false adds another tab",
+    { timeout: TEST_TIMEOUT * 2 },
+    async () => {
+      const SR = "browser-test-replace";
+      await closeTestTabs([SR], testUser);
+      const localBase = (await getChromeTabs()).length;
+
+      try {
+        // Open page 1 — no existing page, replacePage=true (default)
+        const r1 = await run(
+          newPageEndpoints.POST,
+          { url: URL_A1, instanceId: SR, replacePage: true },
+          testUser,
+        );
+        expect(r1.success, `B_REPLACE r1: ${r1.error ?? ""}`).toBe(true);
+        await assertTabCount(localBase, 1, "B_REPLACE: after r1 (first page)");
+
+        // replacePage=true on a session that already has a page → replaces, still 1 tab
+        const r2 = await run(
+          newPageEndpoints.POST,
+          { url: URL_A2, instanceId: SR, replacePage: true },
+          testUser,
+        );
+        expect(r2.success, `B_REPLACE r2: ${r2.error ?? ""}`).toBe(true);
+        await assertTabCount(
+          localBase,
+          1,
+          "B_REPLACE: after r2 (replace — still 1 tab)",
+        );
+
+        // Active page must now be the replaced URL (example.net)
+        const urlAfterReplace = await run(
+          evaluateScriptEndpoints.POST,
+          { function: "() => window.location.href", instanceId: SR },
+          testUser,
+        );
+        expect(urlAfterReplace.success).toBe(true);
+        expect(extractText(urlAfterReplace.data)).toContain("example.net");
+        expect(extractText(urlAfterReplace.data)).not.toContain("example.com");
+
+        // replacePage=false → accumulates; tab count goes to 2
+        const r3 = await run(
+          newPageEndpoints.POST,
+          { url: URL_B1, instanceId: SR, replacePage: false },
+          testUser,
+        );
+        expect(r3.success, `B_REPLACE r3: ${r3.error ?? ""}`).toBe(true);
+        await assertTabCount(
+          localBase,
+          2,
+          "B_REPLACE: after r3 (add — 2 tabs now)",
+        );
+
+        // Active page is the newly added one (example.org)
+        const urlAfterAdd = await run(
+          evaluateScriptEndpoints.POST,
+          { function: "() => window.location.href", instanceId: SR },
+          testUser,
+        );
+        expect(urlAfterAdd.success).toBe(true);
+        expect(extractText(urlAfterAdd.data)).toContain("example.org");
+
+        // replacePage=false again → 3 tabs
+        const r4 = await run(
+          newPageEndpoints.POST,
+          { url: URL_B2, instanceId: SR, replacePage: false },
+          testUser,
+        );
+        expect(r4.success, `B_REPLACE r4: ${r4.error ?? ""}`).toBe(true);
+        await assertTabCount(localBase, 3, "B_REPLACE: after r4 (3 tabs)");
+
+        // Now replacePage=true again → all session pages closed, new one opened: back to 1
+        const r5 = await run(
+          newPageEndpoints.POST,
+          { url: URL_A1, instanceId: SR, replacePage: true },
+          testUser,
+        );
+        expect(r5.success, `B_REPLACE r5: ${r5.error ?? ""}`).toBe(true);
+        await assertTabCount(
+          localBase,
+          1,
+          "B_REPLACE: after r5 (replace 3→1)",
+        );
+
+        const urlAfterReplaceMany = await run(
+          evaluateScriptEndpoints.POST,
+          { function: "() => window.location.href", instanceId: SR },
+          testUser,
+        );
+        expect(urlAfterReplaceMany.success).toBe(true);
+        expect(extractText(urlAfterReplaceMany.data)).toContain("example.com");
+      } finally {
+        await closeTestTabs([SR], testUser);
+      }
+    },
+  );
+
+  // ── B_REPLACE_ISOLATION: replacePage on one session never touches others ──────
+
+  it(
+    "B_REPLACE_ISOLATION: replacePage=true on session A does not affect session B",
+    { timeout: TEST_TIMEOUT * 2 },
+    async () => {
+      const RI_A = "browser-test-replace-iso-a";
+      const RI_B = "browser-test-replace-iso-b";
+      await closeTestTabs([RI_A, RI_B], testUser);
+      const localBase = (await getChromeTabs()).length;
+
+      try {
+        // Both sessions open a page
+        await run(
+          newPageEndpoints.POST,
+          { url: URL_A1, instanceId: RI_A, replacePage: false },
+          testUser,
+        );
+        await run(
+          newPageEndpoints.POST,
+          { url: URL_B1, instanceId: RI_B, replacePage: false },
+          testUser,
+        );
+        await assertTabCount(localBase, 2, "B_REPLACE_ISO: both open");
+
+        // A accumulates a second page
+        await run(
+          newPageEndpoints.POST,
+          { url: URL_A2, instanceId: RI_A, replacePage: false },
+          testUser,
+        );
+        await assertTabCount(localBase, 3, "B_REPLACE_ISO: A has 2 pages");
+
+        // replacePage=true on A → closes A's 2 pages, opens 1 new → still 2 total (A:1 + B:1)
+        const replaceA = await run(
+          newPageEndpoints.POST,
+          { url: URL_A1, instanceId: RI_A, replacePage: true },
+          testUser,
+        );
+        expect(replaceA.success, `B_REPLACE_ISO replaceA: ${replaceA.error ?? ""}`).toBe(true);
+        await assertTabCount(
+          localBase,
+          2,
+          "B_REPLACE_ISO: after A replace — B tab still alive",
+        );
+
+        // B must still be alive at its URL
+        const bUrl = await run(
+          evaluateScriptEndpoints.POST,
+          { function: "() => window.location.href", instanceId: RI_B },
+          testUser,
+        );
+        expect(bUrl.success, `B_REPLACE_ISO bUrl: ${bUrl.error ?? ""}`).toBe(true);
+        expect(extractText(bUrl.data)).toContain("example.org");
+      } finally {
+        await closeTestTabs([RI_A, RI_B], testUser);
+      }
+    },
+  );
+
   // ── B_UNIQUE_URLS: unique URLs per page catch any session/page mix-up ─────────
 
   it(
@@ -1151,24 +1311,25 @@ describe("Browser Tools", () => {
 
       try {
         // A: two pages (example.com, example.net). B: two pages (example.org, httpbin).
+        // First page per session uses default replacePage=true; subsequent pages use replacePage=false to accumulate.
         await run(
           newPageEndpoints.POST,
-          { url: URL_A1, instanceId: UA },
+          { url: URL_A1, replacePage: true, instanceId: UA },
           testUser,
         );
         await run(
           newPageEndpoints.POST,
-          { url: URL_B1, instanceId: UB },
+          { url: URL_B1, replacePage: true, instanceId: UB },
           testUser,
         );
         await run(
           newPageEndpoints.POST,
-          { url: URL_A2, instanceId: UA },
+          { url: URL_A2, instanceId: UA, replacePage: false },
           testUser,
         );
         await run(
           newPageEndpoints.POST,
-          { url: URL_B2, instanceId: UB },
+          { url: URL_B2, instanceId: UB, replacePage: false },
           testUser,
         );
         await assertTabCount(localBase, 4, "B_UNIQUE: 4 pages open");

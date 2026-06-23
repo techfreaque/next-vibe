@@ -48,7 +48,8 @@ import {
 import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
+import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
+import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -77,7 +78,7 @@ export class AiStreamRunRepository {
 
   /**
    * Execute a single pre-call and return its result.
-   * Args are passed as flat merged data - RouteExecutionExecutor auto-splits
+   * Args are passed as flat merged data — execute-tool auto-splits
    * urlPathParams from data using the endpoint's requestUrlPathParamsSchema.
    */
   private static async executePreCall(
@@ -96,16 +97,15 @@ export class AiStreamRunRepository {
   > {
     logger.debug("[AiStreamRun] Executing pre-call", { routeId });
 
-    const result = await RouteExecutionExecutor.executeGenericHandler<
-      Record<string, WidgetData>
-    >({
+    const result = await RouteExecuteRepository.runInProcess({
       toolName: routeId,
-      data: mergedArgs,
+      input: mergedArgs,
+      callbackMode: CallbackMode.WAIT,
       user,
       locale,
       logger,
-      platform: Platform.AI,
       streamContext,
+      platform: Platform.AI,
     });
 
     if (!result.success) {
@@ -116,10 +116,20 @@ export class AiStreamRunRepository {
       });
     }
 
+    // runInProcess wraps inline WAIT results as { result: actualData }.
+    // Unwrap so callers get the endpoint's raw output, not the execute-tool wrapper.
+    const rawData = result.data;
+    const unwrapped =
+      rawData !== null &&
+      typeof rawData === "object" &&
+      !Array.isArray(rawData) &&
+      "result" in rawData
+        ? (rawData as { result: WidgetData }).result
+        : rawData;
     return success({
       routeId,
       args: mergedArgs,
-      data: result.data,
+      data: unwrapped,
     });
   }
 

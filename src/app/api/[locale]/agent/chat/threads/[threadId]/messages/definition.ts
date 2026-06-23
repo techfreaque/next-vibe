@@ -30,7 +30,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EmitEventNamed } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
+import type {
+  EmitEventNamed,
+  EventPayloads,
+} from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId, rootFolderIdOptions } from "../../../config";
@@ -80,7 +83,7 @@ const { GET } = createEndpoint({
     "message-created": {
       remoteEvent: true,
       syncDomain: "chat" as const,
-      fields: {
+      responseFields: {
         messages: [
           "id",
           "threadId",
@@ -102,17 +105,17 @@ const { GET } = createEndpoint({
           "upvotes",
           "downvotes",
           "searchVector",
-        ] as const,
-        streamingState: true as const,
-      },
+        ],
+        streamingState: true,
+      } as const,
       operation: "merge" as const,
       onEvent: async (ctx) => {
         const {
-          partial,
+          responseData,
           urlPathParams: { threadId },
           logger,
         } = ctx;
-        const arrived = partial.messages?.[0];
+        const arrived = responseData.messages?.[0];
         if (!arrived) {
           return;
         }
@@ -174,7 +177,7 @@ const { GET } = createEndpoint({
     // ── content-delta ────────────────────────────────────────────────────────
     // Framework appends delta.content to the matching message.
     "content-delta": {
-      fields: { messages: ["id", "content"] as const },
+      responseFields: { messages: ["id", "content"] } as const,
       operation: "append" as const,
     },
 
@@ -183,7 +186,7 @@ const { GET } = createEndpoint({
     "content-done": {
       remoteEvent: true,
       syncDomain: "chat" as const,
-      fields: { messages: ["id", "content", "metadata"] as const },
+      responseFields: { messages: ["id", "content", "metadata"] } as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
     },
@@ -191,14 +194,14 @@ const { GET } = createEndpoint({
     // ── reasoning-delta ──────────────────────────────────────────────────────
     // Framework appends delta to message.content (reasoning block).
     "reasoning-delta": {
-      fields: { messages: ["id", "content"] as const },
+      responseFields: { messages: ["id", "content"] } as const,
       operation: "append" as const,
     },
 
     // ── reasoning-done ───────────────────────────────────────────────────────
     // onEvent: persist final reasoning content to localStorage for incognito.
     "reasoning-done": {
-      fields: { messages: ["id", "content"] as const },
+      responseFields: { messages: ["id", "content"] } as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
     },
@@ -207,7 +210,7 @@ const { GET } = createEndpoint({
     // Streaming tool call arguments from the AI model. Framework merges the
     // partial metadata (argsText) onto the existing tool message.
     "tool-input-delta": {
-      fields: { messages: ["id", "metadata"] as const },
+      responseFields: { messages: ["id", "metadata"] } as const,
       operation: "merge" as const,
     },
 
@@ -216,7 +219,7 @@ const { GET } = createEndpoint({
     "tool-result": {
       remoteEvent: true,
       syncDomain: "chat" as const,
-      fields: { messages: ["id", "metadata"] as const },
+      responseFields: { messages: ["id", "metadata"] } as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
     },
@@ -226,7 +229,7 @@ const { GET } = createEndpoint({
     "tool-result-updated": {
       remoteEvent: true,
       syncDomain: "chat" as const,
-      fields: { messages: ["id", "metadata"] as const },
+      responseFields: { messages: ["id", "metadata"] } as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
     },
@@ -238,7 +241,7 @@ const { GET } = createEndpoint({
     error: {
       remoteEvent: true,
       syncDomain: "chat" as const,
-      fields: {
+      responseFields: {
         messages: [
           "id",
           "role",
@@ -252,8 +255,8 @@ const { GET } = createEndpoint({
           "errorCode",
           "createdAt",
           "updatedAt",
-        ] as const,
-      },
+        ],
+      } as const,
       operation: "merge" as const,
       onEvent: async (ctx) => {
         const currentHref = getCurrentUrl();
@@ -266,7 +269,7 @@ const { GET } = createEndpoint({
           typeof ctx.requestData["rootFolderId"] === "string"
             ? ctx.requestData["rootFolderId"]
             : "";
-        const msg = ctx.partial.messages?.[0];
+        const msg = ctx.responseData.messages?.[0];
         const msgId = msg?.id;
         const threadId = ctx.urlPathParams["threadId"] ?? "";
         if (msgId) {
@@ -303,7 +306,7 @@ const { GET } = createEndpoint({
     // Framework merges the transcribed message content.
     // onEvent: reset input store and clear draft.
     "voice-transcribed": {
-      fields: { messages: ["id", "content", "metadata"] as const },
+      responseFields: { messages: ["id", "content", "metadata"] } as const,
       operation: "merge" as const,
       onEvent: async () => {
         const { useChatInputStore } =
@@ -315,7 +318,7 @@ const { GET } = createEndpoint({
     // ── audio-chunk ──────────────────────────────────────────────────────────
     // Enqueues TTS audio for sequential playback - payload typed via response fields.
     "audio-chunk": {
-      fields: {
+      responseFields: {
         audioData: true as const,
         chunkIndex: true as const,
         audioMessageId: true as const,
@@ -324,9 +327,9 @@ const { GET } = createEndpoint({
       },
       operation: "merge" as const,
       onEvent: async (ctx) => {
-        const { partial, logger } = ctx;
-        const audioData = partial.audioData;
-        const chunkIndex = partial.chunkIndex;
+        const { responseData, logger } = ctx;
+        const audioData = responseData.audioData;
+        const chunkIndex = responseData.chunkIndex;
         if (typeof audioData !== "string" || typeof chunkIndex !== "number") {
           return;
         }
@@ -341,10 +344,10 @@ const { GET } = createEndpoint({
     // alongside the permanent ones (different IDs). We bypass it entirely and
     // patch the message metadata directly so the attachments array is replaced.
     "files-uploaded": {
-      fields: { messages: ["id", "metadata"] as const },
+      responseFields: { messages: ["id", "metadata"] } as const,
       operation: "merge" as const,
       onEvent: async (ctx) => {
-        const msg = ctx.partial.messages?.[0];
+        const msg = ctx.responseData.messages?.[0];
         const msgId = msg?.id;
         if (!msgId) {
           return;
@@ -372,21 +375,21 @@ const { GET } = createEndpoint({
     "tokens-updated": {
       remoteEvent: true,
       syncDomain: "chat" as const,
-      fields: { messages: ["id", "metadata"] as const },
+      responseFields: { messages: ["id", "metadata"] } as const,
       operation: "merge" as const,
     },
 
     // ── compacting-delta ─────────────────────────────────────────────────────
     // Framework appends delta to message.content.
     "compacting-delta": {
-      fields: { messages: ["id", "content", "metadata"] as const },
+      responseFields: { messages: ["id", "content", "metadata"] } as const,
       operation: "append" as const,
     },
 
     // ── compacting-done ──────────────────────────────────────────────────────
     // onEvent: persist compacted message content to localStorage for incognito.
     "compacting-done": {
-      fields: { messages: ["id", "content", "metadata"] as const },
+      responseFields: { messages: ["id", "content", "metadata"] } as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
     },
@@ -398,9 +401,10 @@ const { GET } = createEndpoint({
     "stream-finished": {
       remoteEvent: true,
       syncDomain: "chat" as const,
-      fields: {
+      responseFields: {
         streamingState: true as const,
       },
+      urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
       onEvent: async (ctx) => {
         const threadId = ctx.urlPathParams["threadId"] ?? "";
@@ -427,7 +431,7 @@ const { GET } = createEndpoint({
     // ── task-completed ───────────────────────────────────────────────────────
     // Framework removes the completed task from backgroundTasks (remove by id).
     "task-completed": {
-      fields: { backgroundTasks: ["id"] as const },
+      responseFields: { backgroundTasks: ["id"] as const },
       operation: "remove" as const,
     },
 
@@ -437,21 +441,22 @@ const { GET } = createEndpoint({
     "streaming-state-changed": {
       remoteEvent: true,
       syncDomain: "chat" as const,
-      fields: ["streamingState"] as const,
+      responseFields: ["streamingState"] as const,
+      urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
     },
 
     // ── generated-media-added ────────────────────────────────────────────────
     // onEvent: persist media metadata to localStorage for incognito.
     "generated-media-added": {
-      fields: { messages: ["id", "metadata"] as const },
+      responseFields: { messages: ["id", "metadata"] } as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
     },
 
     // ── gap-fill-started ─────────────────────────────────────────────────────
     "gap-fill-started": {
-      fields: { messages: ["id", "metadata"] as const },
+      responseFields: { messages: ["id", "metadata"] } as const,
       operation: "merge" as const,
     },
 
@@ -459,7 +464,7 @@ const { GET } = createEndpoint({
     // Framework merge handles metadata.variants update via applyPartialToCache.
     // onEvent: persist variants metadata to localStorage for incognito.
     "gap-fill-completed": {
-      fields: { messages: ["id", "metadata"] as const },
+      responseFields: { messages: ["id", "metadata"] } as const,
       operation: "merge" as const,
       onEvent: onEventPersistMessage(),
     },
@@ -705,7 +710,7 @@ const { GET } = createEndpoint({
             id: "660e8400-e29b-41d4-a716-446655440000",
             threadId: "550e8400-e29b-41d4-a716-446655440000",
             role: ChatMessageRole.USER,
-            content: "Hello, how can you help me?",
+            label: "Hello, how can you help me?",
             parentId: null,
             authorId: "770e8400-e29b-41d4-a716-446655440000",
             authorName: null,
@@ -727,7 +732,7 @@ const { GET } = createEndpoint({
             id: "770e8400-e29b-41d4-a716-446655440000",
             threadId: "550e8400-e29b-41d4-a716-446655440000",
             role: ChatMessageRole.ASSISTANT,
-            content: "I can help you with various tasks!",
+            label: "I can help you with various tasks!",
             parentId: "660e8400-e29b-41d4-a716-446655440000",
             authorId: "770e8400-e29b-41d4-a716-446655440000",
             authorName: null,
@@ -904,12 +909,12 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       messageId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.message.id.content" as const,
+        label: "post.response.message.id.content" as const,
         schema: z.uuid(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.message.createdAt.content" as const,
+        label: "post.response.message.createdAt.content" as const,
         schema: dateSchema,
       }),
     },

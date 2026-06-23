@@ -135,12 +135,12 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "scroll.response.success",
+        label: "scroll.response.success",
         schema: z.boolean().describe("Whether the scroll operation succeeded"),
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "scroll.response.error",
+        label: "scroll.response.error",
         schema: z
           .string()
           .optional()
@@ -148,7 +148,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "scroll.response.executionId",
+        label: "scroll.response.executionId",
         schema: z
           .string()
           .optional()

@@ -19,8 +19,8 @@ export const { DELETE, tools } = endpointsHandler({
         t,
       }),
     onRemoteEvent: {
-      "node-deleted": (payload, ctx) =>
-        CortexDeleteRepository.applyRemoteDelete(payload, ctx.user, ctx.logger),
+      "node-deleted": (props) =>
+        CortexDeleteRepository.applyRemoteDelete(props),
     },
   },
 });

@@ -63,13 +63,13 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.success.title",
+        label: "fields.success.title",
         schema: z.boolean(),
       }),
 
       seedsExecuted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.seedsExecuted.title",
+        label: "fields.seedsExecuted.title",
         schema: z.coerce.number(),
       }),
 
@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
           children: {
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "fields.collections.name.title",
+              label: "fields.collections.name.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
@@ -95,7 +95,7 @@ const { POST } = createEndpoint({
             }),
             recordsCreated: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "fields.collections.recordsCreated.title",
+              label: "fields.collections.recordsCreated.title",
               fieldType: FieldDataType.NUMBER,
               schema: z.coerce.number(),
             }),
@@ -105,13 +105,13 @@ const { POST } = createEndpoint({
 
       totalRecords: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.totalRecords.title",
+        label: "fields.totalRecords.title",
         schema: z.coerce.number(),
       }),
 
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.duration.title",
+        label: "fields.duration.title",
         schema: z.coerce.number(),
       }),
     },

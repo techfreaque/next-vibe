@@ -19,7 +19,7 @@ import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/branch-utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import { WidgetDataSchema } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { WsWireMessage } from "@/app/api/[locale]/system/unified-interface/websocket/types";
@@ -46,10 +46,11 @@ import {
   canPostInThread,
   canViewThread,
 } from "../../../permissions/permissions";
-import type {
-  MessageCreateRequestOutput,
-  MessageCreateResponseOutput,
-  MessageListResponseOutput,
+import type definitions from "./definition";
+import {
+  type MessageCreateRequestOutput,
+  type MessageCreateResponseOutput,
+  type MessageListResponseOutput,
 } from "./definition";
 import { type MessagesT, scopedTranslation } from "./i18n";
 
@@ -682,7 +683,9 @@ export class MessagesRepository {
       // "aborting" is a transient server-side state that maps to "streaming" for the client.
       // "waiting" stays as-is since it means a background task is in flight.
       const effectiveStreamingState =
-        dbStreamingState === "aborting" ? "streaming" : dbStreamingState;
+        dbStreamingState === ThreadStreamingState.ABORTING
+          ? ThreadStreamingState.STREAMING
+          : dbStreamingState;
 
       return success({
         streamingState: effectiveStreamingState,
@@ -1013,3 +1016,213 @@ export class MessagesRepository {
     }
   }
 }
+
+/** Parse the first message from a raw WS wire payload. Used by headless-relay-processor (boundary). */
+export function parseRemoteFirstMsg(
+  raw: WsWireMessage["data"],
+): RemoteMsg | null {
+  const parsed = remoteMessagesPayloadSchema.safeParse(raw);
+  return parsed.success ? (parsed.data.messages[0] ?? null) : null;
+}
+
+export const messagesOnRemoteEvent = {
+  "message-created": async (payload: {
+    messages?: MsgCreated[];
+    streamingState?: ThreadStreamingState | null;
+  }): Promise<void> => {
+    const raw = payload.messages?.[0];
+    const msgId = raw?.id;
+    const msgThreadId = raw?.threadId;
+    if (!msgId || !msgThreadId) {
+      return;
+    }
+    const role = (raw.role ??
+      ChatMessageRole.USER) as (typeof ChatMessageRoleDB)[number];
+    const content = raw.content ?? "";
+    const metadata = (raw.metadata ?? {}) as MessageMetadata;
+    const updatedAt = raw.updatedAt ? new Date(raw.updatedAt) : new Date();
+    await db
+      .insert(chatMessages)
+      .values({
+        id: msgId,
+        threadId: msgThreadId,
+        role,
+        isAI: raw.isAI ?? false,
+        content,
+        parentId: raw.parentId ?? null,
+        authorId: raw.authorId ?? null,
+        model: (raw.model ?? null) as ChatModelId | null,
+        skill: raw.skill ?? null,
+        metadata,
+        sequenceId: raw.sequenceId ?? null,
+        createdAt: raw.createdAt ? new Date(raw.createdAt) : new Date(),
+        updatedAt,
+      })
+      .onConflictDoNothing()
+      .catch(() => undefined);
+    const state = payload.streamingState;
+    if (state) {
+      await db
+        .update(chatThreads)
+        .set({ streamingState: state, updatedAt: new Date() })
+        .where(eq(chatThreads.id, msgThreadId))
+        .catch(() => undefined);
+    }
+  },
+
+  error: async (payload: { messages?: MsgWithIdContent[] }): Promise<void> => {
+    const msg = payload.messages?.[0];
+    if (!msg?.id) {
+      return;
+    }
+    await db
+      .update(chatMessages)
+      .set({
+        content: msg.content ?? "",
+        metadata: msg.metadata
+          ? sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify(msg.metadata)}::jsonb`
+          : sql`metadata`,
+        updatedAt: new Date(),
+      })
+      .where(eq(chatMessages.id, msg.id))
+      .catch(() => undefined);
+  },
+
+  "content-done": async (payload: {
+    messages?: MsgWithIdContent[];
+  }): Promise<void> => {
+    const msg = payload.messages?.[0];
+    if (!msg?.id || !msg.content) {
+      return;
+    }
+    await db
+      .update(chatMessages)
+      .set({
+        content: msg.content,
+        metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
+          promptTokens: msg.metadata?.promptTokens ?? null,
+          completionTokens: msg.metadata?.completionTokens ?? null,
+          totalTokens: msg.metadata?.totalTokens ?? null,
+          creditCost: msg.metadata?.creditCost ?? null,
+          finishReason: msg.metadata?.finishReason ?? null,
+        })}::jsonb`,
+      })
+      .where(eq(chatMessages.id, msg.id));
+  },
+
+  "tool-result": async (
+    payload: { messages?: MsgWithIdContent[] },
+    ctx: RemoteEventCtx,
+  ): Promise<void> => {
+    const msg = payload.messages?.[0];
+    const toolCall = msg?.metadata?.toolCall;
+    if (!msg?.id || !toolCall) {
+      return;
+    }
+    const resultObj =
+      toolCall.result !== null &&
+      toolCall.result !== undefined &&
+      typeof toolCall.result === "object" &&
+      !Array.isArray(toolCall.result) &&
+      !(toolCall.result instanceof Date)
+        ? (toolCall.result as Record<string, string>)
+        : null;
+    const incomingPending =
+      toolCall.status === "pending" ||
+      resultObj?.["status"] === "status.pending";
+    if (incomingPending) {
+      const [existing] = await db
+        .select({ metadata: chatMessages.metadata })
+        .from(chatMessages)
+        .where(eq(chatMessages.id, msg.id))
+        .limit(1);
+      const existingStatus = existing?.metadata?.toolCall?.status;
+      if (existingStatus === "completed" || existingStatus === "failed") {
+        return;
+      }
+    }
+    const taggedToolCall = ctx.instanceId
+      ? { ...toolCall, remoteInstanceId: ctx.instanceId }
+      : toolCall;
+    await db
+      .update(chatMessages)
+      .set({
+        metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({ toolCall: taggedToolCall })}::jsonb`,
+      })
+      .where(eq(chatMessages.id, msg.id));
+  },
+
+  "tool-result-updated": async (
+    payload: { messages?: MsgWithIdContent[] },
+    ctx: RemoteEventCtx,
+  ): Promise<void> => {
+    const msg = payload.messages?.[0];
+    const toolCall = msg?.metadata?.toolCall;
+    if (!msg?.id || !toolCall) {
+      return;
+    }
+    const taggedToolCall = ctx.instanceId
+      ? { ...toolCall, remoteInstanceId: ctx.instanceId }
+      : toolCall;
+    await db
+      .update(chatMessages)
+      .set({
+        metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({ toolCall: taggedToolCall })}::jsonb`,
+      })
+      .where(eq(chatMessages.id, msg.id));
+  },
+
+  "tokens-updated": async (payload: {
+    messages?: MsgWithIdContent[];
+  }): Promise<void> => {
+    const msg = payload.messages?.[0];
+    if (!msg?.id) {
+      return;
+    }
+    await db
+      .update(chatMessages)
+      .set({
+        metadata: sql`COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({
+          promptTokens: msg.metadata?.promptTokens ?? null,
+          completionTokens: msg.metadata?.completionTokens ?? null,
+          totalTokens: msg.metadata?.totalTokens ?? null,
+          creditCost: msg.metadata?.creditCost ?? null,
+          finishReason: msg.metadata?.finishReason ?? null,
+        })}::jsonb`,
+      })
+      .where(eq(chatMessages.id, msg.id));
+  },
+
+  "stream-finished": async (
+    payload: { streamingState?: ThreadStreamingState | null },
+    ctx: RemoteEventCtx,
+  ): Promise<void> => {
+    void payload;
+    const threadId = ctx.urlPathParams.threadId ?? "";
+    await db
+      .update(chatThreads)
+      .set({ streamingState: ThreadStreamingState.IDLE, updatedAt: new Date() })
+      .where(eq(chatThreads.id, threadId))
+      .catch((err: Error) => {
+        ctx.logger.warn(
+          "[messages/repository] stream-finished: failed to mark thread idle",
+          { threadId, error: err.message },
+        );
+      });
+  },
+
+  "streaming-state-changed": async (
+    payload: { streamingState?: ThreadStreamingState | null },
+    ctx: RemoteEventCtx,
+  ): Promise<void> => {
+    const threadId = ctx.urlPathParams.threadId ?? "";
+    if (!threadId || !payload.streamingState) {
+      return;
+    }
+    await db
+      .update(chatThreads)
+      .set({ streamingState: payload.streamingState, updatedAt: new Date() })
+      .where(eq(chatThreads.id, threadId))
+      .catch(() => undefined);
+  },
+};

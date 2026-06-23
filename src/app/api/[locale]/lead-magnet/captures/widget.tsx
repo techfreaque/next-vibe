@@ -45,13 +45,11 @@ function downloadCsv(items: CaptureItem[]): void {
     )
     .join("\n");
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `leads-${new Date().toISOString().slice(0, 10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
+  downloadFile(
+    `leads-${new Date().toISOString().slice(0, 10)}.csv`,
+    csv,
+    "text/csv;charset=utf-8;",
+  );
 }
 
 export function LeadMagnetCapturesWidget(): JSX.Element {

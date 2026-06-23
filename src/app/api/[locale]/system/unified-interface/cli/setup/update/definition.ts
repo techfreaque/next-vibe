@@ -78,37 +78,37 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.success.title",
+        label: "post.success.title",
         schema: z.boolean(),
       }),
 
       installed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.title",
+        label: "post.title",
         schema: z.boolean(),
       }),
 
       version: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.description",
+        label: "post.description",
         schema: z.string().optional(),
       }),
 
       path: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.title",
+        label: "post.title",
         schema: z.string().optional(),
       }),
 
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.success.description",
+        label: "post.success.description",
         schema: z.string(),
       }),
 
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.title",
+        label: "post.title",
         schema: z.string().optional(),
       }),
     },

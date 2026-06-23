@@ -30,26 +30,6 @@ import {
 import type { CortexReadResponseOutput } from "./definition";
 import type { CortexReadT } from "./i18n";
 
-interface ReadParams {
-  userId: string;
-  user: JwtPrivatePayloadType;
-  locale: CountryLanguage;
-  path: string;
-  maxLines?: number;
-  logger: EndpointLogger;
-  t: CortexReadT;
-}
-
-interface ReadResult {
-  responsePath: string;
-  content: string;
-  size: number;
-  truncated: boolean;
-  readonly: boolean;
-  nodeType: string;
-  updatedAt: string;
-}
-
 export class CortexReadRepository {
   static async readFile({
     userId,
@@ -59,7 +39,15 @@ export class CortexReadRepository {
     maxLines,
     logger,
     t,
-  }: ReadParams): Promise<ResponseType<ReadResult>> {
+  }: {
+    userId: string;
+    user: JwtPrivatePayloadType;
+    locale: CountryLanguage;
+    path: string;
+    maxLines?: number;
+    logger: EndpointLogger;
+    t: CortexReadT;
+  }): Promise<ResponseType<CortexReadResponseOutput>> {
     const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
 
     if (!isValidPath(path)) {
@@ -175,7 +163,7 @@ export class CortexReadRepository {
     t: CortexReadT,
     isAdmin: boolean,
     locale: CountryLanguage,
-  ): Promise<ResponseType<ReadResult>> {
+  ): Promise<ResponseType<CortexReadResponseOutput>> {
     try {
       // Dynamic import to avoid pulling in all mount code at module load
       const { resolveVirtualRead } = await import("../mounts/resolver");

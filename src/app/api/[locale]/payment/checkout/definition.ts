@@ -122,25 +122,25 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.success" as const,
+        label: "response.success" as const,
         schema: z.boolean(),
       }),
 
       sessionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.sessionId" as const,
+        label: "response.sessionId" as const,
         schema: z.string(),
       }),
 
       checkoutUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.checkoutUrl" as const,
+        label: "response.checkoutUrl" as const,
         schema: z.string().url(),
       }),
 
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.message" as const,
+        label: "response.message" as const,
         schema: z.string().optional(),
       }),
     },

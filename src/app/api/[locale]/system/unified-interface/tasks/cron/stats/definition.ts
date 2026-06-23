@@ -252,109 +252,109 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       totalTasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalTasks.title",
+        label: "get.response.totalTasks.title",
         schema: z.coerce.number(),
       }),
 
       executedTasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.executedTasks.title",
+        label: "get.response.executedTasks.title",
         schema: z.coerce.number(),
       }),
 
       successfulTasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.successfulTasks.title",
+        label: "get.response.successfulTasks.title",
         schema: z.coerce.number(),
       }),
 
       failedTasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.failedTasks.title",
+        label: "get.response.failedTasks.title",
         schema: z.coerce.number(),
       }),
 
       averageExecutionTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.averageExecutionTime.title",
+        label: "get.response.averageExecutionTime.title",
         schema: z.coerce.number(),
       }),
 
       totalExecutions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalExecutions.title",
+        label: "get.response.totalExecutions.title",
         schema: z.coerce.number().optional(),
       }),
 
       executionsLast24h: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.executionsLast24h.title",
+        label: "get.response.executionsLast24h.title",
         schema: z.coerce.number().optional(),
       }),
 
       successRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.successRate.title",
+        label: "get.response.successRate.title",
         schema: z.coerce.number().optional(),
       }),
 
       successfulExecutions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.successfulExecutions.title",
+        label: "get.response.successfulExecutions.title",
         schema: z.coerce.number().optional(),
       }),
 
       failedExecutions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.failedExecutions.title",
+        label: "get.response.failedExecutions.title",
         schema: z.coerce.number().optional(),
       }),
 
       failureRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.failureRate.title",
+        label: "get.response.failureRate.title",
         schema: z.coerce.number().optional(),
       }),
 
       avgExecutionTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.avgExecutionTime.title",
+        label: "get.response.avgExecutionTime.title",
         schema: z.coerce.number().optional(),
       }),
 
       minExecutionTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.minExecutionTime.title",
+        label: "get.response.minExecutionTime.title",
         schema: z.coerce.number().optional(),
       }),
 
       maxExecutionTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.maxExecutionTime.title",
+        label: "get.response.maxExecutionTime.title",
         schema: z.coerce.number().optional(),
       }),
 
       pendingExecutions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.pendingExecutions.title",
+        label: "get.response.pendingExecutions.title",
         schema: z.coerce.number().optional(),
       }),
 
       runningExecutions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.runningExecutions.title",
+        label: "get.response.runningExecutions.title",
         schema: z.coerce.number().optional(),
       }),
 
       activeTasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.activeTasks.title",
+        label: "get.response.activeTasks.title",
         schema: z.coerce.number().optional(),
       }),
 
       systemStatus: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.systemStatus.title",
+        label: "get.response.systemStatus.title",
         schema: z
           .enum(["healthy", "warning", "critical", "unknown"])
           .optional(),
@@ -362,37 +362,37 @@ const { GET } = createEndpoint({
 
       uptime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.uptime.title",
+        label: "get.response.uptime.title",
         schema: z.string().optional(),
       }),
 
       healthyTasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.healthyTasks.title",
+        label: "get.response.healthyTasks.title",
         schema: z.coerce.number().optional(),
       }),
 
       degradedTasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.degradedTasks.title",
+        label: "get.response.degradedTasks.title",
         schema: z.coerce.number().optional(),
       }),
 
       systemLoad: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.systemLoad.title",
+        label: "get.response.systemLoad.title",
         schema: z.coerce.number().optional(),
       }),
 
       queueSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.queueSize.title",
+        label: "get.response.queueSize.title",
         schema: z.coerce.number().optional(),
       }),
 
       medianExecutionTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.medianExecutionTime.title",
+        label: "get.response.medianExecutionTime.title",
         schema: z.coerce.number().optional(),
       }),
 

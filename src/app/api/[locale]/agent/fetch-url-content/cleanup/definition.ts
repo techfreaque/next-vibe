@@ -44,17 +44,17 @@ const { POST } = createEndpoint({
     children: {
       deletedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cleanup.post.response.deletedCount" as const,
+        label: "cleanup.post.response.deletedCount" as const,
         schema: z.number(),
       }),
       totalScanned: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cleanup.post.response.totalScanned" as const,
+        label: "cleanup.post.response.totalScanned" as const,
         schema: z.number(),
       }),
       retentionDays: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cleanup.post.response.retentionDays" as const,
+        label: "cleanup.post.response.retentionDays" as const,
         schema: z.number(),
       }),
     },

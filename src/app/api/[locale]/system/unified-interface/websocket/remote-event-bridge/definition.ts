@@ -142,7 +142,7 @@ const { POST } = createEndpoint({
         UserRole.PARTNER_EMPLOYEE,
         UserRole.ADMIN,
       ] as const,
-      fields: [
+      responseFields: [
         "originInstanceId",
         "syncDomain",
         "endpointPath",

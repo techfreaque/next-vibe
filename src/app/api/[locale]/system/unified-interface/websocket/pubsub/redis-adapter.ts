@@ -13,11 +13,8 @@
 
 import type { Redis } from "ioredis";
 
-import type {
-  PubSubAdapter,
-  PubSubMessageData,
-  PubSubMessageHandler,
-} from "./types";
+import type { WidgetData } from "../../shared/types/json";
+import type { PubSubAdapter, PubSubMessageHandler } from "./types";
 
 interface RedisWireMessage {
   readonly event: string;

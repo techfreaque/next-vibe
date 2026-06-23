@@ -1488,13 +1488,13 @@ const { POST } = createEndpoint({
       // Summary stats at the top
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.status",
+        label: "response.status",
         schema: z.boolean(),
       }),
 
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.duration",
+        label: "response.duration",
         schema: z.coerce.number(),
       }),
 
@@ -1536,22 +1536,22 @@ const { POST } = createEndpoint({
           children: {
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "table.name",
+              label: "table.name",
               schema: z.string(),
             }),
             directory: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "table.directory",
+              label: "table.directory",
               schema: z.string(),
             }),
             version: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "table.version",
+              label: "table.version",
               schema: z.string().optional(),
             }),
             tag: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "table.tag",
+              label: "table.tag",
               schema: z.string().optional(),
             }),
             status: responseField(scopedTranslation, {
@@ -1560,7 +1560,7 @@ const { POST } = createEndpoint({
             }),
             message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "table.message",
+              label: "table.message",
               schema: z.string().optional(),
             }),
           },
@@ -1641,7 +1641,7 @@ const { POST } = createEndpoint({
           children: {
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "table.name",
+              label: "table.name",
               schema: z.string(),
             }),
             version: responseField(scopedTranslation, {
@@ -1656,7 +1656,7 @@ const { POST } = createEndpoint({
             }),
             url: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "table.url",
+              label: "table.url",
               schema: z.string().optional(),
             }),
           },
@@ -1742,7 +1742,7 @@ const { POST } = createEndpoint({
             }),
             message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "table.message",
+              label: "table.message",
               schema: z.string().optional(),
             }),
           },
@@ -1766,41 +1766,41 @@ const { POST } = createEndpoint({
             children: {
               name: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 schema: z.string(),
               }),
               version: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.version",
+                label: "table.version",
                 schema: z.string(),
               }),
               scripts: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
               dependencies: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
               devDependencies: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
               peerDependencies: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
               optionalDependencies: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
@@ -1817,7 +1817,7 @@ const { POST } = createEndpoint({
               ),
               private: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
@@ -1828,19 +1828,19 @@ const { POST } = createEndpoint({
                 children: {
                   access: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.npmAccess.title",
+                    label: "fields.npmAccess.title",
                     optional: true,
                     schema: z.enum(["public", "restricted"]).optional(),
                   }),
                   registry: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "table.registry",
+                    label: "table.registry",
                     optional: true,
                     schema: z.string().optional(),
                   }),
                   tag: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "table.tag",
+                    label: "table.tag",
                     optional: true,
                     schema: z.string().optional(),
                   }),
@@ -1853,12 +1853,12 @@ const { POST } = createEndpoint({
                 children: {
                   type: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.name.title",
+                    label: "fields.name.title",
                     schema: z.string(),
                   }),
                   url: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "table.url",
+                    label: "table.url",
                     schema: z.string(),
                   }),
                 },
@@ -1874,17 +1874,17 @@ const { POST } = createEndpoint({
             children: {
               newVersion: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.version",
+                label: "table.version",
                 schema: z.string(),
               }),
               lastTag: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.tag",
+                label: "table.tag",
                 schema: z.string(),
               }),
               newTag: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.tag",
+                label: "table.tag",
                 schema: z.string(),
               }),
             },
@@ -1898,34 +1898,34 @@ const { POST } = createEndpoint({
             children: {
               major: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "enums.versionIncrement.major",
+                label: "enums.versionIncrement.major",
                 schema: z.number(),
               }),
               minor: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "enums.versionIncrement.minor",
+                label: "enums.versionIncrement.minor",
                 schema: z.number(),
               }),
               patch: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "enums.versionIncrement.patch",
+                label: "enums.versionIncrement.patch",
                 schema: z.number(),
               }),
               prerelease: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "enums.versionIncrement.prerelease",
+                label: "enums.versionIncrement.prerelease",
                 optional: true,
                 schema: z.string().nullable(),
               }),
               prereleaseNumber: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.prereleaseId.title",
+                label: "fields.prereleaseId.title",
                 optional: true,
                 schema: z.number().nullable(),
               }),
               buildMetadata: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().nullable(),
               }),
@@ -1940,7 +1940,7 @@ const { POST } = createEndpoint({
             children: {
               type: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 schema: z.enum([
                   "github",
                   "gitlab",
@@ -1951,24 +1951,24 @@ const { POST } = createEndpoint({
               }),
               url: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.url",
+                label: "table.url",
                 schema: z.string(),
               }),
               owner: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               repo: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               defaultBranch: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.branchMain.title",
+                label: "fields.branchMain.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
@@ -1983,55 +1983,55 @@ const { POST } = createEndpoint({
             children: {
               sha: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 schema: z.string(),
               }),
               shortSha: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 schema: z.string(),
               }),
               subject: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 schema: z.string(),
               }),
               body: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.releaseBody.title",
+                label: "fields.releaseBody.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               authorName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 schema: z.string(),
               }),
               authorEmail: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 schema: z.string(),
               }),
               timestamp: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 schema: z.coerce.date(),
               }),
               conventionalType: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               conventionalScope: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               isBreaking: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
@@ -2046,54 +2046,54 @@ const { POST } = createEndpoint({
             children: {
               packageManager: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.packageManager.title",
+                label: "fields.packageManager.title",
                 schema: z.string(),
               }),
               packageName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               version: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.version",
+                label: "table.version",
                 optional: true,
                 schema: z.string().optional(),
               }),
               directory: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.directory.title",
+                label: "fields.directory.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               previousVersion: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.version",
+                label: "table.version",
                 optional: true,
                 schema: z.string().optional(),
               }),
               tag: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.tag",
+                label: "table.tag",
                 optional: true,
                 schema: z.string().optional(),
               }),
               isCI: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.ci.title",
+                label: "fields.ci.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
               ciProvider: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               dryRun: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.dryRun.title",
+                label: "fields.dryRun.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
@@ -2108,41 +2108,41 @@ const { POST } = createEndpoint({
             children: {
               success: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "response.status",
+                label: "response.status",
                 schema: z.boolean(),
               }),
               command: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.ciCommand.title",
+                label: "fields.ciCommand.title",
                 schema: z.string(),
               }),
               exitCode: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.number().optional(),
               }),
               stdout: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               stderr: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               duration: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "response.duration",
+                label: "response.duration",
                 optional: true,
                 schema: z.number().optional(),
               }),
               message: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.message",
+                label: "table.message",
                 optional: true,
                 schema: z.string().optional(),
               }),
@@ -2157,7 +2157,7 @@ const { POST } = createEndpoint({
             children: {
               passed: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 schema: z.boolean(),
               }),
               vulnerabilities: objectField(scopedTranslation, {
@@ -2166,22 +2166,22 @@ const { POST } = createEndpoint({
                 children: {
                   critical: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.name.title",
+                    label: "fields.name.title",
                     schema: z.number(),
                   }),
                   high: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.name.title",
+                    label: "fields.name.title",
                     schema: z.number(),
                   }),
                   medium: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.name.title",
+                    label: "fields.name.title",
                     schema: z.number(),
                   }),
                   low: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.name.title",
+                    label: "fields.name.title",
                     schema: z.number(),
                   }),
                 },
@@ -2197,54 +2197,54 @@ const { POST } = createEndpoint({
             children: {
               success: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "response.status",
+                label: "response.status",
                 schema: z.boolean(),
               }),
               packageName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               version: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.version",
+                label: "table.version",
                 optional: true,
                 schema: z.string().optional(),
               }),
               duration: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "response.duration",
+                label: "response.duration",
                 optional: true,
                 schema: z.number().optional(),
               }),
               error: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "response.errors",
+                label: "response.errors",
                 optional: true,
                 schema: z.string().optional(),
               }),
               releaseUrl: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.url",
+                label: "table.url",
                 optional: true,
                 schema: z.string().optional(),
               }),
               commitSha: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.name.title",
+                label: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               branch: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "fields.branch.title",
+                label: "fields.branch.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
               registryUrls: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "table.url",
+                label: "table.url",
                 optional: true,
                 schema: z.array(z.string()).optional(),
               }),
@@ -2255,43 +2255,43 @@ const { POST } = createEndpoint({
                 children: {
                   total: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "response.duration",
+                    label: "response.duration",
                     optional: true,
                     schema: z.number().optional(),
                   }),
                   version: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "table.version",
+                    label: "table.version",
                     optional: true,
                     schema: z.number().optional(),
                   }),
                   quality: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.name.title",
+                    label: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
                   publish: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.name.title",
+                    label: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
                   git: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.name.title",
+                    label: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
                   changelog: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.changelog.title",
+                    label: "fields.changelog.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
                   notification: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "fields.name.title",
+                    label: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),

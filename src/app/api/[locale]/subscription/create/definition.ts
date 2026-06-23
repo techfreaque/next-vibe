@@ -19,7 +19,11 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { PaymentProvider, PaymentProviderDB } from "../../payment/enum";
+import {
+  PaymentProvider,
+  PaymentProviderDB,
+  PaymentProviderOptions,
+} from "../../payment/enum";
 import { UserRole } from "../../user/user-roles/enum";
 import {
   BillingInterval,
@@ -80,6 +84,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.SELECT,
         label: "form.fields.provider.label" as const,
         description: "form.fields.provider.description" as const,
+        options: PaymentProviderOptions,
         schema: z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
         hidden: true,
       }),
@@ -97,12 +102,12 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       checkoutUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.checkoutUrl" as const,
+        label: "response.checkoutUrl" as const,
         schema: z.string().url(),
       }),
       sessionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.sessionId" as const,
+        label: "response.sessionId" as const,
         schema: z.string(),
       }),
     },

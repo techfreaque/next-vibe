@@ -38,7 +38,7 @@ export const { GET } = createEndpoint({
     children: {
       overallStatus: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cluster.status.get.response.overallStatus.title",
+        label: "cluster.status.get.response.overallStatus.title",
         schema: z.string(),
       }),
       nodes: responseArrayField(scopedTranslation, {
@@ -50,25 +50,25 @@ export const { GET } = createEndpoint({
           children: {
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "cluster.status.get.response.nodes.title",
+              label: "cluster.status.get.response.nodes.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "cluster.status.get.response.overallStatus.title",
+              label: "cluster.status.get.response.overallStatus.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             role: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "cluster.status.get.response.overallStatus.title",
+              label: "cluster.status.get.response.overallStatus.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             ip: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "cluster.status.get.response.overallStatus.title",
+              label: "cluster.status.get.response.overallStatus.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
@@ -84,19 +84,19 @@ export const { GET } = createEndpoint({
           children: {
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "cluster.status.get.response.components.title",
+              label: "cluster.status.get.response.components.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "cluster.status.get.response.overallStatus.title",
+              label: "cluster.status.get.response.overallStatus.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             namespace: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "cluster.status.get.response.overallStatus.title",
+              label: "cluster.status.get.response.overallStatus.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
@@ -105,7 +105,7 @@ export const { GET } = createEndpoint({
       }),
       podCounts: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cluster.status.get.response.podCounts.title",
+        label: "cluster.status.get.response.podCounts.title",
         schema: z.record(z.string(), z.number()),
       }),
     },

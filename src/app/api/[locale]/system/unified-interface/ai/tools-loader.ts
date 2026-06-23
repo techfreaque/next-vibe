@@ -16,11 +16,11 @@ import {
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import {
   collectServerDefaults,
   generateSchemaForUsage,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -558,131 +558,89 @@ export function generateInputSchema(
 }
 
 /**
- * Create an AI SDK CoreTool for a remote capability.
- * The tool calls execute-tool locally which forwards the request to the remote.
+ * Build a compact one-line schema summary for a tool catalog entry.
+ * Extracts property names and their JSON Schema types from a Zod schema.
+ * Returns empty string if the schema has no properties.
  */
-function createRemoteTool(params: {
-  toolName: string; // full prefixed name: "hermes__ssh_exec_POST"
-  cap: { title: string; description: string };
-  requiresConfirmation: boolean;
-  user: JwtPayloadType;
-  locale: CountryLanguage;
-  logger: EndpointLogger;
-  streamContext: ToolExecutionContext;
-}): CoreTool {
-  const { toolName, cap, user, locale, logger, streamContext } = params;
-
-  // Accept any JSON object as input - schema is opaque for remote tools
-  const inputSchema = jsonSchema(
-    {
-      type: "object",
-      additionalProperties: true,
-    } as JSONSchema7,
-    {
-      validate: (value) => ({
-        success: true,
-        value: value as Record<string, WidgetData>,
-      }),
-    },
-  );
-
-  return tool({
-    description: cap.description || cap.title,
-    inputSchema,
-    execute: async (input, options) => {
-      const abortSignal = streamContext.abortSignal;
-
-      const executeRemoteInline = async (): Promise<WidgetData> => {
-        // Delegate to execute-tool which routes to the remote
-        const { RouteExecuteRepository } =
-          await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
-        const { scopedTranslation: executeScopedT } =
-          await import("@/app/api/[locale]/system/unified-interface/ai/i18n");
-        const { t } = executeScopedT.scopedT(locale);
-
-        // Extract callbackMode from input if AI passed it; default to wait
-        const { callbackMode: inputCallbackMode, ...restInput } = (input ??
-          {}) as Record<string, WidgetData>;
-        const { CallbackMode: CM } =
-          await import("@/app/api/[locale]/system/unified-interface/execute-tool/constants");
-        const callbackMode =
-          typeof inputCallbackMode === "string" &&
-          Object.values(CM).includes(inputCallbackMode as never)
-            ? (inputCallbackMode as (typeof CM)[keyof typeof CM])
-            : CM.WAIT;
-
-        if (options?.toolCallId && streamContext) {
-          streamContext.callerToolCallId = options.toolCallId;
-        }
-        const result = await RouteExecuteRepository.execute(
-          {
-            toolName,
-            input: restInput,
-            callbackMode,
-          },
-          user,
-          locale,
-          logger,
-          t,
-          streamContext,
-          Platform.AI,
-        );
-
-        if (!result.success) {
-          const errorMsg = result.message ?? "Remote tool execution failed";
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
-          // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
-          throw new Error(errorMsg);
-        }
-
-        // Signal the stream layer to pause when callbackMode=wait AND the result
-        // is actually pending (task-queue path). For direct HTTP the result is
-        // already inline - do NOT set waitingForRemoteResult or the tool-result
-        // handler will skip storing the result (treating it as still queued).
-        const resultData = result.data as Record<string, WidgetData> | null;
-        const isActuallyPending =
-          callbackMode === CM.WAIT &&
-          resultData !== null &&
-          typeof resultData === "object" &&
-          !Array.isArray(resultData) &&
-          resultData["status"] === "status.pending";
-        if (isActuallyPending && streamContext) {
-          streamContext.waitingForRemoteResult = true;
-        }
-
-        return result.data as WidgetData;
-      };
-
-      // If no abort signal, just run inline
-      if (!abortSignal) {
-        return executeRemoteInline();
-      }
-
-      // Already aborted - bail immediately
-      if (abortSignal.aborted) {
-        logger.info(
-          "[ToolsLoader] Stream already cancelled - skipping remote tool",
-          { toolName },
-        );
-        return { error: "Stream cancelled" };
-      }
-
-      // Race: tool execution vs abort signal
-      return Promise.race([
-        executeRemoteInline(),
-        new Promise<never>((...[, reject]) => {
-          const onAbort = (): void => {
-            reject(new Error("User cancelled stream"));
-          };
-          abortSignal.addEventListener("abort", onAbort, { once: true });
-        }),
-      ]);
-    },
-  });
+function buildSchemaSummary(
+  endpoint: CreateApiEndpointAny,
+  userRoles: ReturnType<typeof filterUserPermissionRoles>,
+): string {
+  try {
+    const zodSchema = generateInputSchema(endpoint, userRoles);
+    const jsonSchemaObj = z.toJSONSchema(zodSchema, {
+      target: "draft-7",
+      io: "input",
+      unrepresentable: "any",
+    }) as {
+      properties?: Record<string, { type?: string; enum?: WidgetData[] }>;
+    };
+    const props = jsonSchemaObj.properties;
+    if (!props || Object.keys(props).length === 0) {
+      return "{}";
+    }
+    const entries = Object.entries(props).map(([k, v]) => {
+      const type = v.enum ? v.enum.map(String).join("|") : (v.type ?? "any");
+      return `${k}: ${type}`;
+    });
+    return `{ ${entries.join(", ")} }`;
+  } catch {
+    return "{}";
+  }
 }
 
 /**
- * Load tools for AI streaming
+ * Build a tool catalog string for injection into the system prompt.
+ * The AI uses this to know which tools are available and what inputs they expect.
+ * All tools are called via: execute-tool({ toolName, input, callbackMode? })
+ */
+function buildToolCatalog(
+  localEntries: Array<{
+    preferredName: string;
+    label: string;
+    description: string;
+    credits: number;
+    schemaSummary: string;
+    requiresConfirmation: boolean;
+  }>,
+  remoteEntries: Array<{
+    fullName: string;
+    label: string;
+    description: string;
+    credits: number;
+  }>,
+): string {
+  const lines: string[] = [
+    "<tool-catalog>",
+    "Execute any tool via: execute-tool({ toolName, input, callbackMode? })",
+    "callbackMode: omit=sync result | detach=fire-forget+taskId | wakeUp=async-revival | endLoop=stop-turn",
+    "",
+  ];
+  for (const e of localEntries) {
+    const confirm = e.requiresConfirmation ? " [confirm]" : "";
+    const credits = e.credits > 0 ? ` | ${e.credits} credits` : "";
+    lines.push(
+      `${e.preferredName}${confirm} — ${e.description} | input: ${e.schemaSummary}${credits}`,
+    );
+  }
+  if (remoteEntries.length > 0) {
+    lines.push("");
+    for (const e of remoteEntries) {
+      const credits = e.credits > 0 ? ` | ${e.credits} credits` : "";
+      lines.push(
+        `${e.fullName} [remote] — ${e.description} | input: any${credits}`,
+      );
+    }
+  }
+  lines.push("</tool-catalog>");
+  return lines.join("\n");
+}
+
+/**
+ * Load tools for AI streaming.
+ * Returns a single execute-tool CoreTool (not per-tool registrations).
+ * All tool metadata is collected into toolsMeta for UI/billing.
+ * A tool catalog is injected into the system prompt so the AI knows available tools.
  */
 export async function loadTools(params: {
   requestedTools: string[] | null | undefined;
@@ -730,14 +688,14 @@ export async function loadTools(params: {
       }
     }
 
-    // Create AI SDK tools map
-    const toolsMap = new Map<string, CoreTool>();
     const toolsMeta = new Map<
       string,
       { requiresConfirmation: boolean; credits: number; label: string }
     >();
 
-    // ── Local tools ──────────────────────────────────────────────────────────
+    const permissionRoles = filterUserPermissionRoles(params.user.roles);
+
+    // ── Local tools — build toolsMeta + catalog entries ───────────────────────
     const loaded = await Promise.all(localToolNames.map((n) => getEndpoint(n)));
     const enabledEndpoints = loaded.filter(
       (e): e is CreateApiEndpointAny =>
@@ -755,46 +713,64 @@ export async function loadTools(params: {
       remote: remoteToolNames.length,
     });
 
+    // Track the execute-tool endpoint for CoreTool creation
+    let executeToolEndpoint: CreateApiEndpointAny | undefined;
+
+    const localCatalogEntries: Array<{
+      preferredName: string;
+      label: string;
+      description: string;
+      credits: number;
+      schemaSummary: string;
+      requiresConfirmation: boolean;
+    }> = [];
+
     for (const endpoint of enabledEndpoints) {
       const internalToolName = endpointToToolName(endpoint);
       const preferredToolName = getPreferredToolName(endpoint);
 
-      try {
-        const requiresConfirmation =
-          params.toolConfirmationConfig?.get(preferredToolName) ??
-          params.toolConfirmationConfig?.get(internalToolName) ??
-          endpoint.requiresConfirmation ??
-          false;
+      const requiresConfirmation =
+        params.toolConfirmationConfig?.get(preferredToolName) ??
+        params.toolConfirmationConfig?.get(internalToolName) ??
+        endpoint.requiresConfirmation ??
+        false;
 
-        const createdTool = createToolFromEndpoint(endpoint, {
-          user: params.user,
-          locale: params.locale,
-          logger: params.logger,
-          streamContext: params.streamContext,
-          requiresConfirmation,
-        });
+      const { t: tEndpoint } = endpoint.scopedTranslation.scopedT(
+        params.locale,
+      );
+      const label = tEndpoint(endpoint.title);
+      const description = tEndpoint(endpoint.description ?? endpoint.title);
 
-        const { t: tEndpoint } = endpoint.scopedTranslation.scopedT(
-          params.locale,
-        );
-        toolsMap.set(preferredToolName, createdTool);
-        toolsMeta.set(preferredToolName, {
-          requiresConfirmation,
-          credits: endpoint.credits ?? 0,
-          label: tEndpoint(endpoint.title),
-        });
-      } catch (error) {
-        const parsedError = parseError(error);
-        params.logger.error("Failed to create tool - skipping", {
-          internalToolName,
-          preferredToolName,
-          endpoint: [...endpoint.path],
-          error: parsedError.message,
-        });
+      toolsMeta.set(preferredToolName, {
+        requiresConfirmation,
+        credits: endpoint.credits ?? 0,
+        label,
+      });
+
+      if (preferredToolName === EXECUTE_TOOL_ALIAS) {
+        executeToolEndpoint = endpoint;
+        // execute-tool itself does not appear in the catalog — it IS the call mechanism
+        continue;
       }
+
+      localCatalogEntries.push({
+        preferredName: preferredToolName,
+        label,
+        description,
+        credits: endpoint.credits ?? 0,
+        schemaSummary: buildSchemaSummary(endpoint, permissionRoles),
+        requiresConfirmation,
+      });
     }
 
-    // ── Remote tools ─────────────────────────────────────────────────────────
+    // ── Remote tools — build toolsMeta + catalog entries ──────────────────────
+    const remoteCatalogEntries: Array<{
+      fullName: string;
+      label: string;
+      description: string;
+      credits: number;
+    }> = [];
+
     if (
       remoteToolNames.length > 0 &&
       !params.user.isPublic &&
@@ -842,34 +818,26 @@ export async function loadTools(params: {
           const requiresConfirmation =
             params.toolConfirmationConfig?.get(fullName) ?? false;
 
-          try {
-            const remoteTool = createRemoteTool({
-              toolName: fullName,
-              cap,
-              requiresConfirmation,
-              user: params.user,
-              locale: params.locale,
-              logger: params.logger,
-              streamContext: params.streamContext,
-            });
+          toolsMeta.set(fullName, {
+            requiresConfirmation,
+            credits: cap.credits ?? 0,
+            label: cap.title ?? fullName,
+          });
 
-            toolsMap.set(fullName, remoteTool);
-            toolsMeta.set(fullName, {
-              requiresConfirmation,
-              credits: cap.credits ?? 0,
-              label: cap.title ?? fullName,
-            });
-          } catch (error) {
-            params.logger.error("[Tools Loader] Failed to create remote tool", {
-              fullName,
-              error: parseError(error).message,
-            });
-          }
+          remoteCatalogEntries.push({
+            fullName,
+            label: cap.title ?? fullName,
+            description: cap.description || cap.title,
+            credits: cap.credits ?? 0,
+          });
         }
       }
     }
 
-    if (toolsMap.size === 0) {
+    const totalToolCount =
+      localCatalogEntries.length + remoteCatalogEntries.length;
+
+    if (totalToolCount === 0 && !executeToolEndpoint) {
       return {
         tools: undefined,
         toolsMeta: new Map(),
@@ -877,14 +845,55 @@ export async function loadTools(params: {
       };
     }
 
-    const tools = Object.fromEntries(toolsMap.entries());
+    // ── Single execute-tool CoreTool ───────────────────────────────────────────
+    // All tool calls go through execute-tool. The AI knows available tools via
+    // the catalog injected into the system prompt below.
+    if (!executeToolEndpoint) {
+      // execute-tool was not in the requested list — load it directly (it must always be available)
+      const etEndpoint = await getEndpoint(EXECUTE_TOOL_ALIAS);
+      if (etEndpoint) {
+        executeToolEndpoint = etEndpoint;
+      }
+    }
 
-    params.logger.debug("Tools created", {
-      count: toolsMap.size,
-      preferredToolNames: [...toolsMap.keys()],
+    if (!executeToolEndpoint) {
+      params.logger.error(
+        "[Tools Loader] execute-tool endpoint not found — cannot register single-path tool",
+        {},
+      );
+      return {
+        tools: undefined,
+        toolsMeta,
+        systemPrompt: params.systemPrompt,
+      };
+    }
+
+    const executeTool = createToolFromEndpoint(executeToolEndpoint, {
+      user: params.user,
+      locale: params.locale,
+      logger: params.logger,
+      streamContext: params.streamContext,
+      requiresConfirmation: false,
     });
 
-    return { tools, toolsMeta, systemPrompt: params.systemPrompt };
+    const tools: Record<string, CoreTool> = {
+      [EXECUTE_TOOL_ALIAS]: executeTool,
+    };
+
+    // ── Inject tool catalog into system prompt ─────────────────────────────────
+    const catalogText = buildToolCatalog(
+      localCatalogEntries,
+      remoteCatalogEntries,
+    );
+    const enrichedSystemPrompt = `${params.systemPrompt}\n\n${catalogText}`;
+
+    params.logger.debug("Tools created (single execute-tool path)", {
+      catalogLocal: localCatalogEntries.length,
+      catalogRemote: remoteCatalogEntries.length,
+      toolsMeta: toolsMeta.size,
+    });
+
+    return { tools, toolsMeta, systemPrompt: enrichedSystemPrompt };
   } catch (error) {
     params.logger.error("Failed to load tools", {
       error: parseError(error).message,

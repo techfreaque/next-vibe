@@ -84,17 +84,17 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       text: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.text",
+        label: "post.response.text",
         schema: z.string(),
       }),
       model: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.model",
+        label: "post.response.model",
         schema: z.string(),
       }),
       creditCost: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.creditCost",
+        label: "post.response.creditCost",
         schema: z.number(),
       }),
     },

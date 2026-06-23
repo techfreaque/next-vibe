@@ -136,36 +136,36 @@ const { PATCH } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderUpdate.patch.response.id" as const,
+            label: "orderUpdate.patch.response.id" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderUpdate.patch.response.status" as const,
+            label: "orderUpdate.patch.response.status" as const,
             schema: z.string(),
           }),
           subtotal: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderUpdate.patch.response.subtotal" as const,
+            label: "orderUpdate.patch.response.subtotal" as const,
             fieldType: FieldDataType.NUMBER,
             schema: z.number(),
           }),
           taxAmount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderUpdate.patch.response.taxAmount" as const,
+            label: "orderUpdate.patch.response.taxAmount" as const,
             fieldType: FieldDataType.NUMBER,
             schema: z.number(),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderUpdate.patch.response.total" as const,
+            label: "orderUpdate.patch.response.total" as const,
             fieldType: FieldDataType.NUMBER,
             schema: z.number(),
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderUpdate.patch.response.updatedAt" as const,
+            label: "orderUpdate.patch.response.updatedAt" as const,
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date(),
           }),

@@ -48,6 +48,9 @@ export const translations = {
       },
       timeout: { title: "Timeout", description: "Request timed out" },
     },
+    response: {
+      ok: { title: "OK" },
+    },
     success: {
       title: "User Deleted",
       description: "OS user account deleted successfully",

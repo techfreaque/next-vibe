@@ -1,21 +1,15 @@
 /**
  * AI Stream Integration — Remote Chat Root: Direct-HTTP relay + REMOTE folder
  *
- * Streams go into the REMOTE/hermes subfolder. connectToHermes sets
- * isDefault=true so the AI loop runs on hermes (loopLocation='server').
+ * Thread locations (threadMirrorMode='both'):
+ *   Local  (atlas):  REMOTE     → hermes → tests → remote-chat-root-direct → <thread>
+ *   Remote (hermes): BACKGROUND → atlas  → tests → remote-chat-root-direct → <thread>
  *
- * Thread mirroring (threadMirrorMode='both'):
- *   - Atlas:  REMOTE/<hermes-subfolder-uuid>
- *   - Hermes: REMOTE/<atlas-subfolder-uuid>
- *
- * Full T-suite via describeStreamSuite (rootFolderIdOverride=REMOTE,
- * subFolderIdOverride=<hermes-instance-folder-uuid>).
- *
- * Standalone suite (RCR-D1–RCR-D4) verifies bidirectional storage:
- *   RCR-D1 — atlas thread in REMOTE/hermes subfolder
- *   RCR-D2 — atlas has messages, AI response contains marker
- *   RCR-D3 — hermes thread in REMOTE/atlas subfolder
- *   RCR-D4 — hermes has messages (AI loop ran there)
+ * Standalone bidirectional assertions (RCR-D1–RCR-D4):
+ *   RCR-D1 — atlas thread in REMOTE/hermes/tests/remote-chat-root-direct
+ *   RCR-D2 — atlas has messages and AI response contains marker
+ *   RCR-D3 — hermes thread in BACKGROUND/atlas/tests/remote-chat-root-direct
+ *   RCR-D4 — hermes has messages — AI loop ran there
  *
  * PREREQUISITES
  * ─────────────
@@ -108,8 +102,6 @@ if (_remoteUrl && _isFixtureMode) {
   describeStreamSuite({
     label: `AI Stream — remote chat root direct-HTTP (${_remoteUrl}, REMOTE/hermes, AI on hermes)`,
     cachePrefix: "remote-chat-root-direct-",
-    // REMOTE-folder semantics: loop, tools and system prompt all come from
-    // the remote instance — the thread merely starts locally and mirrors back.
     systemPromptInstanceId: HERMES_INSTANCE_ID,
     get rootFolderIdOverride() {
       return DefaultFolderId.REMOTE;
@@ -121,29 +113,45 @@ if (_remoteUrl && _isFixtureMode) {
     teardown,
   });
 
-  describe(`Remote Chat Root Direct — bidirectional mirror assertions (${_remoteUrl})`, () => {
+  // ── Bidirectional thread location assertions ───────────────────────────────
+
+  describe(`Remote Chat Root Direct — bidirectional thread location (${_remoteUrl})`, () => {
     let testUser: JwtPrivatePayloadType;
     let threadId: string;
+    let _rcrTestsFolderId: string | null = null;
+    let _rcrSuiteFolderId: string | null = null;
 
     beforeAll(async () => {
       const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
-      expect(resolved, `admin user not found — run: vibe dev`).toBeTruthy();
+      expect(resolved, "admin user not found — run: vibe dev").toBeTruthy();
       if (!resolved) {
         // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-        throw new Error(
-          "RCR-D setup failed: admin user not found — cannot continue suite (run: vibe dev)",
-        );
+        throw new Error("RCR-D setup failed: admin user not found");
       }
       testUser = resolved;
 
       await setup(testUser);
+
+      // Create REMOTE/hermes/tests/remote-chat-root-direct folder chain on atlas.
+      _rcrTestsFolderId = await getOrCreateFolder(
+        testUser,
+        DefaultFolderId.REMOTE,
+        "tests",
+        _localFolderId ?? undefined,
+      );
+      _rcrSuiteFolderId = await getOrCreateFolder(
+        testUser,
+        DefaultFolderId.REMOTE,
+        "remote-chat-root-direct",
+        _rcrTestsFolderId ?? undefined,
+      );
 
       setFetchCacheContext("remote-chat-root-direct-rcr-d-");
       const streamResult = await runTestStream({
         prompt: "Reply with EXACTLY: RCR_DIRECT_OK. Nothing else.",
         user: testUser,
         rootFolderId: DefaultFolderId.REMOTE,
-        subFolderId: _localFolderId ?? undefined,
+        subFolderId: _rcrSuiteFolderId ?? undefined,
       });
 
       expect(
@@ -152,72 +160,113 @@ if (_remoteUrl && _isFixtureMode) {
       ).toBe(true);
       if (!streamResult.result.success) {
         // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
-        throw new Error(
-          "RCR-D setup failed: stream did not succeed — cannot continue suite",
-        );
+        throw new Error("RCR-D setup failed: stream did not succeed");
       }
       threadId = streamResult.result.data.threadId ?? "";
     }, 120_000);
 
     afterAll(async () => {
+      const { closeProdDb } = await import("../../testing/remote-setup");
       if (testUser) {
         await teardown(testUser);
       }
+      await closeProdDb();
     });
 
-    it("RCR-D1: atlas thread is in REMOTE/hermes subfolder", async () => {
-      const threadDef =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
-      const result = await RouteExecuteRepository.runInProcessTyped({
-        definition: threadDef.default.GET,
-        input: { rootFolderId: DefaultFolderId.REMOTE },
-        urlPathParams: { threadId },
-        user: testUser,
-        locale: defaultLocale,
-        platform: Platform.AI,
-        logger: createEndpointLogger(false, Date.now(), defaultLocale),
-      });
+    it("RCR-D1: atlas thread is in REMOTE/hermes/tests/remote-chat-root-direct", async () => {
+      const { db } = await import("@/app/api/[locale]/system/db");
+      const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+      const { eq } = await import("drizzle-orm");
+      const [row] = await db
+        .select({
+          folderId: chatThreads.folderId,
+          rootFolderId: chatThreads.rootFolderId,
+        })
+        .from(chatThreads)
+        .where(eq(chatThreads.id, threadId))
+        .limit(1);
 
-      expect(result.success, `thread ${threadId} must exist in atlas DB`).toBe(
-        true,
+      expect(
+        row,
+        `RCR-D1: thread ${threadId} must exist in atlas DB`,
+      ).toBeTruthy();
+      expect(row?.rootFolderId, "RCR-D1: must be in REMOTE root").toBe(
+        DefaultFolderId.REMOTE,
       );
-      const threadRow = result.success ? result.data : null;
       expect(
-        threadRow?.["rootFolderId"],
-        "must be in REMOTE root on atlas",
-      ).toBe(DefaultFolderId.REMOTE);
-      expect(
-        threadRow?.["folderId"],
-        `must be in REMOTE/hermes subfolder`,
-      ).toBe(_localFolderId);
+        row?.folderId,
+        "RCR-D1: must be in REMOTE/hermes/tests/remote-chat-root-direct subfolder",
+      ).toBe(_rcrSuiteFolderId);
     }, 30_000);
 
     it("RCR-D2: atlas has messages and AI response contains marker", async () => {
       const messages = await fetchThreadMessages(threadId, testUser);
-      expect(messages.length, "atlas must have messages").toBeGreaterThan(0);
+      expect(
+        messages.length,
+        "RCR-D2: atlas must have messages",
+      ).toBeGreaterThan(0);
       const aiMsg = messages.find(
         (m) => m.role === "assistant" && m.content?.includes("RCR_DIRECT_OK"),
       );
-      expect(aiMsg, "AI response must contain RCR_DIRECT_OK").toBeTruthy();
+      expect(
+        aiMsg,
+        "RCR-D2: AI response must contain RCR_DIRECT_OK",
+      ).toBeTruthy();
     }, 30_000);
 
-    it("RCR-D3: hermes thread is in REMOTE/atlas subfolder", async () => {
-      const { getProdDb } = await import("../../testing/remote-setup");
+    it("RCR-D3: hermes thread is in BACKGROUND/atlas/tests/remote-chat-root-direct", async () => {
       const pdb = getProdDb();
 
-      const folderRows = await pdb.execute<{ id: string }>(
-        sql`SELECT id FROM chat_folders WHERE root_folder_id = ${DefaultFolderId.REMOTE} AND name = ${ATLAS_INSTANCE_ID} LIMIT 1`,
+      // Resolve BACKGROUND/atlas on hermes.
+      const atlasRows = await pdb.execute<{ id: string }>(
+        sql`SELECT id FROM chat_folders
+              WHERE user_id = ${_mainProdUserId}
+                AND root_folder_id = ${DefaultFolderId.BACKGROUND}
+                AND name = ${ATLAS_INSTANCE_ID}
+                AND parent_id IS NULL
+              LIMIT 1`,
       );
       expect(
-        folderRows.rows.length,
-        `REMOTE/${ATLAS_INSTANCE_ID} subfolder must exist on hermes`,
+        atlasRows.rows.length,
+        `BACKGROUND/${ATLAS_INSTANCE_ID} subfolder must exist on hermes`,
       ).toBeGreaterThan(0);
+      const atlasFolderId = atlasRows.rows[0]!.id;
 
-      await assertProdDbHasThread(threadId, folderRows.rows[0]!.id);
+      // Resolve BACKGROUND/atlas/tests on hermes.
+      const testsRows = await pdb.execute<{ id: string }>(
+        sql`SELECT id FROM chat_folders
+              WHERE user_id = ${_mainProdUserId}
+                AND root_folder_id = ${DefaultFolderId.BACKGROUND}
+                AND name = 'tests'
+                AND parent_id = ${atlasFolderId}
+              LIMIT 1`,
+      );
+      expect(
+        testsRows.rows.length,
+        "BACKGROUND/atlas/tests must exist on hermes",
+      ).toBeGreaterThan(0);
+      const testsFolderId = testsRows.rows[0]!.id;
+
+      // Resolve BACKGROUND/atlas/tests/remote-chat-root-direct on hermes.
+      const suiteRows = await pdb.execute<{ id: string }>(
+        sql`SELECT id FROM chat_folders
+              WHERE user_id = ${_mainProdUserId}
+                AND root_folder_id = ${DefaultFolderId.BACKGROUND}
+                AND name = 'remote-chat-root-direct'
+                AND parent_id = ${testsFolderId}
+              LIMIT 1`,
+      );
+      expect(
+        suiteRows.rows.length,
+        "BACKGROUND/atlas/tests/remote-chat-root-direct must exist on hermes",
+      ).toBeGreaterThan(0);
+      const hermesTargetFolderId = suiteRows.rows[0]!.id;
+
+      await assertProdDbHasThread(threadId, hermesTargetFolderId);
     }, 30_000);
 
     it("RCR-D4: hermes has messages — AI loop ran there", async () => {
-      await assertProdDbHasMessages(threadId, 1);
+      await assertProdDbHasMessages(threadId, 2);
     }, 30_000);
   });
 } else if (!_remoteUrl) {
@@ -225,7 +274,7 @@ if (_remoteUrl && _isFixtureMode) {
     "remote-chat-root-direct",
     "hermes not running — start: vibe --hermes dev",
   );
-} else if (!_isFixtureMode) {
+} else {
   failSuitePrerequisites(
     "remote-chat-root-direct",
     "hermes running but not in fixture mode — restart: vibe --hermes dev --fixture-mode",

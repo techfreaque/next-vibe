@@ -156,22 +156,22 @@ const { POST } = createEndpoint({
       // Response fields
       leadsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.leadsProcessed",
+        label: "post.response.leadsProcessed",
         schema: z.number(),
       }),
       leadsStarted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.leadsStarted",
+        label: "post.response.leadsStarted",
         schema: z.number(),
       }),
       leadsSkipped: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.leadsSkipped",
+        label: "post.response.leadsSkipped",
         schema: z.number(),
       }),
       executionTimeMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.executionTimeMs",
+        label: "post.response.executionTimeMs",
         schema: z.number(),
       }),
       errors: responseArrayField(scopedTranslation, {
@@ -186,17 +186,17 @@ const { POST } = createEndpoint({
           children: {
             leadId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.errors",
+              label: "post.response.errors",
               schema: z.string(),
             }),
             email: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.errors",
+              label: "post.response.errors",
               schema: z.string(),
             }),
             error: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.errors",
+              label: "post.response.errors",
               schema: z.string(),
             }),
           },
@@ -214,37 +214,37 @@ const { POST } = createEndpoint({
           children: {
             locale: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.quotaDetails",
+              label: "post.response.quotaDetails",
               schema: z.string(),
             }),
             weeklyQuota: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.quotaDetails",
+              label: "post.response.quotaDetails",
               schema: z.number(),
             }),
             leadsStartedThisWeek: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.quotaDetails",
+              label: "post.response.quotaDetails",
               schema: z.number(),
             }),
             remainingQuota: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.quotaDetails",
+              label: "post.response.quotaDetails",
               schema: z.number(),
             }),
             totalRunsPerWeek: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.quotaDetails",
+              label: "post.response.quotaDetails",
               schema: z.number(),
             }),
             perRunBudget: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.quotaDetails",
+              label: "post.response.quotaDetails",
               schema: z.number(),
             }),
             dispatched: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.quotaDetails",
+              label: "post.response.quotaDetails",
               schema: z.number(),
             }),
           },
@@ -371,17 +371,17 @@ const { GET } = createEndpoint({
       }),
       dryRun: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.dryRun",
+        label: "get.response.dryRun",
         schema: z.boolean(),
       }),
       minAgeHours: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.minAgeHours",
+        label: "get.response.minAgeHours",
         schema: z.coerce.number().min(0).max(168),
       }),
       localeConfig: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.localeConfig",
+        label: "get.response.localeConfig",
         schema: z.record(
           z.string(),
           z.object({
@@ -396,32 +396,32 @@ const { GET } = createEndpoint({
       }),
       schedule: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.schedule",
+        label: "get.response.schedule",
         schema: z.string().min(1),
       }),
       enabled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.enabled",
+        label: "get.response.enabled",
         schema: z.boolean().default(true),
       }),
       priority: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.priority",
+        label: "get.response.priority",
         schema: z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
       }),
       timeout: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.timeout",
+        label: "get.response.timeout",
         schema: z.coerce.number().min(1000).max(3600000).default(300000),
       }),
       retries: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.retries",
+        label: "get.response.retries",
         schema: z.coerce.number().min(0).max(10).default(3),
       }),
       retryDelay: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.retryDelay",
+        label: "get.response.retryDelay",
         schema: z.coerce.number().min(1000).max(300000).default(30000),
       }),
     },

@@ -63,19 +63,19 @@ const { POST } = createEndpoint({
 
       leadsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "unsubscribe.sync.post.response.leadsProcessed",
+        label: "unsubscribe.sync.post.response.leadsProcessed",
         schema: z.number(),
       }),
 
       leadsUpdated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "unsubscribe.sync.post.response.leadsUpdated",
+        label: "unsubscribe.sync.post.response.leadsUpdated",
         schema: z.number(),
       }),
 
       executionTimeMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "unsubscribe.sync.post.response.executionTimeMs",
+        label: "unsubscribe.sync.post.response.executionTimeMs",
         schema: z.number(),
       }),
     },

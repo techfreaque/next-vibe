@@ -68,13 +68,13 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.id",
+            label: "post.response.id",
             hidden: true,
             schema: z.uuid(),
           }),
           isActive: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.isActive",
+            label: "post.response.isActive",
             schema: z.boolean(),
           }),
         },

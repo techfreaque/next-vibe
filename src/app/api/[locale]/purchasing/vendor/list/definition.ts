@@ -73,33 +73,33 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "vendorList.get.response.id" as const,
+              label: "vendorList.get.response.id" as const,
               hidden: true,
               schema: z.uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "vendorList.get.response.name" as const,
+              label: "vendorList.get.response.name" as const,
               schema: z.string(),
             }),
             code: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "vendorList.get.response.code" as const,
+              label: "vendorList.get.response.code" as const,
               schema: z.string().nullable(),
             }),
             email: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "vendorList.get.response.email" as const,
+              label: "vendorList.get.response.email" as const,
               schema: z.string().nullable(),
             }),
             vatNumber: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "vendorList.get.response.vatNumber" as const,
+              label: "vendorList.get.response.vatNumber" as const,
               schema: z.string().nullable(),
             }),
             defaultCurrency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "vendorList.get.response.defaultCurrency" as const,
+              label: "vendorList.get.response.defaultCurrency" as const,
               schema: z.string(),
             }),
             defaultPaymentTermsDays: responseField(scopedTranslation, {
@@ -110,12 +110,12 @@ const { GET } = createEndpoint({
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "vendorList.get.response.isActive" as const,
+              label: "vendorList.get.response.isActive" as const,
               schema: z.boolean(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "vendorList.get.response.createdAt" as const,
+              label: "vendorList.get.response.createdAt" as const,
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date(),
             }),

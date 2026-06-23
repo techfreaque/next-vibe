@@ -58,12 +58,8 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
     handler: ({ data, urlPathParams, user, logger, locale }) =>
       SkillsRepository.updateSkill(data, urlPathParams, user, logger, locale),
     onRemoteEvent: {
-      "skill-updated": (payload, ctx) =>
-        SkillsRepository.applyRemoteSkillPartialUpdate(
-          ctx.urlPathParams.id,
-          payload,
-          ctx.logger,
-        ),
+      "skill-updated": (props) =>
+        SkillsRepository.applyRemoteSkillPartialUpdate(props),
     },
   },
   [Methods.DELETE]: {
@@ -71,12 +67,8 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
     handler: ({ urlPathParams, user, logger, locale }) =>
       SkillsRepository.deleteSkill(urlPathParams, user, logger, locale),
     onRemoteEvent: {
-      "skill-deleted": (payload, ctx) =>
-        SkillsRepository.applyRemoteSkillDeleteById(
-          payload,
-          ctx.urlPathParams.id,
-          ctx.logger,
-        ),
+      "skill-deleted": (props) =>
+        SkillsRepository.applyRemoteSkillDeleteById(props),
     },
   },
 });

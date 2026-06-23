@@ -19,12 +19,8 @@ export const { POST, tools } = endpointsHandler({
     // Cross-instance applier — a peer relayed new favorite positions (gated by
     // syncScope["favorites"]); apply the same reorder here, scoped to the user.
     onRemoteEvent: {
-      "favorites-reordered": (payload, ctx) =>
-        ChatFavoritesRepository.applyRemoteFavoriteReorder(
-          payload.positions,
-          ctx.user.id,
-          ctx.logger,
-        ),
+      "favorites-reordered": (props) =>
+        ChatFavoritesRepository.applyRemoteFavoriteReorder(props),
     },
   },
 });

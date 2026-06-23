@@ -7,14 +7,16 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
  */
 import type { NextRequest, NextResponse } from "next-vibe-ui/lib/request";
 
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NextHandlerReturnType } from "../../../next-api/handler";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import { Methods } from "../../types/enums";
-import type { Platform } from "../../types/platform";
 import type { GenericHandlerReturnType, MethodHandlerConfig } from "./handler";
+import {
+  type AnyRemoteHandlerMap,
+  registerRemoteEventHandlers,
+} from "./remote-event-registry";
 import { endpointHandler } from "./single";
 
 /**
@@ -36,15 +38,7 @@ export type EndpointHandlerConfig<T extends EndpointDefinitionsConstraint> = {
 } & {
   [K in Methods]?: K extends keyof T
     ? T[K] extends CreateApiEndpointAny
-      ? MethodHandlerConfig<
-          T[K]["types"]["RequestOutput"],
-          T[K]["types"]["ResponseOutput"],
-          T[K]["types"]["UrlVariablesOutput"],
-          T[K]["allowedRoles"],
-          Platform,
-          T[K]["types"]["ScopedTranslationKey"],
-          T[K]["types"]["Events"]
-        >
+      ? MethodHandlerConfig<T[K]>
       : never
     : never;
 };
@@ -56,13 +50,7 @@ export type EndpointHandlerConfig<T extends EndpointDefinitionsConstraint> = {
  */
 export type ToolsObject<T extends EndpointDefinitionsConstraint> = {
   [K in keyof T]: T[K] extends CreateApiEndpointAny
-    ? GenericHandlerReturnType<
-        T[K]["types"]["RequestOutput"],
-        T[K]["types"]["ResponseOutput"],
-        T[K]["types"]["UrlVariablesOutput"],
-        T[K]["allowedRoles"],
-        T[K]["types"]["Events"]
-      >
+    ? GenericHandlerReturnType<T[K]>
     : never;
 };
 
@@ -119,25 +107,9 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         ResponseType<Record<string, string | number | boolean>>,
         Record<string, string> & { locale: CountryLanguage }
       >
-    | Record<
-        string,
-        GenericHandlerReturnType<
-          Record<string, string | number | boolean>,
-          ResponseType<Record<string, string | number | boolean>>,
-          Record<string, string> & { locale: CountryLanguage },
-          readonly UserRoleValue[]
-        >
-      >
+    | Record<string, GenericHandlerReturnType<CreateApiEndpointAny>>
   > & {
-    tools: Record<
-      string,
-      GenericHandlerReturnType<
-        Record<string, string | number | boolean>,
-        ResponseType<Record<string, string | number | boolean>>,
-        Record<string, string> & { locale: CountryLanguage },
-        readonly UserRoleValue[]
-      >
-    >;
+    tools: Record<string, GenericHandlerReturnType<CreateApiEndpointAny>>;
   };
 
   const result: FlexibleResult = {
@@ -167,6 +139,11 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       }
       if (methodConfig.onRemoteEvent) {
         result.tools[Methods.GET].onRemoteEvent = methodConfig.onRemoteEvent;
+        registerRemoteEventHandlers(
+          endpoint.path,
+          Methods.GET,
+          methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+        );
       }
     }
   }
@@ -194,6 +171,11 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       }
       if (methodConfig.onRemoteEvent) {
         result.tools[Methods.POST].onRemoteEvent = methodConfig.onRemoteEvent;
+        registerRemoteEventHandlers(
+          endpoint.path,
+          Methods.POST,
+          methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+        );
       }
     }
   }
@@ -221,6 +203,11 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       }
       if (methodConfig.onRemoteEvent) {
         result.tools[Methods.PUT].onRemoteEvent = methodConfig.onRemoteEvent;
+        registerRemoteEventHandlers(
+          endpoint.path,
+          Methods.PUT,
+          methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+        );
       }
     }
   }
@@ -248,6 +235,11 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       }
       if (methodConfig.onRemoteEvent) {
         result.tools[Methods.PATCH].onRemoteEvent = methodConfig.onRemoteEvent;
+        registerRemoteEventHandlers(
+          endpoint.path,
+          Methods.PATCH,
+          methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+        );
       }
     }
   }
@@ -275,6 +267,11 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       }
       if (methodConfig.onRemoteEvent) {
         result.tools[Methods.DELETE].onRemoteEvent = methodConfig.onRemoteEvent;
+        registerRemoteEventHandlers(
+          endpoint.path,
+          Methods.DELETE,
+          methodConfig.onRemoteEvent as AnyRemoteHandlerMap,
+        );
       }
     }
   }

@@ -1,4 +1,11 @@
 export const translations = {
+  enums: {
+    productType: {
+      service: "Service",
+      physical: "Physical",
+      digital: "Digital",
+    },
+  },
   tags: {
     products: "Products",
     catalog: "Catalog",

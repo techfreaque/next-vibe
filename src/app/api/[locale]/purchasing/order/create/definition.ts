@@ -115,41 +115,41 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderCreate.post.response.id" as const,
+            label: "orderCreate.post.response.id" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           poNumber: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderCreate.post.response.poNumber" as const,
+            label: "orderCreate.post.response.poNumber" as const,
             schema: z.string(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderCreate.post.response.status" as const,
+            label: "orderCreate.post.response.status" as const,
             schema: z.string(),
           }),
           subtotal: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderCreate.post.response.subtotal" as const,
+            label: "orderCreate.post.response.subtotal" as const,
             fieldType: FieldDataType.NUMBER,
             schema: z.number(),
           }),
           taxAmount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderCreate.post.response.taxAmount" as const,
+            label: "orderCreate.post.response.taxAmount" as const,
             fieldType: FieldDataType.NUMBER,
             schema: z.number(),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderCreate.post.response.total" as const,
+            label: "orderCreate.post.response.total" as const,
             fieldType: FieldDataType.NUMBER,
             schema: z.number(),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderCreate.post.response.createdAt" as const,
+            label: "orderCreate.post.response.createdAt" as const,
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date(),
           }),

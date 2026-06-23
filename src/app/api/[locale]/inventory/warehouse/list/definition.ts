@@ -74,38 +74,38 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "warehouseList.get.response.id" as const,
+              label: "warehouseList.get.response.id" as const,
               hidden: true,
               schema: z.uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "warehouseList.get.response.name" as const,
+              label: "warehouseList.get.response.name" as const,
               schema: z.string(),
             }),
             code: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "warehouseList.get.response.code" as const,
+              label: "warehouseList.get.response.code" as const,
               schema: z.string(),
             }),
             address: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "warehouseList.get.response.address" as const,
+              label: "warehouseList.get.response.address" as const,
               schema: z.string().nullable(),
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "warehouseList.get.response.isActive" as const,
+              label: "warehouseList.get.response.isActive" as const,
               schema: z.boolean(),
             }),
             isDefault: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "warehouseList.get.response.isDefault" as const,
+              label: "warehouseList.get.response.isDefault" as const,
               schema: z.boolean(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "warehouseList.get.response.createdAt" as const,
+              label: "warehouseList.get.response.createdAt" as const,
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date(),
             }),

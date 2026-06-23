@@ -8,6 +8,7 @@ export const translations = {
   hotkey: {
     post: {
       title: "Speech-to-Text Hotkey",
+      titleShort: "STT Hotkey",
       description: "Record and transcribe audio with automatic text insertion",
       form: {
         title: "Hotkey Configuration",

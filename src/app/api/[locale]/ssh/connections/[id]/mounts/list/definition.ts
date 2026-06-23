@@ -64,7 +64,7 @@ export const { GET } = createEndpoint({
       }),
       mounts: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list.response.mounts.title" as const,
+        label: "list.response.mounts.title" as const,
         schema: z.array(MountItemSchema),
       }),
     },

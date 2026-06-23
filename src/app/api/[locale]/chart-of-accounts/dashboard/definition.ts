@@ -60,17 +60,17 @@ const { GET } = createEndpoint({
       // Response fields
       accountCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.response.accountCount" as const,
+        label: "dashboard.response.accountCount" as const,
         schema: z.number(),
       }),
       draftEntryCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.response.draftEntryCount" as const,
+        label: "dashboard.response.draftEntryCount" as const,
         schema: z.number(),
       }),
       postedThisMonthCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.response.postedThisMonthCount" as const,
+        label: "dashboard.response.postedThisMonthCount" as const,
         schema: z.number(),
       }),
       hasSetup: responseField(scopedTranslation, {
@@ -80,32 +80,32 @@ const { GET } = createEndpoint({
       }),
       currency: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.response.currency" as const,
+        label: "dashboard.response.currency" as const,
         schema: z.string(),
       }),
       currentPeriodId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.response.currentPeriod" as const,
+        label: "dashboard.response.currentPeriod" as const,
         schema: z.string().nullable(),
       }),
       currentPeriodName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.response.currentPeriod" as const,
+        label: "dashboard.response.currentPeriod" as const,
         schema: z.string().nullable(),
       }),
       currentPeriodStatus: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.response.currentPeriod" as const,
+        label: "dashboard.response.currentPeriod" as const,
         schema: z.string().nullable(),
       }),
       currentPeriodStartDate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.response.currentPeriod" as const,
+        label: "dashboard.response.currentPeriod" as const,
         schema: z.string().nullable(),
       }),
       currentPeriodEndDate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.response.currentPeriod" as const,
+        label: "dashboard.response.currentPeriod" as const,
         schema: z.string().nullable(),
       }),
     },

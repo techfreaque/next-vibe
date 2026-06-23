@@ -113,13 +113,13 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.success" as const,
+        label: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.message" as const,
+        label: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
@@ -133,62 +133,62 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.id" as const,
+            label: "post.response.line.id" as const,
             schema: z.uuid(),
           }),
           estimateId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.estimateId" as const,
+            label: "post.response.line.estimateId" as const,
             schema: z.uuid(),
           }),
           description: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.lineDescription" as const,
+            label: "post.response.line.lineDescription" as const,
             schema: z.string(),
           }),
           productId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.productId" as const,
+            label: "post.response.line.productId" as const,
             schema: z.uuid().nullable(),
           }),
           quantity: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.quantity" as const,
+            label: "post.response.line.quantity" as const,
             schema: z.number(),
           }),
           unitPrice: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.unitPrice" as const,
+            label: "post.response.line.unitPrice" as const,
             schema: z.number(),
           }),
           taxRate: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.taxRate" as const,
+            label: "post.response.line.taxRate" as const,
             schema: z.number().nullable(),
           }),
           taxAmount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.taxAmount" as const,
+            label: "post.response.line.taxAmount" as const,
             schema: z.number(),
           }),
           lineTotal: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.lineTotal" as const,
+            label: "post.response.line.lineTotal" as const,
             schema: z.number(),
           }),
           sortOrder: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.sortOrder" as const,
+            label: "post.response.line.sortOrder" as const,
             schema: z.number().nullable(),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.createdAt" as const,
+            label: "post.response.line.createdAt" as const,
             schema: z.string(),
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.line.updatedAt" as const,
+            label: "post.response.line.updatedAt" as const,
             schema: z.string(),
           }),
         },

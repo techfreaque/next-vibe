@@ -1,5 +1,19 @@
 export const translations = {
   category: "Vibe Sense",
+  enums: {
+    resolution: {
+      "1m": "1 Minute",
+      "3m": "3 Minutes",
+      "5m": "5 Minutes",
+      "15m": "15 Minutes",
+      "30m": "30 Minutes",
+      "1h": "1 Hour",
+      "4h": "4 Hours",
+      "1d": "1 Day",
+      "1w": "1 Week",
+      "1M": "1 Month",
+    },
+  },
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Run Backtest",

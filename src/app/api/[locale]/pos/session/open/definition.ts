@@ -77,28 +77,28 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionOpen.post.response.id",
+            label: "sessionOpen.post.response.id",
             schema: z.uuid(),
           }),
           terminalId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionOpen.post.response.terminalId",
+            label: "sessionOpen.post.response.terminalId",
             schema: z.uuid(),
           }),
           openedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionOpen.post.response.openedAt",
+            label: "sessionOpen.post.response.openedAt",
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionOpen.post.response.status",
+            label: "sessionOpen.post.response.status",
             schema: z.string(),
           }),
           openingFloat: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionOpen.post.response.openingFloat",
+            label: "sessionOpen.post.response.openingFloat",
             schema: z.number(),
           }),
         },

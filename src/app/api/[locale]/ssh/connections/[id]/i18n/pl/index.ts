@@ -53,6 +53,17 @@ export const translations: typeof enTranslations = {
       conflict: { title: "Konflikt", description: "Wystąpił konflikt" },
       network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
     },
+    response: {
+      label: { title: "Nazwa" },
+      host: { title: "Host" },
+      port: { title: "Port" },
+      username: { title: "Użytkownik" },
+      authType: { title: "Typ auth" },
+      isDefault: { title: "Domyślne" },
+      fingerprint: { title: "Odcisk" },
+      notes: { title: "Notatki" },
+      createdAt: { title: "Utworzono" },
+    },
     success: {
       title: "Połączenie załadowane",
       description: "Szczegóły połączenia pobrane",

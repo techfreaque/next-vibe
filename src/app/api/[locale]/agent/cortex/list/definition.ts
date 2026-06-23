@@ -85,7 +85,7 @@ const { GET } = createEndpoint({
       // === RESPONSE ===
       responsePath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.path.content" as const,
+        label: "get.response.path.content" as const,
         schema: z.string(),
         fieldName: "path",
       }),
@@ -99,12 +99,12 @@ const { GET } = createEndpoint({
           children: {
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.entries.name.content" as const,
+              label: "get.response.entries.name.content" as const,
               schema: z.string(),
             }),
             entryPath: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.entries.path.content" as const,
+              label: "get.response.entries.path.content" as const,
               schema: z.string(),
               fieldName: "path",
             }),
@@ -120,7 +120,7 @@ const { GET } = createEndpoint({
             }),
             updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.entries.updatedAt.content" as const,
+              label: "get.response.entries.updatedAt.content" as const,
               schema: z.string(),
             }),
           },

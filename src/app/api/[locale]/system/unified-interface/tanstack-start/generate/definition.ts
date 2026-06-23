@@ -58,25 +58,25 @@ const { POST } = createEndpoint({
     children: {
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "generate.post.response.fields.success",
+        label: "generate.post.response.fields.success",
         schema: z.boolean(),
       }),
 
       created: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "generate.post.response.fields.created",
+        label: "generate.post.response.fields.created",
         schema: z.array(z.string()),
       }),
 
       skipped: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "generate.post.response.fields.skipped",
+        label: "generate.post.response.fields.skipped",
         schema: z.array(z.string()),
       }),
 
       errors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "generate.post.response.fields.errors",
+        label: "generate.post.response.fields.errors",
         schema: z.array(
           z.object({
             file: z.string(),
@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
 
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "generate.post.response.fields.message",
+        label: "generate.post.response.fields.message",
         schema: z.string(),
       }),
     },

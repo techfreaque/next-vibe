@@ -30,11 +30,11 @@ import {
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import {
   searchField,
   searchItems,
 } from "@/app/api/[locale]/system/unified-interface/shared/search/in-memory-search";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { isAgentPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
@@ -65,7 +65,6 @@ import {
 } from "./config";
 import { NO_SKILL_ID } from "./constants";
 import createSkillDefinitions, {
-  type SkillCreatedEventPayload,
   type SkillCreateRequestOutput,
   type SkillCreateResponseOutput,
 } from "./create/definition";

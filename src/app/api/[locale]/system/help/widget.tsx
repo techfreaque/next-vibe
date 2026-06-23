@@ -542,7 +542,7 @@ export function HelpToolsWidget(): JSX.Element {
       silentHistory.replaceState(url);
     },
     back: (): void => {
-      window.history.back();
+      historyBack();
     },
   };
 
@@ -553,10 +553,7 @@ export function HelpToolsWidget(): JSX.Element {
       effectiveSearchRef.current = new URLSearchParams(getCurrentSearch());
       handler();
     };
-    window.addEventListener("popstate", wrappedHandler);
-    return (): void => {
-      window.removeEventListener("popstate", wrappedHandler);
-    };
+    return addWindowListener("popstate", wrappedHandler);
   }, []);
 
   const urlNavStack = useUrlNavStack({

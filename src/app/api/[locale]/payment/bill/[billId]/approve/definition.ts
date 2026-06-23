@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
 
       journalEntryId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.journalEntryId" as const,
+        label: "post.response.journalEntryId" as const,
         schema: z.uuid().nullable(),
       }),
     },

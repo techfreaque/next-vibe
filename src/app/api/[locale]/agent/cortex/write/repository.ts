@@ -1,8 +1,3 @@
-/**
- * Cortex Write Repository
- * Handles creating and overwriting files in the document workspace
- */
-
 import "server-only";
 
 import {
@@ -13,6 +8,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+/**
+ * Cortex Write Repository
+ * Handles creating and overwriting files in the document workspace
+ */
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
@@ -31,18 +30,8 @@ import {
   normalizeToCanonicalPath,
   parseFrontmatter,
 } from "../repository";
-import type { CortexWriteT } from "./i18n";
-
-interface WriteParams {
-  userId: string;
-  user: JwtPrivatePayloadType;
-  locale: CountryLanguage;
-  path: string;
-  content: string;
-  createParents?: boolean;
-  logger: EndpointLogger;
-  t: CortexWriteT;
-}
+import writeDefinitions from "./definition";
+import { type CortexWriteT, scopedTranslation } from "./i18n";
 
 export class CortexWriteRepository {
   static async writeFile({
@@ -54,7 +43,23 @@ export class CortexWriteRepository {
     createParents = true,
     logger,
     t,
-  }: WriteParams): Promise<
+    relayed = false,
+  }: {
+    userId: string;
+    user: JwtPrivatePayloadType;
+    locale: CountryLanguage;
+    path: string;
+    content: string;
+    createParents?: boolean;
+    logger: EndpointLogger;
+    t: CortexWriteT;
+    /**
+     * True when invoked from a cross-instance applier (the write was already
+     * performed on the origin and relayed here). Suppresses the `node-written`
+     * emit so the event is not relayed back, preventing an infinite ping-pong.
+     */
+    relayed?: boolean;
+  }): Promise<
     ResponseType<{
       responsePath: string;
       size: number;
@@ -162,8 +167,6 @@ export class CortexWriteRepository {
             size,
             frontmatter,
             nodeType: CortexNodeType.FILE,
-            // Re-writing a path revives a soft-deleted (tombstoned) node.
-            isDeleted: false,
             updatedAt: now,
           },
         })
@@ -190,26 +193,20 @@ export class CortexWriteRepository {
         });
       }
 
-      // WS-push sync: broadcast changed provider to connected remote instances
-      void (async (): Promise<void> => {
-        try {
-          const { serializeProviders } =
-            await import("@/app/api/[locale]/remote-connection/sync-provider");
-          const { broadcastSyncNotify } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-          const providerKey = path.startsWith("/memories")
-            ? "memories"
-            : "documents";
-          const syncPayloads = await serializeProviders(
-            [providerKey],
-            userId,
-            logger,
-          );
-          broadcastSyncNotify(userId, syncPayloads, logger);
-        } catch {
-          // Best-effort: cron fallback handles missed syncs
-        }
-      })();
+      // This op owns its `node-written` event: the write the user submitted
+      // (requestFields). The peer's onRemoteEvent re-runs writeFile. Server-only.
+      // Suppressed when applying a relayed write (avoids re-relay ping-pong).
+      if (!relayed) {
+        createEndpointEmitter(
+          writeDefinitions.POST,
+          logger,
+          user,
+        )("node-written", {
+          path,
+          content,
+          createParents,
+        });
+      }
 
       return success({
         responsePath: path,
@@ -223,6 +220,38 @@ export class CortexWriteRepository {
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Cross-instance applier for `node-written`: re-run the write on this instance
+   * with the relayed inputs. Reuses writeFile so there is one code path.
+   */
+  static async applyRemoteWrite({
+    requestData,
+    user,
+    logger,
+  }: {
+    requestData: { path: string; content: string; createParents: boolean };
+    user: JwtPrivatePayloadType;
+    logger: EndpointLogger;
+  }): Promise<void> {
+    const { t } = scopedTranslation.scopedT(defaultLocale);
+    const result = await this.writeFile({
+      userId: user.id,
+      user,
+      locale: defaultLocale,
+      path: requestData.path,
+      content: requestData.content,
+      createParents: requestData.createParents,
+      logger,
+      t,
+      relayed: true,
+    });
+    if (!result.success) {
+      logger.error("Failed to apply remote cortex write", {
+        message: result.message,
       });
     }
   }

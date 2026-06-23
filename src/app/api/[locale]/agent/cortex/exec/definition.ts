@@ -121,27 +121,27 @@ export const { POST } = createEndpoint({
       // === RESPONSE ===
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.output.content" as const,
+        label: "post.response.output.content" as const,
         schema: z.string(),
       }),
       exitCode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.exitCode.title" as const,
+        label: "post.response.exitCode.title" as const,
         schema: z.number(),
       }),
       cwd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.cwd.content" as const,
+        label: "post.response.cwd.content" as const,
         schema: z.string(),
       }),
       backend: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.backend.title" as const,
+        label: "post.response.backend.title" as const,
         schema: z.enum(ExecBackendDB),
       }),
       truncated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.truncated.title" as const,
+        label: "post.response.truncated.title" as const,
         schema: z.boolean().optional(),
       }),
     },

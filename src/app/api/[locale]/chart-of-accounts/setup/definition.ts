@@ -72,12 +72,12 @@ const { POST } = createEndpoint({
       }),
       created: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.created" as const,
+        label: "post.response.created" as const,
         schema: z.number(),
       }),
       skipped: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.skipped" as const,
+        label: "post.response.skipped" as const,
         schema: z.number(),
       }),
     },

@@ -1,6 +1,4 @@
-/**
- * Text-to-Speech Polish translations
- */
+import { translations as modelTranslations } from "@/app/api/[locale]/agent/models/i18n/pl";
 
 import type { translations as enTranslations } from "../en";
 
@@ -116,6 +114,7 @@ export const translations: typeof enTranslations = {
       elevenlabsBella: "ElevenLabs Bella",
       elevenlabsAdam: "ElevenLabs Adam",
     },
+    names: modelTranslations.models.names,
   },
 };
 

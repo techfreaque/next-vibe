@@ -92,32 +92,32 @@ const { GET } = createEndpoint({
           children: {
             terminalId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.terminals.terminalId.content" as const,
+              label: "get.response.terminals.terminalId.content" as const,
               schema: z.string(),
             }),
             connectionSlug: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.terminals.connectionSlug.content" as const,
+              label: "get.response.terminals.connectionSlug.content" as const,
               schema: z.string(),
             }),
             cwd: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.terminals.cwd.content" as const,
+              label: "get.response.terminals.cwd.content" as const,
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.terminals.name.content" as const,
+              label: "get.response.terminals.name.content" as const,
               schema: z.string(),
             }),
             openedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.terminals.openedAt.content" as const,
+              label: "get.response.terminals.openedAt.content" as const,
               schema: z.string(),
             }),
             lastCommandAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.terminals.lastCommandAt.content" as const,
+              label: "get.response.terminals.lastCommandAt.content" as const,
               schema: z.string(),
             }),
             status: responseField(scopedTranslation, {

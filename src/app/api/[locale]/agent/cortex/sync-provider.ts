@@ -59,7 +59,7 @@ function nodeFilter(
 function makeCortexNodeSyncProvider(
   pathPrefix: string,
   key: string,
-  labelI18nKey: string,
+  labelKey: string,
 ): SyncProvider {
   const filter = (userId: string): ReturnType<typeof nodeFilter> =>
     nodeFilter(userId, pathPrefix);
@@ -275,11 +275,11 @@ function makeCortexNodeSyncProvider(
 export const documentsSyncProvider = makeCortexNodeSyncProvider(
   DOCUMENTS_PREFIX,
   "documents",
-  "remoteConnection.sync.documents",
+  "documents",
 );
 
 export const memoriesSyncProvider = makeCortexNodeSyncProvider(
   MEMORIES_PREFIX,
   "memories",
-  "remoteConnection.sync.memories",
+  "memories",
 );

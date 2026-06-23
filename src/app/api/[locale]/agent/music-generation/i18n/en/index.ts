@@ -113,4 +113,13 @@ export const translations = {
       description: "Your music has been generated successfully",
     },
   },
+  models: {
+    names: {
+      MUSICGEN_STEREO: "MusicGen Stereo",
+      MUSIC_GEN: "ModelsLab Music Gen",
+      ELEVENLABS_MUSIC: "ElevenLabs Music",
+      SONAUTO_SONG: "Sonauto Song",
+      LYRIA_3: "Lyria 3",
+    },
+  },
 };

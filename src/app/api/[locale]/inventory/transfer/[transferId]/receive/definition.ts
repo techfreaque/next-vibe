@@ -67,18 +67,18 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferReceive.post.response.id" as const,
+            label: "transferReceive.post.response.id" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferReceive.post.response.status" as const,
+            label: "transferReceive.post.response.status" as const,
             schema: z.string(),
           }),
           completedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferReceive.post.response.completedAt" as const,
+            label: "transferReceive.post.response.completedAt" as const,
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date(),
           }),

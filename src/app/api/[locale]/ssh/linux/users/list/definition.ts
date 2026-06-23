@@ -52,7 +52,7 @@ export const { GET } = createEndpoint({
       }),
       users: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.users.title",
+        label: "get.response.users.title",
         schema: z.array(
           z.object({
             username: z.string(),

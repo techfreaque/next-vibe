@@ -6,26 +6,23 @@
 
 import "server-only";
 
-import type {
-  HeadlessAiStreamResult,
-  HeadlessPreCall,
-} from "@/app/api/[locale]/agent/ai-stream/repository/headless";
-import { runHeadlessAiStream } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
+import type { HeadlessAiStreamResult } from "@/app/api/[locale]/agent/ai-stream/repository/headless";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type {
   ChatMessage,
   MessageMetadata,
 } from "@/app/api/[locale]/agent/chat/db";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/chat/favorites/db";
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
-import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
+import {
+  ChatMessageRole,
+  ThreadStreamingState,
+} from "@/app/api/[locale]/agent/chat/enum";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
+import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
+import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
+import { sendTestRequest } from "@/app/api/[locale]/system/check/testing/testing-suite/send-test-request";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type {
   JwtPayloadType,
@@ -34,7 +31,7 @@ import type {
 import { env } from "@/config/env";
 import { defaultLocale } from "@/i18n/core/config";
 
-import { scopedTranslation } from "../stream/i18n";
+import type { ChatModelId } from "../models";
 
 /**
  * Resolve a test user by email+password using endpoints only.
@@ -44,47 +41,28 @@ export async function resolveUser(
   email: string,
   password: string = env.VIBE_ADMIN_USER_PASSWORD,
 ): Promise<JwtPrivatePayloadType | null> {
+  const resolved = await resolveUserAndToken(email, password);
+  return resolved?.user ?? null;
+}
+
+/**
+ * Same as resolveUser but also returns the raw JWT string.
+ * Needed when the token must be stored in a remote connection row for relay auth.
+ */
+export async function resolveUserAndToken(
+  email: string,
+  password: string = env.VIBE_ADMIN_USER_PASSWORD,
+): Promise<{ user: JwtPrivatePayloadType; token: string } | null> {
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const loginDef =
-    await import("@/app/api/[locale]/user/public/login/definition");
-  // The login's public caller needs a REAL lead row — fabricated ids produce
-  // lead-conversion warnings on every login. One marker lead is reused.
-  const { db: dbConn } = await import("@/app/api/[locale]/system/db");
-  const { leads } = await import("@/app/api/[locale]/leads/db");
-  const { LeadStatus, LeadSource } =
-    await import("@/app/api/[locale]/leads/enum");
-  const { eq: eqLead } = await import("drizzle-orm");
-  const TEST_LEAD_EMAIL = "test-runner@local.invalid";
-  let [testLead] = await dbConn
-    .select({ id: leads.id })
-    .from(leads)
-    .where(eqLead(leads.email, TEST_LEAD_EMAIL))
-    .limit(1);
-  if (!testLead) {
-    [testLead] = await dbConn
-      .insert(leads)
-      .values({
-        email: TEST_LEAD_EMAIL,
-        businessName: "",
-        status: LeadStatus.NEW,
-        source: LeadSource.WEBSITE,
-        country: "US",
-        language: "en",
-      })
-      .returning({ id: leads.id });
-  }
-  const publicUser: JwtPayloadType = {
-    isPublic: true,
-    leadId: testLead!.id,
-    roles: [],
-  };
-  const loginResult = await RouteExecuteRepository.runInProcessTyped({
-    definition: loginDef.default.POST,
-    input: { email, password, rememberMe: false },
-    user: publicUser,
-    locale: defaultLocale,
-    platform: Platform.NEXT_API,
-    logger,
+  const loginDef = (
+    await import("@/app/api/[locale]/user/public/login/definition")
+  ).default;
+  // Log in exactly like a web client: POST the public login endpoint.
+  // sendTestRequest resolves the public caller (admin leadId) for us — no
+  // fabricated lead row, no direct DB write.
+  const loginResult = await sendTestRequest({
+    endpoint: loginDef.POST,
+    data: { email, password, rememberMe: false },
   });
   if (!loginResult.success) {
     return null;
@@ -101,7 +79,7 @@ export async function resolveUser(
   if (!verifyResult.success) {
     return null;
   }
-  return verifyResult.data;
+  return { user: verifyResult.data, token };
 }
 
 /**
@@ -114,18 +92,13 @@ export async function getOrCreateFolder(
   name: string,
   parentId: string | null = null,
 ): Promise<string> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-
-  const listDef =
-    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition");
-  const listResult = await RouteExecuteRepository.runInProcessTyped({
-    definition: listDef.default.GET,
-    input: undefined,
+  const listDef = (
+    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition")
+  ).default;
+  const listResult = await sendTestRequest({
+    endpoint: listDef.GET,
     urlPathParams: { rootFolderId },
     user,
-    locale: defaultLocale,
-    platform: Platform.AI,
-    logger,
   });
   if (listResult.success) {
     const folders = listResult.data?.["folders"];
@@ -145,16 +118,14 @@ export async function getOrCreateFolder(
     }
   }
 
-  const createDef =
-    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/definition");
-  const createResult = await RouteExecuteRepository.runInProcessTyped({
-    definition: createDef.default.POST,
-    input: { name, parentId: parentId ?? undefined },
+  const createDef = (
+    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/definition")
+  ).default;
+  const createResult = await sendTestRequest({
+    endpoint: createDef.POST,
+    data: { name, parentId: parentId ?? undefined },
     urlPathParams: { rootFolderId },
     user,
-    locale: defaultLocale,
-    platform: Platform.AI,
-    logger,
   });
   if (!createResult.success) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
@@ -214,41 +185,31 @@ export interface TestStreamParams {
    */
   audioInput?: File | null;
   /**
-   * Use a pre-created favorite to load model + skill.
-   * Takes precedence over skill field when provided.
+   * Use a pre-created favorite to load model + skill + the full FavoriteConfig.
+   * The favorite's config (model, media-gen models, tools, confirmation gates)
+   * is fetched via the favorites/[id] GET endpoint and sent in the stream POST
+   * body — exactly as a real client does. Configure any per-test model/tool
+   * overrides ON the favorite (favorites PATCH), not via separate knobs.
    */
   favoriteId?: string;
   /**
-   * Pre-fetched tool call results to inject before the AI runs.
-   * Appears in the thread DB as tool messages the AI can reason about.
+   * Tool confirmations to send with the stream — the real UI confirm flow.
+   * Each entry confirms/rejects a pending tool call by its message ID. When
+   * provided, no new user message is created (matches the endpoint contract).
    */
-  preCalls?: HeadlessPreCall[];
+  toolConfirmations?: Array<{
+    messageId: string;
+    confirmed: boolean;
+    updatedArgs?: Record<string, string | number | boolean | null>;
+  }> | null;
   /**
-   * When true, use wakeup-resume operation (no CONTINUE prompt).
-   * Used to simulate revival after a wakeUp-mode deferred tool completes.
+   * Pre-resolved favorite config override. Normally omit — favoriteId resolves
+   * the config via the GET endpoint. Used only when a test already holds the
+   * exact config to send (avoids a redundant fetch).
    */
-  wakeUpRevival?: boolean;
-  /**
-   * Override resolved media gen models for this test.
-   * Bypasses the user-settings cascade so tests run a specific provider.
-   */
-  mediaModelOverrides?: {
-    imageGenModelSelection?: ImageGenModelSelection;
-    musicGenModelSelection?: MusicGenModelSelection;
-    videoGenModelSelection?: VideoGenModelSelection;
-  };
-  /** Favorite config override for the headless stream */
   favoriteConfig?: FavoriteConfig | null;
   /** Abort signal to cancel the stream. Defaults to a never-aborting signal. */
   abortSignal?: AbortSignal;
-  /**
-   * Override available tools with custom requiresConfirmation settings.
-   * Used in integration tests to configure confirmation gates for specific tools.
-   */
-  availableTools?: Array<{
-    toolId: string;
-    requiresConfirmation: boolean;
-  }> | null;
 }
 
 /** Slim message shape - only fields we assert on */
@@ -385,18 +346,16 @@ function slimMessages(
 export async function fetchThreadMessages(
   threadId: string,
   user: JwtPayloadType,
+  rootFolderId: DefaultFolderId = DefaultFolderId.BACKGROUND,
 ): Promise<SlimMessage[]> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const msgsDef =
-    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition");
-  const result = await RouteExecuteRepository.runInProcessTyped({
-    definition: msgsDef.default.GET,
-    input: { rootFolderId: DefaultFolderId.BACKGROUND },
+  const msgsDef = (
+    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
+  ).default;
+  const result = await sendTestRequest({
+    endpoint: msgsDef.GET,
+    data: { rootFolderId },
     urlPathParams: { threadId },
     user,
-    locale: defaultLocale,
-    platform: Platform.AI,
-    logger,
   });
   if (!result.success) {
     return [];
@@ -421,17 +380,14 @@ export async function fetchThreadStreamingState(
   threadId: string,
   user: JwtPayloadType,
 ): Promise<string | undefined> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const msgsDef =
-    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition");
-  const result = await RouteExecuteRepository.runInProcessTyped({
-    definition: msgsDef.default.GET,
-    input: { rootFolderId: DefaultFolderId.BACKGROUND },
+  const msgsDef = (
+    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
+  ).default;
+  const result = await sendTestRequest({
+    endpoint: msgsDef.GET,
+    data: { rootFolderId: DefaultFolderId.BACKGROUND },
     urlPathParams: { threadId },
     user,
-    locale: defaultLocale,
-    platform: Platform.AI,
-    logger,
   });
   if (!result.success) {
     return undefined;
@@ -454,24 +410,25 @@ export async function waitForThreadIdle(
   threadId: string,
   user: JwtPayloadType,
   maxWaitMs = 90_000,
+  rootFolderId: DefaultFolderId = DefaultFolderId.BACKGROUND,
 ): Promise<SlimMessage[]> {
   const pollIntervalMs = 500;
   const start = Date.now();
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const msgsDef =
-    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition");
+  const msgsDef = (
+    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
+  ).default;
   while (Date.now() - start < maxWaitMs) {
-    const result = await RouteExecuteRepository.runInProcessTyped({
-      definition: msgsDef.default.GET,
-      input: { rootFolderId: DefaultFolderId.BACKGROUND },
+    const result = await sendTestRequest({
+      endpoint: msgsDef.GET,
+      data: { rootFolderId },
       urlPathParams: { threadId },
       user,
-      locale: defaultLocale,
-      platform: Platform.AI,
-      logger,
     });
-    if (result.success && result.data?.["streamingState"] === "idle") {
-      return fetchThreadMessages(threadId, user);
+    if (
+      result.success &&
+      result.data?.["streamingState"] === ThreadStreamingState.IDLE
+    ) {
+      return fetchThreadMessages(threadId, user, rootFolderId);
     }
     await new Promise((resolve) => {
       setTimeout(resolve, pollIntervalMs);
@@ -483,22 +440,60 @@ export async function waitForThreadIdle(
   );
 }
 
+/**
+ * Poll until a thread's streamingState SETTLES — 'idle' (turn finished) or
+ * 'waiting' (turn paused for async work: detach/wakeUp/queue WAIT). Returns the
+ * thread's messages once settled. Mirrors the fire-and-forget client: the POST
+ * returns immediately and the stream runs in the background; the caller observes
+ * the thread settle into idle (done) or waiting (paused, revival pending).
+ *
+ * Throws if the thread does not settle within maxWaitMs.
+ */
+export async function waitForThreadSettled(
+  threadId: string,
+  user: JwtPayloadType,
+  maxWaitMs = 120_000,
+  rootFolderId: DefaultFolderId = DefaultFolderId.BACKGROUND,
+): Promise<SlimMessage[]> {
+  const pollIntervalMs = 500;
+  const start = Date.now();
+  const msgsDef = (
+    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
+  ).default;
+  while (Date.now() - start < maxWaitMs) {
+    const result = await sendTestRequest({
+      endpoint: msgsDef.GET,
+      data: { rootFolderId },
+      urlPathParams: { threadId },
+      user,
+    });
+    const state = result.success ? result.data?.["streamingState"] : undefined;
+    if (state === "idle" || state === "waiting") {
+      return fetchThreadMessages(threadId, user, rootFolderId);
+    }
+    await new Promise((resolve) => {
+      setTimeout(resolve, pollIntervalMs);
+    });
+  }
+  // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
+  throw new Error(
+    `waitForThreadSettled: thread ${threadId} did not settle (idle|waiting) within ${maxWaitMs}ms`,
+  );
+}
+
 /** Fetch the thread title via endpoint */
 export async function fetchThreadTitle(
   threadId: string,
   user: JwtPayloadType,
 ): Promise<string | null> {
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const threadDef =
-    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
-  const result = await RouteExecuteRepository.runInProcessTyped({
-    definition: threadDef.default.GET,
-    input: { rootFolderId: DefaultFolderId.BACKGROUND },
+  const threadDef = (
+    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition")
+  ).default;
+  const result = await sendTestRequest({
+    endpoint: threadDef.GET,
+    data: { rootFolderId: DefaultFolderId.BACKGROUND },
     urlPathParams: { threadId },
     user,
-    locale: defaultLocale,
-    platform: Platform.AI,
-    logger,
   });
   if (!result.success) {
     return null;
@@ -507,6 +502,122 @@ export async function fetchThreadTitle(
   return typeof title === "string" ? title : null;
 }
 
+/**
+ * Fetch a favorite's full config via the favorites/[id] GET endpoint and
+ * resolve the chat model it would use — exactly the data the web client holds
+ * in its store and sends in the stream POST body. The action (the stream)
+ * still goes through the endpoint; this only assembles the request payload a
+ * real client would send.
+ */
+async function fetchFavoriteConfigAndModel(
+  favoriteId: string,
+  user: JwtPayloadType,
+): Promise<{
+  favoriteConfig: FavoriteConfig;
+  model: ChatModelId;
+  skill: string;
+}> {
+  const favByIdDef = (
+    await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+  ).default;
+  const getResult = await sendTestRequest({
+    endpoint: favByIdDef.GET,
+    urlPathParams: { id: favoriteId },
+    user,
+  });
+  if (!getResult.success) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
+    throw new Error(
+      `fetchFavoriteConfigAndModel: favorites GET failed for ${favoriteId}: ${getResult.message}`,
+    );
+  }
+  const data = getResult.data;
+  const favoriteConfig: FavoriteConfig = {
+    id: favoriteId,
+    skillId: data.skillId,
+    modelSelection: data.modelSelection ?? null,
+    voiceModelSelection: data.voiceModelSelection ?? null,
+    sttModelSelection: data.sttModelSelection ?? null,
+    imageVisionModelSelection: data.imageVisionModelSelection ?? null,
+    videoVisionModelSelection: data.videoVisionModelSelection ?? null,
+    audioVisionModelSelection: data.audioVisionModelSelection ?? null,
+    imageGenModelSelection: data.imageGenModelSelection ?? null,
+    musicGenModelSelection: data.musicGenModelSelection ?? null,
+    videoGenModelSelection: data.videoGenModelSelection ?? null,
+    availableTools: data.availableTools ?? null,
+    pinnedTools: data.pinnedTools ?? null,
+    deniedTools: data.deniedTools ?? null,
+    compactTrigger: data.compactTrigger ?? null,
+    memoryLimit: data.memoryLimit ?? null,
+    promptAppend: data.promptAppend ?? null,
+  };
+
+  const skill = favoriteConfig.skillId || NO_SKILL_ID;
+
+  // Resolve the model the favorite would run — same cascade the client uses:
+  // favorite modelSelection → skill variant modelSelection.
+  const { getBestChatModel } = await import("../models");
+  const { getInstanceAvailability } =
+    await import("@/app/api/[locale]/agent/env-availability");
+  const availability = await getInstanceAvailability();
+  let model: ChatModelId | undefined;
+  if (favoriteConfig.modelSelection) {
+    model = getBestChatModel(
+      favoriteConfig.modelSelection,
+      user,
+      availability,
+    )?.id;
+  }
+  if (!model && skill !== NO_SKILL_ID) {
+    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+    const { SkillsRepository } =
+      await import("@/app/api/[locale]/agent/skills/repository");
+    const { parseSkillId } =
+      await import("@/app/api/[locale]/agent/chat/slugify");
+    const skillResult = await SkillsRepository.getSkillById(
+      { id: skill },
+      user,
+      logger,
+      defaultLocale,
+    );
+    if (skillResult.success) {
+      const variants = skillResult.data.variants;
+      const { variantId } = parseSkillId(favoriteConfig.skillId);
+      const variant = variants
+        ? variantId
+          ? variants.find((v) => v.id === variantId)
+          : (variants.find((v) => v.isDefault) ?? variants[0])
+        : null;
+      if (variant?.modelSelection) {
+        model = getBestChatModel(
+          variant.modelSelection,
+          user,
+          availability,
+        )?.id;
+      }
+    }
+  }
+  if (!model) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
+    throw new Error(
+      `fetchFavoriteConfigAndModel: could not resolve a chat model for favorite ${favoriteId} (skill ${skill})`,
+    );
+  }
+
+  return { favoriteConfig, model, skill };
+}
+
+/**
+ * Drive the real AI stream end-to-end through the `ai-stream/stream` POST
+ * endpoint via sendTestRequest — exactly like a web client:
+ *   1. Resolve the favorite's config + model (the client's store contents).
+ *   2. POST the stream endpoint (fire-and-forget; returns {messageId, threadId}).
+ *   3. Poll the thread's streamingState to 'idle' (WS completion equivalent).
+ *   4. Read messages via the messages endpoint and reconstruct the result.
+ *
+ * No headless shortcut, no synthetic tool injection, no per-call model/tool
+ * overrides — anything a real user configures lives on the favorite.
+ */
 export async function runTestStream(
   params: TestStreamParams,
 ): Promise<TestStreamResult> {
@@ -514,70 +625,306 @@ export async function runTestStream(
     prompt,
     user,
     threadId,
-    skill,
+    skill: skillParam,
     rootFolderId: rootFolderIdOverride,
     subFolderId,
     explicitParentMessageId,
     attachments,
     audioInput,
     favoriteId,
-    preCalls,
-    wakeUpRevival,
-    mediaModelOverrides,
+    toolConfirmations,
     favoriteConfig: paramFavoriteConfig,
     operationOverride: callerOperationOverride,
-    abortSignal = new AbortController().signal,
-    availableTools,
   } = params;
 
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  const { t } = scopedTranslation.scopedT(defaultLocale);
+  const rootFolderId = rootFolderIdOverride ?? DefaultFolderId.BACKGROUND;
+  const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
+  const hasToolConfirmations =
+    Array.isArray(toolConfirmations) && toolConfirmations.length > 0;
 
-  // Resolve effective operationOverride:
-  // - wakeUpRevival takes precedence (needs wakeup-resume, handled in headless.ts)
-  // - caller-provided override (retry/edit) is used as-is when wakeUpRevival is false
-  // - fallback: "send" for append turns (threadId present), undefined for new threads
-  const resolvedOperationOverride = wakeUpRevival
-    ? undefined // headless.ts resolves to wakeup-resume automatically
-    : callerOperationOverride
-      ? callerOperationOverride
-      : threadId
-        ? "send"
-        : undefined;
+  // ── Resolve favorite config + model + skill (client store equivalent) ──
+  let favoriteConfig: FavoriteConfig | null = paramFavoriteConfig ?? null;
+  let model: ChatModelId | undefined;
+  let skill = skillParam;
+  if (favoriteId && !favoriteConfig) {
+    const resolved = await fetchFavoriteConfigAndModel(favoriteId, user);
+    favoriteConfig = resolved.favoriteConfig;
+    model = resolved.model;
+    skill = skillParam ?? resolved.skill;
+  } else if (favoriteConfig) {
+    const { getBestChatModel } = await import("../models");
+    const { getInstanceAvailability } =
+      await import("@/app/api/[locale]/agent/env-availability");
+    if (favoriteConfig.modelSelection) {
+      model = getBestChatModel(
+        favoriteConfig.modelSelection,
+        user,
+        await getInstanceAvailability(),
+      )?.id;
+    }
+    skill = skillParam ?? favoriteConfig.skillId ?? NO_SKILL_ID;
+  }
+  if (!model) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
+    throw new Error(
+      "runTestStream: no model resolved — pass a favoriteId or a favoriteConfig with a resolvable model",
+    );
+  }
+  const effectiveSkill = skill ?? NO_SKILL_ID;
 
-  const result = await runHeadlessAiStream({
-    prompt,
-    favoriteId,
-    skill: skill ?? (favoriteId ? undefined : NO_SKILL_ID),
-    threadId,
-    operationOverride: resolvedOperationOverride,
-    rootFolderId: rootFolderIdOverride ?? DefaultFolderId.BACKGROUND,
-    subFolderId,
-    subAgentDepth: 0,
-    user,
-    locale: defaultLocale,
-    logger,
-    t,
-    explicitParentMessageId,
-    attachments,
-    audioInput,
-    preCalls,
-    wakeUpRevival,
-    mediaModelOverrides,
-    favoriteConfig: paramFavoriteConfig ?? null,
-    abortSignal,
-    availableTools: availableTools ?? null,
-  });
+  // ── Operation (client send/retry/edit) ──
+  const operation: "send" | "retry" | "edit" =
+    callerOperationOverride ?? "send";
 
-  let messages: SlimMessage[] = [];
+  // ── Stream POST body — identical to createAndSendUserMessage (shared.ts) ──
+  const userMessageId = hasToolConfirmations ? null : crypto.randomUUID();
+  const voiceSel = favoriteConfig?.voiceModelSelection;
+  const resolvedVoice =
+    voiceSel &&
+    "manualModelId" in voiceSel &&
+    typeof voiceSel.manualModelId === "string" &&
+    voiceSel.manualModelId
+      ? voiceSel.manualModelId
+      : DEFAULT_TTS_VOICE_ID;
 
-  if (result.success && result.data.threadId) {
-    messages = await fetchThreadMessages(result.data.threadId, user);
+  const streamDef = (
+    await import("@/app/api/[locale]/agent/ai-stream/stream/definition")
+  ).default;
+
+  // Real clients always pass parentMessageId = current leaf of the thread.
+  // When callers don't provide explicitParentMessageId but do provide threadId
+  // (continuing an existing thread), resolve the leaf from DB so the new user
+  // message is chained correctly instead of creating a second root.
+  let resolvedParentMessageId: string | null = explicitParentMessageId ?? null;
+  if (!resolvedParentMessageId && threadId && operation === "send") {
+    const existingMessages = await fetchThreadMessages(
+      threadId,
+      user,
+      rootFolderId,
+    );
+    if (existingMessages.length > 0) {
+      // Find the leaf: the message with no child
+      const childSet = new Set(
+        existingMessages.flatMap((m) => (m.parentId ? [m.parentId] : [])),
+      );
+      const leaf = existingMessages.find((m) => !childSet.has(m.id));
+      resolvedParentMessageId = leaf?.id ?? null;
+    }
   }
 
+  const postResult = await sendTestRequest({
+    endpoint: streamDef.POST,
+    user,
+    data: {
+      operation,
+      rootFolderId,
+      subFolderId: subFolderId ?? null,
+      threadId: threadId ?? crypto.randomUUID(),
+      userMessageId,
+      parentMessageId: resolvedParentMessageId,
+      content: prompt,
+      role: ChatMessageRole.USER,
+      model,
+      skill: effectiveSkill,
+      favoriteConfig,
+      toolConfirmations: toolConfirmations ?? null,
+      messageHistory: [],
+      attachments: attachments && attachments.length > 0 ? attachments : null,
+      audioInput: { file: audioInput ?? null },
+      voiceMode: { enabled: false, voice: resolvedVoice },
+      resumeToken: null,
+      timezone: "UTC",
+    },
+  });
+
+  if (!postResult.success) {
+    return { result: postResult, messages: [], pinnedToolCount: 0 };
+  }
+
+  const responseThreadId =
+    typeof postResult.data?.["responseThreadId"] === "string"
+      ? postResult.data["responseThreadId"]
+      : (threadId ?? "");
+
+  // ── Incognito: nothing persisted; the POST response is the whole story ──
+  if (isIncognito || !responseThreadId) {
+    return {
+      result: {
+        success: true,
+        data: {
+          threadId: isIncognito ? undefined : responseThreadId,
+          lastAiMessageId:
+            typeof postResult.data?.["messageId"] === "string"
+              ? postResult.data["messageId"]
+              : "",
+          lastAiMessageContent: null,
+          lastGeneratedMediaUrl: null,
+          totalCreditsDeducted: 0,
+          pinnedToolCount: 0,
+        },
+      },
+      messages: [],
+      pinnedToolCount: 0,
+    };
+  }
+
+  // ── Wait for the stream to SETTLE (streamingState → 'idle' or 'waiting') ──
+  // 'idle' = the turn finished. 'waiting' = the turn paused for async work
+  // (detach/wakeUp/queue WAIT) — that is a legitimate settled state the caller's
+  // wrapper (runStream) then drives to completion via revival. The real client
+  // is fire-and-forget too; it never blocks for idle on a paused thread.
+  const messages = await waitForThreadSettled(
+    responseThreadId,
+    user,
+    120_000,
+    rootFolderId,
+  );
+
+  // ── Reconstruct the result by walking THIS turn's branch (no timestamps) ──
+  // Branches can be created at any time so createdAt comparisons are wrong.
+  // Instead: the POST response returned the first message ID this turn created
+  // (postResult.data.messageId). Walk DOWN from the anchor using child links,
+  // and at any branch point pick the child whose subtree contains that first
+  // new message ID — that child is always on THIS turn's branch.
+  const byId = new Map(messages.map((m) => [m.id, m]));
+  const childrenOf = new Map<string, SlimMessage[]>();
+  for (const m of messages) {
+    if (m.parentId) {
+      const list = childrenOf.get(m.parentId) ?? [];
+      list.push(m);
+      childrenOf.set(m.parentId, list);
+    }
+  }
+  // The first new message ID this turn created — our branch marker.
+  const firstNewMessageId =
+    typeof postResult.data?.["messageId"] === "string"
+      ? postResult.data["messageId"]
+      : null;
+
+  // Build ancestor set: walk UP from firstNewMessageId. Every node on the path
+  // from the anchor to firstNewMessageId is reachable — used to pick the right
+  // child at any branch point without timestamps.
+  const reachable = new Set<string>();
+  if (firstNewMessageId) {
+    let cur: SlimMessage | undefined = byId.get(firstNewMessageId);
+    while (cur) {
+      reachable.add(cur.id);
+      cur = cur.parentId ? byId.get(cur.parentId) : undefined;
+    }
+  }
+
+  // For confirmation turns (userMessageId=null, no explicit parent), postResult
+  // returns messageId=aiMessageId — the first message this turn created.
+  // Use it as the anchor so chain-walk can still find the correct leaf.
+  const anchorId =
+    userMessageId ?? explicitParentMessageId ?? firstNewMessageId ?? null;
+  // Walk DOWN from anchor to the leaf of this turn's branch.
+  let leaf: SlimMessage | undefined = anchorId ? byId.get(anchorId) : undefined;
+  if (anchorId) {
+    const visited = new Set<string>();
+    let cursor = leaf;
+    while (cursor) {
+      const kids: SlimMessage[] = (childrenOf.get(cursor.id) ?? []).filter(
+        (k) => !visited.has(k.id),
+      );
+      if (kids.length === 0) {
+        break;
+      }
+      visited.add(cursor.id);
+      // At a branch point, pick the child on THIS turn's branch (reachable set).
+      // If none match (no firstNewMessageId, or walk past it), use kids[0].
+      const branchChild = kids.find((k) => reachable.has(k.id));
+      const next: SlimMessage = branchChild ?? kids[0]!;
+      cursor = next;
+      leaf = next;
+    }
+  }
+  // The answer content/media come from the last ASSISTANT on the walked chain.
+  // Walk the chain from the leaf up to find the nearest ASSISTANT.
+  let answerAi: SlimMessage | undefined;
+  {
+    let cursor: SlimMessage | undefined = leaf;
+    while (cursor) {
+      if (cursor.role === ChatMessageRole.ASSISTANT) {
+        answerAi = cursor;
+        break;
+      }
+      cursor = cursor.parentId ? byId.get(cursor.parentId) : undefined;
+    }
+  }
+  // Derive lastGeneratedMediaUrl: check assistant generatedMedia first (tool-call path),
+  // then look for a synthetic tool message in this turn's branch whose result has a
+  // "file" property (native image/video/audio gen path — emitSyntheticToolMessage
+  // does NOT set metadata.generatedMedia, only metadata.toolCall.result.file).
+  let lastGeneratedMediaUrl: string | null =
+    answerAi?.generatedMedia?.[0]?.url ?? null;
+  if (!lastGeneratedMediaUrl && anchorId) {
+    // Walk the branch from anchor to leaf collecting tool messages.
+    let cursor: SlimMessage | undefined = byId.get(anchorId);
+    const visited = new Set<string>();
+    while (cursor) {
+      if (cursor.role === ChatMessageRole.TOOL) {
+        const res = toolResultRecord(cursor.toolCall?.result);
+        if (res && typeof res["file"] === "string" && res["file"]) {
+          lastGeneratedMediaUrl = res["file"];
+        }
+      }
+      visited.add(cursor.id);
+      const kids = (childrenOf.get(cursor.id) ?? []).filter(
+        (k) => !visited.has(k.id),
+      );
+      const branchKid = kids.find((k) => reachable.has(k.id)) ?? kids[0];
+      cursor = branchKid;
+    }
+  }
+  // Only count credits for messages created in THIS turn. `messages` contains all
+  // thread messages; summing everything double-counts prior turns' costs.
+  // Walk the subtree rooted at firstNewMessageId to collect this-turn message IDs.
+  const thisTurnIds = new Set<string>();
+  if (firstNewMessageId) {
+    // If compacting fired, it inserted a compacting-assistant node as the parent of
+    // firstNewMessageId. Include it too so its credit cost is counted.
+    const firstNewMsg = byId.get(firstNewMessageId);
+    if (firstNewMsg?.parentId) {
+      const parent = byId.get(firstNewMsg.parentId);
+      if (parent?.isCompacting) {
+        thisTurnIds.add(parent.id);
+      }
+    }
+    const queue: string[] = [firstNewMessageId];
+    while (queue.length > 0) {
+      const id = queue.shift()!;
+      thisTurnIds.add(id);
+      for (const child of childrenOf.get(id) ?? []) {
+        if (!thisTurnIds.has(child.id)) {
+          queue.push(child.id);
+        }
+      }
+    }
+  }
+  const thisTurnMessages =
+    thisTurnIds.size > 0
+      ? messages.filter((m) => thisTurnIds.has(m.id))
+      : messages;
+  const totalCreditsDeducted = thisTurnMessages.reduce(
+    (sum, m) => sum + (m.creditCost ?? 0),
+    0,
+  );
+
   return {
-    result,
+    result: {
+      success: true,
+      data: {
+        threadId: responseThreadId,
+        // Anchor for the next turn = this turn's true leaf (chain-walked).
+        lastAiMessageId: leaf?.id ?? answerAi?.id ?? "",
+        lastAiMessageContent: answerAi?.content ?? null,
+        lastGeneratedMediaUrl,
+        totalCreditsDeducted,
+        pinnedToolCount: 0,
+      },
+    },
     messages,
-    pinnedToolCount: result.success ? result.data.pinnedToolCount : 0,
+    pinnedToolCount: 0,
   };
 }

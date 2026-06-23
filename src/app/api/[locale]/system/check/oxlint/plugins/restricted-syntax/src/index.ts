@@ -73,12 +73,25 @@ interface ParenthesizedExpression extends OxlintASTNode {
   expression?: OxlintASTNode;
 }
 
+/** AST node for MemberExpression */
+interface MemberExpression extends OxlintASTNode {
+  type: "MemberExpression";
+  object?: OxlintASTNode;
+  property?: OxlintASTNode;
+  computed?: boolean;
+}
+
 /** Default error messages (can be customized via config) */
 interface RestrictedSyntaxMessages {
   unknownType: string;
   objectType: string;
   throwStatement: string;
   jsxInObjectLiteral: string;
+  windowAccess: string;
+  localStorageAccess: string;
+  sessionStorageAccess: string;
+  documentAccess: string;
+  navigatorAccess: string;
 }
 
 // ============================================================
@@ -114,6 +127,16 @@ const DEFAULT_MESSAGES: RestrictedSyntaxMessages = {
     "Usage of 'throw' statements is not allowed. Use proper ResponseType<T> patterns instead.",
   jsxInObjectLiteral:
     "JSX elements inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
+  windowAccess:
+    "Direct 'window' access is not allowed. Use next-vibe-ui utils/hooks: getCurrentUrl(), openUrl(), openInNewTab(), getScreenWidth(), silentPushState(), silentReplaceState(), useWindowSize() — all from 'next-vibe-ui/utils/browser' or 'next-vibe-ui/hooks/use-window-size'.",
+  localStorageAccess:
+    "Direct 'localStorage' access is not allowed. Use the cross-platform storage abstraction: import { storage } from 'next-vibe-ui/lib/storage' and call storage.getItem/setItem/removeItem.",
+  sessionStorageAccess:
+    "Direct 'sessionStorage' access is not allowed. Use the cross-platform storage abstraction: import { storage } from 'next-vibe-ui/lib/storage' and call storage.getItem/setItem/removeItem.",
+  documentAccess:
+    "Direct 'document' access is not allowed. Use next-vibe-ui abstractions: getCookie/setCookie/deleteCookie from 'next-vibe-ui/lib/cookies', or getReferrer() from 'next-vibe-ui/utils/browser'.",
+  navigatorAccess:
+    "Direct 'navigator' access is not allowed. Use getUserAgent() from 'next-vibe-ui/utils/browser', or useWindowSize()/useTouchDevice() hooks from 'next-vibe-ui/hooks'.",
 };
 
 // ============================================================
@@ -342,6 +365,227 @@ function isJSXAllowedKey(
   return keyName !== null && jsxAllowedProperties.has(keyName);
 }
 
+/** Browser globals that must be accessed through vibe-ui abstractions */
+const BROWSER_GLOBALS = new Set([
+  "window",
+  "localStorage",
+  "sessionStorage",
+  "document",
+  "navigator",
+]);
+
+/**
+ * Paths that ARE the browser abstraction layer — the rule does not apply here.
+ * These implement the very APIs that app code should use instead.
+ */
+const BROWSER_IMPL_PATH_FRAGMENTS = [
+  "next-vibe-ui/web/",
+  "next-vibe-ui/tanstack/",
+];
+
+/**
+ * window.* properties that are universal globals — no abstraction needed.
+ * window.setTimeout === setTimeout, etc.
+ */
+const WINDOW_UNIVERSAL_PROPS = new Set([
+  "setTimeout",
+  "clearTimeout",
+  "setInterval",
+  "clearInterval",
+  "requestAnimationFrame",
+  "cancelAnimationFrame",
+  "queueMicrotask",
+  "fetch",
+  "Promise",
+  "URL",
+  "URLSearchParams",
+  "Blob",
+  "File",
+  "FormData",
+  "AbortController",
+  "ResizeObserver",
+  "IntersectionObserver",
+  "MutationObserver",
+  "crypto",
+  "performance",
+  "matchMedia",
+  "devicePixelRatio",
+  "isSecureContext",
+  "postMessage",
+  "Audio",
+  "AudioContext",
+  "WebSocket",
+  "Worker",
+  "SharedWorker",
+  "RTCPeerConnection",
+  "MediaRecorder",
+  "MediaStream",
+  "atob",
+  "btoa",
+  "getComputedStyle",
+]);
+
+/** Per-property messages for window.* access */
+const WINDOW_PROPERTY_MESSAGES: Record<string, string> = {
+  location:
+    "Use getCurrentUrl(), assignUrl(url), reloadPage(), getCurrentOrigin(), getCurrentHostname(), getCurrentPathname(), or getCurrentSearch() from 'next-vibe-ui/utils/browser' instead of window.location.*.",
+  open: "Use openInNewTab(url) from 'next-vibe-ui/utils/browser' instead of window.open().",
+  history:
+    "Use silentPushState(url) or silentReplaceState(url) from 'next-vibe-ui/utils/browser' instead of window.history.",
+  innerWidth:
+    "Use getScreenWidth() or useWindowSize() from 'next-vibe-ui/hooks/use-window-size' instead of window.innerWidth.",
+  innerHeight:
+    "Use useWindowSize() from 'next-vibe-ui/hooks/use-window-size' instead of window.innerHeight.",
+  scrollTo:
+    "Use scrollToTop() from 'next-vibe-ui/utils/browser' instead of window.scrollTo().",
+  print:
+    "Use triggerPrint() from 'next-vibe-ui/utils/browser' instead of window.print().",
+  ontouchstart:
+    "Use useTouchDevice() from 'next-vibe-ui/hooks/use-touch-device' instead of window.ontouchstart.",
+  addEventListener:
+    "Use addWindowListener(event, handler) from 'next-vibe-ui/utils/browser' instead of window.addEventListener().",
+  removeEventListener:
+    "Use the cleanup function returned by addWindowListener() from 'next-vibe-ui/utils/browser' instead of window.removeEventListener().",
+};
+
+/** Per-property messages for document.* access */
+const DOCUMENT_PROPERTY_MESSAGES: Record<string, string> = {
+  cookie:
+    "Use getCookie/setCookie/deleteCookie/getAllCookies from 'next-vibe-ui/lib/cookies' instead of document.cookie.",
+  referrer:
+    "Use getReferrer() from 'next-vibe-ui/utils/browser' instead of document.referrer.",
+  documentElement:
+    "Use getRootCssVar/setRootCssVar/rootHasClass/addRootClass/removeRootClass/observeRootMutations/getDocumentScrollHeight from 'next-vibe-ui/utils/browser' instead of document.documentElement.",
+  getElementById:
+    "Use getElementById(id) from 'next-vibe-ui/utils/browser' instead of document.getElementById().",
+  querySelector:
+    "Use querySelector(selector) from 'next-vibe-ui/utils/browser' instead of document.querySelector().",
+  querySelectorAll:
+    "Use querySelector(selector) from 'next-vibe-ui/utils/browser' instead of document.querySelectorAll().",
+  createElement:
+    "Use downloadFile(filename, content) from 'next-vibe-ui/utils/browser' for download links, or add a specific helper if needed.",
+  addEventListener:
+    "Use addDocumentListener(event, handler) from 'next-vibe-ui/utils/browser' instead of document.addEventListener().",
+  removeEventListener:
+    "Use the cleanup function returned by addDocumentListener() from 'next-vibe-ui/utils/browser' instead of document.removeEventListener().",
+  body: "Use getDocumentBody() from 'next-vibe-ui/utils/browser' instead of document.body.",
+  title:
+    "Set document.title via a <title> tag or metadata API instead of direct document.title access.",
+};
+
+/** Per-property messages for navigator.* access */
+const NAVIGATOR_PROPERTY_MESSAGES: Record<string, string> = {
+  userAgent:
+    "Use getUserAgent() from 'next-vibe-ui/utils/browser' instead of navigator.userAgent.",
+  maxTouchPoints:
+    "Use useTouchDevice() from 'next-vibe-ui/hooks/use-touch-device' instead of navigator.maxTouchPoints.",
+  clipboard:
+    "Use copyToClipboard(text) from 'next-vibe-ui/utils/browser' instead of navigator.clipboard.",
+  geolocation:
+    "Use getGeolocation() from 'next-vibe-ui/utils/browser' instead of navigator.geolocation.",
+  mediaDevices:
+    "Use navigator.mediaDevices directly — no abstraction exists yet. Add one to 'next-vibe-ui/utils/browser' if needed.",
+  language:
+    "Use navigator.language directly — no abstraction exists yet. Add one to 'next-vibe-ui/utils/browser' if needed.",
+  onLine:
+    "Use navigator.onLine directly — no abstraction exists yet. Add one to 'next-vibe-ui/utils/browser' if needed.",
+};
+
+/**
+ * Build a specific error message based on which global and property was accessed.
+ */
+function getBrowserGlobalMessage(
+  globalName: string,
+  propertyName: string | null,
+  messages: RestrictedSyntaxMessages,
+): string {
+  if (propertyName) {
+    let specific: string | undefined;
+    if (globalName === "window") {
+      specific = WINDOW_PROPERTY_MESSAGES[propertyName];
+    } else if (globalName === "document") {
+      specific = DOCUMENT_PROPERTY_MESSAGES[propertyName];
+    } else if (globalName === "navigator") {
+      specific = NAVIGATOR_PROPERTY_MESSAGES[propertyName];
+    }
+    if (specific) {
+      return specific;
+    }
+  }
+  if (globalName === "window") {
+    return messages.windowAccess;
+  }
+  if (globalName === "localStorage") {
+    return messages.localStorageAccess;
+  }
+  if (globalName === "sessionStorage") {
+    return messages.sessionStorageAccess;
+  }
+  if (globalName === "document") {
+    return messages.documentAccess;
+  }
+  return messages.navigatorAccess;
+}
+
+/**
+ * Check if the file is part of the browser abstraction layer (exempt from this rule).
+ */
+function isBrowserImplFile(context: RestrictedSyntaxRuleContext): boolean {
+  let filename = "";
+  if (typeof context.getFilename === "function") {
+    filename = context.getFilename();
+  } else if (typeof context.filename === "string") {
+    filename = context.filename;
+  }
+  if (!filename) {
+    return false;
+  }
+  const normalized = filename.replace(/\\/g, "/");
+  return BROWSER_IMPL_PATH_FRAGMENTS.some((fragment) =>
+    normalized.includes(fragment),
+  );
+}
+
+/**
+ * Return browser global info if node is a MemberExpression rooted at a bare browser global.
+ */
+function getBrowserGlobal(node: OxlintASTNode): {
+  globalName: string;
+  propertyName: string | null;
+} | null {
+  if (node.type !== "MemberExpression") {
+    return null;
+  }
+  const mem = node as MemberExpression;
+  if (!mem.object || mem.object.type !== "Identifier") {
+    return null;
+  }
+  const globalName = (mem.object as Identifier).name;
+  if (!BROWSER_GLOBALS.has(globalName)) {
+    return null;
+  }
+  let propertyName: string | null = null;
+  if (mem.property && !mem.computed) {
+    if (mem.property.type === "Identifier") {
+      propertyName = (mem.property as Identifier).name;
+    } else if (
+      mem.property.type === "Literal" &&
+      typeof (mem.property as Literal).value === "string"
+    ) {
+      propertyName = (mem.property as Literal).value as string;
+    }
+  }
+  // Skip universal globals that are available in all environments (setTimeout, fetch, etc.)
+  if (
+    globalName === "window" &&
+    propertyName !== null &&
+    WINDOW_UNIVERSAL_PROPS.has(propertyName)
+  ) {
+    return null;
+  }
+  return { globalName, propertyName };
+}
+
 /**
  * Check if a node is a JSX element or fragment
  */
@@ -391,6 +635,8 @@ const restrictedSyntaxRule = {
   ): Record<string, (node: OxlintASTNode) => void> {
     // Check if file is in allowed path (applies to all rules)
     const isAllowed = isAllowedPath(context);
+    // Check if this file is the browser abstraction layer itself (exempt from browser global rules)
+    const isBrowserImpl = isBrowserImplFile(context);
 
     // Load JSX allowed properties from rule options or config (single source of truth)
     const jsxAllowedProperties = getJsxAllowedProperties(context);
@@ -476,6 +722,27 @@ const restrictedSyntaxRule = {
           }
         }
       },
+
+      // ============================================================
+      // Browser global restrictions — use vibe-ui abstractions instead
+      // ============================================================
+      MemberExpression(node: OxlintASTNode): void {
+        if (isAllowed || isBrowserImpl || hasDisableComment(context, node)) {
+          return;
+        }
+        const result = getBrowserGlobal(node);
+        if (!result) {
+          return;
+        }
+        context.report({
+          node,
+          message: getBrowserGlobalMessage(
+            result.globalName,
+            result.propertyName,
+            messages,
+          ),
+        });
+      },
     };
   },
 };
@@ -495,6 +762,5 @@ export default {
 };
 
 // Named exports for direct access
-export { DEFAULT_CONFIG as defaultConfig };
-export { DEFAULT_MESSAGES as defaultMessages };
+export { DEFAULT_CONFIG as defaultConfig, DEFAULT_MESSAGES as defaultMessages };
 export type { RestrictedSyntaxMessages, RestrictedSyntaxPluginConfig };

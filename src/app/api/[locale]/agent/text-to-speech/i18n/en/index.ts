@@ -1,6 +1,4 @@
-/**
- * Text-to-Speech English translations
- */
+import { translations as modelTranslations } from "@/app/api/[locale]/agent/models/i18n/en";
 
 export const translations = {
   category: "Agent",
@@ -121,6 +119,7 @@ export const translations = {
       elevenlabsAdam:
         "ElevenLabs Adam - Professional male voice for content creation",
     },
+    names: modelTranslations.models.names,
   },
 };
 

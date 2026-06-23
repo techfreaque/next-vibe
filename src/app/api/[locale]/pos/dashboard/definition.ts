@@ -48,32 +48,32 @@ const { GET } = createEndpoint({
     children: {
       terminalsTotal: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.terminalsTotal",
+        label: "dashboard.get.response.terminalsTotal",
         schema: z.number(),
       }),
       terminalsActive: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.terminalsActive",
+        label: "dashboard.get.response.terminalsActive",
         schema: z.number(),
       }),
       openSessionsCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.openSessionsCount",
+        label: "dashboard.get.response.openSessionsCount",
         schema: z.number(),
       }),
       todayOrderCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.todayOrderCount",
+        label: "dashboard.get.response.todayOrderCount",
         schema: z.number(),
       }),
       todaySalesTotal: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.todaySalesTotal",
+        label: "dashboard.get.response.todaySalesTotal",
         schema: z.number(),
       }),
       currency: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.currency",
+        label: "dashboard.get.response.currency",
         schema: z.string(),
       }),
       terminals: responseArrayField(scopedTranslation, {
@@ -85,38 +85,38 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "dashboard.get.response.terminalId",
+              label: "dashboard.get.response.terminalId",
               hidden: true,
               schema: z.uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "dashboard.get.response.terminalName",
+              label: "dashboard.get.response.terminalName",
               schema: z.string(),
             }),
             location: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "dashboard.get.response.terminalLocation",
+              label: "dashboard.get.response.terminalLocation",
               schema: z.string().nullable(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "dashboard.get.response.terminalCurrency",
+              label: "dashboard.get.response.terminalCurrency",
               schema: z.string(),
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "dashboard.get.response.terminalIsActive",
+              label: "dashboard.get.response.terminalIsActive",
               schema: z.boolean(),
             }),
             hasOpenSession: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "dashboard.get.response.terminalHasOpenSession",
+              label: "dashboard.get.response.terminalHasOpenSession",
               schema: z.boolean(),
             }),
             openSessionId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "dashboard.get.response.terminalOpenSessionId",
+              label: "dashboard.get.response.terminalOpenSessionId",
               schema: z.uuid().nullable(),
             }),
           },

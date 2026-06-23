@@ -75,43 +75,43 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionClose.post.response.id",
+            label: "sessionClose.post.response.id",
             schema: z.uuid(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionClose.post.response.status",
+            label: "sessionClose.post.response.status",
             schema: z.string(),
           }),
           closedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionClose.post.response.closedAt",
+            label: "sessionClose.post.response.closedAt",
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date().nullable(),
           }),
           closingFloat: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionClose.post.response.closingFloat",
+            label: "sessionClose.post.response.closingFloat",
             schema: z.number().nullable(),
           }),
           expectedFloat: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionClose.post.response.expectedFloat",
+            label: "sessionClose.post.response.expectedFloat",
             schema: z.number(),
           }),
           cashSalesTotal: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionClose.post.response.cashSalesTotal",
+            label: "sessionClose.post.response.cashSalesTotal",
             schema: z.number(),
           }),
           variance: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionClose.post.response.variance",
+            label: "sessionClose.post.response.variance",
             schema: z.number(),
           }),
           orderCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionClose.post.response.orderCount",
+            label: "sessionClose.post.response.orderCount",
             schema: z.number(),
           }),
         },

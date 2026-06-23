@@ -58,27 +58,27 @@ const { GET } = createEndpoint({
 
       inStockCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.inStockCount" as const,
+        label: "dashboard.get.response.inStockCount" as const,
         schema: z.number(),
       }),
       outOfStockCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.outOfStockCount" as const,
+        label: "dashboard.get.response.outOfStockCount" as const,
         schema: z.number(),
       }),
       lowStockCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.lowStockCount" as const,
+        label: "dashboard.get.response.lowStockCount" as const,
         schema: z.number(),
       }),
       pendingTransferCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.pendingTransferCount" as const,
+        label: "dashboard.get.response.pendingTransferCount" as const,
         schema: z.number(),
       }),
       warehouseCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.warehouseCount" as const,
+        label: "dashboard.get.response.warehouseCount" as const,
         schema: z.number(),
       }),
     },

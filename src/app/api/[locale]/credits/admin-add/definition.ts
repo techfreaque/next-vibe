@@ -68,7 +68,7 @@ const { POST } = createEndpoint({
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "adminAdd.post.response.message.content" as const,
+        label: "adminAdd.post.response.message.content" as const,
         schema: z.string(),
       }),
       backButton: backButton(scopedTranslation, {

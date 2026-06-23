@@ -131,25 +131,25 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.id" as const,
+        label: "post.response.id" as const,
         schema: z.uuid(),
       }),
 
       companyIdResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.companyId" as const,
+        label: "post.response.companyId" as const,
         schema: z.uuid(),
       }),
 
       supplierNameResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.supplierName" as const,
+        label: "post.response.supplierName" as const,
         schema: z.string(),
       }),
 
       billNumberResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.billNumber" as const,
+        label: "post.response.billNumber" as const,
         schema: z.string().nullable(),
       }),
 
@@ -161,25 +161,25 @@ const { POST } = createEndpoint({
 
       subtotal: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.subtotal" as const,
+        label: "post.response.subtotal" as const,
         schema: z.number(),
       }),
 
       taxAmount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.taxAmount" as const,
+        label: "post.response.taxAmount" as const,
         schema: z.number(),
       }),
 
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.total" as const,
+        label: "post.response.total" as const,
         schema: z.number(),
       }),
 
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.createdAt" as const,
+        label: "post.response.createdAt" as const,
         schema: z.coerce.date(),
       }),
     },

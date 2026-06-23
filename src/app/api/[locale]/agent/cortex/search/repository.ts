@@ -30,26 +30,6 @@ import type { CortexSearchT } from "./i18n";
 const FTS_WEIGHT = 0.4;
 const VECTOR_WEIGHT = 0.6;
 
-interface SearchParams {
-  userId: string;
-  user: JwtPrivatePayloadType;
-  query: string;
-  path: string;
-  maxResults: number;
-  logger: EndpointLogger;
-  t: CortexSearchT;
-  locale: CountryLanguage;
-}
-
-interface SearchResult {
-  resultPath: string;
-  excerpt: string;
-  score: number;
-  updatedAt: string;
-}
-
-type SearchMode = "hybrid" | "keyword";
-
 export class CortexSearchRepository {
   static async search({
     userId,
@@ -60,14 +40,16 @@ export class CortexSearchRepository {
     logger,
     t,
     locale,
-  }: SearchParams): Promise<
-    ResponseType<{
-      responseQuery: string;
-      results: SearchResult[];
-      total: number;
-      searchMode: SearchMode;
-    }>
-  > {
+  }: {
+    userId: string;
+    user: JwtPrivatePayloadType;
+    query: string;
+    path: string;
+    maxResults: number;
+    logger: EndpointLogger;
+    t: CortexSearchT;
+    locale: CountryLanguage;
+  }): Promise<ResponseType<CortexSearchResponseOutput>> {
     const path = normalizePath(rawPath);
 
     if (!isValidPath(path)) {
@@ -106,7 +88,7 @@ export class CortexSearchRepository {
             : Promise.resolve([]),
         ]);
 
-      const searchMode: SearchMode =
+      const searchMode: "hybrid" | "keyword" =
         vectorResults.length > 0 ? "hybrid" : "keyword";
 
       // Merge DB results (FTS + vector), then append virtual/template hits
@@ -155,14 +137,6 @@ async function checkEmbeddingsExist(userId: string): Promise<boolean> {
   return result.length > 0;
 }
 
-interface ScoredResult {
-  path: string;
-  excerpt: string;
-  score: number;
-  updatedAt: Date;
-  source: "fts" | "vector";
-}
-
 /**
  * Run full-text search using PostgreSQL tsvector.
  */
@@ -171,7 +145,15 @@ async function runFtsSearch(
   query: string,
   path: string,
   limit: number,
-): Promise<ScoredResult[]> {
+): Promise<
+  {
+    path: string;
+    excerpt: string;
+    score: number;
+    updatedAt: Date;
+    source: "fts" | "vector";
+  }[]
+> {
   const tsQuery = sql`plainto_tsquery('english', ${query})`;
   const tsVector = sql`to_tsvector('english', COALESCE(${cortexNodes.content}, '') || ' ' || ${cortexNodes.path})`;
 
@@ -221,7 +203,15 @@ async function runVectorSearch(
   logger: EndpointLogger,
   user: JwtPrivatePayloadType,
   locale: CountryLanguage,
-): Promise<ScoredResult[]> {
+): Promise<
+  {
+    path: string;
+    excerpt: string;
+    score: number;
+    updatedAt: Date;
+    source: "fts" | "vector";
+  }[]
+> {
   // Generate embedding for the query
   const { generateEmbedding } = await import("../embeddings/service");
   const queryEmbedding = await generateEmbedding(query);
@@ -302,32 +292,34 @@ async function runVectorSearch(
  */
 async function resolveExcerpts(
   userId: string,
-  results: SearchResult[],
+  results: CortexSearchResponseOutput["results"],
   locale: CountryLanguage,
-): Promise<SearchResult[]> {
+): Promise<CortexSearchResponseOutput["results"]> {
   const { getMountPrefix, isNativePath } = await import("../repository");
   const { resolveVirtualRead } = await import("../mounts/resolver");
 
   return Promise.all(
-    results.map(async (r): Promise<SearchResult> => {
-      if (r.excerpt.trim().length > 0 || isNativePath(r.resultPath, locale)) {
-        return r;
-      }
-      const mountPrefix = getMountPrefix(r.resultPath, locale);
-      if (mountPrefix === null) {
-        return r;
-      }
-      const resolved = await resolveVirtualRead(
-        userId,
-        r.resultPath,
-        mountPrefix,
-        false,
-        locale,
-      ).catch(() => null);
-      return resolved
-        ? { ...r, excerpt: truncateContent(resolved.content, 150) }
-        : r;
-    }),
+    results.map(
+      async (r): Promise<CortexSearchResponseOutput["results"][number]> => {
+        if (r.excerpt.trim().length > 0 || isNativePath(r.resultPath, locale)) {
+          return r;
+        }
+        const mountPrefix = getMountPrefix(r.resultPath, locale);
+        if (mountPrefix === null) {
+          return r;
+        }
+        const resolved = await resolveVirtualRead(
+          userId,
+          r.resultPath,
+          mountPrefix,
+          false,
+          locale,
+        ).catch(() => null);
+        return resolved
+          ? { ...r, excerpt: truncateContent(resolved.content, 150) }
+          : r;
+      },
+    ),
   );
 }
 
@@ -356,7 +348,15 @@ async function runVirtualSearch(
   userId: string,
   query: string,
   limit: number,
-): Promise<ScoredResult[]> {
+): Promise<
+  {
+    path: string;
+    excerpt: string;
+    score: number;
+    updatedAt: Date;
+    source: "fts" | "vector";
+  }[]
+> {
   const taskHits = await import("../mounts/tasks")
     .then((m) => m.searchTasks(userId, query, limit).catch(() => []))
     .catch(() => []);
@@ -378,12 +378,26 @@ async function runTemplateSearch(
   path: string,
   locale: CountryLanguage,
   limit: number,
-): Promise<ScoredResult[]> {
+): Promise<
+  {
+    path: string;
+    excerpt: string;
+    score: number;
+    updatedAt: Date;
+    source: "fts" | "vector";
+  }[]
+> {
   const { getAllTemplates } = await import("../seeds/templates");
   const lq = query.toLowerCase();
   const templates = getAllTemplates(locale);
   const now = new Date();
-  const results: ScoredResult[] = [];
+  const results: {
+    path: string;
+    excerpt: string;
+    score: number;
+    updatedAt: Date;
+    source: "fts" | "vector";
+  }[] = [];
 
   for (const tpl of templates) {
     if (path !== "/" && !tpl.path.startsWith(path)) {
@@ -413,12 +427,36 @@ async function runTemplateSearch(
  * Deduplicates by path, combines scores from both sources.
  */
 function mergeResults(
-  ftsResults: ScoredResult[],
-  vectorResults: ScoredResult[],
-  virtualResults: ScoredResult[],
-  templateResults: ScoredResult[],
+  ftsResults: {
+    path: string;
+    excerpt: string;
+    score: number;
+    updatedAt: Date;
+    source: "fts" | "vector";
+  }[],
+  vectorResults: {
+    path: string;
+    excerpt: string;
+    score: number;
+    updatedAt: Date;
+    source: "fts" | "vector";
+  }[],
+  virtualResults: {
+    path: string;
+    excerpt: string;
+    score: number;
+    updatedAt: Date;
+    source: "fts" | "vector";
+  }[],
+  templateResults: {
+    path: string;
+    excerpt: string;
+    score: number;
+    updatedAt: Date;
+    source: "fts" | "vector";
+  }[],
   limit: number,
-): SearchResult[] {
+): CortexSearchResponseOutput["results"] {
   const resultMap = new Map<
     string,
     { ftsScore: number; vectorScore: number; excerpt: string; updatedAt: Date }

@@ -106,7 +106,7 @@ const { GET } = createEndpoint({
 
       output: responseField(scopedTranslation, {
         type: WidgetType.MARKDOWN,
-        content: "get.response.output.title" as const,
+        label: "get.response.output.title" as const,
         columns: 12,
         schema: z.string().optional(),
       }),
@@ -123,7 +123,7 @@ const { GET } = createEndpoint({
           children: {
             title: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.references.title" as const,
+              label: "get.response.references.title" as const,
               schema: z.string(),
             }),
             url: responseField(scopedTranslation, {
@@ -135,7 +135,7 @@ const { GET } = createEndpoint({
             }),
             snippet: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.references.item.snippet" as const,
+              label: "get.response.references.item.snippet" as const,
               schema: z.string().optional(),
             }),
           },

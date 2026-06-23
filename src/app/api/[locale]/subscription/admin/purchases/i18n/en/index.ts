@@ -112,4 +112,30 @@ export const translations = {
     expired: "Expired",
     neverExpires: "Never",
   },
+  enums: {
+    creditPackTypeFilter: {
+      any: "Any",
+      subscription: "Subscription",
+      permanent: "Permanent",
+      bonus: "Bonus",
+      earned: "Earned",
+    },
+    creditPackSourceFilter: {
+      any: "Any",
+      stripePurchase: "Stripe Purchase",
+      stripeSubscription: "Subscription Grant",
+      adminGrant: "Admin Grant",
+      referralEarning: "Referral Earning",
+    },
+    purchaseSortField: {
+      createdAt: "Created At",
+      amount: "Amount",
+      type: "Type",
+      userEmail: "User Email",
+    },
+    sortOrder: {
+      asc: "Ascending",
+      desc: "Descending",
+    },
+  },
 };

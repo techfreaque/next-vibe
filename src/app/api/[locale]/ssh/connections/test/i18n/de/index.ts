@@ -66,6 +66,12 @@ export const translations: typeof enTranslations = {
         description: "Verbindung hat das Zeitlimit überschritten",
       },
     },
+    response: {
+      ok: { title: "OK" },
+      latencyMs: { title: "Latenz (ms)" },
+      fingerprint: { title: "Fingerprint" },
+      fingerprintChanged: { title: "Fingerprint geändert" },
+    },
     success: {
       title: "Verbindung erfolgreich",
       description: "SSH-Verbindungstest bestanden",

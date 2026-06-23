@@ -86,12 +86,12 @@ const { GET } = createEndpoint({
             children: {
               id: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.id.content",
+                label: "get.response.id.content",
                 schema: z.uuid(),
               }),
               fileName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.fileName.content",
+                label: "get.response.fileName.content",
                 schema: z.string(),
               }),
               status: responseField(scopedTranslation, {
@@ -112,27 +112,27 @@ const { GET } = createEndpoint({
             children: {
               totalRows: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.totalRows.content",
+                label: "get.response.totalRows.content",
                 schema: z.coerce.number().nullable(),
               }),
               processedRows: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.processedRows.content",
+                label: "get.response.processedRows.content",
                 schema: z.coerce.number(),
               }),
               successfulImports: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.successfulImports.content",
+                label: "get.response.successfulImports.content",
                 schema: z.coerce.number(),
               }),
               failedImports: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.failedImports.content",
+                label: "get.response.failedImports.content",
                 schema: z.coerce.number(),
               }),
               duplicateEmails: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.duplicateEmails.content",
+                label: "get.response.duplicateEmails.content",
                 schema: z.coerce.number(),
               }),
             },
@@ -148,27 +148,27 @@ const { GET } = createEndpoint({
             children: {
               currentBatchStart: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.currentBatchStart.content",
+                label: "get.response.currentBatchStart.content",
                 schema: z.coerce.number(),
               }),
               batchSize: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.batchSize.content",
+                label: "get.response.batchSize.content",
                 schema: z.coerce.number(),
               }),
               retryCount: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.retryCount.content",
+                label: "get.response.retryCount.content",
                 schema: z.coerce.number(),
               }),
               maxRetries: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.maxRetries.content",
+                label: "get.response.maxRetries.content",
                 schema: z.coerce.number(),
               }),
               error: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.error.content",
+                label: "get.response.error.content",
                 schema: z.string().nullable(),
               }),
             },
@@ -184,22 +184,22 @@ const { GET } = createEndpoint({
             children: {
               createdAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.createdAt.content",
+                label: "get.response.createdAt.content",
                 schema: z.string(),
               }),
               updatedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.updatedAt.content",
+                label: "get.response.updatedAt.content",
                 schema: z.string(),
               }),
               startedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.startedAt.content",
+                label: "get.response.startedAt.content",
                 schema: z.string().nullable(),
               }),
               completedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.completedAt.content",
+                label: "get.response.completedAt.content",
                 schema: z.string().nullable(),
               }),
             },
@@ -373,12 +373,12 @@ const { PATCH } = createEndpoint({
             children: {
               id: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.id.content",
+                label: "patch.response.id.content",
                 schema: z.uuid(),
               }),
               fileName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.fileName.content",
+                label: "patch.response.fileName.content",
                 schema: z.string(),
               }),
               status: responseField(scopedTranslation, {
@@ -399,27 +399,27 @@ const { PATCH } = createEndpoint({
             children: {
               totalRows: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.totalRows.content",
+                label: "patch.response.totalRows.content",
                 schema: z.coerce.number().nullable(),
               }),
               processedRows: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.processedRows.content",
+                label: "patch.response.processedRows.content",
                 schema: z.coerce.number(),
               }),
               successfulImports: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.successfulImports.content",
+                label: "patch.response.successfulImports.content",
                 schema: z.coerce.number(),
               }),
               failedImports: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.failedImports.content",
+                label: "patch.response.failedImports.content",
                 schema: z.coerce.number(),
               }),
               duplicateEmails: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.duplicateEmails.content",
+                label: "patch.response.duplicateEmails.content",
                 schema: z.coerce.number(),
               }),
             },
@@ -435,27 +435,27 @@ const { PATCH } = createEndpoint({
             children: {
               currentBatchStart: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.currentBatchStart.content",
+                label: "patch.response.currentBatchStart.content",
                 schema: z.coerce.number(),
               }),
               batchSize: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.batchSize.content",
+                label: "patch.response.batchSize.content",
                 schema: z.coerce.number(),
               }),
               retryCount: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.retryCount.content",
+                label: "patch.response.retryCount.content",
                 schema: z.coerce.number(),
               }),
               maxRetries: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.maxRetries.content",
+                label: "patch.response.maxRetries.content",
                 schema: z.coerce.number(),
               }),
               error: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.error.content",
+                label: "patch.response.error.content",
                 schema: z.string().nullable(),
               }),
             },
@@ -471,22 +471,22 @@ const { PATCH } = createEndpoint({
             children: {
               createdAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.createdAt.content",
+                label: "patch.response.createdAt.content",
                 schema: z.string(),
               }),
               updatedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.updatedAt.content",
+                label: "patch.response.updatedAt.content",
                 schema: z.string(),
               }),
               startedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.startedAt.content",
+                label: "patch.response.startedAt.content",
                 schema: z.string().nullable(),
               }),
               completedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "patch.response.completedAt.content",
+                label: "patch.response.completedAt.content",
                 schema: z.string().nullable(),
               }),
             },
@@ -625,12 +625,12 @@ const { DELETE } = createEndpoint({
         children: {
           success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "delete.response.success.content",
+            label: "delete.response.success.content",
             schema: z.boolean(),
           }),
           message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "delete.response.message.content",
+            label: "delete.response.message.content",
             schema: z.string(),
           }),
         },

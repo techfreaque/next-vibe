@@ -35,7 +35,7 @@ export async function readFavoritePath(
   const fileKey = segments[1]!.replace(/\.md$/, "");
 
   const { chatFavorites } =
-    await import("@/app/api/[locale]/agent/chat/favorites/db");
+    await import("@/app/api/[locale]/agent/skills/favorites/db");
 
   const UUID_RE =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -154,7 +154,7 @@ export async function listFavoritePath(
   }
 
   const { chatFavorites } =
-    await import("@/app/api/[locale]/agent/chat/favorites/db");
+    await import("@/app/api/[locale]/agent/skills/favorites/db");
 
   const rows = await db
     .select({
@@ -192,7 +192,7 @@ export async function listFavoritePath(
  */
 export async function getFavoriteCount(userId: string): Promise<number> {
   const { chatFavorites } =
-    await import("@/app/api/[locale]/agent/chat/favorites/db");
+    await import("@/app/api/[locale]/agent/skills/favorites/db");
 
   const rows = await db
     .select({ count: drizzleCount() })

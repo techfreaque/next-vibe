@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
       }),
       title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "request.ui.title",
+        label: "request.ui.title",
         level: 3,
         order: 1,
         inline: true,
@@ -63,7 +63,7 @@ const { POST } = createEndpoint({
       }),
       subtitle: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "request.ui.subtitle",
+        label: "request.ui.subtitle",
         order: 2,
         usage: { request: "data", response: true },
       }),
@@ -95,7 +95,7 @@ const { POST } = createEndpoint({
 
       message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        content: "request.response.success.message",
+        label: "request.response.success.message",
         order: 6,
         schema: z
           .string()

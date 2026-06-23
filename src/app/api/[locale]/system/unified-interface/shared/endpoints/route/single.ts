@@ -10,7 +10,6 @@ import {
   type NextHandlerReturnType,
 } from "../../../next-api/handler";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
-import type { Platform } from "../../types/platform";
 import {
   type ApiHandlerOptions,
   createGenericHandler,
@@ -27,12 +26,7 @@ type EndpointHandlerReturn<TEndpoint extends CreateApiEndpointAny> = {
   >;
 } & {
   tools: {
-    [K in TEndpoint["method"]]: GenericHandlerReturnType<
-      TEndpoint["types"]["RequestOutput"],
-      TEndpoint["types"]["ResponseOutput"],
-      TEndpoint["types"]["UrlVariablesOutput"],
-      TEndpoint["allowedRoles"]
-    >;
+    [K in TEndpoint["method"]]: GenericHandlerReturnType<TEndpoint>;
   };
   definitions: TEndpoint;
 };
@@ -45,15 +39,7 @@ type EndpointHandlerReturn<TEndpoint extends CreateApiEndpointAny> = {
  * Type parameters are inferred from options.endpoint.types for proper type flow
  */
 export function endpointHandler<T extends CreateApiEndpointAny>(
-  options: ApiHandlerOptions<
-    T["types"]["RequestOutput"],
-    T["types"]["ResponseOutput"],
-    T["types"]["UrlVariablesOutput"],
-    T["allowedRoles"],
-    T,
-    Platform,
-    T["types"]["ScopedTranslationKey"]
-  >,
+  options: ApiHandlerOptions<T>,
 ): EndpointHandlerReturn<T> {
   const nextHandler = createNextHandler(options);
   const genericHandler = createGenericHandler(options);

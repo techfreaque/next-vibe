@@ -151,12 +151,12 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.id.content" as const,
+              label: "get.response.folders.folder.id.content" as const,
               schema: z.uuid(),
             }),
             userId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.userId.content" as const,
+              label: "get.response.folders.folder.userId.content" as const,
               schema: z.uuid().nullable(),
             }),
             rootFolderId: responseField(scopedTranslation, {
@@ -167,33 +167,33 @@ const { GET } = createEndpoint({
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.name.content" as const,
+              label: "get.response.folders.folder.name.content" as const,
               schema: z.string(),
             }),
             icon: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.icon.content" as const,
+              label: "get.response.folders.folder.icon.content" as const,
               // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
               schema: iconSchema.nullable(),
             }),
             color: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.color.content" as const,
+              label: "get.response.folders.folder.color.content" as const,
               schema: z.string().nullable(),
             }),
             parentId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.parentId.content" as const,
+              label: "get.response.folders.folder.parentId.content" as const,
               schema: z.uuid().nullable(),
             }),
             expanded: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.expanded.content" as const,
+              label: "get.response.folders.folder.expanded.content" as const,
               schema: z.boolean(),
             }),
             sortOrder: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.sortOrder.content" as const,
+              label: "get.response.folders.folder.sortOrder.content" as const,
               schema: z.coerce.number(),
             }),
             rolesView: responseArrayOptionalField(scopedTranslation, {
@@ -247,7 +247,7 @@ const { GET } = createEndpoint({
             // Permission flags - computed server-side based on user's roles
             canManage: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.canManage.content" as const,
+              label: "get.response.folders.folder.canManage.content" as const,
               schema: z
                 .boolean()
                 .describe(
@@ -276,7 +276,7 @@ const { GET } = createEndpoint({
             }),
             canDelete: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.canDelete.content" as const,
+              label: "get.response.folders.folder.canDelete.content" as const,
               schema: z
                 .boolean()
                 .describe("Whether the current user can delete this folder"),
@@ -293,12 +293,12 @@ const { GET } = createEndpoint({
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.createdAt.content" as const,
+              label: "get.response.folders.folder.createdAt.content" as const,
               schema: dateSchema,
             }),
             updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.folders.folder.updatedAt.content" as const,
+              label: "get.response.folders.folder.updatedAt.content" as const,
               schema: dateSchema,
             }),
           },

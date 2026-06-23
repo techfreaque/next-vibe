@@ -144,12 +144,12 @@ const { POST } = createEndpoint({
       // ── Response fields ─────────────────────────────────────────────────
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "codingAgent.run.post.fields.output.label",
+        label: "codingAgent.run.post.fields.output.label",
         schema: z.string(),
       }),
       durationMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "codingAgent.run.post.fields.durationMs.label",
+        label: "codingAgent.run.post.fields.durationMs.label",
         schema: z.number(),
       }),
       taskId: responseField(scopedTranslation, {

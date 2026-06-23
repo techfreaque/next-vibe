@@ -159,12 +159,12 @@ const { POST } = createEndpoint({
         children: {
           messageId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.messageId.label",
+            label: "response.messageId.label",
             schema: z.string(),
           }),
           accountName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.accountName.label",
+            label: "response.accountName.label",
             schema: z.string(),
           }),
           channel: responseField(scopedTranslation, {
@@ -179,7 +179,7 @@ const { POST } = createEndpoint({
           }),
           sentAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.sentAt.label",
+            label: "response.sentAt.label",
             schema: z.string(),
           }),
         },

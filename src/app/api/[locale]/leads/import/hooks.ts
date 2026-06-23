@@ -158,15 +158,7 @@ export function useLeadsImportEndpoint(
       "jane@company.com,Company Inc,Jane Smith,+0987654321,https://company.com,PL,en,referral,Another sample",
     ].join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "leads_template.csv";
-    document.body.append(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    downloadFile("leads_template.csv", csvContent, "text/csv");
   }, []);
 
   return {

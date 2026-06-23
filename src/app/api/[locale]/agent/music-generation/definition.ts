@@ -6,7 +6,10 @@
 import { lazy } from "react";
 import { z } from "zod";
 
-import { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
+import {
+  MusicGenModelId,
+  MusicGenModelIdOptions,
+} from "@/app/api/[locale]/agent/music-generation/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   backButton,
@@ -51,6 +54,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",
+  timeoutMs: 0,
   icon: "music",
   category: "ai",
   subCategory: "Generation",
@@ -131,23 +135,23 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       audioUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.audioUrl",
+        label: "post.response.audioUrl",
         schema: z.string(),
       }),
       creditCost: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.creditCost",
+        label: "post.response.creditCost",
         schema: z.number(),
       }),
       durationSeconds: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.durationSeconds",
+        label: "post.response.durationSeconds",
         schema: z.number(),
       }),
       /** Async job ID for polling (future async generation) */
       jobId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.jobId",
+        label: "post.response.jobId",
         schema: z.string().optional(),
       }),
     },

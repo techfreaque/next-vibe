@@ -11,6 +11,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -66,16 +67,6 @@ export class CortexDeleteRepository {
         message: t("delete.errors.validation.title"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
-    }
-
-    // Filesystem backend for preview-mode admin
-    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
-    if (!user.isPublic && !isVirtualWritable(path)) {
-      const { isFilesystemMode } = await import("../fs-provider");
-      if (isFilesystemMode(user)) {
-        const { fsDeleteNode } = await import("../fs-provider/fs-delete");
-        return fsDeleteNode(path, recursive ?? false, { t });
-      }
     }
 
     // Virtual writable mount - delegate to mount handler
@@ -156,14 +147,6 @@ export class CortexDeleteRepository {
       const nodesDeleted = deletedRows.length;
       logger.info(`Cortex delete: ${path} (${nodesDeleted} nodes)`);
 
-      // Disk write-through: remove from disk
-      try {
-        const { deleteFromDisk } = await import("../fs-provider/fs-sync");
-        await deleteFromDisk(path);
-      } catch {
-        // Best-effort
-      }
-
       // This op owns its `node-deleted` event: the delete the user submitted
       // (requestFields). The peer's onRemoteEvent re-runs deleteNode. Server-only.
       // Suppressed when applying a relayed delete (avoids re-relay ping-pong).
@@ -192,18 +175,21 @@ export class CortexDeleteRepository {
    * Cross-instance applier for `node-deleted`: re-run the delete on this instance
    * with the relayed inputs. Reuses deleteNode so there is one code path.
    */
-  static async applyRemoteDelete(
-    payload: { path: string; recursive?: boolean },
-    user: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  static async applyRemoteDelete({
+    requestData,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof deleteDefinitions.DELETE,
+    "node-deleted"
+  >): Promise<void> {
     const { t } = scopedTranslation.scopedT(defaultLocale);
     const result = await this.deleteNode({
       userId: user.id,
       user,
       locale: defaultLocale,
-      path: payload.path,
-      recursive: payload.recursive,
+      path: requestData.path,
+      recursive: requestData.recursive,
       logger,
       t,
       relayed: true,

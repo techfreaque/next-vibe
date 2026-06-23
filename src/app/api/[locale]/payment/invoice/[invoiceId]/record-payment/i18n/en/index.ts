@@ -60,6 +60,13 @@ export const translations = {
       description: "Manual payment recorded",
     },
   },
+  enums: {
+    manualPaymentMethod: {
+      cash: "Cash",
+      bankTransfer: "Bank Transfer",
+      other: "Other",
+    },
+  },
   invoiceId: {
     label: "Invoice ID",
     description: "ID of the invoice to record payment against",

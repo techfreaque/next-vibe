@@ -123,17 +123,17 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       folderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.folder.id.content" as const,
+        label: "response.folder.id.content" as const,
         schema: z.uuid(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.folder.createdAt.content" as const,
+        label: "response.folder.createdAt.content" as const,
         schema: dateSchema,
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.folder.updatedAt.content" as const,
+        label: "response.folder.updatedAt.content" as const,
         schema: dateSchema,
       }),
 
@@ -247,7 +247,7 @@ const { POST } = createEndpoint({
             archived: null,
             canEdit: null,
             canPost: null,
-            streamingState: null,
+            streamingState: ThreadStreamingState.IDLE,
             rolesEdit: null,
             activeShareCount: null,
             lastSharedAt: null,

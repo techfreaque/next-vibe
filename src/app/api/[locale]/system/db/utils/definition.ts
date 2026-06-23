@@ -106,13 +106,13 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "status.title",
+        label: "status.title",
         schema: z.enum(["healthy", "degraded", "unhealthy"]),
       }),
 
       timestamp: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "timestamp.title",
+        label: "timestamp.title",
         schema: z.string(),
       }),
 
@@ -125,13 +125,13 @@ const { GET } = createEndpoint({
         children: {
           primary: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "connections.primary",
+            label: "connections.primary",
             fieldType: FieldDataType.BOOLEAN,
             schema: z.boolean(),
           }),
           replica: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "connections.replica",
+            label: "connections.replica",
             fieldType: FieldDataType.BOOLEAN,
             schema: z.boolean().optional(),
           }),
@@ -147,25 +147,25 @@ const { GET } = createEndpoint({
         children: {
           version: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "details.version",
+            label: "details.version",
             fieldType: FieldDataType.TEXT,
             schema: z.string().optional(),
           }),
           uptime: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "details.uptime",
+            label: "details.uptime",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().optional(),
           }),
           activeConnections: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "details.activeConnections",
+            label: "details.activeConnections",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().optional(),
           }),
           maxConnections: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "details.maxConnections",
+            label: "details.maxConnections",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().optional(),
           }),

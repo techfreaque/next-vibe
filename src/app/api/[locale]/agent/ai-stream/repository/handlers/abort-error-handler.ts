@@ -454,7 +454,9 @@ export class AbortErrorHandler {
         // REMOTE_TOOL_WAIT: escalateToTask already fires this early - emitting again is harmless (idempotent on client).
         // STREAM_TIMEOUT: no prior emission, so this is the first signal.
         try {
-          ctx.wsEmit("streaming-state-changed", { streamingState: "waiting" });
+          ctx.wsEmit("streaming-state-changed", {
+            streamingState: ThreadStreamingState.WAITING,
+          });
         } catch (err) {
           logger.warn("[AI Stream] Failed to emit waiting state WS event", {
             threadId,

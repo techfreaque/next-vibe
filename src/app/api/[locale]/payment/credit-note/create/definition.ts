@@ -102,13 +102,13 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.success" as const,
+        label: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.message" as const,
+        label: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
@@ -122,47 +122,47 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.creditNote.id" as const,
+            label: "post.response.creditNote.id" as const,
             schema: z.uuid(),
           }),
           invoiceId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.creditNote.invoiceId" as const,
+            label: "post.response.creditNote.invoiceId" as const,
             schema: z.uuid(),
           }),
           companyId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.creditNote.companyId" as const,
+            label: "post.response.creditNote.companyId" as const,
             schema: z.uuid().nullable(),
           }),
           currency: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.creditNote.currency" as const,
+            label: "post.response.creditNote.currency" as const,
             schema: z.string(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.creditNote.status" as const,
+            label: "post.response.creditNote.status" as const,
             schema: z.string(),
           }),
           amount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.creditNote.amount" as const,
+            label: "post.response.creditNote.amount" as const,
             schema: z.string(),
           }),
           reason: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.creditNote.reason" as const,
+            label: "post.response.creditNote.reason" as const,
             schema: z.string(),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.creditNote.createdAt" as const,
+            label: "post.response.creditNote.createdAt" as const,
             schema: z.string(),
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.creditNote.updatedAt" as const,
+            label: "post.response.creditNote.updatedAt" as const,
             schema: z.string(),
           }),
         },

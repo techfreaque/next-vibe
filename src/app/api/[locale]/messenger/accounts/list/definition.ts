@@ -24,6 +24,8 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 import {
+  MessageChannel,
+  MessageChannelDB,
   MessengerAccountSortField,
   MessengerAccountSortFieldOptions,
   MessengerAccountStatus,
@@ -41,7 +43,6 @@ import {
   MessengerSortOrder,
   MessengerSortOrderOptions,
 } from "../enum";
-import { MessageChannel, MessageChannelDB } from "../enum";
 import { MESSENGER_ACCOUNTS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -166,12 +167,12 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "response.account.id",
+              label: "response.account.id",
               schema: z.uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "response.account.name",
+              label: "response.account.name",
               schema: z.string(),
             }),
             channel: responseField(scopedTranslation, {
@@ -196,37 +197,37 @@ const { GET } = createEndpoint({
             }),
             isDefault: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "response.account.isDefault",
+              label: "response.account.isDefault",
               schema: z.boolean(),
             }),
             priority: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "response.account.priority",
+              label: "response.account.priority",
               schema: z.coerce.number().int(),
             }),
             smtpFromEmail: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "response.account.smtpFromEmail",
+              label: "response.account.smtpFromEmail",
               schema: z.string().nullable(),
             }),
             fromId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "response.account.fromId",
+              label: "response.account.fromId",
               schema: z.string().nullable(),
             }),
             messagesSentTotal: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "response.account.messagesSentTotal",
+              label: "response.account.messagesSentTotal",
               schema: z.coerce.number().int(),
             }),
             lastUsedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "response.account.lastUsedAt",
+              label: "response.account.lastUsedAt",
               schema: dateSchema.nullable(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "response.account.createdAt",
+              label: "response.account.createdAt",
               schema: dateSchema,
             }),
           },
@@ -243,22 +244,22 @@ const { GET } = createEndpoint({
         children: {
           page: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.pagination.page",
+            label: "response.pagination.page",
             schema: z.coerce.number().int(),
           }),
           limit: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.pagination.limit",
+            label: "response.pagination.limit",
             schema: z.coerce.number().int(),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.pagination.total",
+            label: "response.pagination.total",
             schema: z.coerce.number().int(),
           }),
           totalPages: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.pagination.totalPages",
+            label: "response.pagination.totalPages",
             schema: z.coerce.number().int(),
           }),
         },

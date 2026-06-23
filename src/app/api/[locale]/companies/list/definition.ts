@@ -71,7 +71,7 @@ const { GET } = createEndpoint({
       }),
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.total",
+        label: "get.response.total",
         schema: z.number(),
       }),
       companies: responseArrayField(scopedTranslation, {
@@ -83,13 +83,13 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.id",
+              label: "get.response.id",
               hidden: true,
               schema: z.uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.name",
+              label: "get.response.name",
               schema: z.string(),
             }),
             type: responseField(scopedTranslation, {
@@ -106,27 +106,27 @@ const { GET } = createEndpoint({
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.isActive",
+              label: "get.response.isActive",
               schema: z.boolean(),
             }),
             country: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.country",
+              label: "get.response.country",
               schema: z.string().nullable(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.currency",
+              label: "get.response.currency",
               schema: z.string().nullable(),
             }),
             email: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.email",
+              label: "get.response.email",
               schema: z.string().nullable(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.createdAt",
+              label: "get.response.createdAt",
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date(),
             }),

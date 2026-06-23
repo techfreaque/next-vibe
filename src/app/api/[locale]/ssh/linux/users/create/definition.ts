@@ -104,27 +104,27 @@ export const { POST } = createEndpoint({
       }),
       ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.ok.title",
+        label: "post.response.ok.title",
         schema: z.boolean(),
       }),
       uid: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.uid.title",
+        label: "post.response.uid.title",
         schema: z.number(),
       }),
       gid: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.gid.title",
+        label: "post.response.gid.title",
         schema: z.number(),
       }),
       homeDirectory: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.homeDirectory.title",
+        label: "post.response.homeDirectory.title",
         schema: z.string(),
       }),
       shellPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.shell.title",
+        label: "post.response.shell.title",
         schema: z.string(),
       }),
     },

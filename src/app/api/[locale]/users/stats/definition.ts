@@ -678,7 +678,6 @@ const { GET } = createEndpoint({
             type: WidgetType.TEXT,
             fieldType: FieldDataType.DATETIME,
             label: "response.businessInsights.generatedAt.label" as const,
-            content: "response.businessInsights.generatedAt.label" as const,
             schema: dateSchema.describe("When these statistics were generated"),
           }),
         },

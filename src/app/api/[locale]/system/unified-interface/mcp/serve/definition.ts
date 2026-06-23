@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
     children: {
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "serve.post.response.title",
+        label: "serve.post.response.title",
         schema: z.string(),
       }),
     },

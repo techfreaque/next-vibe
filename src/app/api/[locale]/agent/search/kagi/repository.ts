@@ -28,13 +28,8 @@ interface KagiFastGPTReference {
   snippet?: string;
 }
 interface KagiFastGPTResponse {
-  meta: { id: string; node: string; ms: number; api_balance: number | null };
-  data: {
-    output: string;
-    tokens: number;
-    references: KagiFastGPTReference[];
-  } | null;
-  error?: Array<{ code: number; msg: string }>;
+  data?: { output: string; references: KagiFastGPTReference[] };
+  error?: { code: number; msg: string }[];
 }
 
 /**

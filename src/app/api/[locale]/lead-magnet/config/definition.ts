@@ -16,7 +16,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
@@ -74,8 +73,8 @@ export const { GET } = createEndpoint({
         schema: z.boolean(),
       }),
       config: responseField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.OBJECT,
+        type: WidgetType.TEXT,
+        hidden: true,
         schema: configSchema.nullable(),
       }),
     },

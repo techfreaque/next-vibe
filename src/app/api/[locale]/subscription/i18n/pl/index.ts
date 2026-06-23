@@ -430,6 +430,8 @@ export const translations: typeof enTranslations = {
 
   // Response fields
   response: {
+    checkoutUrl: "URL płatności",
+    sessionId: "ID sesji",
     id: "ID subskrypcji",
     userId: "ID użytkownika",
     status: "Status subskrypcji",

@@ -179,12 +179,12 @@ const { PATCH } = createEndpoint({
       // === RESPONSE ===
       folderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.folder.id.content" as const,
+        label: "patch.response.folder.id.content" as const,
         schema: z.uuid(),
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.folder.updatedAt.content" as const,
+        label: "patch.response.folder.updatedAt.content" as const,
         schema: dateSchema,
       }),
 

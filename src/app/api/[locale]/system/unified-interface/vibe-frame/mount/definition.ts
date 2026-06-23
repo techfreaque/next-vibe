@@ -176,12 +176,12 @@ const { POST } = createEndpoint({
           children: {
             frameId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.frameId.label" as const,
+              label: "post.fields.frameId.label" as const,
               schema: z.string(),
             }),
             widgetUrl: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.widgetUrl.label" as const,
+              label: "post.fields.widgetUrl.label" as const,
               schema: z.string(),
             }),
           },

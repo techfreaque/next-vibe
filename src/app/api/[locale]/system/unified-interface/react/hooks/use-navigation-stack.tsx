@@ -272,6 +272,10 @@ export function useNavigationStack(): {
   push: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     options?: NavigationOptions<TEndpoint>,
+    nativePush?: <TEndpoint extends CreateApiEndpointAny>(
+      endpoint: TEndpoint,
+      options?: NavigationOptions<TEndpoint>,
+    ) => void,
   ) => void;
   replace: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,

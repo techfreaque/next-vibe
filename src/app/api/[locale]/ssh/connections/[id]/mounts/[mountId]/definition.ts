@@ -106,22 +106,22 @@ export const { GET } = createEndpoint({
       }),
       name: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "detail.response.name.title" as const,
+        label: "detail.response.name.title" as const,
         schema: z.string(),
       }),
       path: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "detail.response.path.title" as const,
+        label: "detail.response.path.title" as const,
         schema: z.string(),
       }),
       isDefault: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "detail.response.isDefault.title" as const,
+        label: "detail.response.isDefault.title" as const,
         schema: z.boolean(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "detail.response.createdAt.title" as const,
+        label: "detail.response.createdAt.title" as const,
         schema: z.string(),
       }),
     },
@@ -204,7 +204,7 @@ export const { PATCH } = createEndpoint({
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "detail.response.updatedAt.title" as const,
+        label: "detail.response.updatedAt.title" as const,
         schema: z.string(),
       }),
     },
@@ -267,12 +267,12 @@ export const { DELETE } = createEndpoint({
       title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         level: 5,
-        content: "detail.widget.confirmDelete" as const,
+        label: "detail.widget.confirmDelete" as const,
         usage: { request: "urlPathParams" },
       }),
       deleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "detail.response.deleted.title" as const,
+        label: "detail.response.deleted.title" as const,
         schema: z.boolean(),
       }),
       backButton: backButton(scopedTranslation, {

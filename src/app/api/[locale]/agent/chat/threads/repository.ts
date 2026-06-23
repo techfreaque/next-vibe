@@ -28,6 +28,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { leads } from "@/app/api/[locale]/leads/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
@@ -44,8 +45,8 @@ import {
   canPostInThread,
   canViewThread,
 } from "../permissions/permissions";
+import type definitions from "./definition";
 import type {
-  ThreadCreatedEventPayload,
   ThreadCreateRequestOutput,
   ThreadCreateResponseOutput,
   ThreadListRequestOutput,
@@ -893,17 +894,20 @@ export class ThreadsRepository {
    * Cross-instance applier for the `thread-created` event: re-run create on this
    * instance with the relayed inputs. Reuses createThread so there is one path.
    */
-  static async applyRemoteThreadCreate(
-    payload: ThreadCreatedEventPayload,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  static async applyRemoteThreadCreate({
+    requestData,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof definitions.POST,
+    "thread-created"
+  >): Promise<void> {
     const { t } = scopedTranslation.scopedT(defaultLocale);
     const result = await this.createThread(
       {
-        id: payload.id,
-        title: payload.title,
-        rootFolderId: payload.rootFolderId,
+        id: requestData.id,
+        title: requestData.title,
+        rootFolderId: requestData.rootFolderId,
         subFolderId: null,
         model: DEFAULT_CHAT_MODEL_ID,
         character: undefined,

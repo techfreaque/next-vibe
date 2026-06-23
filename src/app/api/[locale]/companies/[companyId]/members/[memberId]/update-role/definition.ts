@@ -87,7 +87,7 @@ const { PATCH } = createEndpoint({
         children: {
           memberId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "updateRole.patch.response.memberId",
+            label: "updateRole.patch.response.memberId",
             hidden: true,
             schema: z.uuid(),
           }),

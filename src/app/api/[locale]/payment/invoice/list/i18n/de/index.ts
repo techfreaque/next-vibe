@@ -2,6 +2,15 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Abrechnung",
+  enums: {
+    invoiceStatus: {
+      draft: "Entwurf",
+      open: "Offen",
+      paid: "Bezahlt",
+      void: "Storniert",
+      uncollectible: "Uneinbringlich",
+    },
+  },
   tags: {
     payment: "zahlung",
     invoice: "rechnung",

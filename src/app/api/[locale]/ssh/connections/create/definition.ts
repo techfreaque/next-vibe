@@ -113,7 +113,7 @@ export const { POST } = createEndpoint({
       }),
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.id.title",
+        label: "post.response.id.title",
         schema: z.string(),
       }),
     },

@@ -24,6 +24,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { EventPayloads } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
@@ -195,7 +196,7 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.threads.thread.id.content" as const,
+              label: "get.response.threads.thread.id.content" as const,
               schema: z.uuid(),
             }),
             title: responseField(scopedTranslation, {
@@ -212,7 +213,7 @@ const { GET } = createEndpoint({
             }),
             folderId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.threads.thread.folderId.content" as const,
+              label: "get.response.threads.thread.folderId.content" as const,
               schema: z.uuid().nullable(),
             }),
             status: responseField(scopedTranslation, {
@@ -222,17 +223,17 @@ const { GET } = createEndpoint({
             }),
             preview: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.threads.thread.preview.content" as const,
+              label: "get.response.threads.thread.preview.content" as const,
               schema: z.string().nullable(),
             }),
             pinned: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.threads.thread.pinned.content" as const,
+              label: "get.response.threads.thread.pinned.content" as const,
               schema: z.boolean(),
             }),
             archived: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.threads.thread.archived.content" as const,
+              label: "get.response.threads.thread.archived.content" as const,
               schema: z.boolean(),
             }),
             // Permission roles - nullable arrays (null = inherit, [] = deny, [roles...] = allow)
@@ -274,7 +275,7 @@ const { GET } = createEndpoint({
             // Permission flags - computed server-side based on user's roles
             canEdit: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.threads.thread.canEdit.content" as const,
+              label: "get.response.threads.thread.canEdit.content" as const,
               schema: z
                 .boolean()
                 .describe(
@@ -283,7 +284,7 @@ const { GET } = createEndpoint({
             }),
             canPost: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.threads.thread.canPost.content" as const,
+              label: "get.response.threads.thread.canPost.content" as const,
               schema: z
                 .boolean()
                 .describe(
@@ -302,7 +303,7 @@ const { GET } = createEndpoint({
             }),
             canDelete: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.threads.thread.canDelete.content" as const,
+              label: "get.response.threads.thread.canDelete.content" as const,
               schema: z
                 .boolean()
                 .describe("Whether the current user can delete this thread"),
@@ -325,12 +326,12 @@ const { GET } = createEndpoint({
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.threads.thread.createdAt.content" as const,
+              label: "get.response.threads.thread.createdAt.content" as const,
               schema: dateSchema,
             }),
             updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.threads.thread.updatedAt.content" as const,
+              label: "get.response.threads.thread.updatedAt.content" as const,
               schema: dateSchema,
             }),
           },
@@ -338,22 +339,22 @@ const { GET } = createEndpoint({
       }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalCount.content" as const,
+        label: "get.response.totalCount.content" as const,
         schema: z.coerce.number(),
       }),
       pageCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.pageCount.content" as const,
+        label: "get.response.pageCount.content" as const,
         schema: z.coerce.number(),
       }),
       currentPage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.page.content" as const,
+        label: "get.response.page.content" as const,
         schema: z.coerce.number(),
       }),
       pageSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.limit.content" as const,
+        label: "get.response.limit.content" as const,
         schema: z.coerce.number(),
       }),
     },
@@ -409,7 +410,7 @@ const { GET } = createEndpoint({
     // Framework merges the partial into the threads array by id (upsert).
     // Emitted by messages/emitter.ts for thread-scoped events that affect the sidebar.
     "thread-title-updated": {
-      fields: { threads: ["id", "title"] as const },
+      responseFields: { threads: ["id", "title"] as const },
       operation: "merge" as const,
       onEvent: onEventUpdateIncognitoThread({
         source: "requestData",
@@ -418,7 +419,7 @@ const { GET } = createEndpoint({
       }),
     },
     "streaming-state-changed": {
-      fields: { threads: ["id", "streamingState"] as const },
+      responseFields: { threads: ["id", "streamingState"] as const },
       operation: "merge" as const,
       onEvent: onEventUpdateIncognitoThread({
         source: "requestData",
@@ -427,7 +428,7 @@ const { GET } = createEndpoint({
       }),
     },
     "stream-finished": {
-      fields: {
+      responseFields: {
         threads: ["id", "streamingState", "preview", "updatedAt"] as const,
       },
       operation: "merge" as const,
@@ -569,7 +570,7 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       threadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.thread.id.content" as const,
+        label: "post.response.thread.id.content" as const,
         schema: z.uuid(),
       }),
       status: responseField(scopedTranslation, {
@@ -579,12 +580,12 @@ const { POST } = createEndpoint({
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.thread.createdAt.content" as const,
+        label: "post.response.thread.createdAt.content" as const,
         schema: dateSchema,
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.thread.updatedAt.content" as const,
+        label: "post.response.thread.updatedAt.content" as const,
         schema: dateSchema,
       }),
     },
@@ -640,12 +641,9 @@ const { POST } = createEndpoint({
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["id", "title", "rootFolderId"] as const,
-      onEvent: async ({ partial, queryClient, logger }) => {
-        if (!partial.id || !partial.rootFolderId) {
-          return;
-        }
-        const rootFolderId = partial.rootFolderId;
-        const threadId = partial.id;
+      onEvent: async ({ responseData, queryClient, logger }) => {
+        const rootFolderId = responseData.rootFolderId;
+        const threadId = responseData.id;
         const [{ apiClient }, threadsDefinition] = await Promise.all([
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("./definition"),
@@ -664,7 +662,7 @@ const { POST } = createEndpoint({
             const now = new Date();
             const newThread: ThreadListItem = {
               id: threadId,
-              title: partial.title ?? "",
+              title: responseData.title ?? "",
               rootFolderId,
               folderId: null,
               status: ThreadStatus.ACTIVE,
@@ -695,7 +693,6 @@ const { POST } = createEndpoint({
           },
           { requestData: { rootFolderId, subFolderId: null } },
         );
-        void queryClient;
       },
     },
   },

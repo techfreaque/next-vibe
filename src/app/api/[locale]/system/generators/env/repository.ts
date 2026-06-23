@@ -661,9 +661,9 @@ import { defaultLocale } from "@/i18n/core/config";
 ${imports.join("\n")}
 
 // Platform detection (will be set at runtime)
-const isServer = typeof window === "undefined";
+const isServer = typeof globalThis.document === "undefined";
 const isReactNative = false;
-const isBrowser = !isServer && typeof window !== "undefined" && !!window.document;
+const isBrowser = !isServer;
 
 const platform = {
   isServer,

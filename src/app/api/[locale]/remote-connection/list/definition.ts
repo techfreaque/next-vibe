@@ -159,5 +159,5 @@ export type RemoteConnectionsListResponseOutput =
 export type RemoteConnection =
   RemoteConnectionsListResponseOutput["connections"][number];
 
-const endpoints = { GET };
+const endpoints = { GET } as const;
 export default endpoints;

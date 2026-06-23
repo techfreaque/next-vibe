@@ -96,7 +96,7 @@ export const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       executions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.executions.title",
+        label: "get.response.executions.title",
         schema: z.array(
           z.object({
             id: z.string(),
@@ -121,17 +121,17 @@ export const { GET } = createEndpoint({
       }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalCount.title",
+        label: "get.response.totalCount.title",
         schema: z.coerce.number(),
       }),
       hasMore: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.hasMore.title",
+        label: "get.response.hasMore.title",
         schema: z.boolean(),
       }),
       summary: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.summary.title",
+        label: "get.response.summary.title",
         schema: z.object({
           totalExecutions: z.coerce.number(),
           successfulExecutions: z.coerce.number(),

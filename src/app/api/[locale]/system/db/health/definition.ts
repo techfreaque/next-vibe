@@ -45,47 +45,47 @@ const { POST } = createEndpoint({
     children: {
       healthy: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dbHealth.post.response.healthy",
+        label: "dbHealth.post.response.healthy",
         schema: z.boolean(),
       }),
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dbHealth.post.response.status",
+        label: "dbHealth.post.response.status",
         schema: z.enum(["ok", "warning", "critical"]),
       }),
       dbResponseMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dbHealth.post.response.dbResponseMs",
+        label: "dbHealth.post.response.dbResponseMs",
         schema: z.number(),
       }),
       memoryUsedPct: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dbHealth.post.response.memoryUsedPct",
+        label: "dbHealth.post.response.memoryUsedPct",
         schema: z.number(),
       }),
       heapUsedMb: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dbHealth.post.response.heapUsedMb",
+        label: "dbHealth.post.response.heapUsedMb",
         schema: z.number(),
       }),
       rssMb: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dbHealth.post.response.rssMb",
+        label: "dbHealth.post.response.rssMb",
         schema: z.number(),
       }),
       diskUsedPct: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dbHealth.post.response.diskUsedPct",
+        label: "dbHealth.post.response.diskUsedPct",
         schema: z.number().nullable(),
       }),
       uptimeHours: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dbHealth.post.response.uptimeHours",
+        label: "dbHealth.post.response.uptimeHours",
         schema: z.number(),
       }),
       warnings: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dbHealth.post.response.warnings",
+        label: "dbHealth.post.response.warnings",
         schema: z.array(z.string()),
       }),
     },

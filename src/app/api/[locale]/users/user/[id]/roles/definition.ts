@@ -87,17 +87,17 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       roleId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "roles.post.response.roleId.content" as const,
+        label: "roles.post.response.roleId.content" as const,
         schema: z.string().uuid().describe("Role assignment ID"),
       }),
       userId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "roles.post.response.userId.content" as const,
+        label: "roles.post.response.userId.content" as const,
         schema: z.string().uuid().describe("User ID"),
       }),
       assignedRole: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "roles.post.response.assignedRole.content" as const,
+        label: "roles.post.response.assignedRole.content" as const,
         schema: z.string().describe("Assigned role"),
       }),
     },

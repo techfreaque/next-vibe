@@ -83,40 +83,6 @@ interface RemoteConnectionByIdWidgetProps {
   field: (typeof definitionsType.PATCH)["fields"];
 }
 
-// ─── Hook: fetch sync providers from the server ────────────────────────────────
-
-function useSyncProviders(): SyncProviderInfo[] {
-  const [providers, setProviders] = useState<SyncProviderInfo[]>([]);
-  const locale = useWidgetLocale();
-  const user = useWidgetUser();
-  const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
-
-  useEffect(() => {
-    if (user.isPublic) {
-      return;
-    }
-    void (async (): Promise<void> => {
-      const { apiClient } =
-        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
-      const result = await apiClient.fetch(
-        syncProvidersDefinitions.GET,
-        logger,
-        user,
-        undefined,
-        undefined,
-        locale,
-        availability,
-      );
-      if (result.success) {
-        setProviders(result.data.providers);
-      }
-    })();
-  }, [user, locale, logger, availability]);
-
-  return providers;
-}
-
 // ─── Sync scope editor (form-context aware, provider-driven) ──────────────────
 
 function SyncScopeEditor({
@@ -126,7 +92,16 @@ function SyncScopeEditor({
 }): JSX.Element {
   const { setValue } = useFormContext();
   const syncScope = useWatch({ name: "syncScope" }) as SyncScope | undefined;
-  const providers = useSyncProviders();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const syncProvidersEndpoint = useEndpoint(
+    syncProvidersDefinitions,
+    undefined,
+    logger,
+    user,
+  );
+  const providers: SyncProviderInfo[] =
+    syncProvidersEndpoint.read?.data?.providers ?? [];
 
   const current: Record<string, boolean> = {};
   for (const p of providers) {
@@ -157,11 +132,6 @@ function SyncScopeEditor({
               {p.description && (
                 <P className="text-xs text-muted-foreground">{p.description}</P>
               )}
-              {p.isLiveOnly && (
-                <P className="text-[10px] text-primary/70 italic">
-                  {t("widget.liveSync.liveOnlyBadge")}
-                </P>
-              )}
             </Div>
             <Switch
               checked={current[p.key] ?? false}
@@ -183,7 +153,16 @@ function SyncScopeViewSection({
   syncScope: SyncScope | null;
 }): JSX.Element | null {
   const { t } = scopedTranslation.scopedT(useWidgetLocale());
-  const providers = useSyncProviders();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const syncProvidersEndpoint = useEndpoint(
+    syncProvidersDefinitions,
+    undefined,
+    logger,
+    user,
+  );
+  const providers: SyncProviderInfo[] =
+    syncProvidersEndpoint.read?.data?.providers ?? [];
 
   if (!syncScope || providers.length === 0) {
     return null;
@@ -457,24 +436,6 @@ function ViewWidget({ instanceId }: { instanceId: string }): JSX.Element {
       {isAdmin && (
         <SectionGroup title={t("widget.behaviorSection")}>
           <DetailGrid columns={2}>
-            {status.loopLocation && (
-              <DetailField
-                label={t("patch.loopLocation.label")}
-                value={status.loopLocation}
-              />
-            )}
-            {status.threadMirrorMode && (
-              <DetailField
-                label={t("patch.threadMirrorMode.label")}
-                value={status.threadMirrorMode}
-              />
-            )}
-            {status.toolSource && (
-              <DetailField
-                label={t("patch.toolSource.label")}
-                value={status.toolSource}
-              />
-            )}
             <DetailField
               label={t("patch.isInferenceProvider.label")}
               value={
@@ -588,7 +549,6 @@ function EditWidget({ field }: RemoteConnectionByIdWidgetProps): JSX.Element {
   const user = useWidgetUser();
   const { pop, canGoBack } = useWidgetNavigation();
   const emptyField = useMemo(() => ({}), []);
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const isAdmin =
     !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN) === true;
@@ -596,7 +556,6 @@ function EditWidget({ field }: RemoteConnectionByIdWidgetProps): JSX.Element {
 
   return (
     <WidgetShell>
-      {/* Sticky header with back + save */}
       <Div className="flex items-center gap-2 px-4 pt-4 pb-3 sticky top-0 bg-background z-10 border-b">
         {canGoBack ? (
           <Button
@@ -642,61 +601,27 @@ function EditWidget({ field }: RemoteConnectionByIdWidgetProps): JSX.Element {
           </Div>
         </SectionGroup>
 
-        {/* ── Transport + Behavior + Sync — admin only ──────────────── */}
+        {/* ── Behavior + Sync — admin only, always visible ──────────── */}
         {isAdmin && (
           <>
-            {/* Advanced settings toggle */}
-            <Div
-              className="flex items-center gap-2 cursor-pointer select-none py-1 border-t pt-3"
-              onClick={() => setShowAdvanced((v) => !v)}
-            >
-              {showAdvanced ? (
-                <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-              )}
-              <P className="text-xs font-medium text-muted-foreground">
-                {t("widget.behaviorSection")}
-              </P>
-            </Div>
-
-            {showAdvanced && (
-              <Div className="flex flex-col gap-5 border rounded-md px-4 py-4 bg-muted/20">
-                {/* Transport is auto-negotiated — read-only status shown in
-                    the status section, never an editable setting (spec.md) */}
-
-                {/* AI behavior */}
-                <SectionGroup title={t("patch.isInferenceProvider.label")}>
-                  <Div className="flex flex-col gap-3">
-                    <BooleanFieldWidget
-                      fieldName="isInferenceProvider"
-                      field={children.isInferenceProvider}
-                    />
-                    <SelectFieldWidget
-                      fieldName="loopLocation"
-                      field={children.loopLocation}
-                    />
-                    <SelectFieldWidget
-                      fieldName="threadMirrorMode"
-                      field={children.threadMirrorMode}
-                    />
-                    <SelectFieldWidget
-                      fieldName="toolSource"
-                      field={children.toolSource}
-                    />
-                  </Div>
-                </SectionGroup>
-
-                {/* Force system provider */}
+            <SectionGroup title={t("widget.behaviorSection")}>
+              <Div className="flex flex-col gap-3">
+                <BooleanFieldWidget
+                  fieldName="isInferenceProvider"
+                  field={children.isInferenceProvider}
+                />
+                <SelectFieldWidget
+                  fieldName="transportMode"
+                  field={children.transportMode}
+                />
                 <BooleanFieldWidget
                   fieldName="forceSystemProvider"
                   field={children.forceSystemProvider}
                 />
-
-                {/* Sync scope — per provider */}
-                <SyncScopeEditor t={t} />
               </Div>
-            )}
+            </SectionGroup>
+
+            <SyncScopeEditor t={t} />
           </>
         )}
       </Div>

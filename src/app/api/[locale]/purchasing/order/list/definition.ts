@@ -24,7 +24,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { PurchaseOrderStatusDB } from "../../enum";
+import { PurchaseOrderStatusDB, PurchaseOrderStatusOptions } from "../../enum";
 import { scopedTranslation } from "../../i18n";
 import { PURCHASING_ORDERS_ALIAS } from "./constants";
 
@@ -69,6 +69,7 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.SELECT,
         label: "orderList.get.status.label" as const,
         description: "orderList.get.status.description" as const,
+        options: PurchaseOrderStatusOptions,
         schema: z.enum(PurchaseOrderStatusDB).optional(),
       }),
 
@@ -81,51 +82,51 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "orderList.get.response.id" as const,
+              label: "orderList.get.response.id" as const,
               hidden: true,
               schema: z.uuid(),
             }),
             poNumber: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "orderList.get.response.poNumber" as const,
+              label: "orderList.get.response.poNumber" as const,
               schema: z.string(),
             }),
             vendorId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "orderList.get.response.vendorId" as const,
+              label: "orderList.get.response.vendorId" as const,
               hidden: true,
               schema: z.uuid(),
             }),
             vendorName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "orderList.get.response.vendorName" as const,
+              label: "orderList.get.response.vendorName" as const,
               schema: z.string(),
             }),
             status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "orderList.get.response.status" as const,
+              label: "orderList.get.response.status" as const,
               schema: z.string(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "orderList.get.response.currency" as const,
+              label: "orderList.get.response.currency" as const,
               schema: z.string(),
             }),
             total: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "orderList.get.response.total" as const,
+              label: "orderList.get.response.total" as const,
               fieldType: FieldDataType.NUMBER,
               schema: z.number(),
             }),
             expectedDeliveryDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "orderList.get.response.expectedDeliveryDate" as const,
+              label: "orderList.get.response.expectedDeliveryDate" as const,
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date().nullable(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "orderList.get.response.createdAt" as const,
+              label: "orderList.get.response.createdAt" as const,
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date(),
             }),

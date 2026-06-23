@@ -173,59 +173,59 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.id",
+        label: "post.response.id",
         schema: z.uuid(),
       }),
       responseLeadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.leadId",
+        label: "post.response.leadId",
         schema: z.uuid(),
       }),
       responseEngagementType: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.engagementType",
+        label: "post.response.engagementType",
         schema: z.enum(EngagementTypesDB),
       }),
       responseCampaignId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.campaignId",
+        label: "post.response.campaignId",
         schema: z.uuid().optional(),
       }),
       responseMetadata: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.metadata",
+        label: "post.response.metadata",
         schema: z
           .record(z.string(), z.string().or(z.coerce.number()).or(z.boolean()))
           .optional(),
       }),
       timestamp: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.timestamp",
+        label: "post.response.timestamp",
         schema: dateSchema,
       }),
       ipAddress: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.ipAddress",
+        label: "post.response.ipAddress",
         schema: z.string().optional(),
       }),
       userAgent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.userAgent",
+        label: "post.response.userAgent",
         schema: z.string().optional(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.createdAt",
+        label: "post.response.createdAt",
         schema: dateSchema,
       }),
       leadCreated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.leadCreated",
+        label: "post.response.leadCreated",
         schema: z.boolean().optional(),
       }),
       relationshipEstablished: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.relationshipEstablished",
+        label: "post.response.relationshipEstablished",
         schema: z.boolean().optional(),
       }),
     },
@@ -436,37 +436,37 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.success",
+        label: "get.response.success",
         schema: z.boolean(),
       }),
       redirectUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.redirectUrl",
+        label: "get.response.redirectUrl",
         schema: z.string().optional(),
       }),
       responseLeadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.leadId",
+        label: "get.response.leadId",
         schema: z.string().optional(),
       }),
       responseCampaignId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.campaignId",
+        label: "get.response.campaignId",
         schema: z.uuid().optional(),
       }),
       engagementRecorded: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.engagementRecorded",
+        label: "get.response.engagementRecorded",
         schema: z.boolean(),
       }),
       leadStatusUpdated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.leadStatusUpdated",
+        label: "get.response.leadStatusUpdated",
         schema: z.boolean(),
       }),
       isLoggedIn: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.isLoggedIn",
+        label: "get.response.isLoggedIn",
         schema: z.boolean(),
       }),
     },

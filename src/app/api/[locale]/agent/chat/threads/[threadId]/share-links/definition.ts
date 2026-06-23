@@ -72,25 +72,25 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "empty" as const,
+              label: "empty" as const,
               order: 999,
               schema: z.string().uuid(),
             }),
             token: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "empty" as const,
+              label: "empty" as const,
               order: 999,
               schema: z.string(),
             }),
             label: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "shareLink.label" as const,
+              label: "shareLink.label" as const,
               order: 1,
               schema: z.string().nullable(),
             }),
             shareUrl: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "shareLink.shareUrl" as const,
+              label: "shareLink.shareUrl" as const,
               order: 2,
               schema: z.string(),
             }),
@@ -117,19 +117,19 @@ const { GET } = createEndpoint({
             }),
             accessCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "shareLink.accessCount" as const,
+              label: "shareLink.accessCount" as const,
               order: 6,
               schema: z.number(),
             }),
             lastAccessedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "shareLink.lastAccessedAt" as const,
+              label: "shareLink.lastAccessedAt" as const,
               order: 7,
               schema: dateSchema.nullable(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "shareLink.createdAt" as const,
+              label: "shareLink.createdAt" as const,
               order: 8,
               schema: dateSchema,
             }),
@@ -259,12 +259,12 @@ const { POST } = createEndpoint({
       }),
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "empty" as const,
+        label: "empty" as const,
         schema: z.string().uuid(),
       }),
       token: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "empty" as const,
+        label: "empty" as const,
         schema: z.string(),
       }),
 
@@ -415,7 +415,7 @@ const { PATCH } = createEndpoint({
       }),
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "empty" as const,
+        label: "empty" as const,
         schema: z.string().uuid(),
       }),
 
@@ -545,32 +545,32 @@ const { DELETE } = createEndpoint({
       // === RESPONSE ===
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "empty" as const,
+        label: "empty" as const,
         schema: z.string().uuid(),
       }),
       token: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "empty" as const,
+        label: "empty" as const,
         schema: z.string(),
       }),
       label: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "empty" as const,
+        label: "empty" as const,
         schema: z.string().nullable(),
       }),
       allowPosting: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "empty" as const,
+        label: "empty" as const,
         schema: z.boolean(),
       }),
       requireAuth: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "empty" as const,
+        label: "empty" as const,
         schema: z.boolean(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "empty" as const,
+        label: "empty" as const,
         schema: dateSchema,
       }),
 

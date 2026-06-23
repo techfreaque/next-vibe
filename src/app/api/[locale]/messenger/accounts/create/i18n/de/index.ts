@@ -1,5 +1,16 @@
 import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
+  countries: {
+    global: "Global",
+    de: "Deutschland",
+    pl: "Polen",
+    us: "USA",
+  },
+  languages: {
+    en: "Englisch",
+    de: "Deutsch",
+    pl: "Polnisch",
+  },
   tags: {
     messaging: "Messaging",
   },
@@ -7,6 +18,34 @@ export const translations: typeof enTranslations = {
   titleShort: "Neues Konto",
   description: "Ein neues Messenger-Konto erstellen",
   enums: {
+    campaignType: {
+      leadCampaign: "Lead-Kampagne",
+      newsletter: "Newsletter",
+      signupNurture: "Anmelde-Nurturing",
+      retention: "Kundenbindung",
+      winback: "Rückgewinnung",
+      transactional: "Transaktional",
+      notification: "Benachrichtigung",
+      system: "System",
+    },
+    emailJourneyVariant: {
+      uncensoredConvert: "Unzensiert konvertieren",
+      sideHustle: "Nebenprojekt",
+      quietRecommendation: "Stille Empfehlung",
+      signupNurture: "Anmelde-Nurturing",
+      retention: "Kundenbindung",
+      winback: "Rückgewinnung",
+      newsletterMay2026: "Newsletter Mai 2026",
+    },
+    emailCampaignStage: {
+      notStarted: "Nicht gestartet",
+      initial: "Initial",
+      followup1: "Follow-up 1",
+      followup2: "Follow-up 2",
+      followup3: "Follow-up 3",
+      nurture: "Nurture",
+      reactivation: "Reaktivierung",
+    },
     channel: {
       email: "E-Mail",
       sms: "SMS",

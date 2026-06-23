@@ -54,32 +54,32 @@ const { GET } = createEndpoint({
     children: {
       spendToday: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.spendToday.content" as const,
+        label: "get.spendToday.content" as const,
         schema: z.number(),
       }),
       capAmount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.capAmount.content" as const,
+        label: "get.capAmount.content" as const,
         schema: z.number(),
       }),
       remainingToday: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.remainingToday.content" as const,
+        label: "get.remainingToday.content" as const,
         schema: z.number(),
       }),
       percentUsed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.percentUsed.content" as const,
+        label: "get.percentUsed.content" as const,
         schema: z.number(),
       }),
       lastResetAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.lastResetAt.content" as const,
+        label: "get.lastResetAt.content" as const,
         schema: z.string(),
       }),
       capExceeded: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.capExceeded.content" as const,
+        label: "get.capExceeded.content" as const,
         schema: z.boolean(),
       }),
     },
@@ -174,7 +174,7 @@ const { POST } = createEndpoint({
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.message.content" as const,
+        label: "post.message.content" as const,
         schema: z.string(),
       }),
     },

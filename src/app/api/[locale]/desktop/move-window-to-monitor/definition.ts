@@ -145,12 +145,12 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "move-window-to-monitor.response.success",
+        label: "move-window-to-monitor.response.success",
         schema: z.boolean().describe("Whether the move succeeded"),
       }),
       movedTo: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "move-window-to-monitor.response.movedTo",
+        label: "move-window-to-monitor.response.movedTo",
         schema: z
           .string()
           .optional()
@@ -158,7 +158,7 @@ const { POST } = createEndpoint({
       }),
       windowTitle: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "move-window-to-monitor.response.windowTitle",
+        label: "move-window-to-monitor.response.windowTitle",
         schema: z
           .string()
           .optional()
@@ -166,7 +166,7 @@ const { POST } = createEndpoint({
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "move-window-to-monitor.response.error",
+        label: "move-window-to-monitor.response.error",
         schema: z
           .string()
           .optional()
@@ -174,7 +174,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "move-window-to-monitor.response.executionId",
+        label: "move-window-to-monitor.response.executionId",
         schema: z
           .string()
           .optional()

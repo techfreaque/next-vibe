@@ -66,42 +66,36 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.success.content" as const,
         label: "fields.success.title",
         schema: z.boolean(),
       }),
 
       isAccessible: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.isAccessible.content" as const,
         label: "fields.isAccessible.title",
         schema: z.boolean(),
       }),
 
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.output.content" as const,
         label: "fields.output.title",
         schema: z.string(),
       }),
 
       totalConnections: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.connectionInfo.totalConnections.content" as const,
         label: "fields.connectionInfo.totalConnections.content",
         schema: z.coerce.number(),
       }),
 
       idleConnections: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.connectionInfo.idleConnections.content" as const,
         label: "fields.connectionInfo.idleConnections.content",
         schema: z.coerce.number(),
       }),
 
       waitingClients: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.connectionInfo.waitingClients.content" as const,
         label: "fields.connectionInfo.waitingClients.content",
         schema: z.coerce.number(),
       }),

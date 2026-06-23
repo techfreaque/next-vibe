@@ -19,12 +19,8 @@ export const { POST, tools } = endpointsHandler({
     // submitted (gated by syncScope["favorites"]); re-run create here so the
     // favorite exists on this instance too. Reuses the one create code path.
     onRemoteEvent: {
-      "favorite-created": (payload, ctx) =>
-        FavoritesCreateRepository.applyRemoteFavoriteCreate(
-          payload,
-          ctx.user,
-          ctx.logger,
-        ),
+      "favorite-created": (props) =>
+        FavoritesCreateRepository.applyRemoteFavoriteCreate(props),
     },
   },
 });

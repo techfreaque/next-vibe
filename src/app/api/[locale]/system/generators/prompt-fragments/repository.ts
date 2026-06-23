@@ -382,14 +382,24 @@ export class PromptFragmentsGeneratorRepository {
     // Map of fragmentId → dataVar (for the return object)
     const dataEntries: string[] = [];
 
+    // Collect which fragment export names are actually used in buildLines (client-backed fragments only)
+    const usedExportNames = new Set<string>(
+      fragments
+        .filter((f) => f.clientImportPath && f.hookExportName)
+        .map((f) => f.ownExportName),
+    );
+
     for (const f of fragments) {
-      if (!seenPrompt.has(f.promptImportPath)) {
+      // Only import fragments that are actually used in the client hook (have a client.ts)
+      const usedNames = f.fragmentExportNames.filter((n) =>
+        usedExportNames.has(n),
+      );
+      if (usedNames.length > 0 && !seenPrompt.has(f.promptImportPath)) {
         seenPrompt.add(f.promptImportPath);
-        const names = f.fragmentExportNames.join(", ");
         fragmentImports.push(
-          `import { ${names} } from "${f.promptImportPath}";`,
+          `import { ${usedNames.join(", ")} } from "${f.promptImportPath}";`,
         );
-        for (const name of f.fragmentExportNames) {
+        for (const name of usedNames) {
           fragmentExportNames.push(name);
         }
       }
@@ -499,11 +509,14 @@ ${fragments
       },
     );
 
-    // Each fragment ID gets its own case (multiple IDs may point to the same file - that's fine)
-    const allPromptCases = fragments.map(
-      (f) =>
-        `    case "${f.id}":\n      return import("${f.promptImportPath}") as Promise<Record<string, unknown>>;`,
-    );
+    // Each fragment ID gets its own case (multiple IDs may point to the same file - that's fine).
+    // Use .then() to extract only the fragment exports so TS doesn't complain about non-fragment
+    // exports (enums, interfaces, helper consts) that may exist in the same file.
+    const allPromptCases = fragments.map((f) => {
+      const names = f.fragmentExportNames.join(", ");
+      const obj = f.fragmentExportNames.map((n) => `${n}`).join(", ");
+      return `    case "${f.id}":\n      return import("${f.promptImportPath}").then(({ ${names} }) => ({ ${obj} }));`;
+    });
 
     // Fragment IDs list
     const fragmentIdList = fragments.map((f) => `  "${f.id}",`).join("\n");
@@ -531,7 +544,7 @@ export type PromptFragmentId = (typeof PROMPT_FRAGMENT_IDS)[number];
  */
 export async function getPromptFragment(
   id: PromptFragmentId,
-): Promise<Record<string, unknown>> {
+): Promise<PromptFragmentModule> {
   switch (id) {
 ${allPromptCases.join("\n")}
     default:

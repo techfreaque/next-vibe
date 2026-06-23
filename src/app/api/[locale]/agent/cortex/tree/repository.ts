@@ -32,16 +32,6 @@ import {
 } from "../repository";
 import type { CortexTreeT } from "./i18n";
 
-interface TreeParams {
-  userId: string;
-  user: JwtPrivatePayloadType;
-  locale: CountryLanguage;
-  path: string;
-  maxDepth: number;
-  logger: EndpointLogger;
-  t: CortexTreeT;
-}
-
 export class CortexTreeRepository {
   static async getTree({
     userId,
@@ -51,7 +41,15 @@ export class CortexTreeRepository {
     maxDepth,
     logger,
     t,
-  }: TreeParams): Promise<
+  }: {
+    userId: string;
+    user: JwtPrivatePayloadType;
+    locale: CountryLanguage;
+    path: string;
+    maxDepth: number;
+    logger: EndpointLogger;
+    t: CortexTreeT;
+  }): Promise<
     ResponseType<{ tree: string; totalFiles: number; totalDirs: number }>
   > {
     const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);

@@ -83,7 +83,7 @@ const { POST } = createEndpoint({
 
       updated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "updated.label",
+        label: "updated.label",
         schema: z.boolean(),
       }),
     },

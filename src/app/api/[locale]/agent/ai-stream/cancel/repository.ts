@@ -229,7 +229,7 @@ export class cancelRepository {
           thread.rootFolderId,
           logger,
           user,
-        )("stream-finished", { streamingState: "idle" });
+        )("stream-finished", { streamingState: ThreadStreamingState.IDLE });
         logger.info(
           "[Cancel] No active stream found - cleared DB flag, cancelled tasks, emitted STREAM_FINISHED",
           { threadId },

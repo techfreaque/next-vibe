@@ -598,27 +598,27 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.success",
+        label: "post.response.success",
         schema: z.boolean(),
       }),
       messageId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.messageId",
+        label: "post.response.messageId",
         schema: z.string(),
       }),
       responseThreadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.threadId",
+        label: "post.response.threadId",
         schema: z.string().optional(),
       }),
       totalTokens: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.totalTokens",
+        label: "post.response.totalTokens",
         schema: z.coerce.number().optional(),
       }),
       finishReason: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.finishReason",
+        label: "post.response.finishReason",
         schema: z.string().optional(),
       }),
     },

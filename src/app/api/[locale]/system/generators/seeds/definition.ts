@@ -106,27 +106,27 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.title",
+        label: "post.title",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.title",
+        label: "post.title",
         schema: z.string(),
       }),
       seedsFound: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.title",
+        label: "post.title",
         schema: z.coerce.number(),
       }),
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.title",
+        label: "post.title",
         schema: z.coerce.number(),
       }),
       outputPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.title",
+        label: "post.title",
         schema: z.string(),
       }),
     },

@@ -83,7 +83,7 @@ const { DELETE } = createEndpoint({
       title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         level: 5,
-        content: "delete.container.description",
+        label: "delete.container.description",
         usage: { request: "urlPathParams" },
       }),
       // === URL PARAMETERS ===

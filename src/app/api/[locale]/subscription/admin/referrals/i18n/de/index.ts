@@ -213,4 +213,29 @@ export const translations: typeof enTranslations = {
       proceed: "Bestätigen",
     },
   },
+  enums: {
+    payoutStatusFilter: {
+      all: "Alle",
+      pending: "Ausstehend",
+      approved: "Genehmigt",
+      rejected: "Abgelehnt",
+      processing: "In Bearbeitung",
+      completed: "Abgeschlossen",
+      failed: "Fehlgeschlagen",
+    },
+    referralSortField: {
+      createdAt: "Erstellt am",
+      earnings: "Gesamtverdienst",
+      signups: "Anmeldungen",
+    },
+    sortOrder: {
+      asc: "Aufsteigend",
+      desc: "Absteigend",
+    },
+    payoutAction: {
+      approve: "Genehmigen",
+      reject: "Ablehnen",
+      complete: "Abschließen",
+    },
+  },
 };

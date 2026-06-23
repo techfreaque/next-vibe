@@ -58,27 +58,27 @@ const { GET } = createEndpoint({
 
       draftCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.draftCount" as const,
+        label: "dashboard.get.response.draftCount" as const,
         schema: z.number(),
       }),
       confirmedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.confirmedCount" as const,
+        label: "dashboard.get.response.confirmedCount" as const,
         schema: z.number(),
       }),
       awaitingReceiptCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.awaitingReceiptCount" as const,
+        label: "dashboard.get.response.awaitingReceiptCount" as const,
         schema: z.number(),
       }),
       activeVendorCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.activeVendorCount" as const,
+        label: "dashboard.get.response.activeVendorCount" as const,
         schema: z.number(),
       }),
       dueThisWeekCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "dashboard.get.response.dueThisWeekCount" as const,
+        label: "dashboard.get.response.dueThisWeekCount" as const,
         schema: z.number(),
       }),
     },

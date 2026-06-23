@@ -1,6 +1,13 @@
 export const translations = {
   category: "System",
 
+  enums: {
+    level: {
+      error: "Error",
+      warn: "Warning",
+    },
+  },
+
   post: {
     title: "Report Client Error",
     titleShort: "Log Error",

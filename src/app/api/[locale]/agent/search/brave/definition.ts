@@ -175,7 +175,7 @@ const { GET } = createEndpoint({
           children: {
             title: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.title" as const,
+              label: "get.response.results.title" as const,
               schema: z.string(),
             }),
             url: responseField(scopedTranslation, {
@@ -187,17 +187,17 @@ const { GET } = createEndpoint({
             }),
             snippet: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.item.snippet" as const,
+              label: "get.response.results.item.snippet" as const,
               schema: z.string(),
             }),
             age: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.item.age" as const,
+              label: "get.response.results.item.age" as const,
               schema: z.string().optional(),
             }),
             source: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.item.source" as const,
+              label: "get.response.results.item.source" as const,
               schema: z.string().optional(),
             }),
           },

@@ -13,7 +13,8 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
@@ -31,12 +32,7 @@ import type {
 /**
  * Processes and handles SMS messages triggered by API responses
  */
-export async function handleSms<
-  TRequest,
-  TResponse,
-  TUrlVariables,
-  TScopedTranslationKey extends string,
->({
+export async function handleSms<TEndpoint extends CreateApiEndpointAny>({
   sms,
   user,
   responseData,
@@ -47,15 +43,16 @@ export async function handleSms<
   locale,
   logger,
 }: {
-  sms:
-    | SmsConfig<TRequest, TResponse, TUrlVariables, TScopedTranslationKey>
-    | undefined;
-  user: JwtPayloadType;
-  responseData: TResponse;
-  urlPathParams: TUrlVariables;
-  requestData: TRequest;
+  sms: SmsConfig<TEndpoint> | undefined;
+  user: InferJwtPayloadTypeFromRoles<TEndpoint["allowedRoles"]>;
+  responseData: TEndpoint["types"]["ResponseOutput"];
+  urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+  requestData: TEndpoint["types"]["RequestOutput"];
   options?: SmsHandlerOptions;
-  t: (key: TScopedTranslationKey, params?: TParams) => TranslatedKeyType;
+  t: (
+    key: TEndpoint["types"]["ScopedTranslationKey"],
+    params?: TParams,
+  ) => TranslatedKeyType;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }): Promise<ResponseType<UndefinedType>> {

@@ -87,12 +87,7 @@ export const getJoyrideLabels = (
 });
 
 function getCssVar(token: string): string {
-  if (typeof window === "undefined") {
-    return "";
-  }
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(token)
-    .trim();
+  return getRootCssVar(token);
 }
 
 // Wrap a raw CSS var value in hsl() if it looks like bare HSL numbers,

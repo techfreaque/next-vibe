@@ -57,6 +57,12 @@ export const translations = {
       },
       timeout: { title: "Timeout", description: "Connection timed out" },
     },
+    response: {
+      ok: { title: "OK" },
+      latencyMs: { title: "Latency (ms)" },
+      fingerprint: { title: "Fingerprint" },
+      fingerprintChanged: { title: "Fingerprint Changed" },
+    },
     success: {
       title: "Connection Successful",
       description: "SSH connection test passed",

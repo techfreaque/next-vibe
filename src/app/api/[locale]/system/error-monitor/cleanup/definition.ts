@@ -50,27 +50,27 @@ const { POST } = createEndpoint({
     children: {
       deletedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "errorMonitor.cleanup.post.response.deletedCount",
+        label: "errorMonitor.cleanup.post.response.deletedCount",
         schema: z.number(),
       }),
       deletedByTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "errorMonitor.cleanup.post.response.deletedByTime",
+        label: "errorMonitor.cleanup.post.response.deletedByTime",
         schema: z.number(),
       }),
       deletedByCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "errorMonitor.cleanup.post.response.deletedByCount",
+        label: "errorMonitor.cleanup.post.response.deletedByCount",
         schema: z.number(),
       }),
       retentionDays: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "errorMonitor.cleanup.post.response.retentionDays",
+        label: "errorMonitor.cleanup.post.response.retentionDays",
         schema: z.number(),
       }),
       maxRows: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "errorMonitor.cleanup.post.response.maxRows",
+        label: "errorMonitor.cleanup.post.response.maxRows",
         schema: z.number(),
       }),
     },

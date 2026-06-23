@@ -58,6 +58,16 @@ export const translations = {
       description: "Estimates retrieved",
     },
   },
+  enums: {
+    estimateStatus: {
+      DRAFT: "Draft",
+      SENT: "Sent",
+      ACCEPTED: "Accepted",
+      DECLINED: "Declined",
+      EXPIRED: "Expired",
+      CONVERTED: "Converted",
+    },
+  },
   companyId: {
     label: "Company ID",
     description: "Filter by company",

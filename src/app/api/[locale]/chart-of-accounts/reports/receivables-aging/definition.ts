@@ -68,7 +68,7 @@ const { GET } = createEndpoint({
 
       asOfDateResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "receivablesAging.response.asOfDate" as const,
+        label: "receivablesAging.response.asOfDate" as const,
         schema: z.string(),
       }),
       bucketsCurrentItems: responseArrayField(scopedTranslation, {
@@ -80,22 +80,22 @@ const { GET } = createEndpoint({
           children: {
             invoiceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.invoiceId" as const,
+              label: "receivablesAging.response.invoiceId" as const,
               schema: z.string(),
             }),
             customerId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.customerId" as const,
+              label: "receivablesAging.response.customerId" as const,
               schema: z.string(),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.amount" as const,
+              label: "receivablesAging.response.amount" as const,
               schema: z.number(),
             }),
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.dueDate" as const,
+              label: "receivablesAging.response.dueDate" as const,
               schema: z.string(),
             }),
           },
@@ -110,22 +110,22 @@ const { GET } = createEndpoint({
           children: {
             invoiceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.invoiceId" as const,
+              label: "receivablesAging.response.invoiceId" as const,
               schema: z.string(),
             }),
             customerId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.customerId" as const,
+              label: "receivablesAging.response.customerId" as const,
               schema: z.string(),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.amount" as const,
+              label: "receivablesAging.response.amount" as const,
               schema: z.number(),
             }),
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.dueDate" as const,
+              label: "receivablesAging.response.dueDate" as const,
               schema: z.string(),
             }),
           },
@@ -140,22 +140,22 @@ const { GET } = createEndpoint({
           children: {
             invoiceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.invoiceId" as const,
+              label: "receivablesAging.response.invoiceId" as const,
               schema: z.string(),
             }),
             customerId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.customerId" as const,
+              label: "receivablesAging.response.customerId" as const,
               schema: z.string(),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.amount" as const,
+              label: "receivablesAging.response.amount" as const,
               schema: z.number(),
             }),
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.dueDate" as const,
+              label: "receivablesAging.response.dueDate" as const,
               schema: z.string(),
             }),
           },
@@ -170,22 +170,22 @@ const { GET } = createEndpoint({
           children: {
             invoiceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.invoiceId" as const,
+              label: "receivablesAging.response.invoiceId" as const,
               schema: z.string(),
             }),
             customerId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.customerId" as const,
+              label: "receivablesAging.response.customerId" as const,
               schema: z.string(),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.amount" as const,
+              label: "receivablesAging.response.amount" as const,
               schema: z.number(),
             }),
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.dueDate" as const,
+              label: "receivablesAging.response.dueDate" as const,
               schema: z.string(),
             }),
           },
@@ -200,22 +200,22 @@ const { GET } = createEndpoint({
           children: {
             invoiceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.invoiceId" as const,
+              label: "receivablesAging.response.invoiceId" as const,
               schema: z.string(),
             }),
             customerId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.customerId" as const,
+              label: "receivablesAging.response.customerId" as const,
               schema: z.string(),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.amount" as const,
+              label: "receivablesAging.response.amount" as const,
               schema: z.number(),
             }),
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "receivablesAging.response.dueDate" as const,
+              label: "receivablesAging.response.dueDate" as const,
               schema: z.string(),
             }),
           },
@@ -223,32 +223,32 @@ const { GET } = createEndpoint({
       }),
       totalsCurrent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "receivablesAging.response.current" as const,
+        label: "receivablesAging.response.current" as const,
         schema: z.number(),
       }),
       totalsDays1to30: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "receivablesAging.response.days1to30" as const,
+        label: "receivablesAging.response.days1to30" as const,
         schema: z.number(),
       }),
       totalsDays31to60: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "receivablesAging.response.days31to60" as const,
+        label: "receivablesAging.response.days31to60" as const,
         schema: z.number(),
       }),
       totalsDays61to90: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "receivablesAging.response.days61to90" as const,
+        label: "receivablesAging.response.days61to90" as const,
         schema: z.number(),
       }),
       totalsOver90: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "receivablesAging.response.over90" as const,
+        label: "receivablesAging.response.over90" as const,
         schema: z.number(),
       }),
       totalsTotal: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "receivablesAging.response.total" as const,
+        label: "receivablesAging.response.total" as const,
         schema: z.number(),
       }),
     },

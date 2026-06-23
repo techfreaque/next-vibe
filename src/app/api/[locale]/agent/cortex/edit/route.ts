@@ -23,8 +23,7 @@ export const { PATCH, tools } = endpointsHandler({
         t,
       }),
     onRemoteEvent: {
-      "node-written": (payload, ctx) =>
-        CortexEditRepository.applyRemoteEdit(payload, ctx.user, ctx.logger),
+      "node-written": (props) => CortexEditRepository.applyRemoteEdit(props),
     },
   },
 });

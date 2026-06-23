@@ -57,25 +57,25 @@ const { POST } = createEndpoint({
 
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.success" as const,
+        label: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.message" as const,
+        label: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
       newEstimateId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.newEstimateId" as const,
+        label: "post.response.newEstimateId" as const,
         schema: z.string(),
       }),
 
       estimateNumber: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.estimateNumber" as const,
+        label: "post.response.estimateNumber" as const,
         schema: z.string(),
       }),
     },

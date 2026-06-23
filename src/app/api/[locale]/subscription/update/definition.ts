@@ -79,42 +79,42 @@ const { PUT } = createEndpoint({
       // RESPONSE ONLY FIELDS
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.id" as const,
+        label: "response.id" as const,
         schema: z.uuid(),
       }),
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.status" as const,
+        label: "response.status" as const,
         schema: z.enum(SubscriptionStatus),
       }),
       currentPeriodStart: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.currentPeriodStart" as const,
+        label: "response.currentPeriodStart" as const,
         schema: z.string(),
       }),
       currentPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.currentPeriodEnd" as const,
+        label: "response.currentPeriodEnd" as const,
         schema: z.string(),
       }),
       cancelAtPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.cancelAtPeriodEnd" as const,
+        label: "response.cancelAtPeriodEnd" as const,
         schema: z.boolean(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.createdAt" as const,
+        label: "response.createdAt" as const,
         schema: z.string(),
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.updatedAt" as const,
+        label: "response.updatedAt" as const,
         schema: z.string(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.message" as const,
+        label: "response.message" as const,
         schema: z.string(),
       }),
     },

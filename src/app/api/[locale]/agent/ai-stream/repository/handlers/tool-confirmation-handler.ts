@@ -17,10 +17,10 @@ import {
   CallbackMode,
   EXECUTE_TOOL_ALIAS,
 } from "@/app/api/[locale]/system/unified-interface/execute-tool/constants";
+import { detectWakeUpConfirmRace } from "@/app/api/[locale]/system/unified-interface/execute-tool/handlers/wakeup-confirm";
 import { RouteExecuteRepository } from "@/app/api/[locale]/system/unified-interface/execute-tool/repository";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

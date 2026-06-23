@@ -50,14 +50,14 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list-windows.response.success",
+        label: "list-windows.response.success",
         schema: z
           .boolean()
           .describe("Whether the window list retrieval succeeded"),
       }),
       windows: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list-windows.response.windows",
+        label: "list-windows.response.windows",
         schema: z
           .array(
             z.object({
@@ -80,7 +80,7 @@ const { POST } = createEndpoint({
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list-windows.response.error",
+        label: "list-windows.response.error",
         schema: z
           .string()
           .optional()
@@ -88,7 +88,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list-windows.response.executionId",
+        label: "list-windows.response.executionId",
         schema: z
           .string()
           .optional()

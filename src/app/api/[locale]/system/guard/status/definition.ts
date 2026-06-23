@@ -84,13 +84,13 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.success.title",
+        label: "post.fields.success.title",
         schema: z.boolean(),
       }),
 
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.output.title",
+        label: "post.fields.output.title",
         schema: z.string(),
       }),
 
@@ -105,55 +105,55 @@ const { POST } = createEndpoint({
           children: {
             guardId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.guardId.title",
+              label: "post.fields.guardId.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             username: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.username.title",
+              label: "post.fields.username.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             projectPath: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.projectPath.title",
+              label: "post.fields.projectPath.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.status.title",
+              label: "post.fields.status.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.createdAt.title",
+              label: "post.fields.createdAt.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             securityLevel: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.securityLevel.title",
+              label: "post.fields.securityLevel.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             isolationMethod: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.isolationMethod.title",
+              label: "post.fields.isolationMethod.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             isRunning: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.isRunning.title",
+              label: "post.fields.isRunning.title",
               fieldType: FieldDataType.BOOLEAN,
               schema: z.boolean(),
             }),
             userHome: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.userHome.title",
+              label: "post.fields.userHome.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string().optional(),
             }),
@@ -163,13 +163,13 @@ const { POST } = createEndpoint({
 
       totalGuards: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.totalGuards.title",
+        label: "post.fields.totalGuards.title",
         schema: z.coerce.number().optional(),
       }),
 
       activeGuards: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.activeGuards.title",
+        label: "post.fields.activeGuards.title",
         schema: z.coerce.number().optional(),
       }),
     },

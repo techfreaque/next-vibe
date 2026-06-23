@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
     children: {
       message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        content: "response.message",
+        label: "response.message",
         schema: z.string(),
       }),
     },

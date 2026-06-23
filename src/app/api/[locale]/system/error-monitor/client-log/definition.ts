@@ -58,6 +58,16 @@ export const { POST } = createEndpoint({
         fieldType: FieldDataType.SELECT,
         label: "post.fields.level.label" as const,
         description: "post.fields.level.description" as const,
+        options: [
+          {
+            value: "error",
+            label: "enums.level.error",
+          },
+          {
+            value: "warn",
+            label: "enums.level.warn",
+          },
+        ],
         schema: z.enum(["error", "warn"]),
       }),
       message: requestField(scopedTranslation, {
@@ -77,7 +87,7 @@ export const { POST } = createEndpoint({
       }),
       ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.ok.title" as const,
+        label: "post.response.ok.title" as const,
         schema: z.boolean(),
       }),
     },

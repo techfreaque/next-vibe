@@ -1,5 +1,14 @@
 export const translations = {
   category: "Newsletter",
+  enum: {
+    preferences: {
+      marketing: "Marketing",
+      productNews: "Product News",
+      companyUpdates: "Company Updates",
+      industryInsights: "Industry Insights",
+      events: "Events",
+    },
+  },
   tags: {
     newsletter: "Newsletter",
     subscription: "Subscription",

@@ -65,58 +65,58 @@ const { GET } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.id",
+            label: "orderGet.get.response.id",
             hidden: true,
             schema: z.uuid(),
           }),
           orderNumber: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.orderNumber",
+            label: "orderGet.get.response.orderNumber",
             schema: z.string(),
           }),
           sessionId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.sessionId",
+            label: "orderGet.get.response.sessionId",
             schema: z.uuid(),
           }),
           customerId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.customerId",
+            label: "orderGet.get.response.customerId",
             schema: z.uuid().nullable(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.status",
+            label: "orderGet.get.response.status",
             schema: z.string(),
           }),
           currency: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.currency",
+            label: "orderGet.get.response.currency",
             schema: z.string(),
           }),
           subtotal: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.subtotal",
+            label: "orderGet.get.response.subtotal",
             schema: z.number(),
           }),
           taxAmount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.taxAmount",
+            label: "orderGet.get.response.taxAmount",
             schema: z.number(),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.total",
+            label: "orderGet.get.response.total",
             schema: z.number(),
           }),
           journalEntryId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.journalEntryId",
+            label: "orderGet.get.response.journalEntryId",
             schema: z.uuid().nullable(),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderGet.get.response.createdAt",
+            label: "orderGet.get.response.createdAt",
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date(),
           }),
@@ -131,42 +131,42 @@ const { GET } = createEndpoint({
               children: {
                 itemId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.itemId",
+                  label: "orderGet.get.response.itemId",
                   schema: z.uuid(),
                 }),
                 productId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.productId",
+                  label: "orderGet.get.response.productId",
                   schema: z.uuid().nullable(),
                 }),
                 description: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.description",
+                  label: "orderGet.get.response.description",
                   schema: z.string(),
                 }),
                 quantity: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.quantity",
+                  label: "orderGet.get.response.quantity",
                   schema: z.number(),
                 }),
                 unitPrice: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.unitPrice",
+                  label: "orderGet.get.response.unitPrice",
                   schema: z.number(),
                 }),
                 taxRate: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.taxRate",
+                  label: "orderGet.get.response.taxRate",
                   schema: z.number(),
                 }),
                 taxAmountItem: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.taxAmountItem",
+                  label: "orderGet.get.response.taxAmountItem",
                   schema: z.number(),
                 }),
                 lineTotal: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.lineTotal",
+                  label: "orderGet.get.response.lineTotal",
                   schema: z.number(),
                 }),
               },
@@ -183,27 +183,27 @@ const { GET } = createEndpoint({
               children: {
                 paymentId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.paymentId",
+                  label: "orderGet.get.response.paymentId",
                   schema: z.uuid(),
                 }),
                 method: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.method",
+                  label: "orderGet.get.response.method",
                   schema: z.string(),
                 }),
                 amount: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.amount",
+                  label: "orderGet.get.response.amount",
                   schema: z.number(),
                 }),
                 change: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.change",
+                  label: "orderGet.get.response.change",
                   schema: z.number(),
                 }),
                 reference: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "orderGet.get.response.reference",
+                  label: "orderGet.get.response.reference",
                   schema: z.string().nullable(),
                 }),
               },

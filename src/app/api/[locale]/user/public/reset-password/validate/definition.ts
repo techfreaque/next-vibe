@@ -79,27 +79,27 @@ const { GET } = createEndpoint({
         children: {
           valid: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "validate.response.valid",
+            label: "validate.response.valid",
             schema: z.boolean(),
           }),
           message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "validate.response.message",
+            label: "validate.response.message",
             schema: z.string(),
           }),
           userId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "validate.response.userId",
+            label: "validate.response.userId",
             schema: z.uuid().optional(),
           }),
           expiresAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "validate.response.expiresAt",
+            label: "validate.response.expiresAt",
             schema: z.string().optional(),
           }),
           nextSteps: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "validate.response.nextSteps.item",
+            label: "validate.response.nextSteps.item",
             schema: z.array(z.string()),
           }),
         },

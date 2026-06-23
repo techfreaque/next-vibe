@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -27,12 +28,10 @@ import {
   canViewThread,
 } from "../../permissions/permissions";
 import threadsByIdDefinitions, {
-  type ThreadDeletedEventPayload,
   type ThreadDeleteResponseOutput,
   type ThreadGetResponseOutput,
   type ThreadPatchRequestOutput,
   type ThreadPatchResponseOutput,
-  type ThreadUpdatedEventPayload,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -426,17 +425,18 @@ export class ThreadByIdRepository {
    * instance with the relayed edits. Reuses updateThread with relayed: true so the
    * event is not relayed back. The thread id rides on the event's urlPathParams.
    */
-  static async applyRemoteThreadUpdate(
-    payload: ThreadUpdatedEventPayload,
-    threadId: string,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<void> {
-    const { updatedAt: _updatedAt, ...data } = payload;
-    void _updatedAt;
+  static async applyRemoteThreadUpdate({
+    requestData,
+    urlPathParams,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof threadsByIdDefinitions.PATCH,
+    "thread-updated"
+  >): Promise<void> {
     const result = await this.updateThread(
-      data,
-      threadId,
+      requestData,
+      urlPathParams.threadId,
       user,
       defaultLocale,
       logger,
@@ -453,15 +453,16 @@ export class ThreadByIdRepository {
    * Cross-instance applier for `thread-deleted`: re-run the delete on this
    * instance. Reuses deleteThread with relayed: true. The id rides on urlPathParams.
    */
-  static async applyRemoteThreadDelete(
-    payload: ThreadDeletedEventPayload,
-    threadId: string,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<void> {
-    void payload;
+  static async applyRemoteThreadDelete({
+    urlPathParams,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof threadsByIdDefinitions.DELETE,
+    "thread-deleted"
+  >): Promise<void> {
     const result = await this.deleteThread(
-      threadId,
+      urlPathParams.threadId,
       user,
       defaultLocale,
       logger,

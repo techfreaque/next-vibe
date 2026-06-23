@@ -765,7 +765,11 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
         },
       },
     ];
-    return { streamingState: "idle" as const, backgroundTasks: [], messages };
+    return {
+      streamingState: ThreadStreamingState.IDLE,
+      backgroundTasks: [],
+      messages,
+    };
   }, [isDisabled, responseData, promptValue, modelValue, skillValue]);
 
   // When a real run completes, invalidate the messages cache so EmbeddedMessagesView refetches.

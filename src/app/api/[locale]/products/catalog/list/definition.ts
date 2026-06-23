@@ -113,7 +113,7 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.total",
+        label: "get.response.total",
         schema: z.number(),
       }),
       products: responseArrayField(scopedTranslation, {
@@ -125,13 +125,13 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.id",
+              label: "get.response.id",
               hidden: true,
               schema: z.uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.name",
+              label: "get.response.name",
               schema: z.string(),
             }),
             type: responseField(scopedTranslation, {
@@ -142,51 +142,51 @@ const { GET } = createEndpoint({
             }),
             sku: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.sku",
+              label: "get.response.sku",
               schema: z.string().nullable(),
             }),
             basePrice: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.basePrice",
+              label: "get.response.basePrice",
               fieldType: FieldDataType.NUMBER,
               schema: z.number(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.currency",
+              label: "get.response.currency",
               schema: z.string(),
             }),
             unit: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.unit",
+              label: "get.response.unit",
               schema: z.string().nullable(),
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.isActive",
+              label: "get.response.isActive",
               schema: z.boolean(),
             }),
             isSubscription: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.isSubscription",
+              label: "get.response.isSubscription",
               hidden: true,
               schema: z.boolean(),
             }),
             billingInterval: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.billingInterval",
+              label: "get.response.billingInterval",
               hidden: true,
               schema: z.string().nullable(),
             }),
             categoryId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.categoryId",
+              label: "get.response.categoryId",
               hidden: true,
               schema: z.uuid().nullable(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.createdAt",
+              label: "get.response.createdAt",
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date(),
             }),

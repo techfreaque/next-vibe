@@ -427,6 +427,8 @@ export const translations = {
 
   // Response fields
   response: {
+    checkoutUrl: "Checkout URL",
+    sessionId: "Session ID",
     id: "Subscription ID",
     userId: "User ID",
     status: "Subscription Status",

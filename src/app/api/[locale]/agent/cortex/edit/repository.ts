@@ -14,11 +14,11 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
+import type { EndpointLogger } from "../../../system/logger/types";
 import { UserPermissionRole } from "../../../user/user-roles/enum";
 import { applyFindReplace, applyLineReplace } from "../_shared/edit-operations";
 import { cortexNodes } from "../db";
@@ -83,24 +83,6 @@ export class CortexEditRepository {
         message: t("patch.errors.validation.title"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
-    }
-
-    // Filesystem backend for preview-mode admin
-    // Skip for virtual writable mounts - they go through mount handlers → DB → disk write-through
-    if (!user.isPublic && !isVirtualWritable(path)) {
-      const { isFilesystemMode } = await import("../fs-provider");
-      if (isFilesystemMode(user)) {
-        const { fsEditFile } = await import("../fs-provider/fs-edit");
-        return fsEditFile({
-          path,
-          find,
-          replace,
-          startLine,
-          endLine,
-          newContent,
-          t,
-        });
-      }
     }
 
     // Virtual writable mount - read via mount, apply edit, write back via mount
@@ -203,14 +185,6 @@ export class CortexEditRepository {
     }
 
     logger.info(`Cortex edit: ${path} (${replacements} replacements)`);
-
-    // Disk write-through for documents
-    try {
-      const { syncToDisk } = await import("../fs-provider/fs-sync");
-      await syncToDisk(path, content);
-    } catch {
-      // Best-effort
-    }
 
     // Queue background re-embedding for semantic search
     if (node.id) {

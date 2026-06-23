@@ -91,7 +91,7 @@ const { POST } = createEndpoint({
 
       paidAtResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.paidAt" as const,
+        label: "post.response.paidAt" as const,
         schema: z.coerce.date().nullable(),
       }),
     },

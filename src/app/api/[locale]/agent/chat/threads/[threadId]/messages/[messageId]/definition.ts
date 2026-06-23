@@ -130,42 +130,42 @@ const { GET } = createEndpoint({
       // === RESPONSE ===
       role: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.message.role.content" as const,
+        label: "get.response.message.role.content" as const,
         schema: z.enum(ChatMessageRole),
       }),
       content: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.message.content.content" as const,
+        label: "get.response.message.content.content" as const,
         schema: z.string().nullable(),
       }),
       parentId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.message.parentId.content" as const,
+        label: "get.response.message.parentId.content" as const,
         schema: z.uuid().nullable(),
       }),
       authorId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.message.authorId.content" as const,
+        label: "get.response.message.authorId.content" as const,
         schema: z.string().nullable(),
       }),
       isAI: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.message.isAI.content" as const,
+        label: "get.response.message.isAI.content" as const,
         schema: z.boolean(),
       }),
       model: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.message.model.content" as const,
+        label: "get.response.message.model.content" as const,
         schema: z.string().nullable(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.message.createdAt.content" as const,
+        label: "get.response.message.createdAt.content" as const,
         schema: dateSchema,
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.message.updatedAt.content" as const,
+        label: "get.response.message.updatedAt.content" as const,
         schema: dateSchema,
       }),
 
@@ -323,17 +323,17 @@ const { PATCH } = createEndpoint({
       // === RESPONSE ===
       updatedContent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.message.content.content" as const,
+        label: "patch.response.message.content.content" as const,
         schema: z.string().nullable(),
       }),
       updatedRole: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.message.role.content" as const,
+        label: "patch.response.message.role.content" as const,
         schema: z.enum(ChatMessageRole),
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.message.updatedAt.content" as const,
+        label: "patch.response.message.updatedAt.content" as const,
         schema: dateSchema,
       }),
 
@@ -515,37 +515,37 @@ const { DELETE } = createEndpoint({
       // === RESPONSE ===
       role: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.role.content" as const,
+        label: "delete.response.role.content" as const,
         schema: z.enum(ChatMessageRole),
       }),
       content: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.content.content" as const,
+        label: "delete.response.content.content" as const,
         schema: z.string().nullable(),
       }),
       parentId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.parentId.content" as const,
+        label: "delete.response.parentId.content" as const,
         schema: z.uuid().nullable(),
       }),
       authorId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.authorId.content" as const,
+        label: "delete.response.authorId.content" as const,
         schema: z.string().nullable(),
       }),
       isAI: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.isAI.content" as const,
+        label: "delete.response.isAI.content" as const,
         schema: z.boolean(),
       }),
       model: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.model.content" as const,
+        label: "delete.response.model.content" as const,
         schema: z.string().nullable(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.createdAt.content" as const,
+        label: "delete.response.createdAt.content" as const,
         schema: dateSchema,
       }),
 

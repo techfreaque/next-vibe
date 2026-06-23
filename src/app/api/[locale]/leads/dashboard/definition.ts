@@ -53,37 +53,37 @@ const { GET } = createEndpoint({
     children: {
       activeLeadsCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.activeLeadsCount" as const,
+        label: "get.response.activeLeadsCount" as const,
         schema: z.number(),
       }),
       newThisWeekCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.newThisWeekCount" as const,
+        label: "get.response.newThisWeekCount" as const,
         schema: z.number(),
       }),
       runningCampaignsCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.runningCampaignsCount" as const,
+        label: "get.response.runningCampaignsCount" as const,
         schema: z.number(),
       }),
       convertedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.convertedCount" as const,
+        label: "get.response.convertedCount" as const,
         schema: z.number(),
       }),
       totalLeadsCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalLeadsCount" as const,
+        label: "get.response.totalLeadsCount" as const,
         schema: z.number(),
       }),
       conversionRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.conversionRate" as const,
+        label: "get.response.conversionRate" as const,
         schema: z.number(),
       }),
       statusBreakdown: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.statusBreakdown" as const,
+        label: "get.response.statusBreakdown" as const,
         schema: z.record(z.string(), z.number()),
       }),
       recentLeads: responseArrayField(scopedTranslation, {
@@ -91,7 +91,7 @@ const { GET } = createEndpoint({
         title: "get.response.recentLeads" as const,
         child: responseField(scopedTranslation, {
           type: WidgetType.TEXT,
-          content: "get.response.recentLeads.id" as const,
+          label: "get.response.recentLeads.id" as const,
           schema: z.object({
             id: z.string().uuid(),
             businessName: z.string(),

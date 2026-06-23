@@ -106,14 +106,14 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "focus-window.response.success",
+        label: "focus-window.response.success",
         schema: z
           .boolean()
           .describe("Whether the window focus operation succeeded"),
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "focus-window.response.error",
+        label: "focus-window.response.error",
         schema: z
           .string()
           .optional()
@@ -121,7 +121,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "focus-window.response.executionId",
+        label: "focus-window.response.executionId",
         schema: z
           .string()
           .optional()

@@ -51,7 +51,7 @@ export class AgentDocsGeneratorRepository {
     try {
       // Import the source-of-truth prompt
       const { PROJECT_INSTRUCTIONS } =
-        await import("@/app/api/[locale]/agent/chat/skills/default-skills/vibe-coder/skill");
+        await import("@/app/api/[locale]/agent/skills/default-skills/vibe-coder/skill");
 
       const projectRoot = process.cwd();
       let filesWritten = 0;

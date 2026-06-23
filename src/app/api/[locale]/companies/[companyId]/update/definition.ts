@@ -154,13 +154,13 @@ const { PATCH } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "patch.response.id",
+            label: "patch.response.id",
             hidden: true,
             schema: z.uuid(),
           }),
           name: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "patch.response.name",
+            label: "patch.response.name",
             schema: z.string(),
           }),
         },

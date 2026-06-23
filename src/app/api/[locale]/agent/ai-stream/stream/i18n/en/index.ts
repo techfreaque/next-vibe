@@ -1,3 +1,5 @@
+import { translations as modelTranslations } from "@/app/api/[locale]/agent/models/i18n/en";
+
 export const translations = {
   category: "Agent",
   tags: {
@@ -859,4 +861,15 @@ export const translations = {
     title: "AI Tools",
     tools: "Tools",
   },
+  config: {
+    folders: {
+      private: "Private",
+      shared: "Shared",
+      public: "Public",
+      background: "Background",
+      incognito: "Incognito",
+      remote: "Remote",
+    },
+  },
+  models: modelTranslations.models,
 };

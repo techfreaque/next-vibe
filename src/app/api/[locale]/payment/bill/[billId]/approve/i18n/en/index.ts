@@ -1,5 +1,14 @@
 export const translations = {
   tags: { payment: "payment", bill: "bill", ap: "accounts-payable" },
+  enums: {
+    billStatus: {
+      DRAFT: "Draft",
+      RECEIVED: "Received",
+      APPROVED: "Approved",
+      PAID: "Paid",
+      DISPUTED: "Disputed",
+    },
+  },
   post: {
     title: "Approve Bill",
     titleShort: "Approve Bill",

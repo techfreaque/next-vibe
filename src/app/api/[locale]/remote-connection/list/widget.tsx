@@ -609,25 +609,31 @@ export function RemoteConnectionsListContainer(): JSX.Element {
 
   if (isCloud) {
     return (
-      <CloudView
-        connections={connections}
-        navigate={navigate}
-        t={t}
-        onPick={onPick}
-        isPickerMode={isPickerMode}
-      />
+      <WidgetShell>
+        <CreditsTabHeader activeTab="remote" />
+        <CloudView
+          connections={connections}
+          navigate={navigate}
+          t={t}
+          onPick={onPick}
+          isPickerMode={isPickerMode}
+        />
+      </WidgetShell>
     );
   }
 
   return (
-    <LocalView
-      connections={connections}
-      selfInstanceId={selfInstanceId}
-      navigate={navigate}
-      t={t}
-      onPick={onPick}
-      isPickerMode={isPickerMode}
-      isAdmin={isAdmin}
-    />
+    <WidgetShell>
+      <CreditsTabHeader activeTab="remote" />
+      <LocalView
+        connections={connections}
+        selfInstanceId={selfInstanceId}
+        navigate={navigate}
+        t={t}
+        onPick={onPick}
+        isPickerMode={isPickerMode}
+        isAdmin={isAdmin}
+      />
+    </WidgetShell>
   );
 }

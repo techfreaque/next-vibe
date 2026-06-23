@@ -56,42 +56,42 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.id.content" as const,
+              label: "get.response.id.content" as const,
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.name.content" as const,
+              label: "get.response.name.content" as const,
               schema: z.string(),
             }),
             provider: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.provider.content" as const,
+              label: "get.response.provider.content" as const,
               schema: z.string(),
             }),
             category: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.category.content" as const,
+              label: "get.response.category.content" as const,
               schema: z.string(),
             }),
             description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.description.content" as const,
+              label: "get.response.description.content" as const,
               schema: z.string(),
             }),
             contextWindow: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.contextWindow.content" as const,
+              label: "get.response.contextWindow.content" as const,
               schema: z.number().nullable(),
             }),
             supportsTools: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.supportsTools.content" as const,
+              label: "get.response.supportsTools.content" as const,
               schema: z.boolean(),
             }),
             creditCost: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.creditCost.content" as const,
+              label: "get.response.creditCost.content" as const,
               schema: z.number(),
             }),
           },
@@ -178,3 +178,5 @@ export default { GET } as const;
 
 export type WsProviderModelsGetRequestOutput = typeof GET.types.RequestOutput;
 export type WsProviderModelsGetResponseOutput = typeof GET.types.ResponseOutput;
+export type WsProviderModelEntry =
+  WsProviderModelsGetResponseOutput["models"][number];

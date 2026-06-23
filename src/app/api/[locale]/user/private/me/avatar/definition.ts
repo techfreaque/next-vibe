@@ -104,27 +104,27 @@ const { POST } = createEndpoint({
         children: {
           success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "upload.response.success",
+            label: "upload.response.success",
             schema: z.boolean(),
           }),
           message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "upload.response.message",
+            label: "upload.response.message",
             schema: z.string(),
           }),
           avatarUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "upload.response.avatarUrl",
+            label: "upload.response.avatarUrl",
             schema: z.string().url().optional(),
           }),
           uploadTime: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "upload.response.uploadTime",
+            label: "upload.response.uploadTime",
             schema: z.string().optional(),
           }),
           nextSteps: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "upload.response.nextSteps.item",
+            label: "upload.response.nextSteps.item",
             schema: z.array(z.string()),
           }),
         },
@@ -269,17 +269,17 @@ const { DELETE } = createEndpoint({
     children: {
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.success",
+        label: "delete.response.success",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.message",
+        label: "delete.response.message",
         schema: z.string(),
       }),
       nextSteps: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.nextSteps.item",
+        label: "delete.response.nextSteps.item",
         schema: z.array(z.string()),
       }),
     },

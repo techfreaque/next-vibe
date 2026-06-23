@@ -122,17 +122,17 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "rate.create.response.id" as const,
+        label: "rate.create.response.id" as const,
         schema: z.string().uuid(),
       }),
       resultCode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "rate.create.response.code" as const,
+        label: "rate.create.response.code" as const,
         schema: z.string(),
       }),
       resultName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "rate.create.response.name" as const,
+        label: "rate.create.response.name" as const,
         schema: z.string(),
       }),
     },

@@ -2,6 +2,12 @@ export const translations = {
   category: "SSH",
 
   enums: {
+    clusterRole: {
+      none: "None",
+      controlPlane: "Control Plane",
+      worker: "Worker",
+      storage: "Storage",
+    },
     authType: {
       password: "Password",
       privateKey: "Private Key (PEM)",
@@ -50,6 +56,17 @@ export const translations = {
         title: "Network Error",
         description: "Network error occurred",
       },
+    },
+    response: {
+      label: { title: "Label" },
+      host: { title: "Host" },
+      port: { title: "Port" },
+      username: { title: "Username" },
+      authType: { title: "Auth Type" },
+      isDefault: { title: "Default" },
+      fingerprint: { title: "Fingerprint" },
+      notes: { title: "Notes" },
+      createdAt: { title: "Created At" },
     },
     success: {
       title: "Connection Loaded",

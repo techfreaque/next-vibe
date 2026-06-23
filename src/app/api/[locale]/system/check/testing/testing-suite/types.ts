@@ -16,6 +16,8 @@ import type { EndpointEventsMap } from "@/app/api/[locale]/system/unified-interf
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { InferUrlVariablesOutput } from "../../../unified-interface/react-native/native-endpoint";
+
 /**
  * Options for testing an API endpoint
  */
@@ -29,7 +31,10 @@ export interface TestEndpointOptions<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
-  TEvents extends EndpointEventsMap<InferResponseOutput<TFields>>,
+  TEvents extends EndpointEventsMap<
+    InferResponseOutput<TFields>,
+    InferRequestOutput<TFields>
+  >,
 > {
   /**
    * Custom test cases to run in addition to (or instead of) example tests
@@ -72,7 +77,10 @@ export interface TestRunner<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
-  TEvents extends EndpointEventsMap<InferResponseOutput<TFields>>,
+  TEvents extends EndpointEventsMap<
+    InferResponseOutput<TFields>,
+    InferRequestOutput<TFields>
+  >,
 > {
   /**
    * Execute the endpoint with the given data and URL params

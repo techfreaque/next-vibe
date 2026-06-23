@@ -30,15 +30,11 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         user,
         locale,
         logger,
+        false,
       ),
     onRemoteEvent: {
-      "thread-updated": (payload, ctx) =>
-        ThreadByIdRepository.applyRemoteThreadUpdate(
-          payload,
-          ctx.urlPathParams.threadId,
-          ctx.user,
-          ctx.logger,
-        ),
+      "thread-updated": (props) =>
+        ThreadByIdRepository.applyRemoteThreadUpdate(props),
     },
   },
   [Methods.DELETE]: {
@@ -49,15 +45,11 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         user,
         locale,
         logger,
+        false,
       ),
     onRemoteEvent: {
-      "thread-deleted": (payload, ctx) =>
-        ThreadByIdRepository.applyRemoteThreadDelete(
-          payload,
-          ctx.urlPathParams.threadId,
-          ctx.user,
-          ctx.logger,
-        ),
+      "thread-deleted": (props) =>
+        ThreadByIdRepository.applyRemoteThreadDelete(props),
     },
   },
 });

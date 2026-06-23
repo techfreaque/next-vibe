@@ -73,13 +73,13 @@ const { POST } = createEndpoint({
 
       succeeded: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.succeeded.label",
+        label: "post.fields.succeeded.label",
         schema: z.number(),
       }),
 
       failed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.failed.label",
+        label: "post.fields.failed.label",
         schema: z.number(),
       }),
 
@@ -93,12 +93,12 @@ const { POST } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.ids.label",
+              label: "post.fields.ids.label",
               schema: z.string(),
             }),
             message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.errors.label",
+              label: "post.fields.errors.label",
               schema: z.string(),
             }),
           },

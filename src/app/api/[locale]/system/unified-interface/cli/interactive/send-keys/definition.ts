@@ -94,19 +94,19 @@ const { POST } = createEndpoint({
 
       content: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "sendKeys.response.fields.content",
+        label: "sendKeys.response.fields.content",
         schema: z
           .string()
           .describe("Terminal frame content after keystroke injection"),
       }),
       logs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "sendKeys.response.fields.logs",
+        label: "sendKeys.response.fields.logs",
         schema: z.string().describe("Error log output from the session"),
       }),
       sessionPid: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "sendKeys.response.fields.pid",
+        label: "sendKeys.response.fields.pid",
         schema: z.number().describe("PID of the active interactive session"),
       }),
     },

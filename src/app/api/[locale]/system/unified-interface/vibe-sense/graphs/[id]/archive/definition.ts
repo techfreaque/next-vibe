@@ -62,7 +62,7 @@ const { POST } = createEndpoint({
       }),
       archivedId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.archivedId",
+        label: "post.response.archivedId",
         schema: z.string(),
       }),
     },

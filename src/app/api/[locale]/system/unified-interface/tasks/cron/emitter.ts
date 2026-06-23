@@ -11,7 +11,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { EmitEventNamed } from "../../websocket/structured-events";
+import type {
+  EmitEventNamed,
+  EventPayloads,
+} from "../../websocket/structured-events";
 import queueDefinitions from "./queue/definition";
 import tasksDefinitions from "./tasks/definition";
 

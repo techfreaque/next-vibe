@@ -78,13 +78,13 @@ const { POST } = createEndpoint({
 
       reported: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.reported.content" as const,
+        label: "post.response.reported.content" as const,
         schema: z.boolean(),
       }),
 
       reportCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.reportCount.content" as const,
+        label: "post.response.reportCount.content" as const,
         schema: z.number().int().nonnegative(),
       }),
 

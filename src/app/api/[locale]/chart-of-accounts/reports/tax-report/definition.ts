@@ -76,27 +76,27 @@ const { GET } = createEndpoint({
 
       fromResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "taxReport.response.from" as const,
+        label: "taxReport.response.from" as const,
         schema: z.string(),
       }),
       toResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "taxReport.response.to" as const,
+        label: "taxReport.response.to" as const,
         schema: z.string(),
       }),
       vatCollected: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "taxReport.response.vatCollected" as const,
+        label: "taxReport.response.vatCollected" as const,
         schema: z.number(),
       }),
       vatReclaimable: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "taxReport.response.vatReclaimable" as const,
+        label: "taxReport.response.vatReclaimable" as const,
         schema: z.number(),
       }),
       netVatPayable: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "taxReport.response.netVatPayable" as const,
+        label: "taxReport.response.netVatPayable" as const,
         schema: z.number(),
       }),
       lines: responseArrayField(scopedTranslation, {
@@ -108,27 +108,27 @@ const { GET } = createEndpoint({
           children: {
             taxRateCode: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "taxReport.response.taxRateCode" as const,
+              label: "taxReport.response.taxRateCode" as const,
               schema: z.string(),
             }),
             taxRateName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "taxReport.response.taxRateName" as const,
+              label: "taxReport.response.taxRateName" as const,
               schema: z.string(),
             }),
             netAmount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "taxReport.response.netAmount" as const,
+              label: "taxReport.response.netAmount" as const,
               schema: z.number(),
             }),
             taxAmount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "taxReport.response.taxAmount" as const,
+              label: "taxReport.response.taxAmount" as const,
               schema: z.number(),
             }),
             rate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "taxReport.response.rate" as const,
+              label: "taxReport.response.rate" as const,
               schema: z.number(),
             }),
           },

@@ -17,7 +17,16 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { SystemPromptDebugResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
-interface DebugSystemPromptParams {
+export async function buildDebugSystemPrompt({
+  rootFolderId,
+  userMessage,
+  threadId,
+  skillId,
+  subFolderId,
+  user,
+  locale,
+  logger,
+}: {
   rootFolderId: DefaultFolderId;
   userMessage?: string;
   threadId?: string;
@@ -26,22 +35,8 @@ interface DebugSystemPromptParams {
   user: JwtPayloadType;
   locale: CountryLanguage;
   logger: EndpointLogger;
-}
-
-export async function buildDebugSystemPrompt(
-  params: DebugSystemPromptParams,
-): Promise<ResponseType<SystemPromptDebugResponseOutput>> {
-  const {
-    rootFolderId,
-    userMessage,
-    threadId,
-    skillId,
-    subFolderId,
-    user,
-    locale,
-    logger,
-  } = params;
-  const { t } = scopedTranslation.scopedT(params.locale);
+}): Promise<ResponseType<SystemPromptDebugResponseOutput>> {
+  const { t } = scopedTranslation.scopedT(locale);
   try {
     const userId = user.isPublic ? undefined : user.id;
 

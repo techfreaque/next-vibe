@@ -27,7 +27,6 @@ import {
   deductMediaCredits,
 } from "../shared/media-generation";
 import {
-  type MusicGenerationMediaGenStreamContext,
   type MusicGenerationPostRequestOutput,
   type MusicGenerationPostResponseOutput,
 } from "./definition";
@@ -36,10 +35,6 @@ import type { MusicGenerationT } from "./i18n";
 import { generateMusicWithModelsLab } from "./providers/modelslab";
 import { generateMusicWithReplicate } from "./providers/replicate";
 import { generateMusicWithUnbottled } from "./providers/unbottled";
-
-interface MediaGenStreamContext {
-  threadId?: string | undefined;
-}
 
 export class MusicGenerationRepository {
   /**
@@ -51,7 +46,9 @@ export class MusicGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: MusicGenerationT,
-    streamContext?: MediaGenStreamContext,
+    streamContext?: {
+      threadId?: string;
+    },
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {

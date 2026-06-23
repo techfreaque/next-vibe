@@ -51,43 +51,43 @@ const { GET } = createEndpoint({
       // Total credits available
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.total.content" as const,
+        label: "get.total.content" as const,
         schema: z.coerce.number(),
       }),
 
       expiring: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.expiring.content" as const,
+        label: "get.expiring.content" as const,
         schema: z.coerce.number(),
       }),
 
       permanent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.permanent.content" as const,
+        label: "get.permanent.content" as const,
         schema: z.coerce.number(),
       }),
 
       earned: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.earned.content" as const,
+        label: "get.earned.content" as const,
         schema: z.coerce.number(),
       }),
 
       free: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.free.content" as const,
+        label: "get.free.content" as const,
         schema: z.coerce.number(),
       }),
 
       expiresAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.expiresAt.content" as const,
+        label: "get.expiresAt.content" as const,
         schema: dateSchema.nullable(),
       }),
 
       capacity: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.capacity.content" as const,
+        label: "get.capacity.content" as const,
         schema: z.coerce.number(),
       }),
     },
@@ -143,7 +143,7 @@ const { GET } = createEndpoint({
   // Framework merges partial into GET response cache. No client-side math needed.
   events: {
     "credits-balance-updated": {
-      fields: [
+      responseFields: [
         "total",
         "expiring",
         "permanent",

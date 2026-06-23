@@ -84,19 +84,19 @@ const { GET } = createEndpoint({
       // Response fields - named distinctly from request fields to avoid duplicate keys
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.total",
+        label: "get.response.total",
         schema: z.number(),
       }),
 
       currentPage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.page",
+        label: "get.response.page",
         schema: z.number(),
       }),
 
       pageSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.pageSize",
+        label: "get.response.pageSize",
         schema: z.number(),
       }),
 
@@ -112,57 +112,57 @@ const { GET } = createEndpoint({
           children: {
             leadId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.leadId",
+              label: "get.response.leadId",
               schema: z.string(),
             }),
             leadEmail: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.leadEmail",
+              label: "get.response.leadEmail",
               schema: z.string().nullable(),
             }),
             businessName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.businessName",
+              label: "get.response.businessName",
               schema: z.string(),
             }),
             campaignType: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.campaignType",
+              label: "get.response.campaignType",
               schema: z.string(),
             }),
             journeyVariant: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.journeyVariant",
+              label: "get.response.journeyVariant",
               schema: z.string(),
             }),
             currentStage: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.currentStage",
+              label: "get.response.currentStage",
               schema: z.string(),
             }),
             nextScheduledAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.nextScheduledAt",
+              label: "get.response.nextScheduledAt",
               schema: z.string().nullable(),
             }),
             emailsSent: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.emailsSent",
+              label: "get.response.emailsSent",
               schema: z.number(),
             }),
             emailsOpened: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.emailsOpened",
+              label: "get.response.emailsOpened",
               schema: z.number(),
             }),
             emailsClicked: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.emailsClicked",
+              label: "get.response.emailsClicked",
               schema: z.number(),
             }),
             startedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.startedAt",
+              label: "get.response.startedAt",
               schema: z.string(),
             }),
           },

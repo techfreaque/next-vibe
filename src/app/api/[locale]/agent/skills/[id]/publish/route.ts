@@ -16,13 +16,8 @@ export const { PATCH, tools } = endpointsHandler({
     handler: ({ data, urlPathParams, user, logger, locale }) =>
       SkillPublishRepository.publish(urlPathParams, data, user, logger, locale),
     onRemoteEvent: {
-      "skill-updated": (payload, ctx) =>
-        SkillPublishRepository.applyRemotePublish(
-          payload,
-          ctx.urlPathParams.id,
-          ctx.user,
-          ctx.logger,
-        ),
+      "skill-updated": (props) =>
+        SkillPublishRepository.applyRemotePublish(props),
     },
   },
 });

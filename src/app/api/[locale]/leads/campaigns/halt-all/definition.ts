@@ -62,13 +62,13 @@ const { POST } = createEndpoint({
 
       halted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.halted",
+        label: "post.response.halted",
         schema: z.number(),
       }),
 
       emailsCancelled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.emailsCancelled",
+        label: "post.response.emailsCancelled",
         schema: z.number(),
       }),
     },

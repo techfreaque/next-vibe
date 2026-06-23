@@ -22,6 +22,7 @@ import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-sp
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -36,7 +37,6 @@ import { DEFAULT_SKILLS } from "../../config";
 import { SkillsRepository } from "../../repository";
 import { chatFavorites } from "../db";
 import createDefinitions, {
-  type FavoriteCreatedEventPayload,
   type FavoriteCreateRequestOutput,
   type FavoriteCreateResponseOutput,
 } from "./definition";
@@ -385,19 +385,20 @@ export class FavoritesCreateRepository {
    * relayed `id` is informational — the slug is regenerated locally; each instance
    * owns its own ids. Reuses createFavorite so there is one create code path.
    */
-  static async applyRemoteFavoriteCreate(
-    payload: FavoriteCreatedEventPayload,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  static async applyRemoteFavoriteCreate({
+    requestData,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof createDefinitions.POST,
+    "favorite-created"
+  >): Promise<void> {
     // Server-to-server apply has no request locale; error strings here are only
     // logged, so the platform default locale is fine.
     const locale = defaultLocale;
     const { t } = scopedTranslation.scopedT(locale);
-    // The relayed `id` is informational — the slug is regenerated locally; each
-    // instance owns its own ids. Strip it; the rest IS the create request.
-    const { id: _relayedId, ...requestData } = payload;
-    void _relayedId;
+    // The relayed `id` is informational — lives on responseData (responseFields).
+    // requestData IS the create request without the id.
     const result = await this.createFavorite(
       requestData,
       user,

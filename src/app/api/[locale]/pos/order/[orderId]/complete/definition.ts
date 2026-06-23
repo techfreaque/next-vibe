@@ -63,22 +63,22 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderComplete.post.response.id",
+            label: "orderComplete.post.response.id",
             schema: z.uuid(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderComplete.post.response.status",
+            label: "orderComplete.post.response.status",
             schema: z.string(),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderComplete.post.response.total",
+            label: "orderComplete.post.response.total",
             schema: z.number(),
           }),
           journalEntryId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderComplete.post.response.journalEntryId",
+            label: "orderComplete.post.response.journalEntryId",
             schema: z.uuid().nullable(),
           }),
         },

@@ -98,27 +98,27 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "terminalCreate.post.response.id",
+            label: "terminalCreate.post.response.id",
             schema: z.uuid(),
           }),
           name: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "terminalCreate.post.response.name",
+            label: "terminalCreate.post.response.name",
             schema: z.string(),
           }),
           companyId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "terminalCreate.post.response.companyId",
+            label: "terminalCreate.post.response.companyId",
             schema: z.uuid(),
           }),
           currency: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "terminalCreate.post.response.currency",
+            label: "terminalCreate.post.response.currency",
             schema: z.string(),
           }),
           isActive: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "terminalCreate.post.response.isActive",
+            label: "terminalCreate.post.response.isActive",
             schema: z.boolean(),
           }),
         },

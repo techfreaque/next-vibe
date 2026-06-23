@@ -94,27 +94,27 @@ const { POST } = createEndpoint({
       // Note: leadId comes from JWT payload (user.leadId) on server-side
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.success",
+        label: "response.success",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.message",
+        label: "response.message",
         schema: z.string(),
       }),
       leadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.leadId",
+        label: "response.leadId",
         schema: z.string(),
       }),
       subscriptionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.subscriptionId",
+        label: "response.subscriptionId",
         schema: z.string(),
       }),
       userId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.userId",
+        label: "response.userId",
         schema: z.string().optional(),
       }),
     },

@@ -106,7 +106,7 @@ const { GET } = createEndpoint({
       // === RESPONSE ===
       responseQuery: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.query.content" as const,
+        label: "get.response.query.content" as const,
         schema: z.string(),
         fieldName: "query",
       }),
@@ -120,13 +120,13 @@ const { GET } = createEndpoint({
           children: {
             resultPath: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.path.content" as const,
+              label: "get.response.results.path.content" as const,
               schema: z.string(),
               fieldName: "path",
             }),
             excerpt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.excerpt.content" as const,
+              label: "get.response.results.excerpt.content" as const,
               schema: z.string(),
             }),
             score: responseField(scopedTranslation, {
@@ -136,7 +136,7 @@ const { GET } = createEndpoint({
             }),
             updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.updatedAt.content" as const,
+              label: "get.response.results.updatedAt.content" as const,
               schema: z.string(),
             }),
           },

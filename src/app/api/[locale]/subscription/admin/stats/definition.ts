@@ -261,7 +261,7 @@ const { GET } = createEndpoint({
           totalPurchased: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "get.response.creditStats.totalPurchased.label" as const,
-            icon: "plus-circle",
+            icon: "plus",
             variant: "success",
             format: "compact",
             schema: z.coerce.number().describe("Total credits purchased"),
@@ -269,7 +269,7 @@ const { GET } = createEndpoint({
           totalSpent: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "get.response.creditStats.totalSpent.label" as const,
-            icon: "minus-circle",
+            icon: "minus",
             variant: "warning",
             format: "compact",
             schema: z.coerce.number().describe("Total credits spent"),
@@ -418,7 +418,6 @@ const { GET } = createEndpoint({
             type: WidgetType.TEXT,
             fieldType: FieldDataType.DATETIME,
             label: "get.response.businessInsights.generatedAt.label" as const,
-            content: "get.response.businessInsights.generatedAt.label" as const,
             schema: dateSchema.describe("When these statistics were generated"),
           }),
         },

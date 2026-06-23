@@ -52,25 +52,25 @@ const pulseStatusEndpoint = createEndpoint({
       // === RESPONSE FIELDS ===
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.status.title",
+        label: "get.fields.status.title",
         schema: z.string(),
       }),
 
       lastPulseAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.lastPulseAt.title",
+        label: "get.fields.lastPulseAt.title",
         schema: z.string().nullable(),
       }),
 
       successRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.successRate.title",
+        label: "get.fields.successRate.title",
         schema: z.coerce.number().nullable(),
       }),
 
       totalExecutions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.totalExecutions.title",
+        label: "get.fields.totalExecutions.title",
         schema: z.coerce.number(),
       }),
     },

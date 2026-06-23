@@ -63,12 +63,12 @@ const { GET } = createEndpoint({
       // === RESPONSE ===
       canCreateThread: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.canCreateThread.content" as const,
+        label: "get.response.canCreateThread.content" as const,
         schema: z.boolean(),
       }),
       canCreateFolder: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.canCreateFolder.content" as const,
+        label: "get.response.canCreateFolder.content" as const,
         schema: z.boolean(),
       }),
     },

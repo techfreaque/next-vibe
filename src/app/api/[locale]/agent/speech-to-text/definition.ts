@@ -26,8 +26,7 @@ const SpeechToTextContainer = lazy(() =>
   import("./widget").then((m) => ({ default: m.SpeechToTextContainer })),
 );
 
-import { TRANSCRIBE_AUDIO_ALIAS } from "./constants";
-import { DEFAULT_STT_MODEL_ID } from "./constants";
+import { DEFAULT_STT_MODEL_ID, TRANSCRIBE_AUDIO_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { SttModelId } from "./models";
 
@@ -134,7 +133,7 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       creditCost: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.creditCost",
+        label: "post.response.creditCost",
         schema: z.number().optional(),
       }),
       response: objectField(scopedTranslation, {
@@ -147,22 +146,22 @@ const { POST } = createEndpoint({
         children: {
           success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.success",
+            label: "post.response.success",
             schema: z.boolean(),
           }),
           text: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.text",
+            label: "post.response.text",
             schema: z.string(),
           }),
           provider: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.provider",
+            label: "post.response.provider",
             schema: z.string(),
           }),
           confidence: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.confidence",
+            label: "post.response.confidence",
             schema: z.coerce.number().optional(),
           }),
         },

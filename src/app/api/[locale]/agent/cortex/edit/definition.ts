@@ -119,7 +119,7 @@ const { PATCH } = createEndpoint({
       // === RESPONSE ===
       responsePath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.path.content" as const,
+        label: "patch.response.path.content" as const,
         schema: z.string(),
         fieldName: "path",
       }),
@@ -135,7 +135,7 @@ const { PATCH } = createEndpoint({
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.updatedAt.content" as const,
+        label: "patch.response.updatedAt.content" as const,
         schema: z.string(),
       }),
     },

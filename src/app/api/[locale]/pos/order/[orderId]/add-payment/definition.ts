@@ -110,32 +110,32 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderAddPayment.post.response.id",
+            label: "orderAddPayment.post.response.id",
             schema: z.uuid(),
           }),
           method: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderAddPayment.post.response.method",
+            label: "orderAddPayment.post.response.method",
             schema: z.string(),
           }),
           amount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderAddPayment.post.response.amount",
+            label: "orderAddPayment.post.response.amount",
             schema: z.number(),
           }),
           change: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderAddPayment.post.response.change",
+            label: "orderAddPayment.post.response.change",
             schema: z.number(),
           }),
           totalPaid: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderAddPayment.post.response.totalPaid",
+            label: "orderAddPayment.post.response.totalPaid",
             schema: z.number(),
           }),
           outstanding: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "orderAddPayment.post.response.outstanding",
+            label: "orderAddPayment.post.response.outstanding",
             schema: z.number(),
           }),
         },

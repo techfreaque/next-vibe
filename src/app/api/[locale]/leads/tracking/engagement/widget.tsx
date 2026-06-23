@@ -324,7 +324,7 @@ export function LeadClickTrackingContainer({
     if (!data?.redirectUrl) {
       return;
     }
-    window.open(data.redirectUrl, "_blank", "noopener,noreferrer");
+    openInNewTab(data.redirectUrl);
     return undefined;
   }, [data?.redirectUrl]);
 

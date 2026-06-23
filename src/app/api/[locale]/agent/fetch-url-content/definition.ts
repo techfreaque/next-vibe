@@ -95,7 +95,7 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.message.title" as const,
+        label: "get.response.message.title" as const,
         columns: 12,
         schema: z.string(),
       }),
@@ -119,28 +119,28 @@ const { GET } = createEndpoint({
 
       statusCode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.statusCode.title" as const,
+        label: "get.response.statusCode.title" as const,
         columns: 6,
         schema: z.number().optional(),
       }),
 
       timeElapsed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.timeElapsed.title" as const,
+        label: "get.response.timeElapsed.title" as const,
         columns: 6,
         schema: z.number().optional(),
       }),
 
       truncated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.truncated.title" as const,
+        label: "get.response.truncated.title" as const,
         columns: 6,
         schema: z.boolean().optional(),
       }),
 
       truncatedNote: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.truncatedNote.title" as const,
+        label: "get.response.truncatedNote.title" as const,
         columns: 12,
         schema: z.string().optional(),
       }),

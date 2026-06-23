@@ -40,19 +40,18 @@ import {
   EmailSecurityTypeDB,
   EmailSecurityTypeOptions,
 } from "../../providers/email/enum";
-import { CampaignType, CampaignTypeOptions } from "../enum";
 import {
+  CampaignType,
+  CampaignTypeOptions,
+  MessageChannel,
+  MessageChannelDB,
+  MessageChannelOptions,
   MessengerAccountStatus,
   MessengerAccountStatusDB,
   MessengerAccountStatusOptions,
   MessengerProvider,
   MessengerProviderDB,
   MessengerProviderOptions,
-} from "../enum";
-import {
-  MessageChannel,
-  MessageChannelDB,
-  MessageChannelOptions,
 } from "../enum";
 import { scopedTranslation } from "./i18n";
 
@@ -489,12 +488,12 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.account.id",
+            label: "response.account.id",
             schema: z.uuid(),
           }),
           name: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.account.name",
+            label: "response.account.name",
             schema: z.string(),
           }),
           channel: responseField(scopedTranslation, {
@@ -514,22 +513,22 @@ const { POST } = createEndpoint({
           }),
           smtpFromEmail: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.account.smtpFromEmail",
+            label: "response.account.smtpFromEmail",
             schema: z.string().nullable(),
           }),
           fromId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.account.fromId",
+            label: "response.account.fromId",
             schema: z.string().nullable(),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.account.createdAt",
+            label: "response.account.createdAt",
             schema: dateSchema,
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.account.updatedAt",
+            label: "response.account.updatedAt",
             schema: dateSchema,
           }),
         },

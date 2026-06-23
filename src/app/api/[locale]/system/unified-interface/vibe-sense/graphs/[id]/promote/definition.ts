@@ -62,7 +62,7 @@ const { POST } = createEndpoint({
       }),
       promotedId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.promotedId",
+        label: "post.response.promotedId",
         schema: z.string(),
       }),
     },

@@ -58,22 +58,22 @@ export const { POST } = createEndpoint({
       }),
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "scale.replicas.post.response.success.title",
+        label: "scale.replicas.post.response.success.title",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "scale.replicas.post.response.message.title",
+        label: "scale.replicas.post.response.message.title",
         schema: z.string(),
       }),
       previousReplicas: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "scale.replicas.post.response.previousReplicas.title",
+        label: "scale.replicas.post.response.previousReplicas.title",
         schema: z.number(),
       }),
       newReplicas: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "scale.replicas.post.response.newReplicas.title",
+        label: "scale.replicas.post.response.newReplicas.title",
         schema: z.number(),
       }),
     },

@@ -34,6 +34,12 @@ export enum ServerFramework {
 }
 
 export const ServerFrameworkOptions = [
-  { value: ServerFramework.NEXT, label: "Next.js" },
-  { value: ServerFramework.TANSTACK, label: "TanStack/Vite" },
-];
+  {
+    value: ServerFramework.NEXT,
+    label: "enum.framework.next" as const,
+  },
+  {
+    value: ServerFramework.TANSTACK,
+    label: "enum.framework.tanstack" as const,
+  },
+] as const;

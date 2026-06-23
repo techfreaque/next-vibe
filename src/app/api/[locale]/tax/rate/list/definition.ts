@@ -103,7 +103,7 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "rate.list.response.total" as const,
+        label: "rate.list.response.total" as const,
         schema: z.number(),
       }),
       rates: responseArrayField(scopedTranslation, {
@@ -115,17 +115,17 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "rate.list.response.rate.id" as const,
+              label: "rate.list.response.rate.id" as const,
               schema: z.string().uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "rate.list.response.rate.name" as const,
+              label: "rate.list.response.rate.name" as const,
               schema: z.string(),
             }),
             code: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "rate.list.response.rate.code" as const,
+              label: "rate.list.response.rate.code" as const,
               schema: z.string(),
             }),
             type: responseField(scopedTranslation, {
@@ -135,17 +135,17 @@ const { GET } = createEndpoint({
             }),
             rate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "rate.list.response.rate.rate" as const,
+              label: "rate.list.response.rate.rate" as const,
               schema: z.number(),
             }),
             country: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "rate.list.response.rate.country" as const,
+              label: "rate.list.response.rate.country" as const,
               schema: z.string().nullable(),
             }),
             region: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "rate.list.response.rate.region" as const,
+              label: "rate.list.response.rate.region" as const,
               schema: z.string().nullable(),
             }),
             isDefault: responseField(scopedTranslation, {
@@ -165,12 +165,12 @@ const { GET } = createEndpoint({
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "rate.list.response.rate.createdAt" as const,
+              label: "rate.list.response.rate.createdAt" as const,
               schema: z.string(),
             }),
             updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "rate.list.response.rate.updatedAt" as const,
+              label: "rate.list.response.rate.updatedAt" as const,
               schema: z.string(),
             }),
           },

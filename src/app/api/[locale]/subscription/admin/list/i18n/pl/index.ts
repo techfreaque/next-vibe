@@ -115,4 +115,35 @@ export const translations: typeof enTranslations = {
     refresh: "Odśwież",
     viewStats: "Statystyki",
   },
+  enums: {
+    subscriptionStatusFilter: {
+      all: "Wszystkie",
+      active: "Aktywne",
+      trialing: "Próbne",
+      pastDue: "Przeterminowane",
+      canceled: "Anulowane",
+      unpaid: "Nieopłacone",
+      paused: "Wstrzymane",
+    },
+    billingIntervalFilter: {
+      any: "Dowolny",
+      monthly: "Miesięczny",
+      yearly: "Roczny",
+    },
+    providerFilter: {
+      any: "Dowolny",
+      stripe: "Stripe",
+      nowpayments: "NowPayments",
+    },
+    subscriptionSortField: {
+      createdAt: "Data utworzenia",
+      status: "Status",
+      interval: "Interwał",
+      userEmail: "Email",
+    },
+    sortOrder: {
+      asc: "Rosnąco",
+      desc: "Malejąco",
+    },
+  },
 };

@@ -75,32 +75,32 @@ const { GET } = createEndpoint({
           children: {
             uid: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "messages.uid.label",
+              label: "messages.uid.label",
               schema: z.number().int(),
             }),
             messageId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "messages.messageId.label",
+              label: "messages.messageId.label",
               schema: z.string(),
             }),
             subject: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "messages.subject.label",
+              label: "messages.subject.label",
               schema: z.string(),
             }),
             from: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "messages.from.label",
+              label: "messages.from.label",
               schema: z.string(),
             }),
             to: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "messages.to.label",
+              label: "messages.to.label",
               schema: z.string(),
             }),
             date: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "messages.date.label",
+              label: "messages.date.label",
               schema: z.coerce.date(),
             }),
             isRead: responseField(scopedTranslation, {
@@ -115,12 +115,12 @@ const { GET } = createEndpoint({
             }),
             folderPath: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "messages.folderPath.label",
+              label: "messages.folderPath.label",
               schema: z.string().optional(),
             }),
             bodyText: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "messages.bodyText.label",
+              label: "messages.bodyText.label",
               schema: z.string().optional(),
             }),
           },

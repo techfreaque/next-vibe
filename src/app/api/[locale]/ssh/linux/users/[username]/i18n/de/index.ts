@@ -61,6 +61,9 @@ export const translations: typeof enTranslations = {
       },
       timeout: { title: "Timeout", description: "Zeitlimit überschritten" },
     },
+    response: {
+      ok: { title: "OK" },
+    },
     success: {
       title: "Benutzer gelöscht",
       description: "OS-Benutzerkonto erfolgreich gelöscht",

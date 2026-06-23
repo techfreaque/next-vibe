@@ -445,9 +445,11 @@ function buildTtsModelOptions(): TtsModelOption[] {
 
 export const ttsModelOptions: TtsModelOption[] = buildTtsModelOptions();
 
-export const TtsModelIdOptions = Object.values(TtsModelId).map((id) => ({
+export const TtsModelIdOptions = (
+  Object.entries(TtsModelId) as [keyof typeof TtsModelId, TtsModelId][]
+).map(([key, id]) => ({
   value: id,
-  label: ttsModelOptions.find((m) => m.id === id)?.name ?? id,
+  label: `models.names.${key}` as `models.names.${keyof typeof TtsModelId}`,
 }));
 
 export function getTtsModelById(
@@ -460,16 +462,30 @@ export function getTtsModelById(
 // TTS MODEL SELECTION SCHEMA
 // ============================================================
 
-export const voiceModelSelectionSchema = z.discriminatedUnion("selectionType", [
-  z
-    .object({
-      selectionType: z.literal(ModelSelectionType.MANUAL),
-      manualModelId: z.enum(TtsModelId),
-    })
-    .merge(sharedFilterPropsSchema),
-  filtersSelectionSchema,
-]);
-export type VoiceModelSelection = z.infer<typeof voiceModelSelectionSchema>;
+const voiceManualModelSelectionSchema = z
+  .object({
+    selectionType: z.literal(ModelSelectionType.MANUAL),
+    manualModelId: z.enum(TtsModelId),
+  })
+  .merge(sharedFilterPropsSchema);
+export type VoiceManualModelSelection = z.infer<
+  typeof voiceManualModelSelectionSchema
+>;
+
+/**
+ * Voice (TTS) selection — explicit union + `z.ZodType<...>` annotation pins
+ * `z.output` to the named type so consumers resolve it shallowly instead of
+ * re-deriving the discriminated union (exceeds TS's instantiation-depth limit).
+ */
+export type VoiceModelSelection =
+  | VoiceManualModelSelection
+  | FiltersModelSelection;
+
+export const voiceModelSelectionSchema: z.ZodType<VoiceModelSelection> =
+  z.discriminatedUnion("selectionType", [
+    voiceManualModelSelectionSchema,
+    filtersSelectionSchema,
+  ]);
 
 // ============================================================
 // TTS MODEL RESOLUTION

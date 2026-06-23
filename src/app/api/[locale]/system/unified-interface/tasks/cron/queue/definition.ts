@@ -146,152 +146,152 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.id",
+              label: "get.response.task.id",
               schema: z.string(),
             }),
             routeId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.routeId",
+              label: "get.response.task.routeId",
               schema: z.string(),
             }),
             displayName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.displayName",
+              label: "get.response.task.displayName",
               schema: z.string(),
             }),
             description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.taskDescription",
+              label: "get.response.task.taskDescription",
               schema: z.string().nullable(),
             }),
             version: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.version",
+              label: "get.response.task.version",
               schema: z.string(),
             }),
             category: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.category",
+              label: "get.response.task.category",
               schema: z.enum(TaskCategoryDB),
             }),
             schedule: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.schedule",
+              label: "get.response.task.schedule",
               schema: z.string(),
             }),
             timezone: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.timezone",
+              label: "get.response.task.timezone",
               schema: z.string().nullable(),
             }),
             enabled: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.enabled",
+              label: "get.response.task.enabled",
               schema: z.boolean(),
             }),
             hidden: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.hidden",
+              label: "get.response.task.hidden",
               schema: z.boolean(),
             }),
             priority: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.priority",
+              label: "get.response.task.priority",
               schema: z.enum(CronTaskPriorityDB),
             }),
             timeout: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.timeout",
+              label: "get.response.task.timeout",
               schema: z.number().nullable(),
             }),
             retries: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.retries",
+              label: "get.response.task.retries",
               schema: z.number().nullable(),
             }),
             retryDelay: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.retryDelay",
+              label: "get.response.task.retryDelay",
               schema: z.number().nullable(),
             }),
             outputMode: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.outputMode",
+              label: "get.response.task.outputMode",
               schema: z.enum(TaskOutputModeDB),
             }),
             owner: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.owner",
+              label: "get.response.task.owner",
               schema: taskOwnerSchema,
             }),
             lastExecutedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.lastExecutedAt",
+              label: "get.response.task.lastExecutedAt",
               schema: z.string().nullable(),
             }),
             lastExecutionStatus: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.lastExecutionStatus",
+              label: "get.response.task.lastExecutionStatus",
               schema: z.enum(CronTaskStatusDB).nullable(),
             }),
             lastExecutionError: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.lastExecutionError",
+              label: "get.response.task.lastExecutionError",
               schema: z.string().nullable(),
             }),
             lastExecutionDuration: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.lastExecutionDuration",
+              label: "get.response.task.lastExecutionDuration",
               schema: z.number().nullable(),
             }),
             nextExecutionAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.nextExecutionAt",
+              label: "get.response.task.nextExecutionAt",
               schema: z.string().nullable(),
             }),
             executionCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.executionCount",
+              label: "get.response.task.executionCount",
               schema: z.number(),
             }),
             consecutiveFailures: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.consecutiveFailures",
+              label: "get.response.task.consecutiveFailures",
               schema: z.number(),
             }),
             successCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.successCount",
+              label: "get.response.task.successCount",
               schema: z.number(),
             }),
             errorCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.errorCount",
+              label: "get.response.task.errorCount",
               schema: z.number(),
             }),
             averageExecutionTime: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.averageExecutionTime",
+              label: "get.response.task.averageExecutionTime",
               schema: z.number().nullable(),
             }),
             shortId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.shortId",
+              label: "get.response.task.shortId",
               schema: z.string(),
             }),
             taskInput: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.taskInput",
+              label: "get.response.task.taskInput",
               schema: z.record(z.string(), z.unknown()).optional().default({}),
             }),
             runOnce: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.runOnce",
+              label: "get.response.task.runOnce",
               schema: z.boolean(),
             }),
             notificationTargets: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.notificationTargets",
+              label: "get.response.task.notificationTargets",
               schema: z
                 .array(
                   z.object({
@@ -304,22 +304,22 @@ const { GET } = createEndpoint({
             }),
             targetInstance: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.targetInstance",
+              label: "get.response.task.targetInstance",
               schema: z.string().nullable(),
             }),
             tags: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.tags",
+              label: "get.response.task.tags",
               schema: z.array(z.string()).optional().default([]),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.createdAt",
+              label: "get.response.task.createdAt",
               schema: z.string(),
             }),
             updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.task.updatedAt",
+              label: "get.response.task.updatedAt",
               schema: z.string(),
             }),
           },
@@ -327,7 +327,7 @@ const { GET } = createEndpoint({
       }),
       totalTasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalTasks",
+        label: "get.response.totalTasks",
         schema: z.coerce.number(),
       }),
     },
@@ -335,15 +335,15 @@ const { GET } = createEndpoint({
 
   events: {
     "task-updated": {
-      fields: { tasks: ["id"] as const },
+      responseFields: { tasks: ["id"] as const },
       operation: "merge" as const,
     },
     "task-created": {
-      fields: { tasks: ["id"] as const },
+      responseFields: { tasks: ["id"] as const },
       operation: "merge" as const,
     },
     "task-removed": {
-      fields: { tasks: ["id"] as const },
+      responseFields: { tasks: ["id"] as const },
       operation: "remove" as const,
     },
   },

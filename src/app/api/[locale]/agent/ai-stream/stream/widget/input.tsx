@@ -261,7 +261,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     if (!activeFavId) {
       return null;
     }
-    const stored = ChatFavoritesRepositoryClient.loadLocalFavorite(activeFavId);
+    const stored =
+      ChatFavoritesRepositoryClient.loadLocalFavoriteSync(activeFavId);
     if (!stored) {
       return null;
     }

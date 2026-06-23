@@ -1,34 +1,19 @@
 /**
- * WebSocket Types
- * Shared type definitions for the typed WebSocket event system.
- * Used by server (emitter), client (hooks), and endpoint definitions.
+ * WebSocket Wire & Server Types
+ *
+ * Wire-protocol frames and server-side connection types shared by the socket
+ * server, the browser client, and the emitter.
+ *
+ * Event PAYLOAD types are NOT here — they are derived per-endpoint from the
+ * field-spec `events` declaration via `structured-events.ts`
+ * (`ComputeEventPayloads` → `definition.types.EventPayloads`). That is the single
+ * event type system; there is no Zod-schema event variant.
  */
 
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
-
-// ============================================================================
-// EVENT TYPE INFERENCE
-// ============================================================================
-
-/**
- * Infer output types from a record of Zod schemas.
- * Used to derive the typed event payloads from definition.events.
- *
- * Example:
- *   events: { contentDelta: z.object({ delta: z.string() }) }
- *   → EventMap = { contentDelta: { delta: string } }
- */
-export type EventMap<T extends Record<string, z.ZodType>> = {
-  [K in keyof T]: z.output<T[K]>;
-};
-
-/**
- * Constraint type for event schema records.
- * Endpoints declare events as Record<string, z.ZodType>.
- */
-export type EventSchemas = Record<string, z.ZodType>;
 
 // ============================================================================
 // WIRE PROTOCOL
@@ -36,14 +21,15 @@ export type EventSchemas = Record<string, z.ZodType>;
 
 /**
  * Message sent over the WebSocket wire (JSON serialized).
- * Generic T defaults to the widest Zod output for untyped contexts.
+ * `data` is the typed event payload, or an `EndpointEventEnvelope` when the
+ * event name is `"__event__"` (endpoint events routed via the user channel).
  */
-export interface WsWireMessage<T = z.infer<z.ZodType>> {
+export interface WsWireMessage<T = WidgetData> {
   /** Channel this event belongs to */
   readonly channel: string;
-  /** Event name (matches a key in the endpoint's events record) */
+  /** Event name (matches a key in the endpoint's events record, or "__event__") */
   readonly event: string;
-  /** Event payload (validated against the Zod schema on emit) */
+  /** Event payload */
   readonly data: T;
   /** Monotonic sequence ID for ordering / resumability */
   readonly seq: number;
@@ -79,6 +65,7 @@ export type WsWireFrame = WsWireMessage | WsWireBatch;
 export interface WsSubscribeMessage {
   readonly type: "subscribe";
   readonly channel: string;
+  readonly locale: CountryLanguage;
 }
 
 export interface WsUnsubscribeMessage {
@@ -115,37 +102,13 @@ export interface WsConnectionData {
   connectedAt: number;
 }
 
-/**
- * Typed emit function - derived from an endpoint's events record.
- * Handlers call emit("eventName", payload) with full type safety.
- */
-export type TypedEmit<TEvents extends EventSchemas | never> =
-  TEvents extends EventSchemas
-    ? <K extends keyof TEvents>(event: K, data: z.input<TEvents[K]>) => void
-    : () => void;
-
 // ============================================================================
 // CLIENT-SIDE TYPES
 // ============================================================================
 
 /**
- * Generic event handler callback.
- * T is narrowed by useWidgetEvents to the specific Zod output type.
- * At the low-level useWebSocket, T is z.infer<z.ZodType> (widest).
+ * Generic event handler callback. Receives the wire `data` for an event.
+ * Consumers (e.g. useEndpointSubscription) narrow `T` to the endpoint's
+ * computed `types.EventPayloads[eventName]`.
  */
 export type EventHandler<T> = (data: T) => void;
-
-/**
- * Return type for useWidgetEvents hook.
- */
-export interface UseWidgetEventsReturn<TEvents extends EventSchemas | never> {
-  /** Subscribe to a specific event type */
-  on: <K extends keyof TEvents & string>(
-    event: K,
-    handler: EventHandler<z.output<TEvents[K]>>,
-  ) => () => void;
-  /** Whether the WebSocket connection is active */
-  connected: boolean;
-  /** Last event received (any type) */
-  lastEvent: WsWireMessage | null;
-}

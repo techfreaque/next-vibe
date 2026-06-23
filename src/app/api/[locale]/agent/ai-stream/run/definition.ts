@@ -102,7 +102,7 @@ const { POST } = createEndpoint({
     // Emitted once a new thread is created - lets callers update thread lists without polling
     "thread-created": {
       operation: "append" as const,
-      fields: ["threadId", "threadTitle", "threadCreatedAt"] as const,
+      responseFields: ["threadId", "threadTitle", "threadCreatedAt"] as const,
     },
   },
 
@@ -377,28 +377,28 @@ const { POST } = createEndpoint({
       // ── Response ────────────────────────────────────────────────────────
       text: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "run.post.response.text",
+        label: "run.post.response.text",
         columns: 12,
         schema: z.string().nullable(),
       }),
 
       promptTokens: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "run.post.response.promptTokens",
+        label: "run.post.response.promptTokens",
         columns: 6,
         schema: z.number().nullable(),
       }),
 
       completionTokens: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "run.post.response.completionTokens",
+        label: "run.post.response.completionTokens",
         columns: 6,
         schema: z.number().nullable(),
       }),
 
       creditCost: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "run.post.response.creditCost",
+        label: "run.post.response.creditCost",
         columns: 6,
         schema: z.number().nullable(),
       }),
@@ -406,28 +406,28 @@ const { POST } = createEndpoint({
       // ── Thread metadata (null when rootFolderId is incognito) ───────────
       threadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "run.post.response.threadId",
+        label: "run.post.response.threadId",
         columns: 6,
         schema: z.string().uuid().nullable(),
       }),
 
       lastAiMessageId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "run.post.response.lastAiMessageId",
+        label: "run.post.response.lastAiMessageId",
         columns: 6,
         schema: z.string().uuid().nullable(),
       }),
 
       threadTitle: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "run.post.response.threadTitle",
+        label: "run.post.response.threadTitle",
         schema: z.string().nullable(),
         columns: 6,
       }),
 
       threadCreatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "run.post.response.threadCreatedAt",
+        label: "run.post.response.threadCreatedAt",
         schema: z.string().datetime().nullable(),
         columns: 6,
       }),
@@ -442,17 +442,17 @@ const { POST } = createEndpoint({
           children: {
             routeId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "run.post.response.preCallResults.routeId",
+              label: "run.post.response.preCallResults.routeId",
               schema: z.string(),
             }),
             success: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "run.post.response.preCallResults.succeeded",
+              label: "run.post.response.preCallResults.succeeded",
               schema: z.boolean(),
             }),
             error: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "run.post.response.preCallResults.errorMessage",
+              label: "run.post.response.preCallResults.errorMessage",
               schema: z.string().nullable(),
             }),
           },

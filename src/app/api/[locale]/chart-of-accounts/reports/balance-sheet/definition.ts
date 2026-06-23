@@ -68,7 +68,7 @@ const { GET } = createEndpoint({
 
       asOfDateResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "balanceSheet.response.asOfDate" as const,
+        label: "balanceSheet.response.asOfDate" as const,
         schema: z.string(),
       }),
       assets: responseArrayField(scopedTranslation, {
@@ -80,27 +80,27 @@ const { GET } = createEndpoint({
           children: {
             accountId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "accountGet.accountId.label" as const,
+              label: "accountGet.accountId.label" as const,
               schema: z.string(),
             }),
             code: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.code" as const,
+              label: "balanceSheet.response.code" as const,
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.name" as const,
+              label: "balanceSheet.response.name" as const,
               schema: z.string(),
             }),
             subtype: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.subtype" as const,
+              label: "balanceSheet.response.subtype" as const,
               schema: z.string(),
             }),
             balance: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.balance" as const,
+              label: "balanceSheet.response.balance" as const,
               schema: z.number(),
             }),
           },
@@ -108,7 +108,7 @@ const { GET } = createEndpoint({
       }),
       totalAssets: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "balanceSheet.response.totalAssets" as const,
+        label: "balanceSheet.response.totalAssets" as const,
         schema: z.number(),
       }),
       liabilities: responseArrayField(scopedTranslation, {
@@ -120,27 +120,27 @@ const { GET } = createEndpoint({
           children: {
             accountId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "accountGet.accountId.label" as const,
+              label: "accountGet.accountId.label" as const,
               schema: z.string(),
             }),
             code: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.code" as const,
+              label: "balanceSheet.response.code" as const,
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.name" as const,
+              label: "balanceSheet.response.name" as const,
               schema: z.string(),
             }),
             subtype: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.subtype" as const,
+              label: "balanceSheet.response.subtype" as const,
               schema: z.string(),
             }),
             balance: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.balance" as const,
+              label: "balanceSheet.response.balance" as const,
               schema: z.number(),
             }),
           },
@@ -148,7 +148,7 @@ const { GET } = createEndpoint({
       }),
       totalLiabilities: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "balanceSheet.response.totalLiabilities" as const,
+        label: "balanceSheet.response.totalLiabilities" as const,
         schema: z.number(),
       }),
       equity: responseArrayField(scopedTranslation, {
@@ -160,27 +160,27 @@ const { GET } = createEndpoint({
           children: {
             accountId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "accountGet.accountId.label" as const,
+              label: "accountGet.accountId.label" as const,
               schema: z.string(),
             }),
             code: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.code" as const,
+              label: "balanceSheet.response.code" as const,
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.name" as const,
+              label: "balanceSheet.response.name" as const,
               schema: z.string(),
             }),
             subtype: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.subtype" as const,
+              label: "balanceSheet.response.subtype" as const,
               schema: z.string(),
             }),
             balance: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "balanceSheet.response.balance" as const,
+              label: "balanceSheet.response.balance" as const,
               schema: z.number(),
             }),
           },
@@ -188,7 +188,7 @@ const { GET } = createEndpoint({
       }),
       totalEquity: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "balanceSheet.response.totalEquity" as const,
+        label: "balanceSheet.response.totalEquity" as const,
         schema: z.number(),
       }),
       isBalanced: responseField(scopedTranslation, {

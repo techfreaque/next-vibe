@@ -103,7 +103,7 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       cancelled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.cancelled",
+        label: "post.response.cancelled",
         schema: z.boolean(),
       }),
     },

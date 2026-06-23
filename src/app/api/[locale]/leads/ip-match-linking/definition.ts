@@ -70,13 +70,13 @@ const { POST } = createEndpoint({
 
       pairsFound: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.pairsFound",
+        label: "post.response.pairsFound",
         schema: z.number(),
       }),
 
       pairsLinked: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.pairsLinked",
+        label: "post.response.pairsLinked",
         schema: z.number(),
       }),
     },

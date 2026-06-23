@@ -54,6 +54,9 @@ export const translations: typeof enTranslations = {
       },
       timeout: { title: "Timeout", description: "Zeitlimit überschritten" },
     },
+    response: {
+      users: { title: "Benutzer" },
+    },
     success: {
       title: "Benutzer aufgelistet",
       description: "OS-Benutzer abgerufen",

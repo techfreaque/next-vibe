@@ -20,16 +20,10 @@ import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";
 
-/**
- * Props for custom widget
- */
 interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-/**
- * Custom container widget for credit history
- */
 export function CreditHistoryContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
@@ -43,8 +37,9 @@ export function CreditHistoryContainer({
   const paginationInfo = value?.paginationInfo;
 
   return (
-    <Div className="flex flex-col gap-0">
-      <NavigateButtonWidget field={children.backButton} />
+    <WidgetShell>
+      <CreditsTabHeader activeTab="history" />
+
       {/* Transactions List */}
       <Div className="flex flex-col gap-3">
         {transactions.length > 0 ? (
@@ -61,7 +56,6 @@ export function CreditHistoryContainer({
                     : "bg-destructive/10 border-destructive/30",
                 )}
               >
-                {/* Left side - type and date */}
                 <Div className="flex flex-col gap-1">
                   {transaction.type && (
                     <Div className="text-sm">{transaction.type}</Div>
@@ -71,7 +65,6 @@ export function CreditHistoryContainer({
                   </Div>
                 </Div>
 
-                {/* Right side - amount and balance */}
                 <Div className="text-right flex flex-col gap-1">
                   <Div
                     className={cn(
@@ -105,6 +98,6 @@ export function CreditHistoryContainer({
           fieldName={"paginationInfo"}
         />
       )}
-    </Div>
+    </WidgetShell>
   );
 }

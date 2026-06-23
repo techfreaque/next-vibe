@@ -80,7 +80,7 @@ const { POST } = createEndpoint({
       }),
       responseMessage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.output.title",
+        label: "post.fields.output.title",
         schema: translatedValueSchema,
       }),
     },

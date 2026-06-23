@@ -1,14 +1,15 @@
 /**
- * Remote Connection — End-to-End Tool Execution Tests
+ * Remote Connection — E2E Tool Execution Tests (instance identity proof)
  *
  * Proves that tool execution routed to hermes actually runs ON hermes:
- *   - `system-prompt-debug` returns "**Instance ID:** hermes" in the system prompt
- *   - Both direct-http transport and reverse-WS transport are tested
+ *   system-prompt-debug returns "**Instance ID:** hermes" in the system prompt.
  *
- * Uses the definition-driven `RouteExecuteRepository.runInProcessTyped` path —
- * the same central executor used by AI loops and the CLI.
+ * Tested for both transport modes:
+ *   RC-EXECUTE-DIRECT: direct-http (connectToHermes)
+ *   RC-EXECUTE-WS:     reverse-WS  (connectToHermesLocalAi)
  *
- * Requires: vibe --hermes dev --fixture-mode  → http://localhost:3002
+ * This file is guarded by resolveRemoteUrlSync() — if Hermes is not running,
+ * the suite fails immediately (not silently skipped). Run: vibe --hermes dev
  */
 
 import "server-only";
@@ -45,24 +46,42 @@ const _remoteUrl = resolveRemoteUrlSync();
 if (!_remoteUrl) {
   failSuitePrerequisites(
     "Remote E2E tool execution tests",
-    "remote server not running — start: vibe --hermes dev --fixture-mode  → http://localhost:3002",
+    "remote server not running — start: vibe --hermes dev → http://localhost:3002",
   );
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-// When instanceId is set, runInProcessTyped goes through execute() which wraps
-// the remote response as { result: <endpoint output> } for MCP/AI display.
-const RemoteResultSchema = z.object({
-  result: z.object({ systemPrompt: z.string() }),
-});
+const RemoteResultSchema = z.object({ systemPrompt: z.string() });
 
 function extractSystemPrompt(data: WidgetData): string {
   const parsed = RemoteResultSchema.safeParse(data);
-  if (!parsed.success) {
-    return "";
+  return parsed.success ? parsed.data.systemPrompt : "";
+}
+
+async function assertRunsOnHermes(user: JwtPrivatePayloadType, label: string): Promise<void> {
+  const result = await RouteExecuteRepository.runInProcessTyped({
+    definition: systemPromptDebugDefinitions.GET,
+    instanceId: HERMES_INSTANCE_ID,
+    user,
+    locale: defaultLocale,
+    input: { rootFolderId: DefaultFolderId.PRIVATE },
+  });
+
+  expect(
+    result.success,
+    `${label}: expected success, got: ${result.success ? "ok" : result.message}`,
+  ).toBe(true);
+  if (!result.success) {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error(`${label}: ${result.message}`);
   }
-  return parsed.data.result.systemPrompt;
+
+  const systemPrompt = extractSystemPrompt(result.data);
+  expect(
+    systemPrompt,
+    `${label}: system prompt must contain "**Instance ID:** hermes" — tool executed locally instead of on hermes. Got: ${systemPrompt.slice(0, 200)}`,
+  ).toContain("**Instance ID:** hermes");
 }
 
 // ── Shared state ──────────────────────────────────────────────────────────────
@@ -95,27 +114,7 @@ describe("RC-EXECUTE-DIRECT: direct-http tool execution on hermes", () => {
   it(
     "RC-DIRECT-1: runInProcessTyped routes to hermes and returns Instance ID: hermes",
     async () => {
-      const result = await RouteExecuteRepository.runInProcessTyped({
-        definition: systemPromptDebugDefinitions.GET,
-        instanceId: HERMES_INSTANCE_ID,
-        user: testUser,
-        locale: defaultLocale,
-        input: { rootFolderId: DefaultFolderId.PRIVATE },
-      });
-
-      expect(
-        result.success,
-        `Expected success but got: ${!result.success ? result.message : "ok"}`,
-      ).toBe(true);
-      if (!result.success) {
-        return;
-      }
-
-      const systemPrompt = extractSystemPrompt(result.data);
-      expect(
-        systemPrompt,
-        `System prompt must contain "**Instance ID:** hermes" — tool must execute ON hermes, not locally. Got: ${systemPrompt.slice(0, 200)}`,
-      ).toContain("**Instance ID:** hermes");
+      await assertRunsOnHermes(testUser, "RC-DIRECT-1");
     },
     60_000,
   );
@@ -136,27 +135,7 @@ describe("RC-EXECUTE-WS: reverse-WS tool execution on hermes", () => {
   it(
     "RC-WS-1: runInProcessTyped via reverse-WS returns Instance ID: hermes",
     async () => {
-      const result = await RouteExecuteRepository.runInProcessTyped({
-        definition: systemPromptDebugDefinitions.GET,
-        instanceId: HERMES_INSTANCE_ID,
-        user: testUser,
-        locale: defaultLocale,
-        input: { rootFolderId: DefaultFolderId.PRIVATE },
-      });
-
-      expect(
-        result.success,
-        `Expected success but got: ${!result.success ? result.message : "ok"}`,
-      ).toBe(true);
-      if (!result.success) {
-        return;
-      }
-
-      const systemPrompt = extractSystemPrompt(result.data);
-      expect(
-        systemPrompt,
-        `System prompt must contain "**Instance ID:** hermes" — tool must execute ON hermes via reverse-WS. Got: ${systemPrompt.slice(0, 200)}`,
-      ).toContain("**Instance ID:** hermes");
+      await assertRunsOnHermes(testUser, "RC-WS-1");
     },
     60_000,
   );

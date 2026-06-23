@@ -8,7 +8,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  FieldDataType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -54,23 +53,23 @@ export const { GET } = createEndpoint({
     usage: { response: true } as const,
     children: {
       items: responseField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.OBJECT,
+        type: WidgetType.TEXT,
+        hidden: true,
         schema: z.array(captureItemSchema),
       }),
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list.response.total" as const,
+        label: "list.response.total" as const,
         schema: z.number(),
       }),
       page: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list.response.page" as const,
+        label: "list.response.page" as const,
         schema: z.number(),
       }),
       pageSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list.response.pageSize" as const,
+        label: "list.response.pageSize" as const,
         schema: z.number(),
       }),
     },

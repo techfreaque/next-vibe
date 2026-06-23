@@ -109,14 +109,14 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-accessibility-tree.response.success",
+        label: "get-accessibility-tree.response.success",
         schema: z
           .boolean()
           .describe("Whether the accessibility tree retrieval succeeded"),
       }),
       tree: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-accessibility-tree.response.tree",
+        label: "get-accessibility-tree.response.tree",
         schema: z
           .string()
           .optional()
@@ -124,7 +124,7 @@ const { POST } = createEndpoint({
       }),
       nodeCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-accessibility-tree.response.nodeCount",
+        label: "get-accessibility-tree.response.nodeCount",
         schema: z
           .number()
           .optional()
@@ -132,7 +132,7 @@ const { POST } = createEndpoint({
       }),
       truncated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-accessibility-tree.response.truncated",
+        label: "get-accessibility-tree.response.truncated",
         schema: z
           .boolean()
           .optional()
@@ -140,7 +140,7 @@ const { POST } = createEndpoint({
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-accessibility-tree.response.error",
+        label: "get-accessibility-tree.response.error",
         schema: z
           .string()
           .optional()
@@ -148,7 +148,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-accessibility-tree.response.executionId",
+        label: "get-accessibility-tree.response.executionId",
         schema: z
           .string()
           .optional()

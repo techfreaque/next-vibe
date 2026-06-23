@@ -134,22 +134,22 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "journalList.response.id" as const,
+              label: "journalList.response.id" as const,
               schema: z.string(),
             }),
             entryNumber: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "journalList.response.entryNumber" as const,
+              label: "journalList.response.entryNumber" as const,
               schema: z.string(),
             }),
             date: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "journalList.response.date" as const,
+              label: "journalList.response.date" as const,
               schema: z.string(),
             }),
             description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "journalList.response.description" as const,
+              label: "journalList.response.description" as const,
               schema: z.string(),
             }),
             status: responseField(scopedTranslation, {
@@ -166,7 +166,7 @@ const { GET } = createEndpoint({
             }),
             postedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "journalList.response.postedAt" as const,
+              label: "journalList.response.postedAt" as const,
               schema: z.string().nullable(),
             }),
           },
@@ -174,7 +174,7 @@ const { GET } = createEndpoint({
       }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "journalList.response.totalCount" as const,
+        label: "journalList.response.totalCount" as const,
         schema: z.number(),
       }),
     },

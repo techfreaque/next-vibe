@@ -66,47 +66,47 @@ export const { GET } = createEndpoint({
       }),
       label: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.label.title",
+        label: "get.response.label.title",
         schema: z.string(),
       }),
       host: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.host.title",
+        label: "get.response.host.title",
         schema: z.string(),
       }),
       port: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.port.title",
+        label: "get.response.port.title",
         schema: z.number(),
       }),
       username: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.username.title",
+        label: "get.response.username.title",
         schema: z.string(),
       }),
       authType: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.authType.title",
+        label: "get.response.authType.title",
         schema: z.enum(SshAuthTypeDB),
       }),
       isDefault: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.isDefault.title",
+        label: "get.response.isDefault.title",
         schema: z.boolean(),
       }),
       fingerprint: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.fingerprint.title",
+        label: "get.response.fingerprint.title",
         schema: z.string().nullable(),
       }),
       notes: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.notes.title",
+        label: "get.response.notes.title",
         schema: z.string().nullable(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.createdAt.title",
+        label: "get.response.createdAt.title",
         schema: z.string(),
       }),
     },
@@ -278,7 +278,7 @@ export const { PATCH } = createEndpoint({
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.updatedAt.title",
+        label: "patch.response.updatedAt.title",
         schema: z.string(),
       }),
     },
@@ -360,7 +360,7 @@ export const { DELETE } = createEndpoint({
       title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         level: 5,
-        content: "widget.confirmDelete",
+        label: "widget.confirmDelete",
         usage: { request: "urlPathParams" },
       }),
       id: requestUrlPathParamsField(scopedTranslation, {
@@ -375,7 +375,7 @@ export const { DELETE } = createEndpoint({
       }),
       deleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.deleted.title",
+        label: "delete.response.deleted.title",
         schema: z.boolean(),
       }),
       backButton: backButton(scopedTranslation, {

@@ -86,13 +86,7 @@ export function LeadsExportContainer({
     for (let i = 0; i < byteChars.length; i++) {
       byteArray[i] = byteChars.charCodeAt(i);
     }
-    const blob = new Blob([byteArray], { type: data.mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = data.fileName;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBinaryFile(data.fileName, byteArray, data.mimeType);
   }, [data]);
 
   const handleCopyToClipboard = useCallback((): void => {
@@ -100,7 +94,7 @@ export function LeadsExportContainer({
       return;
     }
     const text = atob(data.fileContent);
-    void navigator.clipboard.writeText(text).then(() => {
+    void copyToClipboard(text).then(() => {
       setCopied(true);
       setTimeout(() => {
         setCopied(false);

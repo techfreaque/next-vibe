@@ -2,6 +2,15 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Newsletter",
+  enum: {
+    preferences: {
+      marketing: "Marketing",
+      productNews: "Produktnews",
+      companyUpdates: "Unternehmensneuigkeiten",
+      industryInsights: "Brancheneinblicke",
+      events: "Veranstaltungen",
+    },
+  },
   tags: {
     newsletter: "Newsletter",
     subscription: "Abonnement",

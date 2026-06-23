@@ -81,25 +81,25 @@ const { POST } = createEndpoint({
       checkoutUrl: responseField(scopedTranslation, {
         schema: z.string().url(),
         type: WidgetType.TEXT,
-        content: "post.checkoutUrl.content" as const,
+        label: "post.checkoutUrl.content" as const,
       }),
 
       sessionId: responseField(scopedTranslation, {
         schema: z.string(),
         type: WidgetType.TEXT,
-        content: "post.sessionId.content" as const,
+        label: "post.sessionId.content" as const,
       }),
 
       totalAmount: responseField(scopedTranslation, {
         schema: z.coerce.number().int(),
         type: WidgetType.TEXT,
-        content: "post.totalAmount.content" as const,
+        label: "post.totalAmount.content" as const,
       }),
 
       totalCredits: responseField(scopedTranslation, {
         schema: z.coerce.number().int(),
         type: WidgetType.TEXT,
-        content: "post.totalCredits.content" as const,
+        label: "post.totalCredits.content" as const,
       }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,
@@ -168,6 +168,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         quantity: 2,
+        provider: PaymentProvider.STRIPE,
       },
     },
     responses: {

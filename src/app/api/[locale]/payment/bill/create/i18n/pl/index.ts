@@ -6,6 +6,15 @@ export const translations: typeof enTranslations = {
     bill: "faktura",
     ap: "zobowiązania",
   },
+  enums: {
+    billStatus: {
+      DRAFT: "Szkic",
+      RECEIVED: "Otrzymana",
+      APPROVED: "Zatwierdzona",
+      PAID: "Opłacona",
+      DISPUTED: "Sporna",
+    },
+  },
   post: {
     title: "Zarejestruj fakturę zakupową",
     titleShort: "Utwórz rachunek",

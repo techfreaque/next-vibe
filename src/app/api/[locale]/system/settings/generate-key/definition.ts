@@ -42,7 +42,7 @@ export const { GET } = createEndpoint({
     children: {
       key: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.key.title" as const,
+        label: "get.response.key.title" as const,
         schema: z.string().length(64),
       }),
     },

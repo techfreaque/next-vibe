@@ -87,47 +87,47 @@ export const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.id" as const,
+              label: "get.response.earnings.id" as const,
               schema: z.string(),
             }),
             earnerUserId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.earnerUserId" as const,
+              label: "get.response.earnings.earnerUserId" as const,
               schema: z.string(),
             }),
             sourceUserId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.sourceUserId" as const,
+              label: "get.response.earnings.sourceUserId" as const,
               schema: z.string(),
             }),
             transactionId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.transactionId" as const,
+              label: "get.response.earnings.transactionId" as const,
               schema: z.string(),
             }),
             level: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.level" as const,
+              label: "get.response.earnings.level" as const,
               schema: z.coerce.number(),
             }),
             amountCents: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.amountCents" as const,
+              label: "get.response.earnings.amountCents" as const,
               schema: z.coerce.number(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.currency" as const,
+              label: "get.response.earnings.currency" as const,
               schema: z.string(),
             }),
             status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.status" as const,
+              label: "get.response.earnings.status" as const,
               schema: z.string(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.earnings.createdAt" as const,
+              label: "get.response.earnings.createdAt" as const,
               schema: z.string(),
             }),
           },
@@ -135,7 +135,7 @@ export const { GET } = createEndpoint({
       }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalCount" as const,
+        label: "get.response.totalCount" as const,
         schema: z.coerce.number(),
       }),
     },

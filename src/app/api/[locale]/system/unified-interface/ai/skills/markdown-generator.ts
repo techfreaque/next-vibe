@@ -582,7 +582,7 @@ export async function generateSkillAiRunMarkdown(
   }
 
   const { DEFAULT_SKILLS } =
-    await import("@/app/api/[locale]/agent/chat/skills/config");
+    await import("@/app/api/[locale]/agent/skills/config");
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
   const defaultVariant =
     defaultChar?.variants.find((v) => v.isDefault) ?? defaultChar?.variants[0];
@@ -884,7 +884,7 @@ export async function getSkillSkillInfo(
   locale: CountryLanguage,
 ): Promise<SkillSkillInfo | null> {
   const { DEFAULT_SKILLS } =
-    await import("@/app/api/[locale]/agent/chat/skills/config");
+    await import("@/app/api/[locale]/agent/skills/config");
 
   // Check default/system skills first
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
@@ -906,7 +906,7 @@ export async function getSkillSkillInfo(
     }
 
     const { scopedTranslation: charTranslation } =
-      await import("@/app/api/[locale]/agent/chat/skills/i18n");
+      await import("@/app/api/[locale]/agent/skills/i18n");
     const { t } = charTranslation.scopedT(locale);
 
     return {
@@ -927,10 +927,9 @@ export async function getSkillSkillInfo(
 
   // Fall back to DB - only PUBLIC custom skills are accessible without auth
   const { db } = await import("@/app/api/[locale]/system/db");
-  const { customSkills } =
-    await import("@/app/api/[locale]/agent/chat/skills/db");
+  const { customSkills } = await import("@/app/api/[locale]/agent/skills/db");
   const { SkillOwnershipType } =
-    await import("@/app/api/[locale]/agent/chat/skills/enum");
+    await import("@/app/api/[locale]/agent/skills/enum");
   const { eq, and } = await import("drizzle-orm");
 
   const [row] = await db
@@ -1017,7 +1016,7 @@ export async function generateSkillSkillMarkdown(
 
   // Fetch model selection for accurate AI Run example
   const { DEFAULT_SKILLS } =
-    await import("@/app/api/[locale]/agent/chat/skills/config");
+    await import("@/app/api/[locale]/agent/skills/config");
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
   const defaultVariant2 =
     defaultChar?.variants.find((v) => v.isDefault) ?? defaultChar?.variants[0];
@@ -1188,11 +1187,11 @@ export async function getListableSkills(locale: CountryLanguage): Promise<
   }>
 > {
   const { DEFAULT_SKILLS } =
-    await import("@/app/api/[locale]/agent/chat/skills/config");
+    await import("@/app/api/[locale]/agent/skills/config");
   const { UserPermissionRole } =
     await import("@/app/api/[locale]/user/user-roles/enum");
   const { scopedTranslation: charTranslation } =
-    await import("@/app/api/[locale]/agent/chat/skills/i18n");
+    await import("@/app/api/[locale]/agent/skills/i18n");
   const { t } = charTranslation.scopedT(locale);
 
   return DEFAULT_SKILLS.filter((char) => {

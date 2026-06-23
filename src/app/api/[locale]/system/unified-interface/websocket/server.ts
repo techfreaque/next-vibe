@@ -22,14 +22,16 @@ import http from "node:http";
 
 import type { ServerWebSocket } from "bun";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   AUTH_TOKEN_COOKIE_NAME,
   LEAD_ID_COOKIE_NAME,
 } from "@/config/constants";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { PROXY_LOADING_HTML } from "./proxy-loading-page";
 import { getPubSubAdapter } from "./pubsub";
 import type {
   WsBatchEvent,
@@ -56,10 +58,10 @@ let shuttingDown = false;
  * Broadcast to all subscribers on a channel (no user filter).
  * Used by pub/sub adapters that relay events from other processes.
  */
-export function broadcastLocalToAll(
+export function broadcastLocalToAll<T extends WidgetData>(
   channel: string,
   event: string,
-  data: WsWireMessage["data"],
+  data: T,
 ): void {
   const subscribers = channels.get(channel);
   if (!subscribers || subscribers.size === 0) {
@@ -67,7 +69,7 @@ export function broadcastLocalToAll(
   }
 
   globalSeq++;
-  const message: WsWireMessage = {
+  const message: WsWireMessage<T> = {
     channel,
     event,
     data,
@@ -88,10 +90,10 @@ export function broadcastLocalToAll(
  * Broadcast an event to all LOCAL subscribers of a channel.
  * Access control is enforced at subscribe time (not at broadcast time).
  */
-export function broadcastLocal(
+export function broadcastLocal<T extends WidgetData>(
   channel: string,
   event: string,
-  data: WsWireMessage["data"],
+  data: T,
 ): void {
   broadcastLocalToAll(channel, event, data);
 }
@@ -143,12 +145,12 @@ export function broadcastLocalBatch(events: WsBatchEvent[]): void {
 
 /**
  * Publish an event through the pub/sub adapter.
- * NOTE: Route handlers should use createEmitter() from emitter.ts instead.
+ * NOTE: Route handlers should use createEndpointEmitter() from emitter.ts instead.
  */
-export function publish(
+export function publish<T extends WidgetData>(
   channel: string,
   event: string,
-  data: WsWireMessage["data"],
+  data: T,
 ): void {
   getPubSubAdapter().publish(channel, event, data);
 }
@@ -200,6 +202,7 @@ async function authorizeWsChannel(
   user: JwtPayloadType,
   channel: string,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<boolean> {
   // User channel is always allowed — scoped to the authenticated user already
   if (channel.startsWith("user/")) {
@@ -227,7 +230,7 @@ async function authorizeWsChannel(
       entry.endpoint,
       user,
       Platform.NEXT_PAGE,
-      "en-US",
+      locale,
     );
     if (!roleResult.success) {
       return false;
@@ -235,7 +238,7 @@ async function authorizeWsChannel(
 
     // Resource-level check declared in the route handler
     if (entry.canSubscribe) {
-      return entry.canSubscribe({ user, urlPathParams, logger });
+      return entry.canSubscribe({ user, urlPathParams, logger, locale });
     }
 
     return true;
@@ -385,6 +388,50 @@ interface WsConnectionDataWithProxy extends WsConnectionData {
 }
 
 /**
+ * Dispatch a tool-execute-request that arrived on an authenticated server-to-server
+ * WS (the initiator of a reverse-ws connection sends dispatches over its outbound
+ * socket). Delegates to execute-tool's onRemoteEvent handler — same code as the
+ * HTTP path, result published back on the hub channel.
+ */
+async function handleInboundWireMessage(
+  ws: ServerWebSocket<WsConnectionData>,
+  raw: Partial<WsWireMessage>,
+  logger: EndpointLogger,
+): Promise<void> {
+  const channel = typeof raw.channel === "string" ? raw.channel : null;
+  const event = typeof raw.event === "string" ? raw.event : null;
+  if (!channel || !event) {
+    return;
+  }
+  if (
+    !channel.startsWith("system/tool-dispatch/") ||
+    event !== "tool-execute-request"
+  ) {
+    return;
+  }
+
+  const user = ws.data.user;
+  if (user.isPublic || !("id" in user) || !user.id) {
+    logger.warn(
+      "[WS] tool-execute-request from unauthenticated socket — dropped",
+    );
+    return;
+  }
+
+  const { RemoteConnectionRepository } =
+    await import("@/app/api/[locale]/remote-connection/repository");
+  const { dispatchToolWireEvent } =
+    await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+  await dispatchToolWireEvent(
+    "tool-execute-request",
+    raw.data,
+    RemoteConnectionRepository.deriveDefaultSelfInstanceId(),
+    user.id,
+    logger,
+  );
+}
+
+/**
  * Next.js runs on this offset above the main port (internal only).
  * Main port 3000 → Next.js on 3100 (internal, vibe dev)
  * Main port 3001 → Next.js on 3101 (internal, vibe start)
@@ -525,7 +572,10 @@ export function startWebSocketServer(
           return new Response("Missing lead_id cookie", { status: 401 });
         }
 
-        if (channel && !(await authorizeWsChannel(user, channel, logger))) {
+        if (
+          channel &&
+          !(await authorizeWsChannel(user, channel, logger, locale))
+        ) {
           return new Response("Forbidden", { status: 403 });
         }
 
@@ -577,22 +627,26 @@ export function startWebSocketServer(
       const PROXY_RETRY_DELAYS = isIdempotent
         ? [500, 1000, 2000, 4000, 8000]
         : [];
-      // Timeout for a single proxy attempt. Vite can take 30-60s on cold start
-      // for the first SSR render (full dep pre-bundle + module evaluation).
-      // If it takes longer than this, something is genuinely stuck - return 504.
-      const PROXY_REQUEST_TIMEOUT_MS = 90_000;
+      // Proxy timeout is always high — timeout enforcement belongs on the app server
+      // side via endpoint definition's timeoutMs, not here. The proxy must not cut
+      // off long-running requests (SSR cold-start, media generation, execute-tool, etc.)
+      // before the app server's own deadline fires.
+      const PROXY_REQUEST_TIMEOUT_MS = 600_000;
       let lastProxyError = "Unknown error";
       const proxyStartMs = Date.now();
       trackRequest(req.method, url.pathname);
 
-      // For multipart/form-data (file uploads), Bun's internal idle timeout can
-      // fire mid-stream and truncate the body before all bytes reach the proxy.
-      // Buffer the entire body upfront so Bun fully receives it before we open
-      // the proxy connection. This is safe for non-idempotent POSTs (no retry).
+      // Bun's internal idle timeout can fire mid-stream and truncate the body
+      // before all bytes reach the proxy. Buffer multipart (file uploads) and
+      // JSON bodies (large sync payloads) upfront so Bun fully receives them
+      // before we open the proxy connection. This is safe for non-idempotent
+      // POSTs (no retry).
       let bufferedBody: Buffer | null = null;
       const contentType = req.headers.get("content-type") ?? "";
-      const isMultipart = contentType.includes("multipart/form-data");
-      if (!isIdempotent && isMultipart && req.body) {
+      const shouldBufferBody =
+        contentType.includes("multipart/form-data") ||
+        contentType.includes("application/json");
+      if (!isIdempotent && shouldBufferBody && req.body) {
         try {
           bufferedBody = Buffer.from(await req.arrayBuffer());
         } catch {
@@ -611,7 +665,7 @@ export function startWebSocketServer(
             }
             settled = true;
             clearTimeout(timeoutHandle);
-            // eslint-disable-next-line promise/no-multiple-resolved
+            // oxlint-disable-next-line promise/no-multiple-resolved -- `settled` guard prevents double-resolve; static analysis can't track it
             resolve(result);
           };
           const timeoutHandle = setTimeout(() => {
@@ -721,11 +775,12 @@ export function startWebSocketServer(
           });
 
           // Send the request body to the upstream proxy.
-          // Multipart uploads are pre-buffered above to avoid Bun's idle timeout
-          // truncating large bodies mid-stream. All other non-idempotent requests
-          // are streamed directly (no retry means single-use is safe).
+          // Multipart and JSON bodies are pre-buffered above to avoid Bun's
+          // idle timeout truncating large bodies mid-stream. All other
+          // non-idempotent requests are streamed directly (no retry means
+          // single-use is safe).
           if (bufferedBody !== null) {
-            // Pre-buffered multipart body - write all at once
+            // Pre-buffered body - write all at once
             proxyReq.end(bufferedBody);
           } else if (req.body && !isIdempotent) {
             const reader = req.body.getReader();
@@ -793,152 +848,8 @@ export function startWebSocketServer(
         rssMb: Math.round(mem.rss / 1024 / 1024),
         targetPort: nextPort,
       });
-      const errorHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Back in a moment</title>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#080808;--surface:#111;--border:#1e1e1e;--border-bright:#2a2a2a;--text:#f0f0f0;--muted:#555;--subtle:#333;--accent:#6366f1;--accent-dim:#4f46e5}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:0}
-
-    /* Ambient glow */
-    .glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(99,102,241,.07) 0%,transparent 70%);pointer-events:none}
-
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:52px 44px 44px;max-width:460px;width:100%;text-align:center;position:relative;overflow:hidden}
-    .card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(99,102,241,.04) 0%,transparent 60%);pointer-events:none}
-
-    /* Spinner ring */
-    .spinner-wrap{position:relative;width:72px;height:72px;margin:0 auto 32px}
-    .spinner-ring{width:72px;height:72px;border-radius:50%;border:2px solid var(--border-bright);border-top-color:var(--accent);animation:spin 1.1s cubic-bezier(.6,.2,.4,.8) infinite;position:absolute;inset:0}
-    .spinner-ring.slow{width:58px;height:58px;margin:7px;border-top-color:transparent;border-right-color:rgba(99,102,241,.35);animation-duration:2.2s;animation-direction:reverse}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .spinner-dot{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-    .spinner-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:.7;animation:pulse 1.1s ease-in-out infinite}
-    @keyframes pulse{0%,100%{opacity:.4;transform:scale(.85)}50%{opacity:1;transform:scale(1)}}
-
-    .eyebrow{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;opacity:.9}
-    h1{font-size:24px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.25;letter-spacing:-.02em}
-    .subtext{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:32px;max-width:320px;margin-left:auto;margin-right:auto}
-
-    /* Status bar */
-    .status-bar{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:28px;display:flex;align-items:center;gap:12px;text-align:left}
-    .status-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:statusPulse 2s ease-in-out infinite}
-    @keyframes statusPulse{0%,100%{opacity:.4}50%{opacity:1;box-shadow:0 0 6px #22c55e}}
-    .status-dot.warn{background:#f59e0b;animation:statusPulse 1.5s ease-in-out infinite}
-    @keyframes statusPulse{0%,100%{opacity:.5}50%{opacity:1}}
-    .status-text{font-size:13px;color:var(--muted);flex:1}
-    .status-text strong{color:rgba(240,240,240,.75);font-weight:500}
-    .status-timer{font-size:12px;color:var(--subtle);font-variant-numeric:tabular-nums;font-family:ui-monospace,monospace}
-
-    /* Progress bar */
-    .progress-wrap{height:2px;background:var(--border);border-radius:99px;margin-bottom:24px;overflow:hidden}
-    .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent-dim),var(--accent));border-radius:99px;width:0%;transition:width .9s linear}
-
-    /* Button */
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--text);color:#000;border:none;border-radius:10px;padding:12px 26px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s,transform .1s;width:100%}
-    .btn:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
-    .btn:active:not(:disabled){transform:translateY(0)}
-    .btn:disabled{opacity:.35;cursor:not-allowed;background:var(--subtle);color:var(--muted)}
-    .btn-spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,.2);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;display:none}
-    .btn.loading .btn-spinner{display:block}
-    .btn.loading .btn-label{opacity:.7}
-
-    .footer-note{font-size:12px;color:#2e2e2e;margin-top:20px;line-height:1.6}
-  </style>
-</head>
-<body>
-  <div class="glow"></div>
-  <div class="card">
-    <div class="spinner-wrap">
-      <div class="spinner-ring"></div>
-      <div class="spinner-ring slow"></div>
-      <div class="spinner-dot"></div>
-    </div>
-
-    <div class="eyebrow">System Status</div>
-    <h1>Back in a moment</h1>
-    <p class="subtext">The server is catching its breath - either waking up after an update or recovering from high load. It'll be right back.</p>
-
-    <div class="status-bar">
-      <div class="status-dot warn" id="sdot"></div>
-      <div class="status-text"><strong id="stext">Checking server&hellip;</strong><br><span id="sdesc">Auto-retry in progress</span></div>
-      <div class="status-timer" id="stimer">0:15</div>
-    </div>
-
-    <div class="progress-wrap">
-      <div class="progress-bar" id="prog"></div>
-    </div>
-
-    <button class="btn" id="btn" onclick="manualReload()">
-      <div class="btn-spinner"></div>
-      <span class="btn-label">Try now</span>
-    </button>
-  </div>
-  <div class="footer-note">unbottled.ai &mdash; if this persists, try refreshing manually</div>
-
-  <script>
-    var TOTAL=20, elapsed=0, reloading=false;
-    var messages=[
-      ['Warming up…','Server process starting'],
-      ['Almost there…','Loading application modules'],
-      ['Hang tight…','Finalising startup'],
-      ['Ready soon…','Waiting for health check'],
-    ];
-
-    function fmt(s){return'0:'+String(s).padStart(2,'0')}
-
-    function setStatus(dot,title,desc){
-      document.getElementById('sdot').className='status-dot'+(dot?' warn':'');
-      document.getElementById('stext').textContent=title;
-      document.getElementById('sdesc').textContent=desc;
-    }
-
-    function tick(){
-      if(reloading)return;
-      elapsed++;
-      var remaining=TOTAL-elapsed;
-      document.getElementById('stimer').textContent=fmt(Math.max(0,remaining));
-      document.getElementById('prog').style.width=(elapsed/TOTAL*100)+'%';
-
-      var mi=Math.min(Math.floor(elapsed/5),messages.length-1);
-      setStatus(true,messages[mi][0],messages[mi][1]);
-
-      if(remaining<=0){autoReload();return;}
-      setTimeout(tick,1000);
-    }
-
-    function autoReload(){
-      if(reloading)return;
-      reloading=true;
-      var btn=document.getElementById('btn');
-      btn.disabled=true;
-      btn.classList.add('loading');
-      btn.querySelector('.btn-label').textContent='Connecting…';
-      setStatus(false,'Reconnecting…','Attempting to reach the server');
-      document.getElementById('stimer').textContent='';
-      location.reload();
-    }
-
-    function manualReload(){
-      if(reloading)return;
-      reloading=true;
-      var btn=document.getElementById('btn');
-      btn.disabled=true;
-      btn.classList.add('loading');
-      btn.querySelector('.btn-label').textContent='Connecting…';
-      setStatus(false,'Reconnecting…','Attempting to reach the server');
-      document.getElementById('stimer').textContent='';
-      location.reload();
-    }
-
-    window.onload=function(){setTimeout(tick,1000)};
-  </script>
-</body>
-</html>`;
-      return new Response(errorHtml, {
+      // Loading page served when upstream Next.js is unreachable — see proxy-loading-page.ts
+      return new Response(PROXY_LOADING_HTML, {
         status: 503,
         headers: {
           "content-type": "text/html; charset=utf-8",
@@ -1002,7 +913,12 @@ export function startWebSocketServer(
 
           if (msg.type === "subscribe") {
             if (
-              !(await authorizeWsChannel(ws.data.user, msg.channel, logger))
+              !(await authorizeWsChannel(
+                ws.data.user,
+                msg.channel,
+                logger,
+                locale,
+              ))
             ) {
               return;
             }
@@ -1016,6 +932,15 @@ export function startWebSocketServer(
               msg.channel,
             );
             logger.debug(`[WS] Unsubscribed from ${msg.channel}`);
+          } else {
+            // Server-to-server wire message (remote-connection channel spec):
+            // the initiator of a reverse-ws connection sends tool-execute-
+            // requests over its outbound WS — this instance is the executor.
+            await handleInboundWireMessage(
+              ws as ServerWebSocket<WsConnectionData>,
+              JSON.parse(rawStr) as Partial<WsWireMessage>,
+              logger,
+            );
           }
         } catch (err) {
           const rawStr =

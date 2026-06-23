@@ -80,7 +80,7 @@ const { POST } = createEndpoint({
 
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.duration.title",
+        label: "post.fields.duration.title",
         schema: z.coerce.number(),
       }),
 

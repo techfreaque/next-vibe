@@ -2,6 +2,17 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "E-mail",
+  countries: {
+    global: "Globalny",
+    de: "Niemcy",
+    pl: "Polska",
+    us: "USA",
+  },
+  languages: {
+    en: "Angielski",
+    de: "Niemiecki",
+    pl: "Polski",
+  },
   enums: {
     // SMTP Client Enums
     smtpSecurityType: {

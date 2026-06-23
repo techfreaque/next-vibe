@@ -109,7 +109,7 @@ const { POST } = createEndpoint({
       }),
       capturedMonitor: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.monitorName",
+        label: "take-screenshot.response.monitorName",
         schema: z
           .string()
           .optional()
@@ -136,14 +136,14 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.success",
+        label: "take-screenshot.response.success",
         schema: z
           .boolean()
           .describe("Whether the screenshot capture succeeded"),
       }),
       imagePath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.imagePath",
+        label: "take-screenshot.response.imagePath",
         schema: z
           .string()
           .optional()
@@ -151,7 +151,7 @@ const { POST } = createEndpoint({
       }),
       imageData: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.imageData",
+        label: "take-screenshot.response.imageData",
         schema: z
           .string()
           .optional()
@@ -159,7 +159,7 @@ const { POST } = createEndpoint({
       }),
       imageUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.imageUrl",
+        label: "take-screenshot.response.imageUrl",
         schema: z
           .string()
           .optional()
@@ -167,17 +167,17 @@ const { POST } = createEndpoint({
       }),
       width: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.width",
+        label: "take-screenshot.response.width",
         schema: z.number().optional().describe("Screenshot width in pixels"),
       }),
       height: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.height",
+        label: "take-screenshot.response.height",
         schema: z.number().optional().describe("Screenshot height in pixels"),
       }),
       originalWidth: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.originalWidth",
+        label: "take-screenshot.response.originalWidth",
         schema: z
           .number()
           .optional()
@@ -185,7 +185,7 @@ const { POST } = createEndpoint({
       }),
       originalHeight: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.originalHeight",
+        label: "take-screenshot.response.originalHeight",
         schema: z
           .number()
           .optional()
@@ -193,7 +193,7 @@ const { POST } = createEndpoint({
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.error",
+        label: "take-screenshot.response.error",
         schema: z
           .string()
           .optional()
@@ -201,7 +201,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "take-screenshot.response.executionId",
+        label: "take-screenshot.response.executionId",
         schema: z
           .string()
           .optional()
@@ -218,6 +218,7 @@ const { POST } = createEndpoint({
       default: {
         success: true,
         imagePath: "/tmp/screenshot.png",
+        imageUrl: "/api/screenshots/exec_123.png",
         executionId: "exec_123",
       },
     },

@@ -20,8 +20,7 @@ export const { POST, tools } = endpointsHandler({
         t,
       }),
     onRemoteEvent: {
-      "node-written": (payload, ctx) =>
-        CortexMkdirRepository.applyRemoteMkdir(payload, ctx.user, ctx.logger),
+      "node-written": (props) => CortexMkdirRepository.applyRemoteMkdir(props),
     },
   },
 });

@@ -90,7 +90,7 @@ const { GET } = createEndpoint({
       // === RESPONSE ===
       tree: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.tree.content" as const,
+        label: "get.response.tree.content" as const,
         schema: z.string(),
       }),
       totalFiles: responseField(scopedTranslation, {

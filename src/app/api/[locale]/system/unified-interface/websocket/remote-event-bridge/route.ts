@@ -20,11 +20,11 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, user, logger }) =>
       RemoteEventBridgeRepository.receive(data, user, logger),
     onRemoteEvent: {
-      "remote-event": async (payload, ctx) =>
+      "remote-event": ({ responseData, user, logger }) =>
         RemoteEventBridgeRepository.handleRemoteEvent(
-          payload,
-          ctx.user.id,
-          ctx.logger,
+          responseData,
+          user.id,
+          logger,
         ),
     },
   },

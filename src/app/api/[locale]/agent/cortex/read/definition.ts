@@ -91,13 +91,13 @@ const { GET } = createEndpoint({
       // === RESPONSE ===
       responsePath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.path.content" as const,
+        label: "get.response.path.content" as const,
         schema: z.string(),
         fieldName: "path",
       }),
       content: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.content.content" as const,
+        label: "get.response.content.content" as const,
         schema: z.string(),
       }),
       size: responseField(scopedTranslation, {
@@ -122,7 +122,7 @@ const { GET } = createEndpoint({
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.updatedAt.content" as const,
+        label: "get.response.updatedAt.content" as const,
         schema: z.string(),
       }),
     },

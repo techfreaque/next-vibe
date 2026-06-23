@@ -23,6 +23,26 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { FetchUrlContentGetResponseOutput } from "./definition";
 import type { FetchUrlContentT } from "./i18n";
 
+interface TruncateResult {
+  content: string;
+  truncated: boolean;
+  truncatedNote?: string;
+}
+interface FetchUrlResult {
+  url: string;
+  content: string;
+  statusCode: number;
+  timeElapsed: number;
+  timestamp: number;
+}
+interface ScrappeyResponse {
+  solution: { response: string; currentUrl: string; statusCode: number };
+  timeElapsed: number;
+}
+type FetchResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: string; isTimeout?: boolean };
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 /** Maximum chars to return. Middle section is shown when truncated. */
@@ -33,35 +53,6 @@ const CACHE_TTL_MS = 5 * 60 * 1000;
 
 /** Virtual threadId namespace for URL cache - never a real chat thread */
 const CACHE_THREAD_ID = "url-fetch-cache";
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface FetchUrlResult {
-  url: string;
-  content: string;
-  statusCode: number;
-  timeElapsed: number;
-  timestamp: number;
-}
-
-type FetchResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; error: string; isTimeout?: boolean };
-
-interface ScrappeyResponse {
-  solution: {
-    response: string;
-    currentUrl: string;
-    statusCode: number;
-  };
-  timeElapsed: number;
-}
-
-interface TruncateResult {
-  content: string;
-  truncated: boolean;
-  truncatedNote?: string;
-}
 
 // ─── Cache helpers ────────────────────────────────────────────────────────────
 

@@ -48,16 +48,14 @@ async function routeBridgeToHermes(
   eventName: string,
   payload: WidgetData,
 ): Promise<ResponseType<RemoteEventBridgeResponseOutput>> {
-  const { RouteExecuteRepository } = await import(
-    "@/app/api/[locale]/system/unified-interface/execute-tool/repository"
-  );
-  const { CallbackMode } = await import(
-    "@/app/api/[locale]/system/unified-interface/execute-tool/constants"
-  );
-  const { createEndpointLogger } = await import(
-    "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger"
-  );
-  const { makeHeadlessContext } = await import("@/app/api/[locale]/agent/chat/config");
+  const { RouteExecuteRepository } =
+    await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");
+  const { CallbackMode } =
+    await import("@/app/api/[locale]/system/unified-interface/execute-tool/constants");
+  const { createEndpointLogger } =
+    await import("@/app/api/[locale]/system/logger/server");
+  const { makeHeadlessContext } =
+    await import("@/app/api/[locale]/agent/chat/config");
   const { defaultLocale } = await import("@/i18n/core/config");
 
   return RouteExecuteRepository.runInProcessTyped({
@@ -71,7 +69,6 @@ async function routeBridgeToHermes(
     input: {
       eventName,
       leadId: testUser.leadId,
-      originInstanceId: "atlas",
       payload,
     },
   });
@@ -92,26 +89,26 @@ describe("Remote Event Bridge", () => {
   // ════════════════════════════════════════════════════════════════════════════
 
   describe("Local", () => {
-    // ── REB-LOCAL-ENDPOINT-EVENT ──────────────────────────────────────────────
+    // ── REB-LOCAL-REMOTE-EVENT ────────────────────────────────────────────────
+    // One generic remote-event carries any route's relayed event. The bridge
+    // dispatches it to the target route's onRemoteEvent and returns received:true.
 
-    it("REB-LOCAL-ENDPOINT-EVENT: local endpoint-event returns received: true", async () => {
-      setFetchCacheContext("reb-local-endpoint-event");
+    it("REB-LOCAL-REMOTE-EVENT: local remote-event returns received: true", async () => {
+      setFetchCacheContext("reb-local-remote-event");
 
       const result = await sendTestRequest({
         endpoint: endpoints.POST,
         data: {
-          eventName: "endpoint-event",
+          eventName: "remote-event",
           leadId: testUser.leadId,
-          originInstanceId: "hermes",
           payload: {
-            leadId: testUser.leadId,
             originInstanceId: "hermes",
-            pathChannel: "path/channel",
+            domain: "cache",
             endpointPath: ["remote-connection", "remote-event-bridge"],
             endpointMethod: "POST",
             urlPathParams: {},
-            eventName: "update",
-            payload: {},
+            endpointEventName: "update",
+            endpointPayload: {},
           },
         },
         user: testUser,
@@ -119,68 +116,7 @@ describe("Remote Event Bridge", () => {
 
       expect(
         result.success,
-        `REB-LOCAL-ENDPOINT-EVENT failed: ${JSON.stringify(result)}`,
-      ).toBe(true);
-      if (!result.success) {
-        throw new Error(result.message);
-      }
-      expect(result.data.received).toBe(true);
-    });
-
-    // ── REB-LOCAL-SYNC-EVENT ──────────────────────────────────────────────────
-
-    it("REB-LOCAL-SYNC-EVENT: local sync-event returns received: true", async () => {
-      setFetchCacheContext("reb-local-sync-event");
-
-      const result = await sendTestRequest({
-        endpoint: endpoints.POST,
-        data: {
-          eventName: "sync-event",
-          leadId: testUser.leadId,
-          originInstanceId: "hermes",
-          payload: {
-            leadId: testUser.leadId,
-            syncPayloads: {},
-          },
-        },
-        user: testUser,
-      });
-
-      expect(
-        result.success,
-        `REB-LOCAL-SYNC-EVENT failed: ${JSON.stringify(result)}`,
-      ).toBe(true);
-      if (!result.success) {
-        throw new Error(result.message);
-      }
-      expect(result.data.received).toBe(true);
-    });
-
-    // ── REB-LOCAL-LIVE-MESSAGE-EVENT ──────────────────────────────────────────
-
-    it("REB-LOCAL-LIVE-MESSAGE-EVENT: local live-message-event returns received: true", async () => {
-      setFetchCacheContext("reb-local-live-message-event");
-
-      const result = await sendTestRequest({
-        endpoint: endpoints.POST,
-        data: {
-          eventName: "live-message-event",
-          leadId: testUser.leadId,
-          originInstanceId: "hermes",
-          payload: {
-            leadId: testUser.leadId,
-            threadId: "nonexistent-thread-id",
-            originInstanceId: "hermes",
-            eventName: "chunk",
-            data: { text: "hello" },
-          },
-        },
-        user: testUser,
-      });
-
-      expect(
-        result.success,
-        `REB-LOCAL-LIVE-MESSAGE-EVENT failed: ${JSON.stringify(result)}`,
+        `REB-LOCAL-REMOTE-EVENT failed: ${JSON.stringify(result)}`,
       ).toBe(true);
       if (!result.success) {
         throw new Error(result.message);
@@ -199,7 +135,6 @@ describe("Remote Event Bridge", () => {
         data: {
           eventName: "totally-unknown-event",
           leadId: testUser.leadId,
-          originInstanceId: "hermes",
           payload: {},
         },
         user: testUser,
@@ -218,29 +153,27 @@ describe("Remote Event Bridge", () => {
     // ── REB-LOCAL-ECHO-DROP ───────────────────────────────────────────────────
     // Echo prevention: self-originating events silently dropped, still returns success.
 
-    it("REB-LOCAL-ECHO-DROP: self-origin endpoint-event is silently dropped, received: true", async () => {
+    it("REB-LOCAL-ECHO-DROP: self-origin remote-event is silently dropped, received: true", async () => {
       setFetchCacheContext("reb-local-echo-drop");
 
-      const { RemoteConnectionRepository } = await import(
-        "@/app/api/[locale]/remote-connection/repository"
-      );
-      const selfInstanceId = RemoteConnectionRepository.deriveDefaultSelfInstanceId();
+      const { RemoteConnectionRepository } =
+        await import("@/app/api/[locale]/remote-connection/repository");
+      const selfInstanceId =
+        await RemoteConnectionRepository.getLocalInstanceId(testUser.id);
 
       const result = await sendTestRequest({
         endpoint: endpoints.POST,
         data: {
-          eventName: "endpoint-event",
+          eventName: "remote-event",
           leadId: testUser.leadId,
-          originInstanceId: selfInstanceId,
           payload: {
-            leadId: testUser.leadId,
             originInstanceId: selfInstanceId,
-            pathChannel: "path/channel",
+            domain: "cache",
             endpointPath: ["test"],
             endpointMethod: "GET",
             urlPathParams: {},
-            eventName: "update",
-            payload: {},
+            endpointEventName: "update",
+            endpointPayload: {},
           },
         },
         user: testUser,
@@ -258,18 +191,15 @@ describe("Remote Event Bridge", () => {
 
     // ── REB-LOCAL-INVALID-PAYLOAD ─────────────────────────────────────────────
 
-    it("REB-LOCAL-INVALID-PAYLOAD: handleEndpointEvent with invalid payload does not throw", async () => {
-      const { createEndpointLogger } = await import(
-        "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger"
-      );
+    it("REB-LOCAL-INVALID-PAYLOAD: handleRemoteEvent with invalid payload does not throw", async () => {
+      const { createEndpointLogger } =
+        await import("@/app/api/[locale]/system/logger/server");
       const logger = createEndpointLogger(false, Date.now(), "en-US");
 
+      // Empty payload: missing the required endpointPath/endpointMethod/
+      // endpointEventName fields → handler takes the early-return guard path.
       await expect(
-        RemoteEventBridgeRepository.handleEndpointEvent(
-          { not: "valid" },
-          testUser.id,
-          logger,
-        ),
+        RemoteEventBridgeRepository.handleRemoteEvent({}, testUser.id, logger),
       ).resolves.toBeUndefined();
     });
   });
@@ -307,83 +237,39 @@ describe("Remote Event Bridge", () => {
 
       function requireDirectHttp(): void {
         if (_remoteConnectError) {
-          throw new Error(`Skipped — fix prerequisites test first: ${_remoteConnectError}`);
+          throw new Error(
+            `Skipped — fix prerequisites test first: ${_remoteConnectError}`,
+          );
         }
       }
 
-      // ── REB-DIRECT-SYNC-EVENT ─────────────────────────────────────────────
+      // ── REB-DIRECT-REMOTE-EVENT ───────────────────────────────────────────
 
-      it("REB-DIRECT-SYNC-EVENT: sync-event routed to hermes via direct-http returns received: true", async () => {
+      it("REB-DIRECT-REMOTE-EVENT: remote-event routed to hermes via direct-http returns received: true", async () => {
         requireDirectHttp();
-        setFetchCacheContext("reb-direct-sync-event");
+        setFetchCacheContext("reb-direct-remote-event");
 
-        const result = await routeBridgeToHermes(testUser, "sync-event", {
-          leadId: testUser.leadId,
-          syncPayloads: {},
-        });
-
-        expect(
-          result.success,
-          `REB-DIRECT-SYNC-EVENT failed: ${JSON.stringify(result)}`,
-        ).toBe(true);
-        if (!result.success) {
-          throw new Error(result.message);
-        }
-        const data = result.data as Record<string, unknown>;
-        expect(data.received, "hermes bridge must return received: true").toBe(true);
-      }, 60_000);
-
-      // ── REB-DIRECT-ENDPOINT-EVENT ─────────────────────────────────────────
-
-      it("REB-DIRECT-ENDPOINT-EVENT: endpoint-event routed to hermes via direct-http returns received: true", async () => {
-        requireDirectHttp();
-        setFetchCacheContext("reb-direct-endpoint-event");
-
-        const result = await routeBridgeToHermes(testUser, "endpoint-event", {
-          leadId: testUser.leadId,
+        const result = await routeBridgeToHermes(testUser, "remote-event", {
           originInstanceId: "atlas",
-          pathChannel: "path/channel",
+          domain: "cache",
           endpointPath: ["test"],
           endpointMethod: "GET",
           urlPathParams: {},
-          eventName: "update",
-          payload: {},
+          endpointEventName: "update",
+          endpointPayload: {},
         });
 
         expect(
           result.success,
-          `REB-DIRECT-ENDPOINT-EVENT failed: ${JSON.stringify(result)}`,
+          `REB-DIRECT-REMOTE-EVENT failed: ${JSON.stringify(result)}`,
         ).toBe(true);
         if (!result.success) {
           throw new Error(result.message);
         }
         const data = result.data as Record<string, unknown>;
-        expect(data.received, "hermes bridge must return received: true").toBe(true);
-      }, 60_000);
-
-      // ── REB-DIRECT-LIVE-MESSAGE-EVENT ─────────────────────────────────────
-
-      it("REB-DIRECT-LIVE-MESSAGE-EVENT: live-message-event routed to hermes via direct-http returns received: true", async () => {
-        requireDirectHttp();
-        setFetchCacheContext("reb-direct-live-message-event");
-
-        const result = await routeBridgeToHermes(testUser, "live-message-event", {
-          leadId: testUser.leadId,
-          threadId: "nonexistent-thread-id",
-          originInstanceId: "atlas",
-          eventName: "chunk",
-          data: { text: "hello" },
-        });
-
-        expect(
-          result.success,
-          `REB-DIRECT-LIVE-MESSAGE-EVENT failed: ${JSON.stringify(result)}`,
-        ).toBe(true);
-        if (!result.success) {
-          throw new Error(result.message);
-        }
-        const data = result.data as Record<string, unknown>;
-        expect(data.received, "hermes bridge must return received: true").toBe(true);
+        expect(data.received, "hermes bridge must return received: true").toBe(
+          true,
+        );
       }, 60_000);
     });
   } else {
@@ -428,83 +314,40 @@ describe("Remote Event Bridge", () => {
 
       function requireReverseWs(): void {
         if (_remoteConnectError) {
-          throw new Error(`Skipped — fix prerequisites test first: ${_remoteConnectError}`);
+          throw new Error(
+            `Skipped — fix prerequisites test first: ${_remoteConnectError}`,
+          );
         }
       }
 
-      // ── REB-WS-SYNC-EVENT ─────────────────────────────────────────────────
+      // ── REB-WS-REMOTE-EVENT ───────────────────────────────────────────────
 
-      it("REB-WS-SYNC-EVENT: sync-event routed to hermes via reverse-WS returns received: true", async () => {
+      it("REB-WS-REMOTE-EVENT: remote-event routed to hermes via reverse-WS returns received: true", async () => {
         requireReverseWs();
-        setFetchCacheContext("reb-ws-sync-event");
+        setFetchCacheContext("reb-ws-remote-event");
 
-        const result = await routeBridgeToHermes(testUser, "sync-event", {
-          leadId: testUser.leadId,
-          syncPayloads: {},
-        });
-
-        expect(
-          result.success,
-          `REB-WS-SYNC-EVENT failed: ${JSON.stringify(result)}`,
-        ).toBe(true);
-        if (!result.success) {
-          throw new Error(result.message);
-        }
-        const data = result.data as Record<string, unknown>;
-        expect(data.received, "hermes bridge via WS must return received: true").toBe(true);
-      }, 60_000);
-
-      // ── REB-WS-ENDPOINT-EVENT ─────────────────────────────────────────────
-
-      it("REB-WS-ENDPOINT-EVENT: endpoint-event routed to hermes via reverse-WS returns received: true", async () => {
-        requireReverseWs();
-        setFetchCacheContext("reb-ws-endpoint-event");
-
-        const result = await routeBridgeToHermes(testUser, "endpoint-event", {
-          leadId: testUser.leadId,
+        const result = await routeBridgeToHermes(testUser, "remote-event", {
           originInstanceId: "atlas",
-          pathChannel: "path/channel",
+          domain: "cache",
           endpointPath: ["test"],
           endpointMethod: "GET",
           urlPathParams: {},
-          eventName: "update",
-          payload: {},
+          endpointEventName: "update",
+          endpointPayload: {},
         });
 
         expect(
           result.success,
-          `REB-WS-ENDPOINT-EVENT failed: ${JSON.stringify(result)}`,
+          `REB-WS-REMOTE-EVENT failed: ${JSON.stringify(result)}`,
         ).toBe(true);
         if (!result.success) {
           throw new Error(result.message);
         }
         const data = result.data as Record<string, unknown>;
-        expect(data.received, "hermes bridge via WS must return received: true").toBe(true);
-      }, 60_000);
-
-      // ── REB-WS-LIVE-MESSAGE-EVENT ─────────────────────────────────────────
-
-      it("REB-WS-LIVE-MESSAGE-EVENT: live-message-event routed to hermes via reverse-WS returns received: true", async () => {
-        requireReverseWs();
-        setFetchCacheContext("reb-ws-live-message-event");
-
-        const result = await routeBridgeToHermes(testUser, "live-message-event", {
-          leadId: testUser.leadId,
-          threadId: "nonexistent-thread-id",
-          originInstanceId: "atlas",
-          eventName: "chunk",
-          data: { text: "hello" },
-        });
-
         expect(
-          result.success,
-          `REB-WS-LIVE-MESSAGE-EVENT failed: ${JSON.stringify(result)}`,
+          data.received,
+          "hermes bridge via WS must return received: true",
         ).toBe(true);
-        if (!result.success) {
-          throw new Error(result.message);
-        }
-        const data = result.data as Record<string, unknown>;
-        expect(data.received, "hermes bridge via WS must return received: true").toBe(true);
       }, 60_000);
 
       // ── REB-WS-UNKNOWN-EVENT ──────────────────────────────────────────────
@@ -514,9 +357,13 @@ describe("Remote Event Bridge", () => {
         requireReverseWs();
         setFetchCacheContext("reb-ws-unknown-event");
 
-        const result = await routeBridgeToHermes(testUser, "totally-unknown-event", {
-          leadId: testUser.leadId,
-        });
+        const result = await routeBridgeToHermes(
+          testUser,
+          "totally-unknown-event",
+          {
+            leadId: testUser.leadId,
+          },
+        );
 
         expect(
           result.success,
@@ -526,7 +373,10 @@ describe("Remote Event Bridge", () => {
           throw new Error(result.message);
         }
         const data = result.data as Record<string, unknown>;
-        expect(data.received, "hermes bridge unknown event must return received: true").toBe(true);
+        expect(
+          data.received,
+          "hermes bridge unknown event must return received: true",
+        ).toBe(true);
       }, 60_000);
     });
   } else {

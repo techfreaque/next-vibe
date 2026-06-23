@@ -202,7 +202,7 @@ export async function sendMessage(
           (old) =>
             old ??
             success({
-              streamingState: "idle" as const,
+              streamingState: ThreadStreamingState.IDLE,
               backgroundTasks: [],
               messages: [],
             }),
@@ -261,7 +261,7 @@ export async function sendMessage(
             preview: null,
             pinned: false,
             archived: false,
-            streamingState: "idle" as const,
+            streamingState: ThreadStreamingState.IDLE,
             rolesView: null,
             rolesEdit: null,
             rolesPost: null,
@@ -307,7 +307,7 @@ export async function sendMessage(
         preview: null,
         pinned: false,
         archived: false,
-        streamingState: "idle" as const,
+        streamingState: ThreadStreamingState.IDLE,
         canEdit: true,
         canPost: true,
         canDelete: true,

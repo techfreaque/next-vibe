@@ -104,34 +104,34 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseCreate.post.response.id" as const,
+            label: "warehouseCreate.post.response.id" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           companyId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseCreate.post.response.companyId" as const,
+            label: "warehouseCreate.post.response.companyId" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           name: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseCreate.post.response.name" as const,
+            label: "warehouseCreate.post.response.name" as const,
             schema: z.string(),
           }),
           code: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseCreate.post.response.code" as const,
+            label: "warehouseCreate.post.response.code" as const,
             schema: z.string(),
           }),
           isActive: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseCreate.post.response.isActive" as const,
+            label: "warehouseCreate.post.response.isActive" as const,
             schema: z.boolean(),
           }),
           isDefault: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "warehouseCreate.post.response.isDefault" as const,
+            label: "warehouseCreate.post.response.isDefault" as const,
             schema: z.boolean(),
           }),
         },

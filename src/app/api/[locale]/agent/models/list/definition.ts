@@ -91,6 +91,12 @@ const { GET } = createEndpoint({
         label: "get.fields.modelType.label" as const,
         description: "get.fields.modelType.description" as const,
         placeholder: "get.fields.modelType.placeholder" as const,
+        options: [
+          { value: "text", label: "enums.modelType.text" as const },
+          { value: "image", label: "enums.modelType.image" as const },
+          { value: "video", label: "enums.modelType.video" as const },
+          { value: "audio", label: "enums.modelType.audio" as const },
+        ],
         columns: 4,
         schema: z.enum(["text", "image", "video", "audio"] as const),
       }),
@@ -101,6 +107,7 @@ const { GET } = createEndpoint({
         label: "get.fields.contentLevel.label" as const,
         description: "get.fields.contentLevel.description" as const,
         placeholder: "get.fields.contentLevel.placeholder" as const,
+        options: ContentLevelOptions,
         columns: 4,
         schema: z
           .enum([
@@ -117,6 +124,7 @@ const { GET } = createEndpoint({
         label: "get.fields.intelligence.label" as const,
         description: "get.fields.intelligence.description" as const,
         placeholder: "get.fields.intelligence.placeholder" as const,
+        options: IntelligenceLevelOptions,
         columns: 4,
         schema: z
           .enum([
@@ -193,7 +201,7 @@ const { GET } = createEndpoint({
               columns: 3,
               schema: z.string(),
             }),
-            content: responseField(scopedTranslation, {
+            label: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               label: "get.response.model.content" as const,
               columns: 3,
@@ -306,7 +314,7 @@ const { GET } = createEndpoint({
             contextWindow: 128000,
             parameterCount: null,
             intelligence: "brilliant",
-            content: "mainstream",
+            label: "mainstream",
             price: 12,
             supportsTools: true,
             utilities: ["chat", "coding", "analysis", "reasoning"],

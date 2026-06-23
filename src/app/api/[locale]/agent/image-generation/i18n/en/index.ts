@@ -1,3 +1,5 @@
+import { translations as modelTranslations } from "@/app/api/[locale]/agent/models/i18n/en";
+
 export const translations = {
   tags: {
     image: "Image",
@@ -127,4 +129,5 @@ export const translations = {
       description: "Your image has been generated successfully",
     },
   },
+  models: modelTranslations.models,
 };

@@ -1,4 +1,7 @@
+import { translations as modelTranslations } from "@/app/api/[locale]/agent/models/i18n/de";
+
 import type { translations as enTranslations } from "../en";
+
 export const translations: typeof enTranslations = {
   tags: {
     image: "Bild",
@@ -130,4 +133,5 @@ export const translations: typeof enTranslations = {
       description: "Dein Bild wurde erfolgreich generiert",
     },
   },
+  models: modelTranslations.models,
 };

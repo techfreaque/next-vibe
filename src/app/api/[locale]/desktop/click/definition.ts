@@ -124,12 +124,12 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "click.response.success",
+        label: "click.response.success",
         schema: z.boolean().describe("Whether the click operation succeeded"),
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "click.response.error",
+        label: "click.response.error",
         schema: z
           .string()
           .optional()
@@ -137,7 +137,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "click.response.executionId",
+        label: "click.response.executionId",
         schema: z
           .string()
           .optional()

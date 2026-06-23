@@ -1,16 +1,19 @@
 /**
  * WS Channel Registry
  *
- * Index of every endpoint that exposes a WebSocket channel.
+ * Index of every endpoint that exposes a client-subscribable WebSocket channel.
  * The WS server uses this to authorize channel subscriptions — role-based
  * checks come from each endpoint's allowedRoles; resource-level checks come
  * from canSubscribe declared on tools.METHOD in each route.ts.
  *
- * Add a new entry here whenever an endpoint gains an `events` block.
+ * The list is DEFINITION-DRIVEN: any endpoint method that declares an `events`
+ * block with at least one client-delivered event (an event without
+ * `clientDelivery: false`) is auto-discovered by the route-handlers generator
+ * and emitted into the generated ws-channels.ts. Add `events:` to a definition,
+ * run `vibe gen`, and the channel becomes authorizable — no manual edits here.
  *
- * Route modules are imported lazily (only when canSubscribe is actually called)
- * to avoid circular initialization errors in the production webpack bundle.
- * Definition modules are safe to import eagerly since they have no side effects.
+ * This module keeps the shared WsChannelEntry type and the lazyCanSubscribe
+ * helper (consumed by the generated file) and re-exports the generated list.
  */
 
 import type { GenericHandlerBase } from "../shared/endpoints/route/handler";
@@ -26,9 +29,12 @@ export interface WsChannelEntry {
  * This avoids importing route modules (which pull in repositories, DB, etc.)
  * during WS channel registration — preventing circular init errors in prod.
  */
-function lazyCanSubscribe(
+export function lazyCanSubscribe(
   importRoute: () => Promise<{
-    tools: Record<string, Partial<GenericHandlerBase>>;
+    tools: Record<
+      string,
+      { canSubscribe?: GenericHandlerBase["canSubscribe"] }
+    >;
   }>,
   method: string,
 ): NonNullable<GenericHandlerBase["canSubscribe"]> {
@@ -47,108 +53,16 @@ function lazyCanSubscribe(
   };
 }
 
+/**
+ * Returns every endpoint that exposes a client-subscribable WebSocket channel.
+ *
+ * Delegates to the generated ws-channels.ts (produced by the route-handlers
+ * generator from every definition that declares a client-delivered event).
+ * The generated list eagerly imports definitions and lazily wires canSubscribe
+ * from routes via lazyCanSubscribe above.
+ */
 export async function getWsEndpoints(): Promise<WsChannelEntry[]> {
-  // Only import definition modules eagerly — these are lightweight and safe.
-  const [
-    messagesDef,
-    skillByIdDef,
-    aiStreamRunDef,
-    skillsDef,
-    folderContentsDef,
-    favoritesDef,
-    threadsDef,
-    cronQueueDef,
-    cronTasksDef,
-    creditsDef,
-  ] = await Promise.all([
-    import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition"),
-    import("@/app/api/[locale]/agent/chat/skills/[id]/definition"),
-    import("@/app/api/[locale]/agent/ai-stream/run/definition"),
-    import("@/app/api/[locale]/agent/chat/skills/definition"),
-    import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition"),
-    import("@/app/api/[locale]/agent/chat/favorites/definition"),
-    import("@/app/api/[locale]/agent/chat/threads/definition"),
-    import("@/app/api/[locale]/system/unified-interface/tasks/cron/queue/definition"),
-    import("@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition"),
-    import("@/app/api/[locale]/credits/definition"),
-  ]);
-
-  // Route modules are imported lazily via canSubscribe — only when a channel
-  // match is found and resource-level authorization is needed.
-  return [
-    {
-      endpoint: messagesDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () =>
-          import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/route"),
-        "GET",
-      ),
-    },
-    {
-      endpoint: skillByIdDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/chat/skills/[id]/route"),
-        "GET",
-      ),
-    },
-    {
-      endpoint: aiStreamRunDef.default.POST,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/ai-stream/run/route"),
-        "POST",
-      ),
-    },
-    {
-      endpoint: skillsDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/chat/skills/route"),
-        "GET",
-      ),
-    },
-    {
-      endpoint: folderContentsDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () =>
-          import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route"),
-        "GET",
-      ),
-    },
-    {
-      endpoint: favoritesDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/chat/favorites/route"),
-        "GET",
-      ),
-    },
-    {
-      endpoint: threadsDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/agent/chat/threads/route"),
-        "GET",
-      ),
-    },
-    {
-      endpoint: cronQueueDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/tasks/cron/queue/route"),
-        "GET",
-      ),
-    },
-    {
-      endpoint: cronTasksDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/route"),
-        "GET",
-      ),
-    },
-    {
-      endpoint: creditsDef.default.GET,
-      canSubscribe: lazyCanSubscribe(
-        () => import("@/app/api/[locale]/credits/route"),
-        "GET",
-      ),
-    },
-  ];
+  const { getGeneratedWsEndpoints } =
+    await import("../../generated/ws-channels");
+  return getGeneratedWsEndpoints();
 }

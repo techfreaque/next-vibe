@@ -37,13 +37,8 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
     // by syncScope["favorites"]); re-run the update here, keyed by the slug on the
     // event's urlPathParams. Reuses updateFavorite.
     onRemoteEvent: {
-      "favorite-updated": (payload, ctx) =>
-        SingleFavoriteRepository.applyRemoteFavoriteUpdate(
-          payload,
-          ctx.urlPathParams.id,
-          ctx.user,
-          ctx.logger,
-        ),
+      "favorite-updated": (props) =>
+        SingleFavoriteRepository.applyRemoteFavoriteUpdate(props),
     },
   },
   [Methods.DELETE]: {
@@ -54,13 +49,8 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
     // syncScope["favorites"]); remove the favorite here, keyed by the slug on the
     // event's urlPathParams, scoped to the user.
     onRemoteEvent: {
-      "favorite-deleted": (payload, ctx) =>
-        SingleFavoriteRepository.applyRemoteFavoriteDelete(
-          payload,
-          ctx.urlPathParams.id,
-          ctx.user.id,
-          ctx.logger,
-        ),
+      "favorite-deleted": (props) =>
+        SingleFavoriteRepository.applyRemoteFavoriteDelete(props),
     },
   },
 });

@@ -341,6 +341,9 @@ export const translations: typeof enTranslations = {
         consecutiveFailures: "Aufeinanderfolgende Fehler",
         targetInstance: "Zielinstanz",
         tags: "Tags",
+        owner: "Eigentümer",
+        createdAt: "Erstellt am",
+        updatedAt: "Aktualisiert am",
       },
     },
     errors: {

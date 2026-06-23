@@ -122,22 +122,22 @@ const { POST } = createEndpoint({
       // Response fields
       emailsScheduled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.emailsScheduled",
+        label: "post.response.emailsScheduled",
         schema: z.number(),
       }),
       emailsSent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.emailsSent",
+        label: "post.response.emailsSent",
         schema: z.number(),
       }),
       emailsFailed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.emailsFailed",
+        label: "post.response.emailsFailed",
         schema: z.number(),
       }),
       leadsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.leadsProcessed",
+        label: "post.response.leadsProcessed",
         schema: z.number(),
       }),
     },
@@ -234,47 +234,47 @@ const { GET } = createEndpoint({
     children: {
       enabled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.enabled",
+        label: "get.response.enabled",
         schema: z.boolean().default(false),
       }),
       dryRun: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.dryRun",
+        label: "get.response.dryRun",
         schema: z.boolean(),
       }),
       batchSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.batchSize",
+        label: "get.response.batchSize",
         schema: z.number().int().min(1).max(100),
       }),
       maxEmailsPerRun: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.maxEmailsPerRun",
+        label: "get.response.maxEmailsPerRun",
         schema: z.number().int().min(1).max(1000),
       }),
       schedule: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.schedule",
+        label: "get.response.schedule",
         schema: z.string().min(1),
       }),
       priority: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.priority",
+        label: "get.response.priority",
         schema: z.enum(CronTaskPriority).default(CronTaskPriority.HIGH),
       }),
       timeout: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.timeout",
+        label: "get.response.timeout",
         schema: z.number().min(1000).max(3600000).default(1800000),
       }),
       retries: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.retries",
+        label: "get.response.retries",
         schema: z.number().min(0).max(10).default(3),
       }),
       retryDelay: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.retryDelay",
+        label: "get.response.retryDelay",
         schema: z.number().min(1000).max(300000).default(30000),
       }),
     },

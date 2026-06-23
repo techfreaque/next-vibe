@@ -11,7 +11,7 @@
  * For each event received:
  *  1. Looks up endpoint.events[eventName]
  *  2. If declaration has fields: applies operation to GET response cache
- *  3. Calls declaration.onEvent?.({ partial, urlPathParams, queryClient, logger })
+ *  3. Calls declaration.onEvent?.({ responseData, requestData, urlPathParams, queryClient, logger })
  *     where partial is the typed event payload from types.EventPayloads
  *
  * Subscribes to TWO channels:
@@ -35,7 +35,10 @@ import {
 } from "../../websocket/cache-merger";
 import { buildUserChannel, buildWsChannel } from "../../websocket/channel";
 import { subscribeToChannel } from "../../websocket/client";
-import type { EndpointEventEnvelope } from "../../websocket/structured-events";
+import type {
+  AnyEndpointEventEnvelope,
+  EventPayloads,
+} from "../../websocket/structured-events";
 import { eventDeclarationHasFields } from "../../websocket/structured-events";
 import { queryClient } from "./store";
 
@@ -47,6 +50,7 @@ export function useEndpointSubscription(
   logger: EndpointLogger,
   cacheKey: string | undefined,
   user: JwtPayloadType | undefined,
+  locale: CountryLanguage,
 ): void {
   // Use a ref so onEvent always reads the latest requestData without causing
   // re-subscription on every render (requestData object identity may change).
@@ -65,6 +69,12 @@ export function useEndpointSubscription(
   // needing to list the object itself in the dependency array.
   const urlPathParamsRef = useRef(urlPathParams);
   urlPathParamsRef.current = urlPathParams;
+
+  // Refs so onEvent reads the latest user/locale without re-subscribing.
+  const userRef = useRef(user);
+  userRef.current = user;
+  const localeRef = useRef(locale);
+  localeRef.current = locale;
 
   // Stable user id key - avoid re-subscribing when the user object is recreated.
   const userId = user ? (user.isPublic ? user.leadId : user.id) : undefined;
@@ -119,12 +129,14 @@ export function useEndpointSubscription(
       }
 
       declaration.onEvent?.({
-        partial: wirePayload,
-        urlPathParams: resolvedParams,
+        responseData: wirePayload,
         requestData: requestDataRef.current,
+        urlPathParams: resolvedParams,
         queryClient,
         logger,
         cacheKey,
+        user: userRef.current,
+        locale: localeRef.current,
       });
     }
 

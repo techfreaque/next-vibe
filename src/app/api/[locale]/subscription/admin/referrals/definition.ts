@@ -215,32 +215,32 @@ export const { GET } = createEndpoint({
               children: {
                 code: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.codes.code" as const,
+                  label: "get.response.codes.code" as const,
                   schema: z.string(),
                 }),
                 ownerEmail: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.codes.ownerEmail" as const,
+                  label: "get.response.codes.ownerEmail" as const,
                   schema: z.string(),
                 }),
                 ownerName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.codes.ownerName" as const,
+                  label: "get.response.codes.ownerName" as const,
                   schema: z.string(),
                 }),
                 currentUses: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.codes.currentUses" as const,
+                  label: "get.response.codes.currentUses" as const,
                   schema: z.coerce.number(),
                 }),
                 totalSignups: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.codes.totalSignups" as const,
+                  label: "get.response.codes.totalSignups" as const,
                   schema: z.coerce.number(),
                 }),
                 totalEarned: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.codes.totalEarned" as const,
+                  label: "get.response.codes.totalEarned" as const,
                   schema: z.coerce.number(),
                 }),
                 isActive: responseField(scopedTranslation, {
@@ -251,7 +251,7 @@ export const { GET } = createEndpoint({
                 createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content: "get.response.codes.createdAt" as const,
+                  label: "get.response.codes.createdAt" as const,
                   schema: z.coerce.date(),
                 }),
               },
@@ -270,22 +270,22 @@ export const { GET } = createEndpoint({
               children: {
                 id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.payoutRequests.id" as const,
+                  label: "get.response.payoutRequests.id" as const,
                   schema: z.string(),
                 }),
                 userEmail: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.payoutRequests.userEmail" as const,
+                  label: "get.response.payoutRequests.userEmail" as const,
                   schema: z.string(),
                 }),
                 amountCents: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.payoutRequests.amountCents" as const,
+                  label: "get.response.payoutRequests.amountCents" as const,
                   schema: z.coerce.number(),
                 }),
                 currency: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.payoutRequests.currency" as const,
+                  label: "get.response.payoutRequests.currency" as const,
                   schema: z.string(),
                 }),
                 status: responseField(scopedTranslation, {
@@ -295,12 +295,12 @@ export const { GET } = createEndpoint({
                 }),
                 walletAddress: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.payoutRequests.walletAddress" as const,
+                  label: "get.response.payoutRequests.walletAddress" as const,
                   schema: z.string().nullable(),
                 }),
                 adminNotes: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.payoutRequests.adminNotes" as const,
+                  label: "get.response.payoutRequests.adminNotes" as const,
                   schema: z.string().nullable(),
                 }),
                 rejectionReason: responseField(scopedTranslation, {
@@ -312,13 +312,13 @@ export const { GET } = createEndpoint({
                 createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content: "get.response.payoutRequests.createdAt" as const,
+                  label: "get.response.payoutRequests.createdAt" as const,
                   schema: z.coerce.date(),
                 }),
                 processedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content: "get.response.payoutRequests.processedAt" as const,
+                  label: "get.response.payoutRequests.processedAt" as const,
                   schema: z.coerce.date().nullable(),
                 }),
               },
@@ -353,14 +353,12 @@ export const { GET } = createEndpoint({
           totalCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.totalCount" as const,
-            content: "get.response.totalCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),
           pageCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.pageCount" as const,
-            content: "get.response.pageCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),
@@ -416,7 +414,9 @@ export const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        searchFilters: {},
+        searchFilters: {
+          payoutStatus: PayoutStatusAdminFilter.ALL,
+        },
         sortingOptions: {
           sortBy: ReferralSortField.CREATED_AT,
           sortOrder: SortOrder.DESC,
@@ -513,7 +513,7 @@ export const { POST } = createEndpoint({
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.message" as const,
+        label: "post.response.message" as const,
         schema: z.string(),
       }),
     },

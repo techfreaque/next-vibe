@@ -128,49 +128,49 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.fields.success" as const,
+        label: "post.response.fields.success" as const,
         schema: z.boolean().optional(),
       }),
 
       installed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.fields.installed" as const,
+        label: "post.response.fields.installed" as const,
         schema: z.boolean().optional(),
       }),
 
       version: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.fields.version" as const,
+        label: "post.response.fields.version" as const,
         schema: z.string().optional(),
       }),
 
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.fields.status" as const,
+        label: "post.response.fields.status" as const,
         schema: z.string().optional(),
       }),
 
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.fields.output" as const,
+        label: "post.response.fields.output" as const,
         schema: z.string().optional(),
       }),
 
       instructions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.fields.instructions" as const,
+        label: "post.response.fields.instructions" as const,
         schema: z.string().optional(),
       }),
 
       tunnelUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.fields.tunnelUrl" as const,
+        label: "post.response.fields.tunnelUrl" as const,
         schema: z.string().optional(),
       }),
 
       webhookUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.fields.webhookUrl" as const,
+        label: "post.response.fields.webhookUrl" as const,
         schema: z.string().optional(),
       }),
     },

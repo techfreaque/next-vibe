@@ -95,7 +95,7 @@ const { GET } = createEndpoint({
     children: {
       sessions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list.response.sessions",
+        label: "list.response.sessions",
         schema: z.array(
           z.object({
             id: z.string().uuid(),
@@ -150,22 +150,22 @@ const { POST } = createEndpoint({
       }),
       token: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "create.response.token",
+        label: "create.response.token",
         schema: z.string(),
       }),
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "create.response.id",
+        label: "create.response.id",
         schema: z.string().uuid(),
       }),
       sessionName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "create.response.name",
+        label: "create.response.name",
         schema: z.string(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        content: "create.response.message",
+        label: "create.response.message",
         schema: z.string(),
       }),
     },

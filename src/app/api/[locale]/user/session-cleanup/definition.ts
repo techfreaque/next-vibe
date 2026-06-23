@@ -80,25 +80,25 @@ const { POST } = createEndpoint({
 
       sessionsDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.sessionsDeleted",
+        label: "post.response.sessionsDeleted",
         schema: z.number(),
       }),
 
       tokensDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.tokensDeleted",
+        label: "post.response.tokensDeleted",
         schema: z.number(),
       }),
 
       totalProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.totalProcessed",
+        label: "post.response.totalProcessed",
         schema: z.number(),
       }),
 
       executionTimeMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.executionTimeMs",
+        label: "post.response.executionTimeMs",
         schema: z.number(),
       }),
     },

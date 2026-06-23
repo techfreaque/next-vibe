@@ -244,25 +244,25 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       tools: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.tools.title" as const,
+        label: "get.fields.tools.title" as const,
         schema: z.array(aiToolMetadataSchema),
       }),
 
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.totalCount.title" as const,
+        label: "get.fields.totalCount.title" as const,
         schema: z.number(),
       }),
 
       matchedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.matchedCount.title" as const,
+        label: "get.fields.matchedCount.title" as const,
         schema: z.number(),
       }),
 
       categories: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.categories.title" as const,
+        label: "get.fields.categories.title" as const,
         schema: z
           .array(
             z.object({
@@ -278,96 +278,96 @@ const { GET } = createEndpoint({
 
       hint: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.hint.title" as const,
+        label: "get.fields.hint.title" as const,
         schema: z.string().optional(),
       }),
 
       currentPlatform: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.platform.label" as const,
+        label: "get.fields.platform.label" as const,
         schema: z.string().optional(),
         userRoles: [UserRole.ADMIN],
       }),
 
       currentEnv: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.platform.label" as const,
+        label: "get.fields.platform.label" as const,
         schema: z.enum(["development", "production"]).optional(),
         userRoles: [UserRole.ADMIN],
       }),
 
       pinnedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.pinnedCount.title" as const,
+        label: "get.fields.pinnedCount.title" as const,
         schema: z.number().optional(),
       }),
 
       allowedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.allowedCount.title" as const,
+        label: "get.fields.allowedCount.title" as const,
         schema: z.number().optional(),
       }),
 
       allAiToolIds: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.allowedCount.title" as const,
+        label: "get.fields.allowedCount.title" as const,
         schema: z.array(z.string()).optional(),
       }),
 
       skillPinnedDefault: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.pinnedCount.title" as const,
+        label: "get.fields.pinnedCount.title" as const,
         schema: z.array(z.string()).nullable().optional(),
       }),
 
       skillAllowedDefault: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.allowedCount.title" as const,
+        label: "get.fields.allowedCount.title" as const,
         schema: z.array(z.string()).nullable().optional(),
       }),
 
       webPinnedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.webPinnedCount.title" as const,
+        label: "get.fields.webPinnedCount.title" as const,
         schema: z.number().optional(),
       }),
 
       cliAllowedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.allowedCount.title" as const,
+        label: "get.fields.allowedCount.title" as const,
         schema: z.number().optional(),
         userRoles: [UserRole.ADMIN],
       }),
 
       mcpPinnedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.pinnedCount.title" as const,
+        label: "get.fields.pinnedCount.title" as const,
         schema: z.number().optional(),
         userRoles: [UserRole.ADMIN],
       }),
 
       mcpAllowedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.allowedCount.title" as const,
+        label: "get.fields.allowedCount.title" as const,
         schema: z.number().optional(),
         userRoles: [UserRole.ADMIN],
       }),
 
       currentPage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.currentPage.title" as const,
+        label: "get.fields.currentPage.title" as const,
         schema: z.number().optional(),
       }),
 
       effectivePageSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.effectivePageSize.title" as const,
+        label: "get.fields.effectivePageSize.title" as const,
         schema: z.number().optional(),
       }),
 
       totalPages: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.totalPages.title" as const,
+        label: "get.fields.totalPages.title" as const,
         schema: z.number().optional(),
       }),
     },

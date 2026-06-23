@@ -32,7 +32,7 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   editorUriScheme: "cursor://file/", // URI scheme for clickable file links
   // Extensive mode: when false (default), test and generated files are excluded.
   // use "vibe check --extensive" for release validation to catch issues in all files.
-  extensive: false,
+  extensive: true,
 };
 
 // ============================================================
@@ -119,6 +119,7 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   ".env.production",
   "next-env.d.ts",
   "nativewind-env.d.ts",
+  "**/fixtures/**",
   // Glob patterns
   "**/test-files/**",
 ]);
@@ -673,6 +674,16 @@ const oxlint: CheckConfig["oxlint"] = {
     process: "readonly",
     global: "readonly",
   },
+  overrides: [
+    {
+      // next-vibe-ui platform wrappers legitimately use native HTML elements
+      // (head, audio, video, html) that Next.js/a11y rules disallow in app code.
+      files: ["**/next-vibe-ui/**"],
+      rules: {
+        "nextjs/no-head-element": "off",
+      },
+    },
+  ],
 };
 
 // --------------------------------------------------------

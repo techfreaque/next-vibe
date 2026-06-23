@@ -16,7 +16,9 @@ import type { CreateApiEndpointAny } from "../endpoint-base";
 import type { Methods } from "../enums";
 import { FieldDataType, WidgetType } from "../enums";
 
-const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
+const genericST: { ScopedTranslationKey: string } = {
+  ScopedTranslationKey: "",
+};
 
 // Simulate the exact structure from retry/stop endpoints
 const testEndpoint_field = objectField(genericST, {
@@ -49,7 +51,8 @@ type TestEndpoint = CreateApiEndpoint<
   readonly ["enums.userRole.admin"],
   string,
   typeof testEndpoint_field,
-  EndpointEventsMap<string, string>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  EndpointEventsMap<any, any, any>
 >;
 
 // Test if it's assignable
@@ -67,7 +70,8 @@ type TestEndpoint2 = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
-  EndpointEventsMap<string, string>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  EndpointEventsMap<any, any, any>
 >;
 
 type Test2 = TestEndpoint2 extends CreateApiEndpointAny ? "PASS" : "FAIL";

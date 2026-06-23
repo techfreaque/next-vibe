@@ -148,32 +148,32 @@ export const { GET } = createEndpoint({
     children: {
       modules: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.modules.title" as const,
+        label: "get.response.modules.title" as const,
         schema: z.array(settingModuleSchema),
       }),
       wizardSteps: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.wizardSteps.title" as const,
+        label: "get.response.wizardSteps.title" as const,
         schema: z.array(wizardStepSchema),
       }),
       isWritable: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.isWritable.title" as const,
+        label: "get.response.isWritable.title" as const,
         schema: z.boolean(),
       }),
       isDevMode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.isDevMode.title" as const,
+        label: "get.response.isDevMode.title" as const,
         schema: z.boolean(),
       }),
       needsOnboarding: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.needsOnboarding.title" as const,
+        label: "get.response.needsOnboarding.title" as const,
         schema: z.boolean(),
       }),
       onboardingIssues: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.onboardingIssues.title" as const,
+        label: "get.response.onboardingIssues.title" as const,
         schema: z.array(z.string()),
       }),
     },
@@ -299,17 +299,17 @@ export const { PATCH } = createEndpoint({
       ...ENV_KEY_CHILDREN,
       updated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.updated.title" as const,
+        label: "patch.response.updated.title" as const,
         schema: z.array(z.string()),
       }),
       needsRestart: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.needsRestart.title" as const,
+        label: "patch.response.needsRestart.title" as const,
         schema: z.boolean(),
       }),
       resultMessage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.resultMessage.title" as const,
+        label: "patch.response.resultMessage.title" as const,
         schema: z.string(),
       }),
     },

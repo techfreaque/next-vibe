@@ -19,10 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 import type { BraveSearchGetResponseOutput } from "./definition";
 import type { BraveT } from "./i18n";
 
-/**
- * Normalized Search Result
- */
-interface SearchResult {
+interface BraveSearchResult {
   title: string;
   url: string;
   snippet: string;
@@ -35,9 +32,7 @@ interface BraveWebResult {
   description: string;
   age?: string;
   page_age?: string;
-  thumbnail?: {
-    src: string;
-  };
+  thumbnail?: { src: string };
 }
 interface BraveNewsResult {
   title: string;
@@ -47,18 +42,11 @@ interface BraveNewsResult {
   source: string;
 }
 interface BraveSearchApiResponse {
-  web?: {
-    results: BraveWebResult[];
-  };
-  news?: {
-    results: BraveNewsResult[];
-  };
-  query: {
-    original: string;
-  };
+  web?: { results: BraveWebResult[] };
+  news?: { results: BraveNewsResult[] };
+  query: { original: string };
 }
-
-interface SearchConfig {
+interface BraveSearchConfig {
   maxResults?: number;
   includeNews?: boolean;
   freshness?: "past_day" | "past_week" | "past_month" | "past_year";
@@ -117,7 +105,7 @@ export class BraveSearchRepository {
       });
     }
 
-    const config: SearchConfig = {
+    const config: BraveSearchConfig = {
       maxResults: options.maxResults,
       includeNews: options.includeNews,
       freshness: options.freshness,
@@ -145,11 +133,11 @@ export class BraveSearchRepository {
    */
   private static async fetchResults(
     query: string,
-    config: SearchConfig,
+    config: BraveSearchConfig,
     apiKey: string,
     logger: EndpointLogger,
     t: BraveT,
-  ): Promise<ResponseType<{ results: SearchResult[] }>> {
+  ): Promise<ResponseType<{ results: BraveSearchResult[] }>> {
     const params = new URLSearchParams({
       q: query,
       count: String(config.maxResults ?? this.DEFAULT_MAX_RESULTS),
@@ -221,8 +209,8 @@ export class BraveSearchRepository {
   private static parseResults(
     data: BraveSearchApiResponse,
     includeNews = false,
-  ): SearchResult[] {
-    const results: SearchResult[] = [];
+  ): BraveSearchResult[] {
+    const results: BraveSearchResult[] = [];
 
     // Add web results
     if (data.web?.results) {

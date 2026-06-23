@@ -106,27 +106,27 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "ledger.response.id" as const,
+              label: "ledger.response.id" as const,
               schema: z.string(),
             }),
             entryId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "ledger.response.entryId" as const,
+              label: "ledger.response.entryId" as const,
               schema: z.string(),
             }),
             entryNumber: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "ledger.response.entryNumber" as const,
+              label: "ledger.response.entryNumber" as const,
               schema: z.string(),
             }),
             date: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "ledger.response.date" as const,
+              label: "ledger.response.date" as const,
               schema: z.string(),
             }),
             description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "ledger.response.description" as const,
+              label: "ledger.response.description" as const,
               schema: z.string().nullable(),
             }),
             type: responseField(scopedTranslation, {
@@ -137,17 +137,17 @@ const { GET } = createEndpoint({
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "ledger.response.amount" as const,
+              label: "ledger.response.amount" as const,
               schema: z.number(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "ledger.response.currency" as const,
+              label: "ledger.response.currency" as const,
               schema: z.string(),
             }),
             runningBalance: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "ledger.response.runningBalance" as const,
+              label: "ledger.response.runningBalance" as const,
               schema: z.number(),
             }),
           },
@@ -155,7 +155,7 @@ const { GET } = createEndpoint({
       }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "ledger.response.totalCount" as const,
+        label: "ledger.response.totalCount" as const,
         schema: z.number(),
       }),
     },

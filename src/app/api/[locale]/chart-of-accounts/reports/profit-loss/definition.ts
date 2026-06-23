@@ -84,12 +84,12 @@ const { GET } = createEndpoint({
 
       fromResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "profitLoss.response.from" as const,
+        label: "profitLoss.response.from" as const,
         schema: z.string(),
       }),
       toResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "profitLoss.response.to" as const,
+        label: "profitLoss.response.to" as const,
         schema: z.string(),
       }),
       revenue: responseArrayField(scopedTranslation, {
@@ -101,22 +101,22 @@ const { GET } = createEndpoint({
           children: {
             accountId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "accountGet.accountId.label" as const,
+              label: "accountGet.accountId.label" as const,
               schema: z.string(),
             }),
             code: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "profitLoss.response.code" as const,
+              label: "profitLoss.response.code" as const,
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "profitLoss.response.name" as const,
+              label: "profitLoss.response.name" as const,
               schema: z.string(),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "profitLoss.response.amount" as const,
+              label: "profitLoss.response.amount" as const,
               schema: z.number(),
             }),
           },
@@ -124,7 +124,7 @@ const { GET } = createEndpoint({
       }),
       totalRevenue: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "profitLoss.response.totalRevenue" as const,
+        label: "profitLoss.response.totalRevenue" as const,
         schema: z.number(),
       }),
       expenses: responseArrayField(scopedTranslation, {
@@ -136,22 +136,22 @@ const { GET } = createEndpoint({
           children: {
             accountId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "accountGet.accountId.label" as const,
+              label: "accountGet.accountId.label" as const,
               schema: z.string(),
             }),
             code: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "profitLoss.response.code" as const,
+              label: "profitLoss.response.code" as const,
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "profitLoss.response.name" as const,
+              label: "profitLoss.response.name" as const,
               schema: z.string(),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "profitLoss.response.amount" as const,
+              label: "profitLoss.response.amount" as const,
               schema: z.number(),
             }),
           },
@@ -159,22 +159,22 @@ const { GET } = createEndpoint({
       }),
       totalExpenses: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "profitLoss.response.totalExpenses" as const,
+        label: "profitLoss.response.totalExpenses" as const,
         schema: z.number(),
       }),
       grossProfit: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "profitLoss.response.grossProfit" as const,
+        label: "profitLoss.response.grossProfit" as const,
         schema: z.number(),
       }),
       operatingProfit: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "profitLoss.response.operatingProfit" as const,
+        label: "profitLoss.response.operatingProfit" as const,
         schema: z.number(),
       }),
       netProfit: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "profitLoss.response.netProfit" as const,
+        label: "profitLoss.response.netProfit" as const,
         schema: z.number(),
       }),
     },

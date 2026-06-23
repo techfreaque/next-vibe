@@ -91,19 +91,19 @@ const { POST } = createEndpoint({
       }),
       runId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.runId",
+        label: "post.response.runId",
         schema: z.string(),
       }),
       eligible: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.eligible",
+        label: "post.response.eligible",
         schema: z.boolean(),
       }),
       ineligibleNodes: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         child: responseField(scopedTranslation, {
           type: WidgetType.TEXT,
-          content: "post.response.ineligibleNodes",
+          label: "post.response.ineligibleNodes",
           schema: z.string(),
         }),
       }),

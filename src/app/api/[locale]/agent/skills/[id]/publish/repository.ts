@@ -16,6 +16,7 @@ import {
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -134,15 +135,18 @@ export class SkillPublishRepository {
    * Cross-instance applier for the publish `skill-updated` event: re-run publish
    * on this instance with the relayed status. Reuses publish so there is one path.
    */
-  static async applyRemotePublish(
-    payload: { status: typeof SkillStatusValue },
-    skillId: string,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  static async applyRemotePublish({
+    requestData,
+    urlPathParams,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof publishDefinitions.PATCH,
+    "skill-updated"
+  >): Promise<void> {
     const result = await this.publish(
-      { id: skillId },
-      { status: payload.status },
+      { id: urlPathParams.id },
+      { status: requestData.status },
       user,
       logger,
       defaultLocale,

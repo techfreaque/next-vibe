@@ -167,12 +167,7 @@ export interface CronTask<TEndpointDefinition extends CreateApiEndpointAny> {
   id: string;
   name: string;
   definition: TEndpointDefinition;
-  route: GenericHandlerReturnType<
-    TEndpointDefinition["types"]["RequestOutput"],
-    TEndpointDefinition["types"]["ResponseOutput"],
-    TEndpointDefinition["types"]["UrlVariablesOutput"],
-    TEndpointDefinition["allowedRoles"]
-  >;
+  route: GenericHandlerReturnType<TEndpointDefinition>;
   description: string;
   schedule: string;
   category: (typeof TaskCategory)[keyof typeof TaskCategory];
@@ -273,12 +268,7 @@ export type Task = CronTaskAny | TaskRunner<string>;
  */
 export function createCronTask<const T extends CreateApiEndpointAny>(
   definition: T,
-  route: GenericHandlerReturnType<
-    T["types"]["RequestOutput"],
-    T["types"]["ResponseOutput"],
-    T["types"]["UrlVariablesOutput"],
-    T["allowedRoles"]
-  >,
+  route: GenericHandlerReturnType<T>,
   config: {
     /** Stable human-readable task identity (e.g. "db-health"). Must be unique across all tasks. */
     id: string;

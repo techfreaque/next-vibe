@@ -35,6 +35,7 @@ export const translations: typeof enTranslations = {
       FINANCIAL_INCOME: "Finanzerträge",
       FINANCIAL_EXPENSE: "Finanzaufwendungen",
       TAX_EXPENSE: "Steueraufwand",
+      OTHER: "Sonstiges",
     },
   },
   post: {

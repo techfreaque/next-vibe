@@ -538,7 +538,7 @@ export class RemoteConnectionConnectRepository {
     // Merge remote tools into every existing favorite's availableTools.
     try {
       const { chatFavorites } =
-        await import("@/app/api/[locale]/agent/chat/favorites/db");
+        await import("@/app/api/[locale]/agent/skills/favorites/db");
 
       const remoteTools = DEFAULT_REMOTE_TOOL_IDS.map((id) => ({
         toolId: `${instanceId}__${id}`,
@@ -672,7 +672,7 @@ export class RemoteConnectionConnectRepository {
         // direct-http connections use per-stream dedicated WS (stream-relay.ts).
         if (stored && stored.transportMode === "reverse-ws") {
           const { openConnection } =
-            await import("@/app/api/[locale]/remote-connection/connector");
+            await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector");
           openConnection({
             id: stored.id,
             instanceId,

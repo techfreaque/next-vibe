@@ -70,12 +70,12 @@ const { DELETE } = createEndpoint({
       // RESPONSE FIELDS
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.success" as const,
+        label: "response.success" as const,
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.message" as const,
+        label: "response.message" as const,
         schema: z.string(),
       }),
     },

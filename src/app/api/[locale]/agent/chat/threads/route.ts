@@ -22,12 +22,8 @@ export const { GET, POST, tools } = endpointsHandler({
     handler: async ({ data, user, t, logger, locale }) =>
       ThreadsRepository.createThread(data, user, t, logger, locale),
     onRemoteEvent: {
-      "thread-created": (payload, ctx) =>
-        ThreadsRepository.applyRemoteThreadCreate(
-          payload,
-          ctx.user,
-          ctx.logger,
-        ),
+      "thread-created": (props) =>
+        ThreadsRepository.applyRemoteThreadCreate(props),
     },
   },
 });

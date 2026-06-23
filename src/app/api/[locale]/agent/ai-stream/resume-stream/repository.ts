@@ -107,7 +107,7 @@ export class ResumeStreamRepository {
       // finish its finally block before we attempt revival).
       let thread:
         | {
-            streamingState: string | null;
+            streamingState: ThreadStreamingState | null;
             rootFolderId: string | null;
             folderId: string | null;
           }
@@ -126,8 +126,11 @@ export class ResumeStreamRepository {
           .where(eq(chatThreads.id, threadId))
           .limit(1);
         thread = row;
-        const state = row?.streamingState ?? "idle";
-        if (state !== "streaming" || Date.now() - waitStart >= maxWaitMs) {
+        const state = row?.streamingState ?? ThreadStreamingState.IDLE;
+        if (
+          state !== ThreadStreamingState.STREAMING ||
+          Date.now() - waitStart >= maxWaitMs
+        ) {
           break;
         }
         logger.debug(
@@ -163,12 +166,13 @@ export class ResumeStreamRepository {
         }
       }
 
-      const streamingState = thread?.streamingState ?? "idle";
+      const streamingState =
+        thread?.streamingState ?? ThreadStreamingState.IDLE;
       // A live stream is actively running ('streaming'). 'aborting' means user
       // requested cancel - the live stream will die shortly; treat as dead so we
       // don't try to signal a dying stream via publishWakeUpSignal.
-      const isLive = streamingState === "streaming";
-      const isAborting = streamingState === "aborting";
+      const isLive = streamingState === ThreadStreamingState.STREAMING;
+      const isAborting = streamingState === ThreadStreamingState.ABORTING;
 
       // Atomic revival claim: atomically flip streamingState 'idle'→'streaming'.
       // If 0 rows updated, another resume-stream task already claimed this revival slot.
@@ -178,7 +182,7 @@ export class ResumeStreamRepository {
       const claimRevival = async (claimThreadId: string): Promise<boolean> => {
         const claimed = await db
           .update(chatThreads)
-          .set({ streamingState: "streaming" })
+          .set({ streamingState: ThreadStreamingState.STREAMING })
           .where(
             and(
               eq(chatThreads.id, claimThreadId),
@@ -314,7 +318,7 @@ export class ResumeStreamRepository {
           // Resolve model from favorite + skill cascade (fresh from DB).
           if (!resolvedModel) {
             const { resolveSkillVariant } =
-              await import("@/app/api/[locale]/agent/chat/skills/resolver");
+              await import("@/app/api/[locale]/agent/skills/resolver");
             const { resolveChatModelId } =
               await import("../repository/core/modality-resolver");
             const skillVariant = await resolveSkillVariant(
@@ -371,11 +375,14 @@ export class ResumeStreamRepository {
             // Helper: clear thread from streaming→idle if stuck (e.g. previous run
             // claimed revival but crashed before finishing). Idempotent no-op if not streaming.
             const clearStuckStreaming = async (): Promise<void> => {
-              if (streamingState === "streaming") {
+              if (streamingState === ThreadStreamingState.STREAMING) {
                 try {
                   await db
                     .update(chatThreads)
-                    .set({ streamingState: "idle", updatedAt: new Date() })
+                    .set({
+                      streamingState: ThreadStreamingState.IDLE,
+                      updatedAt: new Date(),
+                    })
                     .where(
                       and(
                         eq(chatThreads.id, effectiveThreadId),
@@ -387,7 +394,9 @@ export class ResumeStreamRepository {
                     threadRootFolderId,
                     logger,
                     user,
-                  )("streaming-state-changed", { streamingState: "idle" });
+                  )("streaming-state-changed", {
+                    streamingState: ThreadStreamingState.IDLE,
+                  });
                   logger.debug(
                     "[ResumeStream] wakeUp - cleared stuck streaming state (idempotency path)",
                     { threadId: effectiveThreadId },
@@ -484,7 +493,9 @@ export class ResumeStreamRepository {
                     threadRootFolderId,
                     logger,
                     user,
-                  )("stream-finished", { streamingState: "idle" });
+                  )("stream-finished", {
+                    streamingState: ThreadStreamingState.IDLE,
+                  });
                   logger.debug(
                     "[ResumeStream] wakeUp revival (from existing deferred) complete",
                     {
@@ -624,13 +635,13 @@ export class ResumeStreamRepository {
                   .where(eq(chatThreads.id, effectiveThreadId))
                   .limit(1);
                 const siblingState = currentThread?.streamingState;
-                if (siblingState === "idle") {
+                if (siblingState === ThreadStreamingState.IDLE) {
                   break;
                 }
                 // If thread is aborting (user cancelled), bail out immediately.
                 // The aborting stream will clear itself to 'idle', but we should
                 // not attempt revival on a cancelled thread.
-                if (siblingState === "aborting") {
+                if (siblingState === ThreadStreamingState.ABORTING) {
                   logger.debug(
                     "[ResumeStream] wakeUp - thread aborting during backoff, skipping revival",
                     { threadId: effectiveThreadId, toolMessageId },
@@ -681,7 +692,7 @@ export class ResumeStreamRepository {
               logger,
               user,
             )("message-created", {
-              streamingState: "streaming",
+              streamingState: ThreadStreamingState.STREAMING,
               messages: [
                 {
                   id: deferredId,
@@ -762,7 +773,9 @@ export class ResumeStreamRepository {
                   threadRootFolderId,
                   logger,
                   user,
-                )("stream-finished", { streamingState: "idle" });
+                )("stream-finished", {
+                  streamingState: ThreadStreamingState.IDLE,
+                });
                 logger.debug("[ResumeStream] wakeUp revival complete", {
                   threadId,
                   success: result.success,
@@ -799,7 +812,10 @@ export class ResumeStreamRepository {
                 // Reset thread from streaming→idle so it doesn't get stuck
                 // (e.g. if runHeadlessAiStream throws before setting state back).
                 db.update(chatThreads)
-                  .set({ streamingState: "idle", updatedAt: new Date() })
+                  .set({
+                    streamingState: ThreadStreamingState.IDLE,
+                    updatedAt: new Date(),
+                  })
                   .where(
                     and(
                       eq(chatThreads.id, effectiveThreadId),
@@ -812,7 +828,9 @@ export class ResumeStreamRepository {
                   threadRootFolderId,
                   logger,
                   user,
-                )("streaming-state-changed", { streamingState: "idle" });
+                )("streaming-state-changed", {
+                  streamingState: ThreadStreamingState.IDLE,
+                });
               });
 
             return success({ resumed: true, lastAiMessageId: null });
@@ -922,7 +940,10 @@ export class ResumeStreamRepository {
                 );
                 await db
                   .update(chatThreads)
-                  .set({ streamingState: "idle", updatedAt: new Date() })
+                  .set({
+                    streamingState: ThreadStreamingState.IDLE,
+                    updatedAt: new Date(),
+                  })
                   .where(
                     and(
                       eq(chatThreads.id, effectiveThreadId),
@@ -982,7 +1003,10 @@ export class ResumeStreamRepository {
                 error: parseError(err).message,
               });
               db.update(chatThreads)
-                .set({ streamingState: "idle", updatedAt: new Date() })
+                .set({
+                  streamingState: ThreadStreamingState.IDLE,
+                  updatedAt: new Date(),
+                })
                 .where(
                   and(
                     eq(chatThreads.id, effectiveThreadId),
@@ -995,7 +1019,9 @@ export class ResumeStreamRepository {
                 threadRootFolderId,
                 logger,
                 user,
-              )("streaming-state-changed", { streamingState: "idle" });
+              )("streaming-state-changed", {
+                streamingState: ThreadStreamingState.IDLE,
+              });
               return success({ resumed: true, lastAiMessageId: null });
             }
 
@@ -1012,7 +1038,10 @@ export class ResumeStreamRepository {
             // on success; only failures need explicit reset here.
             if (!revivalResult.success) {
               db.update(chatThreads)
-                .set({ streamingState: "idle", updatedAt: new Date() })
+                .set({
+                  streamingState: ThreadStreamingState.IDLE,
+                  updatedAt: new Date(),
+                })
                 .where(
                   and(
                     eq(chatThreads.id, effectiveThreadId),
@@ -1025,14 +1054,18 @@ export class ResumeStreamRepository {
                 threadRootFolderId,
                 logger,
                 user,
-              )("streaming-state-changed", { streamingState: "idle" });
+              )("streaming-state-changed", {
+                streamingState: ThreadStreamingState.IDLE,
+              });
             } else {
               createMessagesEmitter(
                 threadId,
                 threadRootFolderId,
                 logger,
                 user,
-              )("stream-finished", { streamingState: "idle" });
+              )("stream-finished", {
+                streamingState: ThreadStreamingState.IDLE,
+              });
               // Clean up any error messages that are children of the tool message.
               db.delete(chatMessages)
                 .where(
@@ -1102,11 +1135,14 @@ export class ResumeStreamRepository {
 
       // Stream dead and nothing to revive - clear 'waiting' → 'idle' so the thread
       // doesn't stay stuck in a non-interactive state indefinitely.
-      if (streamingState === "waiting") {
+      if (streamingState === ThreadStreamingState.WAITING) {
         try {
           await db
             .update(chatThreads)
-            .set({ streamingState: "idle", updatedAt: new Date() })
+            .set({
+              streamingState: ThreadStreamingState.IDLE,
+              updatedAt: new Date(),
+            })
             .where(
               and(
                 eq(chatThreads.id, threadId),
@@ -1118,7 +1154,9 @@ export class ResumeStreamRepository {
             threadRootFolderId,
             logger,
             user,
-          )("streaming-state-changed", { streamingState: "idle" });
+          )("streaming-state-changed", {
+            streamingState: ThreadStreamingState.IDLE,
+          });
           logger.debug(
             "[ResumeStream] Cleared thread from waiting to idle (no-op path)",
             { threadId },

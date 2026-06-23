@@ -237,27 +237,27 @@ const { POST } = createEndpoint({
         children: {
           success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.success.content",
+            label: "post.response.success.content",
             schema: z.boolean(),
           }),
           messageId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.messageId.content",
+            label: "post.response.messageId.content",
             schema: z.string().optional(),
           }),
           testEmail: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.testEmail.content",
+            label: "post.response.testEmail.content",
             schema: z.string().email(),
           }),
           subject: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.subject.content",
+            label: "post.response.subject.content",
             schema: z.string(),
           }),
           sentAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.sentAt.content",
+            label: "post.response.sentAt.content",
             schema: dateSchema,
           }),
         },

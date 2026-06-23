@@ -95,11 +95,11 @@ function LinkGenerator({
   const hasInput = generatedPath.length > 0;
 
   const handleCopyGenerated = useCallback(async () => {
-    if (typeof window === "undefined" || !hasInput) {
+    if (!hasInput) {
       return;
     }
-    const trackUrl = `${window.location.origin}/track?ref=${code}&url=${encodeURIComponent(generatedPath)}`;
-    await navigator.clipboard.writeText(trackUrl);
+    const trackUrl = `${getCurrentOrigin()}/track?ref=${code}&url=${encodeURIComponent(generatedPath)}`;
+    await copyToClipboard(trackUrl);
     setCopiedLinkGen(true);
     setTimeout(() => {
       setCopiedLinkGen(false);
@@ -153,15 +153,11 @@ export function ReferralCodesListContainer(): React.JSX.Element {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const handleCopy = async (code: string, index: number): Promise<void> => {
-    if (typeof window !== "undefined") {
-      await navigator.clipboard.writeText(
-        `${window.location.origin}/track?ref=${code}`,
-      );
-      setCopiedIndex(index);
-      setTimeout(() => {
-        setCopiedIndex(null);
-      }, 2000);
-    }
+    await copyToClipboard(`${getCurrentOrigin()}/track?ref=${code}`);
+    setCopiedIndex(index);
+    setTimeout(() => {
+      setCopiedIndex(null);
+    }, 2000);
   };
 
   if (codes.length === 0) {

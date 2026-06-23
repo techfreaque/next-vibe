@@ -135,25 +135,25 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.success.title",
+        label: "post.fields.success.title",
         schema: z.boolean(),
       }),
 
       generationCompleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.generationCompleted.title",
+        label: "post.fields.generationCompleted.title",
         schema: z.boolean(),
       }),
 
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.output.title",
+        label: "post.fields.output.title",
         schema: z.string(),
       }),
 
       generationStats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.generationStats.title",
+        label: "post.fields.generationStats.title",
         schema: z.object({
           totalGenerators: z.coerce.number(),
           generatorsRun: z.coerce.number(),

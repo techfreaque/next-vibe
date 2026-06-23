@@ -72,7 +72,7 @@ export const { POST } = createEndpoint({
       }),
       mountId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "create.response.id.title" as const,
+        label: "create.response.id.title" as const,
         schema: z.string(),
       }),
     },

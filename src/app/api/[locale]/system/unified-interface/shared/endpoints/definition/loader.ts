@@ -104,7 +104,7 @@ export class DefinitionLoader implements IDefinitionLoader {
         logger.warn(
           `[Definition Loader] Stale chunk detected - reloading page (identifier: ${identifier})`,
         );
-        window.location.reload();
+        reloadPage();
         // Return a non-resolving promise - reload is in flight
         return new Promise<ResponseType<TEndpoint>>((resolve) => {
           // Never resolves - page reload is in flight

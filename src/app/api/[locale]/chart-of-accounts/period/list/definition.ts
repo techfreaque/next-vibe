@@ -70,24 +70,24 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.id" as const,
+              label: "get.response.id" as const,
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.name" as const,
+              label: "get.response.name" as const,
               schema: z.string(),
             }),
             startDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               fieldType: FieldDataType.DATETIME,
-              content: "get.response.startDate" as const,
+              label: "get.response.startDate" as const,
               schema: z.coerce.date(),
             }),
             endDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               fieldType: FieldDataType.DATETIME,
-              content: "get.response.endDate" as const,
+              label: "get.response.endDate" as const,
               schema: z.coerce.date(),
             }),
             status: responseField(scopedTranslation, {
@@ -99,7 +99,7 @@ const { GET } = createEndpoint({
             closedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               fieldType: FieldDataType.DATETIME,
-              content: "get.response.closedAt" as const,
+              label: "get.response.closedAt" as const,
               schema: z.coerce.date().nullable(),
             }),
           },

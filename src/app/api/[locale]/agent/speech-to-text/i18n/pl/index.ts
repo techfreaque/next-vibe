@@ -10,6 +10,7 @@ export const translations: typeof enTranslations = {
   hotkey: {
     post: {
       title: "Hotkey mowy na tekst",
+      titleShort: "Hotkey STT",
       description:
         "Nagrywaj i transkrybuj audio z automatycznym wstawianiem tekstu",
       form: {

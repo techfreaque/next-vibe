@@ -619,7 +619,7 @@ async function executeRemoteEndpoint(params: {
 
   const { getRemoteSession } = await import("../auth/remote-session-cache");
   const { buildRemoteUrl, buildRemoteHeaders } =
-    await import("@/app/api/[locale]/remote-connection/dispatch");
+    await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/dispatch");
   const { Methods } = await import("../../shared/types/enums");
 
   // Resolve session from DB
@@ -674,7 +674,7 @@ async function executeRemoteEndpoint(params: {
   if (!isLoginEndpoint && !isLogoutEndpoint) {
     if (userId && resolvedInstanceId) {
       const { createEndpointLogger } =
-        await import("../../shared/logger/server-logger");
+        await import("@/app/api/[locale]/system/logger/server");
       const transportLogger = createEndpointLogger(false, Date.now(), locale);
       const { RouteExecuteRepository } =
         await import("@/app/api/[locale]/system/unified-interface/execute-tool/repository");

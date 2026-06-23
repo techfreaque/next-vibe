@@ -51,7 +51,7 @@ export const { GET } = createEndpoint({
     children: {
       connections: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.connections.title",
+        label: "get.response.connections.title",
         schema: z.array(
           z.object({
             id: z.string(),

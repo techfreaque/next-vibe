@@ -74,37 +74,37 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       accountsCreated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.accountsCreated" as const,
+        label: "post.response.accountsCreated" as const,
         schema: z.number(),
       }),
 
       accountsSkipped: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.accountsSkipped" as const,
+        label: "post.response.accountsSkipped" as const,
         schema: z.number(),
       }),
 
       taxRatesCreated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.taxRatesCreated" as const,
+        label: "post.response.taxRatesCreated" as const,
         schema: z.number(),
       }),
 
       cashAccountId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.cashAccountId" as const,
+        label: "post.response.cashAccountId" as const,
         schema: z.uuid().nullable(),
       }),
 
       bankAccountId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.bankAccountId" as const,
+        label: "post.response.bankAccountId" as const,
         schema: z.uuid().nullable(),
       }),
 
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.success" as const,
+        label: "post.response.success" as const,
         schema: z.boolean(),
       }),
     },

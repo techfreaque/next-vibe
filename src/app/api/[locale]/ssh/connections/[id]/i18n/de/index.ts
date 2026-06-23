@@ -3,6 +3,12 @@ export const translations: typeof enTranslations = {
   category: "SSH",
 
   enums: {
+    clusterRole: {
+      none: "Keine",
+      controlPlane: "Control Plane",
+      worker: "Worker",
+      storage: "Speicher",
+    },
     authType: {
       password: "Passwort",
       privateKey: "Privater Schlüssel (PEM)",
@@ -58,6 +64,17 @@ export const translations: typeof enTranslations = {
         title: "Netzwerkfehler",
         description: "Netzwerkfehler aufgetreten",
       },
+    },
+    response: {
+      label: { title: "Name" },
+      host: { title: "Host" },
+      port: { title: "Port" },
+      username: { title: "Benutzername" },
+      authType: { title: "Auth-Typ" },
+      isDefault: { title: "Standard" },
+      fingerprint: { title: "Fingerprint" },
+      notes: { title: "Notizen" },
+      createdAt: { title: "Erstellt am" },
     },
     success: {
       title: "Verbindung geladen",

@@ -76,17 +76,17 @@ const { GET } = createEndpoint({
       // Note: threadId is already known from the URL param, not repeated here
       userId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.userId.content" as const,
+        label: "get.response.thread.userId.content" as const,
         schema: z.uuid().nullable(),
       }),
       title: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.threadTitle.content" as const,
+        label: "get.response.thread.threadTitle.content" as const,
         schema: z.string(),
       }),
       folderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.folderId.content" as const,
+        label: "get.response.thread.folderId.content" as const,
         schema: z.uuid().nullable(),
       }),
       status: responseField(scopedTranslation, {
@@ -96,57 +96,57 @@ const { GET } = createEndpoint({
       }),
       defaultModel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.defaultModel.content" as const,
+        label: "get.response.thread.defaultModel.content" as const,
         schema: z.string().nullable(),
       }),
       defaultSkill: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.defaultTone.content" as const,
+        label: "get.response.thread.defaultTone.content" as const,
         schema: z.string().nullable(),
       }),
       systemPrompt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.systemPrompt.content" as const,
+        label: "get.response.thread.systemPrompt.content" as const,
         schema: z.string().nullable(),
       }),
       pinned: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.pinned.content" as const,
+        label: "get.response.thread.pinned.content" as const,
         schema: z.boolean(),
       }),
       archived: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.archived.content" as const,
+        label: "get.response.thread.archived.content" as const,
         schema: z.boolean(),
       }),
       tags: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.tags.content" as const,
+        label: "get.response.thread.tags.content" as const,
         schema: z.array(z.string()),
       }),
       preview: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.preview.content" as const,
+        label: "get.response.thread.preview.content" as const,
         schema: z.string().nullable(),
       }),
       metadata: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.metadata.content" as const,
+        label: "get.response.thread.metadata.content" as const,
         schema: z.record(z.string(), z.any()),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.createdAt.content" as const,
+        label: "get.response.thread.createdAt.content" as const,
         schema: dateSchema,
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.updatedAt.content" as const,
+        label: "get.response.thread.updatedAt.content" as const,
         schema: dateSchema,
       }),
       leadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.leadId.content" as const,
+        label: "get.response.thread.leadId.content" as const,
         schema: z.uuid().nullable(),
       }),
       rootFolderId: requestResponseField(scopedTranslation, {
@@ -195,12 +195,12 @@ const { GET } = createEndpoint({
       }),
       published: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.published.content" as const,
+        label: "get.response.thread.published.content" as const,
         schema: z.boolean(),
       }),
       streamingState: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.thread.streamingState.content" as const,
+        label: "get.response.thread.streamingState.content" as const,
         schema: z.enum(ThreadStreamingStateDB),
         hidden: true,
       }),
@@ -426,7 +426,7 @@ const { PATCH } = createEndpoint({
       // Note: threadId already known from URL param, not repeated
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.thread.updatedAt.content" as const,
+        label: "patch.response.thread.updatedAt.content" as const,
         schema: dateSchema,
       }),
     },
@@ -488,13 +488,17 @@ const { PATCH } = createEndpoint({
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["title", "folderId", "status", "rootFolderId"] as const,
-      fields: ["updatedAt"] as const,
-      onEvent: async ({ partial, urlPathParams, queryClient, logger }) => {
+      responseFields: ["updatedAt"] as const,
+      onEvent: async ({
+        requestData,
+        responseData,
+        urlPathParams,
+        queryClient,
+        logger,
+      }) => {
         const threadId = urlPathParams.threadId;
-        if (!threadId || !partial.rootFolderId) {
-          return;
-        }
-        const rootFolderId = partial.rootFolderId;
+
+        const rootFolderId = requestData.rootFolderId;
         const [{ apiClient }, threadsDefinition] = await Promise.all([
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("../definition"),
@@ -514,10 +518,10 @@ const { PATCH } = createEndpoint({
                   thread.id === threadId
                     ? {
                         ...thread,
-                        title: partial.title ?? thread.title,
-                        folderId: partial.folderId ?? thread.folderId,
-                        status: partial.status ?? thread.status,
-                        updatedAt: partial.updatedAt ?? thread.updatedAt,
+                        title: requestData.title ?? thread.title,
+                        folderId: requestData.folderId ?? thread.folderId,
+                        status: requestData.status ?? thread.status,
+                        updatedAt: responseData.updatedAt ?? thread.updatedAt,
                       }
                     : thread,
                 ),
@@ -594,12 +598,12 @@ const { DELETE } = createEndpoint({
       // Note: threadId already known from URL param, not repeated
       userId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.userId.content" as const,
+        label: "delete.response.userId.content" as const,
         schema: z.uuid().nullable(),
       }),
       title: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.title.content" as const,
+        label: "delete.response.title.content" as const,
         schema: z.string(),
       }),
       rootFolderId: requestResponseField(scopedTranslation, {
@@ -613,27 +617,27 @@ const { DELETE } = createEndpoint({
       }),
       folderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.folderId.content" as const,
+        label: "delete.response.folderId.content" as const,
         schema: z.uuid().nullable(),
       }),
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.status.content" as const,
+        label: "delete.response.status.content" as const,
         schema: z.enum(ThreadStatus),
       }),
       preview: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.preview.content" as const,
+        label: "delete.response.preview.content" as const,
         schema: z.string().nullable(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.createdAt.content" as const,
+        label: "delete.response.createdAt.content" as const,
         schema: dateSchema,
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.updatedAt.content" as const,
+        label: "delete.response.updatedAt.content" as const,
         schema: dateSchema,
       }),
     },
@@ -694,12 +698,10 @@ const { DELETE } = createEndpoint({
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["rootFolderId"] as const,
-      onEvent: async ({ partial, urlPathParams, queryClient, logger }) => {
+      onEvent: async ({ responseData, urlPathParams, queryClient, logger }) => {
         const threadId = urlPathParams.threadId;
-        if (!threadId || !partial.rootFolderId) {
-          return;
-        }
-        const rootFolderId = partial.rootFolderId;
+
+        const rootFolderId = responseData.rootFolderId;
         const [{ apiClient }, threadsDefinition] = await Promise.all([
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("../definition"),

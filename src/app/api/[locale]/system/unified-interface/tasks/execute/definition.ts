@@ -84,32 +84,32 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.success.title",
+        label: "post.fields.success.title",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.message.title",
+        label: "post.fields.message.title",
         schema: z.string().optional(),
       }),
       taskName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.taskName",
+        label: "post.response.taskName",
         schema: z.string(),
       }),
       executedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.executedAt",
+        label: "post.response.executedAt",
         schema: z.string(),
       }),
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.duration",
+        label: "post.response.duration",
         schema: z.coerce.number(),
       }),
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.status",
+        label: "post.response.status",
         schema: z.string(),
       }),
     },

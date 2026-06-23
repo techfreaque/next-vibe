@@ -213,7 +213,7 @@ const { POST } = createEndpoint({
           }),
           message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.success.message.content" as const,
+            label: "post.success.message.content" as const,
             schema: z.string().describe("Human-readable success message"),
           }),
         },
@@ -228,54 +228,54 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.id.content" as const,
+            label: "post.response.id.content" as const,
             schema: z.uuid().describe("Generated user ID"),
           }),
           email: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.email.content" as const,
+            label: "post.response.email.content" as const,
             schema: z.email().describe("User's email address"),
           }),
           privateName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.privateName.content" as const,
+            label: "post.response.privateName.content" as const,
             schema: z.string().describe("User's private name"),
           }),
           publicName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.publicName.content" as const,
+            label: "post.response.publicName.content" as const,
             schema: z.string().describe("User's public name"),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.createdAt.content" as const,
+            label: "post.response.createdAt.content" as const,
             schema: dateSchema.describe("When the user was created"),
           }),
         },
       }),
       responseId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.id.content" as const,
+        label: "post.response.id.content" as const,
         schema: z.uuid(),
       }),
       responseLeadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.leadId.content" as const,
+        label: "post.response.leadId.content" as const,
         schema: leadId.nullable(),
       }),
       responseEmail: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.email.content" as const,
+        label: "post.response.email.content" as const,
         schema: z.email(),
       }),
       responsePrivateName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.privateName.content" as const,
+        label: "post.response.privateName.content" as const,
         schema: z.string(),
       }),
       responsePublicName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.publicName.content" as const,
+        label: "post.response.publicName.content" as const,
         schema: z.string(),
       }),
       responseEmailVerified: responseField(scopedTranslation, {
@@ -290,7 +290,7 @@ const { POST } = createEndpoint({
       }),
       responseStripeCustomerId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.stripeCustomerId.content" as const,
+        label: "post.response.stripeCustomerId.content" as const,
         schema: z.string().nullable(),
       }),
       responseUserRoles: responseArrayField(scopedTranslation, {
@@ -304,12 +304,12 @@ const { POST } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.userRoles.id.content" as const,
+              label: "post.response.userRoles.id.content" as const,
               schema: z.uuid(),
             }),
             role: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.userRoles.role.content" as const,
+              label: "post.response.userRoles.role.content" as const,
               schema: z.enum(Object.values(UserRole)),
             }),
           },
@@ -317,12 +317,12 @@ const { POST } = createEndpoint({
       }),
       responseCreatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.createdAt.content" as const,
+        label: "post.response.createdAt.content" as const,
         schema: dateSchema,
       }),
       responseUpdatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.updatedAt.content" as const,
+        label: "post.response.updatedAt.content" as const,
         schema: dateSchema,
       }),
     },

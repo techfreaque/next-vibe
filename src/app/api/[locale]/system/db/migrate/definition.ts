@@ -50,25 +50,25 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.success.title",
+        label: "fields.success.title",
         schema: z.boolean(),
       }),
 
       migrationsRun: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.migrationsRun.title",
+        label: "fields.migrationsRun.title",
         schema: z.coerce.number(),
       }),
 
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.output.title",
+        label: "fields.output.title",
         schema: z.string(),
       }),
 
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.duration.title",
+        label: "fields.duration.title",
         schema: z.coerce.number(),
       }),
     },

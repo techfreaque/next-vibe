@@ -147,22 +147,22 @@ const { PATCH } = createEndpoint({
         children: {
           success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "patch.response.success",
+            label: "patch.response.success",
             schema: z.boolean(),
           }),
           totalMatched: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "patch.response.totalMatched",
+            label: "patch.response.totalMatched",
             schema: z.coerce.number(),
           }),
           totalProcessed: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "patch.response.totalProcessed",
+            label: "patch.response.totalProcessed",
             schema: z.coerce.number(),
           }),
           totalUpdated: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "patch.response.totalUpdated",
+            label: "patch.response.totalUpdated",
             schema: z.coerce.number(),
           }),
           preview: responseArrayOptionalField(scopedTranslation, {
@@ -178,17 +178,17 @@ const { PATCH } = createEndpoint({
               children: {
                 id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "patch.response.preview",
+                  label: "patch.response.preview",
                   schema: z.string(),
                 }),
                 email: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "patch.response.preview",
+                  label: "patch.response.preview",
                   schema: z.string().nullable(),
                 }),
                 businessName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "patch.response.preview",
+                  label: "patch.response.preview",
                   schema: z.string(),
                 }),
                 currentStatus: responseField(scopedTranslation, {
@@ -217,12 +217,12 @@ const { PATCH } = createEndpoint({
               children: {
                 leadId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "patch.response.errors",
+                  label: "patch.response.errors",
                   schema: z.string(),
                 }),
                 error: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "patch.response.errors",
+                  label: "patch.response.errors",
                   schema: z.string(),
                 }),
               },
@@ -368,22 +368,22 @@ const { DELETE } = createEndpoint({
         children: {
           success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "delete.response.success",
+            label: "delete.response.success",
             schema: z.boolean(),
           }),
           totalMatched: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "delete.response.totalMatched",
+            label: "delete.response.totalMatched",
             schema: z.coerce.number(),
           }),
           totalProcessed: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "delete.response.totalProcessed",
+            label: "delete.response.totalProcessed",
             schema: z.coerce.number(),
           }),
           totalDeleted: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "delete.response.totalDeleted",
+            label: "delete.response.totalDeleted",
             schema: z.coerce.number(),
           }),
           preview: responseArrayOptionalField(scopedTranslation, {
@@ -399,17 +399,17 @@ const { DELETE } = createEndpoint({
               children: {
                 id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "delete.response.preview",
+                  label: "delete.response.preview",
                   schema: z.string(),
                 }),
                 email: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "delete.response.preview",
+                  label: "delete.response.preview",
                   schema: z.string().nullable(),
                 }),
                 businessName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "delete.response.preview",
+                  label: "delete.response.preview",
                   schema: z.string(),
                 }),
                 currentStatus: responseField(scopedTranslation, {
@@ -438,12 +438,12 @@ const { DELETE } = createEndpoint({
               children: {
                 leadId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "delete.response.errors",
+                  label: "delete.response.errors",
                   schema: z.string(),
                 }),
                 error: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "delete.response.errors",
+                  label: "delete.response.errors",
                   schema: z.string(),
                 }),
               },

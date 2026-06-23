@@ -108,21 +108,6 @@ const { GET } = createEndpoint({
         schema: z.string().nullable(),
       }),
       // ── Behavior ────────────────────────────────────────────────────────
-      loopLocation: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: LoopLocationSchema.nullable(),
-      }),
-      threadMirrorMode: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: ThreadMirrorModeSchema.nullable(),
-      }),
-      toolSource: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: ToolSourceSchema.nullable(),
-      }),
       isInferenceProvider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
@@ -200,9 +185,6 @@ const { GET } = createEndpoint({
         remoteInstanceId: "atlas",
         capabilitiesVersion: "abc123",
         transportMode: "reverse-ws",
-        loopLocation: "server",
-        threadMirrorMode: "both",
-        toolSource: "local",
         isInferenceProvider: false,
         forceSystemProvider: false,
         syncScope: {
@@ -222,9 +204,6 @@ const { GET } = createEndpoint({
         remoteInstanceId: null,
         capabilitiesVersion: null,
         transportMode: null,
-        loopLocation: null,
-        threadMirrorMode: null,
-        toolSource: null,
         isInferenceProvider: null,
         forceSystemProvider: null,
         syncScope: null,
@@ -275,9 +254,29 @@ const { PATCH } = createEndpoint({
         description: "patch.password.description" as const,
         schema: z.string().min(1).optional(),
       }),
-      // transportMode is NOT a request field — it is auto-negotiated and
-      // dispatch-driven (spec.md → Transport). The response exposes it
-      // read-only for status display.
+      // ── Transport ───────────────────────────────────────────────────────
+      transportMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.transportMode.label" as const,
+        description: "patch.transportMode.description" as const,
+        options: [
+          {
+            value: "reverse-ws",
+            label: "patch.transportMode.options.reverseWs" as const,
+          },
+          {
+            value: "direct-http",
+            label: "patch.transportMode.options.directHttp" as const,
+          },
+          {
+            value: "cloud-only",
+            label: "patch.transportMode.options.cloudOnly" as const,
+          },
+        ],
+        schema: TransportModeSchema.optional(),
+        hidden: true,
+      }),
       // ── Behavior ────────────────────────────────────────────────────────
       isInferenceProvider: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -292,42 +291,6 @@ const { PATCH } = createEndpoint({
         label: "patch.forceSystemProvider.label" as const,
         description: "patch.forceSystemProvider.description" as const,
         schema: z.boolean().optional(),
-      }),
-      loopLocation: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "patch.loopLocation.label" as const,
-        description: "patch.loopLocation.description" as const,
-        options: [
-          { value: "client", label: "client" },
-          { value: "server", label: "server" },
-        ] as const,
-        schema: LoopLocationSchema.optional(),
-      }),
-      threadMirrorMode: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "patch.threadMirrorMode.label" as const,
-        description: "patch.threadMirrorMode.description" as const,
-        options: [
-          { value: "cloud", label: "cloud" },
-          { value: "local", label: "local" },
-          { value: "both", label: "both" },
-          { value: "none", label: "none" },
-        ] as const,
-        schema: ThreadMirrorModeSchema.optional(),
-      }),
-      toolSource: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "patch.toolSource.label" as const,
-        description: "patch.toolSource.description" as const,
-        options: [
-          { value: "local", label: "local" },
-          { value: "remote", label: "remote" },
-          { value: "both", label: "both" },
-        ] as const,
-        schema: ToolSourceSchema.optional(),
       }),
       // ── Sync scope ──────────────────────────────────────────────────────
       syncScope: requestField(scopedTranslation, {
@@ -354,7 +317,44 @@ const { PATCH } = createEndpoint({
     },
   }),
 
-  errorTypes: {},
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "patch.errors.validation.title" as const,
+      description: "patch.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "patch.errors.network.title" as const,
+      description: "patch.errors.network.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "patch.errors.unauthorized.title" as const,
+      description: "patch.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "patch.errors.forbidden.title" as const,
+      description: "patch.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "patch.errors.notFound.title" as const,
+      description: "patch.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "patch.errors.server.title" as const,
+      description: "patch.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "patch.errors.unknown.title" as const,
+      description: "patch.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "patch.errors.unsavedChanges.title" as const,
+      description: "patch.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "patch.errors.conflict.title" as const,
+      description: "patch.errors.conflict.description" as const,
+    },
+  },
 
   successTypes: {
     title: "patch.success.title" as const,
@@ -368,8 +368,6 @@ const { PATCH } = createEndpoint({
       reauth: { email: "you@example.com", password: "new-password" },
       inferenceProvider: { isInferenceProvider: true },
       forceSystem: { forceSystemProvider: true },
-      loopClient: { loopLocation: "client" as const },
-      mirrorBoth: { threadMirrorMode: "both" as const },
       syncScope: {
         syncScope: {
           memories: true,
@@ -380,6 +378,7 @@ const { PATCH } = createEndpoint({
         },
       },
       reconnectNow: { reconnectNow: true },
+      transportMode: { transportMode: "reverse-ws" as const },
     },
     responses: { default: { updated: true } },
   },
@@ -412,7 +411,44 @@ const { DELETE } = createEndpoint({
     },
   }),
 
-  errorTypes: {},
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "delete.errors.validation.title" as const,
+      description: "delete.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "delete.errors.network.title" as const,
+      description: "delete.errors.network.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "delete.errors.unauthorized.title" as const,
+      description: "delete.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "delete.errors.forbidden.title" as const,
+      description: "delete.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "delete.errors.notFound.title" as const,
+      description: "delete.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "delete.errors.server.title" as const,
+      description: "delete.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "delete.errors.unknown.title" as const,
+      description: "delete.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "delete.errors.unsavedChanges.title" as const,
+      description: "delete.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "delete.errors.conflict.title" as const,
+      description: "delete.errors.conflict.description" as const,
+    },
+  },
 
   successTypes: {
     title: "delete.success.title" as const,
@@ -434,5 +470,5 @@ export type RemoteConnectionByIdPatchResponseOutput =
 export type RemoteConnectionByIdDeleteResponseOutput =
   typeof DELETE.types.ResponseOutput;
 
-const definitions = { GET, PATCH, DELETE };
+const definitions = { GET, PATCH, DELETE } as const;
 export default definitions;

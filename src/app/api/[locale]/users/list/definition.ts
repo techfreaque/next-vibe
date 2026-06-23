@@ -221,17 +221,17 @@ const { GET } = createEndpoint({
               children: {
                 email: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.users.email" as const,
+                  label: "get.response.users.email" as const,
                   schema: z.string(),
                 }),
                 privateName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.users.privateName" as const,
+                  label: "get.response.users.privateName" as const,
                   schema: z.string(),
                 }),
                 publicName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.users.publicName" as const,
+                  label: "get.response.users.publicName" as const,
                   schema: z.string(),
                 }),
                 isActive: responseField(scopedTranslation, {
@@ -247,33 +247,33 @@ const { GET } = createEndpoint({
                 createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content: "get.response.users.createdAt" as const,
+                  label: "get.response.users.createdAt" as const,
                   schema: z.coerce.date(),
                 }),
                 updatedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content: "get.response.users.updatedAt" as const,
+                  label: "get.response.users.updatedAt" as const,
                   schema: z.coerce.date(),
                 }),
                 id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.users.id" as const,
+                  label: "get.response.users.id" as const,
                   schema: z.string(),
                 }),
                 referralCode: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.users.referralCode" as const,
+                  label: "get.response.users.referralCode" as const,
                   schema: z.string().nullable(),
                 }),
                 referredByUserId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.users.referredByUserId" as const,
+                  label: "get.response.users.referredByUserId" as const,
                   schema: z.string().nullable(),
                 }),
                 totalReferrals: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.users.totalReferrals" as const,
+                  label: "get.response.users.totalReferrals" as const,
                   schema: z.coerce.number(),
                 }),
               },
@@ -308,14 +308,12 @@ const { GET } = createEndpoint({
           totalCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.totalCount" as const,
-            content: "get.response.totalCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),
           pageCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.pageCount" as const,
-            content: "get.response.pageCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),

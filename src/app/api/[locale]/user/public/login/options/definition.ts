@@ -78,12 +78,12 @@ const { GET } = createEndpoint({
           }),
           message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.message.content",
+            label: "response.message.content",
             schema: z.string().describe("Human-readable status message"),
           }),
           forUser: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.forUser.content",
+            label: "response.forUser.content",
             schema: z
               .string()
               .optional()
@@ -112,7 +112,7 @@ const { GET } = createEndpoint({
                   }),
                   passwordDescription: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "response.loginMethods.password.description",
+                    label: "response.loginMethods.password.description",
                     schema: z.string().describe("Human-readable description"),
                   }),
                 },
@@ -133,7 +133,7 @@ const { GET } = createEndpoint({
                   }),
                   socialDescription: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "response.loginMethods.social.description",
+                    label: "response.loginMethods.social.description",
                     schema: z.string().describe("Human-readable description"),
                   }),
                   providers: responseArrayField(scopedTranslation, {
@@ -190,7 +190,7 @@ const { GET } = createEndpoint({
             children: {
               maxAttempts: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "response.security.maxAttempts.content",
+                label: "response.security.maxAttempts.content",
                 schema: z
                   .number()
                   .optional()
@@ -206,7 +206,7 @@ const { GET } = createEndpoint({
               }),
               securityDescription: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "response.security.description",
+                label: "response.security.description",
                 schema: z.string().describe("Security requirements summary"),
               }),
             },

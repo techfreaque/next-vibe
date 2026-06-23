@@ -118,25 +118,25 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.success",
+        label: "post.response.success",
         schema: z.boolean(),
       }),
 
       actionResult: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.actionResult",
+        label: "post.response.actionResult",
         schema: z.string(),
       }),
 
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.message",
+        label: "post.response.message",
         schema: z.string(),
       }),
 
       timestamp: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.timestamp",
+        label: "post.response.timestamp",
         schema: z.string(),
       }),
     },

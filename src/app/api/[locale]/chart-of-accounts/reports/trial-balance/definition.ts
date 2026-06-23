@@ -76,7 +76,7 @@ const { GET } = createEndpoint({
 
       asOfDateResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "trialBalance.response.asOfDate" as const,
+        label: "trialBalance.response.asOfDate" as const,
         schema: z.string(),
       }),
       accounts: responseArrayField(scopedTranslation, {
@@ -88,37 +88,37 @@ const { GET } = createEndpoint({
           children: {
             accountId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "accountGet.accountId.label" as const,
+              label: "accountGet.accountId.label" as const,
               schema: z.string(),
             }),
             code: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "trialBalance.response.code" as const,
+              label: "trialBalance.response.code" as const,
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "trialBalance.response.name" as const,
+              label: "trialBalance.response.name" as const,
               schema: z.string(),
             }),
             type: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "trialBalance.response.type" as const,
+              label: "trialBalance.response.type" as const,
               schema: z.string(),
             }),
             debitTotal: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "trialBalance.response.debitTotal" as const,
+              label: "trialBalance.response.debitTotal" as const,
               schema: z.number(),
             }),
             creditTotal: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "trialBalance.response.creditTotal" as const,
+              label: "trialBalance.response.creditTotal" as const,
               schema: z.number(),
             }),
             balance: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "trialBalance.response.balance" as const,
+              label: "trialBalance.response.balance" as const,
               schema: z.number(),
             }),
           },
@@ -126,12 +126,12 @@ const { GET } = createEndpoint({
       }),
       totalDebits: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "trialBalance.response.totalDebits" as const,
+        label: "trialBalance.response.totalDebits" as const,
         schema: z.number(),
       }),
       totalCredits: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "trialBalance.response.totalCredits" as const,
+        label: "trialBalance.response.totalCredits" as const,
         schema: z.number(),
       }),
       isBalanced: responseField(scopedTranslation, {

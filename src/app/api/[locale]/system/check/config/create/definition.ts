@@ -155,7 +155,7 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.message",
+        label: "response.message",
         schema: z.string(),
       }),
     },

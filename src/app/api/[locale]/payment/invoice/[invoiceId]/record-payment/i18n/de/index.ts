@@ -2,6 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Abrechnung",
+  enums: {
+    manualPaymentMethod: {
+      cash: "Bargeld",
+      bankTransfer: "Banküberweisung",
+      other: "Sonstiges",
+    },
+  },
   tags: {
     payment: "zahlung",
     invoice: "rechnung",

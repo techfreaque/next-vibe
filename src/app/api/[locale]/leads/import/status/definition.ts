@@ -125,7 +125,7 @@ const { GET } = createEndpoint({
         children: {
           statusCounts: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "status.get.response.statusCounts",
+            label: "status.get.response.statusCounts",
             schema: z.record(z.string(), z.number()),
           }),
           items: responseArrayField(scopedTranslation, {
@@ -143,12 +143,12 @@ const { GET } = createEndpoint({
                 // Job Identity
                 id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.uuid(),
                 }),
                 fileName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.string(),
                 }),
                 status: responseField(scopedTranslation, {
@@ -160,78 +160,78 @@ const { GET } = createEndpoint({
                 // Progress Tracking
                 totalRows: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.coerce.number().nullable(),
                 }),
                 processedRows: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
                 successfulImports: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
                 failedImports: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
                 duplicateEmails: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
 
                 // Batch Processing
                 currentBatchStart: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
                 batchSize: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
 
                 // Error Handling
                 error: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.string().nullable(),
                 }),
                 retryCount: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
                 maxRetries: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
 
                 // Timestamps
                 createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.string(),
                 }),
                 updatedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.string(),
                 }),
                 startedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.string().nullable(),
                 }),
                 completedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "status.get.response.items.title",
+                  label: "status.get.response.items.title",
                   schema: z.string().nullable(),
                 }),
               },

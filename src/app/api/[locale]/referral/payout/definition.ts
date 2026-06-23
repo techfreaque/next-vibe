@@ -25,7 +25,12 @@ import {
 
 import { UserRole } from "../../user/user-roles/enum";
 import { REFERRAL_CONFIG } from "../config";
-import { PayoutCurrency, PayoutCurrencyDB, PayoutStatusDB } from "../enum";
+import {
+  PayoutCurrency,
+  PayoutCurrencyDB,
+  PayoutCurrencyOptions,
+  PayoutStatusDB,
+} from "../enum";
 import { scopedTranslation } from "../i18n";
 
 const ReferralPayoutContainer = lazyWidget(() =>
@@ -180,6 +185,7 @@ export const { POST } = createEndpoint({
         fieldType: FieldDataType.SELECT,
         label: "payout.fields.currency.label" as const,
         description: "payout.fields.currency.description" as const,
+        options: PayoutCurrencyOptions,
         schema: z.enum(PayoutCurrencyDB),
       }),
       walletAddress: requestField(scopedTranslation, {

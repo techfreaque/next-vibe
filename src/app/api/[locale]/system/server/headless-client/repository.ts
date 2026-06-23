@@ -77,15 +77,12 @@ export class HeadlessClientRepository {
 
     // Register the connection from CLI args and open all active reverse-WS connections.
     try {
-      const [
-        { openConnection, decodeJwtUserId },
-        { remoteConnections },
-        { eq, and },
-      ] = await Promise.all([
-        import("@/app/api/[locale]/remote-connection/connector"),
-        import("@/app/api/[locale]/remote-connection/db"),
-        import("drizzle-orm"),
-      ]);
+      const [{ openConnection }, { remoteConnections }, { eq, and }] =
+        await Promise.all([
+          import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector"),
+          import("@/app/api/[locale]/remote-connection/db"),
+          import("drizzle-orm"),
+        ]);
 
       // Resolve DB user ID — CLI bypass user (00000000-...-0001) has no DB row.
       // Fall back to looking up the real admin user from VIBE_ADMIN_USER_EMAIL.
@@ -172,7 +169,6 @@ export class HeadlessClientRepository {
             token: conn.token,
             leadId: conn.leadId,
             userId: conn.userId,
-            remoteUserId: decodeJwtUserId(conn.token),
             capabilitiesVersion: conn.capabilitiesVersion,
             sentCapabilitiesVersion: conn.sentCapabilitiesVersion,
             syncScope: conn.syncScope,

@@ -9,14 +9,15 @@
  *
  * Auth is handled via httpOnly cookies (sent automatically on same-origin).
  *
- * Most consumers should use `useWidgetEvents` instead, which adds
- * type safety from the endpoint definition.
+ * Most consumers should use `useEndpointSubscription` instead, which adds
+ * type safety from the endpoint definition and applies events to the cache.
  */
 
 import { getCurrentHost, getCurrentProtocol } from "next-vibe-ui/lib/location";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   EventHandler,
@@ -44,6 +45,8 @@ interface ChannelState {
   listeners: Map<string, Set<WireHandler>>;
   /** Wildcard handlers: receive the full WsWireMessage for lastEvent tracking */
   wildcardListeners: Set<EventHandler<WsWireMessage>>;
+  /** Locale used when subscribing — sent to server for authorization */
+  locale: CountryLanguage;
 }
 
 // Shared connection state
@@ -84,12 +87,12 @@ function connect(): void {
     return;
   }
 
-  if (typeof window === "undefined") {
+  if (typeof WebSocket === "undefined") {
     return;
   }
 
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const url = `${protocol}//${window.location.host}/ws`;
+  const protocol = getCurrentProtocol() === "https:" ? "wss:" : "ws:";
+  const url = `${protocol}//${getCurrentHost()}/ws`;
 
   const ws = new WebSocket(url);
   sharedWs = ws;
@@ -98,8 +101,8 @@ function connect(): void {
     reconnectAttempts = 0;
     notifyConnectionState(true);
     // Re-subscribe to all active channels after reconnect
-    for (const channel of channels.keys()) {
-      sendToServer({ type: "subscribe", channel });
+    for (const [channel, state] of channels.entries()) {
+      sendToServer({ type: "subscribe", channel, locale: state.locale });
     }
   };
 
@@ -172,7 +175,10 @@ function ensureConnected(): void {
   }
 }
 
-function getOrCreateChannel(channel: string): ChannelState {
+function getOrCreateChannel(
+  channel: string,
+  locale: CountryLanguage,
+): ChannelState {
   let state = channels.get(channel);
   if (state) {
     return state;
@@ -181,11 +187,12 @@ function getOrCreateChannel(channel: string): ChannelState {
   state = {
     listeners: new Map(),
     wildcardListeners: new Set(),
+    locale,
   };
   channels.set(channel, state);
 
   ensureConnected();
-  sendToServer({ type: "subscribe", channel });
+  sendToServer({ type: "subscribe", channel, locale });
   return state;
 }
 
@@ -243,14 +250,17 @@ function addWildcardListener(
  * Subscribe to a WS channel imperatively (outside React lifecycle).
  * Returns an unsubscribe function that cleans up the listener.
  */
-export function subscribeToChannel<T extends WsWireMessage["data"]>(
+export function subscribeToChannel<T = WsWireMessage["data"]>(
   channel: string,
   event: string,
   handler: EventHandler<T>,
+  locale: CountryLanguage,
 ): () => void {
-  const state = getOrCreateChannel(channel);
-  // Caller's generic T narrows the wire data - safe since the WS protocol
-  // guarantees the event name correlates with the correct payload shape.
+  const state = getOrCreateChannel(channel, locale);
+  // Caller's generic T is the inferred event payload (from the endpoint
+  // definition); it threads through unconstrained so the handler is fully
+  // typed. WidgetData is only the default for untyped callers. The wire
+  // protocol guarantees the event name correlates with the payload shape.
   return addListener(state, event, handler as WireHandler, channel);
 }
 
@@ -260,8 +270,8 @@ export function subscribeToChannel<T extends WsWireMessage["data"]>(
  * events are not delayed by connection setup.
  * Safe to call multiple times - returns existing connection if already open.
  */
-export function preWarmChannel(channel: string): void {
-  getOrCreateChannel(channel);
+export function preWarmChannel(channel: string, locale: CountryLanguage): void {
+  getOrCreateChannel(channel, locale);
 }
 
 /**

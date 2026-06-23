@@ -34,7 +34,6 @@ export const browserInstanceIdField = requestField(scopedTranslation, {
     Platform.REMOTE_SKILL,
     Platform.TRPC,
     Platform.NEXT_PAGE,
-    Platform.NEXT_API,
     Platform.CRON,
     Platform.ELECTRON,
     Platform.FRAME,

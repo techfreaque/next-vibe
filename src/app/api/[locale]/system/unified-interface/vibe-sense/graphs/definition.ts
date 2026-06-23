@@ -68,42 +68,42 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list.response.graph.id",
+              label: "list.response.graph.id",
               schema: z.string(),
             }),
             slug: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list.response.graph.slug",
+              label: "list.response.graph.slug",
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list.response.graph.name",
+              label: "list.response.graph.name",
               schema: z.string(),
             }),
             description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list.response.graph.description",
+              label: "list.response.graph.description",
               schema: z.string().nullable(),
             }),
             ownerType: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list.response.graph.ownerType",
+              label: "list.response.graph.ownerType",
               schema: z.string(),
             }),
             ownerId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list.response.graph.ownerId",
+              label: "list.response.graph.ownerId",
               schema: z.string().nullable(),
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              content: "list.response.graph.isActive",
+              label: "list.response.graph.isActive",
               schema: z.boolean(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list.response.graph.createdAt",
+              label: "list.response.graph.createdAt",
               schema: z.string(),
             }),
           },
@@ -219,7 +219,7 @@ const { POST } = createEndpoint({
       }),
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "create.response.id",
+        label: "create.response.id",
         schema: z.string(),
       }),
     },

@@ -49,6 +49,9 @@ export const translations = {
       },
       timeout: { title: "Timeout", description: "Request timed out" },
     },
+    response: {
+      users: { title: "Users" },
+    },
     success: { title: "Users Listed", description: "OS users retrieved" },
   },
   widget: {

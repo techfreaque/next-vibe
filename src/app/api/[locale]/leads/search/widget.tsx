@@ -177,7 +177,7 @@ function CopyEmail({
   const handleCopy = useCallback(
     (e: ButtonMouseEvent): void => {
       e.stopPropagation();
-      void navigator.clipboard.writeText(email).then(() => {
+      void copyToClipboard(email).then(() => {
         setCopied(true);
         setTimeout(() => {
           setCopied(false);

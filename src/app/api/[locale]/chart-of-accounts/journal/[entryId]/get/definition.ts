@@ -66,65 +66,65 @@ const { GET } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.id",
+            label: "journalEntryGet.response.id",
             hidden: true,
             schema: z.string().uuid(),
           }),
           companyId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.companyId",
+            label: "journalEntryGet.response.companyId",
             schema: z.string().uuid(),
           }),
           periodId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.periodId",
+            label: "journalEntryGet.response.periodId",
             schema: z.string().uuid(),
           }),
           entryNumber: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.entryNumber",
+            label: "journalEntryGet.response.entryNumber",
             schema: z.string(),
           }),
           date: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.date",
+            label: "journalEntryGet.response.date",
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date(),
           }),
           description: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.description",
+            label: "journalEntryGet.response.description",
             schema: z.string(),
           }),
           memo: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.memo",
+            label: "journalEntryGet.response.memo",
             schema: z.string().nullable(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.status",
+            label: "journalEntryGet.response.status",
             schema: z.string(),
           }),
           sourceType: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.sourceType",
+            label: "journalEntryGet.response.sourceType",
             schema: z.string(),
           }),
           sourceId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.sourceId",
+            label: "journalEntryGet.response.sourceId",
             schema: z.string().uuid().nullable(),
           }),
           postedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.postedAt",
+            label: "journalEntryGet.response.postedAt",
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date().nullable(),
           }),
           reversalOfId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "journalEntryGet.response.reversalOfId",
+            label: "journalEntryGet.response.reversalOfId",
             schema: z.string().uuid().nullable(),
           }),
           lines: responseArrayField(scopedTranslation, {
@@ -137,32 +137,32 @@ const { GET } = createEndpoint({
               children: {
                 lineId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "journalEntryGet.response.lineId",
+                  label: "journalEntryGet.response.lineId",
                   schema: z.string().uuid(),
                 }),
                 accountId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "journalEntryGet.response.accountId",
+                  label: "journalEntryGet.response.accountId",
                   schema: z.string().uuid(),
                 }),
                 lineType: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "journalEntryGet.response.lineType",
+                  label: "journalEntryGet.response.lineType",
                   schema: z.string(),
                 }),
                 amount: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "journalEntryGet.response.amount",
+                  label: "journalEntryGet.response.amount",
                   schema: z.number(),
                 }),
                 currency: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "journalEntryGet.response.currency",
+                  label: "journalEntryGet.response.currency",
                   schema: z.string(),
                 }),
                 lineDescription: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "journalEntryGet.response.lineDescription",
+                  label: "journalEntryGet.response.lineDescription",
                   schema: z.string().nullable(),
                 }),
               },

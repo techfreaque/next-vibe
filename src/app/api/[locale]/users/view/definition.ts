@@ -67,7 +67,7 @@ export const { GET } = createEndpoint({
 
       title: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.title" as const,
+        label: "get.title" as const,
         usage: { response: true },
       }),
 

@@ -101,7 +101,7 @@ export function LeadCreateContainer({
     if (!createdLeadId) {
       return;
     }
-    void navigator.clipboard.writeText(createdLeadId);
+    void copyToClipboard(createdLeadId);
   }, [createdLeadId]);
 
   // Auto-navigate to lead detail on successful creation

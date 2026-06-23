@@ -46,22 +46,22 @@ export const { POST } = createEndpoint({
       }),
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "deploy.preview.post.response.success.title",
+        label: "deploy.preview.post.response.success.title",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "deploy.preview.post.response.message.title",
+        label: "deploy.preview.post.response.message.title",
         schema: z.string(),
       }),
       preview: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "deploy.preview.post.response.preview.title",
+        label: "deploy.preview.post.response.preview.title",
         schema: z.string(),
       }),
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "deploy.preview.post.response.duration.title",
+        label: "deploy.preview.post.response.duration.title",
         schema: z.number(),
       }),
     },

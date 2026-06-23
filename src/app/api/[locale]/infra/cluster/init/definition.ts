@@ -104,32 +104,32 @@ export const { POST } = createEndpoint({
       }),
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cluster.init.post.response.success.title",
+        label: "cluster.init.post.response.success.title",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cluster.init.post.response.message.title",
+        label: "cluster.init.post.response.message.title",
         schema: z.string(),
       }),
       nodesProvisioned: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cluster.init.post.response.nodesProvisioned.title",
+        label: "cluster.init.post.response.nodesProvisioned.title",
         schema: z.number(),
       }),
       componentsInstalled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cluster.init.post.response.componentsInstalled.title",
+        label: "cluster.init.post.response.componentsInstalled.title",
         schema: z.array(z.string()),
       }),
       kubeconfig: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cluster.init.post.response.kubeconfig.title",
+        label: "cluster.init.post.response.kubeconfig.title",
         schema: z.string(),
       }),
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "cluster.init.post.response.duration.title",
+        label: "cluster.init.post.response.duration.title",
         schema: z.number(),
       }),
     },

@@ -42,12 +42,12 @@ export const { GET } = createEndpoint({
     children: {
       referralCode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.referralCode" as const,
+        label: "response.referralCode" as const,
         schema: z.string().nullable(),
       }),
       referralLabel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.referralLabel" as const,
+        label: "response.referralLabel" as const,
         schema: z.string().nullable(),
       }),
     },

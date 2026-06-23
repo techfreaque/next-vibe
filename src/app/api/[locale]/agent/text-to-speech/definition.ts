@@ -6,7 +6,10 @@
 import { lazy } from "react";
 import { z } from "zod";
 
-import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import {
+  TtsModelId,
+  TtsModelIdOptions,
+} from "@/app/api/[locale]/agent/text-to-speech/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -83,12 +86,12 @@ const { POST } = createEndpoint({
 
       audioUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.audioUrl",
+        label: "post.response.audioUrl",
         schema: z.string(),
       }),
       creditCost: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.audioUrl",
+        label: "post.response.audioUrl",
         schema: z.number().optional(),
       }),
     },

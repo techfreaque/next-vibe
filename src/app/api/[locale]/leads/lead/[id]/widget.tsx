@@ -206,7 +206,7 @@ function CopyButton({
 }): React.JSX.Element {
   const [copied, setCopied] = useState(false);
   const handleCopy = useCallback((): void => {
-    void navigator.clipboard.writeText(text).then(() => {
+    void copyToClipboard(text).then(() => {
       setCopied(true);
       setTimeout(() => {
         setCopied(false);

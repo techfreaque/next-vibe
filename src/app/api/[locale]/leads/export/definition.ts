@@ -166,31 +166,31 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       fileName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.fileName",
+        label: "get.response.fileName",
         schema: z.string(),
       }),
 
-      fileContent: responseField(scopedTranslation, {
+      filelabel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.fileContent",
+        label: "get.response.fileContent",
         schema: z.string(),
       }),
 
       mimeType: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.mimeType",
+        label: "get.response.mimeType",
         schema: z.enum(MimeType),
       }),
 
       totalRecords: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalRecords",
+        label: "get.response.totalRecords",
         schema: z.coerce.number(),
       }),
 
       exportedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.exportedAt",
+        label: "get.response.exportedAt",
         schema: z.coerce.date(),
       }),
     },
@@ -244,7 +244,7 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         fileName: "leads_export_2023-01-01.csv",
-        fileContent: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWU...",
+        filelabel: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWU...",
         mimeType: MimeType.CSV,
         totalRecords: 150,
         exportedAt: new Date("2023-01-01T12:00:00.000Z"),

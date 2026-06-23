@@ -185,12 +185,12 @@ const { GET } = createEndpoint({
         children: {
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "id.get.response.timestamps.createdAt.content" as const,
+            label: "id.get.response.timestamps.createdAt.content" as const,
             schema: dateSchema.describe("Account creation date"),
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "id.get.response.timestamps.updatedAt.content" as const,
+            label: "id.get.response.timestamps.updatedAt.content" as const,
             schema: dateSchema.describe("Last update date"),
           }),
         },
@@ -234,22 +234,22 @@ const { GET } = createEndpoint({
 
       leadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.get.response.leadId.content" as const,
+        label: "id.get.response.leadId.content" as const,
         schema: z.uuid().nullable(),
       }),
       email: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.get.response.email.content" as const,
+        label: "id.get.response.email.content" as const,
         schema: z.email(),
       }),
       privateName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.get.response.privateName.content" as const,
+        label: "id.get.response.privateName.content" as const,
         schema: z.string(),
       }),
       publicName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.get.response.publicName.content" as const,
+        label: "id.get.response.publicName.content" as const,
         schema: z.string(),
       }),
       emailVerified: responseField(scopedTranslation, {
@@ -264,7 +264,7 @@ const { GET } = createEndpoint({
       }),
       stripeCustomerId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.get.response.stripeCustomerId.content" as const,
+        label: "id.get.response.stripeCustomerId.content" as const,
         schema: z.string().nullable(),
       }),
       userRoles: responseArrayField(scopedTranslation, {
@@ -276,7 +276,7 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "id.get.response.userRoles.content" as const,
+              label: "id.get.response.userRoles.content" as const,
               schema: z.uuid(),
             }),
             role: responseField(scopedTranslation, {
@@ -289,12 +289,12 @@ const { GET } = createEndpoint({
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.get.response.createdAt.content" as const,
+        label: "id.get.response.createdAt.content" as const,
         schema: dateSchema,
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.get.response.updatedAt.content" as const,
+        label: "id.get.response.updatedAt.content" as const,
         schema: dateSchema,
       }),
     },
@@ -573,7 +573,7 @@ const { PUT } = createEndpoint({
       // === RESPONSE-ONLY FIELDS ===
       stripeCustomerId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.put.response.stripeCustomerId.content" as const,
+        label: "id.put.response.stripeCustomerId.content" as const,
         schema: z.string().nullable(),
       }),
       userRoles: responseArrayField(scopedTranslation, {
@@ -585,7 +585,7 @@ const { PUT } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "id.put.response.userRoles.content" as const,
+              label: "id.put.response.userRoles.content" as const,
               schema: z.uuid(),
             }),
             role: responseField(scopedTranslation, {
@@ -598,12 +598,12 @@ const { PUT } = createEndpoint({
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.put.response.createdAt.content" as const,
+        label: "id.put.response.createdAt.content" as const,
         schema: dateSchema,
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.put.response.updatedAt.content" as const,
+        label: "id.put.response.updatedAt.content" as const,
         schema: dateSchema,
       }),
     },
@@ -788,12 +788,12 @@ const { DELETE } = createEndpoint({
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.delete.response.deletionResult.message.content" as const,
+        label: "id.delete.response.deletionResult.message.content" as const,
         schema: z.string().describe("Human-readable result message"),
       }),
       deletedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "id.delete.response.deletionResult.deletedAt.content" as const,
+        label: "id.delete.response.deletionResult.deletedAt.content" as const,
         schema: dateSchema.describe("When the user was deleted"),
       }),
     },

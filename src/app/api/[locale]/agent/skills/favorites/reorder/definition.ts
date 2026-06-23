@@ -123,12 +123,9 @@ const { POST } = createEndpoint({
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       requestFields: ["positions"] as const,
-      onEvent: async ({ partial, queryClient, logger }) => {
-        if (!partial.positions) {
-          return;
-        }
+      onEvent: async ({ requestData, queryClient, logger }) => {
         const positionById = new Map(
-          partial.positions.map((p) => [p.id, p.position]),
+          requestData.positions.map((p) => [p.id, p.position]),
         );
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");

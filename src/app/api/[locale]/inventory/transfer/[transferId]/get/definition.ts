@@ -67,62 +67,62 @@ const { GET } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.id" as const,
+            label: "transferGet.get.response.id" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           companyId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.companyId" as const,
+            label: "transferGet.get.response.companyId" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           fromWarehouseId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.fromWarehouseId" as const,
+            label: "transferGet.get.response.fromWarehouseId" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           fromWarehouseName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.fromWarehouseName" as const,
+            label: "transferGet.get.response.fromWarehouseName" as const,
             schema: z.string(),
           }),
           toWarehouseId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.toWarehouseId" as const,
+            label: "transferGet.get.response.toWarehouseId" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           toWarehouseName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.toWarehouseName" as const,
+            label: "transferGet.get.response.toWarehouseName" as const,
             schema: z.string(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.status" as const,
+            label: "transferGet.get.response.status" as const,
             schema: z.string(),
           }),
           reference: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.reference" as const,
+            label: "transferGet.get.response.reference" as const,
             schema: z.string().nullable(),
           }),
           notes: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.notes" as const,
+            label: "transferGet.get.response.notes" as const,
             schema: z.string().nullable(),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.createdAt" as const,
+            label: "transferGet.get.response.createdAt" as const,
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date(),
           }),
           completedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferGet.get.response.completedAt" as const,
+            label: "transferGet.get.response.completedAt" as const,
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date().nullable(),
           }),
@@ -135,19 +135,19 @@ const { GET } = createEndpoint({
               children: {
                 id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "transferGet.get.response.id" as const,
+                  label: "transferGet.get.response.id" as const,
                   hidden: true,
                   schema: z.uuid(),
                 }),
                 productId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "transferGet.get.response.productId" as const,
+                  label: "transferGet.get.response.productId" as const,
                   hidden: true,
                   schema: z.uuid(),
                 }),
                 productName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "transferGet.get.response.productName" as const,
+                  label: "transferGet.get.response.productName" as const,
                   schema: z.string(),
                 }),
                 quantityRequested: responseField(scopedTranslation, {
@@ -158,7 +158,7 @@ const { GET } = createEndpoint({
                 }),
                 quantityReceived: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "transferGet.get.response.quantityReceived" as const,
+                  label: "transferGet.get.response.quantityReceived" as const,
                   schema: z.number(),
                 }),
               },

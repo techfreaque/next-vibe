@@ -17,7 +17,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 import { MessageStatus, MessageType } from "../../../../messages/enum";
 import { createTrackingContext } from "../components/tracking_context.email";
@@ -33,20 +33,8 @@ import type {
  * Email Handling Repository
  */
 export class EmailHandlingRepository {
-  static async handleEmails<
-    TRequest,
-    TResponse,
-    TUrlVariables,
-    TScopedTranslationKey extends string,
-    TUserRoles extends readonly UserRoleValue[],
-  >(
-    data: EmailHandleRequestOutput<
-      TRequest,
-      TResponse,
-      TUrlVariables,
-      TScopedTranslationKey,
-      TUserRoles
-    >,
+  static async handleEmails<TEndpoint extends CreateApiEndpointAny>(
+    data: EmailHandleRequestOutput<TEndpoint>,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailHandleResponseOutput>> {
     const errors: ErrorResponseType[] = [];

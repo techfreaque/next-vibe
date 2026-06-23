@@ -44,6 +44,7 @@ export function GoogleSheetsWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const t = useWidgetTranslation<typeof endpoints.POST>();
   const { endpointMutations } = useWidgetContext();
 
@@ -58,18 +59,18 @@ export function GoogleSheetsWidget(): JSX.Element {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(new URL(getCurrentUrl()).search);
     if (params.get("gs_connected") === "1") {
       setIsConnected(true);
       // Clean URL
-      const newUrl = new URL(window.location.href);
+      const newUrl = new URL(getCurrentUrl());
       newUrl.searchParams.delete("gs_connected");
-      window.history.replaceState({}, "", newUrl.toString());
+      silentReplaceState(newUrl.toString());
     }
     if (params.get("gs_error")) {
-      const newUrl = new URL(window.location.href);
+      const newUrl = new URL(getCurrentUrl());
       newUrl.searchParams.delete("gs_error");
-      window.history.replaceState({}, "", newUrl.toString());
+      silentReplaceState(newUrl.toString());
     }
   }, []);
 
@@ -100,7 +101,7 @@ export function GoogleSheetsWidget(): JSX.Element {
         setLoadingSheets(false);
       }
     })();
-  }, [user, locale, logger]);
+  }, [user, locale, logger, availability]);
 
   useEffect(() => {
     if (isConnected && sheets.length === 0) {
@@ -109,7 +110,9 @@ export function GoogleSheetsWidget(): JSX.Element {
   }, [isConnected, sheets.length, loadSheets]);
 
   const handleConnectGoogle = useCallback((): void => {
-    window.location.href = `/api/${locale.split("-")[0]}/lead-magnet/providers/google-sheets/oauth/start`;
+    assignUrl(
+      `/api/${locale.split("-")[0]}/lead-magnet/providers/google-sheets/oauth/start`,
+    );
   }, [locale]);
 
   const handleSave = useCallback((): void => {
@@ -147,7 +150,16 @@ export function GoogleSheetsWidget(): JSX.Element {
         setSaving(false);
       }
     })();
-  }, [selectedSheetId, sheetTab, user, locale, logger, endpointMutations, t]);
+  }, [
+    selectedSheetId,
+    sheetTab,
+    user,
+    locale,
+    logger,
+    availability,
+    endpointMutations,
+    t,
+  ]);
 
   if (!isConnected) {
     return (

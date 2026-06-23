@@ -68,67 +68,67 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.id" as const,
+              label: "create.response.id" as const,
               schema: z.uuid(),
             }),
             label: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string(),
             }),
             fullName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string().nullable(),
             }),
             company: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string().nullable(),
             }),
             phone: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string().nullable(),
             }),
             vatNumber: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string().nullable(),
             }),
             taxId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string().nullable(),
             }),
             addressLine1: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string(),
             }),
             addressLine2: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string().nullable(),
             }),
             city: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string(),
             }),
             region: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string().nullable(),
             }),
             postalCode: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string().nullable(),
             }),
             country: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string(),
             }),
             isDefaultBilling: responseField(scopedTranslation, {
@@ -143,12 +143,12 @@ const { GET } = createEndpoint({
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string(),
             }),
             updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "create.response.label" as const,
+              label: "create.response.label" as const,
               schema: z.string(),
             }),
           },
@@ -379,12 +379,12 @@ const { POST } = createEndpoint({
       // Response
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "create.response.id" as const,
+        label: "create.response.id" as const,
         schema: z.uuid(),
       }),
       responseLabel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "create.response.label" as const,
+        label: "create.response.label" as const,
         schema: z.string(),
       }),
     },

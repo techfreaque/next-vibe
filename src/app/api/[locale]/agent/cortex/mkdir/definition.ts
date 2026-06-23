@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       responsePath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.path.content" as const,
+        label: "post.response.path.content" as const,
         schema: z.string(),
         fieldName: "path",
       }),
@@ -108,6 +108,19 @@ const { POST } = createEndpoint({
       }),
     },
   }),
+
+  // This op owns its `node-written` event. `requestFields` carry the mkdir the
+  // user submitted; the peer's onRemoteEvent re-runs createDirectory. Server-only
+  // — no client cache to update, so clientDelivery: false.
+  events: {
+    "node-written": {
+      remoteEvent: true as const,
+      clientDelivery: false as const,
+      allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      requestFields: ["path", "viewType", "createParents"] as const,
+      syncDomain: "documents" as const,
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

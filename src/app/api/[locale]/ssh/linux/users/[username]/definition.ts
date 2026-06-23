@@ -52,7 +52,7 @@ export const { DELETE } = createEndpoint({
       }),
       ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.ok.title",
+        label: "delete.response.ok.title",
         schema: z.boolean(),
       }),
     },

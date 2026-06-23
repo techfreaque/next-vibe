@@ -98,37 +98,37 @@ const { POST } = createEndpoint({
 
       accountsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.result.accountsProcessed",
+        label: "post.response.result.accountsProcessed",
         schema: z.coerce.number(),
       }),
       foldersProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.result.foldersProcessed",
+        label: "post.response.result.foldersProcessed",
         schema: z.coerce.number(),
       }),
       messagesProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.result.messagesProcessed",
+        label: "post.response.result.messagesProcessed",
         schema: z.coerce.number(),
       }),
       messagesAdded: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.result.messagesAdded",
+        label: "post.response.result.messagesAdded",
         schema: z.coerce.number(),
       }),
       messagesUpdated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.result.messagesUpdated",
+        label: "post.response.result.messagesUpdated",
         schema: z.coerce.number(),
       }),
       messagesDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.result.messagesDeleted",
+        label: "post.response.result.messagesDeleted",
         schema: z.coerce.number(),
       }),
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.result.duration",
+        label: "post.response.result.duration",
         schema: z.coerce.number(),
       }),
 
@@ -151,7 +151,7 @@ const { POST } = createEndpoint({
             }),
             message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.response.errors.error.message",
+              label: "post.response.errors.error.message",
               schema: z.string(),
             }),
           },

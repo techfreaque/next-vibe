@@ -74,17 +74,17 @@ const MessengerAccountEditContainer = lazyWidget(() =>
 const accountResponseFields = {
   id: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.id",
+    label: "response.account.id",
     schema: z.uuid(),
   }),
   name: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.name",
+    label: "response.account.name",
     schema: z.string(),
   }),
   description: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.name",
+    label: "response.account.name",
     schema: z.string().nullable(),
   }),
   channel: responseField(scopedTranslation, {
@@ -109,22 +109,22 @@ const accountResponseFields = {
   }),
   isDefault: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.isDefault",
+    label: "response.account.isDefault",
     schema: z.boolean(),
   }),
   priority: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.priority",
+    label: "response.account.priority",
     schema: z.coerce.number().int(),
   }),
   smtpHost: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.smtpHost",
+    label: "response.account.smtpHost",
     schema: z.string().nullable(),
   }),
   smtpPort: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.smtpPort",
+    label: "response.account.smtpPort",
     schema: z.coerce.number().int().nullable(),
   }),
   smtpSecurityType: responseField(scopedTranslation, {
@@ -134,62 +134,62 @@ const accountResponseFields = {
   }),
   smtpUsername: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.smtpUsername",
+    label: "response.account.smtpUsername",
     schema: z.string().nullable(),
   }),
   smtpFromEmail: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.smtpFromEmail",
+    label: "response.account.smtpFromEmail",
     schema: z.string().nullable(),
   }),
   smtpFromName: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.smtpFromName",
+    label: "response.account.smtpFromName",
     schema: z.string().nullable(),
   }),
   smtpConnectionTimeout: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.smtpFromEmail",
+    label: "response.account.smtpFromEmail",
     schema: z.coerce.number().int().nullable(),
   }),
   smtpMaxConnections: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.smtpFromEmail",
+    label: "response.account.smtpFromEmail",
     schema: z.coerce.number().int().nullable(),
   }),
   smtpRateLimitPerHour: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.smtpFromEmail",
+    label: "response.account.smtpFromEmail",
     schema: z.coerce.number().int().nullable(),
   }),
   fromId: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.fromId",
+    label: "response.account.fromId",
     schema: z.string().nullable(),
   }),
   webhookUrl: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.fromId",
+    label: "response.account.fromId",
     schema: z.string().nullable(),
   }),
   imapHost: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.imapHost",
+    label: "response.account.imapHost",
     schema: z.string().nullable(),
   }),
   imapPort: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.imapPort",
+    label: "response.account.imapPort",
     schema: z.coerce.number().int().nullable(),
   }),
   imapSecure: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.imapPort",
+    label: "response.account.imapPort",
     schema: z.boolean().nullable(),
   }),
   imapUsername: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.imapHost",
+    label: "response.account.imapHost",
     schema: z.string().nullable(),
   }),
   imapAuthMethod: responseField(scopedTranslation, {
@@ -199,87 +199,87 @@ const accountResponseFields = {
   }),
   imapSyncEnabled: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.imapSyncEnabled",
+    label: "response.account.imapSyncEnabled",
     schema: z.boolean(),
   }),
   imapSyncInterval: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.imapSyncEnabled",
+    label: "response.account.imapSyncEnabled",
     schema: z.coerce.number().int().nullable(),
   }),
   imapMaxMessages: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.imapSyncEnabled",
+    label: "response.account.imapSyncEnabled",
     schema: z.coerce.number().int().nullable(),
   }),
   imapLastSyncAt: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.imapLastSyncAt",
+    label: "response.account.imapLastSyncAt",
     schema: dateSchema.nullable(),
   }),
   campaignTypes: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.campaignTypes",
+    label: "response.account.campaignTypes",
     schema: z.array(z.enum(CampaignType)),
   }),
   emailJourneyVariants: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.emailJourneyVariants",
+    label: "response.account.emailJourneyVariants",
     schema: z.array(z.enum(EmailJourneyVariant)),
   }),
   emailCampaignStages: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.emailCampaignStages",
+    label: "response.account.emailCampaignStages",
     schema: z.array(z.enum(EmailCampaignStage)),
   }),
   countries: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.countries",
+    label: "response.account.countries",
     schema: z.array(z.enum(["GLOBAL", "DE", "PL", "US"])),
   }),
   languages: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.languages",
+    label: "response.account.languages",
     schema: z.array(z.enum(Languages)),
   }),
   isExactMatch: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.isExactMatch",
+    label: "response.account.isExactMatch",
     schema: z.boolean(),
   }),
   weight: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.weight",
+    label: "response.account.weight",
     schema: z.coerce.number().int(),
   }),
   isFailover: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.isFailover",
+    label: "response.account.isFailover",
     schema: z.boolean(),
   }),
   failoverPriority: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.failoverPriority",
+    label: "response.account.failoverPriority",
     schema: z.coerce.number().int(),
   }),
   messagesSentTotal: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.messagesSentTotal",
+    label: "response.account.messagesSentTotal",
     schema: z.coerce.number().int(),
   }),
   lastUsedAt: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.lastUsedAt",
+    label: "response.account.lastUsedAt",
     schema: dateSchema.nullable(),
   }),
   createdAt: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.createdAt",
+    label: "response.account.createdAt",
     schema: dateSchema,
   }),
   updatedAt: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
-    content: "response.account.updatedAt",
+    label: "response.account.updatedAt",
     schema: dateSchema,
   }),
 };

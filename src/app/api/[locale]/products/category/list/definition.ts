@@ -86,7 +86,7 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.total",
+        label: "get.response.total",
         schema: z.number(),
       }),
       categories: responseArrayField(scopedTranslation, {
@@ -98,35 +98,35 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.id",
+              label: "get.response.id",
               hidden: true,
               schema: z.uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.name",
+              label: "get.response.name",
               schema: z.string(),
             }),
             parentId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.parentId",
+              label: "get.response.parentId",
               hidden: true,
               schema: z.uuid().nullable(),
             }),
             sortOrder: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.sortOrder",
+              label: "get.response.sortOrder",
               fieldType: FieldDataType.NUMBER,
               schema: z.number().nullable(),
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.isActive",
+              label: "get.response.isActive",
               schema: z.boolean(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.createdAt",
+              label: "get.response.createdAt",
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date(),
             }),

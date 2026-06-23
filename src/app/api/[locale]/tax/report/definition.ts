@@ -92,27 +92,27 @@ const { GET } = createEndpoint({
           children: {
             taxRateCode: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "report.response.row.taxRateCode" as const,
+              label: "report.response.row.taxRateCode" as const,
               schema: z.string(),
             }),
             taxRateName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "report.response.row.taxRateName" as const,
+              label: "report.response.row.taxRateName" as const,
               schema: z.string(),
             }),
             taxableAmount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "report.response.row.taxableAmount" as const,
+              label: "report.response.row.taxableAmount" as const,
               schema: z.number(),
             }),
             taxAmount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "report.response.row.taxAmount" as const,
+              label: "report.response.row.taxAmount" as const,
               schema: z.number(),
             }),
             period: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "report.response.row.period" as const,
+              label: "report.response.row.period" as const,
               schema: z.string(),
             }),
           },

@@ -63,7 +63,7 @@ const { GET } = createEndpoint({
       // RESPONSE FIELDS
       currency: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.currency" as const,
+        label: "get.response.currency" as const,
         schema: z.string(),
       }),
 
@@ -74,12 +74,12 @@ const { GET } = createEndpoint({
         children: {
           count: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.openCount" as const,
+            label: "get.response.openCount" as const,
             schema: z.number(),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.openTotal" as const,
+            label: "get.response.openTotal" as const,
             schema: z.number(),
           }),
         },
@@ -92,12 +92,12 @@ const { GET } = createEndpoint({
         children: {
           count: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.overdueCount" as const,
+            label: "get.response.overdueCount" as const,
             schema: z.number(),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.overdueTotal" as const,
+            label: "get.response.overdueTotal" as const,
             schema: z.number(),
           }),
         },
@@ -110,12 +110,12 @@ const { GET } = createEndpoint({
         children: {
           count: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.unpaidCount" as const,
+            label: "get.response.unpaidCount" as const,
             schema: z.number(),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.unpaidTotal" as const,
+            label: "get.response.unpaidTotal" as const,
             schema: z.number(),
           }),
         },
@@ -128,7 +128,7 @@ const { GET } = createEndpoint({
         children: {
           count: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.draftCount" as const,
+            label: "get.response.draftCount" as const,
             schema: z.number(),
           }),
         },
@@ -143,42 +143,42 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.recentInvoices" as const,
+              label: "get.response.recentInvoices" as const,
               schema: z.string(),
             }),
             invoiceSequenceNumber: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.recentInvoices" as const,
+              label: "get.response.recentInvoices" as const,
               schema: z.number().nullable(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.currency" as const,
+              label: "get.response.currency" as const,
               schema: z.string(),
             }),
             status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.recentInvoices" as const,
+              label: "get.response.recentInvoices" as const,
               schema: z.string(),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.recentInvoices" as const,
+              label: "get.response.recentInvoices" as const,
               schema: z.string(),
             }),
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.recentInvoices" as const,
+              label: "get.response.recentInvoices" as const,
               schema: z.string().nullable(),
             }),
             isOverdue: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.recentInvoices" as const,
+              label: "get.response.recentInvoices" as const,
               schema: z.boolean(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.recentInvoices" as const,
+              label: "get.response.recentInvoices" as const,
               schema: z.string(),
             }),
           },

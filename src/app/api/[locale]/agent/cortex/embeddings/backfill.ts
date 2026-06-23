@@ -79,8 +79,7 @@ async function getAllUserIds(): Promise<string[]> {
     .from(chatThreads);
 
   // Users with custom skills
-  const { customSkills } =
-    await import("@/app/api/[locale]/agent/chat/skills/db");
+  const { customSkills } = await import("@/app/api/[locale]/agent/skills/db");
   const skillUsers = await db
     .selectDistinct({ userId: customSkills.userId })
     .from(customSkills)

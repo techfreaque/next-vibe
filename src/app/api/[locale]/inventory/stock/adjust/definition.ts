@@ -95,29 +95,29 @@ const { POST } = createEndpoint({
         children: {
           movementId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "stockAdjust.post.response.movementId" as const,
+            label: "stockAdjust.post.response.movementId" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           warehouseId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "stockAdjust.post.response.warehouseId" as const,
+            label: "stockAdjust.post.response.warehouseId" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           productId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "stockAdjust.post.response.productId" as const,
+            label: "stockAdjust.post.response.productId" as const,
             schema: z.uuid(),
           }),
           quantityOnHand: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "stockAdjust.post.response.quantityOnHand" as const,
+            label: "stockAdjust.post.response.quantityOnHand" as const,
             schema: z.number(),
           }),
           quantityAvailable: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "stockAdjust.post.response.quantityAvailable" as const,
+            label: "stockAdjust.post.response.quantityAvailable" as const,
             schema: z.number(),
           }),
         },

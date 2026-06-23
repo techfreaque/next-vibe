@@ -19,8 +19,7 @@ export const { POST, tools } = endpointsHandler({
         t,
       }),
     onRemoteEvent: {
-      "node-moved": (payload, ctx) =>
-        CortexMoveRepository.applyRemoteMove(payload, ctx.user, ctx.logger),
+      "node-moved": (props) => CortexMoveRepository.applyRemoteMove(props),
     },
   },
 });

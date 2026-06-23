@@ -108,21 +108,21 @@ export const { POST } = createEndpoint({
       // === RESPONSE ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.success.label",
+        label: "response.success.label",
         schema: z
           .boolean()
           .describe("Whether the TRPC validation was successful"),
       }),
       operation: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.operation.label",
+        label: "response.operation.label",
         schema: z
           .string()
           .describe("The validation operation that was executed"),
       }),
       result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.result.label",
+        label: "response.result.label",
         schema: z
           .object({
             success: z.boolean(),

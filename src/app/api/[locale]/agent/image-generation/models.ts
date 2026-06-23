@@ -1300,10 +1300,18 @@ export const imageGenModelOptions: ImageGenModelOption[] = Object.values(
   imageGenModelOptionsIndex,
 ).filter((m): m is ImageGenModelOption => m !== undefined);
 
-export const ImageGenModelIdOptions = imageGenModelOptions.map((m) => ({
-  value: m.id,
-  label: m.name,
-}));
+export const ImageGenModelIdOptions = (
+  Object.entries(ImageGenModelId) as [
+    keyof typeof ImageGenModelId,
+    ImageGenModelId,
+  ][]
+)
+  .filter(([, id]) => imageGenModelOptionsIndex[id] !== undefined)
+  .map(([key, id]) => ({
+    value: id,
+    label:
+      `models.names.${key}` as `models.names.${keyof typeof ImageGenModelId}`,
+  }));
 
 export function getImageGenModelById(
   modelId: ImageGenModelId,

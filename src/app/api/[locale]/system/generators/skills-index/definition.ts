@@ -55,22 +55,22 @@ const { POST } = createEndpoint({
 
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.success.title",
+        label: "post.fields.success.title",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.message.title",
+        label: "post.fields.message.title",
         schema: z.string(),
       }),
       skillsFound: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.skillsFound.title",
+        label: "post.fields.skillsFound.title",
         schema: z.coerce.number(),
       }),
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.duration.title",
+        label: "post.fields.duration.title",
         schema: z.coerce.number(),
       }),
     },

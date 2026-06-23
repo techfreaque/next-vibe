@@ -60,6 +60,15 @@ export const translations = {
       lineTotal: "Total",
     },
   },
+  enums: {
+    billStatus: {
+      DRAFT: "Draft",
+      RECEIVED: "Received",
+      APPROVED: "Approved",
+      PAID: "Paid",
+      DISPUTED: "Disputed",
+    },
+  },
   widget: {
     back: "Back",
     submit: "Look Up Bill",

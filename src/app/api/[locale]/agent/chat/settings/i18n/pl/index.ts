@@ -1,3 +1,5 @@
+import { translations as modelTranslations } from "@/app/api/[locale]/agent/models/i18n/pl";
+
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -275,4 +277,5 @@ export const translations: typeof enTranslations = {
       placeholder: "Domyślny systemowy",
     },
   },
+  models: modelTranslations.models,
 };

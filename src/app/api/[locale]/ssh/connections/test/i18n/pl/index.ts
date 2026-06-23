@@ -65,6 +65,12 @@ export const translations: typeof enTranslations = {
         description: "Połączenie przekroczyło limit czasu",
       },
     },
+    response: {
+      ok: { title: "OK" },
+      latencyMs: { title: "Opóźnienie (ms)" },
+      fingerprint: { title: "Odcisk" },
+      fingerprintChanged: { title: "Odcisk zmieniony" },
+    },
     success: {
       title: "Połączenie udane",
       description: "Test połączenia SSH przeszedł pomyślnie",

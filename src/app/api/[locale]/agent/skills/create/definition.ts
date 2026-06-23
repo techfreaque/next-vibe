@@ -33,6 +33,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { EventPayloads } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../shared/types/common.schema";
@@ -40,13 +41,15 @@ import { ChatModelId, getBestChatModel } from "../../ai-stream/models";
 import { SKILL_CREATE_ALIAS } from "../constants";
 import {
   CATEGORY_CONFIG,
+  CategoryOptions,
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   PriceLevel,
+  SkillCategory,
+  SkillCategoryDB,
   SkillOwnershipType,
 } from "../enum";
-import { CategoryOptions, SkillCategory, SkillCategoryDB } from "../enum";
 import { scopedTranslation } from "../i18n";
 
 const SkillCreateContainer = lazy(() =>
@@ -461,7 +464,7 @@ const { POST } = createEndpoint({
       id: responseField(scopedTranslation, {
         schema: z.string(),
         type: WidgetType.TEXT,
-        content: "post.response.id.content" as const,
+        label: "post.response.id.content" as const,
         hidden: true,
       }),
 
@@ -545,26 +548,21 @@ const { POST } = createEndpoint({
         "description",
         "category",
         "isPublic",
-        "voiceModelSelection",
-        "sttModelSelection",
-        "imageVisionModelSelection",
-        "videoVisionModelSelection",
-        "audioVisionModelSelection",
-        "imageGenModelSelection",
-        "musicGenModelSelection",
-        "videoGenModelSelection",
         "systemPrompt",
         "variants",
         "availableTools",
         "pinnedTools",
         "compactTrigger",
       ] as const,
-      fields: ["id"] as const,
-      onEvent: async ({ partial, queryClient, logger, locale, user }) => {
-        if (!partial.id || !partial.category || !user) {
-          return;
-        }
-        const category = partial.category;
+      onEvent: async ({
+        responseData,
+        requestData,
+        queryClient,
+        logger,
+        locale,
+        user,
+      }) => {
+        const category = requestData.category;
         const [
           { apiClient: client },
           skillsDefinition,
@@ -580,14 +578,15 @@ const { POST } = createEndpoint({
         ]);
         const { t } = skillsScopedTranslation.scopedT(locale);
         const defaultVariant =
-          partial.variants?.find((v) => v.isDefault) ?? partial.variants?.[0];
+          requestData.variants?.find((v) => v.isDefault) ??
+          requestData.variants?.[0];
         const card = SkillsRepositoryClient.mapSkillToListItem(
-          partial.id,
+          responseData.id,
           {
-            icon: partial.icon ?? null,
-            name: partial.name ?? null,
-            tagline: partial.tagline ?? null,
-            description: partial.description ?? null,
+            icon: requestData.icon ?? null,
+            name: requestData.name ?? null,
+            tagline: requestData.tagline ?? null,
+            description: requestData.description ?? null,
             category,
             modelSelection: defaultVariant?.modelSelection ?? null,
             ownershipType: SkillOwnershipType.USER,

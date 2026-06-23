@@ -110,6 +110,7 @@ const { GET } = createEndpoint({
         label: "get.status.label",
         description: "get.status.description",
         columns: 6,
+        options: LeadStatusOptions,
         schema: z.enum(LeadStatusDB).optional(),
       }),
       limit: requestField(scopedTranslation, {
@@ -143,20 +144,20 @@ const { GET } = createEndpoint({
             title: "get.response.leads.title",
             child: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.leads.item",
+              label: "get.response.leads.item",
               fieldType: FieldDataType.TEXT,
               schema: leadResponseSchema,
             }),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.total",
+            label: "get.response.total",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
           hasMore: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.hasMore",
+            label: "get.response.hasMore",
             fieldType: FieldDataType.BOOLEAN,
             schema: z.boolean(),
           }),
@@ -213,10 +214,12 @@ const { GET } = createEndpoint({
     requests: {
       default: {
         search: "acme",
+        status: LeadStatus.NEW,
         limit: 10,
         offset: 0,
       },
       empty: {
+        status: LeadStatus.NEW,
         limit: 10,
         offset: 0,
       },

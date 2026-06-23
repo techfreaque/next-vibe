@@ -58,7 +58,8 @@ export class WaitForTaskRepository {
         getPendingCallReconciled,
         setPendingCallRevival,
         discardPendingCall,
-      } = await import("@/app/api/[locale]/remote-connection/pending-calls");
+      } =
+        await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/pending-calls");
       const pendingCall = await getPendingCallReconciled(taskId);
       if (pendingCall) {
         // Suppress any wakeUp signal for the original dispatch tool message —
@@ -98,9 +99,9 @@ export class WaitForTaskRepository {
           // the revival stream uses the caller's model.
           const pendUserId = !user.isPublic ? user.id : undefined;
           const { resolveFavoriteConfig } =
-            await import("@/app/api/[locale]/agent/chat/favorites/repository");
+            await import("@/app/api/[locale]/agent/skills/favorites/repository");
           const { resolveSkillVariant } =
-            await import("@/app/api/[locale]/agent/chat/skills/resolver");
+            await import("@/app/api/[locale]/agent/skills/resolver");
           const { resolveChatModelId } =
             await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
           const { parseSkillId } =
@@ -299,9 +300,9 @@ export class WaitForTaskRepository {
         // Resolve the active chat model from the favorite/skill cascade.
         const waitUserId = !user.isPublic ? user.id : undefined;
         const { resolveFavoriteConfig } =
-          await import("@/app/api/[locale]/agent/chat/favorites/repository");
+          await import("@/app/api/[locale]/agent/skills/favorites/repository");
         const { resolveSkillVariant } =
-          await import("@/app/api/[locale]/agent/chat/skills/resolver");
+          await import("@/app/api/[locale]/agent/skills/resolver");
         const { resolveChatModelId } =
           await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
         const waitFav = await resolveFavoriteConfig(

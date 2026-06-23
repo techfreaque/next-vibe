@@ -87,44 +87,44 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "productLookup.get.response.id",
+              label: "productLookup.get.response.id",
               hidden: true,
               schema: z.uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "productLookup.get.response.name",
+              label: "productLookup.get.response.name",
               schema: z.string(),
             }),
             sku: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "productLookup.get.response.sku",
+              label: "productLookup.get.response.sku",
               schema: z.string().nullable(),
             }),
             type: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "productLookup.get.response.type",
+              label: "productLookup.get.response.type",
               schema: z.string(),
             }),
             basePrice: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "productLookup.get.response.basePrice",
+              label: "productLookup.get.response.basePrice",
               fieldType: FieldDataType.NUMBER,
               schema: z.number(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "productLookup.get.response.currency",
+              label: "productLookup.get.response.currency",
               schema: z.string(),
             }),
             defaultTaxRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "productLookup.get.response.defaultTaxRate",
+              label: "productLookup.get.response.defaultTaxRate",
               schema: z.number().nullable(),
             }),
             unit: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "productLookup.get.response.unit",
+              label: "productLookup.get.response.unit",
               schema: z.string().nullable(),
             }),
           },

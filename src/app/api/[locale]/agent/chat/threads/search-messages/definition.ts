@@ -227,13 +227,13 @@ const { GET } = createEndpoint({
 
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "search.get.response.total.content" as const,
+        label: "search.get.response.total.content" as const,
         schema: z.coerce.number(),
       }),
 
       page: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "search.get.response.page.content" as const,
+        label: "search.get.response.page.content" as const,
         schema: z.coerce.number(),
       }),
     },

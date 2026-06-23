@@ -66,22 +66,22 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.fields.versions.id.label",
+              label: "get.fields.versions.id.label",
               schema: z.string().uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.fields.versions.name.label",
+              label: "get.fields.versions.name.label",
               schema: z.string(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.fields.versions.createdAt.label",
+              label: "get.fields.versions.createdAt.label",
               schema: z.string(),
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.fields.versions.isActive.label",
+              label: "get.fields.versions.isActive.label",
               schema: z.boolean(),
             }),
           },

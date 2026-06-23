@@ -138,17 +138,6 @@ export interface ModeConfig {
    */
   pulse?: (threadId: string) => Promise<void>;
   /**
-   * When true, image gen in T9 is routed through execute-tool instead of calling
-   * generate_image directly. Set this for UNBOTTLED/hermes mode where inference runs
-   * on a remote connection and all non-native tools go through execute-tool.
-   */
-  useExecuteToolWrapping?: boolean;
-  /**
-   * Override image gen model selection for all runStream calls in this mode.
-   * When not set, uses the skill's own imageGenModelSelection (no override).
-   */
-  imageGenModelOverride?: ImageGenModelSelection;
-  /**
    * Test IDs to skip for this mode (e.g. ["T4"] to skip music+video generation).
    * Use when a test makes external API calls that can't be intercepted by FetchCache
    * on the remote server (e.g. direct-http video/music gen).
@@ -523,8 +512,10 @@ function buildTree(messages: SlimMessage[]): Map<string, string[]> {
 
 function msgDesc(m: SlimMessage): string {
   const tool = m.toolCall?.toolName ? `:${m.toolCall.toolName}` : "";
-  const preview = m.content ? ` "${m.content.slice(0, 30)}"` : "";
-  return `${m.id}(${m.role}${tool}${preview})`;
+  const preview = m.content ? ` "${m.content.slice(0, 40)}"` : "";
+  const ts = m.createdAt.toISOString().slice(11, 23);
+  const parent = m.parentId ? ` parent=${m.parentId.slice(0, 8)}` : "";
+  return `${m.id.slice(0, 8)}(${m.role}${tool}${preview} @${ts}${parent})`;
 }
 
 interface ChainIntegrityOptions {
@@ -617,9 +608,20 @@ function assertChainIntegrity(
     }
     const parent = byId.get(parentId);
     const childList = children.map((id) => msgDesc(byId.get(id)!)).join("\n  ");
+    // Walk up from parent to root to show the full ancestor chain
+    const ancestors: string[] = [];
+    let ancestorCursor = parent;
+    const seen = new Set<string>();
+    while (ancestorCursor && !seen.has(ancestorCursor.id)) {
+      seen.add(ancestorCursor.id);
+      ancestors.unshift(msgDesc(ancestorCursor));
+      ancestorCursor = ancestorCursor.parentId
+        ? byId.get(ancestorCursor.parentId)
+        : undefined;
+    }
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test assertion
     throw new Error(
-      `Branch violation on ${parent ? msgDesc(parent) : parentId}: has ${String(children.length)} children (expected 1):\n  ${childList}`,
+      `Branch violation on ${parent ? msgDesc(parent) : parentId}: has ${String(children.length)} children (expected 1):\n  ${childList}\nAncestor chain:\n  ${ancestors.join("\n  ")}`,
     );
   }
 
@@ -946,12 +948,11 @@ async function loadFixture(filename: string, mimeType: string): Promise<File> {
 
 /** Read the current credit balance for the test user via endpoint */
 async function getBalance(user: JwtPrivatePayloadType): Promise<number> {
-  const creditsDef = await import("@/app/api/[locale]/credits/definition");
-  const result = await RouteExecuteRepository.runInProcessTyped({
-    definition: creditsDef.default.GET,
+  const creditsDef = (await import("@/app/api/[locale]/credits/definition"))
+    .default;
+  const result = await sendTestRequest({
+    endpoint: creditsDef.GET,
     user,
-    locale: defaultLocale,
-    platform: Platform.AI,
   });
   if (!result.success) {
     return 0;
@@ -974,14 +975,13 @@ async function pinBalance(
     return;
   }
   const deficit = credits - current;
-  const adminAddDef =
-    await import("@/app/api/[locale]/credits/admin-add/definition");
-  const result = await RouteExecuteRepository.runInProcessTyped({
-    definition: adminAddDef.default.POST,
-    input: { targetUserId: user.id, amount: Math.ceil(deficit) },
+  const adminAddDef = (
+    await import("@/app/api/[locale]/credits/admin-add/definition")
+  ).default;
+  const result = await sendTestRequest({
+    endpoint: adminAddDef.POST,
+    data: { targetUserId: user.id, amount: Math.ceil(deficit) },
     user,
-    locale: defaultLocale,
-    platform: Platform.AI,
   });
   expect(
     result.success,
@@ -1075,10 +1075,15 @@ async function readRemoteAdminBalance(): Promise<number | null> {
     return null;
   }
   const pdb = getProdDb();
+  // Query the user wallet directly (cw.user_id = prodUserId).
+  // The AI stream charges the user wallet (not a lead wallet), and admin-add
+  // also credits the user wallet. Using ORDER BY updated_at DESC across both
+  // user+lead wallets causes flapping: the lead wallet may be more recently
+  // updated than the user wallet (e.g. from a prior session), making before/after
+  // comparisons unreliable.
   const rows = await pdb.execute<{ balance: string | number | null }>(
     sql`SELECT cw.balance FROM credit_wallets cw
-        LEFT JOIN user_lead_links ull ON ull.lead_id = cw.lead_id
-        WHERE cw.user_id = ${prodUserId} OR ull.user_id = ${prodUserId}
+        WHERE cw.user_id = ${prodUserId}
         ORDER BY cw.updated_at DESC
         LIMIT 1`,
   );
@@ -1146,17 +1151,14 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       fetchThreadTitle(tid, testUser);
     /** Fetch the current streamingState for a thread via the messages endpoint. */
     async function getStreamingState(tid: string): Promise<string | undefined> {
-      const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-      const msgsDef =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition");
-      const result = await RouteExecuteRepository.runInProcessTyped({
-        definition: msgsDef.default.GET,
-        input: { rootFolderId: suiteRootFolderId },
+      const msgsDef = (
+        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
+      ).default;
+      const result = await sendTestRequest({
+        endpoint: msgsDef.GET,
+        data: { rootFolderId: suiteRootFolderId },
         urlPathParams: { threadId: tid },
         user: testUser,
-        locale: defaultLocale,
-        platform: Platform.AI,
-        logger,
       });
       if (!result.success) {
         return undefined;
@@ -1190,20 +1192,18 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // Use admin's existing quality-tester favorite if present (respects UI overrides).
       // If none exists, create one via endpoint.
       const [favsDef, favoriteCreateDef] = await Promise.all([
-        import("@/app/api/[locale]/agent/chat/favorites/definition").then(
+        import("@/app/api/[locale]/agent/skills/favorites/definition").then(
           (m) => m.default.GET,
         ),
-        import("@/app/api/[locale]/agent/chat/favorites/create/definition").then(
+        import("@/app/api/[locale]/agent/skills/favorites/create/definition").then(
           (m) => m.default.POST,
         ),
       ]);
 
-      const favsResult = await RouteExecuteRepository.runInProcessTyped({
-        definition: favsDef,
-        input: { pageSize: 500 },
+      const favsResult = await sendTestRequest({
+        endpoint: favsDef,
+        data: { pageSize: 500 },
         user: testUser,
-        locale: defaultLocale,
-        platform: Platform.AI,
       });
       const favsList = favsResult.success
         ? Array.isArray(favsResult.data?.["favorites"])
@@ -1215,28 +1215,24 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // and recreate fresh — reusing rows risks model-selection drift (sync
       // LWW, earlier runs) silently changing which model records fixtures.
       const favoriteDeleteDef =
-        await import("@/app/api/[locale]/agent/chat/favorites/[id]/definition").then(
+        await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition").then(
           (m) => m.default.DELETE,
         );
       for (const fav of favsList) {
         if (String(fav["skillId"] ?? "").startsWith("quality-tester")) {
-          await RouteExecuteRepository.runInProcessTyped({
-            definition: favoriteDeleteDef,
+          await sendTestRequest({
+            endpoint: favoriteDeleteDef,
             urlPathParams: { id: String(fav["id"]) },
             user: testUser,
-            locale: defaultLocale,
-            platform: Platform.AI,
           });
         }
       }
 
       {
-        const createResult = await RouteExecuteRepository.runInProcessTyped({
-          definition: favoriteCreateDef,
-          input: { skillId: "quality-tester__kimi" },
+        const createResult = await sendTestRequest({
+          endpoint: favoriteCreateDef,
+          data: { skillId: "quality-tester__kimi" },
           user: testUser,
-          locale: defaultLocale,
-          platform: Platform.AI,
         });
         expect(
           createResult.success,
@@ -1251,18 +1247,24 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // ── Resolve native image gen favorite (Gemini 3.1 Flash Image Preview) ──
       // T11 tests native image generation where the chat model IS the image gen model.
       {
-        const createResult = await RouteExecuteRepository.runInProcessTyped({
-          definition: favoriteCreateDef,
-          input: {
+        const createResult = await sendTestRequest({
+          endpoint: favoriteCreateDef,
+          data: {
             skillId: "quality-tester__kimi",
             modelSelection: {
               selectionType: ModelSelectionType.MANUAL,
               manualModelId: ChatModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
             },
+            // Image-gen model lives on the favorite (real user config), so the
+            // native-image-gen tests don't need per-call overrides.
+            imageGenModelSelection: {
+              selectionType: ModelSelectionType.MANUAL,
+              manualModelId: ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
+              sortBy: ModelSortField.PRICE,
+              sortDirection: ModelSortDirection.ASC,
+            },
           },
           user: testUser,
-          locale: defaultLocale,
-          platform: Platform.AI,
         });
         expect(
           createResult.success,
@@ -1277,18 +1279,23 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // ── Resolve Nano Banana Pro favorite (Gemini 3 Pro Image Preview) ──
       // T11c/T11d tests: model can see images and generates images natively.
       {
-        const createResult = await RouteExecuteRepository.runInProcessTyped({
-          definition: favoriteCreateDef,
-          input: {
+        const createResult = await sendTestRequest({
+          endpoint: favoriteCreateDef,
+          data: {
             skillId: "quality-tester__kimi",
             modelSelection: {
               selectionType: ModelSelectionType.MANUAL,
               manualModelId: ChatModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
             },
+            // Image-gen model for the I2I tests lives on the favorite.
+            imageGenModelSelection: {
+              selectionType: ModelSelectionType.MANUAL,
+              manualModelId: ImageGenModelId.FLUX_2_KLEIN_4B,
+              sortBy: ModelSortField.PRICE,
+              sortDirection: ModelSortDirection.ASC,
+            },
           },
           user: testUser,
-          locale: defaultLocale,
-          platform: Platform.AI,
         });
         expect(
           createResult.success,
@@ -1418,12 +1425,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         ...params,
         rootFolderId: effectiveRootFolderId,
         subFolderId: effectiveSubFolderId,
-        mediaModelOverrides: {
-          ...(cfg.imageGenModelOverride
-            ? { imageGenModelSelection: cfg.imageGenModelOverride }
-            : {}),
-          ...params.mediaModelOverrides,
-        },
       });
 
       // Waiting-state handling — two flavors:
@@ -1460,15 +1461,31 @@ export function describeStreamSuite(cfg: ModeConfig): void {
                 .map((m) => m.parentId)
                 .filter((id): id is string => !!id),
             );
-            const pendingAsync = snapshot.filter(
-              (m) =>
-                m.role === "tool" &&
-                !preStreamMessageIds.has(m.id) &&
-                (m.toolCall?.callbackMode === "detach" ||
-                  m.toolCall?.callbackMode === "wakeUp") &&
-                (m.toolCall?.status === "pending" ||
-                  resolveToolResult(m) === null),
-            );
+            const pendingAsync = snapshot.filter((m) => {
+              if (
+                m.role !== "tool" ||
+                preStreamMessageIds.has(m.id) ||
+                (m.toolCall?.callbackMode !== "detach" &&
+                  m.toolCall?.callbackMode !== "wakeUp")
+              ) {
+                return false;
+              }
+              if (
+                m.toolCall?.status === "pending" ||
+                resolveToolResult(m) === null
+              ) {
+                return true;
+              }
+              // Detach hint: execute-tool returned {hint, taskId} but the
+              // background task hasn't backfilled a terminal result yet.
+              const res = resolveToolResult(m);
+              return (
+                typeof res?.["hint"] === "string" &&
+                res["imageUrl"] === undefined &&
+                res["audioUrl"] === undefined &&
+                res["videoUrl"] === undefined
+              );
+            });
             const danglingCompacting = snapshot.filter(
               (m) =>
                 m.isCompacting &&
@@ -1480,6 +1497,17 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               Date.now() - mirrorStart > MIRROR_WAIT_MS
             ) {
               break;
+            }
+            // Drive an explicit pull each tick — broadcastSyncNotify from the
+            // remote may have been lost if the WS dropped (e.g. HMR). Pulling
+            // guarantees the mirror converges even without a live WS push.
+            {
+              const { getWsConnection } =
+                await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/connector");
+              const conn = cfg.systemPromptInstanceId
+                ? getWsConnection(cfg.systemPromptInstanceId)
+                : null;
+              conn?.doPullNow();
             }
             await new Promise<void>((resolve) => {
               setTimeout(resolve, 500);
@@ -1501,7 +1529,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           // thread is about to enter 'waiting' (or jump straight to a
           // revival) — poll the transition instead of racing it.
           const { hasPendingCallForThread } =
-            await import("@/app/api/[locale]/remote-connection/pending-calls");
+            await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/pending-calls");
           const hasPendingWork = async (): Promise<boolean> => {
             const [runningTask] = await db
               .select({ id: cronTasks.id })
@@ -1611,7 +1639,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             // fires any attached wait-for-task revival.
             if (cfg.remoteInstanceId && revivalState === "waiting") {
               const { hasPendingCallForThread: reconcileTick } =
-                await import("@/app/api/[locale]/remote-connection/pending-calls");
+                await import("@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/pending-calls");
               await reconcileTick(tid);
             }
             // If thread went back to 'waiting' (AI retried after failure), pulse again.
@@ -1638,37 +1666,76 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // Re-fetch messages with post-revival state
           const revivedMessages = await getMessages(tid);
-          // The stream's own final assistant is the answer when it has
-          // content (wakeUp phases: the wrap-up). When the stream died
-          // before answering (queue WAIT shape), the revival assistant
-          // carries the answer instead.
+          // Chain-walk from the stream's own last message to find the true leaf
+          // in the post-revival state. The stream may have ended on a non-leaf
+          // node (e.g. the phase1 assistant), and the revival adds deferred +
+          // revival-ai below it. Always walk to the deepest descendant so that
+          // the next turn's parent pointer lands on the actual leaf, not a node
+          // that already has children.
           const firstStreamResult = firstResult.result;
-          const streamOwnAi = firstStreamResult.success
-            ? revivedMessages.find(
-                (m) => m.id === firstStreamResult.data.lastAiMessageId,
-              )
+          const revivedById = new Map(revivedMessages.map((m) => [m.id, m]));
+          const revivedChildrenOf = new Map<string, SlimMessage[]>();
+          for (const m of revivedMessages) {
+            if (m.parentId) {
+              const list = revivedChildrenOf.get(m.parentId) ?? [];
+              list.push(m);
+              revivedChildrenOf.set(m.parentId, list);
+            }
+          }
+          // Walk from the stream's leaf to the deepest descendant.
+          const streamLeafId = firstStreamResult.success
+            ? firstStreamResult.data.lastAiMessageId
             : undefined;
-          const streamAnswered = (streamOwnAi?.content ?? "").trim() !== "";
-          const lastRevivalAi = streamAnswered
-            ? streamOwnAi
-            : [...revivedMessages]
-                .toReversed()
-                .find(
-                  (m) =>
-                    m.role === "assistant" && (m.content ?? "").trim() !== "",
-                );
+          let revivalLeaf = streamLeafId
+            ? revivedById.get(streamLeafId)
+            : undefined;
+          if (revivalLeaf) {
+            const visited = new Set<string>();
+            while (revivalLeaf) {
+              visited.add(revivalLeaf.id);
+              const kids: SlimMessage[] = (
+                revivedChildrenOf.get(revivalLeaf.id) ?? []
+              ).filter((k) => !visited.has(k.id));
+              if (kids.length === 0) {
+                break;
+              }
+              revivalLeaf = kids[0];
+            }
+          }
+          // Walk back up from the leaf to find the nearest assistant with content.
+          // That is the AI's final answer for this turn.
+          let lastRevivalAi: SlimMessage | undefined;
+          {
+            let cursor = revivalLeaf;
+            while (cursor) {
+              if (
+                cursor.role === "assistant" &&
+                (cursor.content ?? "").trim() !== ""
+              ) {
+                lastRevivalAi = cursor;
+                break;
+              }
+              cursor = cursor.parentId
+                ? revivedById.get(cursor.parentId)
+                : undefined;
+            }
+          }
           // Sum credits from all messages (initial stream charges tool credits; revival charges AI credits).
           const totalCredits = revivedMessages.reduce(
             (sum, m) => sum + (m.creditCost ?? 0),
             0,
           );
+          // Use the leaf id as the anchor for the next turn (headless runner
+          // semantics: lastAiMessageId = leaf of the walked chain). Fall back to
+          // lastRevivalAi.id if the leaf walk failed (e.g. no messages at all).
+          const revivedLeafId = revivalLeaf?.id ?? lastRevivalAi?.id;
           const revivedResult =
-            lastRevivalAi && firstResult.result.success
+            revivedLeafId && firstResult.result.success
               ? {
                   ...firstResult.result,
                   data: {
                     ...firstResult.result.data,
-                    lastAiMessageId: lastRevivalAi.id,
+                    lastAiMessageId: revivedLeafId,
                     totalCreditsDeducted:
                       totalCredits > 0
                         ? totalCredits
@@ -1866,7 +1933,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           name,
           async () => {
             if (suiteFailed) {
-              expect(false, `[${name}] Previous test in suite failed — aborting dependent tests`).toBe(true);
+              expect(
+                false,
+                `[${name}] Previous test in suite failed — aborting dependent tests`,
+              ).toBe(true);
               return;
             }
             try {
@@ -3963,19 +4033,35 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             }
           }
 
-          // Walk to the actual leaf — model may have called generate_image multiple times,
-          // creating multiple deferred + revival pairs in a linear chain.
+          // Walk to the actual leaf via child links — timestamps are unreliable when
+          // branches can be created at any time. Start from the deferred tool message
+          // and follow children down to the deepest node (revival AI or beyond).
           await pullRemoteMirror(
             cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
           );
           messages = await getMessages(threadId);
-          const t6cMsgsSorted = [
-            ...newMessages(messages, t6cInitialIds),
-          ].toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-          const t6cLeaf =
-            t6cMsgsSorted.find((m) => m.role === "assistant") ?? deferredTool;
-          if (t6cLeaf) {
-            lastMainAiMsgId = t6cLeaf.id;
+          {
+            const t6cById = new Map(messages.map((m) => [m.id, m]));
+            const t6cChildrenOf = new Map<string, SlimMessage[]>();
+            for (const m of messages) {
+              if (m.parentId) {
+                const list = t6cChildrenOf.get(m.parentId) ?? [];
+                list.push(m);
+                t6cChildrenOf.set(m.parentId, list);
+              }
+            }
+            const startId = deferredTool?.id ?? lastMainAiMsgId;
+            let t6cCursor = startId ? t6cById.get(startId) : undefined;
+            while (t6cCursor) {
+              const kids = t6cChildrenOf.get(t6cCursor.id);
+              if (!kids || kids.length === 0) {
+                break;
+              }
+              t6cCursor = kids[0];
+            }
+            if (t6cCursor) {
+              lastMainAiMsgId = t6cCursor.id;
+            }
           }
 
           assertNoOrphans(
@@ -4063,6 +4149,30 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               "T6d inline: imageUrl must be a real URL",
             ).toMatch(/^https?:\/\/.+/);
             await assertThreadIdle(threadId, testUser);
+            // Walk to the actual leaf (chain-walk, no timestamps).
+            {
+              const inlineMsgs = await getMessages(threadId);
+              const inlineById = new Map(inlineMsgs.map((m) => [m.id, m]));
+              const inlineChildrenOf = new Map<string, SlimMessage[]>();
+              for (const m of inlineMsgs) {
+                if (m.parentId) {
+                  const list = inlineChildrenOf.get(m.parentId) ?? [];
+                  list.push(m);
+                  inlineChildrenOf.set(m.parentId, list);
+                }
+              }
+              let inlineCursor = inlineById.get(lastMainAiMsgId);
+              while (inlineCursor) {
+                const kids = inlineChildrenOf.get(inlineCursor.id);
+                if (!kids || kids.length === 0) {
+                  break;
+                }
+                inlineCursor = kids[0];
+              }
+              if (inlineCursor) {
+                lastMainAiMsgId = inlineCursor.id;
+              }
+            }
             return;
           }
 
@@ -4170,17 +4280,36 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           // Walk to the actual leaf — model may have called generate_image multiple times,
           // creating multiple deferred + revival pairs in a linear chain.
+          // Walk DOWN from runStream's lastAiMessageId via child links (no timestamps).
           await pullRemoteMirror(
             cfg.rootFolderIdOverride === DefaultFolderId.REMOTE,
           );
           messages = await getMessages(threadId);
-          const t6dMsgsSorted = [
-            ...newMessages(messages, t6dInitialIds),
-          ].toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-          const t6dLeaf =
-            t6dMsgsSorted.find((m) => m.role === "assistant") ?? deferredTool;
-          if (t6dLeaf) {
-            lastMainAiMsgId = t6dLeaf.id;
+          {
+            const startId = result.data.lastAiMessageId ?? deferredTool?.id;
+            if (startId) {
+              const t6dChildrenOf = new Map<string, SlimMessage[]>();
+              for (const m of messages) {
+                if (m.parentId) {
+                  const list = t6dChildrenOf.get(m.parentId) ?? [];
+                  list.push(m);
+                  t6dChildrenOf.set(m.parentId, list);
+                }
+              }
+              const t6dById = new Map(messages.map((m) => [m.id, m]));
+              let t6dCursor = t6dById.get(startId);
+              while (t6dCursor) {
+                const kids = t6dChildrenOf.get(t6dCursor.id);
+                if (!kids || kids.length === 0) {
+                  break;
+                }
+                // Linear chain expected — exactly one child per step.
+                t6dCursor = kids[0];
+              }
+              if (t6dCursor) {
+                lastMainAiMsgId = t6dCursor.id;
+              }
+            }
           }
 
           assertNoOrphans(
@@ -4213,6 +4342,37 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               (await getMessages(threadId)).map((m) => m.id),
             );
 
+            // The confirmation gate lives ON the favorite (what a real user
+            // configures), not as a per-call override. PATCH generate_image to
+            // requiresConfirmation=true on the main favorite for this phase.
+            // The PATCH requires modelSelection, so read the current one first
+            // and send it back unchanged (faithful client flow).
+            const favByIdDefT7 = (
+              await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+            ).default;
+            const confirmToolId = cfg.remoteInstanceId
+              ? "execute-tool"
+              : "generate_image";
+            const t7FavGet = await sendTestRequest({
+              endpoint: favByIdDefT7.GET,
+              urlPathParams: { id: mainFavoriteId },
+              user: testUser,
+            });
+            const t7ModelSelection = t7FavGet.success
+              ? t7FavGet.data.modelSelection
+              : null;
+            await sendTestRequest({
+              endpoint: favByIdDefT7.PATCH,
+              data: {
+                modelSelection: t7ModelSelection,
+                availableTools: [
+                  { toolId: confirmToolId, requiresConfirmation: true },
+                ],
+              },
+              urlPathParams: { id: mainFavoriteId },
+              user: testUser,
+            });
+
             // Prompt: call BOTH tool-help AND generate_image in same parallel step.
             // generate_image requires confirmation → placeholder only, stream aborts before AI response.
             const { result, messages } = await runStream({
@@ -4221,16 +4381,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               threadId,
               favoriteId: mainFavoriteId,
               explicitParentMessageId: lastMainAiMsgId,
-              availableTools: [
-                {
-                  // execute-tool wrapping: remoteInstanceId mode or unbottled/hermes mode
-                  toolId:
-                    (cfg.remoteInstanceId ?? cfg.useExecuteToolWrapping)
-                      ? "execute-tool"
-                      : "generate_image",
-                  requiresConfirmation: true,
-                },
-              ],
             });
 
             expect(result.success).toBe(true);
@@ -4354,38 +4504,46 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             const prevMessages = await getMessages(threadId);
             const prevMessageIds = new Set(prevMessages.map((m) => m.id));
 
-            const logger = createEndpointLogger(
-              false,
-              Date.now(),
-              defaultLocale,
-            );
-            const { t } = scopedTranslation.scopedT(defaultLocale);
-
-            // Mirror the UI flow exactly: parentId = approveToolMsg.parentId (assistant placeholder that
-            // issued the tool calls), matching grouped-assistant-message.tsx lines ~593-599.
-            // Note: answer-as-ai operation is chosen when explicitParentMessageId is set (no new user msg),
-            // and toolConfirmations skips user message creation - no branch violation.
-            const confirmResult = await runHeadlessAiStream({
+            // Confirm exactly like the UI: POST the stream endpoint with
+            // toolConfirmations (no new user message). Goes through runStream →
+            // the real ai-stream/stream endpoint.
+            const { result: confirmStream } = await runStream({
+              user: testUser,
               prompt: "",
-              favoriteId: mainFavoriteId,
-              favoriteConfig: null,
               threadId,
-              rootFolderId: suiteRootFolderId,
-              subAgentDepth: 0,
+              favoriteId: mainFavoriteId,
               toolConfirmations: [
                 { messageId: approveToolMsgId, confirmed: true },
               ],
-              user: testUser,
-              locale: defaultLocale,
-              logger,
-              t,
-              abortSignal: new AbortController().signal,
             });
 
-            expect(confirmResult.success).toBe(true);
-            if (!confirmResult.success) {
+            expect(confirmStream.success).toBe(true);
+            if (!confirmStream.success) {
               return;
             }
+            const confirmResult = confirmStream;
+
+            // Restore the favorite's tool confirmation gate set in T7a so later
+            // tests (and other suites sharing this favorite) see a clean config.
+            const favByIdDefT7b = (
+              await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+            ).default;
+            const t7bFavGet = await sendTestRequest({
+              endpoint: favByIdDefT7b.GET,
+              urlPathParams: { id: mainFavoriteId },
+              user: testUser,
+            });
+            await sendTestRequest({
+              endpoint: favByIdDefT7b.PATCH,
+              data: {
+                modelSelection: t7bFavGet.success
+                  ? t7bFavGet.data.modelSelection
+                  : null,
+                availableTools: [],
+              },
+              urlPathParams: { id: mainFavoriteId },
+              user: testUser,
+            });
 
             // Queue mode: the confirmation stream creates an AI message responding to the
             // pending {status: pending} result. After pulse fires the revival, the revival AI
@@ -4635,27 +4793,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             const prevMessages = await getMessages(threadId);
             const prevMessageIds = new Set(prevMessages.map((m) => m.id));
 
-            const logger = createEndpointLogger(
-              false,
-              Date.now(),
-              defaultLocale,
-            );
-            const { t } = scopedTranslation.scopedT(defaultLocale);
-
-            // Mirror the UI flow exactly: parentId = cfToolMsg.parentId (assistant that issued the call).
-            const confirmResult = await runHeadlessAiStream({
-              prompt: "",
-              favoriteId: mainFavoriteId,
-              favoriteConfig: null,
-              threadId,
-              rootFolderId: suiteRootFolderId,
-              subAgentDepth: 0,
-              toolConfirmations: [{ messageId: cfToolMsgId, confirmed: true }],
+            // Confirm via the real stream endpoint with toolConfirmations (UI flow).
+            const { result: confirmResult } = await runStream({
               user: testUser,
-              locale: defaultLocale,
-              logger,
-              t,
-              abortSignal: new AbortController().signal,
+              prompt: "",
+              threadId,
+              favoriteId: mainFavoriteId,
+              toolConfirmations: [{ messageId: cfToolMsgId, confirmed: true }],
             });
 
             expect(
@@ -4925,56 +5069,65 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         effectiveTestTimeout,
       );
 
-      // ── T9: preCalls injection ───────────────────────────────────────────
+      // ── T9: prior-tool-result reasoning ───────────────────────────────────
+      // Real two-turn flow: turn 1 the AI actually generates an image, turn 2
+      // it reports the imageUrl it sees in its own prior tool result. No
+      // synthetic injection — the tool result is produced by a real tool call.
       fit(
-        "T9: preCalls injection - synthetic generate_image result in DB, AI reasons about it",
+        "T9: AI reasons about its own prior generate_image tool result in context",
         async () => {
           if (cfg.cheapMode) {
             return; // cheapMode: media generation is the expensive path
           }
           setFetchCacheContext(`${cfg.cachePrefix}precalls-injection`);
-          await pinBalance(testUser, 10);
+          await pinBalance(testUser, 20);
           const before = await getBalance(testUser);
           const prevIds = new Set(
             (await getMessages(threadId)).map((m) => m.id),
           );
 
-          // A real publicly accessible image so the UI widget can render it.
-          const syntheticImageUrl =
-            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800";
-
-          const { result, messages } = await runStream({
+          // ── Turn 1: AI actually generates an image (real tool call) ──
+          const { result: genResult, messages: genMessages } = await runStream({
             user: testUser,
-            prompt: `[T9 preCalls] An image was already generated for you before this message. Look at the ${(cfg.remoteInstanceId ?? cfg.useExecuteToolWrapping) ? "execute-tool" : "generate_image"} tool result in your context and report the imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://images.unsplash.com', or FAILED: <reason> if no imageUrl was visible in the tool result.`,
+            prompt: `[T9 setup] Call ${toolInstrWithArgs(cfg, "generate_image", "prompt='mountain landscape at golden hour'")} to generate an image. End your reply with STEP_OK once the image is generated.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
-            preCalls: [
-              {
-                routeId:
-                  (cfg.remoteInstanceId ?? cfg.useExecuteToolWrapping)
-                    ? "execute-tool"
-                    : "generate_image",
-                args:
-                  (cfg.remoteInstanceId ?? cfg.useExecuteToolWrapping)
-                    ? {
-                        toolName: "generate_image",
-                        ...(cfg.remoteInstanceId
-                          ? { instanceId: cfg.remoteInstanceId }
-                          : {}),
-                        prompt: "mountain landscape at golden hour",
-                      }
-                    : { prompt: "mountain landscape at golden hour" },
-                // Match the real generate_image return format: { imageUrl, creditCost }
-                // This is what the route actually returns and what the UI widget renders.
-                result: {
-                  imageUrl: syntheticImageUrl,
-                  creditCost: 1,
-                },
-                success: true,
-                executionTimeMs: 50,
-              },
-            ],
+          });
+          expect(
+            genResult.success,
+            "T9 setup: image gen turn must succeed",
+          ).toBe(true);
+          if (!genResult.success) {
+            return;
+          }
+
+          const genAdded = newMessages(genMessages, prevIds);
+          const toolMsg = findToolMsg(genAdded, "generate_image", cfg);
+          expect(
+            toolMsg,
+            "T9: generate_image tool message not found",
+          ).toBeDefined();
+          if (toolMsg) {
+            assertToolMessageComplete(toolMsg, "generate_image", "T9a", cfg);
+          }
+          const toolRes = resolveToolResult(toolMsg);
+          expect(toolRes).not.toBeNull();
+          expect(typeof toolRes!["imageUrl"]).toBe("string");
+          expect(String(toolRes!["imageUrl"])).toMatch(/^https?:\/\/.+/);
+          const generatedImageUrl = String(toolRes!["imageUrl"]);
+          lastMainAiMsgId = genResult.data.lastAiMessageId!;
+
+          // ── Turn 2: AI reports the imageUrl it sees in its prior context ──
+          const beforeReport = new Set(
+            (await getMessages(threadId)).map((m) => m.id),
+          );
+          const { result, messages } = await runStream({
+            user: testUser,
+            prompt: `[T9 report] An image was generated for you earlier in this conversation. Look at the generate_image tool result in your context and report the exact imageUrl you see. End your reply with STEP_OK if you can see an imageUrl starting with 'https://' or 'http://', or FAILED: <reason> if no imageUrl was visible.`,
+            threadId,
+            favoriteId: mainFavoriteId,
+            explicitParentMessageId: lastMainAiMsgId,
           });
 
           expect(result.success).toBe(true);
@@ -4982,29 +5135,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             return;
           }
 
-          const added = newMessages(messages, prevIds);
-
-          // ── Synthetic generate_image tool message ──
-          const toolMsg = findToolMsg(added, "generate_image", cfg);
-          expect(toolMsg).toBeDefined();
-          if (toolMsg) {
-            assertToolMessageComplete(toolMsg, "generate_image", "T9a", cfg);
-          }
-          expect(toolMsg!.isAI).toBe(true);
-
-          const toolRes = resolveToolResult(toolMsg);
-          expect(toolRes).not.toBeNull();
-          // result must use imageUrl (matching generate_image's actual return format),
-          // so the UI widget can render the image thumbnail.
-          expect(toolRes!["imageUrl"]).toBe(syntheticImageUrl);
-          expect(toolRes!["creditCost"]).toBe(1);
-
-          // ── AI responded with content ──
-          // When the shared thread has accumulated enough history, compacting fires
-          // mid-T9. The compacting summarizer sees the user question + tool result
-          // and produces "STEP_OK" in its summary. The post-compaction AI turn then
-          // gets that summary as context and may say "COMPLETED" instead of "STEP_OK".
-          // We accept STEP_OK in ANY added assistant message (compacting or regular).
+          const added = newMessages(messages, beforeReport);
           const aiMsgWithStepOk = added.find(
             (m) => m.role === "assistant" && m.content?.includes("STEP_OK"),
           );
@@ -5016,10 +5147,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             "T9: No AI response found at all",
           ).toBeTruthy();
           if (!aiMsgWithStepOk) {
-            // No STEP_OK in any added message - fall back to asserting on lastAi
             assertStepOk(lastAi?.content, "T9");
           }
-          // If aiMsgWithStepOk is found, the AI confirmed it saw the imageUrl - pass.
+          // The AI should be able to reference the real generated URL.
+          void generatedImageUrl;
           lastMainAiMsgId = result.data.lastAiMessageId!;
 
           assertNoOrphans(
@@ -5034,7 +5165,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await assertNoPendingTasks(threadId);
 
           const after = await getBalance(testUser);
-          await assertDeducted(testUser, before, after, 0, 10);
+          await assertDeducted(testUser, before, after, 0, 50);
         },
         effectiveTestTimeout,
       );
@@ -5465,14 +5596,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             threadId,
             favoriteId: nativeImageFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
-            mediaModelOverrides: {
-              imageGenModelSelection: {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
-                sortBy: ModelSortField.PRICE,
-                sortDirection: ModelSortDirection.ASC,
-              },
-            },
           });
 
           expect(result.success).toBe(true);
@@ -5849,14 +5972,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             threadId,
             favoriteId: nanoBananaFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
-            mediaModelOverrides: {
-              imageGenModelSelection: {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: ImageGenModelId.FLUX_2_KLEIN_4B,
-                sortBy: ModelSortField.PRICE,
-                sortDirection: ModelSortDirection.ASC,
-              },
-            },
           });
 
           expect(result.success).toBe(true);
@@ -6109,14 +6224,6 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             threadId,
             favoriteId: nativeImageFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
-            mediaModelOverrides: {
-              imageGenModelSelection: {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
-                sortBy: ModelSortField.PRICE,
-                sortDirection: ModelSortDirection.ASC,
-              },
-            },
           });
 
           expect(result.success).toBe(true);
@@ -6430,20 +6537,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await pinBalance(testUser, 50);
           const beforeIncognito = await getBalance(testUser);
 
-          const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-          const { t } = scopedTranslation.scopedT(defaultLocale);
-
-          const result = await runHeadlessAiStream({
-            prompt: "[C2 incognito] Reply with exactly: INCOGNITO_TEST",
-            favoriteId: mainFavoriteId,
-            favoriteConfig: null,
-            rootFolderId: DefaultFolderId.INCOGNITO,
-            subAgentDepth: 0,
+          // Incognito stream via the real endpoint. The POST returns immediately;
+          // incognito content is never persisted (it only ever flows over WS to
+          // the client), so we assert the invariants a DB observer CAN see:
+          // nothing persisted + credits deducted.
+          const { result } = await runStream({
             user: testUser,
-            locale: defaultLocale,
-            logger,
-            t,
-            abortSignal: new AbortController().signal,
+            prompt: "[C2 incognito] Reply with exactly: INCOGNITO_TEST",
+            rootFolderId: DefaultFolderId.INCOGNITO,
+            favoriteId: mainFavoriteId,
           });
 
           expect(result.success).toBe(true);
@@ -6459,11 +6561,23 @@ export function describeStreamSuite(cfg: ModeConfig): void {
               "C2: incognito messages persisted to DB",
             ).toHaveLength(0);
           }
-          expect(result.data.lastAiMessageContent).toContain("INCOGNITO_TEST");
 
-          const afterIncognito = await getBalance(testUser);
+          // Incognito streams run in the background (no thread state to poll) - poll
+          // balance until it drops or the timeout expires. 30s budget for fixture-speed.
+          const C2_TIMEOUT_MS = 30_000;
+          const C2_POLL_MS = 300;
+          const c2Start = Date.now();
+          let afterIncognito = await getBalance(testUser);
+          while (
+            afterIncognito >= beforeIncognito &&
+            Date.now() - c2Start < C2_TIMEOUT_MS
+          ) {
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, C2_POLL_MS);
+            });
+            afterIncognito = await getBalance(testUser);
+          }
           expect(afterIncognito).toBeLessThan(beforeIncognito);
-          expect(result.data.totalCreditsDeducted ?? 0).toBeGreaterThan(0);
         },
         effectiveTestTimeout,
       );
@@ -6528,170 +6642,25 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     // selection is respected, then run through the UNBOTTLED relay path.
     // All external fetch is blocked (strict mode) - any leaked fetch fails.
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    describe("Favorites + UNBOTTLED self-relay", () => {
+    describe("Favorites resolution", () => {
       const QUALITY_TESTER_SKILL_ID = "quality-tester";
-      let favoriteId: string; // kimi variant - DEFAULT_CHAT_MODEL_ID + OPENROUTER image + MODELSLAB music/video
-      let budgetFavoriteId: string; // budget variant - GPT_5_NANO + MODELSLAB image + REPLICATE music
-      /** Saved chatModelOptionsIndex entries before UNBOTTLED runtime patching */
-      const savedModelOptions = new Map<string, ChatModelOption>();
-      /** Provider entry ops applied to .ts files on disk (reversed in afterAll) */
-      let appliedOps: Array<{
-        action: "add" | "remove" | "update";
-        role: string;
-        enumKey: string;
-        modelId: string;
-        provider: ApiProvider;
-        providerModel: string;
-        creditCost?: number;
-        source: string;
-      }> = [];
-      /** instanceId used in the local DB for the self-relay remote_connections row */
-      const SELF_RELAY_INSTANCE_ID = "self-relay-test";
-      const testModelId = DEFAULT_CHAT_MODEL_ID;
+      let favoriteId: string; // kimi variant - DEFAULT_CHAT_MODEL_ID
+      let budgetFavoriteId: string; // visual variant - GEMINI_3_5_FLASH (native media gen)
 
       beforeAll(async () => {
-        const { readFileSync, writeFileSync } = await import("node:fs");
-
-        // ── Step 1: Run the price updater against local instance ──
-        // Price fetcher uses WsProviderModelsRepository.listModels in-process
-        // (no credentials needed — it queries the local DB directly).
-        const { UnbottledPriceFetcher } =
-          await import("@/app/api/[locale]/agent/models/model-prices/providers/unbottled");
-        const priceFetcher = new UnbottledPriceFetcher();
-        const priceLogger = createEndpointLogger(
-          false,
-          Date.now(),
-          defaultLocale,
-        );
-        const priceResult = await priceFetcher.fetch(priceLogger);
-
-        // The price updater should find models on the local instance
-        expect(
-          priceResult.modelsFound,
-          `Price updater found 0 models - ${priceResult.error ?? "no error"}`,
-        ).toBeGreaterThan(0);
-
-        const allAddOps = (priceResult.providerEntryOps ?? []).filter(
-          (op) => op.action === "add" || op.action === "update",
-        );
-        expect(
-          allAddOps.length,
-          "Price updater returned 0 ops - no UNBOTTLED models found?",
-        ).toBeGreaterThan(0);
-
-        // ── Step 2: Write UNBOTTLED provider entries to .ts files on disk ──
-        // This is the same codepath the production price updater uses.
-        const { addProviderEntry, getRoleFilePaths } =
-          await import("@/app/api/[locale]/agent/models/model-prices/repository");
-        const roleFilePaths = getRoleFilePaths();
-
-        // Group ops by role, read each file once, apply all ops, write back
-        // Track only ops that were actually written (result.changed) so afterAll
-        // doesn't delete pre-existing UNBOTTLED entries that weren't added by this test.
-        const opsByRole = new Map<string, typeof allAddOps>();
-        for (const op of allAddOps) {
-          const list = opsByRole.get(op.role) ?? [];
-          list.push(op);
-          opsByRole.set(op.role, list);
-        }
-        // actuallyWrittenOps tracks only "add"-action ops that were newly inserted
-        // (not "update" ops) so afterAll only removes entries that didn't exist before.
-        const actuallyWrittenOps: typeof allAddOps = [];
-        for (const [role, ops] of opsByRole) {
-          const filePath = roleFilePaths[role];
-          if (!filePath) {
-            continue;
-          }
-          let content = readFileSync(filePath, "utf-8");
-          for (const op of ops) {
-            const result = addProviderEntry(content, op);
-            if (result.changed) {
-              content = result.content;
-              if (op.action === "add") {
-                actuallyWrittenOps.push(op);
-              }
-            }
-          }
-          writeFileSync(filePath, content, "utf-8");
-        }
-        appliedOps = actuallyWrittenOps;
-
-        // ── Step 3: Patch runtime chatModelOptionsIndex ──
-        // .ts file edits don't affect already-loaded modules, so we also
-        // patch the runtime index for chat models. Media gen models are
-        // resolved via favorites/user-settings, not chatModelOptionsIndex.
-        const chatAddOps = allAddOps.filter((op) => op.role === "chat");
-        for (const op of chatAddOps) {
-          const existing = chatModelOptionsIndex[op.modelId];
-          if (existing) {
-            savedModelOptions.set(op.modelId, { ...existing });
-            chatModelOptionsIndex[op.modelId] = {
-              ...existing,
-              apiProvider: ApiProvider.UNBOTTLED,
-              providerModel: op.providerModel,
-              creditCost: op.creditCost ?? existing.creditCost,
-            } as ChatModelOption;
-          }
-        }
-
-        // Verify our test model got patched
-        expect(
-          savedModelOptions.has(testModelId),
-          `Price updater did not return an add op for ${testModelId}`,
-        ).toBe(true);
-
-        // ── Step 4: Create a remote_connections row pointing at ourselves (self-relay) ──
-        // RemoteTransport.resolveInferenceProvider() queries the DB for a row with
-        // isInferenceProvider=true. We insert one pointing at NEXT_PUBLIC_APP_URL
-        // (self) so UNBOTTLED dispatch routes back to the local instance.
-        const { resolveLocalAdminSession } =
-          await import("@/app/api/[locale]/agent/models/model-prices/providers/local-session-helper");
-        const localSession = await resolveLocalAdminSession(
-          env.NEXT_PUBLIC_APP_URL,
-        );
-        expect(
-          localSession,
-          "resolveLocalAdminSession failed - admin user missing?",
-        ).toBeTruthy();
-        // Clean up any leftover row from a previous failed run before inserting.
-        await db
-          .delete(remoteConnections)
-          .where(
-            and(
-              eq(remoteConnections.userId, testUser.id),
-              eq(remoteConnections.instanceId, SELF_RELAY_INSTANCE_ID),
-            ),
-          );
-        await db.insert(remoteConnections).values({
-          userId: testUser.id,
-          instanceId: SELF_RELAY_INSTANCE_ID,
-          remoteUrl: localSession!.remoteUrl,
-          token: localSession!.token,
-          leadId: localSession!.leadId,
-          isInferenceProvider: true,
-          isActive: true,
-          isReverseEntry: false,
-          transportMode: "direct-http",
-          threadMirrorMode: "cloud",
-          loopLocation: "server",
-          toolSource: "local",
-        });
-
-        // ── Step 5: Resolve test favorites via endpoint (reuse existing, create if absent) ──
+        // Resolve test favorites via endpoints (reuse existing, create if absent).
         const [favsDef, favoriteCreateDef] = await Promise.all([
-          import("@/app/api/[locale]/agent/chat/favorites/definition").then(
+          import("@/app/api/[locale]/agent/skills/favorites/definition").then(
             (m) => m.default.GET,
           ),
-          import("@/app/api/[locale]/agent/chat/favorites/create/definition").then(
+          import("@/app/api/[locale]/agent/skills/favorites/create/definition").then(
             (m) => m.default.POST,
           ),
         ]);
-        const favsResult = await RouteExecuteRepository.runInProcessTyped({
-          definition: favsDef,
-          input: { pageSize: 500 },
+        const favsResult = await sendTestRequest({
+          endpoint: favsDef,
+          data: { pageSize: 500 },
           user: testUser,
-          locale: defaultLocale,
-          platform: Platform.AI,
         });
         const favsList = favsResult.success
           ? Array.isArray(favsResult.data?.["favorites"])
@@ -6705,12 +6674,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         if (existingKimi?.["id"]) {
           favoriteId = String(existingKimi["id"]);
         } else {
-          const r = await RouteExecuteRepository.runInProcessTyped({
-            definition: favoriteCreateDef,
-            input: { skillId: "quality-tester__kimi" },
+          const r = await sendTestRequest({
+            endpoint: favoriteCreateDef,
+            data: { skillId: "quality-tester__kimi" },
             user: testUser,
-            locale: defaultLocale,
-            platform: Platform.AI,
           });
           expect(r.success, "F-setup: create quality-tester__kimi failed").toBe(
             true,
@@ -6718,153 +6685,130 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           favoriteId = r.success ? String(r.data?.["id"] ?? "") : "";
         }
 
-        const existingBudget = favsList.find(
-          (f) => String(f["skillId"] ?? "") === "quality-tester__budget",
+        const existingVisual = favsList.find(
+          (f) => String(f["skillId"] ?? "") === "quality-tester__visual",
         );
-        if (existingBudget?.["id"]) {
-          budgetFavoriteId = String(existingBudget["id"]);
+        if (existingVisual?.["id"]) {
+          budgetFavoriteId = String(existingVisual["id"]);
         } else {
-          const r = await RouteExecuteRepository.runInProcessTyped({
-            definition: favoriteCreateDef,
-            input: { skillId: "quality-tester__budget" },
+          const r = await sendTestRequest({
+            endpoint: favoriteCreateDef,
+            data: { skillId: "quality-tester__visual" },
             user: testUser,
-            locale: defaultLocale,
-            platform: Platform.AI,
           });
           expect(
             r.success,
-            "F-setup: create quality-tester__budget failed",
+            "F-setup: create quality-tester__visual failed",
           ).toBe(true);
           budgetFavoriteId = r.success ? String(r.data?.["id"] ?? "") : "";
         }
-
-        // NOTE: Strict mode is NOT enabled here because self-relay inner calls
-        // go through the real provider (OpenRouter) and need to record fixtures
-        // on first run. Once recorded, the fetch cache replays them automatically.
       }, effectiveTestTimeout);
-
-      afterAll(async () => {
-        const { readFileSync, writeFileSync } = await import("node:fs");
-
-        // NOTE: Test favorites are kept for manual inspection - not deleted.
-
-        // Restore runtime chat model options
-        for (const [modelId, original] of savedModelOptions) {
-          chatModelOptionsIndex[modelId] = original;
-        }
-        savedModelOptions.clear();
-
-        // Remove UNBOTTLED provider entries from .ts files on disk
-        if (appliedOps.length > 0) {
-          const { removeProviderEntry, getRoleFilePaths } =
-            await import("@/app/api/[locale]/agent/models/model-prices/repository");
-          const roleFilePaths = getRoleFilePaths();
-          const opsByRole = new Map<string, typeof appliedOps>();
-          for (const op of appliedOps) {
-            const list = opsByRole.get(op.role) ?? [];
-            list.push(op);
-            opsByRole.set(op.role, list);
-          }
-          for (const [role, ops] of opsByRole) {
-            const filePath = roleFilePaths[role];
-            if (!filePath) {
-              continue;
-            }
-            let content = readFileSync(filePath, "utf-8");
-            for (const op of ops) {
-              const result = removeProviderEntry(content, op);
-              if (result.changed) {
-                content = result.content;
-              }
-            }
-            writeFileSync(filePath, content, "utf-8");
-          }
-          appliedOps = [];
-        }
-
-        // Remove the self-relay remote_connections row inserted in beforeAll
-        await db
-          .delete(remoteConnections)
-          .where(
-            and(
-              eq(remoteConnections.userId, testUser.id),
-              eq(remoteConnections.instanceId, SELF_RELAY_INSTANCE_ID),
-            ),
-          );
-        // (strict mode was never enabled for UNBOTTLED tests)
-      });
 
       it(
         "F1: favorite resolution - manual, model switch, media models, filters all work",
         async () => {
-          const { resolveFavorite } = await import("../../repository/headless");
+          const favByIdDef = (
+            await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+          ).default;
+          const { getBestChatModelForFavorite } =
+            await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition");
+          const { getInstanceAvailability } =
+            await import("@/app/api/[locale]/agent/env-availability");
+          const { SkillsRepository } =
+            await import("@/app/api/[locale]/agent/skills/repository");
+          const { parseSkillId } =
+            await import("@/app/api/[locale]/agent/chat/slugify");
           const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
+          // Resolve a favorite's model exactly like the web client: GET the
+          // favorite config via endpoint, then run the client resolver with the
+          // skill variant's modelSelection as the cascade fallback.
+          const resolveModelAndSkill = async (
+            favId: string,
+          ): Promise<{ model: string | undefined; skill: string }> => {
+            const getRes = await sendTestRequest({
+              endpoint: favByIdDef.GET,
+              urlPathParams: { id: favId },
+              user: testUser,
+            });
+            expect(
+              getRes.success,
+              `F1: GET favorite ${favId} must succeed`,
+            ).toBe(true);
+            if (!getRes.success) {
+              return { model: undefined, skill: "" };
+            }
+            const skillId = getRes.data.skillId;
+            const skill = parseSkillId(skillId).skillId;
+            // Skill variant modelSelection — the cascade fallback the client uses.
+            let skillVariantSelection: typeof getRes.data.modelSelection = null;
+            const skillRes = await SkillsRepository.getSkillById(
+              { id: skillId },
+              testUser,
+              logger,
+              defaultLocale,
+            );
+            if (skillRes.success) {
+              const { variantId } = parseSkillId(skillId);
+              const variant = skillRes.data.variants
+                ? variantId
+                  ? skillRes.data.variants.find((v) => v.id === variantId)
+                  : (skillRes.data.variants.find((v) => v.isDefault) ??
+                    skillRes.data.variants[0])
+                : null;
+              skillVariantSelection = variant?.modelSelection ?? null;
+            }
+            const best = getBestChatModelForFavorite(
+              getRes.data.modelSelection,
+              skillVariantSelection ?? undefined,
+              testUser,
+              await getInstanceAvailability(),
+            );
+            return { model: best?.id, skill };
+          };
+
+          type PatchModelSelection =
+            (typeof favByIdDef.PATCH.types.RequestInput)["modelSelection"];
+          const patchModel = async (
+            favId: string,
+            modelSelection: PatchModelSelection,
+          ): Promise<void> => {
+            const r = await sendTestRequest({
+              endpoint: favByIdDef.PATCH,
+              data: { modelSelection },
+              urlPathParams: { id: favId },
+              user: testUser,
+            });
+            expect(r.success, `F1: PATCH favorite ${favId} must succeed`).toBe(
+              true,
+            );
+          };
+
           // ── Part A: Initial resolution → DEFAULT_CHAT_MODEL_ID + quality-tester skill ──
-          const resolved = await resolveFavorite(
-            favoriteId,
-            testUser.id,
-            testUser,
-            logger,
-            defaultLocale,
-          );
-          expect(resolved).toBeTruthy();
-          expect(resolved!.model).toBe(DEFAULT_CHAT_MODEL_ID);
-          expect(resolved!.skill).toBe(QUALITY_TESTER_SKILL_ID);
+          const resolved = await resolveModelAndSkill(favoriteId);
+          expect(resolved.model).toBe(DEFAULT_CHAT_MODEL_ID);
+          expect(resolved.skill).toBe(QUALITY_TESTER_SKILL_ID);
 
           // ── Part B: Change to GEMINI_3_FLASH → respected ──
-          const favByIdDef =
-            await import("@/app/api/[locale]/agent/chat/favorites/[id]/definition");
-          await RouteExecuteRepository.runInProcessTyped({
-            definition: favByIdDef.default.PATCH,
-            input: {
-              modelSelection: {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: ChatModelId.GEMINI_3_FLASH,
-              },
-            },
-            urlPathParams: { id: favoriteId },
-            user: testUser,
-            locale: defaultLocale,
-            platform: Platform.AI,
-            logger,
+          await patchModel(favoriteId, {
+            selectionType: ModelSelectionType.MANUAL,
+            manualModelId: ChatModelId.GEMINI_3_FLASH,
           });
-
-          const resolvedGemini = await resolveFavorite(
-            favoriteId,
-            testUser.id,
-            testUser,
-            logger,
-            defaultLocale,
-          );
-          expect(resolvedGemini).toBeTruthy();
-          expect(resolvedGemini!.model).toBe(ChatModelId.GEMINI_3_FLASH);
-          expect(resolvedGemini!.skill).toBe(QUALITY_TESTER_SKILL_ID);
+          const resolvedGemini = await resolveModelAndSkill(favoriteId);
+          expect(resolvedGemini.model).toBe(ChatModelId.GEMINI_3_FLASH);
+          expect(resolvedGemini.skill).toBe(QUALITY_TESTER_SKILL_ID);
 
           // Restore to DEFAULT_CHAT_MODEL_ID
-          await RouteExecuteRepository.runInProcessTyped({
-            definition: favByIdDef.default.PATCH,
-            input: {
-              modelSelection: {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: DEFAULT_CHAT_MODEL_ID,
-              },
-            },
-            urlPathParams: { id: favoriteId },
-            user: testUser,
-            locale: defaultLocale,
-            platform: Platform.AI,
-            logger,
+          await patchModel(favoriteId, {
+            selectionType: ModelSelectionType.MANUAL,
+            manualModelId: DEFAULT_CHAT_MODEL_ID,
           });
 
-          // ── Part C: Media model selections persisted ──
-          const favGetResult = await RouteExecuteRepository.runInProcessTyped({
-            definition: favByIdDef.default.GET,
+          // ── Part C: Media model selections persisted (via favorites GET) ──
+          const favGetResult = await sendTestRequest({
+            endpoint: favByIdDef.GET,
             urlPathParams: { id: favoriteId },
             user: testUser,
-            locale: defaultLocale,
-            platform: Platform.AI,
-            logger,
           });
           expect(favGetResult.success, "F1: GET favorite must succeed").toBe(
             true,
@@ -6894,65 +6838,29 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           ).toBe(ModelSelectionType.MANUAL);
 
           // ── Part D: FILTERS selection resolves a model ──
-          await RouteExecuteRepository.runInProcessTyped({
-            definition: favByIdDef.default.PATCH,
-            input: {
-              modelSelection: {
-                selectionType: ModelSelectionType.FILTERS,
-                sortBy: ModelSortField.PRICE,
-                sortDirection: ModelSortDirection.ASC,
-                contentRange: {
-                  min: ContentLevel.OPEN,
-                  max: ContentLevel.UNCENSORED,
-                },
-              },
+          await patchModel(favoriteId, {
+            selectionType: ModelSelectionType.FILTERS,
+            sortBy: ModelSortField.PRICE,
+            sortDirection: ModelSortDirection.ASC,
+            contentRange: {
+              min: ContentLevel.OPEN,
+              max: ContentLevel.UNCENSORED,
             },
-            urlPathParams: { id: favoriteId },
-            user: testUser,
-            locale: defaultLocale,
-            platform: Platform.AI,
-            logger,
+          });
+          const resolvedFilter = await resolveModelAndSkill(favoriteId);
+          expect(resolvedFilter.model).toBeTruthy();
+          expect(resolvedFilter.skill).toBe(QUALITY_TESTER_SKILL_ID);
+
+          // Restore to MANUAL
+          await patchModel(favoriteId, {
+            selectionType: ModelSelectionType.MANUAL,
+            manualModelId: DEFAULT_CHAT_MODEL_ID,
           });
 
-          const resolvedFilter = await resolveFavorite(
-            favoriteId,
-            testUser.id,
-            testUser,
-            logger,
-            defaultLocale,
-          );
-          expect(resolvedFilter).toBeTruthy();
-          expect(resolvedFilter!.model).toBeTruthy();
-          expect(resolvedFilter!.skill).toBe(QUALITY_TESTER_SKILL_ID);
-
-          // Restore to MANUAL for relay tests
-          await RouteExecuteRepository.runInProcessTyped({
-            definition: favByIdDef.default.PATCH,
-            input: {
-              modelSelection: {
-                selectionType: ModelSelectionType.MANUAL,
-                manualModelId: DEFAULT_CHAT_MODEL_ID,
-              },
-            },
-            urlPathParams: { id: favoriteId },
-            user: testUser,
-            locale: defaultLocale,
-            platform: Platform.AI,
-            logger,
-          });
-
-          // ── Part E: Budget variant resolution → GPT_5_NANO + different media models ──
-          const resolvedBudget = await resolveFavorite(
-            budgetFavoriteId,
-            testUser.id,
-            testUser,
-            logger,
-            defaultLocale,
-          );
-          expect(resolvedBudget).toBeTruthy();
-          // Budget variant uses FILTERS selection — resolved model may vary.
-          expect(resolvedBudget!.model).toBeTruthy();
-          expect(resolvedBudget!.skill).toBe(QUALITY_TESTER_SKILL_ID);
+          // ── Part E: Visual variant → resolves a model + quality-tester skill ──
+          const resolvedBudget = await resolveModelAndSkill(budgetFavoriteId);
+          expect(resolvedBudget.model).toBeTruthy();
+          expect(resolvedBudget.skill).toBe(QUALITY_TESTER_SKILL_ID);
         },
         effectiveTestTimeout,
       );

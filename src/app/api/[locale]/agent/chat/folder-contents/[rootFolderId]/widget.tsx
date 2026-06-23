@@ -210,7 +210,7 @@ function ThreadRow({
   const isActive = activeThreadId === item.id;
   const isIncognito = item.rootFolderId === DefaultFolderId.INCOGNITO;
 
-  const isThreadStreaming = item.streamingState !== "idle";
+  const isThreadStreaming = item.streamingState !== ThreadStreamingState.IDLE;
 
   const handleThreadClick = (e: DivMouseEvent): void => {
     if (isEditing) {
@@ -718,7 +718,7 @@ function ThreadRowShared({
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
   const { pushState } = useSilentHistory();
   const isActive = activeThreadId === item.id;
-  const isThreadStreaming = item.streamingState !== "idle";
+  const isThreadStreaming = item.streamingState !== ThreadStreamingState.IDLE;
   const activeShareCount = item.activeShareCount ?? 0;
   const lastSharedAt = item.lastSharedAt ?? null;
 

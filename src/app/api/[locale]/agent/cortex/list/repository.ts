@@ -33,23 +33,6 @@ import {
 import type { CortexListResponseOutput } from "./definition";
 import type { CortexListT } from "./i18n";
 
-interface ListParams {
-  userId: string;
-  user: JwtPrivatePayloadType;
-  locale: CountryLanguage;
-  path: string;
-  logger: EndpointLogger;
-  t: CortexListT;
-}
-
-interface ListEntry {
-  name: string;
-  entryPath: string;
-  nodeType: string;
-  size: number | null;
-  updatedAt: string;
-}
-
 export class CortexListRepository {
   static async listDirectory({
     userId,
@@ -58,9 +41,14 @@ export class CortexListRepository {
     path: rawPath,
     logger,
     t,
-  }: ListParams): Promise<
-    ResponseType<{ responsePath: string; entries: ListEntry[]; total: number }>
-  > {
+  }: {
+    userId: string;
+    user: JwtPrivatePayloadType;
+    locale: CountryLanguage;
+    path: string;
+    logger: EndpointLogger;
+    t: CortexListT;
+  }): Promise<ResponseType<CortexListResponseOutput>> {
     // Normalize locale-aware path to canonical for DB queries and template matching
     const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
 
@@ -119,25 +107,29 @@ export class CortexListRepository {
           mountPrefix,
           isAdmin,
         );
-        const entries: ListEntry[] = rawEntries.map((e) => ({
-          name: e.name,
-          entryPath: e.path,
-          nodeType: e.nodeType,
-          size: e.size,
-          updatedAt: e.updatedAt,
-        }));
+        const entries: CortexListResponseOutput["entries"] = rawEntries.map(
+          (e) => ({
+            name: e.name,
+            entryPath: e.path,
+            nodeType: e.nodeType,
+            size: e.size,
+            updatedAt: e.updatedAt,
+          }),
+        );
         return success({ responsePath: path, entries, total: entries.length });
       }
 
       // Document workspace listing
       const nodes = await listChildren(userId, path);
-      const entries: ListEntry[] = nodes.map((node) => ({
-        name: basename(node.path),
-        entryPath: node.path,
-        nodeType: node.nodeType === CortexNodeType.DIR ? "dir" : "file",
-        size: node.size,
-        updatedAt: node.updatedAt.toISOString(),
-      }));
+      const entries: CortexListResponseOutput["entries"] = nodes.map(
+        (node) => ({
+          name: basename(node.path),
+          entryPath: node.path,
+          nodeType: node.nodeType === CortexNodeType.DIR ? "dir" : "file",
+          size: node.size,
+          updatedAt: node.updatedAt.toISOString(),
+        }),
+      );
 
       // Overlay virtual template files/dirs for /memories and /documents paths
       // All template paths and input paths are canonical at this point.

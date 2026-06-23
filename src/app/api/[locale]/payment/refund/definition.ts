@@ -92,13 +92,13 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.success" as const,
+        label: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.message" as const,
+        label: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
@@ -112,52 +112,52 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.refund.id" as const,
+            label: "post.response.refund.id" as const,
             schema: z.uuid(),
           }),
           userId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.refund.userId" as const,
+            label: "post.response.refund.userId" as const,
             schema: z.uuid(),
           }),
           transactionId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.refund.transactionId" as const,
+            label: "post.response.refund.transactionId" as const,
             schema: z.uuid(),
           }),
           stripeRefundId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.refund.stripeRefundId" as const,
+            label: "post.response.refund.stripeRefundId" as const,
             schema: z.string(),
           }),
           amount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.refund.amount" as const,
+            label: "post.response.refund.amount" as const,
             schema: z.coerce.number(),
           }),
           currency: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.refund.currency" as const,
+            label: "post.response.refund.currency" as const,
             schema: z.string(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.refund.status" as const,
+            label: "post.response.refund.status" as const,
             schema: z.string(),
           }),
           reason: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.refund.reason" as const,
+            label: "post.response.refund.reason" as const,
             schema: z.string(),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.refund.createdAt" as const,
+            label: "post.response.refund.createdAt" as const,
             schema: z.string(),
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.refund.updatedAt" as const,
+            label: "post.response.refund.updatedAt" as const,
             schema: z.string(),
           }),
         },

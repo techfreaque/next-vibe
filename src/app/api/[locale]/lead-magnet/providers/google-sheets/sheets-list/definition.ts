@@ -44,7 +44,7 @@ export const { GET } = createEndpoint({
     children: {
       sheets: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.sheets" as const,
+        label: "response.sheets" as const,
         schema: z.array(
           z.object({
             id: z.string(),

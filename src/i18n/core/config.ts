@@ -1,11 +1,7 @@
 // ----------------
 // TYPES
 
-import type { configScopedTranslation } from "@/config/i18n";
 import { languageConfig, languageDefaults } from "@/i18n";
-
-type ConfigTranslationKey =
-  (typeof configScopedTranslation)["ScopedTranslationKey"];
 
 // ----------------
 export type Countries = keyof typeof languageConfig.countries;

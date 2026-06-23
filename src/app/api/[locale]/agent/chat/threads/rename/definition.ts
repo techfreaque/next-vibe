@@ -84,25 +84,25 @@ const { PATCH } = createEndpoint({
       // === RESPONSE FIELDS ===
       updatedThreadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.threadId.content" as const,
+        label: "patch.response.threadId.content" as const,
         schema: z.uuid(),
       }),
 
       updatedTitle: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.title.content" as const,
+        label: "patch.response.title.content" as const,
         schema: z.string(),
       }),
 
       updatedPreview: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.preview.content" as const,
+        label: "patch.response.preview.content" as const,
         schema: z.string().nullable(),
       }),
 
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "patch.response.updatedAt.content" as const,
+        label: "patch.response.updatedAt.content" as const,
         schema: dateSchema,
       }),
     },

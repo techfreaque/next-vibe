@@ -329,6 +329,13 @@ export interface ApiEndpoint<
    * Set to 0 for no timeout (long-running tools like claude-code, shell).
    */
   readonly streamTimeoutMs?: number;
+  /**
+   * Timeout in milliseconds for this endpoint's handler execution.
+   * Enforced both by the route handler (Next.js / TanStack) and by execute-tool's
+   * WAIT/END_LOOP modes (where exceeding the limit auto-upgrades to wakeUp).
+   * Default: DEFAULT_ENDPOINT_TIMEOUT_MS (90s). Set to 0 for no timeout.
+   */
+  readonly timeoutMs?: number;
   /** Icon identifier */
   readonly icon: IconKey;
 

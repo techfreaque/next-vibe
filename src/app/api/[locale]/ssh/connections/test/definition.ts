@@ -64,22 +64,22 @@ export const { POST } = createEndpoint({
       // RESPONSE
       ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.ok.title",
+        label: "post.response.ok.title",
         schema: z.boolean(),
       }),
       latencyMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.latencyMs.title",
+        label: "post.response.latencyMs.title",
         schema: z.number(),
       }),
       fingerprint: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.fingerprint.title",
+        label: "post.response.fingerprint.title",
         schema: z.string().nullable(),
       }),
       fingerprintChanged: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.fingerprintChanged.title",
+        label: "post.response.fingerprintChanged.title",
         schema: z.boolean().optional(),
       }),
     },

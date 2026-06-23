@@ -120,4 +120,35 @@ export const translations = {
     refresh: "Refresh",
     viewStats: "Statistics",
   },
+  enums: {
+    subscriptionStatusFilter: {
+      all: "All",
+      active: "Active",
+      trialing: "Trialing",
+      pastDue: "Past Due",
+      canceled: "Canceled",
+      unpaid: "Unpaid",
+      paused: "Paused",
+    },
+    billingIntervalFilter: {
+      any: "Any",
+      monthly: "Monthly",
+      yearly: "Yearly",
+    },
+    providerFilter: {
+      any: "Any",
+      stripe: "Stripe",
+      nowpayments: "NowPayments",
+    },
+    subscriptionSortField: {
+      createdAt: "Created At",
+      status: "Status",
+      interval: "Interval",
+      userEmail: "User Email",
+    },
+    sortOrder: {
+      asc: "Ascending",
+      desc: "Descending",
+    },
+  },
 };

@@ -80,8 +80,8 @@ export function SubscriptionOverviewContainer(_props: {
 
   const handleManageSubscription = async (): Promise<void> => {
     if (subscription.provider === PaymentProvider.NOWPAYMENTS) {
-      // TODO should not use alert at all. super shitty ux. needs proper solution with brain activated!
-      window.alert(t("manage.nowpayments.info"));
+      alert(t("manage.nowpayments.info")); // TODO should not use alert at all. super shitty ux. needs proper solution with brain activated!
+
       return;
     }
 
@@ -96,9 +96,7 @@ export function SubscriptionOverviewContainer(_props: {
         }
       },
       onError: ({ error }) => {
-        // oxlint-disable-next-line restricted-syntax -- alert for error notification
-        // eslint-disable-next-line no-alert
-        window.alert(error.message ?? t("manage.portal.error"));
+        alert(error.message ?? t("manage.portal.error")); // TODO should not use alert at all. super shitty ux. needs proper solution with brain activated!
       },
     });
   };

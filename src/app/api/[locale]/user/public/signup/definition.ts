@@ -49,13 +49,13 @@ const { POST } = createEndpoint({
     children: {
       title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "form.title",
+        label: "form.title",
         order: 0,
         usage: { request: "data", response: true },
       }),
       subtitle: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "form.description",
+        label: "form.description",
         variant: "body-lg",
         order: 1,
         usage: { request: "data", response: true },

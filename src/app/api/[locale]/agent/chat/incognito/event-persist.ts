@@ -16,7 +16,6 @@
  */
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { EndpointEventHandlerContext } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 
 import { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatThread } from "../db";
@@ -101,7 +100,9 @@ export async function finishIncognitoThreadIfIncognito(
     return;
   }
   const { updateIncognitoThread } = await import("./storage");
-  await updateIncognitoThread(threadId, { streamingState: "idle" });
+  await updateIncognitoThread(threadId, {
+    streamingState: ThreadStreamingState.IDLE,
+  });
 }
 
 // ─── Factory helpers (for simple onEvent = pure incognito persistence) ────────
@@ -133,7 +134,7 @@ export function onEventPersistMessage<TRes, TReq>(opts?: {
       (ctx.requestData as Record<string, string | undefined>)["rootFolderId"] ??
       "";
     await persistMessageIfIncognito(
-      threadId,
+      threadIdRaw,
       msgId,
       rootFolderId,
       ctx.logger,

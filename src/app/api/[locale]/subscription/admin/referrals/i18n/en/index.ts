@@ -215,4 +215,29 @@ export const translations = {
       proceed: "Proceed",
     },
   },
+  enums: {
+    payoutStatusFilter: {
+      all: "All",
+      pending: "Pending",
+      approved: "Approved",
+      rejected: "Rejected",
+      processing: "Processing",
+      completed: "Completed",
+      failed: "Failed",
+    },
+    referralSortField: {
+      createdAt: "Created At",
+      earnings: "Total Earnings",
+      signups: "Signups",
+    },
+    sortOrder: {
+      asc: "Ascending",
+      desc: "Descending",
+    },
+    payoutAction: {
+      approve: "Approve",
+      reject: "Reject",
+      complete: "Complete",
+    },
+  },
 };

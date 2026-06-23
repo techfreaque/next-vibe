@@ -60,45 +60,45 @@ const { GET } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionGet.get.response.id",
+            label: "sessionGet.get.response.id",
             hidden: true,
             schema: z.uuid(),
           }),
           terminalId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionGet.get.response.terminalId",
+            label: "sessionGet.get.response.terminalId",
             schema: z.uuid(),
           }),
           cashierUserId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionGet.get.response.cashierUserId",
+            label: "sessionGet.get.response.cashierUserId",
             schema: z.uuid(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionGet.get.response.status",
+            label: "sessionGet.get.response.status",
             schema: z.string(),
           }),
           openedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionGet.get.response.openedAt",
+            label: "sessionGet.get.response.openedAt",
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date(),
           }),
           closedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionGet.get.response.closedAt",
+            label: "sessionGet.get.response.closedAt",
             fieldType: FieldDataType.DATETIME,
             schema: z.coerce.date().nullable(),
           }),
           openingFloat: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionGet.get.response.openingFloat",
+            label: "sessionGet.get.response.openingFloat",
             schema: z.number(),
           }),
           closingFloat: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "sessionGet.get.response.closingFloat",
+            label: "sessionGet.get.response.closingFloat",
             schema: z.number().nullable(),
           }),
         },

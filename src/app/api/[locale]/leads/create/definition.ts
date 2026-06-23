@@ -235,17 +235,17 @@ const { POST } = createEndpoint({
             children: {
               id: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.summary.id",
+                label: "post.response.summary.id",
                 schema: z.uuid(),
               }),
               businessName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.summary.businessName",
+                label: "post.response.summary.businessName",
                 schema: z.string(),
               }),
               email: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.summary.email",
+                label: "post.response.summary.email",
                 schema: z.string().email().nullable(),
               }),
               status: responseField(scopedTranslation, {
@@ -265,22 +265,22 @@ const { POST } = createEndpoint({
             children: {
               phone: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.contactDetails.phone",
+                label: "post.response.contactDetails.phone",
                 schema: z.string().nullable(),
               }),
               website: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.contactDetails.website",
+                label: "post.response.contactDetails.website",
                 schema: z.string().nullable(),
               }),
               country: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.contactDetails.country",
+                label: "post.response.contactDetails.country",
                 schema: z.string(),
               }),
               language: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.contactDetails.language",
+                label: "post.response.contactDetails.language",
                 schema: z.string(),
               }),
             },
@@ -300,12 +300,12 @@ const { POST } = createEndpoint({
               }),
               emailsSent: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.trackingInfo.emailsSent",
+                label: "post.response.trackingInfo.emailsSent",
                 schema: z.coerce.number(),
               }),
               currentCampaignStage: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.trackingInfo.currentCampaignStage",
+                label: "post.response.trackingInfo.currentCampaignStage",
                 schema: z.string().nullable(),
               }),
             },
@@ -320,17 +320,17 @@ const { POST } = createEndpoint({
             children: {
               notes: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.metadata.notes",
+                label: "post.response.metadata.notes",
                 schema: z.string().nullable(),
               }),
               createdAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.metadata.createdAt",
+                label: "post.response.metadata.createdAt",
                 schema: dateSchema,
               }),
               updatedAt: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "post.response.metadata.updatedAt",
+                label: "post.response.metadata.updatedAt",
                 schema: dateSchema,
               }),
             },

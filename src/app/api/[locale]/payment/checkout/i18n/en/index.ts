@@ -167,6 +167,13 @@ export const translations = {
     },
   },
 
+  enums: {
+    paymentProvider: {
+      stripe: "Stripe",
+      nowpayments: "NowPayments",
+    },
+  },
+
   // Billing interval labels
   billing: {
     monthly: "Monthly",

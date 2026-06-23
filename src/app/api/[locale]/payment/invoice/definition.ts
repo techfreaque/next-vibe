@@ -131,13 +131,13 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.success" as const,
+        label: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.message" as const,
+        label: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
@@ -151,67 +151,67 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.id" as const,
+            label: "post.response.invoice.id" as const,
             schema: z.uuid(),
           }),
           userId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.userId" as const,
+            label: "post.response.invoice.userId" as const,
             schema: z.uuid(),
           }),
           stripeInvoiceId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.stripeInvoiceId" as const,
+            label: "post.response.invoice.stripeInvoiceId" as const,
             schema: z.string(),
           }),
           invoiceNumber: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.invoiceNumber" as const,
+            label: "post.response.invoice.invoiceNumber" as const,
             schema: z.string(),
           }),
           amount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.amount" as const,
+            label: "post.response.invoice.amount" as const,
             schema: z.coerce.number(),
           }),
           currency: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.currency" as const,
+            label: "post.response.invoice.currency" as const,
             schema: z.string(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.status" as const,
+            label: "post.response.invoice.status" as const,
             schema: z.enum(InvoiceStatus),
           }),
           invoiceUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.invoiceUrl" as const,
+            label: "post.response.invoice.invoiceUrl" as const,
             schema: z.string().url(),
           }),
           invoicePdf: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.invoicePdf" as const,
+            label: "post.response.invoice.invoicePdf" as const,
             schema: z.string().url(),
           }),
           dueDate: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.dueDate" as const,
+            label: "post.response.invoice.dueDate" as const,
             schema: z.string(),
           }),
           paidAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.paidAt" as const,
+            label: "post.response.invoice.paidAt" as const,
             schema: z.string().nullable().optional(),
           }),
           createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.createdAt" as const,
+            label: "post.response.invoice.createdAt" as const,
             schema: z.string(),
           }),
           updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "post.response.invoice.updatedAt" as const,
+            label: "post.response.invoice.updatedAt" as const,
             schema: z.string(),
           }),
         },

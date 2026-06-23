@@ -1,5 +1,16 @@
 export const translations = {
   category: "Email",
+  countries: {
+    global: "Global",
+    de: "Germany",
+    pl: "Poland",
+    us: "United States",
+  },
+  languages: {
+    en: "English",
+    de: "German",
+    pl: "Polish",
+  },
   enums: {
     // SMTP Client Enums
     smtpSecurityType: {

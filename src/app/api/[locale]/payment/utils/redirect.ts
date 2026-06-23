@@ -30,7 +30,7 @@ export function handleCheckoutRedirect<T extends { checkoutUrl?: string }>(
   }
 
   // Redirect to payment provider
-  window.location.assign(checkoutUrl);
+  assignUrl(checkoutUrl);
   return true;
 }
 

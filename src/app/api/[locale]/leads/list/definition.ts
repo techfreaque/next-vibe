@@ -80,7 +80,7 @@ const { GET } = createEndpoint({
     children: {
       title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "get.title",
+        label: "get.title",
         getCount: (responseData: {
           data?: { paginationInfo?: { total?: number } };
         }) => responseData?.data?.paginationInfo?.total,

@@ -891,7 +891,7 @@ export class HelpRepository {
         const { chatSettings } =
           await import("@/app/api/[locale]/agent/chat/settings/db");
         const { chatFavorites } =
-          await import("@/app/api/[locale]/agent/chat/favorites/db");
+          await import("@/app/api/[locale]/agent/skills/favorites/db");
         const { eq } = await import("drizzle-orm");
 
         // webPinnedTools: per-user sidebar bookmarks (independent of AI pinnedTools)
@@ -917,7 +917,7 @@ export class HelpRepository {
           const { isUuid } =
             await import("@/app/api/[locale]/agent/chat/slugify");
           const { resolveToolCascade } =
-            await import("@/app/api/[locale]/agent/chat/skills/tools-cascade");
+            await import("@/app/api/[locale]/agent/skills/tools-cascade");
           const [fav] = await db
             .select({
               availableTools: chatFavorites.availableTools,

@@ -90,7 +90,7 @@ const { GET } = createEndpoint({
       // RESPONSE FIELDS
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.totalCount" as const,
+        label: "get.response.totalCount" as const,
         schema: z.number(),
       }),
 
@@ -103,40 +103,40 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.id" as const,
+              label: "get.response.id" as const,
               hidden: true,
               schema: z.uuid(),
             }),
             supplierName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.supplierName" as const,
+              label: "get.response.supplierName" as const,
               schema: z.string(),
             }),
             billNumber: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.billNumber" as const,
+              label: "get.response.billNumber" as const,
               schema: z.string().nullable(),
             }),
             billDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.billDate" as const,
+              label: "get.response.billDate" as const,
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date(),
             }),
             dueDate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.dueDate" as const,
+              label: "get.response.dueDate" as const,
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date().nullable(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.currency" as const,
+              label: "get.response.currency" as const,
               schema: z.string(),
             }),
             billTotal: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.billTotal" as const,
+              label: "get.response.billTotal" as const,
               schema: z.number(),
             }),
             status: responseField(scopedTranslation, {
@@ -146,7 +146,7 @@ const { GET } = createEndpoint({
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.createdAt" as const,
+              label: "get.response.createdAt" as const,
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date(),
             }),

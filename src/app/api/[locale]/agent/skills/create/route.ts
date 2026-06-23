@@ -11,8 +11,8 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, user, logger, t }) =>
       SkillsRepository.createSkill(data, user, logger, t),
     onRemoteEvent: {
-      "skill-created": (payload, ctx) =>
-        SkillsRepository.applyRemoteSkillCreate(payload, ctx.user, ctx.logger),
+      "skill-created": (props) =>
+        SkillsRepository.applyRemoteSkillCreate(props),
     },
   },
 });

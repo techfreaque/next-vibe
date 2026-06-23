@@ -31,15 +31,15 @@ export const { POST, tools } = endpointsHandler({
         platform,
       ),
     onRemoteEvent: {
-      "tool-execute-request": async (payload, ctx) =>
+      "tool-execute-request": ({ responseData, instanceId, logger, user }) =>
         RouteExecuteRepository.handleIncomingToolRequest({
-          raw: payload,
-          executedByInstance: ctx.instanceId,
-          logger: ctx.logger,
-          localUserId: ctx.user.id,
+          raw: responseData,
+          executedByInstance: instanceId,
+          logger,
+          localUserId: user.id,
         }),
-      "tool-execute-result": async (payload, ctx) =>
-        RouteExecuteRepository.handleToolResult(payload, ctx.logger),
+      "tool-execute-result": ({ responseData, logger }) =>
+        RouteExecuteRepository.handleToolResult(responseData, logger),
     },
   },
 });

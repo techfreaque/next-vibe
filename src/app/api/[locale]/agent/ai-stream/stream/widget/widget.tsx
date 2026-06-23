@@ -110,7 +110,7 @@ function AiStreamChatArea(): JSX.Element {
       }
       if (initialPathData?.messages?.length) {
         return {
-          streamingState: "idle" as const,
+          streamingState: ThreadStreamingState.IDLE,
           backgroundTasks: [],
           messages: initialPathData.messages,
         };

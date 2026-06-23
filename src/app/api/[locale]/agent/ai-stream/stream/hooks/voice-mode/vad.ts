@@ -58,7 +58,10 @@ export class VoiceActivityDetector {
       return;
     }
 
-    this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    this.stream = await getMicrophoneStream();
+    if (!this.stream) {
+      return;
+    }
     this.audioContext = new AudioContext();
     this.source = this.audioContext.createMediaStreamSource(this.stream);
 

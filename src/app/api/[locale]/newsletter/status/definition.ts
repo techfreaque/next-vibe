@@ -68,12 +68,12 @@ const { GET } = createEndpoint({
       // RESPONSE FIELDS
       subscribed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.subscribed",
+        label: "response.subscribed",
         schema: z.boolean(),
       }),
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.status",
+        label: "response.status",
         schema: z.string(),
       }),
     },

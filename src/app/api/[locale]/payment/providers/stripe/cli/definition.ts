@@ -157,43 +157,43 @@ const { POST } = createEndpoint({
       // RESPONSE FIELDS
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.success" as const,
+        label: "response.success" as const,
         schema: z.boolean(),
       }),
 
       installed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.installed" as const,
+        label: "response.installed" as const,
         schema: z.boolean().optional(),
       }),
 
       version: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.version" as const,
+        label: "response.version" as const,
         schema: z.string().optional(),
       }),
 
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.status" as const,
+        label: "response.status" as const,
         schema: z.string().optional(),
       }),
 
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.output" as const,
+        label: "response.output" as const,
         schema: z.string().optional(),
       }),
 
       instructions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.instructions" as const,
+        label: "response.instructions" as const,
         schema: z.string().optional(),
       }),
 
       webhookEndpoint: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "response.webhookEndpoint" as const,
+        label: "response.webhookEndpoint" as const,
         schema: z.string().optional(),
       }),
     },

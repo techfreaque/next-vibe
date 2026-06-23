@@ -81,7 +81,7 @@ export function useAIStream(): UseAIStreamReturn {
       // Pre-warm the WS channel BEFORE the POST so the connection is
       // established by the time the server starts emitting events.
       if (threadId) {
-        preWarmChannel(buildMessagesChannel(threadId));
+        preWarmChannel(buildMessagesChannel(threadId), locale);
       }
 
       // Make the POST request via useApiMutation (type-safe, handles

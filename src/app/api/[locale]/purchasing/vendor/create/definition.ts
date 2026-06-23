@@ -209,32 +209,32 @@ const { POST } = createEndpoint({
       // Response fields
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "vendorCreate.post.response.id" as const,
+        label: "vendorCreate.post.response.id" as const,
         schema: z.uuid(),
       }),
       nameResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "vendorCreate.post.response.name" as const,
+        label: "vendorCreate.post.response.name" as const,
         schema: z.string(),
       }),
       codeResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "vendorCreate.post.response.code" as const,
+        label: "vendorCreate.post.response.code" as const,
         schema: z.string().nullable(),
       }),
       emailResponse: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "vendorCreate.post.response.email" as const,
+        label: "vendorCreate.post.response.email" as const,
         schema: z.string().nullable(),
       }),
       isActive: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "vendorCreate.post.response.isActive" as const,
+        label: "vendorCreate.post.response.isActive" as const,
         schema: z.boolean(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "vendorCreate.post.response.createdAt" as const,
+        label: "vendorCreate.post.response.createdAt" as const,
         schema: z.coerce.date(),
       }),
     },

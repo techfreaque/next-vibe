@@ -66,33 +66,33 @@ const { GET } = createEndpoint({
           children: {
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "terminalList.get.response.id",
+              label: "terminalList.get.response.id",
               hidden: true,
               schema: z.uuid(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "terminalList.get.response.name",
+              label: "terminalList.get.response.name",
               schema: z.string(),
             }),
             location: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "terminalList.get.response.location",
+              label: "terminalList.get.response.location",
               schema: z.string().nullable(),
             }),
             currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "terminalList.get.response.currency",
+              label: "terminalList.get.response.currency",
               schema: z.string(),
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "terminalList.get.response.isActive",
+              label: "terminalList.get.response.isActive",
               schema: z.boolean(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "terminalList.get.response.createdAt",
+              label: "terminalList.get.response.createdAt",
               fieldType: FieldDataType.DATETIME,
               schema: z.coerce.date(),
             }),

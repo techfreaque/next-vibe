@@ -75,32 +75,32 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.success.label",
+        label: "post.fields.success.label",
         schema: z.boolean(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.message.label",
+        label: "post.fields.message.label",
         schema: z.string(),
       }),
       serverEnvFiles: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.serverEnvFiles.label",
+        label: "post.fields.serverEnvFiles.label",
         schema: z.coerce.number(),
       }),
       clientEnvFiles: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.clientEnvFiles.label",
+        label: "post.fields.clientEnvFiles.label",
         schema: z.coerce.number(),
       }),
       duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.duration.label",
+        label: "post.fields.duration.label",
         schema: z.coerce.number(),
       }),
       outputPaths: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.outputPaths.label",
+        label: "post.fields.outputPaths.label",
         schema: z.object({
           server: z.string().optional(),
           client: z.string().optional(),

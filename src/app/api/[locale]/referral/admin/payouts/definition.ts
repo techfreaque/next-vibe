@@ -169,6 +169,14 @@ export const { POST } = createEndpoint({
         fieldType: FieldDataType.SELECT,
         label: "admin.payouts.fields.action.label" as const,
         description: "admin.payouts.fields.action.description" as const,
+        options: [
+          { value: "approve", label: "admin.payouts.widget.approve" as const },
+          { value: "reject", label: "admin.payouts.widget.reject" as const },
+          {
+            value: "complete",
+            label: "admin.payouts.widget.complete" as const,
+          },
+        ],
         schema: z.enum(["approve", "reject", "complete"] as const),
       }),
       adminNotes: requestField(scopedTranslation, {

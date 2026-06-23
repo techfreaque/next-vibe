@@ -124,4 +124,66 @@ export const translations = {
     title: "Accounts Retrieved",
     description: "Successfully retrieved messenger accounts",
   },
+
+  enums: {
+    channel: {
+      email: "Email",
+      sms: "SMS",
+      whatsapp: "WhatsApp",
+      telegram: "Telegram",
+    },
+    channelFilter: {
+      any: "All Channels",
+    },
+    provider: {
+      smtp: "SMTP",
+      resend: "Resend",
+      ses: "Amazon SES",
+      mailgun: "Mailgun",
+      sendgrid: "SendGrid",
+      mailjet: "Mailjet",
+      postmark: "Postmark",
+      twilio: "Twilio",
+      awsSns: "AWS SNS",
+      messagebird: "MessageBird",
+      http: "HTTP",
+      whatsappBusiness: "WhatsApp Business",
+      telegramBot: "Telegram Bot",
+    },
+    providerFilter: {
+      any: "All Providers",
+    },
+    status: {
+      active: "Active",
+      inactive: "Inactive",
+      error: "Error",
+      testing: "Testing",
+    },
+    statusFilter: {
+      any: "All Statuses",
+    },
+    healthStatus: {
+      healthy: "Healthy",
+      degraded: "Degraded",
+      unhealthy: "Unhealthy",
+      unknown: "Unknown",
+    },
+    healthStatusFilter: {
+      any: "All",
+    },
+    sortField: {
+      name: "Name",
+      channel: "Channel",
+      provider: "Provider",
+      status: "Status",
+      priority: "Priority",
+      messagesSentTotal: "Messages Sent",
+      lastUsedAt: "Last Used",
+      createdAt: "Created",
+    },
+    sortOrder: {
+      asc: "Ascending",
+      desc: "Descending",
+    },
+  },
 };

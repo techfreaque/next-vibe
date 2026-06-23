@@ -275,13 +275,13 @@ describe("headless-client connection registration", () => {
     const listDef = (await import("@/app/api/[locale]/remote-connection/list/definition")).default;
     const result = await sendTestRequest({
       endpoint: listDef.GET,
-      data: undefined,
+      data: {},
       user,
     });
     expect(result.success, result.success ? "" : String(result.message)).toBe(true);
     // getLocalInstanceId() returns the isDefault=true row — must be headless-client
     // since beforeAll set it. This is the exact value injected into the AI system prompt.
-    expect(result.data?.selfInstanceId, "selfInstanceId must be headless-client").toBe(COMPUTER_NAME);
+    expect(result.success ? result.data.selfInstanceId : undefined, "selfInstanceId must be headless-client").toBe(COMPUTER_NAME);
   });
 });
 
@@ -300,56 +300,17 @@ describe("headless-client thread folder creation", () => {
 });
 
 describe("headless-client AI stream via REMOTE folder", () => {
-  it("system prompt built for relay contains headless-client identity and not atlas", async () => {
-    // Call the debug endpoint locally — this runs buildSystemPrompt() with the
-    // current user's default identity (headless-client, set in beforeAll).
-    // This is the exact system prompt that gets sent in the relay body.
-    const systemPromptDebugDef = (
-      await import("@/app/api/[locale]/agent/ai-stream/system-prompt/debug/definition")
-    ).default;
-    const debugResult = await sendTestRequest({
-      endpoint: systemPromptDebugDef.GET,
-      data: { rootFolderId: DefaultFolderId.BACKGROUND },
-      user,
-    });
-    expect(
-      debugResult.success,
-      debugResult.success ? "" : String(debugResult.message),
-    ).toBe(true);
-
-    const systemPrompt =
-      typeof debugResult.data?.systemPrompt === "string"
-        ? debugResult.data.systemPrompt
-        : "";
-    expect(systemPrompt, "system prompt must not be empty").not.toBe("");
-
-    // Must declare the client's identity — the exact line injected by loadRemoteInstancesData()
-    expect(
-      systemPrompt,
-      `system prompt must contain "**Instance ID:** ${COMPUTER_NAME}" — got:\n${systemPrompt.slice(0, 500)}`,
-    ).toContain(`**Instance ID:** ${COMPUTER_NAME}`);
-
-    // The self-identity line must NOT say atlas — that would mean getLocalInstanceId()
-    // returned the wrong value. "atlas" may appear elsewhere (known instances list) but
-    // the "**Instance ID:**" line must point to COMPUTER_NAME only.
-    const instanceIdLine = systemPrompt
-      .split("\n")
-      .find((l) => l.includes("**Instance ID:**"));
-    expect(
-      instanceIdLine,
-      `"**Instance ID:**" line must exist in system prompt`,
-    ).toBeDefined();
-    expect(
-      instanceIdLine,
-      `"**Instance ID:**" line must not contain "atlas" — got: "${instanceIdLine}"`,
-    ).not.toMatch(/\batlas\b/i);
-  });
-
-  it("AI stream via REMOTE folder succeeds and returns messages", async () => {
-    const subFolderId = await getTestFolder("stream-check");
+  it("AI stream through relay: system prompt has headless-client identity, not atlas", async () => {
+    // End-to-end: run the AI through the REMOTE folder relay and ask it to output
+    // its own System Context section verbatim. Assert on what it actually received —
+    // not a local debug call, not prose parsing. The relay must have sent the system
+    // prompt built with headless-client identity or this fails.
+    const subFolderId = await getTestFolder("system-prompt-check");
 
     const { result, messages } = await runTestStream({
-      prompt: "Reply with exactly: OK",
+      prompt:
+        "Output the entire '## System Context' section from your system prompt verbatim. " +
+        "No commentary, no markdown changes — copy it exactly as-is.",
       user,
       rootFolderId: DefaultFolderId.REMOTE,
       subFolderId,
@@ -358,11 +319,28 @@ describe("headless-client AI stream via REMOTE folder", () => {
 
     expect(result.success, result.success ? "" : result.message).toBe(true);
 
-    const userMsgs = messages.filter((m) => !m.isAI && m.role === "user");
-    expect(userMsgs.length, "must have at least 1 user message in thread").toBeGreaterThan(0);
+    const aiReplies = messages.filter(
+      (m) => m.isAI && m.role === "assistant" && m.content,
+    );
+    expect(aiReplies.length, "relay must produce at least 1 assistant message").toBeGreaterThan(0);
 
-    const aiReplies = messages.filter((m) => m.isAI && m.role === "assistant" && m.content);
-    expect(aiReplies.length, "must have at least 1 assistant message with content").toBeGreaterThan(0);
+    const reply = aiReplies.at(-1)?.content ?? "";
+    expect(reply, "assistant reply must not be empty").not.toBe("");
+
+    // The AI copied its own system prompt — assert the identity line directly
+    const instanceIdLine = reply.split("\n").find((l) => l.includes("**Instance ID:**"));
+    expect(
+      instanceIdLine,
+      `"**Instance ID:**" line not found in AI reply. Full reply:\n${reply}`,
+    ).toBeDefined();
+    expect(
+      instanceIdLine,
+      `Identity line must say "${COMPUTER_NAME}", got: "${instanceIdLine}"`,
+    ).toContain(COMPUTER_NAME);
+    expect(
+      instanceIdLine,
+      `Identity line must not contain "atlas" — relay sent wrong system prompt. Got: "${instanceIdLine}"`,
+    ).not.toMatch(/\batlas\b/i);
   }, 90_000);
 
   it("thread stored in REMOTE folder, not duplicated", async () => {
@@ -378,7 +356,7 @@ describe("headless-client AI stream via REMOTE folder", () => {
 
     expect(result.success, result.success ? "" : result.message).toBe(true);
 
-    const threadId = result.data?.threadId;
+    const threadId = result.success ? result.data.threadId : undefined;
     expect(threadId, "stream must return a threadId").toBeTruthy();
     if (!threadId) {
       // oxlint-disable-next-line restricted-syntax -- unreachable after expect, keeps TS happy

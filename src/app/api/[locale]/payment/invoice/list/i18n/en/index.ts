@@ -73,6 +73,15 @@ export const translations = {
       description: "Invoice list retrieved",
     },
   },
+  enums: {
+    invoiceStatus: {
+      draft: "Draft",
+      open: "Open",
+      paid: "Paid",
+      void: "Void",
+      uncollectible: "Uncollectible",
+    },
+  },
   companyId: {
     label: "Company ID",
     description: "Filter invoices for this company",

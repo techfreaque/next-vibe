@@ -153,17 +153,17 @@ const { POST } = createEndpoint({
       // === RESPONSE ===
       upvotes: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.upvotes.content" as const,
+        label: "post.response.upvotes.content" as const,
         schema: z.coerce.number(),
       }),
       downvotes: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.downvotes.content" as const,
+        label: "post.response.downvotes.content" as const,
         schema: z.coerce.number(),
       }),
       userVote: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.userVote.content" as const,
+        label: "post.response.userVote.content" as const,
         schema: z.enum(["up", "down", "none"]),
       }),
     },

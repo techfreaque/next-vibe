@@ -799,12 +799,12 @@ export function installFetchCache(
 
     // Pass through relay control-plane calls — these are side-effectful and must
     // always reach the live server:
-    //   ws-provider/stream  — starts a new AI loop, returns a fresh responseThreadId
-    //   ws/broadcast        — delivers tool results to the remote AI loop
+    //   ai-stream/stream (with tools+instanceId) — starts a remote AI loop, returns a fresh responseThreadId
+    //   ws/broadcast                              — delivers tool results to the remote AI loop
     // Caching either would break the relay: stale responseThreadId → dead WS channel;
     // cached broadcast → tool result never delivered → tool timeout on remote.
     if (
-      url.includes("/agent/ai-stream/ws-provider/stream") ||
+      url.includes("/agent/ai-stream/stream") ||
       url.includes("/ws/broadcast")
     ) {
       return originalFetch(input, init);

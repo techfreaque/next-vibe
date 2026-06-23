@@ -65,7 +65,7 @@ const { POST } = createEndpoint({
 
       removedMemberId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "removeMember.post.response.removedMemberId",
+        label: "removeMember.post.response.removedMemberId",
         hidden: true,
         schema: z.uuid(),
       }),

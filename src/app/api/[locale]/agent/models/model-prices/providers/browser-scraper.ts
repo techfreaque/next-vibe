@@ -8,7 +8,7 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
 
 interface ScrapeOptions {
   /** URL to navigate to */
@@ -47,6 +47,7 @@ export async function scrapeWithBrowser(
     if (clickButtonTexts) {
       for (const buttonText of clickButtonTexts) {
         const clicked = await page.evaluate((text: string) => {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Playwright evaluate runs inside browser context, cannot use vibe-ui abstractions
           const buttons = [...document.querySelectorAll("button")].filter(
             (b) => b.textContent?.trim() === text && b.offsetParent !== null,
           );
@@ -68,6 +69,7 @@ export async function scrapeWithBrowser(
       try {
         await page.waitForFunction(
           (text: string) =>
+            // eslint-disable-next-line no-restricted-syntax
             document.body.innerText.toLowerCase().includes(text.toLowerCase()),
           waitForText,
           { timeout: 5000 },
@@ -80,6 +82,7 @@ export async function scrapeWithBrowser(
       }
     }
 
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Playwright evaluate runs inside browser context, cannot use vibe-ui abstractions
     const text = await page.evaluate(() => document.body.innerText);
     logger.debug("Browser scrape successful", {
       url,

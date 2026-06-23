@@ -474,7 +474,7 @@ export async function createIncognitoThread(
     rolesModerate: null,
     rolesAdmin: null,
     published: false,
-    streamingState: "idle" as const,
+    streamingState: ThreadStreamingState.IDLE,
     sortOrder: 0,
     canPost: true,
     canEdit: true,

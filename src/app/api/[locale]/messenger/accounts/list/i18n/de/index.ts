@@ -93,4 +93,66 @@ export const translations: typeof enTranslations = {
     title: "Konten abgerufen",
     description: "Messenger-Konten erfolgreich abgerufen",
   },
+
+  enums: {
+    channel: {
+      email: "E-Mail",
+      sms: "SMS",
+      whatsapp: "WhatsApp",
+      telegram: "Telegram",
+    },
+    channelFilter: {
+      any: "Alle Kanäle",
+    },
+    provider: {
+      smtp: "SMTP",
+      resend: "Resend",
+      ses: "Amazon SES",
+      mailgun: "Mailgun",
+      sendgrid: "SendGrid",
+      mailjet: "Mailjet",
+      postmark: "Postmark",
+      twilio: "Twilio",
+      awsSns: "AWS SNS",
+      messagebird: "MessageBird",
+      http: "HTTP",
+      whatsappBusiness: "WhatsApp Business",
+      telegramBot: "Telegram Bot",
+    },
+    providerFilter: {
+      any: "Alle Anbieter",
+    },
+    status: {
+      active: "Aktiv",
+      inactive: "Inaktiv",
+      error: "Fehler",
+      testing: "Test",
+    },
+    statusFilter: {
+      any: "Alle Status",
+    },
+    healthStatus: {
+      healthy: "Gesund",
+      degraded: "Beeinträchtigt",
+      unhealthy: "Ungesund",
+      unknown: "Unbekannt",
+    },
+    healthStatusFilter: {
+      any: "Alle",
+    },
+    sortField: {
+      name: "Name",
+      channel: "Kanal",
+      provider: "Anbieter",
+      status: "Status",
+      priority: "Priorität",
+      messagesSentTotal: "Gesendete Nachrichten",
+      lastUsedAt: "Zuletzt verwendet",
+      createdAt: "Erstellt",
+    },
+    sortOrder: {
+      asc: "Aufsteigend",
+      desc: "Absteigend",
+    },
+  },
 };

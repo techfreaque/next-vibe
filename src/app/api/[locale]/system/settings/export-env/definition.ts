@@ -49,12 +49,12 @@ export const { GET } = createEndpoint({
     children: {
       content: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.content.title" as const,
+        label: "get.response.content.title" as const,
         schema: z.string(),
       }),
       filename: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.filename.title" as const,
+        label: "get.response.filename.title" as const,
         schema: z.string(),
       }),
     },
@@ -106,8 +106,7 @@ export const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
-        content:
-          "# PRODUCTION ENV\nNODE_ENV=production\nDATABASE_URL=postgres://user:pass@host/db\n",
+        content: ".env.prod",
         filename: ".env.prod",
       },
     },

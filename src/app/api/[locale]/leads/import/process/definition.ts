@@ -81,25 +81,25 @@ const { POST } = createEndpoint({
 
       jobsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "import.process.post.response.jobsProcessed",
+        label: "import.process.post.response.jobsProcessed",
         schema: z.number(),
       }),
 
       totalRowsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "import.process.post.response.totalRowsProcessed",
+        label: "import.process.post.response.totalRowsProcessed",
         schema: z.number(),
       }),
 
       successfulImports: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "import.process.post.response.successfulImports",
+        label: "import.process.post.response.successfulImports",
         schema: z.number(),
       }),
 
       failedImports: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "import.process.post.response.failedImports",
+        label: "import.process.post.response.failedImports",
         schema: z.number(),
       }),
     },

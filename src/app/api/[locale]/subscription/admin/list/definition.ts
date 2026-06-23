@@ -204,22 +204,22 @@ const { GET } = createEndpoint({
               children: {
                 id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.subscriptions.id" as const,
+                  label: "get.response.subscriptions.id" as const,
                   schema: z.string(),
                 }),
                 userEmail: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.subscriptions.userEmail" as const,
+                  label: "get.response.subscriptions.userEmail" as const,
                   schema: z.string(),
                 }),
                 userName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.subscriptions.userName" as const,
+                  label: "get.response.subscriptions.userName" as const,
                   schema: z.string().nullable(),
                 }),
                 planId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.subscriptions.planId" as const,
+                  label: "get.response.subscriptions.planId" as const,
                   schema: z.string(),
                 }),
                 billingInterval: responseField(scopedTranslation, {
@@ -236,7 +236,7 @@ const { GET } = createEndpoint({
                 createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content: "get.response.subscriptions.createdAt" as const,
+                  label: "get.response.subscriptions.createdAt" as const,
                   schema: z.coerce.date(),
                 }),
                 currentPeriodEnd: responseField(scopedTranslation, {
@@ -254,7 +254,7 @@ const { GET } = createEndpoint({
                 canceledAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content: "get.response.subscriptions.canceledAt" as const,
+                  label: "get.response.subscriptions.canceledAt" as const,
                   schema: z.coerce.date().nullable(),
                 }),
                 cancellationReason: responseField(scopedTranslation, {
@@ -265,7 +265,7 @@ const { GET } = createEndpoint({
                 }),
                 provider: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "get.response.subscriptions.provider" as const,
+                  label: "get.response.subscriptions.provider" as const,
                   schema: z.string(),
                 }),
                 providerSubscriptionId: responseField(scopedTranslation, {
@@ -306,14 +306,12 @@ const { GET } = createEndpoint({
           totalCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.totalCount" as const,
-            content: "get.response.totalCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),
           pageCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.pageCount" as const,
-            content: "get.response.pageCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),
@@ -369,7 +367,11 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        searchFilters: {},
+        searchFilters: {
+          status: [],
+          interval: BillingIntervalAdminFilter.ANY,
+          provider: ProviderAdminFilter.ANY,
+        },
         sortingOptions: {
           sortBy: SubscriptionSortField.CREATED_AT,
           sortOrder: SortOrder.DESC,

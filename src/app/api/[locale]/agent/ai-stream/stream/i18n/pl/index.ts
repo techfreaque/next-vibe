@@ -1,3 +1,5 @@
+import { translations as modelTranslations } from "@/app/api/[locale]/agent/models/i18n/pl";
+
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -835,4 +837,15 @@ export const translations: typeof enTranslations = {
     title: "Narzędzia AI",
     tools: "Narzędzia",
   },
+  config: {
+    folders: {
+      private: "Prywatny",
+      shared: "Udostępniony",
+      public: "Publiczny",
+      background: "Tło",
+      incognito: "Incognito",
+      remote: "Zdalny",
+    },
+  },
+  models: modelTranslations.models,
 };

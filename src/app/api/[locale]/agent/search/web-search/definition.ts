@@ -190,13 +190,13 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       usedProvider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.provider.title" as const,
+        label: "get.response.provider.title" as const,
         schema: z.string(),
       }),
 
       output: responseField(scopedTranslation, {
         type: WidgetType.MARKDOWN,
-        content: "get.response.output.title" as const,
+        label: "get.response.output.title" as const,
         columns: 12,
         schema: z.string().optional(),
       }),
@@ -213,7 +213,7 @@ const { GET } = createEndpoint({
           children: {
             title: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.item.title" as const,
+              label: "get.response.results.item.title" as const,
               schema: z.string(),
             }),
             url: responseField(scopedTranslation, {
@@ -225,17 +225,17 @@ const { GET } = createEndpoint({
             }),
             snippet: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.item.snippet" as const,
+              label: "get.response.results.item.snippet" as const,
               schema: z.string(),
             }),
             age: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.item.age" as const,
+              label: "get.response.results.item.age" as const,
               schema: z.string().optional(),
             }),
             source: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.results.item.source" as const,
+              label: "get.response.results.item.source" as const,
               schema: z.string().optional(),
             }),
           },

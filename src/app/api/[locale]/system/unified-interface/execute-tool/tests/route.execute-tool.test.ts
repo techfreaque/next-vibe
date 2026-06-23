@@ -29,23 +29,23 @@ import {
   DefaultFolderId,
   makeHeadlessContext,
 } from "@/app/api/[locale]/agent/chat/config";
-import {
-  discardPendingCall,
-  getPendingCall,
-  registerPendingCall,
-} from "@/app/api/[locale]/remote-connection/pending-calls";
 import { resolveTestAdminUser } from "@/app/api/[locale]/system/check/testing/testing-suite/resolve-test-user";
 import { db } from "@/app/api/[locale]/system/db";
 import helpEndpoints from "@/app/api/[locale]/system/help/definition";
+import { createEndpointLogger } from "@/app/api/[locale]/system/logger/server";
 import type { AiT } from "@/app/api/[locale]/system/unified-interface/ai/i18n";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/server-logger";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import type {
-  CronTaskStatusValue} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import type { CronTaskStatusValue } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import {
-  CronTaskStatus
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+  awaitPendingCallResult,
+  completePendingCall,
+  discardPendingCall,
+  getPendingCall,
+  registerPendingCall,
+  setPendingCallRevival,
+} from "@/app/api/[locale]/system/unified-interface/websocket/remote-event-bridge/transport/pending-calls";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -83,7 +83,9 @@ async function pollTaskCompletion(
     if (s === CronTaskStatus.COMPLETED || s === CronTaskStatus.FAILED) {
       return s;
     }
-    await new Promise<void>((resolve) => { setTimeout(resolve, 200); });
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 200);
+    });
   }
   return null;
 }
@@ -637,6 +639,305 @@ describe("Execute-Tool E2E", () => {
   });
 
   // ════════════════════════════════════════════════════════════════════════════
+  // COMPLETE-PENDING-CALL — outcome variants
+  // ════════════════════════════════════════════════════════════════════════════
+
+  it("ET-COMPLETE-UNKNOWN: completePendingCall returns kind=unknown for unregistered callId", () => {
+    const outcome = completePendingCall(`never-registered-${Date.now()}`, {
+      status: "completed",
+      output: null,
+    });
+    expect(outcome.kind, "must be unknown for unregistered call").toBe(
+      "unknown",
+    );
+  });
+
+  it("ET-COMPLETE-SUCCESS: completePendingCall completes a pending entry, returns revival+ids", () => {
+    const callId = `complete-success-${Date.now()}`;
+    registerPendingCall({
+      callId,
+      instanceId: "atlas",
+      toolName: "test-tool",
+      threadId: "thread-A",
+      toolMessageId: "msg-A",
+      deadlineMs: 30_000,
+      onDeadline: async () => undefined,
+    });
+
+    const outcome = completePendingCall(callId, {
+      status: "completed",
+      output: { answer: "42" },
+    });
+
+    expect(outcome.kind, "must be completed").toBe("completed");
+    if (outcome.kind !== "completed") {
+      throw new Error("unreachable — narrowing for TS");
+    }
+    expect(outcome.threadId, "threadId must carry through").toBe("thread-A");
+    expect(outcome.toolMessageId, "toolMessageId must carry through").toBe(
+      "msg-A",
+    );
+    expect(outcome.revival, "revival must be null (none set)").toBeNull();
+
+    // Entry must still be queryable (tombstone TTL not elapsed)
+    const entry = getPendingCall(callId);
+    expect(entry, "tombstoned entry must still be queryable").not.toBeNull();
+    expect(entry!.result?.status, "result status must be completed").toBe(
+      "completed",
+    );
+    expect(entry!.result?.output, "result output must match").toEqual({
+      answer: "42",
+    });
+
+    discardPendingCall(callId);
+  });
+
+  it("ET-COMPLETE-DUPLICATE: second completePendingCall on same callId returns kind=duplicate", () => {
+    const callId = `complete-duplicate-${Date.now()}`;
+    registerPendingCall({
+      callId,
+      instanceId: "atlas",
+      toolName: "test-tool",
+      threadId: null,
+      toolMessageId: null,
+      deadlineMs: 30_000,
+      onDeadline: async () => undefined,
+    });
+
+    const first = completePendingCall(callId, {
+      status: "completed",
+      output: null,
+    });
+    expect(first.kind, "first completion must succeed").toBe("completed");
+
+    const second = completePendingCall(callId, {
+      status: "failed",
+      output: null,
+    });
+    expect(second.kind, "second completion must be duplicate").toBe(
+      "duplicate",
+    );
+
+    // Result must still be from the first completion
+    const entry = getPendingCall(callId);
+    expect(entry!.result?.status, "result must reflect first completion").toBe(
+      "completed",
+    );
+
+    discardPendingCall(callId);
+  });
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // SET-REVIVAL — attach revival target before completion
+  // ════════════════════════════════════════════════════════════════════════════
+
+  it("ET-SET-REVIVAL: setPendingCallRevival attaches revival; completePendingCall returns it", () => {
+    const callId = `revival-test-${Date.now()}`;
+    registerPendingCall({
+      callId,
+      instanceId: "atlas",
+      toolName: "test-tool",
+      threadId: null,
+      toolMessageId: null,
+      deadlineMs: 30_000,
+      onDeadline: async () => undefined,
+    });
+
+    const revival = {
+      threadId: "thread-revival",
+      toolMessageId: "msg-revival",
+      callbackMode: "wakeUp",
+      leafMessageId: "leaf-1",
+      modelId: "gpt-4",
+      skillId: null,
+      favoriteId: null,
+      subAgentDepth: 1,
+      userId: "user-xyz",
+    };
+
+    const attached = setPendingCallRevival(callId, revival);
+    expect(attached, "setPendingCallRevival must return true").toBe(true);
+
+    const outcome = completePendingCall(callId, {
+      status: "completed",
+      output: null,
+    });
+    expect(outcome.kind, "must be completed").toBe("completed");
+    if (outcome.kind !== "completed") {
+      throw new Error("unreachable");
+    }
+    expect(
+      outcome.revival,
+      "revival must be present on outcome",
+    ).not.toBeNull();
+    expect(outcome.revival?.threadId, "revival threadId must match").toBe(
+      "thread-revival",
+    );
+    expect(
+      outcome.revival?.toolMessageId,
+      "revival toolMessageId must match",
+    ).toBe("msg-revival");
+
+    discardPendingCall(callId);
+  });
+
+  it("ET-SET-REVIVAL-UNKNOWN: setPendingCallRevival returns false for unknown callId", () => {
+    const attached = setPendingCallRevival(`never-registered-${Date.now()}`, {
+      threadId: "t",
+      toolMessageId: "m",
+      callbackMode: "wakeUp",
+      leafMessageId: null,
+      modelId: null,
+      skillId: null,
+      favoriteId: null,
+      subAgentDepth: 0,
+      userId: "u",
+    });
+    expect(attached, "must return false for unknown call").toBe(false);
+  });
+
+  it("ET-SET-REVIVAL-ALREADY-DONE: setPendingCallRevival returns false after completion", () => {
+    const callId = `revival-late-${Date.now()}`;
+    registerPendingCall({
+      callId,
+      instanceId: "atlas",
+      toolName: "test-tool",
+      threadId: null,
+      toolMessageId: null,
+      deadlineMs: 30_000,
+      onDeadline: async () => undefined,
+    });
+    completePendingCall(callId, { status: "completed", output: null });
+
+    const attached = setPendingCallRevival(callId, {
+      threadId: "t",
+      toolMessageId: "m",
+      callbackMode: "wakeUp",
+      leafMessageId: null,
+      modelId: null,
+      skillId: null,
+      favoriteId: null,
+      subAgentDepth: 0,
+      userId: "u",
+    });
+    expect(attached, "must return false on already-completed call").toBe(false);
+
+    discardPendingCall(callId);
+  });
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // AWAIT-PENDING-CALL-RESULT — blocking waiter
+  // ════════════════════════════════════════════════════════════════════════════
+
+  it("ET-AWAIT-ALREADY-DONE: awaitPendingCallResult resolves immediately if already completed", async () => {
+    const callId = `await-done-${Date.now()}`;
+    registerPendingCall({
+      callId,
+      instanceId: "atlas",
+      toolName: "test-tool",
+      threadId: null,
+      toolMessageId: null,
+      deadlineMs: 30_000,
+      onDeadline: async () => undefined,
+    });
+    completePendingCall(callId, { status: "completed", output: { x: "1" } });
+
+    const result = await awaitPendingCallResult(callId, 5_000);
+    expect(result, "must resolve immediately with result").not.toBeNull();
+    expect(result!.status, "status must be completed").toBe("completed");
+    expect(result!.output, "output must match").toEqual({ x: "1" });
+
+    discardPendingCall(callId);
+  });
+
+  it("ET-AWAIT-UNKNOWN: awaitPendingCallResult returns null for unknown callId", async () => {
+    const result = await awaitPendingCallResult(
+      `never-registered-${Date.now()}`,
+      100,
+    );
+    expect(result, "must return null for unknown call").toBeNull();
+  });
+
+  it("ET-AWAIT-TIMEOUT: awaitPendingCallResult returns null on timeout if call never completes", async () => {
+    const callId = `await-timeout-${Date.now()}`;
+    registerPendingCall({
+      callId,
+      instanceId: "atlas",
+      toolName: "test-tool",
+      threadId: null,
+      toolMessageId: null,
+      deadlineMs: 30_000,
+      onDeadline: async () => undefined,
+    });
+
+    const result = await awaitPendingCallResult(callId, 50);
+    expect(result, "must timeout and return null").toBeNull();
+
+    discardPendingCall(callId);
+  });
+
+  it("ET-AWAIT-WAKEUP: awaitPendingCallResult resolves when completePendingCall fires", async () => {
+    const callId = `await-wakeup-${Date.now()}`;
+    registerPendingCall({
+      callId,
+      instanceId: "atlas",
+      toolName: "test-tool",
+      threadId: null,
+      toolMessageId: null,
+      deadlineMs: 30_000,
+      onDeadline: async () => undefined,
+    });
+
+    // Start waiter BEFORE completion
+    const waitPromise = awaitPendingCallResult(callId, 5_000);
+
+    // Complete after a short delay
+    setTimeout((): void => {
+      completePendingCall(callId, { status: "failed", output: null });
+    }, 20);
+
+    const result = await waitPromise;
+    expect(result, "waiter must wake up when call completes").not.toBeNull();
+    expect(result!.status, "status must be failed").toBe("failed");
+
+    discardPendingCall(callId);
+  });
+
+  it("ET-AWAIT-MULTI-WAITER: multiple awaiters all resolve when call completes", async () => {
+    const callId = `await-multi-${Date.now()}`;
+    registerPendingCall({
+      callId,
+      instanceId: "atlas",
+      toolName: "test-tool",
+      threadId: null,
+      toolMessageId: null,
+      deadlineMs: 30_000,
+      onDeadline: async () => undefined,
+    });
+
+    const wait1 = awaitPendingCallResult(callId, 5_000);
+    const wait2 = awaitPendingCallResult(callId, 5_000);
+    const wait3 = awaitPendingCallResult(callId, 5_000);
+
+    setTimeout((): void => {
+      completePendingCall(callId, {
+        status: "completed",
+        output: { multi: "yes" },
+      });
+    }, 20);
+
+    const [r1, r2, r3] = await Promise.all([wait1, wait2, wait3]);
+    expect(r1, "waiter 1 must resolve").not.toBeNull();
+    expect(r2, "waiter 2 must resolve").not.toBeNull();
+    expect(r3, "waiter 3 must resolve").not.toBeNull();
+    expect(r1!.output, "all waiters see same output").toEqual({ multi: "yes" });
+    expect(r2!.output, "waiter 2 output").toEqual({ multi: "yes" });
+    expect(r3!.output, "waiter 3 output").toEqual({ multi: "yes" });
+
+    discardPendingCall(callId);
+  });
+
+  // ════════════════════════════════════════════════════════════════════════════
   // REMOTE TESTS (require live Hermes dev instance)
   // ════════════════════════════════════════════════════════════════════════════
 
@@ -865,6 +1166,386 @@ describe("Execute-Tool E2E", () => {
         ).toHaveProperty("result");
       });
 
+      // ── ET-REMOTE-APPROVE ──────────────────────────────────────────────────
+      // Remote APPROVE via instanceId: returns placeholder immediately, no dispatch.
+
+      it("ET-REMOTE-APPROVE: remote APPROVE returns waiting_for_confirmation placeholder, no taskId", async () => {
+        requireRemote();
+        setFetchCacheContext("et-remote-approve");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: "tool-help",
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.APPROVE,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-REMOTE-APPROVE failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(data, "Remote APPROVE must have result field").toHaveProperty(
+          "result",
+        );
+        const inner = data.result as Record<string, unknown> | undefined;
+        expect(inner, "Remote APPROVE result must be an object").toBeTruthy();
+        expect(
+          inner?.status,
+          "Remote APPROVE result.status must be waiting_for_confirmation",
+        ).toBe("waiting_for_confirmation");
+        expect(
+          inner?.toolName,
+          "Remote APPROVE result.toolName must be set",
+        ).toBeTruthy();
+        expect(
+          data.taskId,
+          "Remote APPROVE must not return taskId",
+        ).toBeUndefined();
+      });
+
+      // ── ET-REMOTE-APPROVE-PREFIXED ─────────────────────────────────────────
+      // APPROVE via prefixed toolName: same placeholder behavior, no dispatch.
+
+      it("ET-REMOTE-APPROVE-PREFIXED: prefixed APPROVE returns waiting_for_confirmation, no taskId", async () => {
+        requireRemote();
+        setFetchCacheContext("et-remote-approve-prefixed");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.APPROVE,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-REMOTE-APPROVE-PREFIXED failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data,
+          "Prefixed remote APPROVE must have result field",
+        ).toHaveProperty("result");
+        const inner = data.result as Record<string, unknown> | undefined;
+        expect(
+          inner,
+          "Prefixed remote APPROVE result must be an object",
+        ).toBeTruthy();
+        expect(
+          inner?.status,
+          "Prefixed remote APPROVE result.status must be waiting_for_confirmation",
+        ).toBe("waiting_for_confirmation");
+        expect(
+          inner?.toolName,
+          "Prefixed remote APPROVE result.toolName must be set",
+        ).toBeTruthy();
+        expect(
+          data.taskId,
+          "Prefixed remote APPROVE must not return taskId",
+        ).toBeUndefined();
+      });
+
+      // ── ET-REMOTE-END-LOOP-PREFIXED ───────────────────────────────────────
+      // Same as WAIT-prefixed but END_LOOP callbackMode.
+
+      it("ET-REMOTE-END-LOOP-PREFIXED: prefixed END_LOOP routes to hermes, returns result inline", async () => {
+        requireRemote();
+        setFetchCacheContext("et-remote-end-loop-prefixed");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.END_LOOP,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-REMOTE-END-LOOP-PREFIXED failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data,
+          "Prefixed remote END_LOOP must have result field",
+        ).toHaveProperty("result");
+        expect(
+          data.taskId,
+          "Prefixed remote END_LOOP must not return taskId",
+        ).toBeUndefined();
+      });
+
+      // ── ET-REMOTE-DETACH-PREFIXED ─────────────────────────────────────────
+      // DETACH via prefixed toolName: same { taskId, hint } shape as explicit instanceId.
+
+      it("ET-REMOTE-DETACH-PREFIXED: prefixed DETACH returns taskId immediately, no inline result", async () => {
+        requireRemote();
+        setFetchCacheContext("et-remote-detach-prefixed");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.DETACH,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-REMOTE-DETACH-PREFIXED failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data.taskId,
+          "Prefixed remote DETACH must return taskId",
+        ).toBeTruthy();
+        expect(typeof data.taskId, "taskId must be a string").toBe("string");
+        expect(
+          data.hint,
+          "Prefixed remote DETACH must return hint",
+        ).toBeTruthy();
+        expect(
+          data.result,
+          "Prefixed remote DETACH must not return inline result",
+        ).toBeUndefined();
+      });
+
+      // ── ET-REMOTE-WAKE-UP-PREFIXED ────────────────────────────────────────
+      // WAKE_UP via prefixed toolName: same { taskId, hint } shape.
+
+      it("ET-REMOTE-WAKE-UP-PREFIXED: prefixed WAKE_UP returns taskId, no inline result", async () => {
+        requireRemote();
+        setFetchCacheContext("et-remote-wakeup-prefixed");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.WAKE_UP,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-REMOTE-WAKE-UP-PREFIXED failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data.taskId,
+          "Prefixed remote WAKE_UP must return taskId",
+        ).toBeTruthy();
+        expect(typeof data.taskId, "taskId must be a string").toBe("string");
+        expect(
+          data.hint,
+          "Prefixed remote WAKE_UP must return hint",
+        ).toBeTruthy();
+        expect(
+          data.result,
+          "Prefixed remote WAKE_UP must not return inline result",
+        ).toBeUndefined();
+      });
+
+      // ── ET-REMOTE-DETACH-THEN-WAIT-FOR-TASK ──────────────────────────────
+      // Remote DETACH via explicit instanceId → wait-for-task retrieves result.
+
+      it("ET-REMOTE-DETACH-THEN-WAIT-FOR-TASK: wait-for-task returns completed result after remote DETACH", async () => {
+        requireRemote();
+        setFetchCacheContext("et-remote-detach-wait");
+
+        const detachResult = await RouteExecuteRepository.runInProcess({
+          toolName: "tool-help",
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.DETACH,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          detachResult.success,
+          `Remote DETACH failed: ${JSON.stringify(detachResult)}`,
+        ).toBe(true);
+        if (!detachResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(detachResult.message);
+        }
+
+        const { taskId } = detachResult.data as {
+          taskId: string;
+          hint: string;
+        };
+        expect(taskId, "Remote DETACH must return taskId").toBeTruthy();
+
+        // For remote DETACH, taskId is a pending-call ID (not a DB cron row).
+        // Use awaitPendingCallResult to properly wait for the remote callback.
+        const pendingResult = await awaitPendingCallResult(taskId, 15_000);
+        expect(
+          pendingResult,
+          "Remote DETACH pending call must complete before wait-for-task",
+        ).not.toBeNull();
+        expect(
+          pendingResult?.status,
+          "Remote DETACH pending call must complete with success",
+        ).toBe("completed");
+
+        const { WaitForTaskRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/repository");
+        const { scopedTranslation: tasksScopedT } =
+          await import("@/app/api/[locale]/system/unified-interface/tasks/i18n");
+        const t = tasksScopedT.scopedT(defaultLocale).t;
+
+        const waitResult = await WaitForTaskRepository.waitForTask(
+          { taskId },
+          testUser,
+          makeLogger(),
+          t,
+          makeHeadlessContext(),
+        );
+
+        expect(
+          waitResult.success,
+          `wait-for-task failed: ${JSON.stringify(waitResult)}`,
+        ).toBe(true);
+        if (!waitResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(waitResult.message);
+        }
+        expect(
+          waitResult.data.waiting,
+          "wait-for-task on completed remote task must NOT be waiting",
+        ).toBe(false);
+        expect(
+          waitResult.data.status,
+          "wait-for-task status must be completed",
+        ).toBe(CronTaskStatus.COMPLETED);
+      }, 30_000);
+
+      // ── ET-REMOTE-DETACH-PREFIXED-THEN-WAIT-FOR-TASK ─────────────────────
+      // Remote DETACH via prefixed toolName → wait-for-task retrieves result.
+      // Separate code path: prefix splitting happens before instanceId resolution.
+
+      it("ET-REMOTE-DETACH-PREFIXED-THEN-WAIT-FOR-TASK: prefixed DETACH → wait-for-task returns completed result", async () => {
+        requireRemote();
+        setFetchCacheContext("et-remote-detach-prefixed-wait");
+
+        const detachResult = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.DETACH,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          detachResult.success,
+          `Prefixed remote DETACH failed: ${JSON.stringify(detachResult)}`,
+        ).toBe(true);
+        if (!detachResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(detachResult.message);
+        }
+
+        const { taskId } = detachResult.data as {
+          taskId: string;
+          hint: string;
+        };
+        expect(
+          taskId,
+          "Prefixed remote DETACH must return taskId",
+        ).toBeTruthy();
+
+        const pendingResult = await awaitPendingCallResult(taskId, 15_000);
+        expect(
+          pendingResult,
+          "Prefixed remote DETACH pending call must complete before wait-for-task",
+        ).not.toBeNull();
+        expect(
+          pendingResult?.status,
+          "Prefixed remote DETACH pending call must complete with success",
+        ).toBe("completed");
+
+        const { WaitForTaskRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/repository");
+        const { scopedTranslation: tasksScopedT } =
+          await import("@/app/api/[locale]/system/unified-interface/tasks/i18n");
+        const t = tasksScopedT.scopedT(defaultLocale).t;
+
+        const waitResult = await WaitForTaskRepository.waitForTask(
+          { taskId },
+          testUser,
+          makeLogger(),
+          t,
+          makeHeadlessContext(),
+        );
+
+        expect(
+          waitResult.success,
+          `wait-for-task failed: ${JSON.stringify(waitResult)}`,
+        ).toBe(true);
+        if (!waitResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(waitResult.message);
+        }
+        expect(
+          waitResult.data.waiting,
+          "wait-for-task on completed prefixed remote task must NOT be waiting",
+        ).toBe(false);
+        expect(
+          waitResult.data.status,
+          "wait-for-task status must be completed",
+        ).toBe(CronTaskStatus.COMPLETED);
+      }, 30_000);
+
       // ── ET-REMOTE-CLI ──────────────────────────────────────────────────────
       // CLI surface also routes remote tools correctly.
 
@@ -892,10 +1573,53 @@ describe("Execute-Tool E2E", () => {
           throw new Error(result.message);
         }
 
+        // runInProcessTyped unwraps the { result: ... } wrapper — returns raw endpoint data.
+        // For help endpoint: { tools: [...], totalCount: N, ... }
         const data = result.data as Record<string, unknown>;
-        expect(data, "Remote CLI WAIT must have result field").toHaveProperty(
-          "result",
-        );
+        expect(
+          data,
+          "Remote CLI WAIT must have tools field (raw endpoint data)",
+        ).toHaveProperty("tools");
+        expect(Array.isArray(data.tools), "tools must be an array").toBe(true);
+      });
+
+      // ── ET-REMOTE-CLI-PREFIXED ────────────────────────────────────────────
+      // CLI surface with prefixed toolName (hermes__tool-help): same routing path as AI,
+      // prefix splits before instanceId resolution, result wrapped in { result: ... }.
+
+      it("ET-REMOTE-CLI-PREFIXED: CLI platform prefixed WAIT returns result field", async () => {
+        requireRemote();
+        setFetchCacheContext("et-remote-cli-prefixed");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.WAIT,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.CLI,
+        });
+
+        expect(
+          result.success,
+          `ET-REMOTE-CLI-PREFIXED failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data,
+          "Prefixed remote CLI WAIT must have result field",
+        ).toHaveProperty("result");
+        expect(
+          data.taskId,
+          "Prefixed remote CLI WAIT must not return taskId",
+        ).toBeUndefined();
       });
     });
   } else {
@@ -983,8 +1707,13 @@ describe("Execute-Tool E2E", () => {
         }
 
         const data = result.data as Record<string, unknown>;
-        expect(data, "Reverse-WS WAIT must have result field").toHaveProperty("result");
-        expect(data.taskId, "Reverse-WS WAIT must not return taskId").toBeUndefined();
+        expect(data, "Reverse-WS WAIT must have result field").toHaveProperty(
+          "result",
+        );
+        expect(
+          data.taskId,
+          "Reverse-WS WAIT must not return taskId",
+        ).toBeUndefined();
       }, 60_000);
 
       // ── ET-RWS-END-LOOP ───────────────────────────────────────────────────
@@ -1015,13 +1744,19 @@ describe("Execute-Tool E2E", () => {
         }
 
         const data = result.data as Record<string, unknown>;
-        expect(data, "Reverse-WS END_LOOP must have result field").toHaveProperty("result");
-        expect(data.taskId, "Reverse-WS END_LOOP must not return taskId").toBeUndefined();
+        expect(
+          data,
+          "Reverse-WS END_LOOP must have result field",
+        ).toHaveProperty("result");
+        expect(
+          data.taskId,
+          "Reverse-WS END_LOOP must not return taskId",
+        ).toBeUndefined();
       }, 60_000);
 
       // ── ET-RWS-DETACH ─────────────────────────────────────────────────────
 
-      it("ET-RWS-DETACH: reverse-WS DETACH returns taskId immediately", async () => {
+      it("ET-RWS-DETACH: reverse-WS DETACH returns taskId immediately, hint includes wait-for-task", async () => {
         requireReverseWs();
         setFetchCacheContext("et-rws-detach");
 
@@ -1047,9 +1782,501 @@ describe("Execute-Tool E2E", () => {
         }
 
         const data = result.data as Record<string, unknown>;
-        expect(data.taskId, "Reverse-WS DETACH must return taskId").toBeTruthy();
+        expect(
+          data.taskId,
+          "Reverse-WS DETACH must return taskId",
+        ).toBeTruthy();
+        expect(typeof data.taskId, "taskId must be a string").toBe("string");
         expect(data.hint, "Reverse-WS DETACH must return hint").toBeTruthy();
-        expect(data.result, "Reverse-WS DETACH must not return inline result").toBeUndefined();
+        expect(
+          data.result,
+          "Reverse-WS DETACH must not return inline result",
+        ).toBeUndefined();
+      }, 60_000);
+
+      // ── ET-RWS-WAKE-UP ────────────────────────────────────────────────────
+
+      it("ET-RWS-WAKE-UP: reverse-WS WAKE_UP returns taskId, hint mentions injection", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-wakeup");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: "tool-help",
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.WAKE_UP,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-WAKE-UP failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data.taskId,
+          "Reverse-WS WAKE_UP must return taskId",
+        ).toBeTruthy();
+        expect(typeof data.taskId, "taskId must be a string").toBe("string");
+        expect(data.hint, "Reverse-WS WAKE_UP must return hint").toBeTruthy();
+        expect(
+          data.result,
+          "Reverse-WS WAKE_UP must not return inline result",
+        ).toBeUndefined();
+      }, 60_000);
+
+      // ── ET-RWS-APPROVE ────────────────────────────────────────────────────
+      // APPROVE via reverse-WS: returns waiting_for_confirmation placeholder,
+      // no taskId (stream aborts at finish-step; real result arrives after confirmation).
+
+      it("ET-RWS-APPROVE: reverse-WS APPROVE returns waiting_for_confirmation placeholder, no taskId", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-approve");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: "tool-help",
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.APPROVE,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-APPROVE failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        const inner = data.result as Record<string, unknown> | undefined;
+        expect(inner, "Reverse-WS APPROVE must have result field").toBeTruthy();
+        expect(
+          inner?.status,
+          "Reverse-WS APPROVE result.status must be waiting_for_confirmation",
+        ).toBe("waiting_for_confirmation");
+        expect(
+          inner?.toolName,
+          "Reverse-WS APPROVE result.toolName must be set",
+        ).toBeTruthy();
+        expect(
+          data.taskId,
+          "Reverse-WS APPROVE must not return taskId",
+        ).toBeUndefined();
+      }, 60_000);
+
+      // ── ET-RWS-APPROVE-PREFIXED ───────────────────────────────────────────
+      // APPROVE via prefixed toolName over reverse-WS: placeholder returned, no dispatch.
+
+      it("ET-RWS-APPROVE-PREFIXED: prefixed APPROVE via reverse-WS returns waiting_for_confirmation, no taskId", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-approve-prefixed");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.APPROVE,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-APPROVE-PREFIXED failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data,
+          "Prefixed reverse-WS APPROVE must have result field",
+        ).toHaveProperty("result");
+        const inner = data.result as Record<string, unknown> | undefined;
+        expect(
+          inner,
+          "Prefixed reverse-WS APPROVE result must be an object",
+        ).toBeTruthy();
+        expect(
+          inner?.status,
+          "Prefixed reverse-WS APPROVE result.status must be waiting_for_confirmation",
+        ).toBe("waiting_for_confirmation");
+        expect(
+          inner?.toolName,
+          "Prefixed reverse-WS APPROVE result.toolName must be set",
+        ).toBeTruthy();
+        expect(
+          data.taskId,
+          "Prefixed reverse-WS APPROVE must not return taskId",
+        ).toBeUndefined();
+      }, 60_000);
+
+      // ── ET-RWS-PREFIXED ───────────────────────────────────────────────────
+      // Prefixed toolName "hermes__tool-help" routes to hermes via reverse-WS without explicit instanceId.
+
+      it("ET-RWS-PREFIXED: hermes__tool-help prefix routes to hermes via reverse-WS, WAIT returns result", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-prefixed");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.WAIT,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-PREFIXED failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data,
+          "Prefixed reverse-WS WAIT must have result field",
+        ).toHaveProperty("result");
+      }, 60_000);
+
+      // ── ET-RWS-END-LOOP-PREFIXED ──────────────────────────────────────────
+      // Prefixed END_LOOP via reverse-WS: result inline, no taskId.
+
+      it("ET-RWS-END-LOOP-PREFIXED: prefixed END_LOOP via reverse-WS returns result inline, no taskId", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-end-loop-prefixed");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.END_LOOP,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-END-LOOP-PREFIXED failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data,
+          "Prefixed reverse-WS END_LOOP must have result field",
+        ).toHaveProperty("result");
+        expect(
+          data.taskId,
+          "Prefixed reverse-WS END_LOOP must not return taskId",
+        ).toBeUndefined();
+      }, 60_000);
+
+      // ── ET-RWS-DETACH-PREFIXED ────────────────────────────────────────────
+      // Prefixed DETACH via reverse-WS: { taskId, hint }, no inline result.
+
+      it("ET-RWS-DETACH-PREFIXED: prefixed DETACH via reverse-WS returns taskId, no inline result", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-detach-prefixed");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.DETACH,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-DETACH-PREFIXED failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data.taskId,
+          "Prefixed reverse-WS DETACH must return taskId",
+        ).toBeTruthy();
+        expect(typeof data.taskId, "taskId must be a string").toBe("string");
+        expect(
+          data.hint,
+          "Prefixed reverse-WS DETACH must return hint",
+        ).toBeTruthy();
+        expect(
+          data.result,
+          "Prefixed reverse-WS DETACH must not return inline result",
+        ).toBeUndefined();
+      }, 60_000);
+
+      // ── ET-RWS-WAKE-UP-PREFIXED ───────────────────────────────────────────
+      // Prefixed WAKE_UP via reverse-WS: { taskId, hint }, no inline result.
+
+      it("ET-RWS-WAKE-UP-PREFIXED: prefixed WAKE_UP via reverse-WS returns taskId, no inline result", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-wakeup-prefixed");
+
+        const result = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.WAKE_UP,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-WAKE-UP-PREFIXED failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data.taskId,
+          "Prefixed reverse-WS WAKE_UP must return taskId",
+        ).toBeTruthy();
+        expect(typeof data.taskId, "taskId must be a string").toBe("string");
+        expect(
+          data.hint,
+          "Prefixed reverse-WS WAKE_UP must return hint",
+        ).toBeTruthy();
+        expect(
+          data.result,
+          "Prefixed reverse-WS WAKE_UP must not return inline result",
+        ).toBeUndefined();
+      }, 60_000);
+
+      // ── ET-RWS-DETACH-THEN-WAIT-FOR-TASK ─────────────────────────────────
+      // Reverse-WS DETACH via explicit instanceId → wait-for-task retrieves result.
+
+      it("ET-RWS-DETACH-THEN-WAIT-FOR-TASK: wait-for-task returns completed result after reverse-WS DETACH", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-detach-wait");
+
+        const detachResult = await RouteExecuteRepository.runInProcess({
+          toolName: "tool-help",
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.DETACH,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          detachResult.success,
+          `Reverse-WS DETACH failed: ${JSON.stringify(detachResult)}`,
+        ).toBe(true);
+        if (!detachResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(detachResult.message);
+        }
+
+        const { taskId } = detachResult.data as {
+          taskId: string;
+          hint: string;
+        };
+        expect(taskId, "Reverse-WS DETACH must return taskId").toBeTruthy();
+
+        const pendingResult = await awaitPendingCallResult(taskId, 15_000);
+        expect(
+          pendingResult,
+          "Reverse-WS DETACH pending call must complete before wait-for-task",
+        ).not.toBeNull();
+        expect(
+          pendingResult?.status,
+          "Reverse-WS DETACH pending call must complete with success",
+        ).toBe("completed");
+
+        const { WaitForTaskRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/repository");
+        const { scopedTranslation: tasksScopedT } =
+          await import("@/app/api/[locale]/system/unified-interface/tasks/i18n");
+        const t = tasksScopedT.scopedT(defaultLocale).t;
+
+        const waitResult = await WaitForTaskRepository.waitForTask(
+          { taskId },
+          testUser,
+          makeLogger(),
+          t,
+          makeHeadlessContext(),
+        );
+
+        expect(
+          waitResult.success,
+          `wait-for-task failed: ${JSON.stringify(waitResult)}`,
+        ).toBe(true);
+        if (!waitResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(waitResult.message);
+        }
+        expect(
+          waitResult.data.waiting,
+          "wait-for-task on completed reverse-WS task must NOT be waiting",
+        ).toBe(false);
+        expect(
+          waitResult.data.status,
+          "wait-for-task status must be completed",
+        ).toBe(CronTaskStatus.COMPLETED);
+      }, 60_000);
+
+      // ── ET-RWS-DETACH-PREFIXED-THEN-WAIT-FOR-TASK ────────────────────────
+      // Reverse-WS DETACH via prefixed toolName → wait-for-task retrieves result.
+      // Separate code path: prefix splitting happens before instanceId resolution.
+
+      it("ET-RWS-DETACH-PREFIXED-THEN-WAIT-FOR-TASK: prefixed DETACH via reverse-WS → wait-for-task returns completed result", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-detach-prefixed-wait");
+
+        const detachResult = await RouteExecuteRepository.runInProcess({
+          toolName: `${HERMES_INSTANCE_ID}__tool-help`,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          callbackMode: CallbackMode.DETACH,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          streamContext: makeHeadlessContext(),
+          platform: Platform.AI,
+        });
+
+        expect(
+          detachResult.success,
+          `Prefixed reverse-WS DETACH failed: ${JSON.stringify(detachResult)}`,
+        ).toBe(true);
+        if (!detachResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(detachResult.message);
+        }
+
+        const { taskId } = detachResult.data as {
+          taskId: string;
+          hint: string;
+        };
+        expect(
+          taskId,
+          "Prefixed reverse-WS DETACH must return taskId",
+        ).toBeTruthy();
+
+        const pendingResult = await awaitPendingCallResult(taskId, 15_000);
+        expect(
+          pendingResult,
+          "Prefixed reverse-WS DETACH pending call must complete before wait-for-task",
+        ).not.toBeNull();
+        expect(
+          pendingResult?.status,
+          "Prefixed reverse-WS DETACH pending call must complete with success",
+        ).toBe("completed");
+
+        const { WaitForTaskRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/tasks/wait-for-task/repository");
+        const { scopedTranslation: tasksScopedT } =
+          await import("@/app/api/[locale]/system/unified-interface/tasks/i18n");
+        const t = tasksScopedT.scopedT(defaultLocale).t;
+
+        const waitResult = await WaitForTaskRepository.waitForTask(
+          { taskId },
+          testUser,
+          makeLogger(),
+          t,
+          makeHeadlessContext(),
+        );
+
+        expect(
+          waitResult.success,
+          `wait-for-task failed: ${JSON.stringify(waitResult)}`,
+        ).toBe(true);
+        if (!waitResult.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(waitResult.message);
+        }
+        expect(
+          waitResult.data.waiting,
+          "wait-for-task on completed prefixed reverse-WS task must NOT be waiting",
+        ).toBe(false);
+        expect(
+          waitResult.data.status,
+          "wait-for-task status must be completed",
+        ).toBe(CronTaskStatus.COMPLETED);
+      }, 60_000);
+
+      // ── ET-RWS-CLI ────────────────────────────────────────────────────────
+      // CLI surface with explicit instanceId routes via reverse-WS, returns raw data.
+
+      it("ET-RWS-CLI: CLI platform reverse-WS WAIT returns raw endpoint data", async () => {
+        requireReverseWs();
+        setFetchCacheContext("et-rws-cli");
+
+        const result = await RouteExecuteRepository.runInProcessTyped({
+          definition: helpEndpoints.GET,
+          input: { query: "execute-tool", page: 1, pageSize: 5 },
+          instanceId: HERMES_INSTANCE_ID,
+          callbackMode: CallbackMode.WAIT,
+          user: testUser,
+          locale: defaultLocale,
+          logger: makeLogger(),
+          platform: Platform.CLI,
+        });
+
+        expect(
+          result.success,
+          `ET-RWS-CLI failed: ${JSON.stringify(result)}`,
+        ).toBe(true);
+        if (!result.success) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          throw new Error(result.message);
+        }
+
+        const data = result.data as Record<string, unknown>;
+        expect(
+          data,
+          "Reverse-WS CLI WAIT must have tools field (raw endpoint data)",
+        ).toHaveProperty("tools");
+        expect(Array.isArray(data.tools), "tools must be an array").toBe(true);
       }, 60_000);
     });
   }

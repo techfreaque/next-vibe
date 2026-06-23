@@ -123,6 +123,9 @@ interface BoilerplateMessages {
   routeHandlerNotArrow: string;
   routeHandlerHasBlock: string;
   routeHandlerExtraProperty: string;
+  routeOnRemoteEventNotObject: string;
+  routeOnRemoteEventHandlerNotArrow: string;
+  routeOnRemoteEventHandlerHasBlock: string;
   // i18n-pattern
   i18nEnHasImport: string;
   i18nEnNotSingleExport: string;
@@ -163,6 +166,12 @@ const DEFAULT_MESSAGES: BoilerplateMessages = {
     "Handler body must be a single expression (no block body `=> { ... }`), no logic allowed.",
   routeHandlerExtraProperty:
     "Handler object may only contain 'handler', 'email', 'sms', 'fieldDefaults', 'canSubscribe', and 'onRemoteEvent' properties.",
+  routeOnRemoteEventNotObject:
+    'onRemoteEvent must be an object literal `{ "event-name": (payload, ctx) => Repo.method(payload, ctx) }`.',
+  routeOnRemoteEventHandlerNotArrow:
+    "Each onRemoteEvent handler must be an arrow function.",
+  routeOnRemoteEventHandlerHasBlock:
+    "onRemoteEvent handler body must be a single expression — no block body `=> { ... }`, no inline logic allowed.",
   // i18n-pattern
   i18nEnHasImport:
     "i18n/en/index.ts must not have any imports. Split sub-modules into separate scoped i18n files instead.",
@@ -539,6 +548,41 @@ const routePatternRule = {
                 node: methodProp,
                 message: messages.routeHandlerExtraProperty,
               });
+              continue;
+            }
+
+            if (keyName === "onRemoteEvent") {
+              // onRemoteEvent must be an object literal
+              if (mp.value.type !== "ObjectExpression") {
+                context.report({
+                  node: mp.value,
+                  message: messages.routeOnRemoteEventNotObject,
+                });
+                continue;
+              }
+              const eventsObj = mp.value as ObjectExpression;
+              for (const evtProp of eventsObj.properties) {
+                if (evtProp.type !== "Property") {
+                  continue;
+                }
+                const ep = evtProp as Property;
+                // Each handler must be an arrow function
+                if (ep.value.type !== "ArrowFunctionExpression") {
+                  context.report({
+                    node: ep.value,
+                    message: messages.routeOnRemoteEventHandlerNotArrow,
+                  });
+                  continue;
+                }
+                const evtArrow = ep.value as ArrowFunctionExpression;
+                // Arrow body must NOT be a block statement
+                if (evtArrow.body.type === "BlockStatement") {
+                  context.report({
+                    node: evtArrow.body,
+                    message: messages.routeOnRemoteEventHandlerHasBlock,
+                  });
+                }
+              }
               continue;
             }
 

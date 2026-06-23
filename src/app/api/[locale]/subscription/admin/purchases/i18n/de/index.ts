@@ -107,4 +107,30 @@ export const translations: typeof enTranslations = {
     expired: "Abgelaufen",
     neverExpires: "Unbegrenzt",
   },
+  enums: {
+    creditPackTypeFilter: {
+      any: "Beliebig",
+      subscription: "Abonnement",
+      permanent: "Dauerhaft",
+      bonus: "Bonus",
+      earned: "Verdient",
+    },
+    creditPackSourceFilter: {
+      any: "Beliebig",
+      stripePurchase: "Stripe-Kauf",
+      stripeSubscription: "Abonnement-Guthaben",
+      adminGrant: "Admin-Zuweisung",
+      referralEarning: "Empfehlungsverdienst",
+    },
+    purchaseSortField: {
+      createdAt: "Erstellt am",
+      amount: "Betrag",
+      type: "Typ",
+      userEmail: "E-Mail",
+    },
+    sortOrder: {
+      asc: "Aufsteigend",
+      desc: "Absteigend",
+    },
+  },
 };

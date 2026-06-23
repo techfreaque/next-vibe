@@ -11,6 +11,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -28,17 +29,8 @@ import {
   normalizeToCanonicalPath,
   pathExists,
 } from "../repository";
-import type { CortexMoveT } from "./i18n";
-
-interface MoveParams {
-  userId: string;
-  user: JwtPrivatePayloadType;
-  locale: CountryLanguage;
-  from: string;
-  to: string;
-  logger: EndpointLogger;
-  t: CortexMoveT;
-}
+import moveDefinitions from "./definition";
+import { type CortexMoveT, scopedTranslation } from "./i18n";
 
 export class CortexMoveRepository {
   static async moveNode({
@@ -49,7 +41,22 @@ export class CortexMoveRepository {
     to: rawTo,
     logger,
     t,
-  }: MoveParams): Promise<
+    relayed = false,
+  }: {
+    userId: string;
+    user: JwtPrivatePayloadType;
+    locale: CountryLanguage;
+    from: string;
+    to: string;
+    logger: EndpointLogger;
+    t: CortexMoveT;
+    /**
+     * True when invoked from a cross-instance applier (the move was already
+     * performed on the origin and relayed here). Suppresses the `node-moved`
+     * emit so the event is not relayed back, preventing an infinite ping-pong.
+     */
+    relayed?: boolean;
+  }): Promise<
     ResponseType<{
       responseFrom: string;
       responseTo: string;
@@ -193,33 +200,61 @@ export class CortexMoveRepository {
         // Best-effort
       }
 
-      // WS-push sync: broadcast to connected remote instances
-      void (async (): Promise<void> => {
-        try {
-          const { serializeProviders } =
-            await import("@/app/api/[locale]/remote-connection/sync-provider");
-          const { broadcastSyncNotify } =
-            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
-          const providerKey = from.startsWith("/memories")
-            ? "memories"
-            : "documents";
-          const syncPayloads = await serializeProviders(
-            [providerKey],
-            userId,
-            logger,
-          );
-          broadcastSyncNotify(userId, syncPayloads, logger);
-        } catch {
-          // Best-effort: cron fallback handles missed syncs
-        }
-      })();
+      // This op owns its `node-moved` event: the move the user submitted
+      // (requestFields). The peer's onRemoteEvent re-runs moveNode. Server-only.
+      // Suppressed when applying a relayed move (avoids re-relay ping-pong).
+      if (!relayed) {
+        createEndpointEmitter(
+          moveDefinitions.POST,
+          logger,
+          user,
+        )("node-moved", {
+          from,
+          to,
+        });
+      }
 
-      return success({ responseFrom: from, responseTo: to, nodesAffected });
+      return success({
+        responseFrom: from,
+        responseTo: to,
+        nodesAffected,
+      });
     } catch (error) {
       logger.error("Cortex move failed", parseError(error), { from, to });
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Cross-instance applier for `node-moved`: re-run the move on this instance with
+   * the relayed from/to. Reuses moveNode so there is one move code path.
+   */
+  static async applyRemoteMove({
+    requestData,
+    user,
+    logger,
+    locale,
+  }: RemoteEventHandlerProps<
+    typeof moveDefinitions.POST,
+    "node-moved"
+  >): Promise<void> {
+    const { t } = scopedTranslation.scopedT(locale);
+    const result = await this.moveNode({
+      userId: user.id,
+      user,
+      locale: defaultLocale,
+      from: requestData.from,
+      to: requestData.to,
+      logger,
+      t,
+      relayed: true,
+    });
+    if (!result.success) {
+      logger.error("Failed to apply remote cortex move", {
+        message: result.message,
       });
     }
   }

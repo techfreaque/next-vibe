@@ -62,17 +62,17 @@ const { GET } = createEndpoint({
           children: {
             path: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "folders.path.label",
+              label: "folders.path.label",
               schema: z.string(),
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "folders.name.label",
+              label: "folders.name.label",
               schema: z.string(),
             }),
             displayName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "folders.displayName.label",
+              label: "folders.displayName.label",
               schema: z.string().optional(),
             }),
             specialUseType: responseField(scopedTranslation, {
@@ -82,12 +82,12 @@ const { GET } = createEndpoint({
             }),
             messageCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "folders.messageCount.label",
+              label: "folders.messageCount.label",
               schema: z.number().int(),
             }),
             unseenCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "folders.unseenCount.label",
+              label: "folders.unseenCount.label",
               schema: z.number().int(),
             }),
           },

@@ -22,7 +22,7 @@ import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-sp
 import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/types/json";
+import type { RemoteEventHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { createEndpointEmitter } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -45,7 +45,6 @@ import favoriteByIdDefinitions, {
   type FavoriteDeleteUrlVariablesOutput,
   type FavoriteGetResponseOutput,
   type FavoriteGetUrlVariablesOutput,
-  type FavoriteUpdatedEventPayload,
   type FavoriteUpdateRequestOutput,
   type FavoriteUpdateResponseOutput,
   type FavoriteUpdateUrlVariablesOutput,
@@ -616,17 +615,20 @@ export class SingleFavoriteRepository {
    * is one update code path. Server-to-server apply has no request locale; error
    * strings are only logged, so the platform default locale is fine.
    */
-  static async applyRemoteFavoriteUpdate(
-    payload: FavoriteUpdatedEventPayload,
-    id: string,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  static async applyRemoteFavoriteUpdate({
+    requestData,
+    urlPathParams,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof favoriteByIdDefinitions.PATCH,
+    "favorite-updated"
+  >): Promise<void> {
     const locale = defaultLocale;
     const { t } = scopedTranslation.scopedT(locale);
     const result = await this.updateFavorite(
-      payload,
-      { id },
+      requestData,
+      { id: urlPathParams.id },
       user,
       logger,
       t,
@@ -646,16 +648,17 @@ export class SingleFavoriteRepository {
    * the slug on the event's urlPathParams, scoped to the user. The event is a
    * side-effect event (a delete has no request body), so `payload` is empty.
    */
-  static async applyRemoteFavoriteDelete(
-    payload: WidgetData,
-    slug: string,
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<void> {
-    void payload;
+  static async applyRemoteFavoriteDelete({
+    urlPathParams,
+    user,
+    logger,
+  }: RemoteEventHandlerProps<
+    typeof favoriteByIdDefinitions.DELETE,
+    "favorite-deleted"
+  >): Promise<void> {
     await ChatFavoritesRepository.applyRemoteFavoriteDelete(
-      [{ id: slug }],
-      userId,
+      [{ id: urlPathParams.id }],
+      user.id,
       logger,
     );
   }

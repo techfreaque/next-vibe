@@ -92,13 +92,13 @@ const { POST } = createEndpoint({
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.success.title",
+        label: "fields.success.title",
         schema: z.boolean(),
       }),
 
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.output.title",
+        label: "fields.output.title",
         schema: z.string(),
       }),
 
@@ -113,43 +113,43 @@ const { POST } = createEndpoint({
           children: {
             guardId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "fields.guardId.title",
+              label: "fields.guardId.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             username: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "fields.username.title",
+              label: "fields.username.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             projectPath: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "fields.projectPath.title",
+              label: "fields.projectPath.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
             wasRunning: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "fields.wasRunning.title",
+              label: "fields.wasRunning.title",
               fieldType: FieldDataType.BOOLEAN,
               schema: z.boolean(),
             }),
             nowRunning: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "fields.nowRunning.title",
+              label: "fields.nowRunning.title",
               fieldType: FieldDataType.BOOLEAN,
               schema: z.boolean(),
             }),
             pid: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "fields.pid.title",
+              label: "fields.pid.title",
               fieldType: FieldDataType.NUMBER,
               schema: z.coerce.number().optional(),
             }),
             forceStopped: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "fields.forceStopped.title",
+              label: "fields.forceStopped.title",
               fieldType: FieldDataType.BOOLEAN,
               schema: z.boolean().optional(),
             }),
@@ -159,7 +159,7 @@ const { POST } = createEndpoint({
 
       totalStopped: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "fields.totalStopped.title",
+        label: "fields.totalStopped.title",
         schema: z.coerce.number().optional(),
       }),
     },

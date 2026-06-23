@@ -55,7 +55,7 @@ const { DELETE } = createEndpoint({
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        content: "revoke.response.message",
+        label: "revoke.response.message",
         schema: z.string(),
       }),
     },

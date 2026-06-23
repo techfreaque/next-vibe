@@ -56,6 +56,7 @@ export function NotSelfClosing(): React.ReactElement {
 
       <input type="text"></input>
       <hr></hr>
+      <input type="radio"></input>
     </div>
   );
 }
@@ -63,6 +64,11 @@ export function NotSelfClosing(): React.ReactElement {
 // react/no-unknown-property - Unknown DOM property
 export function UnknownProperty(): React.ReactElement {
   return <div class="wrong">Should use className</div>;
+}
+
+// next/no-img-element - warning for raw <img> usage
+export function ImgWarning(): React.ReactElement {
+  return <img src="photo.jpg" alt="test" />;
 }
 
 // Hook rules violations

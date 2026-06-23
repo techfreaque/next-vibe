@@ -20,8 +20,7 @@ export const { POST, tools } = endpointsHandler({
         t,
       }),
     onRemoteEvent: {
-      "node-written": (payload, ctx) =>
-        CortexWriteRepository.applyRemoteWrite(payload, ctx.user, ctx.logger),
+      "node-written": (props) => CortexWriteRepository.applyRemoteWrite(props),
     },
   },
 });

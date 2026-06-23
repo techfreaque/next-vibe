@@ -52,6 +52,208 @@ import {
 } from "../core/modality-resolver";
 import { ProviderFactory } from "../core/provider-factory";
 
+const BRIDGE_PROMPTS = {
+  image: `You are a vision bridge. Your output will be the ONLY representation of this image that another AI model will ever receive - it cannot see the image itself.
+
+Describe everything you observe with maximum fidelity and detail:
+- **Subject & composition**: What is the main subject? How is it framed and positioned?
+- **Objects & elements**: List every significant object, person, animal, text, symbol, or UI element present.
+- **Text & typography**: Transcribe ALL text visible in the image exactly as written, including signs, labels, captions, watermarks, UI text.
+- **Colors**: Describe colors precisely (e.g. "deep burgundy", "muted sage green") - not just "red" or "green".
+- **Spatial layout**: Where are things relative to each other? Foreground/background, left/right, overlapping?
+- **Style & medium**: Is it a photograph, illustration, screenshot, chart, diagram, painting? What visual style?
+- **Mood & lighting**: What is the atmosphere, lighting condition, time of day if relevant?
+- **Fine details**: Expressions, textures, patterns, any small but potentially meaningful details.
+
+Write in flowing prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this image from your description alone.`,
+
+  audio: `You are an audio bridge. Your output will be the ONLY representation of this audio that another AI model will ever receive - it cannot hear the audio itself.
+
+Transcribe and describe everything you hear with maximum fidelity and detail:
+
+**If speech is present:**
+- Transcribe ALL spoken words verbatim, exactly as said, including filler words, hesitations, repetitions
+- Note speaker characteristics: accent, gender, age estimate, emotional tone, speaking pace
+- Note any background voices or overlapping speech
+
+**If music is present:**
+- Genre, subgenre, and closest reference artists or songs
+- Tempo (BPM estimate), key/scale if discernible, time signature
+- All instruments heard and how they interact (e.g. "driving 808 bass under a sparse piano melody")
+- Vocals: lyrics verbatim if present, vocal style, harmonies
+- Song structure: intro, verse, chorus, bridge - what happens when
+- Production style: raw/lo-fi vs polished, reverb, effects, notable characteristics
+- Mood and emotional arc over the duration
+
+**For any audio:**
+- Duration impression (short clip, full track, extended)
+- Sound quality, recording environment (studio, room, outdoor, phone mic)
+- Any notable sound effects, ambient sounds, or non-musical audio events
+- If silence or near-silence: note that explicitly
+
+Write in structured prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this audio from your description alone.`,
+
+  video: `You are a video bridge. Your output will be the ONLY representation of this video that another AI model will ever receive - it cannot see or hear it.
+
+Describe everything with maximum fidelity and detail:
+
+**Visual content (frame by frame if needed):**
+- What happens over time: describe the sequence of scenes, actions, or changes
+- Every significant person, object, animal, text, or UI element visible
+- Setting/environment: indoor/outdoor, location cues, time of day, era
+- Camera work: cuts, pans, zooms, angles, shot types (close-up, wide, POV)
+- Text on screen: transcribe ALL text exactly - titles, captions, subtitles, UI labels, watermarks
+
+**Audio (if present):**
+- Transcribe ALL speech verbatim, including who is speaking if identifiable
+- Background music: genre, tempo, mood, instruments
+- Sound effects, ambient audio, notable audio events
+
+**Style & production:**
+- Is it a movie, TV show, social media clip, screen recording, animation, news broadcast, tutorial?
+- Visual style: realistic, animated, stylized, filtered, documentary?
+- Production quality: professional, amateur, lo-fi?
+
+**Mood & arc:**
+- What is the emotional tone at the start vs end?
+- Is there a narrative, argument, or demonstration being made?
+
+**Duration & pacing:**
+- Approximate length, pacing (slow/fast cuts, talking speed)
+
+Write in structured prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this video from your description alone.`,
+};
+
+/**
+ * Build a FilePart from a raw part that has either `.data` or `.url`.
+ * Returns null if neither is present.
+ */
+function resolveFilePart(
+  part: FilePart,
+  defaultMimeType: string,
+): FilePart | null {
+  const mimeType =
+    "mediaType" in part && part.mediaType
+      ? String(part.mediaType)
+      : defaultMimeType;
+
+  if ("data" in part && part.data) {
+    return {
+      type: "file" as const,
+      data: part.data,
+      mediaType: mimeType as `${string}/${string}`,
+    };
+  }
+  if ("url" in part && part.url) {
+    return {
+      type: "file" as const,
+      data: new URL(String(part.url)),
+      mediaType: mimeType as `${string}/${string}`,
+    };
+  }
+  return null;
+}
+
+/**
+ * Shared tail for all bridge calls: run aiGenerateText, emit completion, deduct credits.
+ */
+type BridgeModelId =
+  | ChatModelId
+  | ImageVisionModelId
+  | VideoVisionModelId
+  | AudioVisionModelId;
+
+async function runBridgeCall(params: {
+  model: ModelOptionTokenBased;
+  modelId: BridgeModelId;
+  provider: ReturnType<typeof ProviderFactory.getProviderForModel>;
+  contentPart: ImagePart | FilePart;
+  promptText: string;
+  abortSignal: AbortSignal;
+  chatMessageId: string | null;
+  bridgeType: "stt" | "vision" | "translation" | "tts";
+  modality: Modality;
+  creditFeature: string;
+  dbWriter: MessageDbWriter;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
+  errorLabel: string;
+}): Promise<string | null> {
+  const {
+    model,
+    modelId,
+    provider,
+    contentPart,
+    promptText,
+    abortSignal,
+    chatMessageId,
+    bridgeType,
+    modality,
+    creditFeature,
+    dbWriter,
+    user,
+    logger,
+    errorLabel,
+  } = params;
+
+  try {
+    const result = await aiGenerateText({
+      model: provider.chat(model.providerModel) as LanguageModel,
+      abortSignal,
+      messages: [
+        {
+          role: "user" as const,
+          content: [contentPart, { type: "text" as const, text: promptText }],
+        },
+      ],
+    });
+
+    const output = result.text.trim();
+    const creditCost = calculateCreditCost(
+      model,
+      result.usage.inputTokens ?? 0,
+      result.usage.outputTokens ?? 0,
+    );
+
+    if (chatMessageId && output) {
+      const variant: MessageVariant = {
+        modality: "text" as Modality,
+        content: output,
+        modelId,
+        creditCost,
+        createdAt: new Date().toISOString(),
+        bridgeType,
+      };
+
+      await dbWriter.emitGapFillCompleted({
+        messageId: chatMessageId,
+        bridgeType,
+        modality,
+        variant,
+      });
+
+      if (creditCost > 0) {
+        await dbWriter.deductAndEmitCredits({
+          user,
+          amount: creditCost,
+          feature: creditFeature,
+          type: "model",
+          model: modelId,
+        });
+      }
+    }
+
+    return output || null;
+  } catch (err) {
+    logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
+      error: err instanceof Error ? err.message : String(err),
+      modality,
+      bridgeType,
+    });
+    return null;
+  }
+}
+
 /**
  * Run gap-fill on all messages in the history that have attachments the
  * active model cannot handle natively.
@@ -493,105 +695,34 @@ export class GapFillExecutor {
       return null;
     }
 
-    // Get the correct provider for the vision model (not the active model's provider)
-    const visionProvider = ProviderFactory.getProviderForModel(
-      visionModel,
-      logger,
-    );
+    // ImagePart.image is DataContent | URL — AI SDK accepts it natively
+    if (!part.image) {
+      logger.warn("[GapFill] Image part has no image data, skipping");
+      return null;
+    }
 
-    try {
-      // Build vision prompt
-      // ImagePart.image is DataContent | URL - can be a base64 string, data URI, Uint8Array, or URL object
-      const imageField = part.image;
-
-      if (!imageField) {
-        logger.warn("[GapFill] Image part has no image data, skipping");
-        return null;
-      }
-
-      // Pass image directly to generateText - the AI SDK accepts DataContent | URL natively
-      const imageContent = {
+    return runBridgeCall({
+      model: visionModel,
+      modelId: visionModel.id,
+      provider: ProviderFactory.getProviderForModel(visionModel, logger),
+      contentPart: {
         type: "image" as const,
-        image: imageField,
+        image: part.image,
         ...(part.mediaType
           ? { mimeType: part.mediaType as `image/${string}` }
           : {}),
-      };
-
-      const result = await aiGenerateText({
-        model: visionProvider.chat(visionModel.providerModel) as LanguageModel,
-        abortSignal: params.abortSignal,
-        messages: [
-          {
-            role: "user" as const,
-            content: [
-              imageContent,
-              {
-                type: "text" as const,
-                text: `You are a vision bridge. Your output will be the ONLY representation of this image that another AI model will ever receive - it cannot see the image itself.
-
-Describe everything you observe with maximum fidelity and detail:
-- **Subject & composition**: What is the main subject? How is it framed and positioned?
-- **Objects & elements**: List every significant object, person, animal, text, symbol, or UI element present.
-- **Text & typography**: Transcribe ALL text visible in the image exactly as written, including signs, labels, captions, watermarks, UI text.
-- **Colors**: Describe colors precisely (e.g. "deep burgundy", "muted sage green") - not just "red" or "green".
-- **Spatial layout**: Where are things relative to each other? Foreground/background, left/right, overlapping?
-- **Style & medium**: Is it a photograph, illustration, screenshot, chart, diagram, painting? What visual style?
-- **Mood & lighting**: What is the atmosphere, lighting condition, time of day if relevant?
-- **Fine details**: Expressions, textures, patterns, any small but potentially meaningful details.
-
-Write in flowing prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this image from your description alone.`,
-              },
-            ],
-          },
-        ],
-      });
-
-      const description = result.text.trim();
-      const creditCost = calculateCreditCost(
-        visionModel,
-        result.usage.inputTokens ?? 0,
-        result.usage.outputTokens ?? 0,
-      );
-
-      if (chatMessageId && description) {
-        const variant = {
-          modality: "text" as Modality,
-          content: description,
-          modelId: visionModel.id,
-          creditCost,
-          createdAt: new Date().toISOString(),
-          bridgeType,
-        };
-
-        await dbWriter.emitGapFillCompleted({
-          messageId: chatMessageId,
-          bridgeType,
-          modality,
-          variant,
-        });
-
-        // Deduct credits for the vision bridge call
-        if (creditCost > 0) {
-          await dbWriter.deductAndEmitCredits({
-            user,
-            amount: creditCost,
-            feature: `vision-bridge:${visionModel.id}`,
-            type: "model",
-            model: visionModel.id,
-          });
-        }
-      }
-
-      return description || null;
-    } catch (err) {
-      logger.warn("[GapFill] Vision bridge call failed", {
-        error: err instanceof Error ? err.message : String(err),
-        modality,
-        bridgeType,
-      });
-      return null;
-    }
+      },
+      promptText: BRIDGE_PROMPTS.image,
+      abortSignal: params.abortSignal,
+      chatMessageId,
+      bridgeType,
+      modality,
+      creditFeature: `vision-bridge:${visionModel.id}`,
+      dbWriter,
+      user,
+      logger,
+      errorLabel: "Vision",
+    });
   }
 
   private static async bridgeStt(params: {
@@ -634,124 +765,30 @@ Write in flowing prose. Do not summarize. Do not omit. The receiving AI must be 
       return null;
     }
 
-    const audioVisionProvider = ProviderFactory.getProviderForModel(
-      audioVisionModel,
-      logger,
-    );
-
-    try {
-      const mimeType =
-        "mediaType" in part && part.mediaType
-          ? String(part.mediaType)
-          : "audio/webm";
-
-      let fileData: FilePart;
-      if ("data" in part && part.data) {
-        fileData = {
-          type: "file" as const,
-          data: part.data,
-          mediaType: mimeType as `audio/${string}`,
-        };
-      } else if ("url" in part && part.url) {
-        fileData = {
-          type: "file" as const,
-          data: new URL(String(part.url)),
-          mediaType: mimeType as `audio/${string}`,
-        };
-      } else {
-        logger.warn(
-          "[GapFill] Audio FilePart has no data or url, skipping audio-vision bridge",
-        );
-        return null;
-      }
-
-      const result = await aiGenerateText({
-        model: audioVisionProvider.chat(
-          audioVisionModel.providerModel,
-        ) as LanguageModel,
-        abortSignal: params.abortSignal,
-        messages: [
-          {
-            role: "user" as const,
-            content: [
-              fileData,
-              {
-                type: "text" as const,
-                text: `You are an audio bridge. Your output will be the ONLY representation of this audio that another AI model will ever receive - it cannot hear the audio itself.
-
-Transcribe and describe everything you hear with maximum fidelity and detail:
-
-**If speech is present:**
-- Transcribe ALL spoken words verbatim, exactly as said, including filler words, hesitations, repetitions
-- Note speaker characteristics: accent, gender, age estimate, emotional tone, speaking pace
-- Note any background voices or overlapping speech
-
-**If music is present:**
-- Genre, subgenre, and closest reference artists or songs
-- Tempo (BPM estimate), key/scale if discernible, time signature
-- All instruments heard and how they interact (e.g. "driving 808 bass under a sparse piano melody")
-- Vocals: lyrics verbatim if present, vocal style, harmonies
-- Song structure: intro, verse, chorus, bridge - what happens when
-- Production style: raw/lo-fi vs polished, reverb, effects notable characteristics
-- Mood and emotional arc over the duration
-
-**For any audio:**
-- Duration impression (short clip, full track, extended)
-- Sound quality, recording environment (studio, room, outdoor, phone mic)
-- Any notable sound effects, ambient sounds, or non-musical audio events
-- If silence or near-silence: note that explicitly
-
-Write in structured prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this audio from your description alone.`,
-              },
-            ],
-          },
-        ],
-      });
-
-      const transcript = result.text.trim();
-      const creditCost = calculateCreditCost(
-        audioVisionModel,
-        result.usage.inputTokens ?? 0,
-        result.usage.outputTokens ?? 0,
+    const fileData = resolveFilePart(part, "audio/webm");
+    if (!fileData) {
+      logger.warn(
+        "[GapFill] Audio FilePart has no data or url, skipping audio-vision bridge",
       );
-
-      if (chatMessageId && transcript) {
-        const variant = {
-          modality: "text" as Modality,
-          content: transcript,
-          modelId: audioVisionModel.id,
-          creditCost,
-          createdAt: new Date().toISOString(),
-          bridgeType,
-        };
-
-        await dbWriter.emitGapFillCompleted({
-          messageId: chatMessageId,
-          bridgeType,
-          modality,
-          variant,
-        });
-
-        if (creditCost > 0) {
-          await dbWriter.deductAndEmitCredits({
-            user,
-            amount: creditCost,
-            feature: `audio-vision-bridge:${audioVisionModel.id}`,
-            type: "model",
-            model: audioVisionModel.id,
-          });
-        }
-      }
-
-      return transcript || null;
-    } catch (err) {
-      logger.warn("[GapFill] Audio-vision LLM bridge call failed", {
-        error: err instanceof Error ? err.message : String(err),
-        modality,
-        bridgeType,
-      });
       return null;
     }
+
+    return runBridgeCall({
+      model: audioVisionModel,
+      modelId: audioVisionModel.id,
+      provider: ProviderFactory.getProviderForModel(audioVisionModel, logger),
+      contentPart: fileData,
+      promptText: BRIDGE_PROMPTS.audio,
+      abortSignal: params.abortSignal,
+      chatMessageId,
+      bridgeType,
+      modality,
+      creditFeature: `audio-vision-bridge:${audioVisionModel.id}`,
+      dbWriter,
+      user,
+      logger,
+      errorLabel: "Audio-vision LLM",
+    });
   }
 
   /**
@@ -796,128 +833,28 @@ Write in structured prose. Do not summarize. Do not omit. The receiving AI must 
       return null;
     }
 
-    const videoVisionProvider = ProviderFactory.getProviderForModel(
-      videoVisionModel,
-      logger,
-    );
-
-    try {
-      // Build file part - pass data or URL depending on what's available
-      let fileData: FilePart;
-      if ("data" in part && part.data) {
-        fileData = {
-          type: "file" as const,
-          data: part.data,
-          mediaType:
-            "mediaType" in part && part.mediaType
-              ? (part.mediaType as `video/${string}`)
-              : "video/mp4",
-        };
-      } else if ("url" in part && part.url) {
-        fileData = {
-          type: "file" as const,
-          data: new URL(String(part.url)),
-          mediaType:
-            "mediaType" in part && part.mediaType
-              ? (part.mediaType as `video/${string}`)
-              : "video/mp4",
-        };
-      } else {
-        logger.warn("[GapFill] Video FilePart has no data or url, skipping");
-        return null;
-      }
-
-      const result = await aiGenerateText({
-        model: videoVisionProvider.chat(
-          videoVisionModel.providerModel,
-        ) as LanguageModel,
-        abortSignal: params.abortSignal,
-        messages: [
-          {
-            role: "user" as const,
-            content: [
-              fileData,
-              {
-                type: "text" as const,
-                text: `You are a video bridge. Your output will be the ONLY representation of this video that another AI model will ever receive - it cannot see or hear it.
-
-Describe everything with maximum fidelity and detail:
-
-**Visual content (frame by frame if needed):**
-- What happens over time: describe the sequence of scenes, actions, or changes
-- Every significant person, object, animal, text, or UI element visible
-- Setting/environment: indoor/outdoor, location cues, time of day, era
-- Camera work: cuts, pans, zooms, angles, shot types (close-up, wide, POV)
-- Text on screen: transcribe ALL text exactly - titles, captions, subtitles, UI labels, watermarks
-
-**Audio (if present):**
-- Transcribe ALL speech verbatim, including who is speaking if identifiable
-- Background music: genre, tempo, mood, instruments
-- Sound effects, ambient audio, notable audio events
-
-**Style & production:**
-- Is it a movie, TV show, social media clip, screen recording, animation, news broadcast, tutorial?
-- Visual style: realistic, animated, stylized, filtered, documentary?
-- Production quality: professional, amateur, lo-fi?
-
-**Mood & arc:**
-- What is the emotional tone at the start vs end?
-- Is there a narrative, argument, or demonstration being made?
-
-**Duration & pacing:**
-- Approximate length, pacing (slow/fast cuts, talking speed)
-
-Write in structured prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this video from your description alone.`,
-              },
-            ],
-          },
-        ],
-      });
-
-      const description = result.text.trim();
-      const creditCost = calculateCreditCost(
-        videoVisionModel,
-        result.usage.inputTokens ?? 0,
-        result.usage.outputTokens ?? 0,
-      );
-
-      if (chatMessageId && description) {
-        const variant = {
-          modality: "text" as Modality,
-          content: description,
-          modelId: videoVisionModel.id,
-          creditCost,
-          createdAt: new Date().toISOString(),
-          bridgeType,
-        };
-
-        await dbWriter.emitGapFillCompleted({
-          messageId: chatMessageId,
-          bridgeType,
-          modality,
-          variant,
-        });
-
-        if (creditCost > 0) {
-          await dbWriter.deductAndEmitCredits({
-            user,
-            amount: creditCost,
-            feature: `video-vision-bridge:${videoVisionModel.id}`,
-            type: "model",
-            model: videoVisionModel.id,
-          });
-        }
-      }
-
-      return description || null;
-    } catch (err) {
-      logger.warn("[GapFill] Video vision bridge call failed", {
-        error: err instanceof Error ? err.message : String(err),
-        modality,
-        bridgeType,
-      });
+    const fileData = resolveFilePart(part, "video/mp4");
+    if (!fileData) {
+      logger.warn("[GapFill] Video FilePart has no data or url, skipping");
       return null;
     }
+
+    return runBridgeCall({
+      model: videoVisionModel,
+      modelId: videoVisionModel.id,
+      provider: ProviderFactory.getProviderForModel(videoVisionModel, logger),
+      contentPart: fileData,
+      promptText: BRIDGE_PROMPTS.video,
+      abortSignal: params.abortSignal,
+      chatMessageId,
+      bridgeType,
+      modality,
+      creditFeature: `video-vision-bridge:${videoVisionModel.id}`,
+      dbWriter,
+      user,
+      logger,
+      errorLabel: "Video vision",
+    });
   }
 
   /**
@@ -981,75 +918,11 @@ Write in structured prose. Do not summarize. Do not omit. The receiving AI must 
     );
 
     const promptText =
-      modality === "image"
-        ? `You are a vision bridge. Your output will be the ONLY representation of this image that another AI model will ever receive - it cannot see the image itself.
-
-Describe everything you observe with maximum fidelity and detail:
-- **Subject & composition**: What is the main subject? How is it framed and positioned?
-- **Objects & elements**: List every significant object, person, animal, text, symbol, or UI element present.
-- **Text & typography**: Transcribe ALL text visible in the image exactly as written, including signs, labels, captions, watermarks, UI text.
-- **Colors**: Describe colors precisely (e.g. "deep burgundy", "muted sage green") - not just "red" or "green".
-- **Spatial layout**: Where are things relative to each other? Foreground/background, left/right, overlapping?
-- **Style & medium**: Is it a photograph, illustration, screenshot, chart, diagram, painting? What visual style?
-- **Mood & lighting**: What is the atmosphere, lighting condition, time of day if relevant?
-- **Fine details**: Expressions, textures, patterns, any small but potentially meaningful details.
-
-Write in flowing prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this image from your description alone.`
-        : modality === "video"
-          ? `You are a video bridge. Your output will be the ONLY representation of this video that another AI model will ever receive - it cannot see or hear it.
-
-Describe everything with maximum fidelity and detail:
-
-**Visual content (frame by frame if needed):**
-- What happens over time: describe the sequence of scenes, actions, or changes
-- Every significant person, object, animal, text, or UI element visible
-- Setting/environment: indoor/outdoor, location cues, time of day, era
-- Camera work: cuts, pans, zooms, angles, shot types (close-up, wide, POV)
-- Text on screen: transcribe ALL text exactly - titles, captions, subtitles, UI labels, watermarks
-
-**Audio (if present):**
-- Transcribe ALL speech verbatim, including who is speaking if identifiable
-- Background music: genre, tempo, mood, instruments
-- Sound effects, ambient audio, notable audio events
-
-**Style & production:**
-- Is it a movie, TV show, social media clip, screen recording, animation, news broadcast, tutorial?
-- Visual style: realistic, animated, stylized, filtered, documentary?
-- Production quality: professional, amateur, lo-fi?
-
-**Mood & arc:**
-- What is the emotional tone at the start vs end?
-- Is there a narrative, argument, or demonstration being made?
-
-**Duration & pacing:**
-- Approximate length, pacing (slow/fast cuts, talking speed)
-
-Write in structured prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this video from your description alone.`
-          : `You are an audio bridge. Your output will be the ONLY representation of this audio that another AI model will ever receive - it cannot hear the audio itself.
-
-Transcribe and describe everything you hear with maximum fidelity and detail:
-
-**If speech is present:**
-- Transcribe ALL spoken words verbatim, exactly as said, including filler words, hesitations, repetitions
-- Note speaker characteristics: accent, gender, age estimate, emotional tone, speaking pace
-- Note any background voices or overlapping speech
-
-**If music is present:**
-- Genre, subgenre, and closest reference artists or songs
-- Tempo (BPM estimate), key/scale if discernible, time signature
-- All instruments heard and how they interact (e.g. "driving 808 bass under a sparse piano melody")
-- Vocals: lyrics verbatim if present, vocal style, harmonies
-- Song structure: intro, verse, chorus, bridge - what happens when
-- Production style: raw/lo-fi vs polished, reverb, effects, notable characteristics
-- Mood and emotional arc over the duration
-
-**For any audio:**
-- Duration impression (short clip, full track, extended)
-- Sound quality, recording environment (studio, room, outdoor, phone mic)
-- Any notable sound effects, ambient sounds, or non-musical audio events
-- If silence or near-silence: note that explicitly
-
-Write in structured prose. Do not summarize. Do not omit. The receiving AI must be able to reconstruct a near-perfect mental model of this audio from your description alone.`;
+      modality === "video"
+        ? BRIDGE_PROMPTS.video
+        : modality === "audio"
+          ? BRIDGE_PROMPTS.audio
+          : BRIDGE_PROMPTS.image;
 
     // Resolve media bytes via direct storage access (bypasses HTTP auth) or HTTP fetch.
     // Direct storage is preferred because:

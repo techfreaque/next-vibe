@@ -1243,7 +1243,7 @@ const { POST } = createEndpoint({
 
       output: responseField(scopedTranslation, {
         type: WidgetType.CODE_OUTPUT,
-        content: "post.fields.buildOutput.title",
+        label: "post.fields.buildOutput.title",
         language: "plaintext",
         icon: "terminal",
         schema: z.string(),
@@ -1251,7 +1251,7 @@ const { POST } = createEndpoint({
 
       duration: responseField(scopedTranslation, {
         type: WidgetType.STAT,
-        content: "post.fields.duration.title",
+        label: "post.fields.duration.title",
         icon: "clock",
         suffix: "ms",
         schema: z.coerce.number(),
@@ -1264,7 +1264,7 @@ const { POST } = createEndpoint({
         icon: "check-circle",
         child: responseField(scopedTranslation, {
           type: WidgetType.TEXT,
-          content: "post.fields.filesBuilt.item",
+          label: "post.fields.filesBuilt.item",
           schema: z.string(),
         }),
       }),
@@ -1276,14 +1276,14 @@ const { POST } = createEndpoint({
         icon: "copy",
         child: responseField(scopedTranslation, {
           type: WidgetType.TEXT,
-          content: "post.fields.filesCopied.item",
+          label: "post.fields.filesCopied.item",
           schema: z.string(),
         }),
       }),
 
       packageJson: responseField(scopedTranslation, {
         type: WidgetType.CODE_OUTPUT,
-        content: "post.fields.packageJson.title",
+        label: "post.fields.packageJson.title",
         language: "json",
         optional: true,
         icon: "file-json",
@@ -1292,7 +1292,7 @@ const { POST } = createEndpoint({
 
       profileUsed: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        content: "post.fields.profileUsed.title",
+        label: "post.fields.profileUsed.title",
         optional: true,
         icon: "layers",
         schema: z.enum(BuildProfileEnum).optional(),
@@ -1300,7 +1300,7 @@ const { POST } = createEndpoint({
 
       reportPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.reportPath.title",
+        label: "post.fields.reportPath.title",
         schema: z.string().optional(),
       }),
 
@@ -1316,7 +1316,7 @@ const { POST } = createEndpoint({
           children: {
             step: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "post.fields.stepTimings.step",
+              label: "post.fields.stepTimings.step",
               icon: "chevron-right",
               schema: z.string(),
             }),

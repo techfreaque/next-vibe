@@ -49,14 +49,14 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-focused-window.response.success",
+        label: "get-focused-window.response.success",
         schema: z
           .boolean()
           .describe("Whether the window info retrieval succeeded"),
       }),
       windowId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-focused-window.response.windowId",
+        label: "get-focused-window.response.windowId",
         schema: z
           .string()
           .optional()
@@ -64,7 +64,7 @@ const { POST } = createEndpoint({
       }),
       windowTitle: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-focused-window.response.windowTitle",
+        label: "get-focused-window.response.windowTitle",
         schema: z
           .string()
           .optional()
@@ -72,7 +72,7 @@ const { POST } = createEndpoint({
       }),
       pid: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-focused-window.response.pid",
+        label: "get-focused-window.response.pid",
         schema: z
           .number()
           .optional()
@@ -80,17 +80,17 @@ const { POST } = createEndpoint({
       }),
       width: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-focused-window.response.width",
+        label: "get-focused-window.response.width",
         schema: z.number().optional().describe("Window width in pixels"),
       }),
       height: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-focused-window.response.height",
+        label: "get-focused-window.response.height",
         schema: z.number().optional().describe("Window height in pixels"),
       }),
       monitor: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-focused-window.response.monitor",
+        label: "get-focused-window.response.monitor",
         schema: z
           .string()
           .optional()
@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-focused-window.response.error",
+        label: "get-focused-window.response.error",
         schema: z
           .string()
           .optional()
@@ -106,7 +106,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get-focused-window.response.executionId",
+        label: "get-focused-window.response.executionId",
         schema: z
           .string()
           .optional()

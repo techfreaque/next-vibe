@@ -131,22 +131,22 @@ const { POST } = createEndpoint({
         children: {
           success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.success",
+            label: "response.success",
             schema: z.boolean(),
           }),
           message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.message",
+            label: "response.message",
             schema: z.string(),
           }),
           securityTip: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.securityTip",
+            label: "response.securityTip",
             schema: z.string().optional(),
           }),
           nextSteps: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.nextSteps.item",
+            label: "response.nextSteps.item",
             schema: z.array(z.string()),
           }),
         },

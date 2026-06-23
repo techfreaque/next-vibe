@@ -90,6 +90,7 @@ export const translations = {
         senderName: "Sender Name",
         type: "Type",
         status: "Status",
+        channel: "Channel",
         templateName: "Template Name",
         emailProvider: "Email Provider",
         externalId: "External ID",
@@ -209,6 +210,19 @@ export const translations = {
     },
   },
   enums: {
+    status: {
+      pending: "Pending",
+      sent: "Sent",
+      delivered: "Delivered",
+      opened: "Opened",
+      clicked: "Clicked",
+      bounced: "Bounced",
+      failed: "Failed",
+      unsubscribed: "Unsubscribed",
+    },
+    statusFilter: {
+      any: "All Statuses",
+    },
     type: {
       transactional: "Transactional",
       marketing: "Marketing",

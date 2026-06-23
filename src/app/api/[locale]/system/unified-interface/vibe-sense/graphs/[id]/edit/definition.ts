@@ -92,7 +92,7 @@ const { PUT } = createEndpoint({
       }),
       newId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "put.response.newId",
+        label: "put.response.newId",
         schema: z.string(),
       }),
     },

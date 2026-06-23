@@ -52,7 +52,7 @@ export class ChatMessagesRepositoryClient {
       });
 
       return success({
-        streamingState: "idle" as const,
+        streamingState: ThreadStreamingState.IDLE,
         backgroundTasks: [],
         messages: messages.map((msg) => ({
           id: msg.id,

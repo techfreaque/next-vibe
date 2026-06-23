@@ -67,19 +67,19 @@ const { POST } = createEndpoint({
 
       voted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.voted.content" as const,
+        label: "post.response.voted.content" as const,
         schema: z.boolean(),
       }),
 
       voteCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.voteCount.content" as const,
+        label: "post.response.voteCount.content" as const,
         schema: z.number().int().nonnegative(),
       }),
 
       trustLevel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.trustLevel.content" as const,
+        label: "post.response.trustLevel.content" as const,
         schema: z.string(),
       }),
 
@@ -145,12 +145,10 @@ const { POST } = createEndpoint({
   events: {
     "skill-voted": {
       operation: "merge" as const,
-      fields: ["voteCount", "trustLevel"] as const,
-      onEvent: async ({ partial, urlPathParams, queryClient, logger }) => {
+      responseFields: ["voteCount", "trustLevel"] as const,
+      onEvent: async ({ responseData, urlPathParams, queryClient, logger }) => {
         const skillId = urlPathParams.id;
-        if (!skillId) {
-          return;
-        }
+
         const [{ apiClient }, skillsDefinition] = await Promise.all([
           import("@/app/api/[locale]/system/unified-interface/react/hooks/store"),
           import("../../definition"),
@@ -172,8 +170,8 @@ const { POST } = createEndpoint({
                     sk.skillId === skillId
                       ? {
                           ...sk,
-                          voteCount: partial.voteCount ?? sk.voteCount,
-                          trustLevel: partial.trustLevel ?? sk.trustLevel,
+                          voteCount: responseData.voteCount ?? sk.voteCount,
+                          trustLevel: responseData.trustLevel ?? sk.trustLevel,
                         }
                       : sk,
                   ),

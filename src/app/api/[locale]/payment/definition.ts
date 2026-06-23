@@ -108,12 +108,12 @@ const { GET } = createEndpoint({
       }),
       sessionUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.sessionUrl" as const,
+        label: "get.response.sessionUrl" as const,
         schema: z.string().url(),
       }),
       sessionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.sessionId" as const,
+        label: "get.response.sessionId" as const,
         schema: z.string(),
       }),
     },
@@ -269,17 +269,17 @@ const { POST } = createEndpoint({
       }),
       sessionUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.sessionUrl" as const,
+        label: "get.response.sessionUrl" as const,
         schema: z.string().url(),
       }),
       sessionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.sessionId" as const,
+        label: "get.response.sessionId" as const,
         schema: z.string(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "create.success.message" as const,
+        label: "create.success.message" as const,
         schema: z.string(),
       }),
     },

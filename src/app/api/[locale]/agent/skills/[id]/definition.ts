@@ -29,6 +29,7 @@ import {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { EventPayloads } from "@/app/api/[locale]/system/unified-interface/websocket/structured-events";
 import {
   UserPermissionRole,
   UserRole,
@@ -43,12 +44,13 @@ import {
 } from "../constants";
 import type { SkillListResponseOutput } from "../definition";
 import {
+  CategoryOptions,
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
+  SkillCategory,
   SkillOwnershipType,
 } from "../enum";
-import { CategoryOptions, SkillCategory } from "../enum";
 import { scopedTranslation } from "./i18n";
 
 const SkillEditContainer = lazyWidget(() =>
@@ -161,7 +163,7 @@ const { DELETE } = createEndpoint({
       title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         level: 5,
-        content: "delete.container.description" as const,
+        label: "delete.container.description" as const,
         usage: { request: "urlPathParams", response: true },
       }),
       // === URL PARAMETERS ===
@@ -1023,7 +1025,7 @@ const { GET } = createEndpoint({
       }),
 
       // === CREATOR ECONOMY FIELDS ===
-      longContent: responseField(scopedTranslation, {
+      longlabel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().nullable(),
@@ -1130,7 +1132,7 @@ const { GET } = createEndpoint({
         compactTrigger: null,
         availableTools: null,
         pinnedTools: null,
-        longContent: null,
+        longlabel: null,
         favoritesCount: 0,
         creatorProfile: null,
         variants: [
@@ -1165,7 +1167,7 @@ const { GET } = createEndpoint({
         compactTrigger: null,
         availableTools: null,
         pinnedTools: null,
-        longContent: null,
+        longlabel: null,
         favoritesCount: 42,
         creatorProfile: null,
         variants: [

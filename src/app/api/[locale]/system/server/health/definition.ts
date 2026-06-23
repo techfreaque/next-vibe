@@ -85,19 +85,19 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.status.title",
+        label: "get.response.status.title",
         schema: z.enum(["healthy", "warning", "critical", "unknown"]),
       }),
 
       timestamp: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.timestamp.title",
+        label: "get.response.timestamp.title",
         schema: z.string(),
       }),
 
       uptime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.response.uptime.title",
+        label: "get.response.uptime.title",
         schema: z.coerce.number(),
       }),
 
@@ -111,22 +111,22 @@ const { GET } = createEndpoint({
         children: {
           name: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.environment.name.title",
+            label: "get.response.environment.name.title",
             schema: z.string(),
           }),
           nodeEnv: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.environment.nodeEnv.title",
+            label: "get.response.environment.nodeEnv.title",
             schema: z.string(),
           }),
           platform: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.environment.platform.title",
+            label: "get.response.environment.platform.title",
             schema: z.string(),
           }),
           supportsTaskRunners: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.environment.supportsTaskRunners.title",
+            label: "get.response.environment.supportsTaskRunners.title",
             schema: z.boolean(),
           }),
         },
@@ -144,17 +144,17 @@ const { GET } = createEndpoint({
         children: {
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.database.status.title",
+            label: "get.response.database.status.title",
             schema: z.enum(["connected", "disconnected", "error", "unknown"]),
           }),
           responseTime: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.database.responseTime.title",
+            label: "get.response.database.responseTime.title",
             schema: z.coerce.number().optional(),
           }),
           error: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.database.error.title",
+            label: "get.response.database.error.title",
             schema: z.string().optional(),
           }),
         },
@@ -170,27 +170,27 @@ const { GET } = createEndpoint({
         children: {
           runnerStatus: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.tasks.runnerStatus.title",
+            label: "get.response.tasks.runnerStatus.title",
             schema: z.enum(["running", "stopped", "error", "unknown"]),
           }),
           activeTasks: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.tasks.activeTasks.title",
+            label: "get.response.tasks.activeTasks.title",
             schema: z.coerce.number(),
           }),
           totalTasks: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.tasks.totalTasks.title",
+            label: "get.response.tasks.totalTasks.title",
             schema: z.coerce.number(),
           }),
           errors: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.tasks.errors.title",
+            label: "get.response.tasks.errors.title",
             schema: z.coerce.number(),
           }),
           lastError: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "get.response.tasks.lastError.title",
+            label: "get.response.tasks.lastError.title",
             schema: z.string().optional(),
           }),
         },
@@ -214,17 +214,17 @@ const { GET } = createEndpoint({
             children: {
               used: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.system.memory.used.title",
+                label: "get.response.system.memory.used.title",
                 schema: z.coerce.number(),
               }),
               total: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.system.memory.total.title",
+                label: "get.response.system.memory.total.title",
                 schema: z.coerce.number(),
               }),
               percentage: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.system.memory.percentage.title",
+                label: "get.response.system.memory.percentage.title",
                 schema: z.coerce.number(),
               }),
             },
@@ -239,12 +239,12 @@ const { GET } = createEndpoint({
             children: {
               usage: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.system.cpu.usage.title",
+                label: "get.response.system.cpu.usage.title",
                 schema: z.coerce.number(),
               }),
               loadAverage: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.system.cpu.loadAverage.title",
+                label: "get.response.system.cpu.loadAverage.title",
                 schema: z.array(z.coerce.number()),
               }),
             },
@@ -259,17 +259,17 @@ const { GET } = createEndpoint({
             children: {
               available: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.system.disk.available.title",
+                label: "get.response.system.disk.available.title",
                 schema: z.coerce.number(),
               }),
               total: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.system.disk.total.title",
+                label: "get.response.system.disk.total.title",
                 schema: z.coerce.number(),
               }),
               percentage: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "get.response.system.disk.percentage.title",
+                label: "get.response.system.disk.percentage.title",
                 schema: z.coerce.number(),
               }),
             },
@@ -291,22 +291,22 @@ const { GET } = createEndpoint({
           children: {
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.checks.item.name.title",
+              label: "get.response.checks.item.name.title",
               schema: z.string(),
             }),
             status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.checks.item.status.title",
+              label: "get.response.checks.item.status.title",
               schema: z.enum(["pass", "fail", "warn"]),
             }),
             message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.checks.item.message.title",
+              label: "get.response.checks.item.message.title",
               schema: z.string().optional(),
             }),
             duration: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.checks.item.duration.title",
+              label: "get.response.checks.item.duration.title",
               schema: z.coerce.number().optional(),
             }),
           },

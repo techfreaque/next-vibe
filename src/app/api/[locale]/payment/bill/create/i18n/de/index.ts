@@ -6,6 +6,15 @@ export const translations: typeof enTranslations = {
     bill: "rechnung",
     ap: "kreditorenbuchhaltung",
   },
+  enums: {
+    billStatus: {
+      DRAFT: "Entwurf",
+      RECEIVED: "Eingegangen",
+      APPROVED: "Genehmigt",
+      PAID: "Bezahlt",
+      DISPUTED: "Strittig",
+    },
+  },
   post: {
     title: "Eingangsrechnung erfassen",
     titleShort: "Rechnung erstellen",

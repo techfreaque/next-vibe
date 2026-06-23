@@ -77,12 +77,12 @@ const { POST } = createEndpoint({
       }),
       nodeCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.nodeCount",
+        label: "post.response.nodeCount",
         schema: z.number(),
       }),
       errorCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.response.errorCount",
+        label: "post.response.errorCount",
         schema: z.number(),
       }),
     },

@@ -225,12 +225,12 @@ const { GET } = createEndpoint({
               children: {
                 id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "response.emails.item.id",
+                  label: "response.emails.item.id",
                   schema: z.uuid(),
                 }),
                 subject: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "response.emails.item.subject",
+                  label: "response.emails.item.subject",
                   schema: z.string(),
                 }),
                 status: responseField(scopedTranslation, {
@@ -263,12 +263,12 @@ const { GET } = createEndpoint({
                   children: {
                     recipientEmail: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
-                      content: "response.emails.item.recipientEmail",
+                      label: "response.emails.item.recipientEmail",
                       schema: z.string(),
                     }),
                     recipientName: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
-                      content: "response.emails.item.recipientName",
+                      label: "response.emails.item.recipientName",
                       schema: z.string().nullable(),
                     }),
                   },
@@ -281,12 +281,12 @@ const { GET } = createEndpoint({
                   children: {
                     senderEmail: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
-                      content: "response.emails.item.senderEmail",
+                      label: "response.emails.item.senderEmail",
                       schema: z.string(),
                     }),
                     senderName: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
-                      content: "response.emails.item.senderName",
+                      label: "response.emails.item.senderName",
                       schema: z.string().nullable(),
                     }),
                   },
@@ -309,7 +309,7 @@ const { GET } = createEndpoint({
                 }),
                 templateName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "response.emails.item.templateName",
+                  label: "response.emails.item.templateName",
                   schema: z.string().nullable(),
                 }),
               },
@@ -324,22 +324,22 @@ const { GET } = createEndpoint({
               children: {
                 sentAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "response.emails.item.sentAt",
+                  label: "response.emails.item.sentAt",
                   schema: dateSchema.nullable(),
                 }),
                 deliveredAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "response.emails.item.deliveredAt",
+                  label: "response.emails.item.deliveredAt",
                   schema: dateSchema.nullable(),
                 }),
                 openedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "response.emails.item.openedAt",
+                  label: "response.emails.item.openedAt",
                   schema: dateSchema.nullable(),
                 }),
                 clickedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "response.emails.item.clickedAt",
+                  label: "response.emails.item.clickedAt",
                   schema: dateSchema.nullable(),
                 }),
               },
@@ -355,12 +355,12 @@ const { GET } = createEndpoint({
               children: {
                 retryCount: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "response.emails.item.retryCount",
+                  label: "response.emails.item.retryCount",
                   schema: z.coerce.number().int(),
                 }),
                 error: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "response.emails.item.error",
+                  label: "response.emails.item.error",
                   schema: z.string().nullable(),
                 }),
                 associatedIds: objectField(scopedTranslation, {
@@ -371,12 +371,12 @@ const { GET } = createEndpoint({
                   children: {
                     userId: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
-                      content: "response.emails.item.userId",
+                      label: "response.emails.item.userId",
                       schema: z.string().nullable(),
                     }),
                     leadId: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
-                      content: "response.emails.item.leadId",
+                      label: "response.emails.item.leadId",
                       schema: z.string().nullable(),
                     }),
                   },
@@ -389,12 +389,12 @@ const { GET } = createEndpoint({
                   children: {
                     createdAt: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
-                      content: "response.emails.item.createdAt",
+                      label: "response.emails.item.createdAt",
                       schema: dateSchema,
                     }),
                     updatedAt: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
-                      content: "response.emails.item.updatedAt",
+                      label: "response.emails.item.updatedAt",
                       schema: dateSchema,
                     }),
                   },
@@ -415,22 +415,22 @@ const { GET } = createEndpoint({
         children: {
           page: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.pagination.page",
+            label: "response.pagination.page",
             schema: z.coerce.number().int().min(1),
           }),
           limit: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.pagination.limit",
+            label: "response.pagination.limit",
             schema: z.coerce.number().int().min(1),
           }),
           total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.pagination.total",
+            label: "response.pagination.total",
             schema: z.coerce.number().int().min(0),
           }),
           totalPages: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "response.pagination.totalPages",
+            label: "response.pagination.totalPages",
             schema: z.coerce.number().int().min(0),
           }),
         },
@@ -530,6 +530,7 @@ const { GET } = createEndpoint({
               id: "123e4567-e89b-12d3-a456-426614174000",
               subject: "Welcome to Our Amazing Service!",
               status: MessageStatus.DELIVERED,
+              channel: MessageChannel.EMAIL,
             },
             emailParties: {
               recipient: {
@@ -618,6 +619,7 @@ const { GET } = createEndpoint({
               id: "123e4567-e89b-12d3-a456-426614174000",
               subject: "Welcome to Our Amazing Service!",
               status: MessageStatus.DELIVERED,
+              channel: MessageChannel.EMAIL,
             },
             emailParties: {
               recipient: {

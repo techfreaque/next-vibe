@@ -6,6 +6,7 @@ import type {
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/logger/types";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
@@ -210,33 +211,21 @@ export interface SmsHandlerOptions {
 /**
  * Explicit interface for SMS handler configuration
  */
-export interface SmsHandler<
-  TRequest,
-  TResponse,
-  TUrlVariables,
-  TScopedTranslationKey extends string,
-> {
+export interface SmsHandler<TEndpoint extends CreateApiEndpointAny> {
   readonly ignoreErrors?: boolean;
   readonly render: SmsFunctionType<
-    TRequest,
-    TResponse,
-    TUrlVariables,
-    TScopedTranslationKey
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"],
+    TEndpoint["types"]["ScopedTranslationKey"]
   >;
 }
 
 /**
  * Explicit interface for SMS configuration
  */
-export interface SmsConfig<
-  TRequest,
-  TResponse,
-  TUrlVariables,
-  TScopedTranslationKey extends string,
-> {
-  afterHandlerSms?: ReadonlyArray<
-    SmsHandler<TRequest, TResponse, TUrlVariables, TScopedTranslationKey>
-  >;
+export interface SmsConfig<TEndpoint extends CreateApiEndpointAny> {
+  afterHandlerSms?: ReadonlyArray<SmsHandler<TEndpoint>>;
 }
 
 /**

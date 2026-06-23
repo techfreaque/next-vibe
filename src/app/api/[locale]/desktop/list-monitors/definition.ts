@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
       // Response fields
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list-monitors.response.success",
+        label: "list-monitors.response.success",
         schema: z.boolean().describe("Whether the monitor listing succeeded"),
       }),
       monitors: responseArrayField(scopedTranslation, {
@@ -65,43 +65,43 @@ const { POST } = createEndpoint({
           children: {
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list-monitors.response.monitors",
+              label: "list-monitors.response.monitors",
               schema: z
                 .string()
                 .describe("Monitor output name (e.g. DP-1, HDMI-1)"),
             }),
             index: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list-monitors.response.monitors",
+              label: "list-monitors.response.monitors",
               schema: z.number().int().describe("Zero-based monitor index"),
             }),
             x: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list-monitors.response.monitors",
+              label: "list-monitors.response.monitors",
               schema: z
                 .number()
                 .describe("X position in virtual desktop space"),
             }),
             y: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list-monitors.response.monitors",
+              label: "list-monitors.response.monitors",
               schema: z
                 .number()
                 .describe("Y position in virtual desktop space"),
             }),
             width: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list-monitors.response.monitors",
+              label: "list-monitors.response.monitors",
               schema: z.number().describe("Monitor width in pixels"),
             }),
             height: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list-monitors.response.monitors",
+              label: "list-monitors.response.monitors",
               schema: z.number().describe("Monitor height in pixels"),
             }),
             primary: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "list-monitors.response.monitors",
+              label: "list-monitors.response.monitors",
               schema: z
                 .boolean()
                 .describe("Whether this is the primary monitor"),
@@ -111,7 +111,7 @@ const { POST } = createEndpoint({
       }),
       error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list-monitors.response.error",
+        label: "list-monitors.response.error",
         schema: z
           .string()
           .optional()
@@ -119,7 +119,7 @@ const { POST } = createEndpoint({
       }),
       executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "list-monitors.response.executionId",
+        label: "list-monitors.response.executionId",
         schema: z
           .string()
           .optional()

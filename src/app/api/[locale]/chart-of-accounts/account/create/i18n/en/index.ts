@@ -33,6 +33,7 @@ export const translations = {
       FINANCIAL_INCOME: "Financial Income",
       FINANCIAL_EXPENSE: "Financial Expense",
       TAX_EXPENSE: "Tax Expense",
+      OTHER: "Other",
     },
   },
   post: {

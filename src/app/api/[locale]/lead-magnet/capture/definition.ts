@@ -79,12 +79,12 @@ export const { POST } = createEndpoint({
       }),
       nextStep: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "submit.response.nextStep" as const,
+        label: "submit.response.nextStep" as const,
         schema: z.enum(["signup", "already_subscribed"]),
       }),
       signupUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "submit.response.signupUrl" as const,
+        label: "submit.response.signupUrl" as const,
         schema: z.string(),
       }),
     },

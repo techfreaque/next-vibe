@@ -4,7 +4,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { messagesOnRemoteEvent, MessagesRepository } from "./repository";
+import { MessagesRemoteRepository, MessagesRepository } from "./repository";
 
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
@@ -12,7 +12,7 @@ export const { GET, POST, tools } = endpointsHandler({
     email: undefined,
     handler: ({ urlPathParams, user, t, logger, locale }) =>
       MessagesRepository.listMessages(urlPathParams, user, t, logger, locale),
-    canSubscribe: async ({ user, urlPathParams, logger }) => {
+    canSubscribe: async ({ user, urlPathParams, logger, locale }) => {
       const threadId = urlPathParams["threadId"];
       if (!threadId) {
         return false;
@@ -40,9 +40,25 @@ export const { GET, POST, tools } = endpointsHandler({
             .limit(1)
             .then(([f]) => f ?? null)
         : null;
-      return canViewThread(user, thread, folder, logger, "en-US");
+      return canViewThread(user, thread, folder, logger, locale);
     },
-    onRemoteEvent: messagesOnRemoteEvent,
+    onRemoteEvent: {
+      "message-created": (props) =>
+        MessagesRemoteRepository.applyRemoteMessageCreated(props),
+      error: (props) => MessagesRemoteRepository.applyRemoteError(props),
+      "content-done": (props) =>
+        MessagesRemoteRepository.applyRemoteContentDone(props),
+      "tool-result": (props) =>
+        MessagesRemoteRepository.applyRemoteToolResult(props),
+      "tool-result-updated": (props) =>
+        MessagesRemoteRepository.applyRemoteToolResultUpdated(props),
+      "tokens-updated": (props) =>
+        MessagesRemoteRepository.applyRemoteTokensUpdated(props),
+      "stream-finished": (props) =>
+        MessagesRemoteRepository.applyRemoteStreamFinished(props),
+      "streaming-state-changed": (props) =>
+        MessagesRemoteRepository.applyRemoteStreamingStateChanged(props),
+    },
   },
   [Methods.POST]: {
     email: undefined,

@@ -115,29 +115,29 @@ const { POST } = createEndpoint({
         children: {
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferCreate.post.response.id" as const,
+            label: "transferCreate.post.response.id" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferCreate.post.response.status" as const,
+            label: "transferCreate.post.response.status" as const,
             schema: z.string(),
           }),
           reference: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferCreate.post.response.reference" as const,
+            label: "transferCreate.post.response.reference" as const,
             schema: z.string().nullable(),
           }),
           fromWarehouseId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferCreate.post.response.fromWarehouseId" as const,
+            label: "transferCreate.post.response.fromWarehouseId" as const,
             hidden: true,
             schema: z.uuid(),
           }),
           toWarehouseId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "transferCreate.post.response.toWarehouseId" as const,
+            label: "transferCreate.post.response.toWarehouseId" as const,
             hidden: true,
             schema: z.uuid(),
           }),
@@ -150,7 +150,7 @@ const { POST } = createEndpoint({
               children: {
                 id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "transferCreate.post.response.id" as const,
+                  label: "transferCreate.post.response.id" as const,
                   hidden: true,
                   schema: z.uuid(),
                 }),
@@ -162,7 +162,7 @@ const { POST } = createEndpoint({
                 }),
                 quantityRequested: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "transferCreate.post.response.status" as const,
+                  label: "transferCreate.post.response.status" as const,
                   schema: z.number(),
                 }),
               },

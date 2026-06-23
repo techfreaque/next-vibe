@@ -327,10 +327,18 @@ export const musicGenModelOptions: MusicGenModelOption[] = Object.values(
   musicGenModelOptionsIndex,
 ).filter((m): m is MusicGenModelOption => m !== undefined);
 
-export const MusicGenModelIdOptions = musicGenModelOptions.map((m) => ({
-  value: m.id,
-  label: m.name,
-}));
+export const MusicGenModelIdOptions = (
+  Object.entries(MusicGenModelId) as [
+    keyof typeof MusicGenModelId,
+    MusicGenModelId,
+  ][]
+)
+  .filter(([, id]) => musicGenModelOptionsIndex[id] !== undefined)
+  .map(([key, id]) => ({
+    value: id,
+    label:
+      `models.names.${key}` as `models.names.${keyof typeof MusicGenModelId}`,
+  }));
 
 export function getMusicGenModelById(
   modelId: MusicGenModelId,
@@ -359,21 +367,30 @@ export function getMusicGenModelForProvider(
 // MUSIC GEN MODEL SELECTION SCHEMA
 // ============================================================
 
-export const musicGenModelSelectionSchema = z.discriminatedUnion(
-  "selectionType",
-  [
-    z
-      .object({
-        selectionType: z.literal(ModelSelectionType.MANUAL),
-        manualModelId: z.enum(MusicGenModelId),
-      })
-      .merge(sharedFilterPropsSchema),
-    filtersSelectionSchema,
-  ],
-);
-export type MusicGenModelSelection = z.infer<
-  typeof musicGenModelSelectionSchema
+const musicGenManualModelSelectionSchema = z
+  .object({
+    selectionType: z.literal(ModelSelectionType.MANUAL),
+    manualModelId: z.enum(MusicGenModelId),
+  })
+  .merge(sharedFilterPropsSchema);
+export type MusicGenManualModelSelection = z.infer<
+  typeof musicGenManualModelSelectionSchema
 >;
+
+/**
+ * Music-gen selection — explicit union + `z.ZodType<...>` annotation pins
+ * `z.output` to the named type so consumers resolve it shallowly instead of
+ * re-deriving the discriminated union (exceeds TS's instantiation-depth limit).
+ */
+export type MusicGenModelSelection =
+  | MusicGenManualModelSelection
+  | FiltersModelSelection;
+
+export const musicGenModelSelectionSchema: z.ZodType<MusicGenModelSelection> =
+  z.discriminatedUnion("selectionType", [
+    musicGenManualModelSelectionSchema,
+    filtersSelectionSchema,
+  ]);
 
 export function filterMusicGenModels(
   selection: MusicGenModelSelection | null | undefined,

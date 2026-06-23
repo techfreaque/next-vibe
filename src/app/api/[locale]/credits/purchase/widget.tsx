@@ -132,7 +132,7 @@ export function CreditsPurchaseContainer({
   // Redirect to checkout URL on successful response
   useEffect(() => {
     if (value?.checkoutUrl) {
-      window.location.href = value.checkoutUrl;
+      assignUrl(value.checkoutUrl);
     }
   }, [value?.checkoutUrl]);
 
